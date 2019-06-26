@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import Counter
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.utils.translation import ugettext as _
@@ -163,3 +165,97 @@ def _compute_number_children_by_education_group_type(root, link=None, to_delete=
     ).annotate(
         count=Count("education_group_type__name")
     )
+
+
+def can_link_be_attached_bis(parent, link_to_attach):
+    min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(parent,
+                                                                                          link_to_attach=link_to_attach)
+
+
+def can_link_be_modified_bis(parent, old_link, new_link):
+    min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(parent,
+                                                                                          link_to_detach=old_link,
+                                                                                          link_to_attach=new_link)
+
+
+def can_link_be_detached_bis(parent, link_to_detach):
+    min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(parent,
+                                                                                          link_to_detach=link_to_detach)
+
+
+def _get_authorized_relationship_not_respected(parent, link_to_detach=None, link_to_attach=None):
+    authorized_relationships = _authorized_relationships(parent)
+    old_link_children_type_count = _link_children_type_count(link_to_detach) if link_to_detach else {}
+    new_link_children_type_count = _link_children_type_count(link_to_attach) if link_to_attach else {}
+
+    children_type_count_after_all = _children_type_count(parent).copy()
+    children_type_count_after_all.subtract(old_link_children_type_count)
+    children_type_count_after_all.update(new_link_children_type_count)
+
+    children_type_count_modified = Counter(
+        (key, count for key, count in children_type_count_after_all.items()
+         if key in old_link_children_type_count or key in new_link_children_type_count)
+    )
+
+    min_reached = _filter_min_reached(children_type_count_modified, authorized_relationships)
+    not_authorized = _filter_not_authorized(children_type_count_modified, authorized_relationships)
+    max_reached = _filter_max_reached(children_type_count_modified, authorized_relationships)
+
+    return min_reached, max_reached, not_authorized
+
+
+def _filter_not_authorized(egy_type_count, auth_rels):
+    return [egy_type for egy_type, count in egy_type_count.items() if egy_type not in auth_rels]
+
+
+def _filter_min_reached(egy_type_count, auth_rels):
+    return [egy_type for egy_type, count in egy_type_count.items()
+            if egy_type in auth_rels and count < auth_rels[egy_type].min_count_authorized]
+
+
+def _filter_max_reached(egy_type_count, auth_rels):
+    return [egy_type for egy_type, count in egy_type_count.items()
+            if egy_type in auth_rels and auth_rels[egy_type].max_count_authorized is not None and
+            count > auth_rels[egy_type].max_count_authorized]
+
+
+def _authorized_relationships(parent):
+    auth_rels_qs = parent.education_group_type.authorized_parent_type.all().select_related("child_type")
+    return {auth_rel.child_type.name: auth_rel for auth_rel in auth_rels_qs}
+
+
+def _children_type_count(parent):
+    direct_children = (Q(child_branch__parent=parent) & Q(child_branch__link_type=None))
+    referenced_children = (Q(child_branch__parent__child_branch__parent=parent) &
+                           Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
+    filter_children_clause = direct_children | referenced_children
+
+    children_type_count_qs = EducationGroupYear.objects.filter(
+        filter_children_clause
+    ).values(
+        "education_group_type__name"
+    ).order_by(
+        "education_group_type__name"
+    ).annotate(
+        count=Count("education_group_type__name")
+    ).values_list("education_group_type__name", "count")
+
+    return Counter(children_type_count_qs)
+
+
+def _link_children_type_count(link):
+    filter_children_clause = Q(id=link.child_branch.id)
+    if link.link_type == LinkTypes.REFERENCE.name:
+        filter_children_clause = Q(child_branch__parent__id=link.child_branch.id)
+
+    children_type_count_qs = EducationGroupYear.objects.filter(
+        filter_children_clause
+    ).values(
+        "education_group_type__name"
+    ).order_by(
+        "education_group_type__name"
+    ).annotate(
+        count=Count("education_group_type__name")
+    ).values_list("education_group_type__name", "count")
+
+    return Counter(children_type_count_qs)
