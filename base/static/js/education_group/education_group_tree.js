@@ -68,7 +68,7 @@ $(document).ready(function () {
                 "selected": false,
             },
             "contextmenu": {
-                "select_node": true,
+                "select_node": false,
                 "items": {
                     "select": {
                         "label": gettext("Select"),
