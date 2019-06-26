@@ -26,12 +26,134 @@
 
 from django.test import TestCase
 
-from base.business.group_element_years.management import _compute_number_children_by_education_group_type
+from base.business.group_element_years.management import _compute_number_children_by_education_group_type, \
+    _get_authorized_relationship_not_respected
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
+
+
+class TestAuthorizedRelationshipCheck(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_types = EducationGroupTypeFactory.create_batch(3)
+
+        cls.parent_egy = EducationGroupYearFactory()
+
+        cls.grp_type_1 = GroupElementYearFactory(
+            parent=cls.parent_egy,
+            child_branch__education_group_type=cls.education_group_types[0],
+            child_branch__academic_year=cls.parent_egy.academic_year
+        )
+        GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.parent_egy,
+            child_branch__education_group_type=cls.education_group_types[1],
+            child_branch__academic_year=cls.parent_egy.academic_year
+        )
+        cls.reference_group_element_year_children = GroupElementYearFactory(
+            parent=cls.parent_egy,
+            child_branch__education_group_type=cls.education_group_types[0],
+            child_branch__academic_year=cls.parent_egy.academic_year,
+            link_type=LinkTypes.REFERENCE.name
+        )
+
+        GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.reference_group_element_year_children.child_branch,
+            child_branch__education_group_type=cls.education_group_types[1],
+            child_branch__academic_year=cls.reference_group_element_year_children.child_branch.academic_year
+        )
+        GroupElementYearFactory(
+            parent=cls.reference_group_element_year_children.child_branch,
+            child_branch__education_group_type=cls.education_group_types[2],
+            child_branch__academic_year=cls.reference_group_element_year_children.child_branch.academic_year
+        )
+
+        cls.child = EducationGroupYearFactory(education_group_type=cls.education_group_types[0])
+        GroupElementYearFactory.create_batch(
+            2,
+            parent=cls.child,
+            child_branch__education_group_type=cls.education_group_types[2],
+            child_branch__academic_year=cls.child.academic_year,
+        )
+
+        AuthorizedRelationshipFactory(
+            parent_type=cls.parent_egy.education_group_type,
+            child_type=cls.education_group_types[0],
+            min_count_authorized=1,
+            max_count_authorized=1
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=cls.parent_egy.education_group_type,
+            child_type=cls.education_group_types[1],
+            min_count_authorized=0,
+            max_count_authorized=None
+        )
+
+    def test_when_min_reached_after_detaching(self):
+        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+            self.parent_egy,
+            link_to_detach=self.grp_type_1,
+            link_to_attach=None
+        )
+        self.assertEqual(
+            [self.education_group_types[0].name],
+            min_reached
+        )
+        self.assertFalse(not_authorized)
+        self.assertFalse(max_reached)
+
+    def test_when_max_reached_after_attaching(self):
+        link_to_attach = GroupElementYearFactory.build(
+            parent=self.parent_egy,
+            child_branch=EducationGroupYearFactory(
+                education_group_type=self.education_group_types[0]
+            )
+        )
+        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+            self.parent_egy,
+            link_to_detach=None,
+            link_to_attach=link_to_attach
+        )
+        self.assertEqual(
+            [self.education_group_types[0].name],
+            max_reached
+        )
+        self.assertFalse(min_reached)
+        self.assertFalse(not_authorized)
+
+    def test_when_child_not_authorized_for_attach(self):
+        link_to_attach = GroupElementYearFactory.build(
+            parent=self.parent_egy,
+            child_branch=EducationGroupYearFactory(
+                education_group_type=self.education_group_types[2]
+            )
+        )
+        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+            self.parent_egy,
+            link_to_detach=None,
+            link_to_attach=link_to_attach
+        )
+        self.assertEqual(
+            [self.education_group_types[2].name],
+            not_authorized
+        )
+        self.assertFalse(min_reached)
+        self.assertFalse(max_reached)
+
+    def test_when_detaching_should_succeed(self):
+        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+            self.parent_egy,
+            link_to_detach=self.reference_group_element_year_children,
+            link_to_attach=None
+        )
+
+        self.assertFalse(min_reached)
+        self.assertFalse(max_reached)
+        self.assertFalse(not_authorized)
 
 
 class TestComputeNumberChildrenByEducationGroupType(TestCase):

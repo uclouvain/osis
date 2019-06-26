@@ -185,16 +185,18 @@ def can_link_be_detached_bis(parent, link_to_detach):
 
 def _get_authorized_relationship_not_respected(parent, link_to_detach=None, link_to_attach=None):
     authorized_relationships = _authorized_relationships(parent)
-    old_link_children_type_count = _link_children_type_count(link_to_detach) if link_to_detach else {}
-    new_link_children_type_count = _link_children_type_count(link_to_attach) if link_to_attach else {}
+    old_link_children_type_count = _link_children_type_count(link_to_detach) if link_to_detach else Counter()
+    new_link_children_type_count = _link_children_type_count(link_to_attach) if link_to_attach else Counter()
 
     children_type_count_after_all = _children_type_count(parent).copy()
     children_type_count_after_all.subtract(old_link_children_type_count)
     children_type_count_after_all.update(new_link_children_type_count)
 
     children_type_count_modified = Counter(
-        (key, count for key, count in children_type_count_after_all.items()
-         if key in old_link_children_type_count or key in new_link_children_type_count)
+        dict(
+            (key, count) for key, count in children_type_count_after_all.items()
+            if key in old_link_children_type_count or key in new_link_children_type_count
+        )
     )
 
     min_reached = _filter_min_reached(children_type_count_modified, authorized_relationships)
@@ -205,7 +207,7 @@ def _get_authorized_relationship_not_respected(parent, link_to_detach=None, link
 
 
 def _filter_not_authorized(egy_type_count, auth_rels):
-    return [egy_type for egy_type, count in egy_type_count.items() if egy_type not in auth_rels]
+    return [egy_type for egy_type, count in egy_type_count.items() if egy_type not in auth_rels and count > 0]
 
 
 def _filter_min_reached(egy_type_count, auth_rels):
@@ -240,7 +242,7 @@ def _children_type_count(parent):
         count=Count("education_group_type__name")
     ).values_list("education_group_type__name", "count")
 
-    return Counter(children_type_count_qs)
+    return Counter(dict(children_type_count_qs))
 
 
 def _link_children_type_count(link):
@@ -258,4 +260,4 @@ def _link_children_type_count(link):
         count=Count("education_group_type__name")
     ).values_list("education_group_type__name", "count")
 
-    return Counter(children_type_count_qs)
+    return Counter(dict(children_type_count_qs))
