@@ -2462,7 +2462,7 @@ msgstr "Liste des enseignants"
 
 #: templates/education_group/search.html:122
 msgid "List of trainings"
-msgstr "Liste des organisations de formation"
+msgstr "Liste des formations"
 
 #: business/education_group.py:56 templates/education_group/search.html:129
 msgid "List of trainings with administrative data"
@@ -6171,6 +6171,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Education groups"
-#~ msgstr "Organisations de formations"
