@@ -45,14 +45,14 @@ class RecomputePortalTestCase(TestCase):
     def test_recompute_portal_without_authentification(self):
         self.client.force_authenticate(user=None)
         response = self.client.post(self.url, {'global_ids': self.global_ids})
-        self.assertEquals(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_recompute_portal_not_valid_http_method(self):
         response = self.client.get(self.url, {'global_ids': self.global_ids})
-        self.assertEquals(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @mock.patch('attribution.business.attribution_json.publish_to_portal', side_effect=lambda global_ids: True)
     def test_recompute_portal_success_test_case(self, mock_publish_to_portal):
         response = self.client.post(self.url, {'global_ids': self.global_ids})
-        self.assertEquals(response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
         mock_publish_to_portal.assert_called_with(self.global_ids)
