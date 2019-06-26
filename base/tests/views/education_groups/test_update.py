@@ -507,7 +507,7 @@ class TestSelectAttach(TestCase):
         response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         data_cached = ElementCache(self.person.user).cached_data
 
-        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertDictEqual(
             data_cached,
             {
@@ -524,7 +524,7 @@ class TestSelectAttach(TestCase):
         )
         data_cached = ElementCache(self.person.user).cached_data
 
-        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertDictEqual(
             data_cached,
             {
@@ -694,7 +694,7 @@ class TestSelectAttach(TestCase):
             parent=self.new_parent_education_group_year,
             child_leaf=self.learning_unit_year
         ).count()
-        self.assertEquals(expected_group_element_year_count, 1)
+        self.assertEqual(expected_group_element_year_count, 1)
 
     def test_attach_without_selecting_gives_warning(self):
         ElementCache(self.person.user).clear()

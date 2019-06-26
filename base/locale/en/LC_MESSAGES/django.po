@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-25 15:41+0200\n"
+"POT-Creation-Date: 2019-06-26 14:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1500,12 +1500,6 @@ msgstr ""
 msgid ""
 "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> successfuly updated."
-msgstr ""
-
-#: templates/education_group/search.html:34
-#: templates/education_group/search.html:42
-#: templates/education_group/search.html:107
-msgid "Education groups"
 msgstr ""
 
 #: business/education_group.py:45 business/education_group.py:46
@@ -3313,8 +3307,12 @@ msgstr ""
 msgid "Produce a customizable xls of learning units"
 msgstr ""
 
+#: templates/education_group/search.html:128
+msgid "Produce xls of trainings with administrative data"
+msgstr ""
+
 #: templates/education_group/search.html:121
-msgid "Produce xls with a list of education groups"
+msgid "Produce xls with a list of trainings"
 msgstr ""
 
 #: models/education_group_organization.py:54
@@ -4706,6 +4704,9 @@ msgstr ""
 #: templates/catalog.html:43 templates/education_group/layout.html:7
 #: templates/education_group/learning_unit/layout_detail.html:6
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:38
+#: templates/education_group/search.html:34
+#: templates/education_group/search.html:42
+#: templates/education_group/search.html:107
 #: templates/learning_unit/blocks/tabs.html:44
 #: templates/learning_unit/formations.html:47
 #: templates/learning_unit/proposal/tabs.html:45
