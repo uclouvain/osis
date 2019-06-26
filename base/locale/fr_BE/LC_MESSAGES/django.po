@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-25 15:41+0200\n"
+"POT-Creation-Date: 2019-06-26 14:06+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1556,12 +1556,6 @@ msgstr ""
 "Organisation de formations <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> mis à jour avec succès."
 
-#: templates/education_group/search.html:34
-#: templates/education_group/search.html:42
-#: templates/education_group/search.html:107
-msgid "Education groups"
-msgstr "Organisations de formations"
-
 #: business/education_group.py:45 business/education_group.py:46
 msgid "Education_groups"
 msgstr "Formations"
@@ -2452,7 +2446,7 @@ msgstr "Liens existants dans l'application EPC."
 
 #: business/education_group.py:47
 msgid "List education groups"
-msgstr "Liste des organisations de formations"
+msgstr "Liste des formations"
 
 #: business/proposal_xls.py:45
 msgid "List of comparison between proposals and UE"
@@ -3414,10 +3408,14 @@ msgstr "Produire Excel"
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
 
+#: templates/education_group/search.html:128
+msgid "Produce xls of trainings with administrative data"
+msgstr "Produire un fichier Excel avec la liste des formations avec données administratives"
+
 #: templates/education_group/search.html:121
-msgid "Produce xls with a list of education groups"
+msgid "Produce xls with a list of trainings"
 msgstr ""
-"Produire un fichier Excel avec la liste des organisations de formations"
+"Produire un fichier Excel avec la liste des formations"
 
 #: models/education_group_organization.py:54
 #: templates/education_group/blocks/coorganization.html:41
@@ -4876,6 +4874,9 @@ msgstr "Type d'OF"
 #: templates/catalog.html:43 templates/education_group/layout.html:7
 #: templates/education_group/learning_unit/layout_detail.html:6
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:38
+#: templates/education_group/search.html:34
+#: templates/education_group/search.html:42
+#: templates/education_group/search.html:107
 #: templates/learning_unit/blocks/tabs.html:44
 #: templates/learning_unit/formations.html:47
 #: templates/learning_unit/proposal/tabs.html:45
@@ -6170,3 +6171,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Education groups"
+#~ msgstr "Organisations de formations"
