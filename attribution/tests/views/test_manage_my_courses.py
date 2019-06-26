@@ -94,7 +94,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.client.force_login(person_not_tutor.user)
 
         response = self.client.get(self.url, follow=True)
-        self.assertEquals(response.status_code, HttpResponseNotFound.status_code)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_list_my_attributions_summary_editable(self):
         """In this test, we ensure that user see only UE of (CURRENT YEAR + 1) and not erlier/older UE"""

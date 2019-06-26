@@ -1,3 +1,4 @@
+{% load i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -27,21 +28,21 @@
         {{ header_text }}
         {% if can_edit_information %}
             <a href="#" role="button"
-                class="button line-edit-btn"
-                data-form="{{ update_line_url }}?section={{ section_name }}&amp;language={{ language.tab_lang }}">
-                    <span class="glyphicon glyphicon-plus" style="font-size: 16px;" aria-hidden="true"></span>
+               class="button line-edit-btn"
+               data-form="{{ update_line_url }}?section={{ section_name }}&amp;language={{ language.tab_lang }}">
+                <span class="glyphicon glyphicon-plus" style="font-size: 16px;" aria-hidden="true"></span>
             </a>
         {% endif %}
     </td>
 </tr>
 {% for record in records %}
-<tr id="{{ section_name }}_{{ record.id }}">
+    <tr id="{{ section_name }}_{{ record.id }}">
 
         <td id="{{ section_name }}_{{ record.id }}_diploma">
             {{ record.diploma_text|linebreaksbr }}
         </td>
         <td id="{{ section_name_text }}_{{ record.id }}_conditions">
-            {{record.conditions_text|safe }}
+            {{ record.conditions_text|safe }}
         </td>
         <td id="{{ section_name }}_{{ record.id }}_access" class="text-right">
             {{ record.get_access_display|linebreaksbr|safe }}
@@ -50,23 +51,32 @@
             {{ record.remarks_text|safe }}
         </td>
 
-    {% if can_edit_information %}
-    <td class="text-right">
-        <a href="{% url 'education_group_year_admission_condition_remove_line' root.pk education_group_year.pk %}?id={{ record.id }}"
-           role="button" class="button">
-            <span class="glyphicon glyphicon-remove-circle" style="font-size: 16px;" aria-hidden="true"></span>
-        </a>
-        <a href="#" role="button" class="button line-edit-btn"
-           data-form="{{ update_line_url }}?id={{ record.id }}&amp;section={{ section_name }}&amp;language={{ language.tab_lang }}">
-            <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
-        </a>
-        <a href="#" role="button" class="button action-order" data-record="{{ record.id }}" data-action="up">
-            <i class="fa fa-arrow-up"></i>
-        </a>
-        <a href="#" role="button" class="button action-order" data-record="{{ record.id }}" data-action="down">
-            <i class="fa fa-arrow-down"></i>
-        </a>
-    </td>
-    {% endif %}
-</tr>
+        {% if can_edit_information %}
+            <td>
+                <div class="btn-group pull-right" role="group" aria-label="actions">
+                    <a title="{% trans 'Update' %}" role="button" class="button line-edit-btn"
+                       data-form="{{ update_line_url }}?id={{ record.id }}&amp;section={{ section_name }}&amp;language={{ language.tab_lang }}">
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </a>
+
+                    <button class="btn-as-atag action-order"
+                            {% if forloop.counter0 == 0 %}disabled{% endif %}
+                            role="button" data-record="{{ record.id }}" data-action="up" title="{% trans 'Up' %}">
+                        <i class="fa fa-arrow-up"></i>
+                    </button>
+
+                    <button role="button" class="btn-as-atag action-order"
+                            {% if forloop.last %}disabled{% endif %}
+                            data-record="{{ record.id }}" data-action="down" title="{% trans 'Down' %}">
+                        <i class="fa fa-arrow-down"></i>
+                    </button>
+
+                    <a href="{% url 'education_group_year_admission_condition_remove_line' root.pk education_group_year.pk %}?id={{ record.id }}"
+                       role="button" class="button" title="{% trans 'delete' %}">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </a>
+                </div>
+            </td>
+        {% endif %}
+    </tr>
 {% endfor %}
