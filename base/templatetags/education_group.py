@@ -37,19 +37,11 @@ from base.business.education_groups.perms import is_eligible_to_change_education
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.utils.utils import get_verbose_field_value
 
-# TODO Use inclusion tags instead
-BUTTON_ORDER_TEMPLATE = """
-<button type="submit" title="{}" class="btn btn-default btn-sm" 
-    id="{}" data-toggle="tooltip-wrapper" name="action" value="{}" {}>
-    <i class="fa {}"></i>
-</button>
-"""
-
 ICONS = {
-    "up": "fa-arrow-up",
-    "down": "fa-arrow-down",
-    "detach": "fa-times",
-    "edit": "fa-edit",
+    "up": "fa fa-arrow-up",
+    "down": "fa fa-arrow-down",
+    "detach": "glyphicon glyphicon-remove",
+    "edit": "glyphicon glyphicon-edit",
 }
 
 register = template.Library()
@@ -155,7 +147,7 @@ def button_edit_administrative_data(context):
     }
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag("blocks/button/button_order.html", takes_context=True)
 def button_order_with_permission(context, title, id_button, value):
     permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
 
@@ -168,24 +160,12 @@ def button_order_with_permission(context, title, id_button, value):
     if value == "down" and context["forloop"]["last"]:
         disabled = "disabled"
 
-    return mark_safe(BUTTON_ORDER_TEMPLATE.format(title, id_button, value, disabled, ICONS[value]))
-
-
-@register.inclusion_tag("blocks/button/button_template.html", takes_context=True)
-def button_with_permission(context, title, value, url):
-    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
-    load_modal = True
-
-    if disabled:
-        title = permission_denied_message
-        load_modal = False
-
     return {
-        'load_modal': load_modal,
         'title': title,
-        'class_button': "btn-default btn-sm " + disabled,
+        'id': id_button,
+        'value': value,
+        'disabled': disabled,
         'icon': ICONS[value],
-        'url': url,
     }
 
 
