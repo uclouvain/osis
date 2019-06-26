@@ -94,7 +94,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
     def test_button_order_with_permission(self):
         result = button_order_with_permission(self.context, "title", "id", "edit")
-        self.assertEqual(result, {"title": "title", "id": "id", "value": "edit", 'disabled': "", 'icon': "fa-edit"})
+        self.assertEqual(result, {"title": "title", "id": "id", "value": "edit", 'disabled': "",
+                                  'icon': "glyphicon glyphicon-edit"})
 
     def test_li_with_create_perm_training(self):
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
