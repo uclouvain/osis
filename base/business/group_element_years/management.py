@@ -120,13 +120,13 @@ def check_authorized_relationship(root, link, to_delete=False):
 
     if link.child_branch.education_group_type.name in min_reached:
         raise AuthorizedRelationshipNotRespectedException(
-            message=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+            errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
                 "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
             }
         )
     elif link.child_branch.education_group_type.name in max_reached:
         raise AuthorizedRelationshipNotRespectedException(
-            message=_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
+            errors=_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                      "has already reached the limit.") % {
                        'child_types': ', '.join(str(AllTypes.get_value(name)) for name in max_reached),
                        'parent': root
@@ -134,7 +134,7 @@ def check_authorized_relationship(root, link, to_delete=False):
         )
     elif link.child_branch.education_group_type.name in not_authorized:
         raise AuthorizedRelationshipNotRespectedException(
-            message=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+            errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                 'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
                 'parent': root,
                 'parent_type': AllTypes.get_value(root.education_group_type.name),
