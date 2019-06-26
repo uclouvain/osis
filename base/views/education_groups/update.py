@@ -60,12 +60,12 @@ def update_education_group(request, root_id, education_group_year_id):
     # it will be used in the templates.
     education_group_year.root = root_id
 
-    # Proctect the view
-    can_change_education_group(request.user, education_group_year)
-
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
             education_group_year.academic_year.year < current_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
+
+    # Proctect the view
+    can_change_education_group(request.user, education_group_year)
     return update_education_group_year(request, root_id, education_group_year)
 
 
