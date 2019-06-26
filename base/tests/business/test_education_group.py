@@ -45,8 +45,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
-from base.models.person import Person
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP
+from base.models.person import Person
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -408,7 +408,7 @@ class EducationGroupGetEligibleEntities(TestCase):
 
     def test_case_one_egy(self):
         education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.assertEquals(
+        self.assertEqual(
             get_education_group_year_eligible_management_entities(education_group_year),
             [education_group_year.management_entity]
         )
@@ -421,12 +421,12 @@ class EducationGroupGetEligibleEntities(TestCase):
             child_branch=education_group_year_child
         )
 
-        self.assertEquals(
+        self.assertEqual(
             get_education_group_year_eligible_management_entities(education_group_year_child),
             [education_group_year_child.management_entity]
         )
 
-        self.assertEquals(
+        self.assertEqual(
             get_education_group_year_eligible_management_entities(education_group_year_parent),
             [education_group_year_parent.management_entity]
         )
@@ -441,7 +441,7 @@ class EducationGroupGetEligibleEntities(TestCase):
         education_group_year_child.management_entity = None
         education_group_year_child.save()
 
-        self.assertEquals(
+        self.assertEqual(
             get_education_group_year_eligible_management_entities(education_group_year_child),
             [education_group_year_parent.management_entity]
         )
