@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
@@ -774,6 +775,7 @@ class EducationGroupYear(SerializableModel):
         return list(set(ascendants))
 
     def clean(self):
+        self.clean_academic_year()
         self.clean_acronym()
         self.clean_partial_acronym()
         if not self.constraint_type:
@@ -781,6 +783,13 @@ class EducationGroupYear(SerializableModel):
         else:
             self.clean_min_max()
         self.clean_duration_data()
+
+    def clean_academic_year(self):
+        if self.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+            raise ValidationError({
+                'academic_year': _("You cannot create/update an education group before %(limit_year)s") % {
+                                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
+            })
 
     def clean_constraint_type(self):
         # If min or max has been set, constraint_type is required

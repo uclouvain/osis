@@ -35,6 +35,7 @@ OPTIONAL_APPS = (
     'cms',
     'webservices',
     'behave_django',
+    'backoffice'
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()
