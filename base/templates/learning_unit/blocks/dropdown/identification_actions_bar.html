@@ -82,12 +82,12 @@
                                 {% trans 'Learning units comparison' %}
                             </a>
                         </li>
-                        {% if proposal and proposal.academic_year == learning_unit_year.academic_year %}
+                        {% if proposal and proposal.learning_unit_year.academic_year == learning_unit_year.academic_year %}
                             {% url "learning_unit_proposal_comparison" learning_unit_year_id=learning_unit_year.id as url_proposal_comparison %}
-                            <li id="link_proposal_comparison" {% if proposal.type == 'CREATION' %} class="disabled" {% endif %}>
-                                <a href="{% if proposal.type != 'CREATION' %}{{ url_proposal_comparison }}{% else %}#{% endif %}"
+                            <li id="link_proposal_comparison" {% if proposal.type == 'CREATION' or proposal.type == 'SUPPRESSION' %} class="disabled" {% endif %}>
+                                <a href="{% if proposal.type != 'CREATION' and proposal.type != 'SUPPRESSION' %}{{ url_proposal_comparison }}{% else %}#{% endif %}"
                                    data-toggle="tooltip"
-                                {% if proposal.type == 'CREATION' %} disabled title="{% trans 'Proposal of creation, so nothing to compare to'%}"{% endif %}>
+                                {% if proposal.type == 'CREATION' or proposal.type == 'SUPPRESSION' %} disabled title="{% trans 'Proposal of creation or suppression, so nothing to compare to'%}"{% endif %}>
                                     {% trans 'Learning units proposal comparison' %}</a>
                             </li>
                         {% endif %}

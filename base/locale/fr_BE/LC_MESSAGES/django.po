@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-25 15:41+0200\n"
+"POT-Creation-Date: 2019-06-26 16:08+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -681,7 +681,7 @@ msgstr "Appliquer le report sur les organisations de formations annualisées"
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:140
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:142
 msgid "Are you certain that you want to cancel the learning unit proposal ?"
 msgstr "Êtes-vous certain de vouloir annuler la proposition ?"
 
@@ -926,7 +926,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annuler"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:115
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:117
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
@@ -1029,7 +1029,7 @@ msgstr "Cliquez pour vous reconnectez"
 msgid "Clinical internship"
 msgstr "Stage clinique"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:144
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:146
 #: templates/learning_unit/class_edit.html:34
 #: templates/learning_unit/component_edit.html:33
 #: templates/my_osis/my_message.html:60
@@ -1151,7 +1151,7 @@ msgstr "Erreur de consistance en %(academic_year)s : %(error)s"
 msgid "Consolidate"
 msgstr "Consolider"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:117
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:119
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
@@ -1297,7 +1297,7 @@ msgstr "Inscription par défaut aux cours"
 msgid "Delete"
 msgstr "Supprimer"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:123
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:125
 msgid "Delete learning unit year definitively"
 msgstr "Supprimer l'UE définitivement"
 
@@ -1503,7 +1503,7 @@ msgstr "Durée"
 msgid "Edit"
 msgstr "Éditer"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:109
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:111
 msgid "Edit the proposal"
 msgstr "Editer la proposition"
 
@@ -2401,7 +2401,7 @@ msgstr "Inscription aux unités d'enseignement"
 msgid "Learning units list"
 msgstr "Liste des UEs"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:89
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:91
 #: templates/learning_unit/proposal_comparison.html:32
 msgid "Learning units proposal comparison"
 msgstr "Fiche comparative de la proposition"
@@ -3549,6 +3549,10 @@ msgstr "La proposition n'est pas dans un état éligible à la consolidation"
 msgid "Proposal of creation"
 msgstr "Proposition de création"
 
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:90
+msgid "Proposal of creation or suppression, so nothing to compare to"
+msgstr "Proposition de création ou de suppression, aucune comparaison possible"
+
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:81
 msgid "Proposal of creation, so nothing to compare to"
 msgstr "Proposition de création, aucune comparaison possible"
@@ -3596,11 +3600,11 @@ msgstr "Partenaire public"
 msgid "Publication contact entity"
 msgstr "Entité de contact de publication"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:102
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:104
 msgid "Put in proposal for ending date"
 msgstr "Mettre en proposition de fin d'enseignement"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:99
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:101
 msgid "Put in proposal in modification"
 msgstr "Mettre en proposition de modification"
 
@@ -5654,7 +5658,7 @@ msgstr "commentaire"
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
 
-#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:146
+#: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:148
 #: templates/learning_unit/blocks/modal/modal_confirm_delete.html:37
 #: templates/learning_unit/teaching_material/modal_delete.html:34
 msgid "confirm"
