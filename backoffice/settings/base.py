@@ -108,6 +108,12 @@ TESTING = 'test' in sys.argv
 if TESTING:
     # add test packages that have specific models for tests
     INSTALLED_APPS += ('osis_common.tests', )
+    # Speed up test because default hasher is slow by design
+    # https://docs.djangoproject.com/en/1.11/topics/testing/overview/#password-hashing
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+
 APPS_TO_TEST = (
     'osis_common',
     'reference',
