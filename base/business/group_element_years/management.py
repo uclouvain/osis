@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import Counter
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
@@ -66,43 +69,32 @@ def is_max_child_reached(parent, child_education_group_type):
         return True
 
     try:
-        education_group_type_count = compute_number_children_by_education_group_type(parent, None). \
+        education_group_type_count = _compute_number_children_by_education_group_type(parent, None). \
             get(education_group_type__name=child_education_group_type)["count"]
     except EducationGroupYear.DoesNotExist:
         education_group_type_count = 0
     return auth_rel.max_count_authorized is not None and education_group_type_count >= auth_rel.max_count_authorized
 
 
-def _check_authorized_relationship(root, link, to_delete=False):
-    auth_rels = root.education_group_type.authorized_parent_type.all().select_related("child_type")
-    auth_rels_dict = {auth_rel.child_type.name: auth_rel for auth_rel in auth_rels}
-
-    count_children_by_education_group_type_qs = compute_number_children_by_education_group_type(root, link, to_delete)
-    count_children_dict = {
-        record["education_group_type__name"]: record["count"] for record in count_children_by_education_group_type_qs
-    }
-
-    max_reached, min_reached, not_authorized = [], [], []
-    for key, count in count_children_dict.items():
-        if to_delete:
-            count -= 1
-
-        if key not in auth_rels_dict:
-            not_authorized.append(key)
-        elif count < auth_rels_dict[key].min_count_authorized:
-            min_reached.append(key)
-        elif auth_rels_dict[key].max_count_authorized is not None and count > auth_rels_dict[key].max_count_authorized:
-            max_reached.append(key)
-
-    _min_reach_technical_group(auth_rels_dict, count_children_dict, min_reached)
-    return min_reached, max_reached, not_authorized
-
-
-def _min_reach_technical_group(auth_rels_dict, count_children_dict, min_reached):
-    """ Check for technical group that would not be linked to root """
-    for key, auth_rel in auth_rels_dict.items():
-        if key not in count_children_dict and auth_rel.min_count_authorized > 0:
-            min_reached.append(key)
+def can_link_be_attached(root, link):
+    min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=False)
+    child_type = link.child_branch.education_group_type.name
+    if child_type in max_reached:
+        raise AuthorizedRelationshipNotRespectedException(
+            errors=_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
+                     "has already reached the limit.") % {
+                       'child_types': ', '.join(str(AllTypes.get_value(name)) for name in max_reached),
+                       'parent': root
+                   }
+        )
+    elif child_type in not_authorized:
+        raise AuthorizedRelationshipNotRespectedException(
+            errors=_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
+                'parent': root,
+                'parent_type': AllTypes.get_value(root.education_group_type.name),
+            }
+        )
 
 
 def can_link_be_detached(root, link):
@@ -142,7 +134,39 @@ def check_authorized_relationship(root, link, to_delete=False):
         )
 
 
-def compute_number_children_by_education_group_type(root, link=None, to_delete=False):
+def _check_authorized_relationship(root, link, to_delete=False):
+    auth_rels = root.education_group_type.authorized_parent_type.all().select_related("child_type")
+    auth_rels_dict = {auth_rel.child_type.name: auth_rel for auth_rel in auth_rels}
+
+    count_children_by_education_group_type_qs = _compute_number_children_by_education_group_type(root, link, to_delete)
+    count_children_dict = {
+        record["education_group_type__name"]: record["count"] for record in count_children_by_education_group_type_qs
+    }
+
+    max_reached, min_reached, not_authorized = [], [], []
+    for key, count in count_children_dict.items():
+        if to_delete:
+            count -= 1
+
+        if key not in auth_rels_dict:
+            not_authorized.append(key)
+        elif count < auth_rels_dict[key].min_count_authorized:
+            min_reached.append(key)
+        elif auth_rels_dict[key].max_count_authorized is not None and count > auth_rels_dict[key].max_count_authorized:
+            max_reached.append(key)
+
+    _min_reach_technical_group(auth_rels_dict, count_children_dict, min_reached)
+    return min_reached, max_reached, not_authorized
+
+
+def _min_reach_technical_group(auth_rels_dict, count_children_dict, min_reached):
+    """ Check for technical group that would not be linked to root """
+    for key, auth_rel in auth_rels_dict.items():
+        if key not in count_children_dict and auth_rel.min_count_authorized > 0:
+            min_reached.append(key)
+
+
+def _compute_number_children_by_education_group_type(root, link=None, to_delete=False):
     child_branch_id = None if not link else link.child_branch.id
 
     direct_children = (Q(child_branch__parent=root) &

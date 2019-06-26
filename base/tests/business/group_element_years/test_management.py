@@ -27,7 +27,7 @@ from unittest import mock
 
 from django.test import TestCase
 
-from base.business.group_element_years.management import compute_number_children_by_education_group_type, \
+from base.business.group_element_years.management import _compute_number_children_by_education_group_type, \
     check_authorized_relationship
 from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
@@ -151,7 +151,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         ]
         link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
         self.assertCountEqual(
-            list(compute_number_children_by_education_group_type(parent_without_children, link)),
+            list(_compute_number_children_by_education_group_type(parent_without_children, link)),
             expected_result
         )
 
@@ -163,7 +163,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         ]
         link = GroupElementYearFactory.build(child_branch=self.child, link_type=None)
         self.assertCountEqual(
-            list(compute_number_children_by_education_group_type(self.parent_egy, link)),
+            list(_compute_number_children_by_education_group_type(self.parent_egy, link)),
             expected_result
         )
         AuthorizedRelationshipFactory(parent_type=self.parent_egy.education_group_type,
@@ -177,7 +177,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         ]
         link = GroupElementYearFactory.build(child_branch=self.child, link_type=LinkTypes.REFERENCE.name)
         self.assertCountEqual(
-            list(compute_number_children_by_education_group_type(self.parent_egy, link)),
+            list(_compute_number_children_by_education_group_type(self.parent_egy, link)),
             expected_result
         )
 
@@ -190,7 +190,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
         link = GroupElementYearFactory.build(child_branch=self.reference_group_element_year_children.child_branch,
                                              link_type=None)
         self.assertCountEqual(
-            list(compute_number_children_by_education_group_type(self.parent_egy, link)),
+            list(_compute_number_children_by_education_group_type(self.parent_egy, link)),
             expected_result
         )
 
@@ -202,7 +202,7 @@ class TestComputeNumberChildrenByEducationGroupType(TestCase):
 
         link = self.reference_group_element_year_children
         self.assertCountEqual(
-            list(compute_number_children_by_education_group_type(self.parent_egy, link, to_delete=True)),
+            list(_compute_number_children_by_education_group_type(self.parent_egy, link, to_delete=True)),
             expected_result
         )
 
