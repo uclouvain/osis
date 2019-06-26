@@ -1029,8 +1029,3 @@ msgstr "programme(s)"
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
 
-#~ msgid "Program type"
-#~ msgstr "Programme type"
-
-#~ msgid "End date Prof"
-#~ msgstr "Date de remise"

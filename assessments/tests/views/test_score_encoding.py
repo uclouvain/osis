@@ -33,7 +33,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase, RequestFactory, TransactionTestCase
 from django.utils import timezone
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 from django.utils.translation import ugettext_lazy as _
 
 from assessments.business.score_encoding_list import ScoresEncodingList
@@ -530,7 +530,7 @@ class UploadXLSExtractSessionTest(TestCase):
     def test_extract_session_number_many_values(self):
         with self.assertRaisesMessage(
                 UploadValueError,
-                ugettext("File error : Different values in the column Session. No scores injected.")
+                gettext("File error : Different values in the column Session. No scores injected.")
         ):
             _extract_session_number(
                 {
@@ -541,7 +541,7 @@ class UploadXLSExtractSessionTest(TestCase):
     def test_extract_session_number_no_value(self):
         with self.assertRaisesMessage(
                 UploadValueError,
-                ugettext("File error : No value in the column Session. No scores injected.")
+                gettext("File error : No value in the column Session. No scores injected.")
         ):
             _extract_session_number(
                 {
