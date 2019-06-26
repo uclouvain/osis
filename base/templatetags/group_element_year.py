@@ -48,9 +48,8 @@ def _get_permission(context, permission):
     return permission_denied_message, "" if result else "disabled", root
 
 
-@register.inclusion_tag("blocks/button/button_template.html", takes_context=True,
-                        name='group_element_year_button_with_permission')
-def button_with_permission(context, title, value, url):
+@register.inclusion_tag("blocks/button/action_template.html", takes_context=True)
+def action_with_permission(context, title, value, url):
     permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_update_group_element_year)
     load_modal = True
 
@@ -61,7 +60,7 @@ def button_with_permission(context, title, value, url):
     return {
         'load_modal': load_modal,
         'title': title,
-        'class_button': "btn-default btn-sm " + disabled,
+        'class_button': disabled,
         'icon': ICONS[value],
         'url': url,
     }
