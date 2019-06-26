@@ -23,76 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ###########################################################################
-from unittest import mock
 
 from django.test import TestCase
 
-from base.business.group_element_years.management import _compute_number_children_by_education_group_type, \
-    check_authorized_relationship
+from base.business.group_element_years.management import _compute_number_children_by_education_group_type
 from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-
-
-class TestCheckMinMaxChildReached(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.parent_type = EducationGroupTypeFactory()
-        cls.child_type, cls.other_child_type = EducationGroupTypeFactory.create_batch(2)
-
-        cls.parent_egy = EducationGroupYearFactory(education_group_type=cls.parent_type)
-        cls.child_egy = EducationGroupYearFactory(education_group_type=cls.child_type)
-        cls.new_link = GroupElementYearFactory.build(child_branch=cls.child_egy)
-
-    def setUp(self):
-        returned_value = [
-            {"education_group_type__name": self.child_type.name, "count": 2}
-        ]
-        self.mocked_compute_number_children = mock.patch(
-            "base.business.group_element_years.management.compute_number_children_by_education_group_type",
-            return_value=returned_value
-        )
-        self.mocked_perm = self.mocked_compute_number_children.start()
-
-        self.addCleanup(self.mocked_compute_number_children.stop)
-
-    def create_group_element_years_of_child_type(self, parent=None, link_type=None):
-        return GroupElementYearFactory(
-            parent=parent or self.parent_egy,
-            link_type=link_type,
-            child_branch__education_group_type=self.child_type
-        )
-
-    def create_authorized_relationship(self, max_count=None, min_count=0):
-        return AuthorizedRelationshipFactory(
-            parent_type=self.parent_type,
-            child_type=self.child_type,
-            max_count_authorized=max_count,
-            min_count_authorized=min_count,
-        )
-
-    def test_when_no_authorized_relationship(self):
-        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
-            check_authorized_relationship(self.parent_egy, self.new_link)
-
-    def test_should_raise_exception_when_max_count_exceeded(self):
-        self.create_authorized_relationship(max_count=1)
-
-        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
-            check_authorized_relationship(self.parent_egy, self.new_link)
-
-    def test_should_raise_exception_when_min_count_subceeded(self):
-        self.create_authorized_relationship(min_count=3)
-
-        with self.assertRaises(AuthorizedRelationshipNotRespectedException):
-            check_authorized_relationship(self.parent_egy, self.new_link)
-
-    def test_when_limit_respected(self):
-        self.create_authorized_relationship()
-        check_authorized_relationship(self.parent_egy, self.new_link)
 
 
 class TestComputeNumberChildrenByEducationGroupType(TestCase):
