@@ -104,7 +104,3 @@ def find_authorized_types(category=None, parents=None):
                 authorized_child_type__parent_type__educationgroupyear=parent
             )
     return queryset.order_by_translated_name()
-
-
-def find_by_name(name=None):
-    return EducationGroupType.objects.filter(name=name)
