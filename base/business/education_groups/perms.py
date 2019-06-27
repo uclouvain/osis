@@ -32,6 +32,7 @@ from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
+from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
@@ -220,7 +221,7 @@ def check_authorized_type(education_group: EducationGroupYear, category, raise_e
     return result
 
 
-def get_education_group_year_eligible_management_entities(education_group):
+def get_education_group_year_eligible_management_entities(education_group:EducationGroupYear):
     if education_group and education_group.management_entity:
         return [education_group.management_entity]
 
@@ -342,9 +343,8 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
         return True
 
 
-def can_delete_all_education_group(user, education_group):
-    education_group_years = EducationGroupYear.objects.filter(education_group=education_group)
-    for education_group_yr in education_group_years:
+def can_delete_all_education_group(user, education_group:EducationGroup):
+    for education_group_yr in education_group.educationgroupyear_set.all():
         if not is_eligible_to_delete_education_group(user.person, education_group_yr, raise_exception=True):
             raise PermissionDenied
     return True

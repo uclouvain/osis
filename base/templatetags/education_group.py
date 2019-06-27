@@ -34,7 +34,7 @@ from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
     _is_eligible_certificate_aims, is_eligible_to_delete_education_group_year
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.utils.utils import get_verbose_field_value
 
 ICONS = {
@@ -56,7 +56,7 @@ def li_with_deletion_perm(context, url, message, url_id="link_delete"):
 def li_with_update_perm(context, url, message, url_id="link_update"):
     is_general_faculty_manager = context['person'].is_faculty_manager and \
                                  not context['person'].is_faculty_manager_for_ue
-    if context['education_group_year'].academic_year.year < current_academic_year().year and is_general_faculty_manager:
+    if context['education_group_year'].academic_year.year < context['current_academic_year'].year and is_general_faculty_manager:
         return li_with_permission(context, _is_eligible_certificate_aims, url, message, url_id, True)
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 

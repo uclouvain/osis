@@ -102,7 +102,14 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     with_tree = True
 
     def get_queryset(self):
-        return super().get_queryset().select_related('education_group_type')
+        return super().get_queryset().select_related(
+            'education_group_type', 'enrollment_campus__organization', 'main_teaching_campus__organization'
+        ).prefetch_related(
+            Prefetch(
+                'education_group__educationgroupyear_set',
+                queryset=EducationGroupYear.objects.select_related('management_entity', 'academic_year'),
+            ),
+        )
 
     @cached_property
     def person(self):
@@ -111,6 +118,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     @cached_property
     def root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
+
+    @cached_property
+    def current_academic_year(self):
+        return current_academic_year()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,6 +148,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             education_group=context['object'],
         )
         context['enums'] = mdl.enums.education_group_categories
+        context['current_academic_year'] = self.current_academic_year
 
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
@@ -191,7 +203,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
-               current_academic_year().year + 2
+               self.current_academic_year.year + 2
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
