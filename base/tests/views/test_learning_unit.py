@@ -53,7 +53,7 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models.academic_year import AcademicYear
-from base.models.enums import entity_container_year_link_type, active_status, education_group_categories, \
+from base.models.enums import active_status, education_group_categories, \
     learning_component_year_type, proposal_type, proposal_state
 from base.models.enums import entity_type
 from base.models.enums import internship_subtypes
@@ -378,7 +378,7 @@ class LearningUnitViewTestCase(TestCase):
         json_response = str(response.content, encoding='utf8')
         results = json.loads(json_response)['results']
         self.assertEqual(results[0]['text'], self.entity_version.verbose_title)
-        self.assertEqual(results[1]['text'], self.entity_version_2.verbose_title)
+        self.assertEqual(results[1]['text'], self.entity_version_3.verbose_title)
 
     def test_entity_requirement_autocomplete_with_q(self):
         self.client.force_login(self.person.user)
