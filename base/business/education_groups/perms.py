@@ -200,7 +200,7 @@ def check_authorized_type(education_group: EducationGroupYear, category, raise_e
     if not education_group or not category:
         return True
 
-    result = education_group.education_group_type.authorized_child_type.filter(
+    result = education_group.education_group_type.authorized_parent_type.filter(
         parent_type__category=category.name
     ).exists()
 
