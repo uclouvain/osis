@@ -221,7 +221,7 @@ def check_authorized_type(education_group: EducationGroupYear, category, raise_e
     return result
 
 
-def get_education_group_year_eligible_management_entities(education_group:EducationGroupYear):
+def get_education_group_year_eligible_management_entities(education_group: EducationGroupYear):
     if education_group and education_group.management_entity:
         return [education_group.management_entity]
 
@@ -343,7 +343,7 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
         return True
 
 
-def can_delete_all_education_group(user, education_group:EducationGroup):
+def can_delete_all_education_group(user, education_group: EducationGroup):
     for education_group_yr in education_group.educationgroupyear_set.all():
         if not is_eligible_to_delete_education_group(user.person, education_group_yr, raise_exception=True):
             raise PermissionDenied
