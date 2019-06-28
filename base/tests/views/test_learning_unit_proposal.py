@@ -40,7 +40,7 @@ from waffle.testutils import override_flag
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit_proposal as proposal_business
-from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS
+from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
@@ -721,9 +721,11 @@ class TestEditProposal(TestCase):
             'component-0-hourly_volume_total_annual': 20,
             'component-0-hourly_volume_partial_q1': 10,
             'component-0-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-1-planned_classes': 1,
         }
 
     def get_modify_data(self):
@@ -737,6 +739,8 @@ class TestEditProposal(TestCase):
         return faultydict
 
     def test_edit_proposal_post_as_faculty_manager(self):
+        initial_data = copy_learning_unit_data(self.learning_unit_year)
+        self.proposal.initial_data = initial_data
         request_factory = RequestFactory()
         request = request_factory.post(self.url, data=self.get_modify_data())
 
