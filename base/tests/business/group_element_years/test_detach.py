@@ -28,6 +28,7 @@ from unittest import mock
 from django.test import TestCase
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy
+from base.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.prerequisite import Prerequisite
@@ -230,12 +231,13 @@ class TestDetachPrerequisiteCheck(TestCase):
         )
 
     def setUp(self):
-        self.authorized_relationship_patcher = mock.patch(
-            "base.business.group_element_years.management.check_authorized_relationship",
-            return_value=True
+        self.mock_authorized_relationship_check_is_valid = mock.patch.object(
+            CheckAuthorizedRelationshipDetach,
+            "is_valid"
         )
-        self.mocked_perm = self.authorized_relationship_patcher.start()
-        self.addCleanup(self.authorized_relationship_patcher.stop)
+        self.mock_authorized_relationship_check_is_valid.return_value = True
+        self.mocked_perm = self.mock_authorized_relationship_check_is_valid.start()
+        self.addCleanup(self.mock_authorized_relationship_check_is_valid.stop)
 
         self.prerequisite = PrerequisiteFactory(
             learning_unit_year=self.lu_children_level_3[0].child_leaf,
