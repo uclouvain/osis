@@ -121,27 +121,6 @@ class CheckAuthorizedRelationship:
         return len(self.errors) == 0
 
     def _check_authorized_relationship(self):
-        min_reached, max_reached, not_authorized = self._get_authorized_relationship_not_respected()
-        if min_reached:
-            self.min_reached_errors.append(_("The parent must have at least one child of type(s) \"%(types)s\".") % {
-                "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
-            })
-
-        if max_reached:
-            self.max_reached_errors.append(_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-                                             "has already reached the limit.") % {
-                'child_types': ', '.join(str(AllTypes.get_value(name)) for name in max_reached),
-                'parent': self.parent
-            })
-        if not_authorized:
-            self.not_authorized_errors.append(_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" "
-                                                "(type \"%(parent_type)s\")") % {
-                'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized),
-                'parent': self.parent,
-                'parent_type': AllTypes.get_value(self.parent.education_group_type.name),
-            })
-
-    def _get_authorized_relationship_not_respected(self):
         children_type_count_after_attach_and_detach = self._children_type_count.copy()
         children_type_count_after_attach_and_detach.subtract(self._detach_link_children_type_count)
         children_type_count_after_attach_and_detach.update(self._attach_link_children_type_count)
@@ -152,11 +131,28 @@ class CheckAuthorizedRelationship:
                 if key in self._attach_link_children_type_count or key in self._detach_link_children_type_count
             )
         )
-        min_reached = _filter_min_reached(children_type_count_impacted, self._authorized_relationships)
-        not_authorized = _filter_not_authorized(children_type_count_impacted, self._authorized_relationships)
-        max_reached = _filter_max_reached(children_type_count_impacted, self._authorized_relationships)
+        min_reached_types = _filter_min_reached(children_type_count_impacted, self._authorized_relationships)
+        not_authorized_types = _filter_not_authorized(children_type_count_impacted, self._authorized_relationships)
+        max_reached_types = _filter_max_reached(children_type_count_impacted, self._authorized_relationships)
 
-        return min_reached, max_reached, not_authorized
+        if min_reached_types:
+            self.min_reached_errors.append(_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached_types)
+            })
+
+        if max_reached_types:
+            self.max_reached_errors.append(_("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
+                                             "has already reached the limit.") % {
+                'child_types': ', '.join(str(AllTypes.get_value(name)) for name in max_reached_types),
+                'parent': self.parent
+            })
+        if not_authorized_types:
+            self.not_authorized_errors.append(_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" "
+                                                "(type \"%(parent_type)s\")") % {
+                'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized_types),
+                'parent': self.parent,
+                'parent_type': AllTypes.get_value(self.parent.education_group_type.name),
+            })
 
     @cached_property
     def _authorized_relationships(self):
