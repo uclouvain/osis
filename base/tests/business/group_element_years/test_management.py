@@ -27,7 +27,7 @@
 from django.test import TestCase
 
 from base.business.group_element_years.management import _compute_number_children_by_education_group_type, \
-    _get_authorized_relationship_not_respected
+    CheckAuthorizedRelationship, CheckAuthorizedRelationshipDetach, CheckAuthorizedRelationshipAttach
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -94,17 +94,11 @@ class TestAuthorizedRelationshipCheck(TestCase):
         )
 
     def test_when_min_reached_after_detaching(self):
-        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+        check = CheckAuthorizedRelationshipDetach(
             self.parent_egy,
-            link_to_detach=self.grp_type_1,
-            link_to_attach=None
+            link_to_detach=self.grp_type_1
         )
-        self.assertEqual(
-            [self.education_group_types[0].name],
-            min_reached
-        )
-        self.assertFalse(not_authorized)
-        self.assertFalse(max_reached)
+        self.assertFalse(check.is_valid())
 
     def test_when_max_reached_after_attaching(self):
         link_to_attach = GroupElementYearFactory.build(
@@ -113,17 +107,11 @@ class TestAuthorizedRelationshipCheck(TestCase):
                 education_group_type=self.education_group_types[0]
             )
         )
-        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+        check = CheckAuthorizedRelationshipAttach(
             self.parent_egy,
-            link_to_detach=None,
             link_to_attach=link_to_attach
         )
-        self.assertEqual(
-            [self.education_group_types[0].name],
-            max_reached
-        )
-        self.assertFalse(min_reached)
-        self.assertFalse(not_authorized)
+        self.assertFalse(check.is_valid())
 
     def test_when_child_not_authorized_for_attach(self):
         link_to_attach = GroupElementYearFactory.build(
@@ -132,28 +120,18 @@ class TestAuthorizedRelationshipCheck(TestCase):
                 education_group_type=self.education_group_types[2]
             )
         )
-        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+        check = CheckAuthorizedRelationshipAttach(
             self.parent_egy,
-            link_to_detach=None,
             link_to_attach=link_to_attach
         )
-        self.assertEqual(
-            [self.education_group_types[2].name],
-            not_authorized
-        )
-        self.assertFalse(min_reached)
-        self.assertFalse(max_reached)
+        self.assertFalse(check.is_valid())
 
     def test_when_detaching_should_succeed(self):
-        min_reached, max_reached, not_authorized = _get_authorized_relationship_not_respected(
+        check = CheckAuthorizedRelationshipDetach(
             self.parent_egy,
-            link_to_detach=self.reference_group_element_year_children,
-            link_to_attach=None
+            link_to_detach=self.reference_group_element_year_children
         )
-
-        self.assertFalse(min_reached)
-        self.assertFalse(max_reached)
-        self.assertFalse(not_authorized)
+        self.assertTrue(check.is_valid())
 
 
 class TestComputeNumberChildrenByEducationGroupType(TestCase):
