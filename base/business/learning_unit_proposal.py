@@ -76,8 +76,8 @@ INITIAL_DATA_FIELDS = {
         "attribution_procedure",
     ],
     'learning_component_year': [
-        "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
-        "type", "repartition_volume_requirement_entity", "repartition_volume_additional_entity_1",
+        "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
+        "planned_classes", "type", "repartition_volume_requirement_entity", "repartition_volume_additional_entity_1",
         "repartition_volume_additional_entity_2"
     ],
 }
@@ -462,8 +462,7 @@ def get_components_identification_initial_data(proposal):
                     'learning_component_year': learning_component_year,
                     'volumes': volume_from_initial_learning_component_year(
                         learning_component_year,
-                        proposal.initial_data.get('volumes')[learning_component_year['type']] if
-                        learning_component_year['type'] else proposal.initial_data.get('volumes')['null']
+                        proposal.initial_data.get('volumes')[learning_component_year['acronym']]
                     )
                 }
             )
@@ -516,6 +515,6 @@ def _get_volumes_for_initial(learning_unit_year):
 
     volumes_for_initial = {}
     for component_key, volume_data in volumes.items():
-        volumes_for_initial[component_key.type] = volume_data
+        volumes_for_initial[component_key.acronym] = volume_data
 
     return volumes_for_initial
