@@ -231,7 +231,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
             },
             forward=['country_requirement_entity']
         ),
-        queryset=find_additional_requirement_entities_choices(),
+        queryset=find_pedagogical_entities_version(),
         label=_('Requirement entity')
     )
 

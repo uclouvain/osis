@@ -55,7 +55,7 @@ from base.tests.factories.education_group_year_domain import EducationGroupYearD
 from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.utils.cache import ElementCache
@@ -77,6 +77,7 @@ class TestUpdate(TestCase):
                                                     end_date=self.end_date_ay_1,
                                                     year=self.current_academic_year.year + 1)
         academic_year_1.save()
+
         self.start_date_ay_2 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 2)
         self.end_date_ay_2 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 3)
         academic_year_2 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
@@ -99,8 +100,8 @@ class TestUpdate(TestCase):
 
         self.url = reverse(update_education_group, kwargs={"root_id": self.education_group_year.pk,
                                                            "education_group_year_id": self.education_group_year.pk})
-        self.person = PersonFactory()
-
+        self.person = CentralManagerFactory()
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
         self.client.force_login(self.person.user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.person.user.user_permissions.add(permission)
@@ -159,6 +160,7 @@ class TestUpdate(TestCase):
             update_education_group,
             args=[self.training_education_group_year.pk, self.training_education_group_year.pk]
         )
+        PersonEntityFactory(person=self.person, entity=self.training_education_group_year.management_entity)
 
         self.domains = [DomainFactory() for x in range(10)]
 
@@ -174,6 +176,7 @@ class TestUpdate(TestCase):
             update_education_group,
             args=[self.mini_training_education_group_year.pk, self.mini_training_education_group_year.pk]
         )
+        PersonEntityFactory(person=self.person, entity=self.mini_training_education_group_year.management_entity)
 
         EntityVersionFactory(
             entity=self.mini_training_education_group_year.management_entity,
@@ -205,6 +208,8 @@ class TestUpdate(TestCase):
     def test_post(self):
         new_entity_version = MainEntityVersionFactory()
         PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        self.education_group_year.management_entity = new_entity_version.entity
+        self.education_group_year.save()
 
         data = {
             'title': 'Cours au choix',
@@ -429,19 +434,19 @@ class TestSelectAttach(TestCase):
         self.academic_year = create_current_academic_year()
         self.child_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group__end_year=self.academic_year.year+1
+            education_group__end_year=self.academic_year.year + 1
         )
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.new_parent_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year+2
+            education_group__end_year=self.academic_year.year + 2
         )
         self.bad_parent = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year-1
+            education_group__end_year=self.academic_year.year - 1
         )
 
         self.initial_group_element_year = GroupElementYearFactory(
@@ -502,13 +507,13 @@ class TestSelectAttach(TestCase):
         response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         data_cached = ElementCache(self.person.user).cached_data
 
-        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertDictEqual(
             data_cached,
             {
                 'modelname': management.EDUCATION_GROUP_YEAR,
                 'id': self.child_education_group_year.id,
-                'source_link_id':  self.initial_group_element_year.pk
+                'source_link_id': self.initial_group_element_year.pk
             }
         )
 
@@ -519,7 +524,7 @@ class TestSelectAttach(TestCase):
         )
         data_cached = ElementCache(self.person.user).cached_data
 
-        self.assertEquals(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertDictEqual(
             data_cached,
             {
@@ -689,7 +694,7 @@ class TestSelectAttach(TestCase):
             parent=self.new_parent_education_group_year,
             child_leaf=self.learning_unit_year
         ).count()
-        self.assertEquals(expected_group_element_year_count, 1)
+        self.assertEqual(expected_group_element_year_count, 1)
 
     def test_attach_without_selecting_gives_warning(self):
         ElementCache(self.person.user).clear()

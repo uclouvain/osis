@@ -104,11 +104,13 @@ class EducationGroupYearModelFormMixin(TestCase):
         )
 
         academic_year_field = form.fields["academic_year"]
+
         self.assertTrue(academic_year_field.disabled)
         self.assertTrue(academic_year_field.initial, self.academic_year)
         self.assertQuerysetEqual(
             academic_year_field.queryset,
-            AcademicYear.objects.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+            AcademicYear.objects.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION),
+            transform=lambda x: x
         )
 
     @patch('base.forms.education_group.common.find_authorized_types')

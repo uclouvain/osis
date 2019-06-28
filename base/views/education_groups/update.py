@@ -47,6 +47,7 @@ from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
+from base.views.education_groups.perms import can_change_education_group
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
@@ -62,6 +63,9 @@ def update_education_group(request, root_id, education_group_year_id):
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
             education_group_year.academic_year.year < current_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
+
+    # Proctect the view
+    can_change_education_group(request.user, education_group_year)
     return update_education_group_year(request, root_id, education_group_year)
 
 
