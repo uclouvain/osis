@@ -227,14 +227,14 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         with self.assertRaises(ValidationError):
             self.assertTrue(strategy.is_valid())
 
-    def test_is_invalid_case_attach_finality_which_child_branch_duplicate(self):
+    def test_is_case_attach_finality_which_child_branch_duplicate(self):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
             academic_year=self.academic_year,
             education_group__end_year=self.master_120.education_group.end_year - 1
         )
 
-        GroupElementYearFactory(parent=self.finality_group, child_branch=master_120_didactic)
+        ge = GroupElementYearFactory(parent=self.finality_group, child_branch=master_120_didactic)
 
         duplicate = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
@@ -242,6 +242,13 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         )
         with self.assertRaises(ValidationError):
             self.assertTrue(duplicate.is_valid())
+
+        update = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic,
+            instance=ge
+        )
+        self.assertTrue(update.is_valid())
 
     def test_is_invalid_case_attach_finality_which_child_leaf_duplicate(self):
         child_leaf = LearningUnitYearFactory(academic_year=self.finality_group.academic_year)

@@ -5352,7 +5352,7 @@ msgstr "Vous êtes à présent déconnecté."
 #: business/group_element_years/attach.py:152
 #: business/group_element_years/attach.py:168
 msgid "You can not attach the same child several times."
-msgstr "Vous ne pouvez pas attaché plusieurs fois le même enfant."
+msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
 
 #: templates/education_group/protect_delete_inner.html:9
 msgid "You can not delete this object because some dependencies are protected"
