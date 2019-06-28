@@ -59,6 +59,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
             self._check_attach_options_rules()
+
             if not self.instance:
                 self._check_new_attach_is_not_duplication()
         return True
