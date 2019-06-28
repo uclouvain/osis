@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -46,6 +48,7 @@ from base.models.enums.education_group_types import MiniTrainingType, TrainingTy
 from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.utils.utils import get_object_or_none
+from base.models.validation_rule import ValidationRule
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
 
@@ -846,6 +849,12 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
+        # print(self.rules()['partial_acronym'].regex_rule)
+        # if not bool(re.match(self.rules['partial_acronym'].regex_rule, self.partial_acronym)):
+        #     raise ValidationError({
+        #         'partial_acronym': _("Partial acronym is invalid")
+        #     })
+
     def clean_acronym(self, raise_warnings=False):
         if not self.acronym:
             return
@@ -873,6 +882,27 @@ class EducationGroupYear(SerializableModel):
                     "academic_year": self.format_year_to_academic_year(egy_using_same_acronym["past"])
                 }
             })
+
+        if not bool(re.match(self.rules['acronym'].regex_rule, self.acronym)):
+            raise ValidationError({
+                'acronym': _("Acronym is invalid")
+            })
+
+    def rules(self):
+        result = {}
+        bulk_rules = ValidationRule.objects.in_bulk()
+        for name, field in self.__dict__.items():
+            field_ref = self.field_reference(name)
+            if field_ref in bulk_rules:
+                result[name] = bulk_rules[self.field_reference(name)]
+        return result
+
+    def field_reference(self, name):
+        return self._field_reference(self._meta.model, name, self.education_group_type.external_id or 'osis')
+
+    @staticmethod
+    def _field_reference(model, name, *args):
+        return '.'.join([model._meta.db_table, name, *args])
 
     def next_year(self):
         try:
