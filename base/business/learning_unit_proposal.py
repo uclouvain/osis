@@ -462,11 +462,11 @@ def get_components_identification_initial_data(proposal):
                     'learning_component_year': learning_component_year,
                     'volumes': volume_from_initial_learning_component_year(
                         learning_component_year,
-                        proposal.initial_data.get('volumes')[learning_component_year['type']]
+                        proposal.initial_data.get('volumes')[learning_component_year['type']] if
+                        learning_component_year['type'] else proposal.initial_data.get('volumes')['null']
                     )
                 }
             )
-
         return compose_components_dict(components, additional_entities)
     return None
 

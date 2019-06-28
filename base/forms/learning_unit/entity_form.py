@@ -33,6 +33,10 @@ from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 class EntitiesVersionChoiceField(forms.ModelChoiceField):
     entity_version = None
 
+    def __init__(self, queryset, *args, **kwargs):
+        queryset = queryset.select_related('entity__organization')
+        super().__init__(queryset, *args, **kwargs)
+
     def label_from_instance(self, obj):
         return obj.verbose_title
 
