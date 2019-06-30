@@ -40,7 +40,9 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
 from base.models.person import get_user_interface_language, \
     change_language
@@ -253,3 +255,13 @@ class PersonTest(PersonTestCase):
         self.assertTrue(
             self.person_with_user.is_linked_to_entity_in_charge_of_learning_unit_year(luy)
         )
+
+    def test_managed_programs(self):
+        offer_year_1 = OfferYearFactory()
+        offer_year_2 = OfferYearFactory()
+        ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_1)
+        ProgramManagerFactory(person=self.person_with_user, offer_year=offer_year_2)
+        managed_programs = self.person_with_user.get_managed_programs()
+        self.assertTrue(len(managed_programs) == 2)
+        self.assertTrue(offer_year_1 in managed_programs)
+        self.assertTrue(offer_year_2 in managed_programs)
