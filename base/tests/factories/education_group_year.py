@@ -24,7 +24,10 @@
 #
 ##############################################################################
 import operator
+import random
+import string
 
+import exrex
 import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
@@ -52,8 +55,8 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
 
     education_group = factory.SubFactory(EducationGroupFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
-    acronym = factory.Sequence(lambda n: 'ED%d' % n)
-    partial_acronym = factory.Sequence(lambda n: 'SCS%03dT' % n)
+    acronym = ""
+    partial_acronym = ""
     title = factory.LazyAttribute(generate_title)
     title_english = factory.LazyAttribute(generate_title)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
@@ -76,6 +79,26 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     primary_language = factory.SubFactory(LanguageFactory)
     enrollment_campus = factory.SubFactory(CampusFactory)
     diploma_printing_title = "Yolo"
+
+    @factory.post_generation
+    def gen_acronym(self, create, extracted, **kwargs):
+        try:
+            if self.acronym == '':
+                self.acronym = exrex.getone(self.rules['acronym'].regex_rule).upper()
+        except KeyError:
+            self.acronym = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+                                   for _ in range(14))
+            # self.acronym = factory.Sequence(lambda n: 'ED%d' % n).evaluate()
+
+    @factory.post_generation
+    def gen_partial_acronym(self, create, extracted, **kwargs):
+        try:
+            if self.partial_acronym == "":
+                self.partial_acronym = exrex.getone(self.rules['partial_acronym'].regex_rule).upper()
+        except KeyError:
+            self.partial_acronym = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits)
+                                           for _ in range(14))
+            # self.partial_acronym = factory.Sequence(lambda n: 'SCS%03dT' % n).evaluate()
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):

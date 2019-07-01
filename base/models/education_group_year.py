@@ -842,7 +842,8 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
-        if not bool(re.match(self.rules['partial_acronym'].regex_rule, self.partial_acronym)):
+        my_validation_rule = self.rules.get('partial_acronym')
+        if my_validation_rule and not bool(re.match(my_validation_rule.regex_rule, self.partial_acronym)):
             raise ValidationError({
                 'partial_acronym': _("Partial acronym is invalid")
             })
@@ -875,7 +876,8 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
-        if not bool(re.match(self.rules['acronym'].regex_rule, self.acronym)):
+        my_validation_rule = self.rules.get('acronym')
+        if my_validation_rule and not bool(re.match(my_validation_rule.regex_rule, self.acronym)):
             raise ValidationError({
                 'acronym': _("Acronym is invalid")
             })
@@ -891,7 +893,6 @@ class EducationGroupYear(SerializableModel):
     def rules(self):
         result = {}
         bulk_rules = ValidationRule.objects.in_bulk()
-        # for name, field in self.__dict__.items():
         for name in dir(self):
             field_ref = self.field_reference(name)
             if field_ref in bulk_rules:
