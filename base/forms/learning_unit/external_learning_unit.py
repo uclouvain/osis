@@ -78,6 +78,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         elif initial.get("campus"):
             self.fields["country_external_institution"].initial = initial["campus"].organization.country and\
                                                                   initial["campus"].organization.country.pk
+        if not instance:
+            self.data['acronym_0'] = LearningUnitExternalSite.E.value
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
@@ -218,7 +220,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
 
     def get_context(self):
         return {
-            'learning_unit_year': self.instance,
+            'learning_unit_year': self.instance or self.learning_unit_year_form.instance,
             'subtype': self.subtype,
             'learning_unit_form': self.learning_unit_form,
             'learning_unit_year_form': self.learning_unit_year_form,
