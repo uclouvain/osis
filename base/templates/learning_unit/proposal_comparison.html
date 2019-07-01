@@ -49,10 +49,13 @@
                         <tr {% if forloop.first %} style="border-top: groove"{% endif %}>
                             <td class="table_header">{{ key.0 }}</td>
                             <td>
+                                {% trans "Credits" as credits %}
                                 {% if key.1 == True %}
                                     {% trans 'Yes' %}
                                 {% elif key.1 == False %}
                                     {% trans 'No' %}
+                                {% elif key.0 == credits %}
+                                    {% dl_component_tooltip 'initial' value=key.1 default_if_none=0 %}
                                 {% else %}
                                     {{ key.1|default_if_none:'-'|capfirst }}
                                 {% endif %}
@@ -62,6 +65,8 @@
                                     {% trans 'Yes' %}
                                 {% elif key.2 == False %}
                                     {% trans 'No' %}
+                                {% elif key.0 == _('Credits') %}
+                                    {% dl_component_tooltip 'initial' value=key.2 default_if_none=0 %}
                                 {% else %}
                                     {{ key.2|default_if_none:'-'|capfirst }}
                                 {% endif %}

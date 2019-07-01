@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 from copy import deepcopy
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -215,32 +216,37 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
 def get_volumes_comparison_context(component, initial_data):
     volumes = {}
     acronym = component['learning_component_year'].acronym
-    volume_total = component['volumes'][VOLUME_TOTAL] or 0
-    volume_q1 = component['volumes'][VOLUME_Q1] or 0
-    volume_q2 = component['volumes'][VOLUME_Q2] or 0
+    repartition_volume_total = component['volumes'][VOLUME_TOTAL] or 0
+    repartition_volume_q1 = component['volumes'][VOLUME_Q1] or 0
+    repartition_volume_q2 = component['volumes'][VOLUME_Q2] or 0
     planned_classes = component['volumes'][PLANNED_CLASSES] or 0
     repartition_volume_requirement_entity = component['volumes'][VOLUME_REQUIREMENT_ENTITY] or 0
     repartition_volume_additional_entity_1 = component['volumes'][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1] or 0
     repartition_volume_additional_entity_2 = component['volumes'][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2] or 0
-    if volume_total != initial_data['volumes'][acronym][VOLUME_TOTAL]:
-        volumes[_('Volume total annual')] = [initial_data['volumes'][acronym][VOLUME_TOTAL], volume_total]
-    if planned_classes != initial_data['volumes'][acronym][PLANNED_CLASSES]:
-        volumes[_('Planned classes')] = [initial_data['volumes'][acronym][PLANNED_CLASSES], planned_classes]
-    if volume_q1 != initial_data['volumes'][acronym][VOLUME_Q1]:
-        volumes[_('Volume Q1')] = [initial_data['volumes'][acronym][VOLUME_Q1], volume_q1]
-    if volume_q2 != initial_data['volumes'][acronym][VOLUME_Q2]:
-        volumes[_('Volume Q2')] = [initial_data['volumes'][acronym][VOLUME_Q2], volume_q2]
-    if repartition_volume_requirement_entity != initial_data['volumes'][acronym][VOLUME_REQUIREMENT_ENTITY]:
-        volumes[_('Requirement entity')] = [initial_data['volumes'][acronym][VOLUME_REQUIREMENT_ENTITY],
-                                            repartition_volume_requirement_entity]
-    vol_additional_entity_1 = initial_data['volumes'][acronym][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1]
-    if repartition_volume_additional_entity_1 != vol_additional_entity_1:
-        volumes[_('Additional requirement entity 1')] = [vol_additional_entity_1,
-                                                         repartition_volume_additional_entity_1]
-    vol_additional_entity_2 = initial_data['volumes'][acronym][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2]
-    if repartition_volume_additional_entity_2 != vol_additional_entity_2:
-        volumes[_('Additional requirement entity 2')] = [vol_additional_entity_2,
-                                                         repartition_volume_additional_entity_2]
+    initial_volume_total = initial_data['volumes'][acronym][VOLUME_TOTAL] or 0
+    initial_volume_q1 = initial_data['volumes'][acronym][VOLUME_Q1] or 0
+    initial_volume_q2 = initial_data['volumes'][acronym][VOLUME_Q2] or 0
+    initial_planned_classes = initial_data['volumes'][acronym][PLANNED_CLASSES] or 0
+    initial_volume_requirement_entity = initial_data['volumes'][acronym][VOLUME_REQUIREMENT_ENTITY] or 0
+    initial_volume_additional_entity_1 = initial_data['volumes'][acronym][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1] or 0
+    initial_volume_additional_entity_2 = initial_data['volumes'][acronym][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2] or 0
+    if repartition_volume_total != initial_volume_total:
+        volumes[_('Volume total annual')] = [Decimal(initial_volume_total), Decimal(repartition_volume_total)]
+    if planned_classes != initial_planned_classes:
+        volumes[_('Planned classes')] = [initial_planned_classes, planned_classes]
+    if repartition_volume_q1 != initial_volume_q1:
+        volumes[_('Volume Q1')] = [Decimal(initial_volume_q1), Decimal(repartition_volume_q1)]
+    if repartition_volume_q2 != initial_volume_q2:
+        volumes[_('Volume Q2')] = [Decimal(initial_volume_q2), Decimal(repartition_volume_q2)]
+    if repartition_volume_requirement_entity != initial_volume_requirement_entity:
+        volumes[_('Requirement entity')] = [Decimal(initial_volume_requirement_entity),
+                                            Decimal(repartition_volume_requirement_entity)]
+    if repartition_volume_additional_entity_1 != initial_volume_additional_entity_1:
+        volumes[_('Additional requirement entity 1')] = [Decimal(initial_volume_additional_entity_1),
+                                                         Decimal(repartition_volume_additional_entity_1)]
+    if repartition_volume_additional_entity_2 != initial_volume_additional_entity_2:
+        volumes[_('Additional requirement entity 2')] = [Decimal(initial_volume_additional_entity_2),
+                                                         Decimal(repartition_volume_additional_entity_2)]
     return volumes
 
 
@@ -299,6 +305,9 @@ def get_learning_unit_year_comparison_context(initial_data, learning_unit_year):
             elif field == 'attribution_procedure':
                 initial = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(initial_learning_unit_year, field))
                 new_value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+            elif field == 'credits':
+                initial = Decimal(getattr(initial_learning_unit_year, field))
+                new_value = Decimal(getattr(learning_unit_year, field))
             else:
                 initial = getattr(initial_learning_unit_year, field)
                 new_value = getattr(learning_unit_year, field)
