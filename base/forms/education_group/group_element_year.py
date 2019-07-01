@@ -27,9 +27,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
-from base.business.group_element_years.management import check_authorized_relationship
+from base.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 from base.models.enums import education_group_categories
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 
 
@@ -100,11 +99,10 @@ class GroupElementYearForm(forms.ModelForm):
         if not self.instance.child_branch:
             return data_cleaned
 
-        try:
-            new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
-            check_authorized_relationship(self.instance.parent, new_link)
-        except AuthorizedRelationshipNotRespectedException as e:
-            raise ValidationError(e.errors)
+        new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
+        check = CheckAuthorizedRelationshipAttach(self.instance.parent, link_to_attach=new_link)
+        if not check.is_valid():
+            raise ValidationError(check.errors)
         return data_cleaned
 
     def clean(self):
