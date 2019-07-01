@@ -26,6 +26,7 @@
 from decimal import Decimal
 
 from django import template
+from django.templatetags.l10n import unlocalize
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -75,8 +76,8 @@ def get_difference_css(differences, parameter, default_if_none=""):
         return mark_safe(
             ' data-toggle=tooltip title="{} : {}" class="{}" '.format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                normalize_fraction(Decimal(value)) if parameter == "credits" and
-                                                      not isinstance(value, str) else value or default_if_none,
+                normalize_fraction(Decimal(value)) if parameter == "credits" and not isinstance(value, str)
+                else value or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
         )
