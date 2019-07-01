@@ -842,18 +842,17 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
+        if not bool(re.match(self.rules['partial_acronym'].regex_rule, self.partial_acronym)):
+            raise ValidationError({
+                'partial_acronym': _("Partial acronym is invalid")
+            })
+
         if raise_warnings and egy_using_same_partial_acronym["past"]:
             raise ValidationWarning({
                 'partial_acronym': _("Partial acronym existed in %(academic_year)s") % {
                     "academic_year": self.format_year_to_academic_year(egy_using_same_partial_acronym["past"])
                 }
             })
-
-        # print(self.rules()['partial_acronym'].regex_rule)
-        # if not bool(re.match(self.rules['partial_acronym'].regex_rule, self.partial_acronym)):
-        #     raise ValidationError({
-        #         'partial_acronym': _("Partial acronym is invalid")
-        #     })
 
     def clean_acronym(self, raise_warnings=False):
         if not self.acronym:
@@ -876,6 +875,11 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
+        if not bool(re.match(self.rules['acronym'].regex_rule, self.acronym)):
+            raise ValidationError({
+                'acronym': _("Acronym is invalid")
+            })
+
         if raise_warnings and egy_using_same_acronym["past"]:
             raise ValidationWarning({
                 'acronym': _("Acronym existed in %(academic_year)s") % {
@@ -883,15 +887,12 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
-        if not bool(re.match(self.rules['acronym'].regex_rule, self.acronym)):
-            raise ValidationError({
-                'acronym': _("Acronym is invalid")
-            })
-
+    @property
     def rules(self):
         result = {}
         bulk_rules = ValidationRule.objects.in_bulk()
-        for name, field in self.__dict__.items():
+        # for name, field in self.__dict__.items():
+        for name in dir(self):
             field_ref = self.field_reference(name)
             if field_ref in bulk_rules:
                 result[name] = bulk_rules[self.field_reference(name)]
