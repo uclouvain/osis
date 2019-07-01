@@ -247,7 +247,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
 
     def post(self, request, **kwargs):
         try:
-            postponer = PostponeContent(self.get_root().previous_year())
+            postponer = PostponeContent(self.root.previous_year())
             postponer.postpone()
             success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
                 'count_elements': postponer.number_elements_created,

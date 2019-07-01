@@ -99,6 +99,7 @@ class EntityVersionAdmin(SerializableModelAdmin):
     search_fields = ['entity__id', 'entity__external_id', 'title', 'acronym', 'entity_type', 'start_date', 'end_date']
     raw_id_fields = ('entity', 'parent')
     readonly_fields = ('find_direct_children', 'count_direct_children', 'find_descendants', 'get_parent_version')
+    list_filter = ['entity_type']
 
 
 class EntityVersionQuerySet(models.QuerySet):

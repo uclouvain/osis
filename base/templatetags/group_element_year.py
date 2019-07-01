@@ -60,7 +60,7 @@ def action_with_permission(context, title, value, url):
     return {
         'load_modal': load_modal,
         'title': title,
-        'class_button': disabled,
+        'disabled': disabled,
         'icon': ICONS[value],
         'url': url,
     }

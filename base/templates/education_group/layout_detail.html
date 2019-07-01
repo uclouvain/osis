@@ -19,14 +19,13 @@
     <div class="page-header">
         <h2>
             {% if education_group_year.education_group_type.category == "TRAINING" %}
-                {{ education_group_year.acronym }} - {{ education_group_year.title }}
+                {{ education_group_year.acronym }}
             {% else %}
-                {{ education_group_year.partial_acronym }} - {{ education_group_year.title }}
+                {{ education_group_year.partial_acronym }}
             {% endif %}
-            <small style="color:black;font-family:Verdana;">
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ education_group_year.academic_year }}
-            </small>
+                - {{ education_group_year.academic_year }}
         </h2>
+    <h3>{{ education_group_year.title }}</h3>
     </div>
 {% endblock %}
 
