@@ -1386,7 +1386,7 @@ class TestLearningUnitProposalComparison(TestCase):
                                                    end_date=today.replace(year=today.year + 1))
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
-            acronym="TP",
+            acronym="PM",
             learning_unit_year=self.learning_unit_year,
             repartition_volume_requirement_entity=10,
             repartition_volume_additional_entity_1=10,
@@ -1459,7 +1459,7 @@ class TestLearningUnitProposalComparison(TestCase):
                  }
             ],
             "volumes": {
-                'LECTURING': {
+                'PM': {
                     VOLUME_Q1: self.learning_component_year_lecturing.hourly_volume_partial_q1,
                     VOLUME_Q2: self.learning_component_year_lecturing.hourly_volume_partial_q2,
                     REAL_CLASSES: 1,
@@ -1470,7 +1470,7 @@ class TestLearningUnitProposalComparison(TestCase):
                     VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
                     VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
                 },
-                'PRACTICAL_EXERCISES': {
+                'PP': {
                     VOLUME_Q1: 10, VOLUME_Q2: 10, REAL_CLASSES: 0, VOLUME_TOTAL: 20,
                     PLANNED_CLASSES: 0, VOLUME_REQUIREMENT_ENTITY: 0,
                     VOLUME_TOTAL_REQUIREMENT_ENTITIES: 0,
