@@ -33,7 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.business.education_groups.volume_strategy import VolumeEditionNoFacultyStrategy, \
     CompleteVolumeEditionFacultyStrategy, SimpleVolumeEditionFacultyStrategy
 from base.business.learning_units import edition
-from base.business.learning_units.edition import check_postponement_conflict_report_errors
+from base.business.learning_units.edition import check_postponement_conflict_report_errors, ConsistencyError
 from base.forms.utils.emptyfield import EmptyField
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
@@ -234,8 +234,16 @@ class VolumeEditionBaseFormset(forms.BaseFormSet):
         return {k.lower(): v for k, v in component_dict.items()}
 
     def save(self, postponement):
+        errors = []
+        last_instance_updated = None
         for form in self.forms:
-            form.save(postponement)
+            try:
+                form.save(postponement)
+            except ConsistencyError as e:
+                errors.extend(e.error_list)
+                last_instance_updated = e.last_instance_updated
+        if errors:
+            raise ConsistencyError(last_instance_updated, errors)
 
 
 class VolumeEditionFormsetContainer:
