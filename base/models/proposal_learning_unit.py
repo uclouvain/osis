@@ -24,18 +24,19 @@
 #
 ##############################################################################
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from django.core.serializers.json import DjangoJSONEncoder
 
 
-class ProposalLearningUnitAdmin(OsisModelAdmin):
+class ProposalLearningUnitAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('learning_unit_year', 'folder_id', 'entity', 'type', 'state')
 
     search_fields = ['folder_id', 'learning_unit_year__acronym']

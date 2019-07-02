@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from osis_common.models import osis_model_admin
 
@@ -75,7 +76,7 @@ class AdmissionCondition(models.Model):
         )
 
 
-class AdmissionConditionAdmin(osis_model_admin.OsisModelAdmin):
+class AdmissionConditionAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('name',)
 
     def name(self, obj):
