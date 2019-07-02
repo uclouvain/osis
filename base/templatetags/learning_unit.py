@@ -75,7 +75,7 @@ def get_difference_css(differences, parameter, default_if_none=""):
         return mark_safe(
             ' data-toggle=tooltip title="{} : {}" class="{}" '.format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                normalize_fraction(Decimal(value)) if parameter == "credits" and not isinstance(value, str)
+                normalize_fraction(Decimal(value)) if parameter == "credits"
                 else value or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
@@ -128,7 +128,7 @@ def dl_tooltip(context, instance, key, **kwargs):
                                    )
 
     html_id = "id='id_{}'".format(key.lower())
-
+    value = normalize_fraction(value) if isinstance(value, Decimal) else value
     return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference} {id}>{value}</dd></dl>".format(
         difference=difference, id=html_id, label_text=label_text, value=value or ''))
 
