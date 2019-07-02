@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from reversion.admin import VersionAdmin
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class ExternalOfferAdmin(SerializableModelAdmin):
+class ExternalOfferAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('name', 'adhoc', 'domain', 'grade_type', 'offer_year', 'changed')
     ordering = ('name',)
     search_fields = ['name']
