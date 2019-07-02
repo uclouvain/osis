@@ -44,8 +44,8 @@ from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.language import LanguageFactory
 
 
-def string_generator():
-    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+def string_generator(nb_char=8):
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(nb_char))
 
 
 def generate_title(education_group_year):
@@ -92,7 +92,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
             if self.acronym == '':
                 self.acronym = exrex.getone(self.rules['acronym'].regex_rule).upper()
         except KeyError:
-            self.acronym = string_generator()
+            self.acronym = string_generator(6)
 
     @factory.post_generation
     def gen_partial_acronym(self, create, extracted, **kwargs):
@@ -100,7 +100,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
             if self.partial_acronym == "":
                 self.partial_acronym = exrex.getone(self.rules['partial_acronym'].regex_rule).upper()
         except KeyError:
-            self.partial_acronym = string_generator()
+            self.partial_acronym = string_generator(7)
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
