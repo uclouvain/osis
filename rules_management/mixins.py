@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Prefetch, Case, When, Value, BooleanField
+from django.db.models import Prefetch, Case, When, Value, BooleanField, Subquery, Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 
 from rules_management.models import FieldReference
@@ -67,7 +67,7 @@ class PermissionFieldMixin(ModelFormMixin):
                 self.disable_field(field_name)
 
     def check_user_permission(self, field_reference):
-        if field_reference.is_in_user_groups:
+        if field_reference.user_groups:
             # Check at group level
             return True
         elif self._check_at_permissions_level(field_reference):
@@ -89,17 +89,9 @@ class PermissionFieldMixin(ModelFormMixin):
             content_type__app_label=self._meta.model._meta.app_label,
             content_type__model=self._meta.model._meta.model_name,
             context=context,
-
         ).prefetch_related(
             Prefetch('permissions', queryset=Permission.objects.select_related('content_type')),
-        ).annotate(
-            is_in_user_groups=Case(
-                When(
-                    groups__user=self.user, then=Value(True)
-                ),
-                default=Value(False),
-                output_field=BooleanField()
-            )
+            Prefetch('groups', queryset=Group.objects.filter(user=self.user), to_attr="user_groups")
         )
 
     def get_context(self):
