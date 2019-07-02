@@ -404,8 +404,8 @@ class LearningUnitEditionTestCase(TestCase):
         for test in tests_cases:
             with self.subTest(test=test):
                 error_expected = (_("The value of field '%(field)s' for the learning unit %(acronym)s "
-                                    "(%(component_type)s) is different between year %(year)s - %(value)d and year "
-                                    "%(next_year)s - %(next_value)d") %
+                                    "(%(component_type)s) is different between year %(year)s - %(value)s and year "
+                                    "%(next_year)s - %(next_value)s") %
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
