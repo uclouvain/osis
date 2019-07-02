@@ -30,6 +30,7 @@ from django.db import models
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import learning_unit, learning_unit_year
 from base.models.enums import prerequisite_operator
@@ -65,7 +66,7 @@ prerequisite_syntax_validator = validators.RegexValidator(regex=PREREQUISITE_SYN
                                                           message=mark_safe_lazy(_("Prerequisites are invalid")))
 
 
-class PrerequisiteAdmin(OsisModelAdmin):
+class PrerequisiteAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('learning_unit_year', 'education_group_year')
     raw_id_fields = ('learning_unit_year', 'education_group_year')
     list_filter = ('education_group_year__academic_year',)
