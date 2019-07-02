@@ -23,29 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections.__init__ import OrderedDict
-
-from dal import autocomplete
 from django import forms
-from django.utils.functional import lazy
-from django.utils.translation import ugettext_lazy as _
-
-from base.forms.utils.choice_field import add_blank, add_all
-from base.models.entity_container_year import EntityContainerYear
-from base.models.entity_version import get_last_version, find_all_current_entities_version
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
-from reference.models.country import Country
-
-
-def _get_section_choices():
-    return add_blank(
-        add_all(Country.objects.filter(entity__isnull=False).values_list('id', 'name') .distinct().order_by('name'))
-    )
+from django.db.models import Q
+from django.utils import timezone
+from base.models.entity_version import EntityVersion
+from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 
 
 class EntitiesVersionChoiceField(forms.ModelChoiceField):
     entity_version = None
+
+    def __init__(self, queryset, *args, **kwargs):
+        queryset = queryset.select_related('entity__organization')
+        super().__init__(queryset, *args, **kwargs)
 
     def label_from_instance(self, obj):
         return obj.verbose_title
@@ -56,176 +46,9 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
         return ev_data.entity if ev_data else None
 
 
-class EntityContainerYearModelForm(forms.ModelForm):
-    entity = EntitiesVersionChoiceField(
-        widget=autocomplete.ModelSelect2(
-            url='entity_autocomplete',
-            attrs={'data-html': True},
-            forward=['country']
-        ),
-        queryset=find_all_current_entities_version()
-    )
-    entity_type = ''
-    country = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, label=_("Country"))
-
-    def __init__(self, *args, **kwargs):
-        self.person = kwargs.pop('person')
-
-        super().__init__(*args, prefix=self.entity_type.lower(), **kwargs)
-
-        self.fields['entity'].label = EntityContainerYearLinkTypes[self.entity_type].value
-        self.instance.type = self.entity_type
-
-        if hasattr(self.instance, 'entity'):
-            self.initial['entity'] = get_last_version(self.instance.entity).pk
-
-    class Meta:
-        model = EntityContainerYear
-        fields = ['entity', 'country']
-
-    def pre_save(self, learning_container_year):
-        self.instance.learning_container_year = learning_container_year
-
-    def save(self, commit=True):
-        if hasattr(self.instance, 'entity'):
-            return super().save(commit)
-        elif self.instance.pk:
-            # if the instance has no entity, it must be deleted
-            self.instance.delete()
-
-    @property
-    def entity_version(self):
-        return self.fields["entity"].entity_version
-
-    def post_clean(self, start_date):
-        entity = self.cleaned_data.get('entity')
-        if not entity:
-            return
-
-
-class RequirementEntityContainerYearModelForm(EntityContainerYearModelForm):
-    entity_type = REQUIREMENT_ENTITY
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.queryset = self.person.find_main_entities_version
-        field.widget.attrs = {
-            'onchange': (
-                'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1", false);'
-                'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_1_country", false);'
-                'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", true);'
-                'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", true);'
-            ), 'id': 'id_requirement_entity'}
-
-
-class AllocationEntityContainerYearModelForm(EntityContainerYearModelForm):
-    entity_type = ALLOCATION_ENTITY
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.widget.attrs = {'id': 'allocation_entity'}
-
-
-class Additional1EntityContainerYearModelForm(EntityContainerYearModelForm):
-    entity_type = ADDITIONAL_REQUIREMENT_ENTITY_1
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.required = False
-        field.widget.attrs = {
-            'onchange': (
-                'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
-                'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2_country", false);'
-            ),
-            'id': 'id_additional_requirement_entity_1'
-        }
-        country = self.fields['country']
-        country.widget.attrs = {'id': 'id_additional_requirement_entity_1_country'}
-
-
-class Additional2EntityContainerYearModelForm(EntityContainerYearModelForm):
-    entity_type = ADDITIONAL_REQUIREMENT_ENTITY_2
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        field = self.fields['entity']
-        field.required = False
-        field.widget.attrs = {'id': 'id_additional_requirement_entity_2'}
-        country = self.fields['country']
-        country.widget.attrs = {'id': 'id_additional_requirement_entity_2_country'}
-
-
-class EntityContainerBaseForm:
-    form_classes = [
-        RequirementEntityContainerYearModelForm,
-        AllocationEntityContainerYearModelForm,
-        Additional1EntityContainerYearModelForm,
-        Additional2EntityContainerYearModelForm
-    ]
-
-    def __init__(self, data=None, person=None, learning_container_year=None):
-        self.forms = []
-        self.instance = learning_container_year
-        for form in self.form_classes:
-            qs = EntityContainerYear.objects.filter(learning_container_year=self.instance,
-                                                    type=form.entity_type)
-
-            instance = qs.get() if qs.exists() else None
-            self.forms.append(form(data, person=person, instance=instance))
-
-    @property
-    def changed_data(self):
-        return [form.changed_data for form in self.forms]
-
-    @property
-    def errors(self):
-        return {form.prefix: form.errors for form in self.forms if form.errors}
-
-    def get_clean_data_entity(self, key):
-        try:
-            form = self.forms[ENTITY_TYPE_LIST.index(key.upper())]
-            return form.instance.entity
-        except(AttributeError, IndexError):
-            return None
-
-    @property
-    def fields(self):
-        return OrderedDict(
-            (ENTITY_TYPE_LIST[index].lower(), form.fields['entity']) for index, form in enumerate(self.forms)
-        )
-
-    @property
-    def instances_data(self):
-        return OrderedDict(
-            (ENTITY_TYPE_LIST[index].lower(), getattr(form.instance, 'entity', None))
-            for index, form in enumerate(self.forms)
-        )
-
-    def post_clean(self, container_type, academic_year):
-        for form in self.forms:
-            form.post_clean(academic_year.start_date)
-        return not any(form.errors for form in self.forms)
-
-    def is_valid(self):
-        """ Trigger the forms validation"""
-        return not self.errors
-
-    def __iter__(self):
-        """Yields the forms in the order they should be rendered"""
-        return iter(self.forms)
-
-    def __getitem__(self, index):
-        """Returns the form at the given index, based on the rendering order"""
-        return self.forms[index]
-
-    def save(self, commit=True, learning_container_year=None):
-        if learning_container_year:
-            for form in self.forms:
-                form.pre_save(learning_container_year)
-        return [form.save(commit) for form in self.forms]
-
-    def get_linked_entities_forms(self):
-        return {key: self.get_clean_data_entity(key) for key in ENTITY_TYPE_LIST}
+def find_additional_requirement_entities_choices():
+    date = timezone.now()
+    return EntityVersion.objects.current(date).filter(
+        Q(entity__organization__type=MAIN) |
+        (Q(entity__organization__type=ACADEMIC_PARTNER) & Q(entity__organization__is_current_partner=True))
+    ).select_related('entity', 'entity__organization').order_by('acronym')

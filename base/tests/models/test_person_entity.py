@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import IntegrityError
 from django.test import TestCase
 
 from base.models.person_entity import PersonEntity
@@ -37,13 +36,6 @@ from base.tests.factories.person_entity import PersonEntityFactory
 class PersonEntityTest(TestCase):
     def setUp(self):
         self._create_entity_structure()
-
-    def test_create_same_person_same_entity_multiple_time(self):
-        """ Must raise an error, because db constraint on person/entity"""
-        person = PersonFactory()
-        PersonEntityFactory(person=person, entity=self.root_entity)
-        with self.assertRaises(IntegrityError):
-            PersonEntityFactory(person=person, entity=self.root_entity)
 
     def test_find_entities_by_person_with_no_link(self):
         person = PersonFactory()

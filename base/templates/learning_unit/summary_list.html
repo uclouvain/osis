@@ -87,7 +87,7 @@
                             <td>{{ learning_unit.academic_year.name }}</td>
                             <td>
                                 <a href="{% url 'learning_unit_pedagogy' learning_unit.id %}"
-                                   id="lnk_learning_unit_{{ learning_unit.id }}">{{ learning_unit.acronym }}</a>
+                                  class="col-acronym" id="lnk_learning_unit_{{ learning_unit.id }}">{{ learning_unit.acronym }}</a>
                             </td>
                             <td>{{ learning_unit.complete_title|default_if_none:'' }}</td>
                             <td>

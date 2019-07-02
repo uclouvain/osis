@@ -24,22 +24,26 @@
 #
 ############################################################################
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
 from reversion.models import Version
 
-from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
-    get_components_identification
+from base.business.learning_unit import get_all_attributions, get_components_identification
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
     learning_unit_proposal_permissions, is_eligible_for_modification
+from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
+from base.views.common import display_warning_messages
 
 
 class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
@@ -56,40 +60,49 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        # Change template and permissions for external learning units.
+        # Change template and permissions for external learning units and co_graduation is false.
+        if self.object.is_external_mobility():
+            self.template_name = "learning_unit/external/read.html"
         if self.object.is_external():
             self.permission_required = "base.can_access_externallearningunityear"
-            self.template_name = "learning_unit/external/read.html"
-
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         # Get does not need to fetch self.object again
         context = self.get_context_data(object=self.object)
+
+        if proposal_learning_unit.is_learning_unit_year_in_proposal(self.object) and \
+                self.object.get_partims_related().exists():
+            display_warning_messages(request, _("The learning unit have partim"))
         return self.render_to_response(context)
 
     @cached_property
     def person(self):
         return get_object_or_404(Person.objects.select_related('user'), user=self.request.user)
 
+    @cached_property
+    def current_academic_year(self):
+        return current_academic_year()
+
     def get_queryset(self):
+        qs_learningcomponentyear = LearningComponentYear.objects.order_by('type', 'acronym')
+        prefetch = Prefetch('learningcomponentyear_set', queryset=qs_learningcomponentyear)
         return super().get_queryset().select_related(
             'learning_container_year__academic_year',
             'academic_year', 'learning_unit',
             'campus__organization', 'externallearningunityear'
-        )
+        ).prefetch_related(prefetch)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['current_academic_year'] = current_academic_year()
+        context['current_academic_year'] = self.current_academic_year
         context['is_person_linked_to_entity'] = self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
             self.object)
 
         context['warnings'] = self.object.warnings
 
         context['learning_container_year_partims'] = self.object.get_partims_related()
-        context['experimental_phase'] = True
         context.update(get_all_attributions(self.object))
         components = get_components_identification(self.object)
 
@@ -133,8 +146,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         for component in self.object.learningcomponentyear_set.all():
             versions |= Version.objects.get_for_object(component)
-            for entity_component in component.entitycomponentyear_set.all():
-                versions |= Version.objects.get_for_object(entity_component)
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created'
                                                                      ).select_related('revision__user__person')

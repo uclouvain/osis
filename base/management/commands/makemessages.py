@@ -28,3 +28,7 @@ from django.core.management.commands import makemessages
 
 class Command(makemessages.Command):
     xgettext_options = makemessages.Command.xgettext_options + ['--sort-output']
+
+    def handle(self, *args, **options):
+        options['ignore_patterns'] = ['static/jsi18n/*']
+        super().handle(*args, **options)

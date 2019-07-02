@@ -39,7 +39,8 @@ from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
+    UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
 
@@ -112,7 +113,15 @@ class Person(SerializableModel):
 
     @cached_property
     def is_faculty_manager(self):
-        return self.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists()
+        return self.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() or self.is_faculty_manager_for_ue
+
+    @cached_property
+    def is_faculty_manager_for_ue(self):
+        return self.user.groups.filter(name=UE_FACULTY_MANAGER_GROUP).exists()
+
+    @cached_property
+    def is_administrative_manager(self):
+        return self.user.groups.filter(name=ADMINISTRATIVE_MANAGER_GROUP).exists()
 
     @cached_property
     def is_sic(self):
@@ -154,16 +163,10 @@ class Person(SerializableModel):
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
-        if learning_unit_year.is_external():
-            requesting_entity = learning_unit_year.externallearningunityear.requesting_entity
-            return self.is_attached_entity(requesting_entity) if requesting_entity else False
-
-        entities = Entity.objects.filter(
-            entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
-            entitycontaineryear__type=REQUIREMENT_ENTITY
-        )
-
-        return self.is_attached_entities(entities)
+        requirement_entity = learning_unit_year.learning_container_year.requirement_entity
+        if not requirement_entity:
+            return False
+        return self.is_attached_entities([requirement_entity])
 
     def is_attached_entities(self, entities):
         return any(self.is_attached_entity(entity) for entity in entities)

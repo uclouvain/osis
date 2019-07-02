@@ -25,12 +25,12 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active">
+    <li role="presentation" {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates'%}class="active"{% endif %}>
         <a data-toggle="tab" href="#tab_identification" role="tab">
             {% trans 'Identification'%} <span id="spn_identification_errors" class="error"></span>
         </a>
     </li>
-    <li role="presentation" >
+    <li role="presentation" {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates'%}class="active"{% endif %}>
         <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats" name="test">
             {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
         </a>
@@ -40,7 +40,7 @@
 
 <div class="tab-content">
 
-    <div id="tab_identification" class="tab-pane active" >
+    <div id="tab_identification" class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates'%}active{% else %}fade{% endif %}" >
         <div class="row">
             <div class="col-md-7">
                 <div class="panel panel-default">
@@ -178,7 +178,7 @@
         </div>
     </div>
 
-    <div id="tab_diploma" class="tab-pane fade">
+    <div id="tab_diploma" class="tab-pane {% if request.GET.tab_to_show or request.GET.tab_to_show == 'diplomas_certificates'%}active{% else %}fade{% endif %}">
         {% include "education_group/blocks/form/training_tab_diploma.html" %}
     </div>
 </div>

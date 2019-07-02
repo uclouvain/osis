@@ -24,6 +24,7 @@
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
@@ -97,7 +98,6 @@ class EducationGroupHierarchy:
                             'parent').order_by("order", "parent__partial_acronym")
 
     def to_json(self):
-        group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self.education_group_year.verbose,
             'icon': self.icon,
@@ -112,9 +112,11 @@ class EducationGroupHierarchy:
                 'attach_url': reverse('education_group_attach', args=[self.root.pk, self.education_group_year.pk]),
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#'
+                ]) if self.group_element_year else '#',
+                'modify_url': reverse('group_element_year_update', args=[
+                    self.root.pk, self.education_group_year.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#',
             },
-            'id': 'id_{}_{}'.format(self.education_group_year.pk, group_element_year_pk),
         }
 
     def to_list(self, flat=False, pruning_function=None):
@@ -162,6 +164,9 @@ class EducationGroupHierarchy:
             if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
         ]
 
+    def get_learning_unit_year_list(self):
+        return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
+
 
 class NodeLeafJsTree(EducationGroupHierarchy):
     element_type = LEARNING_UNIT_YEAR
@@ -176,7 +181,6 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         return
 
     def to_json(self):
-        group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
             'text': self._get_acronym(),
             'icon': self.icon,
@@ -186,24 +190,36 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'group_element_year': self.group_element_year and self.group_element_year.pk,
                 'element_id': self.learning_unit_year.pk,
                 'element_type': self.element_type,
-                'title': self.learning_unit_year.complete_title,
+                'title': self._get_tooltip_text(),
                 'has_prerequisite': self.group_element_year.has_prerequisite,
                 'is_prerequisite': self.group_element_year.is_prerequisite,
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
+                'modify_url': reverse('group_element_year_update', args=[
+                    self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
+                ]) if self.group_element_year else '#',
                 'class': self._get_class()
             },
-            'id': 'id_{}_{}'.format(self.learning_unit_year.pk, group_element_year_pk),
         }
+
+    def _get_tooltip_text(self):
+        title = self.learning_unit_year.complete_title
+        if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
+            title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
+        elif self.group_element_year.has_prerequisite:
+            title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
+        elif self.group_element_year.is_prerequisite:
+            title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
+        return title
 
     def _get_icon(self):
         if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
             return "fa fa-exchange-alt"
         elif self.group_element_year.has_prerequisite:
-            return "fa fa-arrow-right"
-        elif self.group_element_year.is_prerequisite:
             return "fa fa-arrow-left"
+        elif self.group_element_year.is_prerequisite:
+            return "fa fa-arrow-right"
         return "far fa-file"
 
     def _get_acronym(self) -> str:

@@ -26,8 +26,8 @@
 import os
 import sys
 
-from django.core.urlresolvers import reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -244,33 +244,12 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'django-db')
 LOCALE_PATHS = ()
 
 
-def define_style_sheet(name, class_name):
-    return {'name': name, 'element': 'div', 'attributes': {'class': class_name}}
-
-
-REDDOT_STYLES = [
-    define_style_sheet('Intro', 'reddot_intro'),
-    define_style_sheet('Teaser', 'reddot_teaser'),
-    define_style_sheet('Collapse', 'reddot_collapse'),
-    define_style_sheet('Extra', 'reddot_extra'),
-    define_style_sheet('Body', 'reddot_body'),
-    define_style_sheet('Part1', 'reddot_part1'),
-    define_style_sheet('Part2', 'reddot_part2'),
-    define_style_sheet('Contact Responsible', 'contacts_responsible'),
-    define_style_sheet('Contact Other Responsibles', 'contacts_responsibles'),
-    define_style_sheet('Contact Jury', 'contacts_jury'),
-    define_style_sheet('Contact Contact', 'contacts_contact'),
-    define_style_sheet('Contact Introduction', 'contacts_introduction'),
-]
-
 # Apps Settings
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraAllowedContent': 'div(reddot_*,contacts_*)',
-        'extraPlugins': ','.join(['pastefromword']),
-        'stylesSet': REDDOT_STYLES,
+        'extraPlugins': ','.join(['pastefromword', 'cdn']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -280,13 +259,15 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
+            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'allowedContent': True,
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
     },
     'default': {
         "removePlugins": "stylesheetparser",
         'allowedContent': True,
-        'extraAllowedContent': 'div(reddot_*,contacts_*)',
         'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
@@ -306,19 +287,22 @@ CKEDITOR_CONFIGS = {
                        'HiddenField']},
             {'name': 'about', 'items': ['About']},
         ],
-        'stylesSet': REDDOT_STYLES,
         'autoParagraph': False
     },
     'minimal': {
         'toolbar': 'Custom',
+        'extraPlugins': ','.join(['cdn']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink']
+            ['Link', 'Unlink'],
+            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'allowedContent': True,
+        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -409,10 +393,11 @@ RELEASE_TAG = os.environ.get('RELEASE_TAG')
 # Selenium Testing
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
-    'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', os.path.join(BASE_DIR, "selenium/geckodriver")),
-    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'true',
+    'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', "geckodriver"),
+    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'false',
     'SCREEN_WIDTH': int(os.environ.get('SELENIUM_SCREEN_WIDTH', 1920)),
-    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080))
+    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080)),
+    'TAKE_SCREEN_ON_FAILURE': os.environ.get('SELENIUM_TAKE_SCREENSHOTS', 'True').lower() == 'true',
 }
 
 # BOOTSTRAP3 Configuration
@@ -461,6 +446,6 @@ REQUESTS_TIMEOUT = 20
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
-YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))
+YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 0))  # By default, no restriction
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')

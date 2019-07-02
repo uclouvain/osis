@@ -33,11 +33,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import close_old_connections, transaction
 from django.db.utils import OperationalError as DjangoOperationalError, InterfaceError as DjangoInterfaceError
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as  PsycopInterfaceError
 
@@ -45,7 +45,7 @@ from assessments.business import score_encoding_progress, score_encoding_list, s
 from assessments.business import score_encoding_sheet
 from attribution import models as mdl_attr
 from base import models as mdl
-from base.models.enums import exam_enrollment_state as enrollment_states
+from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
 from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
@@ -255,7 +255,10 @@ def online_encoding_submission(request, learning_unit_year_id):
                                                                learning_unit_year_id=learning_unit_year_id)
     submitted_enrollments = []
     draft_scores_not_sumitted_yet = scores_list.enrollment_draft_not_submitted
-    not_submitted_enrollments = set([ex for ex in scores_list.enrollments if not ex.is_final])
+    not_submitted_enrollments = set([
+        ex for ex in scores_list.enrollments
+        if not ex.is_final and ex.enrollment_state == exam_enrollment_state.ENROLLED
+    ])
     for exam_enroll in draft_scores_not_sumitted_yet:
         if (exam_enroll.score_draft is not None and exam_enroll.score_final is None) \
                 or (exam_enroll.justification_draft and not exam_enroll.justification_final):

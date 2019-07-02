@@ -29,13 +29,11 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.models.entity_version import EntityVersion
 from base.models.enums.learning_container_year_types import EXTERNAL
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
@@ -52,16 +50,21 @@ class TestUpdateExternalLearningUnitView(TestCase):
         self.person = CentralManagerFactory(user=self.user)
         self.client.force_login(self.user)
 
+        person_entity = PersonEntityFactory(
+            person=self.person,
+            entity=EntityVersionFactory().entity,
+        )
+
         self.academic_year = create_current_academic_year()
 
-        luy = LearningUnitYearFullFactory(academic_year=self.academic_year)
+        luy = LearningUnitYearFullFactory(
+            academic_year=self.academic_year,
+            internship_subtype=None,
+            acronym="EFAC0000",
+            learning_container_year__container_type=EXTERNAL,
+            learning_container_year__requirement_entity=person_entity.entity,
+        )
         self.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
-
-        luy.learning_container_year.container_type = EXTERNAL
-        luy.learning_container_year.save()
-
-        EntityVersionFactory(entity=self.external.requesting_entity)
-        PersonEntityFactory(person=self.person, entity=self.external.requesting_entity)
 
         self.data = get_valid_external_learning_unit_form_data(self.academic_year, self.person,
                                                                self.external.learning_unit_year)

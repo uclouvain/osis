@@ -54,16 +54,20 @@ def cache_filter(exclude_params=None, **default_values):
             except Exception:
                 logger.exception('An error occurred with cache system')
             return func(request, *args, **kwargs)
+
         return inner
+
     return decorator
 
 
 class CacheFilterMixin:
+    cache_exclude_params = None
+
     # Mixin that keep the cache for cbv.
     def get(self, request, *args, **kwargs):
         request_cache = RequestCache(user=request.user, path=request.path)
         if request.GET:
-            request_cache.save_get_parameters(request)
+            request_cache.save_get_parameters(request, parameters_to_exclude=self.cache_exclude_params)
         request.GET = request_cache.restore_get_request(request)
         return super().get(request, *args, **kwargs)
 
@@ -121,6 +125,8 @@ class ElementCache(OsisCache):
     def key(self):
         return self.PREFIX_KEY.format(user=self.user.pk)
 
-    def save_element_selected(self, obj):
+    def save_element_selected(self, obj, source_link_id=None):
         data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table}
+        if source_link_id:
+            data_to_cache['source_link_id'] = source_link_id
         self.set_cached_data(data_to_cache)

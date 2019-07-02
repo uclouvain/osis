@@ -41,17 +41,20 @@ class EntityAdmin(SerializableModelAdmin):
 
 
 class Entity(SerializableModel):
-    organization = models.ForeignKey('Organization', blank=True, null=True)
+    organization = models.ForeignKey('Organization', blank=True, null=True, on_delete=models.CASCADE)
     external_id = models.CharField(max_length=255, unique=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
     location = models.CharField(max_length=255, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=255, blank=True, null=True)
     website = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return "{0}".format(self.most_recent_acronym)
 
     @cached_property
     def most_recent_acronym(self):
@@ -68,8 +71,12 @@ class Entity(SerializableModel):
     def has_address(self):
         return self.location and self.postal_code and self.city
 
-    def __str__(self):
-        return "{0}".format(self.most_recent_acronym)
+    # TODO :: remove this function and use annotation (most_recent_entity_version)
+    def get_latest_entity_version(self):
+        # Sometimes, entity-versions is prefetch to optimized queries
+        if getattr(self, "entity_versions", None):
+            return self.entity_versions[-1]
+        return self.entityversion_set.order_by('start_date').last()
 
 
 def search(**kwargs):
@@ -107,10 +114,10 @@ def find_versions_from_entites(entities, date):
         date = timezone.now()
     order_list = [entity_type.SECTOR, entity_type.FACULTY, entity_type.SCHOOL, entity_type.INSTITUTE, entity_type.POLE]
     preserved = Case(*[When(entity_type=pk, then=pos) for pos, pk in enumerate(order_list)])
-    return Entity.objects.filter(pk__in=entities).\
+    return Entity.objects.filter(pk__in=entities). \
         filter(Q(entityversion__end_date__gte=date) | Q(entityversion__end_date__isnull=True),
-               entityversion__start_date__lte=date).\
-        annotate(acronym=F('entityversion__acronym')).annotate(title=F('entityversion__title')).\
+               entityversion__start_date__lte=date). \
+        annotate(acronym=F('entityversion__acronym')).annotate(title=F('entityversion__title')). \
         annotate(entity_type=F('entityversion__entity_type')).order_by(preserved)
 
 

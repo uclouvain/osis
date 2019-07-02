@@ -35,8 +35,6 @@ from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
     get_representing_string
 from base.business.proposal_xls import components_titles, basic_titles
-from base.models.entity_container_year import EntityContainerYear
-from base.models.enums import entity_container_year_link_type
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -93,12 +91,8 @@ class TestComparisonXls(TestCase):
         self.assertEqual(data[0][14], learning_unit_yr.specific_title_english)
         self.assertEqual(data[0][15], learning_unit_yr.requirement_entity.most_recent_acronym)
         self.assertEqual(data[0][16], learning_unit_yr.allocation_entity.most_recent_acronym)
-        self.assertEqual(data[0][17], EntityContainerYear.objects.get(
-            learning_container_year=learning_unit_yr.learning_container_year,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1).entity.most_recent_acronym)
-        self.assertEqual(data[0][18], EntityContainerYear.objects.get(
-            learning_container_year=learning_unit_yr.learning_container_year,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2).entity.most_recent_acronym)
+        self.assertEqual(data[0][17], learning_unit_yr.learning_container_year.additional_entity_1.most_recent_acronym)
+        self.assertEqual(data[0][18], learning_unit_yr.learning_container_year.additional_entity_2.most_recent_acronym)
         self.assertEqual(data[0][19], _('Yes') if learning_unit_yr.professional_integration else _('No'))
         if learning_unit_yr.campus:
             self.assertEqual(data[0][20], learning_unit_yr.campus.organization.name)
@@ -211,15 +205,15 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display())
 
         self.assertEqual(data[29], DEFAULT_ACRONYM_COMPONENT.get(lecturing_component.type))
-        self.assertEqual(data[30], float(lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0)
-        self.assertEqual(data[31], float(lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0)
-        self.assertEqual(data[32], float(lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0)
+        self.assertEqual(data[30], lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0
+        self.assertEqual(data[31], lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0
+        self.assertEqual(data[32], lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0
         self.assertEqual(data[33], lecturing_component.real_classes)
         self.assertEqual(data[34], lecturing_component.planned_classes)
         self.assertEqual(data[39], DEFAULT_ACRONYM_COMPONENT.get(practical_component.type))
-        self.assertEqual(data[40], float(practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0)
-        self.assertEqual(data[41], float(practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0)
-        self.assertEqual(data[42], float(practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0)
+        self.assertEqual(data[40], practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0
+        self.assertEqual(data[41], practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0
+        self.assertEqual(data[42], practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0
         self.assertEqual(data[43], practical_component.real_classes)
         self.assertEqual(data[44], practical_component.planned_classes)
 
