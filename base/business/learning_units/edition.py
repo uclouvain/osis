@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.db import IntegrityError, transaction, Error
 from django.db.models import F
 from django.urls import reverse
@@ -44,6 +46,7 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from cms.models import translated_text
+from osis_common.utils.numbers import normalize_fraction
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 
@@ -557,17 +560,20 @@ def _get_volumes_diff(current_volumes_data, next_year_volumes_data):
 
 
 def _get_error_volume_field_diff(field_diff, current_component, next_year_component, values_diff):
-    return _("The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
-             "is different between year %(year)s - %(value)d and year %(next_year)s - %(next_value)d") % \
-           {
-               'field': COMPONENT_DETAILS[field_diff].lower(),
-               'acronym': current_component.learning_unit_year.acronym,
-               'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
-               'year': current_component.learning_unit_year.academic_year,
-               'value': values_diff.get('current') or _('No data'),
-               'next_year': next_year_component.learning_unit_year.academic_year,
-               'next_value': values_diff.get('next_year') or _('No data')
-           }
+    current_value = values_diff.get('current')
+    next_value = values_diff.get('next_year')
+    return _(
+        "The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
+        "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s"
+    ) % {
+        'field': COMPONENT_DETAILS[field_diff].lower(),
+        'acronym': current_component.learning_unit_year.acronym,
+        'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
+        'year': current_component.learning_unit_year.academic_year,
+        'value': normalize_fraction(current_value) if current_value is not None else _('No data'),
+        'next_year': next_year_component.learning_unit_year.academic_year,
+        'next_value': normalize_fraction(next_value) if next_value is not None else _('No data')
+    }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):
