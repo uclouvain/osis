@@ -176,18 +176,12 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             enrollments = []
             for exam_enrol in list_enrollments:
                 student = exam_enrol.learning_unit_enrollment.student
-                score = ''
-                if exam_enrol.score_final is not None:
-                    if learning_unit_yr.decimal_scores:
-                        score = str(exam_enrol.score_final)
-                    else:
-                        score = str(int(exam_enrol.score_final))
 
                 enrollments.append({
                     "registration_id": student.registration_id,
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
-                    "score": score,
+                    "score": _format_score(exam_enrol, learning_unit_yr),
                     "justification": _(exam_enrol.get_justification_final_display())
                     if exam_enrol.justification_final else '',
                     "deadline": _get_formatted_deadline(date_format, exam_enrol),
@@ -231,4 +225,13 @@ def _get_formatted_deadline(date_format, exam_enrol):
         deadline = get_deadline(exam_enrol)
         if deadline:
             return deadline.strftime(date_format)
+    return ''
+
+
+def _format_score(exam_enrol, learning_unit_yr):
+    if exam_enrol.score_final is not None:
+        if learning_unit_yr.decimal_scores:
+            return str(exam_enrol.score_final)
+        else:
+            return str(int(exam_enrol.score_final))
     return ''

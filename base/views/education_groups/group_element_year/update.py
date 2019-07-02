@@ -25,7 +25,6 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import UpdateView
@@ -114,7 +113,8 @@ def _down(request, group_element_year, *args, **kwargs):
 @require_http_methods(['POST'])
 def _select(request, group_element_year, *args, **kwargs):
     element = kwargs['element']
-    ElementCache(request.user).save_element_selected(element)
+    group_element_year_pk = group_element_year.pk if group_element_year else None
+    ElementCache(request.user).save_element_selected(element, source_link_id=group_element_year_pk)
     success_msg = build_success_message(element)
     return build_success_json_response(success_msg)
 
@@ -147,4 +147,5 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
         return _("The link of %(acronym)s has been updated") % {'acronym': self.object.child}
 
     def get_success_url(self):
-        return reverse("education_group_content", args=[self.kwargs["root_id"], self.education_group_year.pk])
+        # We can just reload the page
+        return

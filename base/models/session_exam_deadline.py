@@ -46,7 +46,7 @@ class SessionExamDeadline(models.Model):
     deliberation_date = models.DateField(blank=True, null=True)
     deadline_tutor = models.IntegerField(null=True, blank=True)  # Delta day(s)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
-    offer_enrollment = models.ForeignKey('OfferEnrollment')
+    offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.CASCADE)
 
     __original_deliberation_date = None
 

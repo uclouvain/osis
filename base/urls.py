@@ -54,11 +54,35 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 from base.views.person import EmployeeAutocomplete
+from base.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
-    url(r'^entity_autocomplete/$', base.views.learning_units.update.EntityAutocomplete.as_view(),
-        name='entity_autocomplete'),
+    url(
+        r'^entity_autocomplete/$',
+        base.views.learning_units.update.EntityAutocomplete.as_view(),
+        name='entity_autocomplete'
+    ),
+    url(
+        r'^allocation_entity_autocomplete/$',
+        base.views.learning_units.update.AllocationEntityAutocomplete.as_view(),
+        name='allocation_entity_autocomplete'
+    ),
+    url(
+        r'^additional_entity_1_autocomplete/$',
+        base.views.learning_units.update.AdditionnalEntity1Autocomplete.as_view(),
+        name='additional_entity_1_autocomplete'
+    ),
+    url(
+        r'^additional_entity_2_autocomplete/$',
+        base.views.learning_units.update.AdditionnalEntity2Autocomplete.as_view(),
+        name='additional_entity_2_autocomplete'
+    ),
+    url(
+        r'^entity_requirement_autocomplete/$',
+        base.views.learning_units.update.EntityRequirementAutocomplete.as_view(),
+        name='entity_requirement_autocomplete'
+    ),
     url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
         name='organization_autocomplete'),
     url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),
@@ -78,8 +102,6 @@ urlpatterns = [
         url(r'^delete(?:/(?P<pk>[0-9]+))?/$', academic_calendar.AcademicCalendarDelete.as_view(),
             name='academic_calendar_delete'),
     ])),
-
-    url(r'^academic_year/$', common.academic_year, name='academic_year'),
 
     url(r'^admin/', include([
         url(r'^data/$', common.data, name='data'),
@@ -240,16 +262,9 @@ urlpatterns = [
     url(r'^offers/', include([
         url(r'^$', offer.offers, name='offers'),
         url(r'^search$', offer.offers_search, name='offers_search'),
-        url(r'^(?P<offer_year_id>[0-9]+)/', include([
-            url(r'^$', offer.offer_read, name='offer_read'),
-            url(r'^academic_calendar/$', offer.offer_academic_calendar_tab, name='offer_academic_calendar_tab'),
-            url(r'^program_managers/$', offer.offer_program_managers_tab, name='offer_program_managers_tab'),
-        ]))
     ])),
 
     url(r'^educationgroups/', include(education_groups.urls.urlpatterns)),
-
-    url(r'^offer_year_calendars/([0-9]+)/$', offer.offer_year_calendar_read, name='offer_year_calendar_read'),
 
     url(r'^organizations/', include([
         url(r'^$', organization.OrganizationSearch.as_view(), name='organizations'),
@@ -288,7 +303,9 @@ urlpatterns = [
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
         url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
     ])),
-
+    url(r'^quick_search_learning_unit/$', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
+    url(r'^quick_search_education_group/$', QuickSearchEducationGroupYearView.as_view(),
+        name="quick_search_education_group"),
 ]
 
 if settings.DEBUG:

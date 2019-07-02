@@ -27,12 +27,10 @@ import datetime
 from decimal import Decimal
 
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
 from base.forms.learning_unit_proposal import ProposalBaseForm
-from base.models import proposal_learning_unit, entity_container_year
-from base.models.entity_container_year import EntityContainerYear
+from base.models import proposal_learning_unit
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
@@ -43,7 +41,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
@@ -62,19 +59,6 @@ class TestSave(TestCase):
         self.person = PersonFactory()
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=current_academic_year,
-            container_type=learning_container_year_types.COURSE,
-        )
-        self.learning_unit_year = LearningUnitYearFakerFactory(
-            credits=5,
-            subtype=learning_unit_year_subtypes.FULL,
-            academic_year=current_academic_year,
-            learning_container_year=learning_container_year,
-            campus=CampusFactory(organization=an_organization, is_administration=True),
-            periodicity=learning_unit_year_periodicity.ANNUAL,
-            internship_subtype=None
-        )
 
         today = datetime.date.today()
         an_entity = EntityFactory(organization=an_organization)
@@ -85,10 +69,20 @@ class TestSave(TestCase):
         self.entity_version_school = EntityVersionFactory(entity=self.an_entity_school, entity_type=entity_type.SCHOOL,
                                                           start_date=today.replace(year=1900),
                                                           end_date=None)
-        self.entity_container_year = EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-            entity=self.entity_version.entity
+
+        learning_container_year = LearningContainerYearFactory(
+            academic_year=current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=self.entity_version.entity,
+        )
+        self.learning_unit_year = LearningUnitYearFakerFactory(
+            credits=Decimal(5),
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=current_academic_year,
+            learning_container_year=learning_container_year,
+            campus=CampusFactory(organization=an_organization, is_administration=True),
+            periodicity=learning_unit_year_periodicity.ANNUAL,
+            internship_subtype=None
         )
         self.person_entity = PersonEntityFactory(person=self.person, entity=an_entity)
         self.language = LanguageFactory(code="EN")
@@ -105,7 +99,7 @@ class TestSave(TestCase):
             "specific_title_english": "New title english",
             "container_type": self.learning_unit_year.learning_container_year.container_type,
             "internship_subtype": "",
-            "credits": "4",
+            "credits": self.learning_unit_year.credits,
             "periodicity": learning_unit_year_periodicity.BIENNIAL_ODD,
             "status": False,
             "language": self.language.pk,
@@ -114,21 +108,23 @@ class TestSave(TestCase):
             "entity": self.entity_version.id,
             "folder_id": "1",
             "state": proposal_state.ProposalState.CENTRAL.name,
-            'requirement_entity-entity': self.entity_version.id,
-            'allocation_entity-entity': self.entity_version.id,
-            'additional_requirement_entity_1-entity': self.entity_version.id,
-            'additional_requirement_entity_2-entity': self.entity_version.id,
+            'requirement_entity': self.entity_version.id,
+            'allocation_entity': self.entity_version.id,
+            'additional_entity_1': self.entity_version.id,
+            'additional_entity_2': self.entity_version.id,
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
             'component-INITIAL_FORMS': '0',
             'component-MAX_NUM_FORMS': '2',
-            'component-0-hourly_volume_total_annual': 20,
-            'component-0-hourly_volume_partial_q1': 10,
-            'component-0-hourly_volume_partial_q2': 10,
-            'component-1-hourly_volume_total_annual': 20,
-            'component-1-hourly_volume_partial_q1': 10,
-            'component-1-hourly_volume_partial_q2': 10,
+            'component-0-hourly_volume_total_annual': Decimal(20),
+            'component-0-hourly_volume_partial_q1': Decimal(10),
+            'component-0-hourly_volume_partial_q2': Decimal(10),
+            'component-1-hourly_volume_total_annual': Decimal(20),
+            'component-1-hourly_volume_partial_q1': Decimal(10),
+            'component-1-hourly_volume_partial_q2': Decimal(10),
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
 
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):
@@ -193,8 +189,9 @@ class TestSave(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
-        self.entity_container_year.refresh_from_db()
-        self.assertEqual(self.entity_container_year.entity, self.entity_version.entity)
+        container = self.learning_unit_year.learning_container_year
+        container.refresh_from_db()
+        self.assertEqual(container.requirement_entity, self.entity_version.entity)
 
     def test_with_all_entities_set(self):
         today = datetime.date.today()
@@ -208,16 +205,16 @@ class TestSave(TestCase):
                                                            start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
                                                            entity=entity_2)
-        self.form_data["allocation_entity-entity"] = self.entity_version.id
-        self.form_data["additional_requirement_entity_1-entity"] = additional_entity_version_1.id
-        self.form_data["additional_requirement_entity_2-entity"] = additional_entity_version_2.id
+        self.form_data["allocation_entity"] = self.entity_version.id
+        self.form_data["additional_entity_1"] = additional_entity_version_1.id
+        self.form_data["additional_entity_2"] = additional_entity_version_2.id
 
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
-        entities_by_type = \
-            entity_container_year.find_entities_grouped_by_linktype(self.learning_unit_year.learning_container_year)
+        self.learning_unit_year.learning_container_year.refresh_from_db()
+        entities_by_type = self.learning_unit_year.learning_container_year.get_map_entity_by_type()
 
         expected_entities = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity,
@@ -246,8 +243,7 @@ class TestSave(TestCase):
         self.assertEqual(self.learning_unit_year.internship_subtype, internship_subtypes.TEACHING_INTERNSHIP)
 
     def test_creation_proposal_learning_unit(self):
-        initial_data_expected = build_initial_data(self.learning_unit_year, self.entity_container_year)
-
+        self.maxDiff = None
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -257,17 +253,27 @@ class TestSave(TestCase):
         self.assertEqual(a_proposal_learning_unt.type, PROPOSAL_TYPE)
         self.assertEqual(a_proposal_learning_unt.state, PROPOSAL_STATE)
         self.assertEqual(a_proposal_learning_unt.author, self.person)
-        self.assertDictEqual(a_proposal_learning_unt.initial_data, initial_data_expected)
+        self.assertDictEqual(a_proposal_learning_unt.initial_data, self._get_initial_data_expected())
+
+    def _get_initial_data_expected(self):
+        initial_data_expected = build_initial_data(self.learning_unit_year, self.entity_version.entity)
+        initial_data_expected["learning_unit_year"]["credits"] = '5.00'
+        initial_data_expected['entities'] = {
+            entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity.id,
+            entity_container_year_link_type.ALLOCATION_ENTITY: None,
+            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
+            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
+        }
+        return initial_data_expected
 
     def test_when_setting_additional_entity_to_none(self):
-        self.form_data['additional_requirement_entity_1-entity'] = None
+        self.form_data['additional_entity_1'] = None
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
-        with self.assertRaises(ObjectDoesNotExist):
-            EntityContainerYear.objects.get(learning_container_year=self.learning_unit_year.learning_container_year,
-                                            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
+        self.learning_unit_year.learning_container_year.refresh_from_db()
+        self.assertIsNone(self.learning_unit_year.learning_container_year.additional_entity_1)
 
     def test_creation_proposal_learning_unit_with_school_entity(self):
         self.entity_version.entity_type = SCHOOL
@@ -282,7 +288,7 @@ class TestSave(TestCase):
         self.assertTrue('entity' in form.errors[1])
 
 
-def build_initial_data(learning_unit_year, entity_container_yr):
+def build_initial_data(learning_unit_year, entity):
     initial_data_expected = {
         "learning_container_year": {
             "id": learning_unit_year.learning_container_year.id,
@@ -294,6 +300,10 @@ def build_initial_data(learning_unit_year, entity_container_yr):
             "common_title_english": learning_unit_year.learning_container_year.common_title_english,
             "is_vacant": learning_unit_year.learning_container_year.is_vacant,
             "type_declaration_vacant": learning_unit_year.learning_container_year.type_declaration_vacant,
+            "requirement_entity": entity.id,
+            "allocation_entity": None,
+            "additional_entity_1": None,
+            "additional_entity_2": None,
         },
         "learning_unit_year": {
             "id": learning_unit_year.id,
@@ -301,7 +311,7 @@ def build_initial_data(learning_unit_year, entity_container_yr):
             "specific_title": learning_unit_year.specific_title,
             "internship_subtype": learning_unit_year.internship_subtype,
             "language": learning_unit_year.language.pk,
-            "credits": learning_unit_year.credits,
+            "credits": Decimal(5),
             "campus": learning_unit_year.campus.id,
             "periodicity": learning_unit_year.periodicity,
             "status": learning_unit_year.status,
@@ -316,12 +326,6 @@ def build_initial_data(learning_unit_year, entity_container_yr):
             'end_year': learning_unit_year.learning_unit.end_year,
             "other_remark": learning_unit_year.learning_unit.other_remark,
             "faculty_remark": learning_unit_year.learning_unit.faculty_remark,
-        },
-        "entities": {
-            entity_container_year_link_type.REQUIREMENT_ENTITY: entity_container_yr.entity.id,
-            entity_container_year_link_type.ALLOCATION_ENTITY: None,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
         },
         "learning_component_years": [],
         "volumes": {}

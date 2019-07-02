@@ -23,10 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.utils.translation import ugettext_lazy as _
 
 from base.business import learning_unit_year_with_context
+from base.models import entity_version
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
+
+
+def _check_entity_version_exists(learning_container_year):
+    warnings = []
+    for link_type, entity in learning_container_year.get_map_entity_by_type().items():
+        link_type_translated = EntityContainerYearLinkTypes.get_value(link_type)
+        if not entity_version.get_by_entity_and_date(entity, learning_container_year.academic_year.start_date):
+            warnings.append(
+                _("The linked %(entity)s does not exist at the start date of the academic year"
+                  " linked to this learning unit") % {'entity': link_type_translated}
+            )
+    return warnings
 
 
 def get_learning_container_year_warnings(learning_container_year):
@@ -44,17 +60,21 @@ def get_learning_container_year_warnings(learning_container_year):
             _('Volumes are inconsistent'),
             _('At least a partim volume value is greater than corresponding volume of parent')
         ))
+
+    _warnings += _check_entity_version_exists(learning_container_year)
+
     return _warnings
 
 
 def volumes_are_inconsistent_between_partim_and_full(partim, full):
     for full_component, full_component_values in full.components.items():
         if any(volumes_are_inconsistent_between_components(partim_component_values, full_component_values)
-                for partim_component, partim_component_values in partim.components.items()
-                if partim_component.type == full_component.type):
+               for partim_component, partim_component_values in partim.components.items()
+               if partim_component.type == full_component.type):
             return True
     return False
 
 
 def volumes_are_inconsistent_between_components(partim_component_values, full_component_values):
-    return any(partim_component_values.get(key) > full_value for key, full_value in full_component_values.items())
+    return any((partim_component_values.get(key) or Decimal(0)) > (full_value or Decimal(0)) for key, full_value in
+               full_component_values.items())

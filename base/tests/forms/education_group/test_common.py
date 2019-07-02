@@ -25,12 +25,13 @@
 ##############################################################################
 from unittest.mock import patch
 
+from django.conf import settings
 from django.forms import ModelForm
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from base.forms.education_group.common import EducationGroupModelForm, CommonBaseForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm, MiniTrainingForm
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -90,8 +91,11 @@ class EducationGroupYearModelFormMixin(TestCase):
         form = form_class(parent=None, user=self.user, education_group_type=self.education_group_type)
         self.assertCountEqual(tuple(form.fields.keys()), fields)
 
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2014)
     @patch('base.forms.education_group.common.find_authorized_types')
     def _test_init_and_disable_academic_year_field(self, form_class, mock_authorized_types):
+        AcademicYearFactory(year=settings.YEAR_LIMIT_EDG_MODIFICATION - 1)
+
         mock_authorized_types.return_value = EducationGroupType.objects.all()
         form = form_class(
             parent=self.parent_education_group_year,
@@ -100,8 +104,14 @@ class EducationGroupYearModelFormMixin(TestCase):
         )
 
         academic_year_field = form.fields["academic_year"]
+
         self.assertTrue(academic_year_field.disabled)
         self.assertTrue(academic_year_field.initial, self.academic_year)
+        self.assertQuerysetEqual(
+            academic_year_field.queryset,
+            AcademicYear.objects.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION),
+            transform=lambda x: x
+        )
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def _test_init_education_group_type_field(self, form_class, expected_category, mock_authorized_types):

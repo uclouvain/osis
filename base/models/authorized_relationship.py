@@ -36,8 +36,8 @@ class AuthorizedRelationshipAdmin(OsisModelAdmin):
 
 
 class AuthorizedRelationship(models.Model):
-    parent_type = models.ForeignKey(EducationGroupType, related_name='authorized_parent_type')
-    child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type')
+    parent_type = models.ForeignKey(EducationGroupType, related_name='authorized_parent_type', on_delete=models.CASCADE)
+    child_type = models.ForeignKey(EducationGroupType, related_name='authorized_child_type', on_delete=models.CASCADE)
     changed = models.DateTimeField(auto_now=True)
 
     min_count_authorized = models.PositiveIntegerField(

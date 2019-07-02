@@ -1,12 +1,12 @@
 const internship = "INTERNSHIP";
 const LEARNING_UNIT_FULL_SUBTYPE = "FULL";
-const trans_existed_acronym = gettext('existed_acronym');
-const trans_existing_acronym = gettext('existing_acronym');
-const trans_invalid_acronym = gettext('invalid_acronym');
-const trans_field_required = gettext('field_is_required');
-const trans_field_min = gettext('min_for_field');
-const trans_field_max = gettext('max_for_field');
-const trans_field_step = gettext('step_for_field');
+const trans_existed_acronym = gettext('Existed code for ');
+const trans_existing_acronym = gettext('Existing code in ');
+const trans_invalid_acronym = gettext('Invalid code');
+const trans_field_required = gettext('This field is required');
+const trans_field_min = gettext('Please enter a value greater than or equal to 0.');
+const trans_field_max = gettext('Please enter a value less than or equal to 500.');
+const trans_field_step = gettext('Please enter a value that is a multiple of 0.5.');
 
 
 var form = $('#LearningUnitYearForm').closest("form");
@@ -47,10 +47,22 @@ function updateAdditionalEntityEditability(elem, id, disable_only){
     var empty_element = elem === "";
     if (empty_element){
         $('#'.concat(id))[0].selectedIndex = 0;
+        if (id === 'id_additional_requirement_entity_2') {
+            $('#select2-id_additional_requirement_entity_2-container').empty();
+        }
         document.getElementById(id).disabled = true;
     }
     else if (!disable_only){
         document.getElementById(id).disabled = false;
+    }
+}
+
+function clearAdditionalEntity(id){
+    if (id === 'id_additional_requirement_entity_1') {
+            $('#select2-id_additional_requirement_entity_1-container').empty();
+    }
+    if (id === 'id_additional_requirement_entity_2') {
+            $('#select2-id_additional_requirement_entity_2-container').empty();
     }
 }
 
@@ -156,20 +168,22 @@ $(document).ready(function() {
         showInternshipSubtype();
     }
 
-    if(document.getElementById('id_container_type').value !== 'EXTERNAL'){
-        document.getElementById('id_additional_requirement_entity_1').disabled = !isLearningUnitSubtypeFull()
-            || isValueEmpty('id_requirement_entity')
-            || isDisabledField('id_requirement_entity');
-        document.getElementById('id_additional_requirement_entity_1_country').disabled = !isLearningUnitSubtypeFull()
-            || isValueEmpty('id_requirement_entity')
-            || isDisabledField('id_requirement_entity');
-        document.getElementById('id_additional_requirement_entity_2').disabled = !isLearningUnitSubtypeFull()
-            || isValueEmpty('id_additional_requirement_entity_1')
-            || isDisabledField('id_additional_requirement_entity_1');
-        document.getElementById('id_additional_requirement_entity_2_country').disabled = !isLearningUnitSubtypeFull()
-            || isValueEmpty('id_additional_requirement_entity_1')
-            || isDisabledField('id_additional_requirement_entity_1');
-    }
+    document.getElementById('id_additional_requirement_entity_1').disabled = !isLearningUnitSubtypeFull()
+        || isValueEmpty('id_requirement_entity')
+        || isDisabledField('id_requirement_entity');
+    document.getElementById('id_additional_entity_1_country').disabled = !isLearningUnitSubtypeFull()
+        || isValueEmpty('id_requirement_entity')
+        || isDisabledField('id_requirement_entity');
+    document.getElementById('id_additional_requirement_entity_2').disabled = !isLearningUnitSubtypeFull()
+        || isValueEmpty('id_additional_requirement_entity_1')
+        || isDisabledField('id_additional_requirement_entity_1');
+    document.getElementById('id_additional_entity_2_country').disabled = !isLearningUnitSubtypeFull()
+        || isValueEmpty('id_additional_requirement_entity_1')
+        || isDisabledField('id_additional_requirement_entity_1');
+    document.getElementById('id_component-0-repartition_volume_additional_entity_1').disabled = isValueEmpty('id_additional_requirement_entity_1');
+    document.getElementById('id_component-1-repartition_volume_additional_entity_1').disabled = isValueEmpty('id_additional_requirement_entity_1');
+    document.getElementById('id_component-0-repartition_volume_additional_entity_2').disabled = isValueEmpty('id_additional_requirement_entity_2');
+    document.getElementById('id_component-1-repartition_volume_additional_entity_2').disabled = isValueEmpty('id_additional_requirement_entity_2');
 
     $('#id_acronym_0').change(validate_acronym);
     $('#id_acronym_1').change(validate_acronym);

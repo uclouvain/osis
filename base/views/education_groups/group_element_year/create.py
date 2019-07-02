@@ -23,16 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import CreateView
+from django.views.generic.base import TemplateView
 
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
+from base.business.group_element_years.detach import DetachEducationGroupYearStrategy, DetachLearningUnitYearStrategy
 from base.business.group_element_years.management import extract_child_from_cache
 from base.forms.education_group.group_element_year import GroupElementYearForm
+from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
+
+
+class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
+    template_name = "education_group/group_element_year_attach_type_dialog_inner.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
+            child = cached_data['child_branch'] if cached_data.get('child_branch') else cached_data.get('child_leaf')
+            context['object_to_attach'] = child
+            context['source_link'] = cached_data.get('source_link')
+            context['education_group_year_parent'] = self.education_group_year
+
+        except ObjectDoesNotExist:
+            warning_msg = _("Please select an item before attach it")
+            display_warning_messages(self.request, warning_msg)
+        return context
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
@@ -46,18 +69,21 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 
         try:
             cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
-            if not cached_data:
-                raise ObjectDoesNotExist
             kwargs.update({
                 'parent': self.education_group_year,
                 'child_branch': cached_data.get('child_branch'),
                 'child_leaf': cached_data.get('child_leaf')
             })
 
+            child = kwargs['child_branch'] if kwargs['child_branch'] else kwargs['child_leaf']
+            strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                AttachLearningUnitYearStrategy
+            strategy(parent=self.education_group_year, child=child).is_valid()
         except ObjectDoesNotExist:
-            warning_msg = _("Please Select or Move an item before Attach it")
+            warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)
-
+        except ValidationError as e:
+            display_error_messages(self.request, e.messages)
         except IntegrityError as e:
             warning_msg = str(e)
             display_warning_messages(self.request, warning_msg)
@@ -79,3 +105,28 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_success_url(self):
         """ We'll reload the page """
         return
+
+
+class MoveGroupElementYearView(CreateGroupElementYearView):
+    form_class = GroupElementYearForm
+    template_name = "education_group/group_element_year_comment_inner.html"
+
+    @cached_property
+    def strategy(self):
+        obj = self.get_object()
+        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+        return strategy_class(obj)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        if not self.strategy.is_valid():
+            display_error_messages(self.request, self.strategy.errors)
+
+        return kwargs
+
+    def form_valid(self, form):
+        self.strategy.post_valid()
+        obj = self.get_object()
+        obj.delete()
+        return super().form_valid(form)

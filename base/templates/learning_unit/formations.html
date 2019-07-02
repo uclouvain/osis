@@ -40,7 +40,7 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                <th>{% trans 'code' %}</th>
+                                <th>{% trans 'Code' %}</th>
                                 <th>{% trans 'Title' %}</th>
                                 <th>{% trans "Training type" %}</th>
                                 <th>{% trans 'Block' %}</th>
@@ -62,8 +62,21 @@
                                         <td>{{ group_element_year.block | default_if_none:'-' }}</td>
                                         <td>
                                             <ul>
-                                                {% for training in  formations_by_educ_group_year|get_item:group_element_year.parent_id %}
-                                                    <li>{{ training.acronym }} - {{ training.title }}</li>
+                                                {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_id %}
+                                                    {% url 'education_group_read' training.id training.id as url_education_group_yr %}
+                                                    <li>
+                                                        <a href="{{ url_education_group_yr }}">{{ training.acronym }} - {{ training.title }}</a>
+                                                        {% if formations_by_educ_group_year|get_item:training.id %}
+                                                            <ul><li>
+                                                                {% trans 'Included in' %} :
+                                                                {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
+                                                                    {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
+                                                                    <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
+                                                                    {% if not forloop.last %} - {% endif %}
+                                                                {% endfor %}
+                                                            </li></ul>
+                                                        {% endif %}
+                                                    </li>
                                                 {% endfor %}
                                             </ul>
                                         </td>

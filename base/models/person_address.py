@@ -37,11 +37,11 @@ class PersonAddressAdmin(OsisModelAdmin):
 
 class PersonAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    person = models.ForeignKey('Person')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
     location = models.CharField(max_length=255, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
     label = models.CharField(max_length=20, choices=PersonAddressType.choices(),
                              default=PersonAddressType.PROFESSIONAL.value)
 

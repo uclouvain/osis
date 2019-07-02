@@ -28,27 +28,52 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}"><ins>{{ learning_unit_year.acronym }}</ins></a>
-                {% trans "has the following prerequisites" %}:
+                <a href="{% url 'learning_unit' learning_unit_year.pk %}">
+                    <ins>{{ learning_unit_year.acronym }}</ins>
+                </a>
+                {% trans "has the following prerequisites" %} :
             </p>
 
             <div class="row">
                 <div class="col-md-7">
-                    <p>{{ prerequisite.prerequisite_string|default:"-"}}</p>
+                    <p>{{ prerequisite.prerequisite_string_as_href|safe|default:"-" }}</p>
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}
                         <a class="btn btn-default"
-                           href="{% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id%}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                           href=
+                                   {% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
                            role="button">
                             {% trans 'Modify prerequisites' %}
                         </a>
-                        {% else %}
+                    {% else %}
                         <button class="btn btn-default" disabled>{% trans 'Modify prerequisites' %}</button>
                     {% endif %}
                 </div>
             </div>
 
+
         </div>
     </div>
+    {% if is_prerequisites_list %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>
+                    <a href="{% url 'learning_unit' learning_unit_year.pk %}">
+                        <ins>{{ learning_unit_year.acronym }}</ins>
+                    </a>
+                    {% trans 'is a prereqisite of' %}:
+                </p>
+
+                {% for p in is_prerequisites_list %}
+                    <a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a>
+                    {% if is_prerequisites_list|length > 1 %}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

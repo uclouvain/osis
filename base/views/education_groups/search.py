@@ -79,7 +79,6 @@ def education_groups(request):
         'form': filter_form.form,
         'object_list': object_list_paginated,
         'object_list_count': objects_qs.count(),
-        'experimental_phase': True,
         'enums': education_group_categories,
         'person': person
     }

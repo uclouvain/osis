@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.education_group_year import search, find_with_enrollments_count
@@ -44,7 +45,6 @@ from base.tests.factories.offer_year import OfferYearFactory
 
 
 class EducationGroupYearTest(TestCase):
-
     def setUp(self):
         self.academic_year = AcademicYearFactory()
         self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
@@ -66,6 +66,8 @@ class EducationGroupYearTest(TestCase):
                                                                 education_group_type=self.education_group_type_group)
         self.education_group_year_5 = EducationGroupYearFactory(academic_year=self.academic_year,
                                                                 education_group_type=self.education_group_type_group)
+        self.education_group_year_6 = EducationGroupYearFactory(academic_year=self.academic_year,
+                                                                education_group_type=self.education_group_type_training)
 
         self.educ_group_year_domain = EducationGroupYearDomainFactory(education_group_year=self.education_group_year_2)
 
@@ -85,8 +87,12 @@ class EducationGroupYearTest(TestCase):
 
         self.group_element_year_4 = GroupElementYearFactory(parent=self.education_group_year_3,
                                                             child_branch=self.education_group_year_1)
-        self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_3,
+        self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_6,
                                                             child_branch=self.education_group_year_1)
+
+    def test_verbose_type(self):
+        type_of_egt = self.education_group_year_1.education_group_type.get_name_display()
+        self.assertEqual(type_of_egt, self.education_group_year_1.verbose_type)
 
     def test_verbose_credit(self):
         verbose__waiting = "{} ({} {})".format(
@@ -104,7 +110,7 @@ class EducationGroupYearTest(TestCase):
 
         result = search(education_group_type=[self.education_group_type_training,
                                               self.education_group_type_minitraining])
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
 
     def test_domains_property(self):
         domains = self.education_group_year_1.str_domains
@@ -159,6 +165,7 @@ class EducationGroupYearTest(TestCase):
                 self.education_group_year_2,
                 self.education_group_year_3,
                 self.education_group_year_4,
+                self.education_group_year_6
             ]
         )
 
@@ -187,6 +194,7 @@ class EducationGroupYearTest(TestCase):
                 self.education_group_year_3,
                 self.education_group_year_4,
                 self.education_group_year_5,
+                self.education_group_year_6,
             ]
         )
 
@@ -196,6 +204,7 @@ class EducationGroupYearTest(TestCase):
         self.assertFalse(self.education_group_year_3.is_mini_training())
         self.assertFalse(self.education_group_year_4.is_mini_training())
         self.assertFalse(self.education_group_year_5.is_mini_training())
+        self.assertFalse(self.education_group_year_6.is_mini_training())
 
 
 class EducationGroupYearCleanTest(TestCase):
@@ -243,6 +252,19 @@ class EducationGroupYearCleanTest(TestCase):
 
         with self.assertRaises(ValidationError):
             e.clean()
+
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2016)
+    def test_clean_case_academic_year_before_settings(self):
+        e = EducationGroupYearFactory(academic_year__year=2015)
+
+        with self.assertRaises(ValidationError) as context_error:
+            e.clean()
+
+        self.assertListEqual(
+            context_error.exception.messages,
+            [_("You cannot create/update an education group before %(limit_year)s") % {
+                                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}]
+        )
 
 
 class TestCleanPartialAcronym(TestCase):

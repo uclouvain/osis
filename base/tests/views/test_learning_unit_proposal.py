@@ -32,7 +32,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError, transaction
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
@@ -41,13 +40,13 @@ from waffle.testutils import override_flag
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit_proposal as proposal_business
-from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS
+from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
-from base.models import entity_container_year, entity_version
+from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import entity_container_year_link_type, learning_unit_year_periodicity
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
@@ -61,7 +60,6 @@ from base.tests.factories.academic_year import create_current_academic_year, \
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -91,10 +89,18 @@ class TestLearningUnitModificationProposal(TestCase):
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
+        an_entity = EntityFactory(organization=an_organization)
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
+                                                  start_date=current_academic_year.start_date,
+                                                  end_date=current_academic_year.end_date)
         learning_container_year = LearningContainerYearFactory(
             acronym="LOSIS1212",
             academic_year=current_academic_year,
             container_type=learning_container_year_types.COURSE,
+            requirement_entity=cls.entity_version.entity,
+            allocation_entity=cls.entity_version.entity,
+            additional_entity_1=cls.entity_version.entity,
+            additional_entity_2=cls.entity_version.entity,
         )
         cls.learning_unit_year = LearningUnitYearFakerFactory(
             acronym=learning_container_year.acronym,
@@ -105,31 +111,6 @@ class TestLearningUnitModificationProposal(TestCase):
             specific_title_english="title english",
             campus=CampusFactory(organization=an_organization, is_administration=True),
             internship_subtype=None
-        )
-
-        an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                  start_date=current_academic_year.start_date,
-                                                  end_date=current_academic_year.end_date)
-        cls.requirement_entity = EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=cls.entity_version.entity,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        )
-        cls.allocation_entity = EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=cls.entity_version.entity,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY
-        )
-        cls.additional_requirement_entity_1 = EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=cls.entity_version.entity,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1
-        )
-        cls.additional_requirement_entity_2 = EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=cls.entity_version.entity,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2
         )
 
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=an_entity, with_child=True)
@@ -156,10 +137,10 @@ class TestLearningUnitModificationProposal(TestCase):
             "entity": cls.entity_version.id,
             "folder_id": "1",
             "state": proposal_state.ProposalState.FACULTY.name,
-            'requirement_entity-entity': cls.entity_version.id,
-            'allocation_entity-entity': cls.entity_version.id,
-            'additional_requirement_entity_1-entity': cls.entity_version.id,
-            'additional_requirement_entity_2-entity': cls.entity_version.id,
+            'requirement_entity': cls.entity_version.id,
+            'allocation_entity': cls.entity_version.id,
+            'additional_entity_1': cls.entity_version.id,
+            'additionanl_entity_2': cls.entity_version.id,
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
@@ -168,9 +149,11 @@ class TestLearningUnitModificationProposal(TestCase):
             'component-0-hourly_volume_total_annual': 20,
             'component-0-hourly_volume_partial_q1': 10,
             'component-0-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-1-planned_classes': 1,
         }
 
     def setUp(self):
@@ -196,7 +179,6 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/proposal/create_modification.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        self.assertEqual(response.context['experimental_phase'], True)
         self.assertEqual(response.context['person'], self.person)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
@@ -220,7 +202,6 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/proposal/create_modification.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        self.assertEqual(response.context['experimental_phase'], True)
         self.assertEqual(response.context['person'], self.person)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
@@ -236,9 +217,10 @@ class TestLearningUnitModificationProposal(TestCase):
 
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.MODIFICATION.name),
-                self.learning_unit_year.acronym),
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                'type': proposal_type.ProposalType.MODIFICATION.value,
+                'acronym': self.learning_unit_year.acronym
+            },
             list(messages_list))
 
     def test_initial_data_fields(self):
@@ -246,6 +228,7 @@ class TestLearningUnitModificationProposal(TestCase):
             'learning_container_year': [
                 "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
                 "is_vacant", "type_declaration_vacant",
+                'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
             ],
             'learning_unit': [
                 "id", "end_year", "faculty_remark", "other_remark",
@@ -256,8 +239,9 @@ class TestLearningUnitModificationProposal(TestCase):
                 "session", "attribution_procedure",
             ],
             'learning_component_year': [
-                "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
-                "planned_classes", "type"
+                "id", "acronym","hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
+                "planned_classes", "type", "repartition_volume_requirement_entity",
+                "repartition_volume_additional_entity_1", "repartition_volume_additional_entity_2"
             ],
         }
 
@@ -279,11 +263,18 @@ class TestLearningUnitSuppressionProposal(TestCase):
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
 
+        an_entity = EntityFactory(organization=an_organization)
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
+                                                  start_date=current_academic_year.start_date,
+                                                  end_date=current_academic_year.end_date)
+
         cls.next_academic_year = AcademicYearFactory(year=current_academic_year.year + 1)
 
         learning_container_year = LearningContainerYearFactory(
             academic_year=current_academic_year,
-            container_type=learning_container_year_types.COURSE
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=cls.entity_version.entity,
+            allocation_entity=cls.entity_version.entity,
         )
         cls.learning_unit = LearningUnitFactory(
             end_year=None
@@ -301,21 +292,6 @@ class TestLearningUnitSuppressionProposal(TestCase):
                 is_administration=True
             ),
             periodicity=learning_unit_year_periodicity.ANNUAL
-        )
-
-        an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                  start_date=current_academic_year.start_date,
-                                                  end_date=current_academic_year.end_date)
-        cls.requirement_entity = EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=cls.entity_version.entity,
-            type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        )
-        cls.allocation_entity = EntityContainerYearFactory(
-            learning_container_year=cls.learning_unit_year.learning_container_year,
-            entity=cls.entity_version.entity,
-            type=entity_container_year_link_type.ALLOCATION_ENTITY
         )
 
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=an_entity, with_child=True)
@@ -337,7 +313,6 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/proposal/create_suppression.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        self.assertEqual(response.context['experimental_phase'], True)
         self.assertEqual(response.context['person'], self.person)
 
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
@@ -362,9 +337,10 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
-            _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.SUPPRESSION.name),
-                self.learning_unit_year.acronym),
+            _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                'type': proposal_type.ProposalType.SUPPRESSION.value,
+                'acronym': self.learning_unit_year.acronym
+            },
             list(messages)
         )
 
@@ -481,11 +457,10 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
 
-        requirement_entity_container = entity_container_year. \
-            find_by_learning_container_year_and_linktype(self.learning_unit_year.learning_container_year,
-                                                         entity_container_year_link_type.REQUIREMENT_ENTITY)
-        self.person_entity = PersonEntityFactory(person=self.person,
-                                                 entity=requirement_entity_container.entity)
+        self.person_entity = PersonEntityFactory(
+            person=self.person,
+            entity=self.learning_unit_year.learning_container_year.requirement_entity
+        )
 
         self.client.force_login(self.person.user)
         self.url = reverse('learning_unit_cancel_proposal', args=[self.learning_unit_year.id])
@@ -563,46 +538,31 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.assertTrue(_test_attributes_equal(self.learning_unit_year.learning_unit, initial_data["learning_unit"]))
         self.assertTrue(_test_attributes_equal(self.learning_unit_year.learning_container_year,
                                                initial_data["learning_container_year"]))
-        self.assertTrue(_test_entities_equal(self.learning_unit_year.learning_container_year, initial_data["entities"]))
 
 
 def _test_attributes_equal(obj, attribute_values_dict):
     for key, value in attribute_values_dict.items():
+        attr_value = getattr(obj, key)
+        foreign_key_fields = [
+            "campus", "language", 'requirement_entity', 'allocation_entity',
+            'additional_entity_1', 'additional_entity_2'
+        ]
         if key == "credits":
-            if float(getattr(obj, key)) != float(value):
+            if float(attr_value) != float(value):
                 return False
-        elif key in ["campus", "language"]:
-            if getattr(obj, key).pk != value:
+        elif attr_value and key in foreign_key_fields:
+            if attr_value.pk != value:
                 return False
-        elif getattr(obj, key) != value:
-            return False
-    return True
-
-
-def _test_entities_equal(learning_container_year, entities_values_dict):
-    for type_entity in [entity_container_year_link_type.REQUIREMENT_ENTITY,
-                        entity_container_year_link_type.ALLOCATION_ENTITY,
-                        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2]:
-
-        linked_entity_container = entity_container_year.find_by_learning_container_year_and_linktype(
-            learning_container_year, type_entity)
-        if entities_values_dict[type_entity] is None and linked_entity_container is not None:
-            return False
-        if entities_values_dict[type_entity] is not None \
-                and linked_entity_container.entity.id != entities_values_dict[type_entity]:
+        elif attr_value != value:
             return False
     return True
 
 
 def _create_proposal_learning_unit(acronym):
-    an_entity = EntityFactory()
-    EntityVersionFactory(entity=an_entity)
-    a_learning_unit_year = LearningUnitYearFactory(acronym=acronym, subtype=learning_unit_year_subtypes.FULL)
-    an_entity_container_year = EntityContainerYearFactory(
-        learning_container_year=a_learning_unit_year.learning_container_year,
-        type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-        entity=an_entity
+    a_learning_unit_year = LearningUnitYearFactory(
+        acronym=acronym,
+        subtype=learning_unit_year_subtypes.FULL,
+        learning_container_year__requirement_entity=EntityVersionFactory().entity,
     )
     learning_component_lecturing = LearningComponentYearFactory(
         learning_unit_year=a_learning_unit_year,
@@ -612,14 +572,19 @@ def _create_proposal_learning_unit(acronym):
         learning_unit_year=a_learning_unit_year,
         type=learning_component_year_type.PRACTICAL_EXERCISES)
 
+    container_year = a_learning_unit_year.learning_container_year
     initial_data = {
         "learning_container_year": {
-            "id": a_learning_unit_year.learning_container_year.id,
+            "id": container_year.id,
             "acronym": a_learning_unit_year.acronym,
             "common_title": a_learning_unit_year.specific_title,
             "common_title_english": a_learning_unit_year.specific_title_english,
-            "container_type": a_learning_unit_year.learning_container_year.container_type,
-            "in_charge": a_learning_unit_year.learning_container_year.in_charge
+            "container_type": container_year.container_type,
+            "in_charge": container_year.in_charge,
+            "requirement_entity": container_year.requirement_entity.id,
+            "allocation_entity": None,
+            "additional_entity_1": None,
+            "additional_entity_2": None,
         },
         "learning_unit_year": {
             "id": a_learning_unit_year.id,
@@ -634,12 +599,6 @@ def _create_proposal_learning_unit(acronym):
         },
         "learning_unit": {
             "id": a_learning_unit_year.learning_unit.id,
-        },
-        "entities": {
-            entity_container_year_link_type.REQUIREMENT_ENTITY: an_entity_container_year.entity.id,
-            entity_container_year_link_type.ALLOCATION_ENTITY: None,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
         },
         "learning_component_years": [
             {"id": learning_component_lecturing.id, "planned_classes": learning_component_lecturing.planned_classes,
@@ -660,7 +619,7 @@ def _create_proposal_learning_unit(acronym):
                                        type=proposal_type.ProposalType.MODIFICATION.name,
                                        state=proposal_state.ProposalState.FACULTY.name,
                                        initial_data=initial_data,
-                                       entity=an_entity)
+                                       entity=container_year.requirement_entity)
 
 
 def _modify_learning_unit_year_data(a_learning_unit_year):
@@ -677,9 +636,8 @@ def _modify_learning_unit_year_data(a_learning_unit_year):
 
 
 def _modify_entities_linked_to_learning_container_year(a_learning_container_year):
-    a_new_entity = EntityFactory()
-    entity_container_year.search(learning_container_year=a_learning_container_year). \
-        update(entity=a_new_entity)
+    a_learning_container_year.requirement_entity = EntityFactory()
+    a_learning_container_year.save()
 
 
 @override_flag('learning_unit_proposal_update', active=True)
@@ -704,7 +662,7 @@ class TestEditProposal(TestCase):
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
 
         cls.person = PersonWithPermissionsFactory("can_edit_learning_unit_proposal")
-        requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year.entity
+        requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         PersonEntityFactory(entity=requirement_entity_of_luy, person=cls.person)
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.entity)
 
@@ -754,9 +712,9 @@ class TestEditProposal(TestCase):
             "periodicity": learning_unit_year_periodicity.ANNUAL,
             "entity": self.entity_version.id,
             "folder_id": 1,
-            'requirement_entity-entity': self.entity_version.id,
-            'allocation_entity-entity': self.entity_version.id,
-            'additional_requirement_entity_1-entity': '',
+            'requirement_entity': self.entity_version.id,
+            'allocation_entity': self.entity_version.id,
+            'additional_entity_1': '',
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
@@ -765,9 +723,11 @@ class TestEditProposal(TestCase):
             'component-0-hourly_volume_total_annual': 20,
             'component-0-hourly_volume_partial_q1': 10,
             'component-0-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-1-planned_classes': 1,
         }
 
     def get_modify_data(self):
@@ -781,6 +741,8 @@ class TestEditProposal(TestCase):
         return faultydict
 
     def test_edit_proposal_post_as_faculty_manager(self):
+        initial_data = copy_learning_unit_data(self.learning_unit_year)
+        self.proposal.initial_data = initial_data
         request_factory = RequestFactory()
         request = request_factory.post(self.url, data=self.get_modify_data())
 
@@ -943,7 +905,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_str_representing_old_data_from_foreign_key(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences, str(self.campus.name))
 
     def test_get_str_representing_old_data_from_foreign_key_equals_no_value(self):
         differences = proposal_business._get_str_representing_old_data_from_foreign_key(
@@ -959,7 +921,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)
-        self.assertEqual(differences, str(self.campus))
+        self.assertEqual(differences, str(self.campus.name))
 
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)

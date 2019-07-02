@@ -78,7 +78,7 @@ class EducationGroupFilter(FilterSet):
     )
     with_entity_subordinated = filters.BooleanFilter(
         method=lambda queryset, *args, **kwargs: queryset,
-        label=_('With subord. ent.'),
+        label=_('Include subordinate entities'),
         widget=forms.CheckboxInput
     )
     acronym = filters.CharFilter(
@@ -132,6 +132,7 @@ class EducationGroupFilter(FilterSet):
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.form.fields['academic_year'].initial = current_academic_year()
         self.form.fields['category'].initial = education_group_categories.TRAINING
+        self.form.fields["with_entity_subordinated"].initial = kwargs.pop('with_entity_subordinated', True)
 
     def filter_with_entity_subordinated(self, queryset, name, value):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']

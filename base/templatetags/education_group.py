@@ -31,26 +31,17 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
-from base.business.education_groups.perms import is_eligible_to_delete_education_group, \
-    is_eligible_to_change_education_group, is_eligible_to_add_training, \
+from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
-    _is_eligible_certificate_aims
-from base.models.academic_year import AcademicYear, current_academic_year
+    _is_eligible_certificate_aims, is_eligible_to_delete_education_group_year
+from base.models.academic_year import AcademicYear
 from base.models.utils.utils import get_verbose_field_value
 
-# TODO Use inclusion tags instead
-BUTTON_ORDER_TEMPLATE = """
-<button type="submit" title="{}" class="btn btn-default btn-sm" 
-    id="{}" data-toggle="tooltip-wrapper" name="action" value="{}" {}>
-    <i class="fa {}"></i>
-</button>
-"""
-
 ICONS = {
-    "up": "fa-arrow-up",
-    "down": "fa-arrow-down",
-    "detach": "fa-times",
-    "edit": "fa-edit",
+    "up": "fa fa-arrow-up",
+    "down": "fa fa-arrow-down",
+    "detach": "glyphicon glyphicon-remove",
+    "edit": "glyphicon glyphicon-edit",
 }
 
 register = template.Library()
@@ -58,13 +49,16 @@ register = template.Library()
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_deletion_perm(context, url, message, url_id="link_delete"):
-    return li_with_permission(context, is_eligible_to_delete_education_group, url, message, url_id, True)
+    return li_with_permission(context, is_eligible_to_delete_education_group_year, url, message, url_id, True)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_update_perm(context, url, message, url_id="link_update"):
-    if context['education_group_year'].academic_year.year < current_academic_year().year and \
-            context['person'].is_faculty_manager:
+    person = context['person']
+    year = context['education_group_year'].academic_year.year
+    is_general_faculty_manager = person.is_faculty_manager and not person.is_faculty_manager_for_ue
+    is_education_group_in_past = year < context['current_academic_year'].year
+    if is_education_group_in_past and is_general_faculty_manager:
         return li_with_permission(context, _is_eligible_certificate_aims, url, message, url_id, True)
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 
@@ -134,7 +128,6 @@ def _get_permission(context, permission):
     except PermissionDenied as e:
         result = False
         permission_denied_message = str(e)
-
     return permission_denied_message, "" if result else "disabled", root
 
 
@@ -143,19 +136,20 @@ def button_edit_administrative_data(context):
     education_group_year = context.get('education_group_year')
 
     permission_denied_message, is_disabled, root = _get_permission(context, can_user_edit_administrative_data)
-    if not permission_denied_message:
+    if not permission_denied_message and is_disabled:
         permission_denied_message = _("Only program managers of the education group OR "
                                       "central manager linked to entity can edit.")
 
     return {
-        'is_disabled': is_disabled,
-        'message': permission_denied_message,
+        'class_li': is_disabled,
+        'title': permission_denied_message,
         'text': _('Modify'),
-        'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
+        'url': '#' if is_disabled else
+        reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }
 
 
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag("blocks/button/button_order.html", takes_context=True)
 def button_order_with_permission(context, title, id_button, value):
     permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
 
@@ -168,24 +162,12 @@ def button_order_with_permission(context, title, id_button, value):
     if value == "down" and context["forloop"]["last"]:
         disabled = "disabled"
 
-    return mark_safe(BUTTON_ORDER_TEMPLATE.format(title, id_button, value, disabled, ICONS[value]))
-
-
-@register.inclusion_tag("blocks/button/button_template.html", takes_context=True)
-def button_with_permission(context, title, value, url):
-    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
-    load_modal = True
-
-    if disabled:
-        title = permission_denied_message
-        load_modal = False
-
     return {
-        'load_modal': load_modal,
         'title': title,
-        'class_button': "btn-default btn-sm " + disabled,
+        'id': id_button,
+        'value': value,
+        'disabled': disabled,
         'icon': ICONS[value],
-        'url': url,
     }
 
 

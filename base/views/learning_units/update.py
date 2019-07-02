@@ -27,6 +27,7 @@ from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -38,11 +39,12 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
+from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
-from base.models.entity_version import find_pedagogical_entities_version, \
-    find_all_current_entities_version
+from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
@@ -121,11 +123,7 @@ def update_learning_unit(request, learning_unit_year_id):
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
     context["is_update"] = True
-
-    if learning_unit_year.is_external():
-        template = "learning_unit/external/update.html"
-    else:
-        template = 'learning_unit/simple/update.html'
+    template = 'learning_unit/simple/update.html'
 
     return render(request, template, context)
 
@@ -154,7 +152,6 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     context['tab_active'] = 'components'
     context['entity_types_volume'] = REQUIREMENT_ENTITIES
     context['luy_url'] = 'learning_unit_components' if form_type == "full" else 'learning_unit'
-    context['experimental_phase'] = True
     if request.is_ajax():
         return JsonResponse({'errors': volume_edition_formset_container.errors})
 
@@ -190,15 +187,43 @@ def _save_form_and_display_messages(request, form):
 class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         country = self.forwarded.get('country', None)
-        if country and country == "all":
-            qs = find_all_current_entities_version().order_by('acronym')
-        elif country:
-            qs = find_all_current_entities_version().filter(entity__country__id=country).order_by('acronym')
+        qs = find_additional_requirement_entities_choices()
+        if country:
+            qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
+            if country != "all":
+                qs = qs.filter(entity__country_id=country)
         else:
-            qs = find_pedagogical_entities_version()
+            qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:
-            qs = qs.filter(acronym__icontains=self.q).order_by('acronym')
+            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
         return qs
+
+    def get_result_label(self, result):
+        return format_html(result.verbose_title)
+
+
+class AllocationEntityAutocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_allocation_entity')
+        return super(AllocationEntityAutocomplete, self).get_queryset()
+
+
+class AdditionnalEntity1Autocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_additional_entity_1')
+        return super(AdditionnalEntity1Autocomplete, self).get_queryset()
+
+
+class AdditionnalEntity2Autocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        self.forwarded['country'] = self.forwarded.get('country_additional_entity_2')
+        return super(AdditionnalEntity2Autocomplete, self).get_queryset()
+
+
+class EntityRequirementAutocomplete(EntityAutocomplete):
+    def get_queryset(self):
+        return super(EntityRequirementAutocomplete, self).get_queryset()\
+            .filter(entity__in=self.request.user.person.linked_entities)
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)

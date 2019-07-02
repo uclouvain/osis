@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import random
 from unittest import mock
 
 from django.core.exceptions import PermissionDenied
@@ -31,7 +32,8 @@ from django.test import TestCase
 
 from base.business.education_groups.perms import is_education_group_edit_period_opened, check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
-    GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms
+    GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
+    _is_eligible_to_add_education_group_with_category
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, Categories
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -40,7 +42,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
-    FacultyManagerFactory
+    FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -105,6 +107,42 @@ class TestPerms(TestCase):
     def test_check_authorized_type_without_parent(self):
         result = check_authorized_type(None, TRAINING)
         self.assertTrue(result)
+
+    def test_faculty_manager_is_not_eligible_to_add_groups_in_search_page(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            None,
+            Categories.GROUP,
+            raise_exception=False
+        )
+        self.assertFalse(result)
+
+    def test_faculty_manager_is_eligible_to_add_groups_in_tree_of_offer_of_its_entity(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            EducationGroupYearFactory(),
+            Categories.GROUP,
+            raise_exception=False
+        )
+        self.assertTrue(result)
+
+    def test_faculty_manager_is_eligible_to_add_mini_training(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            random.choice([EducationGroupYearFactory(), None]),
+            Categories.MINI_TRAINING,
+            raise_exception=False
+        )
+        self.assertTrue(result)
+
+    def test_faculty_manager_is_not_eligible_to_add_training(self):
+        result = _is_eligible_to_add_education_group_with_category(
+            FacultyManagerFactory(),
+            random.choice([EducationGroupYearFactory(), None]),
+            Categories.TRAINING,
+            raise_exception=False
+        )
+        self.assertFalse(result)
 
 
 class TestCommonEducationGroupStrategyPerms(TestCase):
@@ -245,6 +283,14 @@ class TestGeneralInformationPerms(TestCase):
         self.assertTrue(mock_is_faculty_eligible.called)
 
     @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    def test_is_not_eligible_case_user_is_faculty_manager_for_ue(self, mock_super_is_eligible):
+        faculty_manager = UEFacultyManagerFactory()
+        perm = GeneralInformationPerms(faculty_manager.user, self.common_bachelor)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+        self.assertTrue(mock_super_is_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
     @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_user_have_perm", return_value=True)
     @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_sic_eligible")
     def test_is_eligible_case_user_is_sic(self, mock_is_sic_eligible, mock_user_have_perm, mock_super_is_eligible):
@@ -254,6 +300,12 @@ class TestGeneralInformationPerms(TestCase):
 
         self.assertTrue(mock_super_is_eligible.called)
         self.assertTrue(mock_is_sic_eligible.called)
+
+    def test_is_not_eligible_case_user_is_administrative_manager(self, ):
+        administrative_manager = AdministrativeManagerFactory()
+
+        perm = GeneralInformationPerms(administrative_manager.user, self.common_bachelor)
+        self.assertFalse(perm.is_eligible())
 
     def test_is_user_have_perm_for_common_case_user_without_perm(self):
         person = PersonWithPermissionsFactory()
@@ -352,6 +404,14 @@ class TestAdmissionConditionPerms(TestCase):
         self.assertTrue(mock_is_faculty_eligible.called)
 
     @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    def test_is_not_eligible_case_user_is_faculty_manager_for_ue(self, mock_super_is_eligible):
+        faculty_manager = UEFacultyManagerFactory()
+        perm = AdmissionConditionPerms(faculty_manager.user, self.common_bachelor)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+        self.assertTrue(mock_super_is_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
     @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_user_have_perm", return_value=True)
     @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_sic_eligible")
     def test_is_eligible_case_user_is_sic(self, mock_is_sic_eligible, mock_user_have_perm, mock_super_is_eligible):
@@ -361,6 +421,12 @@ class TestAdmissionConditionPerms(TestCase):
 
         self.assertTrue(mock_super_is_eligible.called)
         self.assertTrue(mock_is_sic_eligible.called)
+
+    def test_is_not_eligible_case_user_is_administrative_manager(self, ):
+        administrative_manager = AdministrativeManagerFactory()
+
+        perm = AdmissionConditionPerms(administrative_manager.user, self.common_bachelor)
+        self.assertFalse(perm.is_eligible())
 
     def test_is_user_have_perm_for_common_case_user_without_perm(self):
         person = PersonWithPermissionsFactory()
