@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 
 from django.db import IntegrityError, transaction, Error
 from django.db.models import F
