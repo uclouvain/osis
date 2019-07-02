@@ -245,11 +245,12 @@ LOCALE_PATHS = ()
 
 
 # Apps Settings
+CDN_URL = os.environ.get("CDN_URL", "")
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraPlugins': ','.join(['pastefromword', 'cdn']),
+        'extraPlugins': ','.join(['pastefromword', 'cdn'] if CDN_URL else ['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -263,7 +264,7 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
+        'customValues': {'cdn_url': CDN_URL},
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -291,7 +292,7 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
-        'extraPlugins': ','.join(['cdn']),
+        'extraPlugins': ','.join(['cdn']) if CDN_URL else '',
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
@@ -302,7 +303,7 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
+        'customValues': {'cdn_url': CDN_URL},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
