@@ -485,10 +485,11 @@ def _check_postponement_conflict_on_volumes(lcy, next_lcy):
     for luy_with_components in current_learning_units:
         try:
             next_luy_with_components = _get_next_luy_with_components(luy_with_components, next_year_learning_units)
-            error_list.extend(_check_postponement_conflict_on_components(
-                luy_with_components,
-                next_luy_with_components)
-            )
+            if next_luy_with_components:
+                error_list.extend(_check_postponement_conflict_on_components(
+                    luy_with_components,
+                    next_luy_with_components)
+                )
         except StopIteration:
             error_list.append(_("There is not the learning unit %(acronym)s - %(next_year)s") % {
                 'acronym': luy_with_components.acronym,
@@ -498,8 +499,10 @@ def _check_postponement_conflict_on_volumes(lcy, next_lcy):
 
 
 def _get_next_luy_with_components(luy_with_components, next_year_learning_units):
-    return next(luy for luy in next_year_learning_units if
-                luy.learning_unit == luy_with_components.learning_unit)
+    return next(
+        (luy for luy in next_year_learning_units if luy.learning_unit == luy_with_components.learning_unit),
+        None
+    )
 
 
 def _check_postponement_conflict_on_components(luy_with_components, next_luy_with_components):
