@@ -98,7 +98,7 @@ class TestLearningUnitFormationsTab(TestCase):
                 ]
             }
         )
-        self.assertEqual(
+        self.assertCountEqual(
             list(response.context['group_elements_years']),
             [self.group_element_year]
         )
