@@ -27,13 +27,14 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.utils import formats
 from django.utils.translation import ugettext as _
+from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_calendar import AbstractCalendar
 from base.signals.publisher import compute_scores_encodings_deadlines
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class OfferYearCalendarAdmin(OsisModelAdmin):
+class OfferYearCalendarAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('academic_calendar', 'offer_year', 'start_date', 'end_date', 'changed', 'education_group_year')
     raw_id_fields = ('offer_year', 'education_group_year')
     search_fields = ['offer_year__acronym']

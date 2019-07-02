@@ -28,13 +28,14 @@ import collections
 from django.db import models
 from django.db.models import Case, When
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EducationGroupTypeAdmin(SerializableModelAdmin):
+class EducationGroupTypeAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('name', 'category', )
     list_filter = ('name', 'category', )
     search_fields = ['name', 'category']

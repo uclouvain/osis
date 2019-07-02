@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ObjectDoesNotExist
+from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_achievement import AbstractAchievement, AbstractAchievementAdmin
 
 
-class LearningAchievementAdmin(AbstractAchievementAdmin):
+class LearningAchievementAdmin(VersionAdmin, AbstractAchievementAdmin):
     raw_id_fields = ('learning_unit_year',)
 
     def get_list_display(self, request):
