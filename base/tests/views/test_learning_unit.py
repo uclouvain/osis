@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import json
+from decimal import Decimal
 from unittest import mock
 
 import factory.fuzzy
@@ -1386,19 +1387,19 @@ class TestLearningUnitProposalComparison(TestCase):
                                                    end_date=today.replace(year=today.year + 1))
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
-            acronym="TP",
+            acronym="PM",
             learning_unit_year=self.learning_unit_year,
-            repartition_volume_requirement_entity=10,
-            repartition_volume_additional_entity_1=10,
-            repartition_volume_additional_entity_2=10
+            repartition_volume_requirement_entity=Decimal(10),
+            repartition_volume_additional_entity_1=Decimal(10),
+            repartition_volume_additional_entity_2=Decimal(10)
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
             learning_unit_year=self.learning_unit_year,
-            repartition_volume_requirement_entity=10,
-            repartition_volume_additional_entity_1=10,
-            repartition_volume_additional_entity_2=10
+            repartition_volume_requirement_entity=Decimal(10),
+            repartition_volume_additional_entity_1=Decimal(10),
+            repartition_volume_additional_entity_2=Decimal(10)
         )
 
         requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
@@ -1459,23 +1460,23 @@ class TestLearningUnitProposalComparison(TestCase):
                  }
             ],
             "volumes": {
-                'LECTURING': {
+                'PM': {
                     VOLUME_Q1: self.learning_component_year_lecturing.hourly_volume_partial_q1,
                     VOLUME_Q2: self.learning_component_year_lecturing.hourly_volume_partial_q2,
                     REAL_CLASSES: 1,
                     VOLUME_TOTAL: self.learning_component_year_practical.hourly_volume_total_annual,
                     PLANNED_CLASSES: self.learning_component_year_lecturing.planned_classes,
-                    VOLUME_REQUIREMENT_ENTITY: 120.0,
-                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: 120.0,
-                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
-                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
+                    VOLUME_REQUIREMENT_ENTITY: Decimal(120),
+                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: Decimal(120),
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(0),
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: Decimal(0)
                 },
-                'PRACTICAL_EXERCISES': {
-                    VOLUME_Q1: 10, VOLUME_Q2: 10, REAL_CLASSES: 0, VOLUME_TOTAL: 20,
-                    PLANNED_CLASSES: 0, VOLUME_REQUIREMENT_ENTITY: 0,
-                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: 0,
-                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0,
-                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0
+                'PP': {
+                    VOLUME_Q1: Decimal(10), VOLUME_Q2: Decimal(10), REAL_CLASSES: 0, VOLUME_TOTAL: Decimal(20),
+                    PLANNED_CLASSES: 0, VOLUME_REQUIREMENT_ENTITY: Decimal(0),
+                    VOLUME_TOTAL_REQUIREMENT_ENTITIES: Decimal(0),
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(0),
+                    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: Decimal(0)
                 }
             }
         }
