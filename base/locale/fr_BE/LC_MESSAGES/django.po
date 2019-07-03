@@ -4661,7 +4661,6 @@ msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 
 #: business/learning_units/edition.py:565
 #: tests/business/learning_units/test_edition.py:406
-#, python-format
 msgid ""
 "The value of field '%(field)s' for the learning unit %(acronym)s "
 "(%(component_type)s) is different between year %(year)s - %(value)s and year "
