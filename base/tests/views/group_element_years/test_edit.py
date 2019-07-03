@@ -104,8 +104,15 @@ class TestEdit(TestCase):
         }
         response = self.client.post(self.url, data=data)
 
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND, catch_error_forms(response))
 
         self.group_element_year.refresh_from_db()
         self.assertEqual(self.group_element_year.comment, data['comment'])
         self.assertEqual(self.group_element_year.comment_english, data['comment_english'])
+
+
+def catch_error_forms(response) -> str:
+    try:
+        return response.context['form'].errors
+    except Exception:
+        return "Unknown Error"
