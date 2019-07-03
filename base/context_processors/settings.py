@@ -28,6 +28,12 @@ from django.conf import settings
 
 def virtual_desktop(request):
     url = ''
-    if request.user.person.is_program_manager:
-        url = settings.VIRTUAL_DESKTOP_URL
+    if request.user.is_authenticated():
+        url = _get_virtual_desktop_url_if_program_manager(request, url)
     return {"virtual_desktop_url": url}
+
+
+def _get_virtual_desktop_url_if_program_manager(request, url):
+    if hasattr(request.user, 'person') and request.user.person.is_program_manager:
+        url = settings.VIRTUAL_DESKTOP_URL
+    return url
