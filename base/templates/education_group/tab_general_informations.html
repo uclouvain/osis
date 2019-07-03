@@ -32,26 +32,37 @@
 {% endblock %}
 {% block details %}
     {% url 'education_group_pedagogy_edit' parent.pk education_group_year.id as post_url %}
-    {% for section_name, labels in sections_with_translated_labels %}
-        <div class="section row">
-            <div class="col-md-12 text-center">
+    <div class="panel panel-default">
+        {% for section_name, labels in sections_with_translated_labels %}
+            <div class="panel-heading text-center section">
                 <h3>{{ section_name }}</h3>
             </div>
-        </div>
-        {% for label in labels %}
-            {% include  "education_group/blocks/row_label_general_informations.html" %}
-            {% if not forloop.last %}
-                <hr/>
-            {% endif %}
+            <div class="panel panel-body">
+                <div class="container-fluid">
+                    {% for label in labels %}
+                        {% include  "education_group/blocks/row_label_general_informations.html" %}
+                        {% if not forloop.last %}
+                            <hr/>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+        {% if not forloop.last or not show_contacts %}
+            </div>
+        {% endif %}
         {% endfor %}
-        <hr/>
-    {% endfor %}
 
-    {% if show_contacts %}
-        <div class="row">
-            {% include  "education_group/blocks/contacts_general_informations.html" %}
-        </div>
-    {% endif %}
+
+        {% if show_contacts %}
+                <hr/>
+                <div class="container-fluid">
+                    <div class="row">
+                        {% include  "education_group/blocks/contacts_general_informations.html" %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+            </div>
+    </div>
 
     <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}

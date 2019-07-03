@@ -29,18 +29,10 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                {% if perms.base.can_access_offer %}
-                                    <li>
-                                        <a href="{% url 'offers' %}" id="lnk_dropdown_offers">
-                                            <span class="fa fa-map"></span>
-                                            {% trans 'Offers' %}
-                                        </a>
-                                    </li>
-                                {% endif %}
                                 {% if perms.base.can_access_education_group %}
                                     <li>
                                         <a href="{% url 'education_groups' %}" id="lnk_dropdown_educationgroups">
-                                            <span class="fa fa-map"></span>
+                                            <span class="fa fa-folder-open"></span>
                                             {% trans 'Trainings' %}
                                         </a>
                                     </li>
@@ -48,16 +40,8 @@
                                 {% if perms.base.can_access_learningunit %}
                                     <li>
                                         <a href="{% url 'learning_units' %}" id="lnk_dropdown_learning_units">
-                                            <span class="fa fa-book"></span>
+                                            <span class="fa fa-file"></span>
                                             {% trans 'Learning units' %}
-                                        </a>
-                                    </li>
-                                {% endif %}
-                                {% if perms.base.can_access_academicyear %}
-                                    <li>
-                                        <a href="{% url 'academic_year' %}" id="lnk_dropdown_academic_year">
-                                            <span class="fa fa-calendar"></span>
-                                            {% trans 'Academic year' %}
                                         </a>
                                     </li>
                                 {% endif %}
@@ -73,9 +57,21 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
+                                {% if perms.base.can_access_offer %}
+                                    <li>
+                                        <a href="{% url 'offers' %}" id="lnk_dropdown_offers">
+                                            <span class="fa fa-map-marker-alt"></span>
+                                            {% trans 'Addresses' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                                 {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
-                                    <li><a href="{% url 'assessments' %}"
-                                           id="lnk_dropdown_evaluations">{% trans 'Evaluations' %}</a></li>
+                                    <li>
+                                        <a href="{% url 'assessments' %}" id="lnk_dropdown_evaluations">
+                                            <span class="fa fa-tachometer-alt"></span>
+                                            {% trans 'Evaluations' %}
+                                        </a>
+                                    </li>
                                 {% endif %}
                                 {% if perms.base.can_access_student %}
                                     <li><a href="{% url 'students' %}"
@@ -126,6 +122,14 @@
                                         </a>
                                     </li>
                                 {% endif %}
+                                {% if perms.base.can_access_academicyear and perms.base.can_access_academic_calendar %}
+                                    <li>
+                                        <a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">
+                                            <span class="fa fa-calendar"></span>
+                                            {% trans 'Academic calendar' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </li>
                     {% endif %}
@@ -171,6 +175,17 @@
                 </ul>
             {% endif %}
             <ul class="nav navbar-nav navbar-right" id="">
+                <li>
+                    {% if request.session.quick_search_model == 'LearningUnitYear' %}
+                        {% url 'quick_search_learning_unit' as quick_search_url %}
+                    {% else %}
+                        {% url 'quick_search_education_group' as quick_search_url %}
+                    {% endif %}
+                    <a class="trigger_modal pull-right" id="quick-search" data-url="{{ quick_search_url }}"
+                       data-modal_class="modal-lg" title="{% trans 'Search' %}">
+                        <i class="fa fa-search"></i>
+                    </a>
+                </li>
                 {% if request.user.is_authenticated %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
@@ -220,7 +235,8 @@
                         {% include "blocks/notifications.html" %}
                     </li>
                     <li>
-                        <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}" class="hidden-md">
+                        <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}"
+                           class="hidden-md">
                             <span class="glyphicon glyphicon-question-sign"></span>
                         </a>
                     </li>

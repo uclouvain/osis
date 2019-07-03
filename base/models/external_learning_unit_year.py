@@ -88,7 +88,7 @@ class ExternalLearningUnitYear(models.Model):
 
     co_graduation = models.BooleanField(default=False, verbose_name=_('Co-graduation'))
     mobility = models.BooleanField(default=False, verbose_name=_('Mobility'))
-    author = models.ForeignKey('Person', null=True)
+    author = models.ForeignKey('Person', null=True, on_delete=models.CASCADE)
     creation_date = models.DateTimeField(null=True, auto_now_add=True)
 
     class Meta:

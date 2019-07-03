@@ -51,6 +51,9 @@ from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
@@ -115,12 +118,10 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison, learning
     ).prefetch_related(
         get_learning_component_prefetch()
     ).prefetch_related(
-        build_entity_container_prefetch([
-            entity_types.ALLOCATION_ENTITY,
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ])
+        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
+        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
@@ -248,15 +249,15 @@ def _get_volumes(component, components):
     volumes = components[component]
     return [
         component.acronym if component.acronym else EMPTY_VALUE,
-        volumes.get('VOLUME_Q1', EMPTY_VALUE),
-        volumes.get('VOLUME_Q2', EMPTY_VALUE),
-        volumes.get('VOLUME_TOTAL', EMPTY_VALUE),
+        volumes.get(VOLUME_Q1, EMPTY_VALUE),
+        volumes.get(VOLUME_Q2, EMPTY_VALUE),
+        volumes.get(VOLUME_TOTAL, EMPTY_VALUE),
         component.real_classes if component.real_classes else EMPTY_VALUE,
         component.planned_classes if component.planned_classes else EMPTY_VALUE,
-        volumes.get('VOLUME_GLOBAL', '0'),
-        volumes.get('VOLUME_REQUIREMENT_ENTITY', EMPTY_VALUE),
-        volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1', EMPTY_VALUE),
-        volumes.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2', EMPTY_VALUE)
+        volumes.get(VOLUME_GLOBAL, '0'),
+        volumes.get(VOLUME_REQUIREMENT_ENTITY, EMPTY_VALUE),
+        volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, EMPTY_VALUE),
+        volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, EMPTY_VALUE)
     ]
 
 
@@ -306,15 +307,15 @@ def _get_component_data_by_type(component, type):
     if component:
         return [
             DEFAULT_ACRONYM_COMPONENT.get(type),
-            component.get('VOLUME_Q1'),
-            component.get('VOLUME_Q2'),
-            component.get('VOLUME_TOTAL'),
-            component.get('REAL_CLASSES'),
-            component.get('PLANNED_CLASSES'),
-            component.get('VOLUME_TOTAL_REQUIREMENT_ENTITIES'),
-            component.get('VOLUME_REQUIREMENT_ENTITY'),
-            component.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'),
-            component.get('VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'),
+            component.get(VOLUME_Q1),
+            component.get(VOLUME_Q2),
+            component.get(VOLUME_TOTAL),
+            component.get(REAL_CLASSES),
+            component.get(PLANNED_CLASSES),
+            component.get(VOLUME_TOTAL_REQUIREMENT_ENTITIES),
+            component.get(VOLUME_REQUIREMENT_ENTITY),
+            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1),
+            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2),
         ]
     else:
         return []
@@ -330,12 +331,10 @@ def _get_learning_unit_yr_with_component(learning_unit_years):
     ).prefetch_related(
         get_learning_component_prefetch()
     ).prefetch_related(
-        build_entity_container_prefetch([
-            entity_types.ALLOCATION_ENTITY,
-            entity_types.REQUIREMENT_ENTITY,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2
-        ])
+        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
+        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
+        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by('learning_unit', 'academic_year__year')
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
@@ -376,10 +375,12 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
 
 def _get_data_from_initial_data(initial_data):
     learning_unit_yr = get_by_id(initial_data.get('learning_unit_year')['id'])
-    requirement_entity = find_by_id(initial_data.get('entities')['REQUIREMENT_ENTITY'])
-    allocation_entity = find_by_id(initial_data.get('entities')['ALLOCATION_ENTITY'])
-    add1_requirement_entity = find_by_id(initial_data.get('entities')['ADDITIONAL_REQUIREMENT_ENTITY_1'])
-    add2_requirement_entity = find_by_id(initial_data.get('entities')['ADDITIONAL_REQUIREMENT_ENTITY_2'])
+    learning_container_year = initial_data.get('learning_container_year') or {}
+
+    requirement_entity = find_by_id(learning_container_year['requirement_entity'])
+    allocation_entity = find_by_id(learning_container_year['allocation_entity'])
+    add1_requirement_entity = find_by_id(learning_container_year['additional_entity_1'])
+    add2_requirement_entity = find_by_id(learning_container_year['additional_entity_2'])
     campus = find_campus_by_id(initial_data.get('learning_unit_year')['campus'])
 
     organization = get_organization_from_learning_unit_year(learning_unit_yr)

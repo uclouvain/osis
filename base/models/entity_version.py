@@ -33,6 +33,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
@@ -46,7 +47,6 @@ PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS = [
     "IUFC",
     "CCR"
 ]
-
 
 SQL_RECURSIVE_QUERY = """\
 WITH RECURSIVE under_entity AS (
@@ -95,11 +95,12 @@ class Node:
         }
 
 
-class EntityVersionAdmin(SerializableModelAdmin):
+class EntityVersionAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('id', 'entity', 'acronym', 'parent', 'title', 'entity_type', 'start_date', 'end_date',)
     search_fields = ['entity__id', 'entity__external_id', 'title', 'acronym', 'entity_type', 'start_date', 'end_date']
     raw_id_fields = ('entity', 'parent')
     readonly_fields = ('find_direct_children', 'count_direct_children', 'find_descendants', 'get_parent_version')
+    list_filter = ['entity_type']
 
 
 class EntityVersionQuerySet(models.QuerySet):
@@ -159,7 +160,7 @@ class EntityVersionQuerySet(models.QuerySet):
 class EntityVersion(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    entity = models.ForeignKey('Entity')
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     title = models.CharField(db_index=True, max_length=255)
     acronym = models.CharField(db_index=True, max_length=20)
 
@@ -171,7 +172,8 @@ class EntityVersion(SerializableModel):
         verbose_name=_("Type")
     )
 
-    parent = models.ForeignKey('Entity', related_name='parent_of', blank=True, null=True)
+    parent = models.ForeignKey('Entity', related_name='parent_of',
+                               blank=True, null=True, on_delete=models.CASCADE)
     start_date = models.DateField(db_index=True)
     end_date = models.DateField(db_index=True, blank=True, null=True)
 
@@ -200,11 +202,16 @@ class EntityVersion(SerializableModel):
 
     def exists_now(self):
         now = datetime.datetime.now().date()
-        return (not self.end_date) or (self.end_date and self.start_date < now < self.end_date)
+        return self.exists_at_specific_date(now)
+
+    def exists_at_specific_date(self, date):
+        return (not self.end_date) or (self.end_date and self.start_date < date < self.end_date)
 
     @property
     def verbose_title(self):
-        complete_title = ' - '.join(filter(None, [self.acronym, self.title]))
+        complete_title = self.title
+        if self.entity.organization and self.entity.organization.type == MAIN:
+            complete_title = ' - '.join(filter(None, [self.acronym, self.title]))
         return complete_title
 
     def can_save_entity_version(self):
@@ -218,7 +225,7 @@ class EntityVersion(SerializableModel):
                 Q(start_date__range=(self.start_date, self.end_date)) |
                 Q(end_date__range=(self.start_date, self.end_date)) |
                 (
-                    Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
+                        Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
                 )
             )
         else:
@@ -501,17 +508,6 @@ def find_pedagogical_entities_version():
 
 def find_latest_version_by_entity(entity, date):
     return EntityVersion.objects.current(date).entity(entity).select_related('entity', 'parent').first()
-
-
-def find_last_entity_version_by_learning_unit_year_id(learning_unit_year_id, entity_type):
-    now = datetime.datetime.now(get_tzinfo())
-    try:
-        return EntityVersion.objects.current(now).\
-            filter(entity__entitycontaineryear__learning_container_year__learningunityear__id=learning_unit_year_id,
-                   entity__entitycontaineryear__type=entity_type). \
-            latest('start_date')
-    except EntityVersion.DoesNotExist:
-        return None
 
 
 def find_entity_version_according_academic_year(an_entity, an_academic_year):

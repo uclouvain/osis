@@ -60,7 +60,7 @@
         {% endif %}
         <div {% if entities_version|length > 0 %} style="visibility:visible;display:block;" {% else %}
                                                   style="visibility:hidden;display:none;" {% endif %}>
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="table_entities">
                 <thead>
                 <tr>
                     <th>{% trans 'Acronym' %}</th>
@@ -72,7 +72,7 @@
                 <tbody>
                 {% for entity_version in entities_version %}
                     <tr>
-                        <td>
+                        <td id="td_entity_{{ forloop.counter }}">
                             <a href="{% url 'entity_read' entity_version.id %}"
                                id="lnk_entity_read_{{ entity_version.id }}">
                                 {{ entity_version.acronym }}

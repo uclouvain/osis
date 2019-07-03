@@ -28,11 +28,12 @@ import abc
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.functional import cached_property
-from django.utils.translation import ngettext
+from django.utils.translation import ngettext, gettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 
 
@@ -43,20 +44,24 @@ class AttachStrategy(metaclass=abc.ABCMeta):
 
 
 class AttachEducationGroupYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear):
+    def __init__(self, parent: EducationGroupYear, child: EducationGroupYear, instance=None):
         self.parent = parent
         self.child = child
+        self.instance = instance
 
     @cached_property
     def parents(self):
         return EducationGroupYear.hierarchy.filter(pk=self.parent.pk).get_parents() \
-                                           .select_related('education_group_type')
+            .select_related('education_group_type')
 
     def is_valid(self):
         if self.parent.education_group_type.name in TrainingType.root_master_2m_types() or \
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
             self._check_attach_options_rules()
+
+            if not self.instance:
+                self._check_new_attach_is_not_duplication()
         return True
 
     def _check_end_year_constraints_on_2m(self):
@@ -64,8 +69,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         In context of 2M, when we add a finality [or group which contains finality], we must ensure that
         the end date of all 2M is greater or equals of all finalities
         """
-        finalities_to_add_qs = EducationGroupYear.objects.filter(pk=self.child.pk) | \
-            EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
+        finalities_to_add_qs = EducationGroupYear.objects.filter(
+            pk=self.child.pk) | EducationGroupYear.hierarchy.filter(pk=self.child.pk).get_children()
         finalities_to_add_qs = finalities_to_add_qs.filter(education_group_type__name__in=TrainingType.finality_types())
 
         root_2m_qs = self.parents | EducationGroupYear.objects.filter(pk=self.parent.pk)
@@ -114,6 +119,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         finalities_pks = finalities_qs.filter(
             education_group_type__name__in=TrainingType.finality_types()
         ).values_list('pk', flat=True)
+        if self.child.education_group_type.name in TrainingType.finality_types():
+            finalities_pks = list(finalities_pks) + [self.parent.pk]
         if finalities_pks:
             root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
                 education_group_type__name__in=TrainingType.root_master_2m_types()
@@ -142,11 +149,22 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if errors:
             raise ValidationError(errors)
 
+    def _check_new_attach_is_not_duplication(self):
+        if GroupElementYear.objects.filter(parent=self.parent, child_branch=self.child).exists():
+            raise ValidationError(gettext("You can not attach the same child several times."))
+
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
-    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear):
+    def __init__(self, parent: EducationGroupYear, child: LearningUnitYear, instance=None):
         self.parent = parent
         self.child = child
+        self.instance = instance
 
     def is_valid(self):
+        if not self.instance:
+            self._check_new_attach_is_not_duplication()
         return True
+
+    def _check_new_attach_is_not_duplication(self):
+        if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
+            raise ValidationError(gettext("You can not attach the same child several times."))

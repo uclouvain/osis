@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from django.db import models
+from reversion.admin import VersionAdmin
 
 from base.models.enums import education_group_language
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class EducationGroupLanguageAdmin(OsisModelAdmin):
+class EducationGroupLanguageAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('type', 'order', 'education_group_year', 'language')
     raw_id_fields = ('education_group_year', 'language')
 
@@ -39,8 +40,8 @@ class EducationGroupLanguage(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     type = models.CharField(max_length=255, choices=education_group_language.EducationGroupLanguages.choices())
     order = models.IntegerField()
-    education_group_year = models.ForeignKey('base.EducationGroupYear')
-    language = models.ForeignKey('reference.Language')
+    education_group_year = models.ForeignKey('base.EducationGroupYear', on_delete=models.CASCADE)
+    language = models.ForeignKey('reference.Language', on_delete=models.CASCADE)
 
     def __str__(self):
         return "{} - {}".format(self.education_group_year, self.language)

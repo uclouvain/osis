@@ -27,6 +27,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -98,6 +99,7 @@ class AcademicYear(SerializableModel):
             ("can_access_academicyear", "Can access academic year"),
         )
 
+    @cached_property
     def is_past(self):
         return self.year < current_academic_year().year
 

@@ -1,0 +1,16 @@
+{% if load_modal %}
+    {% if not url or url == "#" %}
+        {# Alert to be sure the widget is correctly initialized #}
+        <script>alert("No url provided for {{ id_button }} {{ url }}")</script>
+    {% else %}
+        <button class="btn-as-atag trigger_modal" id="{{ id_button }}" data-url="{{ url }}"
+                data-toggle="tooltip" title="{{ title }}" {{ disabled }}>
+            <span class="{{ icon }}"></span>
+        </button>
+    {% endif %}
+{% else %}
+    <button class="btn-as-atag {{ class_button }}" id="{{ id_button }}" title="{{ title }}"
+            data-toggle="tooltip" {{ disabled }}>
+        <span class="{{ icon }}"></span>
+    </button>
+{% endif %}

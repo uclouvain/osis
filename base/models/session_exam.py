@@ -39,8 +39,8 @@ class SessionExam(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
-    learning_unit_year = models.ForeignKey('LearningUnitYear')
-    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
+    learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True, on_delete=models.CASCADE)
     progress = None
 
     def __str__(self):

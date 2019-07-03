@@ -31,13 +31,11 @@ from django.forms import model_to_dict
 from django.test import TestCase
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
-from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, PartimForm, \
     LearningUnitPartimModelForm
 from base.forms.utils import acronym_field
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_subtypes, organization_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
@@ -107,7 +105,7 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
 
     def test_model_forms_case_creation(self):
         form_classes_expected = [LearningUnitPartimModelForm, LearningUnitYearModelForm, LearningContainerModelForm,
-                                 LearningContainerYearModelForm, EntityContainerBaseForm]
+                                 LearningContainerYearModelForm]
         form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
                                  academic_year=self.current_academic_year)
         for cls in form_classes_expected:
@@ -162,7 +160,7 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
             'common_title', 'common_title_english',
             'requirement_entity', 'allocation_entity',
             'academic_year', 'container_type', 'internship_subtype',
-            'additional_requirement_entity_1', 'additional_requirement_entity_2'
+            'additional_entity_1', 'additional_entity_2'
         }
         all_fields = partim_form.fields.items()
         self.assertTrue(all(field.disabled == (field_name in expected_disabled_fields)
@@ -202,7 +200,6 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
         # Inherit instance from learning unit year full
         self._test_learning_container_model_form_instance(form)
         self._test_learning_container_year_model_form_instance(form)
-        self._test_entity_container_model_formset_instance(form)
 
     def test_partim_periodicity_biannual_with_parent_annual(self):
         a_new_learning_unit_partim = LearningUnitYearFactory(
@@ -256,21 +253,6 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
         self.assertEqual(form_instance.instance,
                          self.learning_unit_year_full.learning_container_year)
 
-    def _test_entity_container_model_formset_instance(self, partim_form):
-        """ In this test, we ensure that the instance of learning container year model form inherit
-            from full learning container year """
-        formset_instance = partim_form.forms[EntityContainerBaseForm]
-        self.assertEqual(formset_instance.instance, self.learning_unit_year_full.learning_container_year)
-        # Test expected instance
-        expected_instance_form = [
-            self.generated_container_year.requirement_entity_container_year,
-            self.generated_container_year.allocation_entity_container_year,
-            self.generated_container_year.additionnal_1_entity_container_year,
-            self.generated_container_year.addtionnal_2_entity_container_year,
-        ]
-        for index, form in enumerate(formset_instance.forms):
-            self.assertEqual(expected_instance_form[index], form.instance)
-
     @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.is_valid',
                 side_effect=lambda *args: False)
     def test_creation_case_wrong_learning_unit_data(self, mock_is_valid):
@@ -314,9 +296,6 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
             learning_unit_year__learning_container_year=saved_instance.learning_container_year
         )
         self.assertEqual(learning_component_year_list.count(), 6)
-        self.assertEqual(
-            EntityComponentYear.objects.filter(
-                learning_component_year__in=learning_component_year_list).count(), 18)
         self.assertTrue(
             learning_component_year_list.filter(type=LECTURING, acronym="PM").exists())
         self.assertTrue(
@@ -404,7 +383,7 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
                                  academic_year=self.learning_unit_year_full.academic_year,
                                  instance=self.learning_unit_year_partim.learning_unit)
-        disabled_fields = {key for key, value in form.fields.items() if value.disabled == True}
+        disabled_fields = {key for key, value in form.fields.items() if value.disabled is True}
         # acronym_0 and acronym_1 are disabled in the widget, not in the field
         disabled_fields.update({'acronym_0', 'acronym_1'})
         self.assertEqual(disabled_fields, PARTIM_FORM_READ_ONLY_FIELD)
@@ -437,9 +416,11 @@ def get_valid_form_data(learning_unit_year_partim):
         'component-0-hourly_volume_total_annual': 20,
         'component-0-hourly_volume_partial_q1': 10,
         'component-0-hourly_volume_partial_q2': 10,
+        'component-0-planned_classes': 1,
         'component-1-hourly_volume_total_annual': 20,
         'component-1-hourly_volume_partial_q1': 10,
         'component-1-hourly_volume_partial_q2': 10,
+        'component-1-planned_classes': 1,
     }
 
 

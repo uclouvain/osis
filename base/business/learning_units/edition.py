@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.db import IntegrityError, transaction, Error
 from django.db.models import F
 from django.urls import reverse
@@ -33,18 +34,18 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
-from base.models import entity_component_year
-from base.models import entity_container_year, learning_component_year, learning_class_year
+from base.enums.component_detail import COMPONENT_DETAILS
+from base.models import learning_class_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
-from base.models.entity_component_year import EntityComponentYear
-from base.models.entity_container_year import EntityContainerYear
-from base.models.entity_version import EntityVersion
+from base.models.entity import Entity
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITIES
+from base.models.enums.component_type import COMPONENT_TYPES
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from cms.models import translated_text
+from osis_common.utils.numbers import normalize_fraction
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 
@@ -179,52 +180,43 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
     )
     # Sometimes, the container already exists, we can directly use it and its entitycontaineryear
     if not queryset.exists():
-        duplicated_lcy = update_related_object(new_learn_unit_year.learning_container_year,
-                                               'academic_year', new_academic_year)
+        duplicated_lcy = update_related_object(
+            new_learn_unit_year.learning_container_year,
+            'academic_year',
+            new_academic_year,
+            commit_save=False,
+        )
         duplicated_lcy.is_vacant = False
         duplicated_lcy.type_declaration_vacant = None
-
-        _duplicate_entity_container_year(duplicated_lcy, new_academic_year)
+        _raise_if_entity_version_does_not_exist(duplicated_lcy, new_academic_year)
+        duplicated_lcy.save()
     else:
         duplicated_lcy = queryset.get()
         duplicated_lcy.copied_from = new_learn_unit_year.learning_container_year
     return duplicated_lcy
 
 
-def _duplicate_entity_container_year(new_lcy, new_academic_year):
-    for entity_container_y in entity_container_year.search(learning_container_year=new_lcy.copied_from):
-        entity_versions = EntityVersion.objects.entity(entity_container_y.entity)
-        if not entity_versions.current(new_academic_year.end_date).exists():
+def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
+    prefetched_entities_previous_year = Entity.objects.filter(
+        pk__in=[ent.id for ent in new_lcy.copied_from.get_map_entity_by_type().values() if ent]
+    ).prefetch_related(
+        "entityversion_set"
+    )
+    for entity in prefetched_entities_previous_year:
+        if not any(obj.exists_at_specific_date(new_academic_year.end_date) for obj in entity.entityversion_set.all()):
             raise IntegrityError(
                 _('The entity %(entity_acronym)s does not exist for the selected academic year %(academic_year)s') % {
-                    'entity_acronym': entity_versions.last().acronym,
+                    'entity_acronym': entity.most_recent_acronym,
                     'academic_year': new_academic_year
                 })
-        update_related_object(entity_container_y, 'learning_container_year', new_lcy)
 
 
+# TODO :: remove unused param
 def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
         new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
         _duplicate_learning_class_year(new_component)
-        _duplicate_entity_component_year(new_component, new_learn_container_year)
-
-
-def _duplicate_entity_component_year(new_component, new_learn_container_year):
-    for old_entity_comp_year in EntityComponentYear.objects.filter(learning_component_year=new_component.copied_from):
-        old_entity_container = old_entity_comp_year.entity_container_year
-        new_entity_container_year = EntityContainerYear.objects.get(
-            learning_container_year=new_learn_container_year,
-            entity=old_entity_container.entity,
-            type=old_entity_container.type
-        )
-
-        new_entity_component_year = update_related_object(old_entity_comp_year,
-                                                          'entity_container_year',
-                                                          new_entity_container_year)
-        new_entity_component_year.learning_component_year = new_component
-        new_entity_component_year.save()
 
 
 def _duplicate_learning_class_year(new_component):
@@ -304,8 +296,7 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
     # Update luy which doesn't have conflict
     for luy in luy_to_update_list:
-        _update_learning_unit_year(luy, fields_to_update, with_report=(luy != luy_to_update))
-        _update_learning_unit_year_entities(luy, entities_by_type_to_update)
+        _update_learning_unit_year(luy, fields_to_update, (luy != luy_to_update), entities_by_type_to_update)
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
@@ -339,67 +330,25 @@ def check_postponement_conflict_report_errors(conflict_report):
 
 
 # FIXME should used include and not exclude
-def _update_learning_unit_year(luy_to_update, fields_to_update, with_report):
+def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, entities_to_update_by_type):
     fields_to_exclude = ()
     if with_report:
         fields_to_exclude = FIELDS_TO_EXCLUDE_WITH_REPORT
 
     update_instance_model_from_data(luy_to_update.learning_unit, fields_to_update, exclude=('acronym',))
 
+    luy_to_update.learning_container_year.set_entities(entities_to_update_by_type)
+
     # Only the subtype FULL can edit the container
     if luy_to_update.subtype == learning_unit_year_subtypes.FULL:
-        update_instance_model_from_data(luy_to_update.learning_container_year, fields_to_update,
-                                        exclude=fields_to_exclude)
+        update_instance_model_from_data(
+            luy_to_update.learning_container_year,
+            fields_to_update,
+            exclude=fields_to_exclude
+        )
 
     update_instance_model_from_data(luy_to_update, fields_to_update,
                                     exclude=fields_to_exclude + ("in_charge",))
-
-
-def _update_learning_unit_year_entities(luy, entities_by_type_to_update):
-    for entity_link_type, entity, in entities_by_type_to_update.items():
-        if entity:
-            entity_container_yr = _update_entity_container_year(entity, luy.learning_container_year, entity_link_type)
-            _create_entity_component_year_if_not_exists(entity_container_yr)
-        else:
-            _delete_entity_component_year(luy.learning_container_year, entity_link_type)
-            _delete_entity_container_year(luy.learning_container_year, entity_link_type)
-
-
-def update_or_create_entity_container_year_with_components(an_entity, learning_container_year, type_entity):
-    an_entity_container_year = _update_entity_container_year(an_entity, learning_container_year, type_entity)
-    if type_entity in REQUIREMENT_ENTITIES:
-        # Only entity with volume can have entity_component_year
-        _create_entity_component_year_if_not_exists(an_entity_container_year)
-
-
-def _update_entity_container_year(an_entity, learning_container_year, type_entity):
-    entity_container_yr, created = entity_container_year.EntityContainerYear.objects.update_or_create(
-        type=type_entity, learning_container_year=learning_container_year, defaults={"entity": an_entity})
-    return entity_container_yr
-
-
-def _create_entity_component_year_if_not_exists(an_entity_container):
-    """We must create an entity component year for each component (Full+Partim)"""
-    learning_component_yr_list = learning_component_year.find_by_learning_container_year(
-        learning_container_year=an_entity_container.learning_container_year
-    )
-    for learning_component_yr in learning_component_yr_list:
-        entity_component_year.EntityComponentYear.objects.get_or_create(
-            entity_container_year=an_entity_container,
-            learning_component_year=learning_component_yr
-        )
-
-
-def _delete_entity_container_year(learning_container_year, type_entity):
-    entity_container_year.EntityContainerYear.objects.filter(
-        type=type_entity, learning_container_year=learning_container_year).delete()
-
-
-def _delete_entity_component_year(learning_container_year, type_entity):
-    entity_component_year.EntityComponentYear.objects.filter(
-        entity_container_year__learning_container_year=learning_container_year,
-        entity_container_year__type=type_entity
-    ).delete()
 
 
 def _check_postponement_conflict(luy, next_luy):
@@ -476,10 +425,15 @@ def _check_postponement_learning_unit_year_proposal_state(nex_luy):
     return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 
+# TODO :: should remove this function and add requirement_entity, allocation_entity, additional_entities
+# TODO ::  in _check_postponement_conflict_on_learning_container_year
 def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
-    current_entities = entity_container_year.find_entities_grouped_by_linktype(lcy)
-    next_year_entities = entity_container_year.find_entities_grouped_by_linktype(next_lcy)
-    error_list = _check_if_all_entities_exist(next_lcy, list(next_year_entities.values()))
+    current_entities = lcy.get_map_entity_by_type()
+    next_year_entities = next_lcy.get_map_entity_by_type()
+    error_list = _check_if_all_entities_exist(
+        next_lcy,
+        list(filter(lambda entity: entity, next_year_entities.values()))
+    )
     entity_type_diff = filter(lambda type: _is_different_value(current_entities, next_year_entities, type),
                               ENTITY_TYPE_LIST)
     for entity_type in entity_type_diff:
@@ -533,10 +487,11 @@ def _check_postponement_conflict_on_volumes(lcy, next_lcy):
     for luy_with_components in current_learning_units:
         try:
             next_luy_with_components = _get_next_luy_with_components(luy_with_components, next_year_learning_units)
-            error_list.extend(_check_postponement_conflict_on_components(
-                luy_with_components,
-                next_luy_with_components)
-            )
+            if next_luy_with_components:
+                error_list.extend(_check_postponement_conflict_on_components(
+                    luy_with_components,
+                    next_luy_with_components)
+                )
         except StopIteration:
             error_list.append(_("There is not the learning unit %(acronym)s - %(next_year)s") % {
                 'acronym': luy_with_components.acronym,
@@ -546,8 +501,10 @@ def _check_postponement_conflict_on_volumes(lcy, next_lcy):
 
 
 def _get_next_luy_with_components(luy_with_components, next_year_learning_units):
-    return next(luy for luy in next_year_learning_units if
-                luy.learning_unit == luy_with_components.learning_unit)
+    return next(
+        (luy for luy in next_year_learning_units if luy.learning_unit == luy_with_components.learning_unit),
+        None
+    )
 
 
 def _check_postponement_conflict_on_components(luy_with_components, next_luy_with_components):
@@ -602,17 +559,20 @@ def _get_volumes_diff(current_volumes_data, next_year_volumes_data):
 
 
 def _get_error_volume_field_diff(field_diff, current_component, next_year_component, values_diff):
-    return _("The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
-             "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") % \
-           {
-               'field': _(field_diff.lower()),
-               'acronym': current_component.learning_unit_year.acronym,
-               'component_type': _(current_component.type) if current_component.type else 'NT',
-               'year': current_component.learning_unit_year.academic_year,
-               'value': values_diff.get('current') or _('No data'),
-               'next_year': next_year_component.learning_unit_year.academic_year,
-               'next_value': values_diff.get('next_year') or _('No data')
-           }
+    current_value = values_diff.get('current')
+    next_value = values_diff.get('next_year')
+    return _(
+        "The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
+        "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s"
+    ) % {
+        'field': COMPONENT_DETAILS[field_diff].lower(),
+        'acronym': current_component.learning_unit_year.acronym,
+        'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
+        'year': current_component.learning_unit_year.academic_year,
+        'value': normalize_fraction(current_value) if current_value is not None else _('No data'),
+        'next_year': next_year_component.learning_unit_year.academic_year,
+        'next_value': normalize_fraction(next_value) if next_value is not None else _('No data')
+    }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):

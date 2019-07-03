@@ -31,11 +31,10 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 from waffle.testutils import override_flag
 
-from base.models.enums import proposal_state, entity_container_year_link_type, learning_unit_year_subtypes, \
+from base.models.enums import proposal_state, learning_unit_year_subtypes, \
     proposal_type
 import base.models as mdl_base
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -52,7 +51,8 @@ class TestConsolidate(TestCase):
             state=proposal_state.ProposalState.ACCEPTED.name,
             learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
             learning_unit_year__academic_year=cls.current_academic_year,
-            learning_unit_year__learning_container_year__academic_year=cls.current_academic_year
+            learning_unit_year__learning_container_year__academic_year=cls.current_academic_year,
+            learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
         )
         cls.learning_unit_year = cls.proposal.learning_unit_year
 
@@ -61,9 +61,7 @@ class TestConsolidate(TestCase):
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
 
         person_entity = PersonEntityFactory(person=cls.person,
-                                            entity=EntityContainerYearFactory(
-                                                learning_container_year=cls.learning_unit_year.learning_container_year,
-                                                type=entity_container_year_link_type.REQUIREMENT_ENTITY).entity)
+                                            entity=cls.learning_unit_year.learning_container_year.requirement_entity)
         EntityVersionFactory(entity=person_entity.entity)
         cls.url = reverse("learning_unit_consolidate_proposal")
         cls.post_data = {"learning_unit_year_id": cls.learning_unit_year.id}

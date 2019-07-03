@@ -23,23 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
-from django.conf import settings
 from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
-from base.models.education_group_type import find_authorized_types
+from base.models.education_group import EducationGroup
+from base.models.education_group_type import EducationGroupType
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 
 ERRORS_MSG = {
-    "base.add_educationgroup": "The user has not permission to create education groups.",
-    "base.change_educationgroup": "The user has not permission to change education groups.",
-    "base.delete_educationgroup": "The user has not permission to delete education groups.",
+    "base.add_educationgroup": _("The user has not permission to create education groups."),
+    "base.change_educationgroup": _("The user has not permission to change education groups."),
+    "base.delete_educationgroup": _("The user has not permission to delete education groups."),
 }
 
 
@@ -61,7 +63,7 @@ def is_eligible_to_add_group(person, education_group, raise_exception=False):
 def _is_eligible_to_add_education_group(person, education_group, category, education_group_type=None,
                                         raise_exception=False):
     return check_permission(person, "base.add_educationgroup", raise_exception) and \
-           _is_eligible_to_add_education_group_with_category(person, category, raise_exception) and \
+           _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \
            (not management.is_max_child_reached(education_group, education_group_type.name)
             if education_group_type and education_group
@@ -78,7 +80,7 @@ def _is_year_editable(education_group, raise_exception):
     error_msg = None
     if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
         error_msg = _("You cannot change a education group before %(limit_year)s") % {
-                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
+            "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
 
     result = error_msg is None
     can_raise_exception(raise_exception, result, error_msg)
@@ -124,6 +126,10 @@ def is_eligible_to_delete_education_group(person, education_group, raise_excepti
            _is_eligible_education_group(person, education_group, raise_exception)
 
 
+def is_eligible_to_delete_education_group_year(person, education_group_yr, raise_exception=False):
+    return can_delete_all_education_group(person.user, education_group_yr.education_group)
+
+
 def is_education_group_edit_period_opened(education_group, raise_exception=False):
     error_msg = None
 
@@ -147,10 +153,13 @@ def _is_eligible_certificate_aims(person, education_group, raise_exception):
     return check_link_to_management_entity(education_group, person, raise_exception)
 
 
-def _is_eligible_to_add_education_group_with_category(person, category, raise_exception):
+def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
     # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
-    result = person.is_central_manager or (person.is_faculty_manager and category == Categories.MINI_TRAINING)
+    result = person.is_central_manager or (
+            person.is_faculty_manager and (category == Categories.MINI_TRAINING or
+                                           (category == Categories.GROUP and education_group is not None))
+    )
 
     msg = pgettext(
         "male" if category == Categories.GROUP else "female",
@@ -158,13 +167,16 @@ def _is_eligible_to_add_education_group_with_category(person, category, raise_ex
     ) % {"category": category.value}
 
     can_raise_exception(raise_exception, result, msg)
+
     return result
 
 
 def check_link_to_management_entity(education_group, person, raise_exception):
     if education_group:
-        eligible_entities = get_education_group_year_eligible_management_entities(education_group)
-        result = person.is_attached_entities(eligible_entities)
+        if not hasattr(education_group, 'eligible_entities'):
+            education_group.eligible_entities = get_education_group_year_eligible_management_entities(education_group)
+
+        result = person.is_attached_entities(education_group.eligible_entities)
     else:
         result = True
 
@@ -185,31 +197,33 @@ def can_raise_exception(raise_exception, result, msg):
         raise PermissionDenied(_(msg).capitalize())
 
 
-def check_authorized_type(education_group, category, raise_exception=False):
+def check_authorized_type(education_group: EducationGroupYear, category, raise_exception=False):
     if not education_group or not category:
         return True
 
-    result = find_authorized_types(
+    result = EducationGroupType.objects.filter(
         category=category.name,
-        parents=[education_group]
+        authorized_child_type__parent_type__educationgroupyear=education_group
     ).exists()
 
     parent_category = education_group.education_group_type.category
+
     can_raise_exception(
         raise_exception, result,
         pgettext(
             "female" if parent_category in [TRAINING, MINI_TRAINING] else "male",
-            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
-        ) % {
+            "No type of %(child_category)s can be created as child of %(category)s of type %(type)s")
+        % {
             "child_category": category.value,
             "category": education_group.education_group_type.get_category_display(),
             "type": education_group.education_group_type.get_name_display(),
-        })
+        }
+    )
 
     return result
 
 
-def get_education_group_year_eligible_management_entities(education_group):
+def get_education_group_year_eligible_management_entities(education_group: EducationGroupYear):
     if education_group and education_group.management_entity:
         return [education_group.management_entity]
 
@@ -329,3 +343,10 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
 
     def _is_sic_eligible(self):
         return True
+
+
+def can_delete_all_education_group(user, education_group: EducationGroup):
+    for education_group_yr in education_group.educationgroupyear_set.all():
+        if not is_eligible_to_delete_education_group(user.person, education_group_yr, raise_exception=True):
+            raise PermissionDenied
+    return True

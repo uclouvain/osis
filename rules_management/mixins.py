@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Case, When, Value, BooleanField, Subquery, Exists, OuterRef
 from django.utils.translation import gettext_lazy as _
 
 from rules_management.models import FieldReference
@@ -56,7 +56,6 @@ class PermissionFieldMixin(ModelFormMixin):
 
         if not self.user:
             raise ImproperlyConfigured("This form must receive the user to determine his permissions")
-
         if "context" in kwargs:
             self.context = kwargs.pop("context")
 
@@ -68,7 +67,7 @@ class PermissionFieldMixin(ModelFormMixin):
                 self.disable_field(field_name)
 
     def check_user_permission(self, field_reference):
-        if self._check_at_groups_level(field_reference):
+        if field_reference.user_groups:
             # Check at group level
             return True
         elif self._check_at_permissions_level(field_reference):
@@ -84,19 +83,15 @@ class PermissionFieldMixin(ModelFormMixin):
                 return True
         return False
 
-    def _check_at_groups_level(self, field_reference):
-        group_names = field_reference.groups.all().values_list('name', flat=True)
-        return self.user.groups.filter(name__in=group_names).exists()
-
     def get_queryset(self):
         context = self.get_context()
         return self.model_permission.objects.filter(
             content_type__app_label=self._meta.model._meta.app_label,
             content_type__model=self._meta.model._meta.model_name,
-            context=context
+            context=context,
         ).prefetch_related(
             Prefetch('permissions', queryset=Permission.objects.select_related('content_type')),
-            Prefetch('groups')
+            Prefetch('groups', queryset=Group.objects.filter(user=self.user), to_attr="user_groups")
         )
 
     def get_context(self):

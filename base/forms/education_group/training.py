@@ -47,6 +47,9 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.hops import Hops
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
+from reference.models.language import find_all_languages
+
+MAX_NUMBER_CERTIFICATE_TYPE_2 = 2
 
 
 def _get_section_choices():
@@ -196,6 +199,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
+        self.fields['primary_language'].queryset = find_all_languages()
 
         if getattr(self.instance, 'administration_entity', None):
             self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk
@@ -222,6 +226,13 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         else:
             self.fields['joint_diploma'].initial = False
             self.fields['diploma_printing_title'].required = False
+
+    def clean_certificate_aims(self):
+        certificate_aims = self.cleaned_data["certificate_aims"]
+        certificate_aims_type_2 = [ca for ca in certificate_aims if ca.section == 2]
+        if len(certificate_aims_type_2) >= MAX_NUMBER_CERTIFICATE_TYPE_2:
+            raise forms.ValidationError(_("There can only be one type 2 expectation"))
+        return certificate_aims
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)

@@ -43,8 +43,8 @@ class LearningUnitEnrollment(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
-    learning_unit_year = models.ForeignKey('LearningUnitYear')
-    offer_enrollment = models.ForeignKey('OfferEnrollment')
+    learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
+    offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.CASCADE)
     enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, default="")
 
     class Meta:

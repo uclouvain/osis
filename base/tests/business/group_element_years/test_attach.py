@@ -26,11 +26,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestAttachOptionEducationGroupYearStrategy(TestCase):
@@ -112,6 +113,29 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         strategy = AttachEducationGroupYearStrategy(
             parent=self.master_120_specialized,
             child=subgroup
+        )
+        with self.assertRaises(ValidationError):
+            strategy.is_valid()
+
+    def test_is_not_valid_case_attach_finality_which_contains_option_which_are_not_within_master_120(self):
+        """
+        In this test, we ensure that we CANNOT add a finality which contains options at specialized finality because
+        this options are not present in root master 2m level
+        """
+        finality = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MS_120.name,
+            academic_year=self.academic_year
+        )
+        option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name,
+                                                         academic_year=self.academic_year)
+        # Error case
+        GroupElementYearFactory(parent=finality, child_branch=option_which_are_not_in_2m)
+        # Good case (present in 2M)
+        GroupElementYearFactory(parent=finality, child_branch=self.option_in_parent)
+
+        strategy = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=finality
         )
         with self.assertRaises(ValidationError):
             strategy.is_valid()
@@ -202,3 +226,38 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         )
         with self.assertRaises(ValidationError):
             self.assertTrue(strategy.is_valid())
+
+    def test_is_case_attach_finality_which_child_branch_duplicate(self):
+        master_120_didactic = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.academic_year,
+            education_group__end_year=self.master_120.education_group.end_year - 1
+        )
+
+        ge = GroupElementYearFactory(parent=self.finality_group, child_branch=master_120_didactic)
+
+        duplicate = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(duplicate.is_valid())
+
+        update = AttachEducationGroupYearStrategy(
+            parent=self.finality_group,
+            child=master_120_didactic,
+            instance=ge
+        )
+        self.assertTrue(update.is_valid())
+
+    def test_is_invalid_case_attach_finality_which_child_leaf_duplicate(self):
+        child_leaf = LearningUnitYearFactory(academic_year=self.finality_group.academic_year)
+
+        GroupElementYearFactory(parent=self.finality_group, child_leaf=child_leaf, child_branch=None)
+
+        duplicate = AttachLearningUnitYearStrategy(
+            parent=self.finality_group,
+            child=child_leaf
+        )
+        with self.assertRaises(ValidationError):
+            self.assertTrue(duplicate.is_valid())

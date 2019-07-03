@@ -34,7 +34,7 @@ class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
 
 class LearningClassYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    learning_component_year = models.ForeignKey('LearningComponentYear')
+    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
     acronym = models.CharField(max_length=3)
     description = models.CharField(max_length=100, blank=True, null=True)
 

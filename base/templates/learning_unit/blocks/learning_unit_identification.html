@@ -1,10 +1,24 @@
-{% load bootstrap3 %}
+{% load bootstrap3 i18n %}
 
 <div class="row">
-    {% bootstrap_field learning_unit_year_form.acronym form_group_class="acronym-group col-md-4" %}
+    <div class="col-md-4 acronym-group required_field">
+        {% bootstrap_label learning_unit_year_form.acronym.label label_class="control-label" %}
+        {% if subtype == 'FULL' %}
+            <abbr title="{% trans 'acronym rules' %}">
+            <span class="glyphicon glyphicon-question-sign "
+                  title="{% trans 'acronym rules' %}"
+                  style="font-size: 14pt;"></span></abbr>
+        {% else %}
+            <abbr title="{% trans 'external acronym rules' %}">
+            <span class="glyphicon glyphicon-question-sign "
+                  title="{% trans 'external acronym rules' %}"
+                  style="font-size: 14pt;"></span></abbr>
+        {% endif %}
+        {% bootstrap_field learning_unit_year_form.acronym show_label=False %}
+    </div>
     {% bootstrap_field learning_container_year_form.container_type form_group_class="col-md-3" %}
     {% if learning_unit_year_form.internship_subtype in learning_unit_year_form.visible_fields %}
-        {% bootstrap_field  learning_unit_year_form.internship_subtype form_group_class="col-md-5"%}
+        {% bootstrap_field learning_unit_year_form.internship_subtype form_group_class="col-md-5" %}
     {% endif %}
 </div>
 

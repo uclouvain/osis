@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from distutils.util import strtobool
+
 from django import forms
 from django.core.validators import RegexValidator
 from django.utils.safestring import mark_safe
@@ -96,11 +98,10 @@ class ValidationRuleMixin(WarningFormMixin):
 
     def get_rules(self):
         result = {}
-
+        bulk_rules = ValidationRule.objects.in_bulk()
         for name, field in self.fields.items():
-            qs = ValidationRule.objects.filter(field_reference=self.field_reference(name))
-            if qs:
-                result[name] = qs.get()
+            if self.field_reference(name) in bulk_rules:
+                result[name] = bulk_rules[self.field_reference(name)]
 
         return result
 
@@ -124,7 +125,9 @@ class ValidationRuleMixin(WarningFormMixin):
                 if rule.placeholder:
                     field.widget.attrs["placeholder"] = rule.placeholder
                 else:
-                    field.initial = rule.initial_value
+                    field.initial = rule.initial_value if rule.initial_value not in ['False', 'True'] else bool(
+                        strtobool(
+                            rule.initial_value))
 
                 field.validators.append(
                     RegexValidator(rule.regex_rule, rule.regex_error_message or None)

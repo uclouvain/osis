@@ -570,21 +570,6 @@
                 "entity"
             ],
             [
-                "add_entitycomponentyear",
-                "base",
-                "entitycomponentyear"
-            ],
-            [
-                "change_entitycomponentyear",
-                "base",
-                "entitycomponentyear"
-            ],
-            [
-                "delete_entitycomponentyear",
-                "base",
-                "entitycomponentyear"
-            ],
-            [
                 "add_entitycontaineryear",
                 "base",
                 "entitycontaineryear"
@@ -1933,11 +1918,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "can_access_evaluation",
                 "base",
                 "offerenrollment"
@@ -2709,11 +2689,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "is_institution_administrator",
                 "base",
                 "person"
@@ -3078,11 +3053,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "can_edit_education_group_administrative_data",
                 "base",
                 "person"
@@ -3266,11 +3236,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "is_institution_administrator",
                 "base",
                 "person"
@@ -3341,6 +3306,154 @@
 {
     "model": "auth.group",
     "fields": {
+        "name": "faculty_managers_for_ue",
+        "permissions": [
+            [
+                "can_access_education_group",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "change_learningclassyear",
+                "base",
+                "learningclassyear"
+            ],
+            [
+                "change_learningcomponentyear",
+                "base",
+                "learningcomponentyear"
+            ],
+            [
+                "can_access_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_access_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
+                "add_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
+                "can_create_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_delete_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_edit_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_edit_learningunit_date",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_edit_learningunit_pedagogy",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_edit_learningunit_specification",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_propose_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "delete_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "delete_learningunityear",
+                "base",
+                "learningunityear"
+            ],
+            [
+                "can_access_catalog",
+                "base",
+                "offer"
+            ],
+            [
+                "is_institution_administrator",
+                "base",
+                "person"
+            ],
+            [
+                "add_proposalfolder",
+                "base",
+                "proposalfolder"
+            ],
+            [
+                "change_proposalfolder",
+                "base",
+                "proposalfolder"
+            ],
+            [
+                "delete_proposalfolder",
+                "base",
+                "proposalfolder"
+            ],
+            [
+                "add_proposallearningunit",
+                "base",
+                "proposallearningunit"
+            ],
+            [
+                "can_edit_learning_unit_proposal",
+                "base",
+                "proposallearningunit"
+            ],
+            [
+                "change_proposallearningunit",
+                "base",
+                "proposallearningunit"
+            ],
+            [
+                "delete_proposallearningunit",
+                "base",
+                "proposallearningunit"
+            ],
+            [
+                "can_access_structure",
+                "base",
+                "structure"
+            ],
+            [
+                "add_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
+                "can_manage_charge_repartition",
+                "base",
+                "person"
+            ],
+            [
+                "can_manage_attribution",
+                "base",
+                "person"
+            ]
+        ]
+    }
+},
+{
+    "model": "auth.group",
+    "fields": {
         "name": "executive",
         "permissions": [
             [
@@ -3400,6 +3513,21 @@
                 "can_access_catalog",
                 "base",
                 "offer"
+            ],
+            [
+                "can_access_education_group",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "is_institution_administrator",
+                "base",
+                "person"
+            ],
+            [
+                "can_access_structure",
+                "base",
+                "structure"
             ]
         ]
     }
@@ -3467,6 +3595,24 @@
                 ],
                 [
                     "change_admission",
+                    "continuing_education",
+                    "admission"
+                ]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "continuing_education_student_workers",
+            "permissions": [
+                [
+                    "can_access_admission",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "can_edit_received_file_field",
                     "continuing_education",
                     "admission"
                 ]

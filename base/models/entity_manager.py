@@ -25,20 +25,21 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Prefetch
+from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityManagerAdmin(SerializableModelAdmin):
+class EntityManagerAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('person', 'structure', 'entity')
     search_fields = ['person__first_name', 'person__last_name', 'structure__acronym']
 
 
 class EntityManager(SerializableModel):
-    person = models.ForeignKey('Person')
-    structure = models.ForeignKey('Structure')
-    entity = models.ForeignKey('Entity', blank=True, null=True)
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    structure = models.ForeignKey('Structure', on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s" % self.person

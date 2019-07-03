@@ -23,21 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
-from base.business.utils.convert import volume_format
 from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_verbose_field_value
+from osis_common.utils.numbers import normalize_fraction
 
 register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
 CSS_PROPOSAL_VALUE = "proposal_value"
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
+EXTERNAL_CREDIT_TOOLTIP = _('If the partner university does not use ECTS credit units, '
+                            'enter below the number of credit units according to the local system.')
 
 
 @register.filter
@@ -71,7 +75,8 @@ def get_difference_css(differences, parameter, default_if_none=""):
         return mark_safe(
             ' data-toggle=tooltip title="{} : {}" class="{}" '.format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                value or default_if_none,
+                normalize_fraction(Decimal(value)) if parameter == "credits"
+                else value or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
         )
@@ -83,14 +88,13 @@ def has_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
-# TODO Use inclusion tag instead
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag("blocks/dl/dl_tooltip.html", takes_context=True)
 def dl_tooltip(context, instance, key, **kwargs):
     title = kwargs.get('title', '')
-    label_text = _(str(kwargs.get('label_text', '')))
+    label_text = kwargs.get('label_text', '')
     url = kwargs.get('url', '')
     default_if_none = kwargs.get('default_if_none', '')
-    value = kwargs.get('value', '')
+    value = kwargs.get('value')
     inherited = kwargs.get('inherited', '')
     not_annualized = kwargs.get('not_annualized', '')
     differences = context['differences']
@@ -101,10 +105,15 @@ def dl_tooltip(context, instance, key, **kwargs):
     if not value:
         value = get_verbose_field_value(instance, key)
 
-    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
+    value = normalize_fraction(value) if isinstance(value, Decimal) else value
+
+    difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(
+        EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits'
+        else _(title)
+    )
 
     if url:
-        value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
+        value = "<a href='{url}'>{value}</a>".format(value=value or '', url=url)
 
     if inherited == PARTIM:
         label_text = get_style_of_label_text(label_text, "color:grey",
@@ -114,15 +123,18 @@ def dl_tooltip(context, instance, key, **kwargs):
     if not_annualized:
         label_text = get_style_of_label_text(label_text, "font-style:italic",
                                              "The value of this attribute is not annualized")
-        value = get_style_of_value("font-style:italic",
-                                   "The value of this attribute is not annualized",
-                                   value if value else default_if_none
-                                   )
+        value = get_style_of_value(
+            "font-style:italic",
+            "The value of this attribute is not annualized",
+            value if value else default_if_none
+        )
 
-    html_id = "id='id_{}'".format(key.lower())
-
-    return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference} {id}>{value}</dd></dl>".format(
-        difference=difference, id=html_id, label_text=label_text, value=_(str(value))))
+    return {
+        'difference': difference,
+        'id': key.lower(),
+        'label_text': label_text,
+        'value': value or ''
+    }
 
 
 def get_style_of_value(style, title, value):
@@ -196,12 +208,12 @@ def dl_component_tooltip(context, key, **kwargs):
                 break
 
         difference = get_component_volume_css(volumes, key, default_if_none, value) or 'title="{}"'.format(_(title))
-        value = get_style_of_value("", "", volume_format(value))
+        value = get_style_of_value("", "", normalize_fraction(value))
         html_id = "id='id_{}'".format(key.lower())
 
         return mark_safe("<dl><dd {difference} {id}>{value}</dd></dl>".format(
             difference=difference, id=html_id, value=str(value)))
-    return volume_format(value) if value else default_if_none
+    return normalize_fraction(value) if value else default_if_none
 
 
 @register.filter
@@ -210,7 +222,7 @@ def get_component_volume_css(values, parameter, default_if_none="", value=None):
         return mark_safe(
             " data-toggle=tooltip title='{} : {}' class='{}' ".format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                volume_format(values[parameter]) or default_if_none,
+                normalize_fraction(values[parameter]) or default_if_none,
                 CSS_PROPOSAL_VALUE
             )
         )

@@ -90,7 +90,7 @@
                     {% for learning_unit in page_obj %}
                         <tr data-id="{{ learning_unit.id }}" data-value="{{ learning_unit.acronym }}">
                             <td>{{ learning_unit.academic_year.name }}</td>
-                            <td>
+                            <td  class="col-acronym">
                                 <a href="{% url 'learning_unit' learning_unit.id %}"
                                    id="lnk_learning_unit_{{ learning_unit.id }}">{{ learning_unit.acronym }}</a>
                             </td>
@@ -103,7 +103,7 @@
                             </td>
                             <td>{{ learning_unit.entity_requirement|default_if_none:'-' }}</td>
                             <td>{{ learning_unit.entity_allocation|default_if_none:'-' }}</td>
-                            <td>{% if learning_unit.credits %}{{ learning_unit.credits|floatformat }}{% endif %}</td>
+                            <td>{% if learning_unit.credits %}{{ learning_unit.credits|floatformat:-2 }}{% endif %}</td>
                             <td>
                                 {% if learning_unit.status %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color: limegreen;"

@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 #############################################################################
-import itertools
 
 from django.db import models, IntegrityError
-from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
-from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class PrerequisiteItemAdmin(OsisModelAdmin):
+class PrerequisiteItemAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('prerequisite', 'learning_unit', 'group_number', 'position')
     raw_id_fields = ('learning_unit', 'prerequisite')
     list_filter = ('prerequisite__learning_unit_year__academic_year',)
@@ -51,7 +49,7 @@ class PrerequisiteItem(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    learning_unit = models.ForeignKey("LearningUnit")
+    learning_unit = models.ForeignKey("LearningUnit", on_delete=models.CASCADE)
     prerequisite = models.ForeignKey("Prerequisite", on_delete=models.CASCADE)
 
     group_number = models.PositiveIntegerField()

@@ -24,18 +24,20 @@
 #
 ##############################################################################
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit import LearningUnit
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from django.core.serializers.json import DjangoJSONEncoder
 
 
-class ProposalLearningUnitAdmin(OsisModelAdmin):
+class ProposalLearningUnitAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('learning_unit_year', 'folder_id', 'entity', 'type', 'state')
 
     search_fields = ['folder_id', 'learning_unit_year__acronym']
@@ -46,9 +48,9 @@ class ProposalLearningUnitAdmin(OsisModelAdmin):
 class ProposalLearningUnit(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    author = models.ForeignKey('Person', null=True)
+    author = models.ForeignKey('Person', null=True, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now=True)
-    learning_unit_year = models.OneToOneField('LearningUnitYear')
+    learning_unit_year = models.OneToOneField('LearningUnitYear', on_delete=models.CASCADE)
     type = models.CharField(
         max_length=50,
         choices=ProposalType.choices(),
@@ -64,7 +66,7 @@ class ProposalLearningUnit(models.Model):
     )
 
     initial_data = JSONField(default={}, encoder=DjangoJSONEncoder)
-    entity = models.ForeignKey('Entity')
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     folder_id = models.PositiveIntegerField()
 
     class Meta:
@@ -117,5 +119,5 @@ def is_learning_unit_year_in_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
-def is_learning_unit_in_proposal(lu):
+def is_learning_unit_in_proposal(lu: LearningUnit):
     return ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=lu).exists()

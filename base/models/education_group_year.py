@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
@@ -45,6 +48,7 @@ from base.models.enums.education_group_types import MiniTrainingType, TrainingTy
 from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.utils.utils import get_object_or_none
+from base.models.validation_rule import ValidationRule
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
 
@@ -180,7 +184,8 @@ class EducationGroupYear(SerializableModel):
 
     academic_year = models.ForeignKey(
         'AcademicYear',
-        verbose_name=_("validity")
+        verbose_name=_("validity"),
+        on_delete=models.CASCADE
     )
 
     education_group = models.ForeignKey(
@@ -190,7 +195,8 @@ class EducationGroupYear(SerializableModel):
 
     education_group_type = models.ForeignKey(
         'EducationGroupType',
-        verbose_name=_("Type of training")
+        verbose_name=_("Type of training"),
+        on_delete=models.CASCADE
     )
 
     active = models.CharField(
@@ -255,6 +261,7 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_("Enrollment campus"),
+        on_delete=models.CASCADE
     )
 
     main_teaching_campus = models.ForeignKey(
@@ -262,7 +269,8 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         related_name='teaching',
-        verbose_name=_("Learning location")
+        verbose_name=_("Learning location"),
+        on_delete=models.CASCADE
     )
 
     dissertation = models.BooleanField(
@@ -346,6 +354,7 @@ class EducationGroupYear(SerializableModel):
         'reference.Language',
         null=True,
         verbose_name=_('Primary language'),
+        on_delete=models.CASCADE
     )
 
     language_association = models.CharField(
@@ -458,13 +467,15 @@ class EducationGroupYear(SerializableModel):
         Entity,
         verbose_name=_("Management entity"),
         null=True,
-        related_name="management_entity"
+        related_name="management_entity",
+        on_delete=models.CASCADE
     )
 
     administration_entity = models.ForeignKey(
         Entity, null=True,
         verbose_name=_("Administration entity"),
-        related_name='administration_entity'
+        related_name='administration_entity',
+        on_delete=models.CASCADE
     )
 
     weighting = models.BooleanField(
@@ -538,6 +549,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_("Publication contact entity"),
         null=True,
         blank=True,
+        on_delete=models.CASCADE
     )
 
     linked_with_epc = models.BooleanField(
@@ -563,6 +575,14 @@ class EducationGroupYear(SerializableModel):
     @property
     def type(self):
         return self.education_group_type.name
+
+    @property
+    def is_option(self):
+        return self.type == MiniTrainingType.OPTION.name
+
+    @property
+    def is_finality(self):
+        return self.type in TrainingType.finality_types()
 
     @property
     def is_minor(self):
@@ -625,6 +645,14 @@ class EducationGroupYear(SerializableModel):
         return self.title
 
     @property
+    def verbose_type(self):
+        return self.education_group_type.get_name_display()
+
+    @property
+    def complete_title(self):
+        return self.verbose_title
+
+    @property
     def verbose_remark(self):
         if self.remark_english and translation.get_language() == LANGUAGE_CODE_EN:
             return self.remark_english
@@ -646,7 +674,7 @@ class EducationGroupYear(SerializableModel):
         return ""
 
     def get_absolute_url(self):
-        return reverse("education_group_read", args=[self.pk])
+        return reverse("education_group_read", args=[self.pk, self.pk])
 
     @property
     def str_domains(self):
@@ -749,13 +777,8 @@ class EducationGroupYear(SerializableModel):
 
         return list(set(ascendants))
 
-    def is_deletable(self):
-        """An education group year cannot be deleted if there are enrollment on it"""
-        if self.offerenrollment_set.all().exists():
-            return False
-        return True
-
     def clean(self):
+        self.clean_academic_year()
         self.clean_acronym()
         self.clean_partial_acronym()
         if not self.constraint_type:
@@ -763,6 +786,13 @@ class EducationGroupYear(SerializableModel):
         else:
             self.clean_min_max()
         self.clean_duration_data()
+
+    def clean_academic_year(self):
+        if self.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+            raise ValidationError({
+                'academic_year': _("You cannot create/update an education group before %(limit_year)s") % {
+                                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
+            })
 
     def clean_constraint_type(self):
         # If min or max has been set, constraint_type is required
@@ -812,6 +842,12 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
+        my_validation_rule = self.rules.get('partial_acronym')
+        if my_validation_rule and not bool(re.match(my_validation_rule.regex_rule, self.partial_acronym)):
+            raise ValidationError({
+                'partial_acronym': _("Partial acronym is invalid")
+            })
+
         if raise_warnings and egy_using_same_partial_acronym["past"]:
             raise ValidationWarning({
                 'partial_acronym': _("Partial acronym existed in %(academic_year)s") % {
@@ -840,12 +876,35 @@ class EducationGroupYear(SerializableModel):
                 }
             })
 
+        my_validation_rule = self.rules.get('acronym')
+        if my_validation_rule and not bool(re.match(my_validation_rule.regex_rule, self.acronym)):
+            raise ValidationError({
+                'acronym': _("Acronym is invalid")
+            })
+
         if raise_warnings and egy_using_same_acronym["past"]:
             raise ValidationWarning({
                 'acronym': _("Acronym existed in %(academic_year)s") % {
                     "academic_year": self.format_year_to_academic_year(egy_using_same_acronym["past"])
                 }
             })
+
+    @property
+    def rules(self):
+        result = {}
+        bulk_rules = ValidationRule.objects.in_bulk()
+        for name in dir(self):
+            field_ref = self.field_reference(name)
+            if field_ref in bulk_rules:
+                result[name] = bulk_rules[self.field_reference(name)]
+        return result
+
+    def field_reference(self, name):
+        return self._field_reference(self._meta.model, name, self.education_group_type.external_id or 'osis')
+
+    @staticmethod
+    def _field_reference(model, name, *args):
+        return '.'.join([model._meta.db_table, name, *args])
 
     def next_year(self):
         try:

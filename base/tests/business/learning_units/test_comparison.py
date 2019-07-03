@@ -30,20 +30,23 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from base.business.learning_units.comparison import get_keys, get_value, \
-    compare_learning_component_year, compare_volumes, get_entity_by_type
+    compare_learning_component_year, compare_volumes
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import quadrimesters, learning_unit_year_session, attribution_procedure
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import create_learning_unit_year
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 TITLE = 'Intitulé'
 OTHER_TITLE = 'title 1'
@@ -136,48 +139,47 @@ class LearningUnitYearComparaisonTest(TestCase):
 
         data_volumes_previous = {
             'volumes': {
-                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                'VOLUME_GLOBAL': previous_volume_global,
-                'PLANNED_CLASSES': previous_planned_classes,
-                'VOLUME_Q1': None,
-                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                'VOLUME_REQUIREMENT_ENTITY': 12.0
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0, VOLUME_TOTAL: Decimal('12.00'),
+                VOLUME_GLOBAL: previous_volume_global,
+                PLANNED_CLASSES: previous_planned_classes,
+                VOLUME_Q1: None,
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0.0, VOLUME_Q2: Decimal('30.00'),
+                VOLUME_REQUIREMENT_ENTITY: 12.0
             }
         }
 
         data_volumes_current = {
             'volumes': {
-                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0,
-                'VOLUME_TOTAL': Decimal('12.00'),
-                'VOLUME_GLOBAL': current_volume_global,
-                'PLANNED_CLASSES': current_planned_classes,
-                'VOLUME_Q1': current_volume_q1,
-                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0,
-                'VOLUME_Q2': Decimal('30.00'),
-                'VOLUME_REQUIREMENT_ENTITY': 12.0
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0,
+                VOLUME_TOTAL: Decimal('12.00'),
+                VOLUME_GLOBAL: current_volume_global,
+                PLANNED_CLASSES: current_planned_classes,
+                VOLUME_Q1: current_volume_q1,
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0.0,
+                VOLUME_Q2: Decimal('30.00'),
+                VOLUME_REQUIREMENT_ENTITY: 12.0
             }
         }
         data_volumes_next = {
             'volumes': {
-                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': 0, 'VOLUME_TOTAL': Decimal('12.00'),
-                'VOLUME_GLOBAL': 12.0, 'PLANNED_CLASSES': 1, 'VOLUME_Q1': next_volume_q1,
-                'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': 0.0, 'VOLUME_Q2': Decimal('30.00'),
-                'VOLUME_REQUIREMENT_ENTITY': 12.0
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: 0, VOLUME_TOTAL: Decimal('12.00'),
+                VOLUME_GLOBAL: 12.0, PLANNED_CLASSES: 1, VOLUME_Q1: next_volume_q1,
+                VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: 0.0, VOLUME_Q2: Decimal('30.00'),
+                VOLUME_REQUIREMENT_ENTITY: 12.0
             }
         }
 
         data = compare_volumes(data_volumes_current, data_volumes_previous, data_volumes_next)
-        self.assertEqual(data.get('VOLUME_GLOBAL'), [previous_volume_global, current_volume_global, 12.0])
-        self.assertEqual(data.get('VOLUME_Q1'), [None, current_volume_q1, next_volume_q1])
+        self.assertEqual(data.get(VOLUME_GLOBAL), [previous_volume_global, current_volume_global, 12.0])
+        self.assertEqual(data.get(VOLUME_Q1), [None, current_volume_q1, next_volume_q1])
         self.assertEqual(len(list(data.keys())), 2)
 
     def test_get_entity_by_type(self):
-        learning_cont_yr = LearningContainerYearFactory(academic_year=self.academic_year)
-        entity_container_yr = EntityContainerYearFactory(
-            learning_container_year=learning_cont_yr,
-            type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1
+        learning_cont_yr = LearningContainerYearFactory(
+            academic_year=self.academic_year,
+            additional_entity_1=EntityFactory()
         )
-        luy = LearningUnitYear(academic_year=self.academic_year, learning_container_year=learning_cont_yr)
-        self.assertEqual(get_entity_by_type(luy, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1),
-                         entity_container_yr.entity)
-        self.assertIsNone(get_entity_by_type(luy, entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2))
+        result = learning_cont_yr.get_entity_from_type(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
+        self.assertEqual(result, learning_cont_yr.additional_entity_1)
+        result = learning_cont_yr.get_entity_from_type(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
+        self.assertIsNone(result)

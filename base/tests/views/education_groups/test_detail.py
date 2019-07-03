@@ -269,7 +269,8 @@ class TestReadEducationGroup(TestCase):
 
     def test_main_common_show_only_identification_and_general_information(self):
         main_common = EducationGroupYearCommonFactory(
-            academic_year=self.academic_year
+            academic_year=self.academic_year,
+            education_group_type=EducationGroupTypeFactory(name=TrainingType.BACHELOR.name)
         )
         url = reverse("education_group_read", args=[main_common.pk, main_common.pk])
 
@@ -573,7 +574,7 @@ class TestContent(TestCase):
 
         self.assertTemplateUsed(response, "education_group/tab_content.html")
 
-        geys = response.context["group_element_years"]
+        geys = response.context["object"].groupelementyear_set.all()
         self.assertIn(self.group_element_year_1, geys)
         self.assertIn(self.group_element_year_2, geys)
         self.assertIn(self.group_element_year_3, geys)

@@ -25,13 +25,14 @@
 ##############################################################################
 from django.db import models
 from django.utils.functional import cached_property
+from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from base.models.entity_version import EntityVersion
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class PersonEntityAdmin(OsisModelAdmin):
+class PersonEntityAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('person', 'entity', 'latest_entity_version_name', 'with_child')
     search_fields = ['person__first_name', 'person__last_name']
     raw_id_fields = ('person', 'entity',)
@@ -47,8 +48,8 @@ class PersonEntityAdmin(OsisModelAdmin):
 
 
 class PersonEntity(models.Model):
-    person = models.ForeignKey('Person')
-    entity = models.ForeignKey('Entity')
+    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     with_child = models.BooleanField(default=False)
 
     class Meta:
