@@ -70,9 +70,6 @@ class TestTutor(TestCase):
     def test_find_by_user(self):
         self.assertEqual(self.tutor, tutor.find_by_user(self.user))
 
-    def test_find_by_user_wrong_id(self):
-        self.assertIsNone(tutor.find_by_user(-1))
-
     def test_find_by_id(self):
         self.assertEqual(self.tutor, tutor.find_by_id(self.tutor.id))
 
