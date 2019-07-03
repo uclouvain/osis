@@ -38,7 +38,6 @@ from django.utils.translation import gettext_lazy as _
 from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
@@ -189,13 +188,12 @@ def find_by_id(person_id):
 
 
 def find_by_user(user):
-    person = Person.objects.filter(user=user).first()
-    return person
+    return user.person
 
 
 def get_user_interface_language(user):
     user_language = settings.LANGUAGE_CODE
-    person = find_by_user(user)
+    person = user.person
     if person:
         user_language = person.language
     return user_language
@@ -203,7 +201,7 @@ def get_user_interface_language(user):
 
 def change_language(user, new_language):
     if new_language in (l[0] for l in settings.LANGUAGES):
-        person = find_by_user(user)
+        person = user.person
         if person:
             person.language = new_language
             person.save()
@@ -230,7 +228,7 @@ def count_by_email(email):
 def search_employee(full_name):
     queryset = annotate_with_first_last_names()
     if full_name:
-        return queryset.filter(employee=True)\
+        return queryset.filter(employee=True) \
             .filter(Q(begin_by_first_name__iexact='{}'.format(full_name.lower())) |
                     Q(begin_by_last_name__iexact='{}'.format(full_name.lower())) |
                     Q(first_name__icontains=full_name) |
@@ -258,4 +256,3 @@ def find_by_firstname_or_lastname(name):
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception=False):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-
