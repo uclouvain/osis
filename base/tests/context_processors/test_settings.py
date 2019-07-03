@@ -44,6 +44,16 @@ class TestFindcontextualSettings(TestCase):
             {'virtual_desktop_url': ''}
         )
 
+    def test_with_no_logged_person(self):
+        self.client.logout()
+        self.request = self.client.get('')
+        self.request.user = self.person.user
+        result = virtual_desktop(self.request)
+        self.assertEqual(
+            result,
+            {'virtual_desktop_url': ''}
+        )
+
     @override_settings(VIRTUAL_DESKTOP_URL='URL')
     def test_with_program_manager(self):
         self.request = self.client.get('')

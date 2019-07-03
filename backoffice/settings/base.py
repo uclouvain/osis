@@ -134,8 +134,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
                 'base.context_processors.user_manual.user_manual_url',
+                'base.context_processors.settings.virtual_desktop',
                 'django.template.context_processors.i18n',
-                'base.context_processors.settings.virtual_desktop'
             ],
         },
     },
