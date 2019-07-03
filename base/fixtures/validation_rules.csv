@@ -170,13 +170,13 @@ Examples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>","Sigle d’un Master en 120 crédits 
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
 Exemples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>",Ex: BBMC2MD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.*)$",,"Acronym of Master MS 120 is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 120 is composed of:
 <ul>
-<li>2-4 letters + <b>2MS/</b> + letters</li>
+<li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
 </ul>
 Examples: <i>ACTU2MS/SA, BBMC2MS/BT, FYAP2MS/G</i>","Sigle d’un Master en 120 crédits à finalité spécialisée est composé de:
 <ul>
-<li>2-4 lettres + <b>2MS/</b> + lettres</li>
+<li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
 Exemples: <i>ACTU2MS/SA,BBMC2MS/BT, FYAP2MS/G</i>",Ex: BBMC2MS/BT
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M180,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 180-240 is composed of:
@@ -206,13 +206,13 @@ Examples: <i>MED2MD</i>","Sigle d’un Master en 180-240 crédits à finalité d
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
 Exemples: <i>MED2MD</i>",Ex: MED2MD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS180,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.*)$",,"Acronym of Master MS 180-240 is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS180,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 180-240 is composed of:
 <ul>
-<li>2-4 letters + <b>2MS/</b> + letters</li>
+<li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
 </ul>
 Examples: <i>MED2MS/G, MED2MS/SG</i>","Sigle d’un Master en 180-240 crédits à finalité spécialisée est composé de:
 <ul>
-<li>2-4 lettres + <b>2MS/</b> + lettres</li>
+<li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
 Exemples: <i>MED2MS/G, MED2MS/SG</i>",Ex: MED2MS/G
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M1,REQUIRED,2M1,"^([A-Za-z]{2,4})(2)([Mm])(1)$",,"Acronym of Master 60 is composed of:
