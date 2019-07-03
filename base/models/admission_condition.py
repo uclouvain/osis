@@ -137,7 +137,7 @@ class AdmissionConditionLine(OrderedModel):
     objects = AdmissionConditionLineQuerySet.as_manager()
 
 
-class AdmissionConditionLineAdmin(osis_model_admin.OsisModelAdmin):
+class AdmissionConditionLineAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('name', 'section')
 
     def name(self, obj):
