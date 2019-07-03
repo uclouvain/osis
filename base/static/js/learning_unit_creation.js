@@ -19,6 +19,7 @@ function isLearningUnitSubtypeFull(){
 
 
 function isValueEmpty(html_id){
+    console.log("hello");
     return document.getElementById(html_id).value === ""
 }
 
