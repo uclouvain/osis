@@ -119,5 +119,5 @@ def is_learning_unit_year_in_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
-def is_learning_unit_in_proposal(lu:LearningUnit):
+def is_learning_unit_in_proposal(lu: LearningUnit):
     return ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=lu).exists()
