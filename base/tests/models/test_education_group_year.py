@@ -32,9 +32,11 @@ from base.models.education_group_year import search, find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit
 from base.models.enums.constraint_type import CREDITS
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
+from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
+    string_generator
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -57,8 +59,9 @@ class EducationGroupYearTest(TestCase):
 
         self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year,
                                                                 education_group_type=self.education_group_type_training)
-        self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                                education_group_type=self.education_group_type_minitraining)
+        self.education_group_year_2 = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_minitraining)
 
         self.education_group_year_3 = EducationGroupYearFactory(academic_year=self.academic_year,
                                                                 education_group_type=self.education_group_type_training)
@@ -272,6 +275,12 @@ class TestCleanPartialAcronym(TestCase):
     def setUpTestData(cls):
         cls.previous_acy, cls.current_acy, cls.next_acy = AcademicYearFactory.produce(number_past=1, number_future=1)
         cls.partial_acronym = 'CODE'
+        ValidationRule(field_reference='base_educationgroupyear.partial_acronym.osis.education_group_type_2M180',
+                       regex_rule='^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Mm])$').save()
+        ValidationRule(field_reference='base_educationgroupyear.partial_acronym.osis.education_group_type_2M1',
+                       regex_rule='^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Uu])$').save()
+        ValidationRule(field_reference='base_educationgroupyear.partial_acronym.osis.education_group_type_3DP',
+                       regex_rule='^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Dd])$').save()
 
     def test_raise_validation_error_when_partial_acronym_exists_in_present_or_future(self):
         for acy in (self.current_acy, self.next_acy):
@@ -293,6 +302,19 @@ class TestCleanPartialAcronym(TestCase):
         with self.assertRaises(ValidationWarning):
             e.clean_partial_acronym(raise_warnings=True)
 
+    def test_raise_validation_partial_acronym_invalid(self):
+        random_partial_acronym = string_generator()
+        external_ids = ['osis.education_group_type_2M180',
+                        'osis.education_group_type_2M1',
+                        'osis.education_group_type_3DP']
+        for ext_id in external_ids:
+            with self.subTest(type=ext_id):
+                e = TrainingFactory(partial_acronym=random_partial_acronym,
+                                    academic_year=self.current_acy,
+                                    education_group_type__external_id=ext_id)
+                with self.assertRaises(ValidationError):
+                    e.clean_partial_acronym()
+
     def test_when_partial_acronym_not_exists(self):
         EducationGroupYearFactory(partial_acronym='CODE1')
         e = EducationGroupYearFactory.build(partial_acronym='CODE2')
@@ -304,6 +326,12 @@ class TestCleanAcronym(TestCase):
     def setUpTestData(cls):
         cls.previous_acy, cls.current_acy, cls.next_acy = AcademicYearFactory.produce(number_past=1, number_future=1)
         cls.acronym = 'SIGLE'
+        ValidationRule(field_reference='base_educationgroupyear.acronym.osis.education_group_type_2M180',
+                       regex_rule='^([A-Za-z]{2,4})(2)([Mm])$').save()
+        ValidationRule(field_reference='base_educationgroupyear.acronym.osis.education_group_type_2M1',
+                       regex_rule='^([A-Za-z]{2,4})(2)([Mm])(1)$').save()
+        ValidationRule(field_reference='base_educationgroupyear.acronym.osis.education_group_type_3DP',
+                       regex_rule='^([A-Za-z]{2,4})(3)([Dd])([Pp])$').save()
 
     def test_raise_validation_error_when_acronym_exists_in_present_or_future(self):
         for acy in (self.current_acy, self.next_acy):
@@ -330,6 +358,19 @@ class TestCleanAcronym(TestCase):
         e = EducationGroupYearFactory.build(acronym=self.acronym, academic_year=self.current_acy)
         with self.assertRaises(ValidationWarning):
             e.clean_acronym(raise_warnings=True)
+
+    def test_raise_validation_acronym_invalid(self):
+        random_acronym = string_generator()
+        external_ids = ['osis.education_group_type_2M180',
+                        'osis.education_group_type_2M1',
+                        'osis.education_group_type_3DP']
+        for ext_id in external_ids:
+            with self.subTest(type=ext_id):
+                e = TrainingFactory(acronym=random_acronym,
+                                    academic_year=self.current_acy,
+                                    education_group_type__external_id=ext_id)
+                with self.assertRaises(ValidationError):
+                    e.clean_acronym()
 
     def test_when_acronym_not_exists(self):
         EducationGroupYearFactory(acronym='CODE1')
@@ -419,4 +460,3 @@ class EducationGroupYearTypeTest(TestCase):
     def test_type_property(self):
         education_group_year = EducationGroupYearFactory()
         self.assertEqual(education_group_year.type, education_group_year.education_group_type.name)
-

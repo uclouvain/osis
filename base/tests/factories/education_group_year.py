@@ -24,7 +24,10 @@
 #
 ##############################################################################
 import operator
+import random
+import string
 
+import exrex
 import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
@@ -41,8 +44,14 @@ from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.language import LanguageFactory
 
 
+def string_generator(nb_char=8):
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(nb_char))
+
+
 def generate_title(education_group_year):
-    return '{obj.academic_year} {obj.acronym}'.format(obj=education_group_year).lower()
+    if education_group_year.acronym:
+        return '{obj.academic_year} {obj.acronym}'.format(obj=education_group_year).lower()
+    return '{obj.academic_year} {gen_str}'.format(obj=education_group_year, gen_str=string_generator()).lower()
 
 
 class EducationGroupYearFactory(factory.django.DjangoModelFactory):
@@ -52,8 +61,8 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
 
     education_group = factory.SubFactory(EducationGroupFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
-    acronym = factory.Sequence(lambda n: 'ED%d' % n)
-    partial_acronym = factory.Sequence(lambda n: 'SCS%03dT' % n)
+    acronym = ""
+    partial_acronym = ""
     title = factory.LazyAttribute(generate_title)
     title_english = factory.LazyAttribute(generate_title)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
@@ -76,6 +85,22 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     primary_language = factory.SubFactory(LanguageFactory)
     enrollment_campus = factory.SubFactory(CampusFactory)
     diploma_printing_title = "Yolo"
+
+    @factory.post_generation
+    def gen_acronym(self, create, extracted, **kwargs):
+        try:
+            if self.acronym == '':
+                self.acronym = exrex.getone(self.rules['acronym'].regex_rule).upper()
+        except KeyError:
+            self.acronym = string_generator(6)
+
+    @factory.post_generation
+    def gen_partial_acronym(self, create, extracted, **kwargs):
+        try:
+            if self.partial_acronym == "":
+                self.partial_acronym = exrex.getone(self.rules['partial_acronym'].regex_rule).upper()
+        except KeyError:
+            self.partial_acronym = string_generator(7)
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
