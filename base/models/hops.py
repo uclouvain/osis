@@ -26,11 +26,12 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class HopsAdmin(OsisModelAdmin):
+class HopsAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('ares_study', 'ares_graca', 'ares_ability', 'changed')
     list_filter = ('ares_study', )
     raw_id_fields = (

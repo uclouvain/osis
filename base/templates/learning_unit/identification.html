@@ -83,10 +83,7 @@
                         <div class="row">
                             {% block content_row2 %}
                                 <div class="col-md-3">
-                                    <label {{ differences|get_difference_css:'credits' }}>{% trans 'Credits' %}</label><br>
-                                    <span {{ differences|get_difference_css:'credits' }} id="id_credits">
-                                            {{ learning_unit_year.credits.normalize }}
-                                        </span>
+                                    {% dl_tooltip learning_unit_year 'credits' %}
                                 </div>
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'periodicity' %}

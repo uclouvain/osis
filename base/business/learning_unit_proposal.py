@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import functools
+from decimal import Decimal
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -500,6 +501,8 @@ def _get_name_attribute(obj):
 def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
     differences = differences_param
     for column_name, value in initial_data_by_model.items():
+        if value is not None and column_name == 'credits':
+            value = Decimal(value)
         if not (value is None and actual_data[model][column_name] == '') and value != actual_data[model][column_name]:
             differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
     return differences
