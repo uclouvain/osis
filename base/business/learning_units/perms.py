@@ -27,7 +27,6 @@ import datetime
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.db.models import Subquery, OuterRef
 from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
@@ -38,8 +37,7 @@ from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YE
     starting_academic_year, current_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from base.models.enums import learning_container_year_types, entity_container_year_link_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
+from base.models.enums import learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
