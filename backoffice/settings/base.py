@@ -251,7 +251,7 @@ CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraPlugins': ','.join(['pastefromword', 'cdn'] if CDN_URL else ['pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -261,11 +261,9 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
-            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': CDN_URL},
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -293,18 +291,16 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
-        'extraPlugins': ','.join(['cdn']) if CDN_URL else '',
+        'extraPlugins': '',
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
-            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': CDN_URL},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -319,6 +315,11 @@ CKEDITOR_CONFIGS = {
         'autoParagraph': False
     },
 }
+if CDN_URL:
+    for config_name in ['reddot', 'minimal']:
+        CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
+        CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
+        CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
 
 LOGGING = {
     'version': 1,

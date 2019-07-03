@@ -88,14 +88,13 @@ def has_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
-# TODO Use inclusion tag instead
-@register.simple_tag(takes_context=True)
+@register.inclusion_tag("blocks/dl/dl_tooltip.html", takes_context=True)
 def dl_tooltip(context, instance, key, **kwargs):
     title = kwargs.get('title', '')
-    label_text = _(str(kwargs.get('label_text', '')))
+    label_text = kwargs.get('label_text', '')
     url = kwargs.get('url', '')
     default_if_none = kwargs.get('default_if_none', '')
-    value = kwargs.get('value', '')
+    value = kwargs.get('value')
     inherited = kwargs.get('inherited', '')
     not_annualized = kwargs.get('not_annualized', '')
     differences = context['differences']
@@ -106,13 +105,15 @@ def dl_tooltip(context, instance, key, **kwargs):
     if not value:
         value = get_verbose_field_value(instance, key)
 
+    value = normalize_fraction(value) if isinstance(value, Decimal) else value
+
     difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(
         EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits'
         else _(title)
     )
 
     if url:
-        value = "<a href='{url}'>{value}</a>".format(value=_(str(value)), url=url)
+        value = "<a href='{url}'>{value}</a>".format(value=value or '', url=url)
 
     if inherited == PARTIM:
         label_text = get_style_of_label_text(label_text, "color:grey",
@@ -122,15 +123,18 @@ def dl_tooltip(context, instance, key, **kwargs):
     if not_annualized:
         label_text = get_style_of_label_text(label_text, "font-style:italic",
                                              "The value of this attribute is not annualized")
-        value = get_style_of_value("font-style:italic",
-                                   "The value of this attribute is not annualized",
-                                   value if value else default_if_none
-                                   )
+        value = get_style_of_value(
+            "font-style:italic",
+            "The value of this attribute is not annualized",
+            value if value else default_if_none
+        )
 
-    html_id = "id='id_{}'".format(key.lower())
-    value = normalize_fraction(value) if isinstance(value, Decimal) else value
-    return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference} {id}>{value}</dd></dl>".format(
-        difference=difference, id=html_id, label_text=label_text, value=value or ''))
+    return {
+        'difference': difference,
+        'id': key.lower(),
+        'label_text': label_text,
+        'value': value or ''
+    }
 
 
 def get_style_of_value(style, title, value):
