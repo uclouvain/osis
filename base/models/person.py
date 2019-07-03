@@ -88,7 +88,7 @@ class Person(SerializableModel):
             if settings.INTERNAL_EMAIL_SUFFIX.strip():
                 # It limits the creation of person with external emails. The domain name is case insensitive.
                 if self.source and self.source != person_source_type.BASE \
-                               and settings.INTERNAL_EMAIL_SUFFIX in str(self.email).lower():
+                        and settings.INTERNAL_EMAIL_SUFFIX in str(self.email).lower():
                     raise AttributeError('Invalid email for external person.')
 
         super(Person, self).save()
@@ -187,13 +187,16 @@ def find_by_id(person_id):
         return None
 
 
-def find_by_user(user):
-    return user.person
+def find_by_user(user: User):
+    try:
+        return user.person
+    except Person.DoesNotExist:
+        return None
 
 
 def get_user_interface_language(user):
     user_language = settings.LANGUAGE_CODE
-    person = user.person
+    person = find_by_user(user)
     if person:
         user_language = person.language
     return user_language
@@ -201,7 +204,7 @@ def get_user_interface_language(user):
 
 def change_language(user, new_language):
     if new_language in (l[0] for l in settings.LANGUAGES):
-        person = user.person
+        person = find_by_user(user)
         if person:
             person.language = new_language
             person.save()
