@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import csv
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from base.models.validation_rule import ValidationRule
@@ -8,7 +9,7 @@ from base.models.validation_rule import ValidationRule
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        path = "base/fixtures/validation_rules.csv"
+        path = "{}/base/fixtures/validation_rules.csv".format(settings.BASE_DIR)
         self.load_csv(path)
 
     @staticmethod
