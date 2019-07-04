@@ -23,10 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 
-CENTRAL_MANAGER_GROUP = "central_managers"
-FACULTY_MANAGER_GROUP = "faculty_managers"
-UE_FACULTY_MANAGER_GROUP = "faculty_managers_for_ue"
-ADMINISTRATIVE_MANAGER_GROUP = "administrative_manager"
-PROGRAM_MANAGER_GROUP = "program_managers"
-SIC_GROUP = "sic"
+
+def virtual_desktop(request):
+    url = ''
+    if request.user.is_authenticated():
+        url = _get_virtual_desktop_url_if_program_manager(request, url)
+    return {"virtual_desktop_url": url}
+
+
+def _get_virtual_desktop_url_if_program_manager(request, url):
+    if hasattr(request.user, 'person') and request.user.person.is_program_manager:
+        url = settings.VIRTUAL_DESKTOP_URL
+    return url
