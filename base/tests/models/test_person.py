@@ -34,19 +34,18 @@ from django.test import override_settings
 
 from base.models import person
 from base.models.enums import person_source_type
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
 from base.models.person import get_user_interface_language, \
     change_language
 from base.tests.factories import user
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
     UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import UserFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.user import UserFactory
 
 
 def create_person(first_name, last_name, email=None):
@@ -180,6 +179,14 @@ class PersonTest(PersonTestCase):
 
         a_person = UEFacultyManagerFactory()
         self.assertTrue(a_person.is_faculty_manager_for_ue)
+
+    def test_is_program_manager(self):
+        a_person = PersonFactory()
+        self.assertFalse(a_person.is_program_manager)
+
+        del a_person.is_program_manager
+        a_person.user.groups.add(Group.objects.get(name=PROGRAM_MANAGER_GROUP))
+        self.assertTrue(a_person.is_program_manager)
 
     def test_is_sic(self):
         a_person = PersonFactory()

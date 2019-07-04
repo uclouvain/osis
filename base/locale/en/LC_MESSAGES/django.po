@@ -382,6 +382,10 @@ msgstr ""
 msgid "Access minor"
 msgstr ""
 
+#: templates/studies.html:70
+msgid "Access to the student's virtual office"
+msgstr ""
+
 #: models/admission_condition.py:90
 msgid "Access with additional training"
 msgstr ""
@@ -530,7 +534,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:270
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:51
-#: templates/learning_unit/identification.html:232 views/learning_unit.py:245
+#: templates/learning_unit/identification.html:235 views/learning_unit.py:245
 #: views/learning_unit.py:365 views/learning_unit.py:383
 msgid "Additional requirement entity 1"
 msgstr ""
@@ -1193,6 +1197,7 @@ msgstr ""
 #: business/proposal_xls.py:40 business/proposal_xls.py:57
 #: models/learning_unit_year.py:146 templates/learning_unit/by_activity.html:85
 #: templates/learning_unit/by_external.html:49
+#: templates/learning_unit/identification.html:86
 #: templates/learning_unit/proposal_comparison.html:52
 #: templates/learning_unit/proposal_comparison.html:68
 #: tests/business/test_learning_unit_xls.py:324
@@ -2872,7 +2877,7 @@ msgstr ""
 #: templates/academic_calendar/academic_calendars.html:106
 #: templates/entities.html:59 templates/learning_unit/summary_list.html:121
 #: templates/offers.html:71 templates/organization/organizations.html:81
-#: tests/views/education_groups/test_search.py:192 views/common.py:229
+#: tests/views/education_groups/test_search.py:192 views/common.py:236
 #: views/education_groups/search.py:57
 msgid "No result!"
 msgstr ""
@@ -4924,6 +4929,10 @@ msgstr ""
 
 #: templates/entity/tabs.html:41
 msgid "Versions"
+msgstr ""
+
+#: templates/studies.html:69
+msgid "Virtual Desktop"
 msgstr ""
 
 #: business/proposal_xls.py:90 business/proposal_xls.py:100
