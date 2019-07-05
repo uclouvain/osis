@@ -144,7 +144,6 @@ class TestGetUrlToPublish(TestCase):
         mini_training = MiniTrainingFactory(education_group_type__name=random.choice(
             [t.name for t in MiniTrainingType])
         )
-        print(mini_training.education_group_type)
         expected_url = "{api_url}/{endpoint}".format(
             api_url=settings.ESB_API_URL,
             endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
