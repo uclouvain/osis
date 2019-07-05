@@ -30,7 +30,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
@@ -47,6 +47,7 @@ from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
+from base.views.education_groups.perms import can_change_education_group
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
@@ -54,9 +55,17 @@ from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 @waffle_flag("education_group_update")
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+
+    # Store root in the instance to avoid to pass the root in methods
+    # it will be used in the templates.
+    education_group_year.root = root_id
+
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
             education_group_year.academic_year.year < current_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
+
+    # Proctect the view
+    can_change_education_group(request.user, education_group_year)
     return update_education_group_year(request, root_id, education_group_year)
 
 
@@ -238,7 +247,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
 
     def post(self, request, **kwargs):
         try:
-            postponer = PostponeContent(self.get_root().previous_year())
+            postponer = PostponeContent(self.root.previous_year())
             postponer.postpone()
             success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
                 'count_elements': postponer.number_elements_created,

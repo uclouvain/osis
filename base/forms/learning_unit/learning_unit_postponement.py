@@ -32,12 +32,11 @@ from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
-from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm
+from base.forms.learning_unit.external_learning_unit import ExternalPartimForm, ExternalLearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -54,8 +53,8 @@ FIELDS_TO_NOT_POSTPONE = {
 FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'acronym', 'specific_title', 'specific_title_english',
                    'credits', 'session', 'quadrimestre', 'status', 'internship_subtype', 'professional_integration',
                    'campus', 'language', 'periodicity', 'container_type', 'common_title', 'common_title_english',
-                   'team', 'requirement_entity', 'allocation_entity', 'additional_requirement_entity_1',
-                   'additional_requirement_entity_2']
+                   'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
+                   'additional_entity_2']
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year
@@ -155,7 +154,7 @@ class LearningUnitPostponementForm:
             ).order_by('academic_year__year')
         to_delete = to_update = to_insert = []
 
-        if self.start_postponement.is_past():
+        if self.start_postponement.is_past:
             to_update = self._init_forms_in_past(existing_learn_unit_years, data)
         else:
             if self._is_update_action() and existing_learn_unit_years:
@@ -245,7 +244,9 @@ class LearningUnitPostponementForm:
             'postposal': not data
         }
         if self.external:
-            return ExternalLearningUnitBaseForm(**form_kwargs)
+            return ExternalLearningUnitBaseForm(
+                **form_kwargs) if self.subtype == learning_unit_year_subtypes.FULL else ExternalPartimForm(
+                **form_kwargs)
         return FullForm(**form_kwargs) if self.subtype == learning_unit_year_subtypes.FULL else \
             PartimForm(**form_kwargs)
 
@@ -345,38 +346,33 @@ class LearningUnitPostponementForm:
         This volume is never edited in the form, so we have to load data separably
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
-        initial_values = EntityComponentYear.objects.filter(
-            learning_component_year__learning_unit_year=initial_learning_unit_year
-        ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
+        # TODO :: select_related entities
+        entity_by_type = initial_learning_unit_year.learning_container_year.get_map_entity_by_type()
 
-        for reparation_volume, component_type, entity_type in initial_values:
-            try:
-                component = EntityComponentYear.objects.filter(
-                    learning_component_year__type=component_type,
-                    entity_container_year__type=entity_type,
-                    learning_component_year__learning_unit_year=luy
-                ).get()
-            except EntityComponentYear.DoesNotExist:
-                # Case: N year have additional requirement but N+1 doesn't have.
-                # Not need to display message because, already done on _check_differences function
-                component = None
+        for current_component in initial_learning_unit_year.learningcomponentyear_set.all():
+            component_type = current_component.type
+            new_component = LearningComponentYear.objects.filter(
+                type=component_type,
+                learning_unit_year=luy
+            ).select_related("learning_unit_year__learning_container_year").get()
 
-            if component and component.repartition_volume != reparation_volume:
-                name = component.learning_component_year.acronym + "-" + \
-                       component.entity_container_year.entity.most_recent_acronym
+            for entity_container_type, new_repartition_volume in new_component.repartition_volumes.items():
+                current_repartition = current_component.repartition_volumes[entity_container_type]
+                if new_repartition_volume != current_repartition and entity_container_type in entity_by_type:
+                    name = new_component.acronym + "-" + entity_by_type[entity_container_type].most_recent_acronym
 
-                self.consistency_errors.setdefault(luy.academic_year, []).append(
-                    _("The repartition volume of %(col_name)s has been already modified. "
-                      "({%(new_value)s} instead of {%(current_value)s})") % {
-                        'col_name': name,
-                        'new_value': component.repartition_volume,
-                        'current_value': reparation_volume
-                    }
-                )
+                    self.consistency_errors.setdefault(luy.academic_year, []).append(
+                        _("The repartition volume of %(col_name)s has been already modified. "
+                          "(%(new_value)s instead of %(current_value)s)") % {
+                            'col_name': name,
+                            'new_value': new_repartition_volume,
+                            'current_value': current_repartition
+                        }
+                    )
 
     def _check_differences(self, current_form, next_form, ac_year):
         differences = [
-            _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+            _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                 'col_name': next_form.label_fields.get(col_name, col_name),
                 'new_value': self._get_translated_value(next_form.instances_data.get(col_name)),
                 'current_value': self._get_translated_value(value)

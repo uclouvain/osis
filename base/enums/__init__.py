@@ -23,24 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
-import factory.fuzzy
-
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-
-
-class EntityComponentYearFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.EntityComponentYear"
-
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(
-        datetime.datetime(2016, 1, 1),
-        datetime.datetime(2017, 3, 1,)
-    )
-
-    entity_container_year = factory.SubFactory(EntityContainerYearFactory)
-    learning_component_year = factory.SubFactory(LearningComponentYearFactory)
-    repartition_volume = factory.fuzzy.FuzzyDecimal(9)
+from base.models.enums import internship_subtypes
+from base.models.enums import learning_unit_management_sites
+from base.models.enums import learning_unit_year_session

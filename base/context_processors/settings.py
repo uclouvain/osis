@@ -23,28 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from reversion.admin import VersionAdmin
-
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from django.conf import settings
 
 
-class EntityComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('entity_container_year', 'learning_component_year', 'repartition_volume',)
-    search_fields = ['entity_container_year__learning_container_year__acronym']
-    raw_id_fields = ('entity_container_year', 'learning_component_year')
-    list_filter = ('entity_container_year__learning_container_year__academic_year',)
+def virtual_desktop(request):
+    url = ''
+    if request.user.is_authenticated():
+        url = _get_virtual_desktop_url_if_program_manager(request, url)
+    return {"virtual_desktop_url": url}
 
 
-class EntityComponentYear(SerializableModel):
-    external_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-    entity_container_year = models.ForeignKey('EntityContainerYear', on_delete=models.CASCADE)
-    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
-    repartition_volume = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-
-    def __str__(self):
-        return u"%s - %s" % (self.entity_container_year, self.learning_component_year)
-
-    class Meta:
-        unique_together = ('entity_container_year', 'learning_component_year', )
+def _get_virtual_desktop_url_if_program_manager(request, url):
+    if hasattr(request.user, 'person') and request.user.person.is_program_manager:
+        url = settings.VIRTUAL_DESKTOP_URL
+    return url

@@ -29,10 +29,8 @@ from django.test import TestCase
 
 from attribution.business import summary_responsible
 from attribution.tests.factories.attribution import AttributionFactory
-from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -51,16 +49,11 @@ class TestSearchAttributions(TestCase):
         cls.current_academic_year = create_current_academic_year()
         # Create multiple attribution
         for nb in range(0, 10):
-            attribution = AttributionFactory(
+            AttributionFactory(
                 learning_unit_year__acronym='LBIR120{}'.format(nb),
                 learning_unit_year__academic_year=cls.current_academic_year,
                 learning_unit_year__learning_container_year__academic_year=cls.current_academic_year,
-            )
-            # Link course to entity
-            EntityContainerYearFactory(
-                learning_container_year=attribution.learning_unit_year.learning_container_year,
-                entity=cls.entity_version.entity,
-                type=entity_container_year_link_type.REQUIREMENT_ENTITY,
+                learning_unit_year__learning_container_year__requirement_entity=cls.entity_version.entity,
             )
 
     def test_search_attributions_case_academic_year_without_any_attribution(self):
@@ -97,8 +90,9 @@ class TestGetAttributionsData(TestCase):
             'academic_year': learning_unit_year.academic_year
         }
         result = summary_responsible.get_attributions_data(
-            user=UserFactory(),
-            learning_unit_year_id=learning_unit_year.id
+            UserFactory(),
+            learning_unit_year.id,
+            '-summary_responsible'
         )
         self.assertIsInstance(result, dict)
         self.assertDictEqual(result, expected_result)

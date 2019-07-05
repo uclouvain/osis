@@ -33,7 +33,9 @@
 <head>
     {% analytical_head_top %}
     <meta charset="utf-8">
-    <title>OSIS</title>
+    {% block title %}
+        <title>OSIS</title>
+    {% endblock %}
 
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -191,7 +193,7 @@
     {% block content %}{% endblock %}
     {% block modal %}{% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" role="dialog">
+    <div class="modal fade" id="form-ajax-modal" role="dialog" tabindex='-1'>
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}

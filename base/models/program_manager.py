@@ -25,13 +25,14 @@
 ##############################################################################
 from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy
+from reversion.admin import VersionAdmin
 
 from base.models.education_group import EducationGroup
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from .learning_unit_enrollment import LearningUnitEnrollment
 
 
-class ProgramManagerAdmin(OsisModelAdmin):
+class ProgramManagerAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('person', 'offer_year', 'changed', 'education_group')
     raw_id_fields = ('person', 'offer_year', 'education_group')
     search_fields = ['person__first_name', 'person__last_name', 'person__global_id', 'offer_year__acronym']

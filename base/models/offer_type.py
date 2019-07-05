@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from django.db import models
+
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class OfferTypeAdmin(OsisModelAdmin):
-    list_display = ('name', )
-    list_filter = ('name', )
+    list_display = ('name',)
+    list_filter = ('name',)
     search_fields = ['name']
 
 
@@ -40,6 +41,5 @@ class OfferType(models.Model):
     def __str__(self):
         return u"%s" % self.name
 
-
-def find_all():
-    return OfferType.objects.distinct('name').order_by('name')
+    class Meta:
+        ordering = 'name',

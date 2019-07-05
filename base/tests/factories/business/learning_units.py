@@ -37,10 +37,9 @@ from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_session
 from base.models.enums import organization_type
 from base.models.enums import quadrimesters
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.entity_component_year import EntityComponentYearFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -54,15 +53,15 @@ from reference.tests.factories.language import LanguageFactory
 
 
 def create_learning_unit_with_context(academic_year, structure, entity, acronym):
-    learning_container_year = LearningContainerYearFactory(academic_year=academic_year, acronym=acronym)
+    learning_container_year = LearningContainerYearFactory(
+        academic_year=academic_year,
+        acronym=acronym,
+        allocation_entity=entity,
+    )
     learning_unit_year = LearningUnitYearFactory(structure=structure,
                                                  acronym=acronym,
                                                  learning_container_year=learning_container_year,
                                                  academic_year=academic_year)
-
-    EntityContainerYearFactory(type=entity_container_year_link_type.ALLOCATION_ENTITY,
-                               learning_container_year=learning_container_year,
-                               entity=entity)
 
     return learning_unit_year
 
@@ -272,6 +271,8 @@ class GenerateContainer:
                 entity__organization__type=organization_type.MAIN
             ).entity for _ in range(4)
         ]
+        for entity in self.entities:
+            entity.refresh_from_db()
 
     def _setup_common_data(self):
         self.language = LanguageFactory(code='FR', name='French')
@@ -297,18 +298,33 @@ class GenerateContainerYear:
         self._setup_learning_unit_year_full(learning_unit_full)
         self._setup_learning_unit_year_partim(learning_unit_partim)
         self._setup_learning_components_year()
-        self._setup_entity_containers_year()
-        self._setup_entity_components_year()
         self.nb_classes = 5
         self._setup_classes()
 
     def _setup_learning_container_year(self, learning_container):
-        self.learning_container_year = LearningContainerYearFactory(learning_container=learning_container,
-                                                                    academic_year=self.academic_year,
-                                                                    container_type=learning_container_year_types.COURSE,
-                                                                    acronym="LDROI1200",
-                                                                    common_title="Droit international",
-                                                                    common_title_english="Droit international english")
+        self.requirement_entity_container_year = self.entities[0]
+        self.allocation_entity_container_year = self.entities[1]
+        self.additionnal_1_entity_container_year = self.entities[2]
+        self.addtionnal_2_entity_container_year = self.entities[3]
+
+        self.list_repartition_volume_entities = [
+            self.requirement_entity_container_year,
+            self.additionnal_1_entity_container_year,
+            self.addtionnal_2_entity_container_year
+        ]
+
+        self.learning_container_year = LearningContainerYearFactory(
+            learning_container=learning_container,
+            academic_year=self.academic_year,
+            container_type=learning_container_year_types.COURSE,
+            acronym="LDROI1200",
+            common_title="Droit international",
+            common_title_english="Droit international english",
+            requirement_entity=self.requirement_entity_container_year,
+            allocation_entity=self.allocation_entity_container_year,
+            additional_entity_1=self.additionnal_1_entity_container_year,
+            additional_entity_2=self.addtionnal_2_entity_container_year,
+        )
         self.learning_container = self.learning_container_year.learning_container
 
     def _setup_learning_unit_year_full(self, learning_unit):
@@ -344,38 +360,6 @@ class GenerateContainerYear:
             self.learning_component_cm_partim,
             self.learning_component_tp_partim
         ]
-
-    def _setup_entity_containers_year(self):
-        self.requirement_entity_container_year = _setup_entity_container_year(
-            self.learning_container_year,
-            entity_container_year_link_type.REQUIREMENT_ENTITY,
-            self.entities[0]
-        )
-        self.allocation_entity_container_year = _setup_entity_container_year(
-            self.learning_container_year,
-            entity_container_year_link_type.ALLOCATION_ENTITY,
-            self.entities[1]
-        )
-        self.additionnal_1_entity_container_year = _setup_entity_container_year(
-            self.learning_container_year,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            self.entities[2]
-        )
-        self.addtionnal_2_entity_container_year = _setup_entity_container_year(
-            self.learning_container_year,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2,
-            self.entities[3]
-        )
-        self.list_repartition_volume_entities = [
-            self.requirement_entity_container_year,
-            self.additionnal_1_entity_container_year,
-            self.addtionnal_2_entity_container_year
-        ]
-
-    def _setup_entity_components_year(self):
-        for component in self.list_components:
-            for entity_container_year in self.list_repartition_volume_entities:
-                _setup_entity_component_year(component, entity_container_year)
 
     def _setup_classes(self):
         for component in self.list_components:
@@ -430,24 +414,11 @@ def _setup_learning_component_tp(learning_unit_year):
 
 def _setup_learning_component_year(learning_unit_year, component_type):
     return LearningComponentYearFactory(
+        acronym=DEFAULT_ACRONYM_COMPONENT[component_type],
         learning_unit_year=learning_unit_year,
         type=component_type,
         planned_classes=1
     )
-
-
-def _setup_entity_container_year(learning_container_year, entity_container_type, entity):
-    return EntityContainerYearFactory(
-        learning_container_year=learning_container_year,
-        entity=entity,
-        type=entity_container_type
-    )
-
-
-def _setup_entity_component_year(learning_component_year, entity_container_year):
-    return EntityComponentYearFactory(learning_component_year=learning_component_year,
-                                      entity_container_year=entity_container_year,
-                                      repartition_volume=0)
 
 
 def _setup_classes(learning_component_year, number_classes=5):

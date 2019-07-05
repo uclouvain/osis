@@ -60,6 +60,10 @@ class PersonRolesSerializer(serializers.ModelSerializer):
             'reddot': {
                 'description': _('General information and Admission condition'),
                 'scope': self.roles_for_reddot(obj)
+            },
+            'program_manager': {
+                'description': _('Program manager'),
+                'scope': self.roles_for_program_managers(obj)
             }
         }
         return roles
@@ -77,3 +81,7 @@ class PersonRolesSerializer(serializers.ModelSerializer):
                 )
             entities_acronym |= acronyms
         return entities_acronym
+
+    def roles_for_program_managers(self, obj):
+        return [{'acronym': offer_year.acronym, 'year': offer_year.academic_year.year}
+                for offer_year in obj.get_managed_programs()]

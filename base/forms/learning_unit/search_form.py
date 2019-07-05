@@ -44,13 +44,11 @@ from base.forms.utils.dynamic_field import DynamicChoiceField
 from base.models import learning_unit_year, group_element_year
 from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
-from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type,\
     learning_container_year_types
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import convert_status_bool
+from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -101,15 +99,13 @@ class LearningUnitSearchForm(BaseSearchForm):
             learning_unit_year=OuterRef('pk'),
         )
         entity_requirement = EntityVersion.objects.filter(
-            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
-            entity__entitycontaineryear__type=REQUIREMENT_ENTITY
+            entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
         entity_allocation = EntityVersion.objects.filter(
-            entity__entitycontaineryear__learning_container_year__learningunityear=OuterRef('pk'),
-            entity__entitycontaineryear__type=ALLOCATION_ENTITY
+            entity=OuterRef('learning_container_year__allocation_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
@@ -161,16 +157,14 @@ class LearningUnitSearchForm(BaseSearchForm):
             requirement_entity_ids = get_entities_ids(requirement_entity_acronym, with_entity_subordinated)
 
             qs = qs.filter(
-                learning_container_year__entitycontaineryear__entity__in=requirement_entity_ids,
-                learning_container_year__entitycontaineryear__type=REQUIREMENT_ENTITY
+                learning_container_year__requirement_entity__in=requirement_entity_ids,
             )
 
         if allocation_entity_acronym:
             allocation_entity_ids = get_entities_ids(allocation_entity_acronym, with_entity_subordinated)
 
             qs = qs.filter(
-                learning_container_year__entitycontaineryear__entity__in=allocation_entity_ids,
-                learning_container_year__entitycontaineryear__type=ALLOCATION_ENTITY
+                learning_container_year__allocation_entity__in=allocation_entity_ids,
             )
 
         return qs
@@ -216,7 +210,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         super().__init__(*args, **kwargs)
 
         if self.borrowed_course_search:
-            self.fields["academic_year_id"].required = True
             self.fields["academic_year_id"].empty_label = None
 
         self.fields["with_entity_subordinated"].initial = True
@@ -251,20 +244,17 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         service_course_search = service_course_search or self.service_course_search
 
         learning_units = self.get_queryset()
+
         if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
             raise TooManyResultsException
 
-        learning_units = learning_units.prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ])
-        )
-
         if self.borrowed_course_search:
-            # TODO must return a queryset
-            learning_units = list(self._filter_borrowed_learning_units(learning_units))
+            learning_units = self._filter_borrowed_learning_units(learning_units)
 
+        learning_units = learning_units.prefetch_related(
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
+        )
         for learning_unit in learning_units:
             append_latest_entities(learning_unit, service_course_search)
 
@@ -281,10 +271,8 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise TooManyResultsException
 
         queryset = queryset.prefetch_related(
-            build_entity_container_prefetch([
-                entity_container_year_link_type.ALLOCATION_ENTITY,
-                entity_container_year_link_type.REQUIREMENT_ENTITY
-            ]),
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
             Prefetch(
                 'attribution_set',
                 queryset=Attribution.objects.filter(summary_responsible=True),
@@ -318,13 +306,14 @@ class LearningUnitYearForm(LearningUnitSearchForm):
                 faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
                     get(acronym=faculty_borrowing_acronym).entity.id
             except EntityVersion.DoesNotExist:
-                return []
+                return LearningUnitYear.objects.none()
 
-        return filter_is_borrowed_learning_unit_year(
+        ids = filter_is_borrowed_learning_unit_year(
             qs_learning_units,
             academic_year.start_date,
             faculty_borrowing=faculty_borrowing_id
         )
+        return self.get_queryset().filter(id__in=ids)
 
 
 def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_borrowing=None):
@@ -340,9 +329,16 @@ def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_b
     map_luy_education_group_entities = \
         map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
 
-    return filter(lambda luy: __is_borrowed_learning_unit(luy, entities_faculty, map_luy_entity,
-                                                          map_luy_education_group_entities, entities_borrowing_allowed),
-                  learning_unit_year_qs)
+    ids = []
+    for luy in learning_unit_year_qs:
+        if _is_borrowed_learning_unit(luy,
+                                      entities_faculty,
+                                      map_luy_entity,
+                                      map_luy_education_group_entities,
+                                      entities_borrowing_allowed):
+            ids.append(luy.id)
+
+    return ids
 
 
 def compute_faculty_for_entities(entities):
@@ -363,11 +359,9 @@ def __search_faculty_for_entity(entity_id, entities):
 
 
 def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
-    entity_container_years = EntityContainerYear.objects. \
-        filter(learning_container_year__pk=OuterRef("learning_container_year__pk"),
-               type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-    learning_unit_years_with_entity = learning_unit_year_qs.values_list("id"). \
-        annotate(entity=Subquery(entity_container_years.values("entity")))
+    learning_unit_years_with_entity = learning_unit_year_qs\
+        .select_related('learning_container_year__requirement_entity')\
+        .values_list("id", 'learning_container_year__requirement_entity')
     return {luy_id: entity_id for luy_id, entity_id in learning_unit_years_with_entity}
 
 
@@ -386,8 +380,8 @@ def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_
     return dict_education_group_year_entities_for_learning_unit_year
 
 
-def __is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_education_group_entities,
-                                entities_borrowing_allowed):
+def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_education_group_entities,
+                               entities_borrowing_allowed):
     luy_entity = map_luy_entity.get(luy.id)
     luy_faculty = map_entity_faculty.get(luy_entity)
 
@@ -410,8 +404,10 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
         required=False, label=_("Country")
     )
-    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"))
-    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"))
+    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"),
+                                help_text=_("Please select a country and a city first"))
+    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"),
+                              help_text=_("Please select a country first"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

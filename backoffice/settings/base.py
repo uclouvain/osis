@@ -134,6 +134,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
                 'base.context_processors.user_manual.user_manual_url',
+                'base.context_processors.settings.virtual_desktop',
                 'django.template.context_processors.i18n',
             ],
         },
@@ -245,11 +246,12 @@ LOCALE_PATHS = ()
 
 
 # Apps Settings
+CDN_URL = os.environ.get("CDN_URL", "")
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraPlugins': ','.join(['pastefromword', 'cdn']),
+        'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -259,11 +261,9 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
-            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -291,18 +291,16 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
-        'extraPlugins': ','.join(['cdn']),
+        'extraPlugins': '',
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
-            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': os.environ.get("CDN_URL", "https://uclouvain.be/PPE-filemanager/?ckeditor=yes")},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -317,6 +315,11 @@ CKEDITOR_CONFIGS = {
         'autoParagraph': False
     },
 }
+if CDN_URL:
+    for config_name in ['reddot', 'minimal']:
+        CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
+        CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
+        CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
 
 LOGGING = {
     'version': 1,
@@ -393,10 +396,11 @@ RELEASE_TAG = os.environ.get('RELEASE_TAG')
 # Selenium Testing
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
-    'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', os.path.join(BASE_DIR, "selenium/geckodriver")),
-    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'true',
+    'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', "geckodriver"),
+    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'false',
     'SCREEN_WIDTH': int(os.environ.get('SELENIUM_SCREEN_WIDTH', 1920)),
-    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080))
+    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080)),
+    'TAKE_SCREEN_ON_FAILURE': os.environ.get('SELENIUM_TAKE_SCREENSHOTS', 'True').lower() == 'true',
 }
 
 # BOOTSTRAP3 Configuration
@@ -445,6 +449,7 @@ REQUESTS_TIMEOUT = 20
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
-YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 2019))
+YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 0))  # By default, no restriction
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
+VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')

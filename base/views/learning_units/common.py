@@ -89,7 +89,6 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
     context['learning_container_year_partims'] = learning_unit_year.get_partims_related()
     context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
     context['campus'] = learning_unit_year.campus
-    context['experimental_phase'] = True
     context.update(get_all_attributions(learning_unit_year))
     components = get_components_identification(learning_unit_year)
     context['components'] = components.get('components')

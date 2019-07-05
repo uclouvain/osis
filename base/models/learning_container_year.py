@@ -29,8 +29,11 @@ from reversion.admin import VersionAdmin
 
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import learning_unit_year
-from base.models.enums import learning_unit_year_subtypes
+from base.models.entity import Entity
+from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
 from base.models.enums import vacant_declaration_type
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -67,6 +70,31 @@ class LearningContainerYear(SerializableModel):
                                                choices=vacant_declaration_type.DECLARATION_TYPE)
     in_charge = models.BooleanField(default=False)
 
+    requirement_entity = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=False,
+        related_name='requirement_entities',
+        on_delete=models.PROTECT,
+    )
+    allocation_entity = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=True,
+        related_name='allocation_entities',
+        on_delete=models.PROTECT,
+    )
+    additional_entity_1 = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=True,
+        related_name='additional_entities_1',
+        on_delete=models.PROTECT,
+    )
+    additional_entity_2 = models.ForeignKey(
+        to="base.Entity",
+        null=True, blank=True,
+        related_name='additional_entities_2',
+        on_delete=models.PROTECT,
+    )
+
     _warnings = None
 
     def __str__(self):
@@ -90,3 +118,46 @@ class LearningContainerYear(SerializableModel):
 
     def is_type_for_faculty(self) -> bool:
         return self.container_type in LearningContainerYearType.for_faculty()
+
+    @staticmethod
+    def get_attrs_by_entity_container_type():
+        return {
+            REQUIREMENT_ENTITY: 'requirement_entity',
+            ALLOCATION_ENTITY: 'allocation_entity',
+            ADDITIONAL_REQUIREMENT_ENTITY_1: 'additional_entity_1',
+            ADDITIONAL_REQUIREMENT_ENTITY_2: 'additional_entity_2',
+        }
+
+    def get_entity_from_type(self, entity_container_type):
+        attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
+        return getattr(self, attr, None)
+
+    def get_map_entity_by_type(self) -> dict:
+        return {
+            link_type: self.get_entity_from_type(link_type)
+            for link_type in LearningContainerYear.get_attrs_by_entity_container_type()
+        }
+
+    def set_entity(self, entity_container_type, new_entity):
+        attr = LearningContainerYear.get_attrs_by_entity_container_type()[entity_container_type]
+        setattr(self, attr, new_entity)
+
+    def set_entities(self, entities_by_type_to_set):
+        for link_type, new_entity in entities_by_type_to_set.items():
+            self.set_entity(link_type, new_entity)
+
+    def get_most_recent_entity_acronym(self, entity_container_type):
+        entity = self.get_entity_from_type(entity_container_type)
+        return entity.most_recent_acronym if entity else None
+
+
+def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_type=None):
+    if link_type is None:
+        link_types = entity_container_year_link_type.ENTITY_TYPE_LIST
+    else:
+        link_types = [link_type]
+    return {
+        link_type: entity.get_latest_entity_version()
+        for link_type, entity in learning_container_year.get_map_entity_by_type().items()
+        if entity and link_type in link_types
+    }

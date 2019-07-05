@@ -23,11 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from base.models import entity_container_year as mdl_entity_container_year
 from base.models.enums import learning_component_year_type
 
 FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'credits', 'periodicity',
@@ -175,13 +173,3 @@ def _is_key_to_compare(key, vol):
 
 def get_partims_as_str(partim_list):
     return ', '.join(sorted(str(partim.subdivision) for partim in partim_list))
-
-
-def get_entity_by_type(luy, entity_type):
-    try:
-        entity_container_yr = mdl_entity_container_year.search(
-            link_type=entity_type, learning_container_year=luy.learning_container_year
-        ).get()
-        return entity_container_yr.entity
-    except (MultipleObjectsReturned, ObjectDoesNotExist):
-        return None

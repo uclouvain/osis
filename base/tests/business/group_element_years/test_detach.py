@@ -25,14 +25,20 @@
 ##############################################################################
 from unittest import mock
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy
+from base.business.group_element_years.management import CheckAuthorizedRelationshipDetach
+from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.prerequisite import Prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class TestOptionDetachEducationGroupYearStrategy(TestCase):
@@ -59,12 +65,13 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
 
     def setUp(self):
-        self.authorized_relationship_patcher = mock.patch(
-            "base.business.group_element_years.management.check_authorized_relationship",
-            return_value=True
+        self.mock_authorized_relationship_check_is_valid = mock.patch.object(
+            CheckAuthorizedRelationshipDetach,
+            "is_valid"
         )
-        self.mocked_perm = self.authorized_relationship_patcher.start()
-        self.addCleanup(self.authorized_relationship_patcher.stop)
+        self.mock_authorized_relationship_check_is_valid.return_value = True
+        self.mocked_perm = self.mock_authorized_relationship_check_is_valid.start()
+        self.addCleanup(self.mock_authorized_relationship_check_is_valid.stop)
 
     def test_is_valid_case_detach_option_which_are_not_within_finality_master_120(self):
         """
@@ -114,8 +121,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         )
 
         strategy = DetachEducationGroupYearStrategy(link=master_120_link_option)
-        with self.assertRaises(ValidationError):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
 
     def test_is_not_valid_case_detach_group_which_contains_option_which_are_within_finality_master_120(self):
         """
@@ -132,8 +138,7 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         master_120_link_option = GroupElementYearFactory(parent=self.master_120, child_branch=option)
 
         strategy = DetachEducationGroupYearStrategy(link=master_120_link_option)
-        with self.assertRaises(ValidationError):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
 
     def test_is_not_valid_case_detach_group_which_contains_option_which_are_reused_in_multiple_2M(self):
         """
@@ -174,5 +179,94 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
 
         # We try to detach OPT1 from GROUP1 but it is not allowed because another 2M structure won't be valid anymore
         strategy = DetachEducationGroupYearStrategy(link=group1_link_opt1)
-        with self.assertRaises(ValidationError):
-            strategy.is_valid()
+        self.assertFalse(strategy.is_valid())
+
+
+class TestDetachPrerequisiteCheck(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root = TrainingFactory(
+            academic_year__current=True,
+            education_group_type=EducationGroupTypeFactory(name=education_group_types.TrainingType.MASTER_MA_120.name)
+        )
+        cls.children_level_0 = GroupElementYearFactory.create_batch(
+            1,
+            parent=cls.root,
+            child_branch__education_group_type__group=True,
+            child_branch__academic_year=cls.root.academic_year
+        )
+
+        cls.children_level_1 = GroupElementYearFactory.create_batch(
+            3,
+            parent=cls.children_level_0[0].child_branch,
+            child_branch__education_group_type__group=True,
+            child_branch__academic_year=cls.root.academic_year
+        )
+        cls.children_level_2 = GroupElementYearFactory.create_batch(
+            1,
+            parent=cls.children_level_1[0].child_branch,
+            child_branch__education_group_type__group=True,
+            child_branch__academic_year=cls.root.academic_year
+        )
+        cls.lu_children_level_2 = GroupElementYearChildLeafFactory.create_batch(
+            2,
+            parent=cls.children_level_1[1].child_branch,
+            child_leaf__academic_year=cls.root.academic_year
+        )
+
+        cls.lu_children_level_3 = GroupElementYearChildLeafFactory.create_batch(
+            2,
+            parent=cls.children_level_2[0].child_branch,
+            child_leaf__academic_year=cls.root.academic_year
+        )
+
+    def setUp(self):
+        self.mock_authorized_relationship_check_is_valid = mock.patch.object(
+            CheckAuthorizedRelationshipDetach,
+            "is_valid"
+        )
+        self.mock_authorized_relationship_check_is_valid.return_value = True
+        self.mocked_perm = self.mock_authorized_relationship_check_is_valid.start()
+        self.addCleanup(self.mock_authorized_relationship_check_is_valid.stop)
+
+        self.prerequisite = PrerequisiteFactory(
+            learning_unit_year=self.lu_children_level_3[0].child_leaf,
+            education_group_year=self.root,
+        )
+        self.prerequisite_item = PrerequisiteItemFactory(
+            prerequisite=self.prerequisite,
+            learning_unit=self.lu_children_level_2[0].child_leaf.learning_unit
+        )
+
+    def test_when_no_prerequisite(self):
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[2])
+        self.assertIsNone(strategy._check_detach_prerequisite_rules())
+        self.assertFalse(strategy.errors)
+        self.assertFalse(strategy.warnings)
+
+    def test_create_warnings_when_has_prerequisite_in_formation(self):
+        strategy = DetachEducationGroupYearStrategy(self.children_level_2[0])
+        strategy._check_detach_prerequisite_rules()
+        self.assertFalse(strategy.errors)
+        self.assertTrue(strategy.warnings)
+
+    def test_create_error_when_is_prerequisite_in_formation(self):
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[1])
+        strategy._check_detach_prerequisite_rules()
+        self.assertTrue(strategy.errors)
+
+    def test_can_detach_if_duplicate_luy(self):
+        GroupElementYearChildLeafFactory(
+            parent=self.children_level_1[0].child_branch,
+            child_leaf=self.lu_children_level_2[0].child_leaf
+        )
+        strategy = DetachEducationGroupYearStrategy(self.children_level_1[1])
+        self.assertIsNone(strategy._check_detach_prerequisite_rules())
+
+    def test_warnings_when_prerequisites_in_group_that_is_detached(self):
+        strategy = DetachEducationGroupYearStrategy(self.children_level_0[0])
+        strategy._check_detach_prerequisite_rules()
+        self.assertTrue(strategy.warnings)
+
+        strategy.delete_prerequisites()
+        self.assertFalse(Prerequisite.objects.filter(id=self.prerequisite.id))

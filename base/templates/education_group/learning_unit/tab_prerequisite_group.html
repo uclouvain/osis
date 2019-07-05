@@ -42,8 +42,8 @@
                 <tbody>
                     {% for education_group_year in formations %}
                         <tr>
-                            <td>{{ education_group_year.acronym }}</td>
-                            <td>{{ education_group_year.prerequisites.0.prerequisite_string|default:"-"}}</td>
+                            <td><a href="{% url 'education_group_read' education_group_year.id education_group_year.id %}">{{ education_group_year.acronym }}</a></td>
+                            <td>{{ education_group_year.prerequisites.0.prerequisite_string_as_href|safe|default:"-"}}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

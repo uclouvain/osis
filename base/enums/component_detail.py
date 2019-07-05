@@ -23,23 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import operator
+from django.utils.translation import ugettext_lazy as _
 
-import factory.fuzzy
+VOLUME_TOTAL = 'VOLUME_TOTAL'
+VOLUME_Q1 = 'VOLUME_Q1'
+VOLUME_Q2 = 'VOLUME_Q2'
+PLANNED_CLASSES = 'PLANNED_CLASSES'
+VOLUME_REQUIREMENT_ENTITY = 'VOLUME_REQUIREMENT_ENTITY'
+VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1 = 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1'
+VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2 = 'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2'
+VOLUME_TOTAL_REQUIREMENT_ENTITIES = 'VOLUME_TOTAL_REQUIREMENT_ENTITIES'
+REAL_CLASSES = 'REAL_CLASSES'
+VOLUME_GLOBAL = 'VOLUME_GLOBAL'
 
-from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-
-
-class EntityContainerYearFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.EntityContainerYear"
-
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
-    entity = factory.SubFactory(EntityFactory)
-    learning_container_year = factory.SubFactory(LearningContainerYearFactory)
-    type = factory.Iterator(EntityContainerYearLinkTypes.choices(), getter=operator.itemgetter(0))
+COMPONENT_DETAILS = {
+    VOLUME_TOTAL: _('Vol. annual'),
+    VOLUME_Q1: _('Vol. Q1'),
+    VOLUME_Q2: _('Vol. Q2'),
+    PLANNED_CLASSES: _('Planned classes'),
+    VOLUME_REQUIREMENT_ENTITY: _('volume requirement entity'),
+    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: _('volume additional requirement entity 1'),
+    VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: _('volume additional requirement entity 2'),
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES: _('volume total requirement entities'),
+    REAL_CLASSES: _('Real classes'),
+    VOLUME_GLOBAL: _('Vol. global'),
+}

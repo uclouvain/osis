@@ -23,31 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import offer_type
+from unittest import mock
 
-from base.tests.factories.offer_type import OfferTypeFactory
-from django.test import TestCase
-from django.utils import timezone
+from django.test import TestCase, override_settings
 
-
-class OfferTypeTest(TestCase):
-
-    def test_find_all_result_none(self):
-        self.assertEqual(len(offer_type.find_all()), 0)
-
-    def test_find_all_existing_results(self):
-        an_offer_type_1 = offer_type.OfferType(name="Bachelier")
-        an_offer_type_1.save()
-        an_offer_type_2 = offer_type.OfferType(name="Doctorat")
-        an_offer_type_2.save()
-
-        self.assertEqual(len(offer_type.find_all()), 2)
+from osis_common.queue.queue_listener import SynchronousConsumerThread
 
 
-    def test_find_all_distinct_existing_results(self):
-        an_offer_type_1 = offer_type.OfferType(name="Bachelier")
-        an_offer_type_1.save()
-        an_offer_type_2 = offer_type.OfferType(name="Bachelier")
-        an_offer_type_2.save()
-
-        self.assertEqual(len(offer_type.find_all()), 1)
+@override_settings(
+    QUEUES={
+        'QUEUES_NAME': {
+            'QUEUE': 'NAME'
+        }
+    }
+)
+class WSGITestCase(TestCase):
+    @mock.patch.object(SynchronousConsumerThread, 'start', return_value=None)
+    def test_listen_to_queue_with_callback(self, mock_queue):
+        from backoffice.wsgi import _listen_to_queue_with_callback
+        _listen_to_queue_with_callback(
+            callback=lambda: None,
+            queue_name='QUEUE'
+        )
+        self.assertTrue(mock_queue.called)

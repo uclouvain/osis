@@ -27,10 +27,9 @@ from django.db import models
 from django.db.models import Prefetch
 
 from attribution.models.enums.function import Functions
-from base.models import entity_container_year
 from base.models import person
 from base.models.academic_year import current_academic_year
-from base.models.enums import entity_container_year_link_type
+from base.models.entity import Entity
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
@@ -94,9 +93,8 @@ def find_all_responsibles_by_learning_unit_year(a_learning_unit_year):
 
 
 def find_all_tutors_by_learning_unit_year(a_learning_unit_year, responsibles_order=""):
-    attribution_list = Attribution.objects.filter(learning_unit_year=a_learning_unit_year) \
-        .distinct("tutor").values_list('id', flat=True)
-    result = Attribution.objects.filter(id__in=attribution_list).order_by(responsibles_order, "tutor__person")
+    result = find_all_responsible_by_learning_unit_year(a_learning_unit_year, responsibles_order=responsibles_order)\
+        .order_by(responsibles_order, "tutor__person")
     return [
         [attribution.tutor, attribution.score_responsible, attribution.summary_responsible]
         for attribution in result
@@ -169,18 +167,22 @@ def search_by_learning_unit_this_year(code, specific_title, academic_year=None):
 
 def filter_by_entities(queryset, entities):
     entities_ids = [entity.id for entity in entities]
-    l_container_year_ids = entity_container_year.search(link_type=entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                        entity_id=entities_ids) \
-        .values_list('learning_container_year_id', flat=True)
-    queryset = queryset.filter(learning_unit_year__learning_container_year__id__in=l_container_year_ids)
+    queryset = queryset.filter(learning_unit_year__learning_container_year__allocation_entity_id__in=entities_ids)
     return queryset
 
 
-def find_all_responsible_by_learning_unit_year(learning_unit_year):
-    all_tutors = Attribution.objects.filter(learning_unit_year=learning_unit_year) \
-        .distinct("tutor").values_list('id', flat=True)
-    return Attribution.objects.filter(id__in=all_tutors).prefetch_related('tutor')\
-                              .order_by("tutor__person")
+def find_all_responsible_by_learning_unit_year(learning_unit_year, responsibles_order=None):
+    if not responsibles_order:
+        # FIXME :: this code fixes wrong database model. The flags summary_responsible and score_responsible should be
+        # FIXME :: in another model than Attribution (to avoid ducplicates tutor name)
+        raise AttributeError("Please set the responsibles_order param. It's used to order by attributions from"
+                             "scores responsibles or summary responsibles.")
+    all_tutors_qs = Attribution.objects.filter(learning_unit_year=learning_unit_year).order_by('tutor')
+    if responsibles_order:
+        all_tutors_qs = all_tutors_qs.order_by('tutor', responsibles_order)
+    all_tutors_qs = all_tutors_qs.distinct('tutor').values_list('id', flat=True)
+    return Attribution.objects.filter(id__in=all_tutors_qs).prefetch_related('tutor') \
+        .order_by("tutor__person")
 
 
 def find_all_summary_responsibles_by_learning_unit_years(learning_unit_years):
@@ -237,9 +239,8 @@ def _filter_by_tutor(queryset, tutor):
 
 def _prefetch_entity_version(queryset):
     return queryset.prefetch_related(
-        Prefetch('learning_unit_year__learning_container_year__entitycontaineryear_set',
-                 queryset=entity_container_year.search(link_type=entity_container_year_link_type.ALLOCATION_ENTITY)
-                 .prefetch_related(
-                     Prefetch('entity__entityversion_set', to_attr='entity_versions')
-                 ), to_attr='entities_containers_year')
+        Prefetch(
+            'learning_unit_year__learning_container_year__allocation_entity',
+            queryset=Entity.objects.all().prefetch_related(Prefetch('entityversion_set', to_attr='entity_versions'))
+        )
     )

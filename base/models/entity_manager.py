@@ -25,12 +25,13 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Prefetch
+from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityManagerAdmin(SerializableModelAdmin):
+class EntityManagerAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('person', 'structure', 'entity')
     search_fields = ['person__first_name', 'person__last_name', 'structure__acronym']
 

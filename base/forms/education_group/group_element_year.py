@@ -27,10 +27,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
-from base.business.group_element_years.management import check_authorized_relationship
+from base.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 from base.models.enums import education_group_categories
-from base.models.enums.link_type import LinkTypes
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 
 
@@ -70,10 +68,6 @@ class GroupElementYearForm(forms.ModelForm):
                 self.instance.child_branch.education_group_type):
             self.fields.pop("access_condition")
 
-            # Change the initial but (for strange reasons) let the possibility to the user to try with the main link.
-            # Like that he will see the form error.
-            self.fields["link_type"].initial = LinkTypes.REFERENCE.name
-
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent) and \
                 not self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["access_condition"])
@@ -105,17 +99,16 @@ class GroupElementYearForm(forms.ModelForm):
         if not self.instance.child_branch:
             return data_cleaned
 
-        try:
-            new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
-            check_authorized_relationship(self.instance.parent, new_link)
-        except AuthorizedRelationshipNotRespectedException as e:
-            raise ValidationError(e.errors)
+        new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
+        check = CheckAuthorizedRelationshipAttach(self.instance.parent, link_to_attach=new_link)
+        if not check.is_valid():
+            raise ValidationError(check.errors)
         return data_cleaned
 
     def clean(self):
         strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \
             AttachLearningUnitYearStrategy
-        strategy(parent=self.instance.parent, child=self.instance.child).is_valid()
+        strategy(parent=self.instance.parent, child=self.instance.child, instance=self.instance).is_valid()
         return super().clean()
 
     def _check_authorized_relationship(self, child_type):

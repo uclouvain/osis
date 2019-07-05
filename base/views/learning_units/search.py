@@ -82,7 +82,7 @@ def learning_units_search(request, search_type):
             check_if_display_message(request, found_learning_units)
 
     except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
+        display_error_messages(request, _('Too many results'))
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
 
@@ -116,7 +116,6 @@ def learning_units_search(request, search_type):
         if isinstance(found_learning_units, list) else
         found_learning_units.count(),
         'current_academic_year': starting_academic_year(),
-        'experimental_phase': True,
         'search_type': search_type,
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
@@ -191,7 +190,6 @@ def learning_units_proposal_search(request):
         'form_proposal_state': ProposalStateModelForm(),
         'academic_years': get_last_academic_years(),
         'current_academic_year': current_academic_year(),
-        'experimental_phase': True,
         'search_type': PROPOSAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
@@ -252,7 +250,6 @@ def learning_units_external_search(request):
         'form': search_form,
         'academic_years': get_last_academic_years(),
         'current_academic_year': current_academic_year(),
-        'experimental_phase': True,
         'search_type': EXTERNAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,

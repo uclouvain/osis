@@ -35,3 +35,10 @@ def can_update_group_element_year(user, group_element_year, raise_exception=Fals
     if not business_perms.is_eligible_to_update_group_element_year(pers, group_element_year, raise_exception):
         raise PermissionDenied
     return True
+
+
+def can_detach_group_element_year(user, group_element_year, raise_exception=False):
+    pers = get_object_or_404(person.Person, user=user)
+    if not business_perms.is_eligible_to_detach_group_element_year(pers, group_element_year, raise_exception):
+        raise PermissionDenied
+    return True

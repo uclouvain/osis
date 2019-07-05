@@ -24,11 +24,10 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 
 from base import models as mdl
 from base.models.academic_year import AcademicYear
-from base.models.offer_year_calendar import OfferYearCalendar
 
 
 @login_required
@@ -38,6 +37,7 @@ def offers(request):
     academic_years = AcademicYear.objects.all()
 
     academic_year_calendar = mdl.academic_year.current_academic_year()
+
     if academic_year_calendar:
         academic_yr = academic_year_calendar.id
     return render(request, "offers.html", {'academic_year': academic_yr,
@@ -67,40 +67,3 @@ def offers_search(request):
                                            'academic_years': academic_years,
                                            'offer_years': offer_years,
                                            'init': "0"})
-
-
-@login_required
-@permission_required('base.can_access_offer', raise_exception=True)
-def offer_read(request, offer_year_id):
-    return _offer_identification_tab(request, offer_year_id)
-
-
-def _offer_identification_tab(request, offer_year_id):
-    offer_year = mdl.offer_year.find_by_id(offer_year_id)
-    return render(request, "offer/tab_identification.html", locals())
-
-
-@login_required
-@permission_required('base.can_access_offer', raise_exception=True)
-def offer_academic_calendar_tab(request, offer_year_id):
-    offer_year = mdl.offer_year.find_by_id(offer_year_id)
-    offer_year_events = mdl.offer_year_calendar.find_offer_year_events(offer_year)
-    return render(request, "offer/tab_academic_calendar.html", locals())
-
-
-@login_required
-@permission_required('base.can_access_offer', raise_exception=True)
-def offer_program_managers_tab(request, offer_year_id):
-    offer_year = mdl.offer_year.find_by_id(offer_year_id)
-    program_managers = mdl.program_manager.find_by_offer_year(offer_year)
-    return render(request, "offer/tab_program_managers.html", locals())
-
-
-@login_required
-@permission_required('base.can_access_offer', raise_exception=True)
-def offer_year_calendar_read(request, id):
-    offer_year_calendar = get_object_or_404(OfferYearCalendar, pk=id)
-    is_programme_manager = mdl.program_manager.is_program_manager(request.user,
-                                                                  offer_year=offer_year_calendar.offer_year)
-    return render(request, "offer_year_calendar.html", {'offer_year_calendar': offer_year_calendar,
-                                                        'is_programme_manager': is_programme_manager})

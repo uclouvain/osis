@@ -42,7 +42,6 @@ from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.models.academic_year import current_academic_year, starting_academic_year
 from base.models.enums import academic_calendar_type
-from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -50,7 +49,6 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -157,13 +155,22 @@ class LearningUnitPedagogyTestCase(TestCase):
             text_label=TextLabelFactory(label='bibliography'),
             entity=LEARNING_UNIT_YEAR,
             text="<ul><li>Test</li></ul>",
-            reference=luy.pk
+            reference=luy.pk,
+            language='fr-be'
         )
         online_resources = TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL</a>",
-            reference=luy.pk
+            reference=luy.pk,
+            language='fr-be'
+        )
+        online_resources_en = TranslatedTextFactory(
+            text_label=TextLabelFactory(label='online_resources'),
+            entity=LEARNING_UNIT_YEAR,
+            text="<a href='test_url'>TestURL EN</a>",
+            reference=luy.pk,
+            language='en'
         )
 
         # Test the view
@@ -178,7 +185,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         wb = load_workbook(BytesIO(response.content), read_only=True)
 
         sheet = wb.active
-        data = sheet['A1': 'F3']
+        data = sheet['A1': 'G3']
 
         # Check the first row content
         titles = next(data)
@@ -189,7 +196,8 @@ class LearningUnitPedagogyTestCase(TestCase):
             str(_('Req. Entity')).title(),
             str(_('bibliography')).title(),
             str(_('teaching materials')).title(),
-            str(_('online resources')).title(),
+            str("{} - Fr-Be".format(_('online resources'))).title(),
+            str("{} - En".format(_('online resources'))).title(),
         ])
 
         # Check data from the luy
@@ -199,7 +207,10 @@ class LearningUnitPedagogyTestCase(TestCase):
             luy.acronym,
             luy.complete_title,
             str(luy.requirement_entity),
-            "Test\n", "Magic wand", "TestURL - [test_url] \n"
+            "Test\n",
+            "Magic wand",
+            "TestURL - [test_url] \n",
+            "TestURL EN - [test_url] \n"
         ])
 
         # The second luy has no mandatory teaching material
@@ -248,12 +259,12 @@ class LearningUnitPedagogyTestCase(TestCase):
                               end_date=an_academic_calendar.end_date)
 
     def _create_learning_unit_year_for_entity(self, an_entity, acronym):
-        l_container_yr = LearningContainerYearFactory(acronym=acronym,
-                                                      academic_year=self.current_academic_year,
-                                                      container_type=learning_container_year_types.COURSE)
-        EntityContainerYearFactory(learning_container_year=l_container_yr,
-                                   entity=an_entity,
-                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
+        l_container_yr = LearningContainerYearFactory(
+            acronym=acronym,
+            academic_year=self.current_academic_year,
+            container_type=learning_container_year_types.COURSE,
+            requirement_entity=an_entity,
+        )
         return LearningUnitYearFactory(acronym=acronym,
                                        learning_container_year=l_container_yr,
                                        academic_year=self.current_academic_year)

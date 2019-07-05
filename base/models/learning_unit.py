@@ -38,7 +38,7 @@ from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
 LEARNING_UNIT_ACRONYM_REGEX_MODEL = "^[BEGLMTWX][A-Z]{2,4}\d{4}"
-LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
+LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BELMWX][A-Z]{2,4}\d{4}"
 LEARNING_UNIT_ACRONYM_REGEX_EXTERNAL = "^[EGLMTW][A-Z]{2,4}\d{4}$"
 LETTER_OR_DIGIT = "[A-Z0-9]"
 STRING_END = "$"

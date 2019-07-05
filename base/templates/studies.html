@@ -34,31 +34,43 @@
     <h2>{% trans 'Student path' %}</h2>
 </div>
 
-<div class="panel panel-default">
+    <div class="panel panel-default">
     <div class="panel-body">
-        {% if 'assessments' in installed_apps and perms.assessments.can_access_scoreencoding %}
         <div class="row">
-            <div class="col-md-1"><i class="fa fa-tachometer" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-11">
-                <h4 class="media-heading"><a href="{% url 'assessments' %}" id="lnk_assessments" >{% trans 'Evaluations' %}</a></h4>
-                <p>{% trans 'This process helps tutors while scores encoding.' %}</p>
-            </div>
+            {% if perms.base.can_access_offer %}
+                <div class="col-md-1"><i class="fa fa-map-marker-alt" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{% url 'offers' %}" id="lnk_offers">{% trans 'Addresses' %}</a></h4>
+                    <p>{% trans 'Management of addresses on the scoresheets.' %}</p>
+                </div>
+            {% endif %}
+            {% if 'assessments' in installed_apps and perms.assessments.can_access_scoreencoding %}
+                <div class="col-md-1"><i class="fa fa-tachometer-alt" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{% url 'assessments' %}" id="lnk_assessments" >{% trans 'Evaluations' %}</a></h4>
+                    <p>{% trans 'This process helps tutors while scores encoding.' %}</p>
+                </div>
+            {% endif %}
         </div>
         <br>
-        {% endif %}
-        {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
         <div class="row">
-
+            {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
                 <div class="col-md-1"><i class="fa fa-user-md" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-11">
+                <div class="col-md-5">
                     <h4 class="media-heading">
                         <a href="{% url 'internship' %}" id="lnk_internships">{% trans 'Internships' %}</a>
                     </h4>
                     <p>{% trans 'This process controls students internships.' %}</p>
                 </div>
+            {% endif %}
+            {% if virtual_desktop_url %}
+                <div class="col-md-1"><i class="fas fa-desktop" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{{ virtual_desktop_url }}" id="lnk_virtual_desktop">{% trans 'Virtual Desktop' %}</a></h4>
+                    <p>{% trans "Access to the student's virtual office." %}</p>
+                </div>
+            {% endif %}
         </div>
-        <br/>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

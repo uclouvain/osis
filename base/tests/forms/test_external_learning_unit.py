@@ -28,20 +28,21 @@ from django.test import TestCase
 
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm, \
     LearningContainerYearExternalModelForm, CograduationExternalLearningUnitModelForm, \
-    LearningUnitYearForExternalModelForm
+    LearningUnitYearForExternalModelForm, ExternalPartimForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
 from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
-from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
@@ -74,6 +75,7 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         # Learning unit year data model form
         'acronym_0': learning_unit_year.acronym[0],
         'acronym_1': learning_unit_year.acronym[1:],
+        'acronym_2': "A",
         'academic_year': learning_unit_year.academic_year.id,
         'specific_title': learning_unit_year.specific_title,
         'specific_title_english': learning_unit_year.specific_title_english,
@@ -92,8 +94,8 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         'is_vacant': learning_unit_year.learning_container_year.is_vacant,
 
         # External learning unit model form
-        'requirement_entity-entity': requesting_entity.id,
-        'allocation_entity-entity': requesting_entity.id,
+        'requirement_entity': requesting_entity.id,
+        'allocation_entity': requesting_entity.id,
         'external_acronym': 'Gorzyne',
         'external_credits': '5',
 
@@ -104,9 +106,11 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         'component-0-hourly_volume_total_annual': 20,
         'component-0-hourly_volume_partial_q1': 10,
         'component-0-hourly_volume_partial_q2': 10,
+        'component-0-planned_classes': 1,
         'component-1-hourly_volume_total_annual': 20,
         'component-1-hourly_volume_partial_q1': 10,
         'component-1-hourly_volume_partial_q2': 10,
+        'component-1-planned_classes': 1,
     }
 
 
@@ -145,6 +149,59 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
 
+class TestExternalPartimForm(TestCase):
+    def setUp(self):
+        self.person = PersonFactory()
+        self.academic_year = create_current_academic_year()
+        self.language = LanguageFactory(code='FR')
+        organization = OrganizationFactory(type=organization_type.MAIN)
+        campus = CampusFactory(organization=organization)
+        language = LanguageFactory(code='FR')
+        container_year = LearningContainerYearFactory(academic_year=self.academic_year, container_type=EXTERNAL)
+        self.learning_unit = LearningUnitFactory(start_year=self.academic_year.year)
+        self.learning_unit_year = LearningUnitYearFactory(
+            acronym='EOSIS1111',
+            academic_year=self.academic_year,
+            learning_unit=self.learning_unit,
+            learning_container_year=container_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            campus=campus,
+            language=language,
+            internship_subtype=None
+        )
+
+    def test_external_learning_unit_form_init(self):
+        form = ExternalPartimForm(person=self.person, academic_year=self.academic_year,
+                                  learning_unit_full_instance=self.learning_unit_year.learning_unit)
+
+        context = form.get_context()
+        self.assertEqual(context['subtype'], PARTIM)
+        self.assertIsInstance(context['learning_unit_form'], LearningUnitModelForm)
+        self.assertIsInstance(context['learning_unit_year_form'], LearningUnitYearModelForm)
+        self.assertIsInstance(context['learning_container_year_form'], LearningContainerYearExternalModelForm)
+        self.assertIsInstance(context['learning_unit_external_form'], CograduationExternalLearningUnitModelForm)
+
+    def test_external_learning_unit_form_is_valid(self):
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
+                                  learning_unit_full_instance=self.learning_unit_year.learning_unit)
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_external_learning_unit_form_save(self):
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        form = ExternalPartimForm(person=self.person, academic_year=self.academic_year, data=data,
+                                  start_year=self.academic_year.year,
+                                  learning_unit_full_instance=self.learning_unit_year.learning_unit)
+        self.assertTrue(form.is_valid(), form.errors)
+        luy = form.save()
+
+        self.assertIsInstance(luy, LearningUnitYear)
+        self.assertEqual(luy.learning_container_year.container_type, EXTERNAL)
+        self.assertEqual(luy.acronym[0], 'E')
+        self.assertEqual(luy.externallearningunityear.author, self.person)
+        self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
+
+
 class TestLearningUnitYearForExternalModelForm(TestCase):
     def setUp(self):
         self.person = PersonFactory()
@@ -160,7 +217,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
         form = LearningUnitYearForExternalModelForm(
             person=self.person, data=None,
             subtype=FULL, instance=luy, initial={})
-        self.assertEqual(form.initial["country_external_institution"], address.country.pk)
+        self.assertEqual(form.fields["country_external_institution"].initial, address.country.pk)
 
 
 class TestExternalLearningUnitSearchForm(TestCase):
@@ -234,7 +291,8 @@ class TestExternalLearningUnitSearchForm(TestCase):
         self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1.learning_unit_year])
 
     def test_assert_ignore_external_learning_units_of_type_mobility(self):
-        original_count = LearningUnitYear.objects.filter(externallearningunityear__co_graduation=True, externallearningunityear__mobility=False).count()
+        original_count = LearningUnitYear.objects.filter(externallearningunityear__co_graduation=True,
+                                                         externallearningunityear__mobility=False).count()
         ExternalLearningUnitYearFactory(
             learning_unit_year__academic_year=self.academic_year,
             mobility=True,

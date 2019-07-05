@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 from copy import deepcopy
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
@@ -32,6 +33,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
@@ -42,14 +44,17 @@ from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
     get_components_identification
-from base.business.learning_unit_proposal import _get_value_from_enum
+from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units import perms as business_perms
-from base.business.learning_units.comparison import get_entity_by_type, \
-    FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
+from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
+    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
+from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import ATTRIBUTION_PROCEDURES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
@@ -78,13 +83,15 @@ def learning_unit_formations(request, learning_unit_year_id):
         "parent", "child_leaf", "parent__education_group_type"
     ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(education_groups_years,
-                                                                                         parents_as_instances=True)
+    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(
+        education_groups_years,
+        parents_as_instances=True,
+        with_parents_of_parents=True
+    )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
     context['group_elements_years'] = group_elements_years
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
-    context['experimental_phase'] = True
 
     return render(request, "learning_unit/formations.html", context)
 
@@ -103,7 +110,6 @@ def learning_unit_components(request, learning_unit_year_id):
     context['ADDITIONAL_REQUIREMENT_ENTITY_2'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_2')
     context['tab_active'] = 'components'
     context['can_manage_volume'] = business_perms.is_eligible_for_modification(context["learning_unit_year"], person)
-    context['experimental_phase'] = True
     return render(request, "learning_unit/components.html", context)
 
 
@@ -119,8 +125,6 @@ def learning_unit_attributions(request, learning_unit_year_id):
     context["can_manage_attribution"] = business_perms.is_eligible_to_manage_attributions(
         context["learning_unit_year"], request.user.person
     )
-    context['experimental_phase'] = True
-
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
     return render(request, "learning_unit/attributions.html", context)
@@ -137,7 +141,6 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
-    context['experimental_phase'] = True
     return render(request, "learning_unit/specifications.html", context)
 
 
@@ -212,35 +215,61 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
 
 def get_volumes_comparison_context(component, initial_data):
     volumes = {}
-    component_type = component['learning_component_year'].type
-    volume_total = component['volumes']['VOLUME_TOTAL'] or 0
-    volume_q1 = component['volumes']['VOLUME_Q1'] or 0
-    volume_q2 = component['volumes']['VOLUME_Q2'] or 0
-    planned_classes = component['volumes']['PLANNED_CLASSES'] or 0
-    if volume_total != initial_data['volumes'][component_type]['VOLUME_TOTAL']:
-        volumes[_('Volume total annual')] = [initial_data['volumes'][component_type]['VOLUME_TOTAL'], volume_total]
-    if planned_classes != initial_data['volumes'][component_type]['PLANNED_CLASSES']:
-        volumes[_('Planned classes')] = [initial_data['volumes'][component_type]['PLANNED_CLASSES'],
-                                         planned_classes]
-    if volume_q1 != initial_data['volumes'][component_type]['VOLUME_Q1']:
-        volumes[_('Volume Q1')] = [initial_data['volumes'][component_type]['VOLUME_Q1'], volume_q1]
-    if volume_q2 != initial_data['volumes'][component_type]['VOLUME_Q2']:
-        volumes[_('Volume Q2')] = [initial_data['volumes'][component_type]['VOLUME_Q2'], volume_q2]
+    acronym = component['learning_component_year'].acronym
+    repartition_volume_total = component['volumes'][VOLUME_TOTAL] or 0
+    repartition_volume_q1 = component['volumes'][VOLUME_Q1] or 0
+    repartition_volume_q2 = component['volumes'][VOLUME_Q2] or 0
+    planned_classes = component['volumes'][PLANNED_CLASSES] or 0
+    repartition_volume_requirement_entity = component['volumes'][VOLUME_REQUIREMENT_ENTITY] or 0
+    repartition_volume_additional_entity_1 = component['volumes'][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1] or 0
+    repartition_volume_additional_entity_2 = component['volumes'][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2] or 0
+    initial_volume_total = initial_data['volumes'][acronym][VOLUME_TOTAL] or 0
+    initial_volume_q1 = initial_data['volumes'][acronym][VOLUME_Q1] or 0
+    initial_volume_q2 = initial_data['volumes'][acronym][VOLUME_Q2] or 0
+    initial_planned_classes = initial_data['volumes'][acronym][PLANNED_CLASSES] or 0
+    initial_volume_requirement_entity = initial_data['volumes'][acronym][VOLUME_REQUIREMENT_ENTITY] or 0
+    initial_volume_additional_entity_1 = initial_data['volumes'][acronym][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1] or 0
+    initial_volume_additional_entity_2 = initial_data['volumes'][acronym][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2] or 0
+    if repartition_volume_total != initial_volume_total:
+        volumes[_('Volume total annual')] = [Decimal(initial_volume_total), Decimal(repartition_volume_total)]
+    if planned_classes != initial_planned_classes:
+        volumes[_('Planned classes')] = [initial_planned_classes, planned_classes]
+    if repartition_volume_q1 != initial_volume_q1:
+        volumes[_('Volume Q1')] = [Decimal(initial_volume_q1), Decimal(repartition_volume_q1)]
+    if repartition_volume_q2 != initial_volume_q2:
+        volumes[_('Volume Q2')] = [Decimal(initial_volume_q2), Decimal(repartition_volume_q2)]
+    if repartition_volume_requirement_entity != initial_volume_requirement_entity:
+        volumes[_('Requirement entity')] = [Decimal(initial_volume_requirement_entity),
+                                            Decimal(repartition_volume_requirement_entity)]
+    if repartition_volume_additional_entity_1 != initial_volume_additional_entity_1:
+        volumes[_('Additional requirement entity 1')] = [Decimal(initial_volume_additional_entity_1),
+                                                         Decimal(repartition_volume_additional_entity_1)]
+    if repartition_volume_additional_entity_2 != initial_volume_additional_entity_2:
+        volumes[_('Additional requirement entity 2')] = [Decimal(initial_volume_additional_entity_2),
+                                                         Decimal(repartition_volume_additional_entity_2)]
     return volumes
 
 
 def get_all_entities_comparison_context(initial_data, learning_unit_year):
     entities_fields = []
-    for link_type in ENTITY_TYPE_LIST:
-        link = EntityContainerYearLinkTypes[link_type].value
-        new_entity = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
-            learning_unit_year, link_type) else None
-        initial_entity = entity.find_by_id(
-            initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
-            initial_data['entities'][link_type]) else None
-        if initial_entity != new_entity:
-            entities_fields.append([link, initial_entity, new_entity])
+    new_container_year = learning_unit_year.learning_container_year
+    for entity_link, attr in new_container_year.get_attrs_by_entity_container_type().items():
+        new_entity = getattr(new_container_year, attr, None)
+        new_entity_acronym = new_entity.most_recent_acronym if new_entity else None
+        initial_entity_acronym = _get_initial_entity_acronym(initial_data, attr)
+        if initial_entity_acronym != new_entity_acronym:
+            translated_value = EntityContainerYearLinkTypes[entity_link].value
+            entities_fields.append([translated_value, initial_entity_acronym, new_entity_acronym])
     return entities_fields
+
+
+def _get_initial_entity_acronym(initial_data, entity_key_field_name):
+    initial_entity_acronym = None
+    initial_entity_id = initial_data['learning_container_year'][entity_key_field_name]
+    if initial_entity_id:
+        now = timezone.now().date()
+        initial_entity_acronym = EntityVersion.objects.current(now).get(entity_id=initial_entity_id).acronym
+    return initial_entity_acronym
 
 
 def get_learning_container_year_comparison_context(initial_data, learning_unit_year):
@@ -276,6 +305,9 @@ def get_learning_unit_year_comparison_context(initial_data, learning_unit_year):
             elif field == 'attribution_procedure':
                 initial = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(initial_learning_unit_year, field))
                 new_value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+            elif field == 'credits':
+                initial = Decimal(getattr(initial_learning_unit_year, field))
+                new_value = Decimal(getattr(learning_unit_year, field))
             else:
                 initial = getattr(initial_learning_unit_year, field)
                 new_value = getattr(learning_unit_year, field)
@@ -317,15 +349,24 @@ def get_full_context(learning_unit_year):
     context['entities_fields'] = get_entities_context(initial_data, learning_unit_year)
     if 'components' not in context:
         components = get_components_identification(learning_unit_year)
-        for component in components['components']:
-            volumes = {_('Volume total annual'): component['volumes']['VOLUME_TOTAL'] or 0,
-                       _('Planned classes'): component['volumes']['PLANNED_CLASSES'] or 0,
-                       _('Volume Q1'): component['volumes']['VOLUME_Q1'] or 0,
-                       _('Volume Q2'): component['volumes']['VOLUME_Q2'] or 0}
-            components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES,
-                                                 component['learning_component_year'].type)] = volumes
+        get_component_values(components, components_list)
         context['components'] = components_list
     return context
+
+
+def get_component_values(components, components_list):
+    for component in components['components']:
+        volumes = {
+            _('Volume total annual'): component['volumes'][VOLUME_TOTAL] or 0,
+            _('Planned classes'): component['volumes'][PLANNED_CLASSES] or 0,
+            _('Volume Q1'): component['volumes'][VOLUME_Q1] or 0,
+            _('Volume Q2'): component['volumes'][VOLUME_Q2] or 0,
+            _('Requirement entity'): component['volumes'][VOLUME_REQUIREMENT_ENTITY] or 0,
+            _('Additional requirement entity 1'): component['volumes'][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1] or 0,
+            _('Additional requirement entity 2'): component['volumes'][VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2] or 0
+        }
+        components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES,
+                                             component['learning_component_year'].type)] = volumes
 
 
 def reinitialize_learning_unit_year(components_list, context, initial_data, learning_unit_year):
@@ -337,7 +378,11 @@ def reinitialize_learning_unit_year(components_list, context, initial_data, lear
         volumes = {_('Volume total annual'): component['hourly_volume_total_annual'] or 0,
                    _('Planned classes'): component['planned_classes'] or 0,
                    _('Volume Q1'): component['hourly_volume_partial_q1'] or 0,
-                   _('Volume Q2'): component['hourly_volume_partial_q2'] or 0}
+                   _('Volume Q2'): component['hourly_volume_partial_q2'] or 0,
+                   _('Requirement entity'): component['repartition_volume_requirement_entity'] or 0,
+                   _('Additional requirement entity 1'): component['repartition_volume_additional_entity_1'] or 0,
+                   _('Additional requirement entity 2'): component['repartition_volume_additional_entity_2'] or 0
+                   }
         components_list[_get_value_from_enum(LEARNING_COMPONENT_YEAR_TYPES, component['type'])] = volumes
     context['components'] = components_list
     return initial_data
@@ -345,16 +390,14 @@ def reinitialize_learning_unit_year(components_list, context, initial_data, lear
 
 def get_entities_context(initial_data, learning_unit_year):
     entities_fields = {}
-    for link_type in ENTITY_TYPE_LIST:
-        link = EntityContainerYearLinkTypes[link_type].value
+    container_year = learning_unit_year.learning_container_year
+    for entity_link, attr in container_year.get_attrs_by_entity_container_type().items():
         if initial_data:
-            entity_data = entity.find_by_id(
-                initial_data['entities'][link_type]).most_recent_acronym if entity.find_by_id(
-                initial_data['entities'][link_type]) else None
+            entity_acronym = _get_initial_entity_acronym(initial_data, attr)
         else:
-            entity_data = get_entity_by_type(learning_unit_year, link_type).most_recent_acronym if get_entity_by_type(
-                learning_unit_year, link_type) else None
-        entities_fields[link] = entity_data
+            entity_acronym = container_year.get_most_recent_entity_acronym(entity_link)
+        translated_value = EntityContainerYearLinkTypes[entity_link].value
+        entities_fields[translated_value] = entity_acronym
     return entities_fields
 
 
@@ -396,17 +439,8 @@ def build_context_comparison(current_context, learning_unit_year, next_context, 
 def _reinitialize_model(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
-
-
-def _clean_attribute_initial_value(attribute_name, attribute_value):
-    clean_attribute_value = attribute_value
-    if attribute_name == "campus":
-        clean_attribute_value = campus.find_by_id(attribute_value)
-    elif attribute_name == "language":
-        clean_attribute_value = language.find_by_id(attribute_value)
-    return clean_attribute_value
 
 
 def _reinitialize_components(initial_components):
@@ -416,7 +450,7 @@ def _reinitialize_components(initial_components):
         )
         for attribute_name, attribute_value in initial_data_by_model.items():
             if attribute_name != "id":
-                cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+                cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
                 setattr(learning_component_year, attribute_name, cleaned_initial_value)
 
 

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import functools
+from decimal import Decimal
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -36,17 +37,14 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_unit import compose_components_dict
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
 from base.business.learning_units import perms
-from base.business.learning_units.edition import update_or_create_entity_container_year_with_components, \
-    edit_learning_unit_end_date, update_learning_unit_year_with_report
+from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report
 from base.business.learning_units.simple import deletion as business_deletion
-from base.models import entity_container_year, campus, entity
+from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
-from base.models.entity import find_by_id
-from base.models.entity_container_year import find_entities_grouped_by_linktype
+from base.models.entity import find_by_id, Entity, get_by_internal_id
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
@@ -54,8 +52,7 @@ from reference.models import language
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
-    'language', 'campus', REQUIREMENT_ENTITY, ALLOCATION_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_1,
-    ADDITIONAL_REQUIREMENT_ENTITY_2,
+    'language', 'campus', 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
 )
 
 APP_BASE_LABEL = 'base'
@@ -69,6 +66,7 @@ INITIAL_DATA_FIELDS = {
     'learning_container_year': [
         "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team", "is_vacant",
         "type_declaration_vacant",
+        'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
     ],
     'learning_unit': [
         "id", "end_year", "faculty_remark", "other_remark"
@@ -79,8 +77,9 @@ INITIAL_DATA_FIELDS = {
         "attribution_procedure",
     ],
     'learning_component_year': [
-        "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
-        "type"
+        "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
+        "planned_classes", "type", "repartition_volume_requirement_entity", "repartition_volume_additional_entity_1",
+        "repartition_volume_additional_entity_2"
     ],
 }
 
@@ -105,38 +104,27 @@ def reinitialize_data_before_proposal(learning_unit_proposal):
     _reinitialize_model_before_proposal(learning_unit_year.learning_unit, initial_data["learning_unit"])
     _reinitialize_model_before_proposal(learning_unit_year.learning_container_year,
                                         initial_data["learning_container_year"])
-    _reinitialize_entities_before_proposal(learning_unit_year.learning_container_year,
-                                           initial_data["entities"])
     _reinitialize_components_before_proposal(initial_data.get("learning_component_years") or {})
 
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()
 
 
-def _clean_attribute_initial_value(attribute_name, attribute_value):
+def clean_attribute_initial_value(attribute_name, attribute_value):
+    # TODO : clean this function ; it could make up to 6 hits DB
     clean_attribute_value = attribute_value
     if attribute_name == "campus":
         clean_attribute_value = campus.find_by_id(attribute_value)
     elif attribute_name == "language":
         clean_attribute_value = language.find_by_id(attribute_value)
+    elif attribute_name in ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']:
+        clean_attribute_value = get_by_internal_id(attribute_value)
     return clean_attribute_value
-
-
-def _reinitialize_entities_before_proposal(learning_container_year, initial_entities_by_type):
-    for type_entity, id_entity in initial_entities_by_type.items():
-        initial_entity = entity.get_by_internal_id(id_entity)
-        if initial_entity:
-            update_or_create_entity_container_year_with_components(initial_entity, learning_container_year, type_entity)
-        else:
-            current_entity_container_year = entity_container_year.find_by_learning_container_year_and_linktype(
-                learning_container_year, type_entity)
-            if current_entity_container_year is not None:
-                current_entity_container_year.delete()
 
 
 def delete_learning_unit_proposal(learning_unit_proposal, delete_learning_unit):
@@ -304,7 +292,7 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
 def _apply_action_on_proposals(proposals, action_method, author, permission_check):
     proposals_with_results = []
     for proposal in proposals:
-        proposal_with_result = (proposal, {ERROR: ["User %(person)s do not have rights on this proposal." % {
+        proposal_with_result = (proposal, {ERROR: [_("User %(person)s do not have rights on this proposal.") % {
             "person": str(author)
         }]})
         if permission_check(proposal, author):
@@ -388,9 +376,9 @@ def _consolidate_modification_proposal_accepted(proposal):
                                               exclude=("id",)))
         fields_to_update_clean = {}
         for field_name, field_value in fields_to_update.items():
-            fields_to_update_clean[field_name] = _clean_attribute_initial_value(field_name, field_value)
+            fields_to_update_clean[field_name] = clean_attribute_initial_value(field_name, field_value)
 
-        entities_to_update = find_entities_grouped_by_linktype(proposal.learning_unit_year.learning_container_year)
+        entities_to_update = proposal.learning_unit_year.learning_container_year.get_map_entity_by_type()
 
         update_learning_unit_year_with_report(next_luy, fields_to_update_clean, entities_to_update,
                                               override_postponement_consistency=True)
@@ -404,11 +392,11 @@ def compute_proposal_state(a_person):
 
 def copy_learning_unit_data(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
-    entities_by_type = entity_container_year.find_entities_grouped_by_linktype(learning_container_year)
+    entities_by_type = learning_container_year.get_map_entity_by_type()
 
     learning_unit_year_values = _get_attributes_values(learning_unit_year,
                                                        INITIAL_DATA_FIELDS['learning_unit_year'])
-    learning_unit_year_values["credits"] = float(learning_unit_year.credits) if learning_unit_year.credits else None
+    learning_unit_year_values["credits"] = learning_unit_year.credits if learning_unit_year.credits else None
 
     return {
         "learning_container_year": _get_attributes_values(learning_container_year,
@@ -416,6 +404,7 @@ def copy_learning_unit_data(learning_unit_year):
         "learning_unit_year": learning_unit_year_values,
         "learning_unit": _get_attributes_values(learning_unit_year.learning_unit,
                                                 INITIAL_DATA_FIELDS['learning_unit']),
+        # TODO :: remove "entities" key, duplicated with entities in LearningContainerYear
         "entities": get_entities(entities_by_type),
         "learning_component_years": get_components_initial_data(learning_unit_year),
         "volumes": _get_volumes_for_initial(learning_unit_year)
@@ -437,14 +426,10 @@ def get_entity_by_type(entity_type, entities_by_type):
         return None
 
 
-def convert_volume_to_float(data, key):
-    return {key: float(data.get(key))} if key in data and data.get(key) else {key: None}
-
-
 def update_or_create_learning_unit_component(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
-            cleaned_initial_value = _clean_attribute_initial_value(attribute_name, attribute_value)
+            cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()
 
@@ -463,9 +448,6 @@ def get_components_initial_data(learning_unit_year):
     component_values_list = []
     for component in components:
         data = _get_attributes_values(component, INITIAL_DATA_FIELDS['learning_component_year'])
-        data.update(convert_volume_to_float(data, 'hourly_volume_total_annual'))
-        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q1'))
-        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q2'))
         component_values_list.append(data)
     return component_values_list
 
@@ -476,21 +458,15 @@ def get_components_identification_initial_data(proposal):
     learning_component_year_list_from_initial = proposal.initial_data.get('learning_component_years')
     if learning_component_year_list_from_initial:
         for learning_component_year in learning_component_year_list_from_initial:
-            entity_components_yr = mdl_base.entity_component_year.EntityComponentYear.objects.filter(
-                learning_component_year=learning_component_year.get('id')
-            )
-
             components.append(
                 {
                     'learning_component_year': learning_component_year,
-                    'entity_component_yr': entity_components_yr.first(),
                     'volumes': volume_from_initial_learning_component_year(
                         learning_component_year,
-                        entity_components_yr
+                        proposal.initial_data.get('volumes')[learning_component_year['acronym']]
                     )
                 }
             )
-
         return compose_components_dict(components, additional_entities)
     return None
 
@@ -525,6 +501,8 @@ def _get_name_attribute(obj):
 def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
     differences = differences_param
     for column_name, value in initial_data_by_model.items():
+        if value is not None and column_name == 'credits':
+            value = Decimal(value)
         if not (value is None and actual_data[model][column_name] == '') and value != actual_data[model][column_name]:
             differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
     return differences
@@ -540,6 +518,6 @@ def _get_volumes_for_initial(learning_unit_year):
 
     volumes_for_initial = {}
     for component_key, volume_data in volumes.items():
-        volumes_for_initial[component_key.type] = volume_data
+        volumes_for_initial[component_key.acronym] = volume_data
 
     return volumes_for_initial

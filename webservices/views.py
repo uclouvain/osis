@@ -128,14 +128,13 @@ def ws_catalog_offer(request, year, language, acronym):
 def ws_catalog_common_offer(request, year, language):
     # Validation
     common_education_group, iso_language, year = parameters_validation('common', language, year)
-    response = dict.fromkeys(SECTIONS_PER_OFFER_TYPE['common'], None)
+    response = dict.fromkeys(SECTIONS_PER_OFFER_TYPE['common']['specific'], None)
 
     qs = TranslatedText.objects.filter(
         reference=str(common_education_group.pk),
         language=iso_language,
-        text_label__label__in=SECTIONS_PER_OFFER_TYPE['common']
+        text_label__label__in=SECTIONS_PER_OFFER_TYPE['common']['specific']
     ).exclude(Q(text__isnull=True) | Q(text__exact='')).select_related('text_label')
-
     for translated_text in qs:
         response[translated_text.text_label.label] = translated_text.text
 
@@ -220,7 +219,7 @@ def new_context(education_group_year, iso_language, language, original_acronym):
     assert isinstance(original_acronym, str)
 
     title = get_title_of_education_group_year(education_group_year, iso_language)
-    partial_acronym = education_group_year.partial_acronym.upper()
+    partial_acronym = education_group_year.partial_acronym.upper() if education_group_year.partial_acronym else ''
     acronym = education_group_year.acronym.upper()
 
     is_partial = original_acronym.upper() == partial_acronym
