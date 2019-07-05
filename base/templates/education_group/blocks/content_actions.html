@@ -32,7 +32,7 @@
         <form id="form_group_element_year_actions" method="POST" style="display:inline;"
               action="{% url 'education_groups_management' %}">
             <input type="hidden" name="root_id" value="{{ root.id }}"/>
-            <input type="hidden" name="element_id" value="{{ group.child_id }}"/>
+            <input type="hidden" name="element_id" value="{{ group.child.id }}"/>
             <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
             {% csrf_token %}
             {% button_order_with_permission _("Up") "btn_operation_up_"|addstr:group.id "up" %}
