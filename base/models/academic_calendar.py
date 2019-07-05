@@ -26,6 +26,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext as _
+from reversion.admin import VersionAdmin
 
 from base.models import academic_year
 from base.models.enums import academic_calendar_type
@@ -36,7 +37,7 @@ from base.signals.publisher import compute_all_scores_encodings_deadlines
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class AcademicCalendarAdmin(SerializableModelAdmin):
+class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('academic_year', 'title', 'start_date', 'end_date')
     list_display_links = None
     readonly_fields = ('academic_year', 'title', 'start_date', 'end_date')

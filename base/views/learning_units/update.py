@@ -220,12 +220,10 @@ class AdditionnalEntity2Autocomplete(EntityAutocomplete):
         return super(AdditionnalEntity2Autocomplete, self).get_queryset()
 
 
-class EntityRequirementAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+class EntityRequirementAutocomplete(EntityAutocomplete):
     def get_queryset(self):
-        qs = find_additional_requirement_entities_choices().filter(entity__in=self.request.user.person.linked_entities)
-        if self.q:
-            qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
-        return qs
+        return super(EntityRequirementAutocomplete, self).get_queryset()\
+            .filter(entity__in=self.request.user.person.linked_entities)
 
     def get_result_label(self, result):
         return format_html(result.verbose_title)

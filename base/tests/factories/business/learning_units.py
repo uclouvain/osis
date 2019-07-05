@@ -37,6 +37,7 @@ from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_session
 from base.models.enums import organization_type
 from base.models.enums import quadrimesters
+from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -413,6 +414,7 @@ def _setup_learning_component_tp(learning_unit_year):
 
 def _setup_learning_component_year(learning_unit_year, component_type):
     return LearningComponentYearFactory(
+        acronym=DEFAULT_ACRONYM_COMPONENT[component_type],
         learning_unit_year=learning_unit_year,
         type=component_type,
         planned_classes=1

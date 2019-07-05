@@ -1,5 +1,6 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load staticfiles bootstrap3 i18n %}
+{% load learning_unit %}
 {% load components_classes %}
 {% load waffle_tags %}
 
@@ -94,23 +95,24 @@
                 </td>
                 <td>{{ component.learning_unit_usage }}</td>
                 <td>{% if component.learning_component_year.type %}
-                        {{ component.learning_component_year.get_type_display }}
-                    {% endif %}
+                    {{ component.learning_component_year.get_type_display }}
+                {% endif %}
                 </td>
                 <td>/
                     {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}
                     {% if component.learning_component_year.acronym == 'NT' %}PM{% else %}
                         {{ component.learning_component_year.acronym  | default_if_none:'' }}{% endif %}</td>
-                <td>{{ component.volumes.VOLUME_Q1.normalize | default_if_none:'' }}</td>
-                <td>{{ component.volumes.VOLUME_Q2.normalize | default_if_none:'' }}</td>
-                <td>{{ component.volumes.VOLUME_TOTAL.normalize | default_if_none:'' }}</td>
+                <td>{% dl_component_tooltip 'VOLUME_Q1' value=component.volumes.VOLUME_Q1 default_if_none='' %}</td>
+                <td>{% dl_component_tooltip 'VOLUME_Q2' value=component.volumes.VOLUME_Q2 default_if_none='' %}</td>
+                <td>{% dl_component_tooltip 'VOLUME_TOTAL' value=component.volumes.VOLUME_TOTAL default_if_none='' %}</td>
+
                 <td>
                                 <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:component.learning_component_year.real_classes }}">
                                     {{ component.learning_component_year.real_classes| default_if_none:'0' }} /
                                         {{ component.learning_component_year.planned_classes| default_if_none:'0' }}
                                 </span>
                 </td>
-                <td>{{ component.volumes.VOLUME_GLOBAL.normalize | default_if_none:'' }}</td>
+                <td>{% dl_component_tooltip 'VOLUME_GLOBAL' value=component.volumes.VOLUME_GLOBAL default_if_none='' %}</td>
                 {% block additional_requirement_entity_volumes %}
                     {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
                 {% endblock %}
@@ -150,8 +152,7 @@
         function changeOrientation(button) {
             if (button.className == "glyphicon glyphicon-collapse-down") {
                 button.className = "glyphicon glyphicon-expand"
-            }
-            else if (button.className == "glyphicon glyphicon-expand") {
+            } else if (button.className == "glyphicon glyphicon-expand") {
                 button.className = "glyphicon glyphicon-collapse-down"
             }
         }

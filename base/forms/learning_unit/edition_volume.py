@@ -30,8 +30,10 @@ from django.db import transaction
 from django.forms import formset_factory, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.education_groups.volume_strategy import VolumeEditionNoFacultyStrategy, \
+    CompleteVolumeEditionFacultyStrategy, SimpleVolumeEditionFacultyStrategy
 from base.business.learning_units import edition
-from base.business.learning_units.edition import check_postponement_conflict_report_errors
+from base.business.learning_units.edition import check_postponement_conflict_report_errors, ConsistencyError
 from base.forms.utils.emptyfield import EmptyField
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
@@ -140,27 +142,22 @@ class VolumeEditionForm(forms.Form):
         """
         cleaned_data = super().clean()
 
-        volume_q1 = self.cleaned_data.get("volume_q1") or 0
-        volume_q2 = self.cleaned_data.get("volume_q2") or 0
-        volume_total = self.cleaned_data.get("volume_total") or 0
+        input_names = {
+            'volume_q1': 'volume_q1',
+            'volume_q2': 'volume_q2',
+            'volume_total': 'volume_total',
+            'planned_classes': 'planned_classes',
+            'volume_requirement_entity': 'volume_requirement_entity',
+            'volume_additional_requirement_entity_1': 'volume_additional_requirement_entity_1',
+            'volume_additional_requirement_entity_2': 'volume_additional_requirement_entity_2',
+        }
 
-        if (volume_q1 or volume_q2) and volume_total != volume_q1 + volume_q2:
-            self.add_error("volume_total", _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
-            self.add_error("volume_q1", "")
-            self.add_error("volume_q2", "")
+        strategy = {
+            True: CompleteVolumeEditionFacultyStrategy,
+            False: VolumeEditionNoFacultyStrategy,
+        }
 
-        if self.is_faculty_manager:
-
-            if 0 in [self.initial.get("volume_q1"), self.initial.get("volume_q2")]:
-                if 0 not in [self.cleaned_data.get("volume_q1"), self.cleaned_data.get("volume_q2")]:
-                    self.add_error("volume_q1", _("One of the partial volumes must have a value to 0."))
-                    self.add_error("volume_q2", _("One of the partial volumes must have a value to 0."))
-
-            else:
-                if volume_q1 == 0:
-                    self.add_error("volume_q1", _("The volume can not be set to 0."))
-                if volume_q2 == 0:
-                    self.add_error("volume_q2", _("The volume can not be set to 0."))
+        strategy[self.is_faculty_manager](self, input_names).is_valid()
 
         return cleaned_data
 
@@ -237,8 +234,16 @@ class VolumeEditionBaseFormset(forms.BaseFormSet):
         return {k.lower(): v for k, v in component_dict.items()}
 
     def save(self, postponement):
+        errors = []
+        last_instance_updated = None
         for form in self.forms:
-            form.save(postponement)
+            try:
+                form.save(postponement)
+            except ConsistencyError as e:
+                errors.extend(e.error_list)
+                last_instance_updated = e.last_instance_updated
+        if errors:
+            raise ConsistencyError(last_instance_updated, errors)
 
 
 class VolumeEditionFormsetContainer:
@@ -348,32 +353,27 @@ class SimplifiedVolumeForm(forms.ModelForm):
         """
         Prevent faculty users to a volume to 0 if there was a value other than 0.
         Also, prevent the faculty user from putting a volume if its value was 0.
-        # FIXME Refactor this method with the clean of VolumeEditionForm
         """
         cleaned_data = super().clean()
-        if self.is_faculty_manager and not self.proposal:
-            if 0 in [self.instance.hourly_volume_partial_q1, self.instance.hourly_volume_partial_q2]:
-                if 0 not in [self.cleaned_data.get("hourly_volume_partial_q1"),
-                             self.cleaned_data.get("hourly_volume_partial_q2")]:
-                    self.add_error("hourly_volume_partial_q1", _("One of the partial volumes must have a value to 0."))
-                    self.add_error("hourly_volume_partial_q2", _("One of the partial volumes must have a value to 0."))
 
-            else:
-                if self.cleaned_data.get("hourly_volume_partial_q1") == 0:
-                    self.add_error("hourly_volume_partial_q1", _("The volume can not be set to 0."))
-                if self.cleaned_data.get("hourly_volume_partial_q2") == 0:
-                    self.add_error("hourly_volume_partial_q2", _("The volume can not be set to 0."))
+        input_names = {
+            'volume_q1': 'hourly_volume_partial_q1',
+            'volume_q2': 'hourly_volume_partial_q2',
+            'volume_total': 'hourly_volume_total_annual',
+            'planned_classes': 'planned_classes',
+            'volume_requirement_entity': 'repartition_volume_requirement_entity',
+            'volume_additional_requirement_entity_1': 'repartition_volume_additional_entity_1',
+            'volume_additional_requirement_entity_2': 'repartition_volume_additional_entity_2',
+        }
 
-        volume_q1 = self.cleaned_data.get("hourly_volume_partial_q1") or 0
-        volume_q2 = self.cleaned_data.get("hourly_volume_partial_q2") or 0
-        volume_total = self.cleaned_data.get("hourly_volume_total_annual") or 0
+        strategy = {
+            True: {False: SimpleVolumeEditionFacultyStrategy,
+                   True: VolumeEditionNoFacultyStrategy},
+            False: {False: VolumeEditionNoFacultyStrategy,
+                    True: VolumeEditionNoFacultyStrategy},
+        }
 
-        if (self.cleaned_data.get("hourly_volume_partial_q1") is not None or self.cleaned_data.get(
-                "hourly_volume_partial_q2") is not None) and volume_total != volume_q1 + volume_q2:
-            self.add_error("hourly_volume_total_annual",
-                           _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
-            self.add_error("hourly_volume_partial_q1", "")
-            self.add_error("hourly_volume_partial_q2", "")
+        strategy[self.is_faculty_manager][self.proposal](self, input_names).is_valid()
 
         return cleaned_data
 

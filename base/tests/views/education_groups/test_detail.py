@@ -574,7 +574,7 @@ class TestContent(TestCase):
 
         self.assertTemplateUsed(response, "education_group/tab_content.html")
 
-        geys = response.context["group_element_years"]
+        geys = response.context["object"].groupelementyear_set.all()
         self.assertIn(self.group_element_year_1, geys)
         self.assertIn(self.group_element_year_2, geys)
         self.assertIn(self.group_element_year_3, geys)

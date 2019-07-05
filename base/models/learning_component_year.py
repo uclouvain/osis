@@ -27,7 +27,6 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Sum
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -35,10 +34,9 @@ from reversion.admin import VersionAdmin
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriNoStrategy
-from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2,\
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2, \
     ADDITIONAL_REQUIREMENT_ENTITY_1
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -65,7 +63,7 @@ class LearningComponentYear(SerializableModel):
     type = models.CharField(max_length=30, choices=learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES,
                             blank=True, null=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
-    planned_classes = models.IntegerField(blank=True, null=True, default=1)
+    planned_classes = models.IntegerField(blank=True, null=True)
     hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                      verbose_name=_("hourly volume total annual"))
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
@@ -108,9 +106,9 @@ class LearningComponentYear(SerializableModel):
         else:
             return '{}/{}'.format(self.learning_unit_year.acronym, self.acronym)
 
-    @property
-    def real_classes(self):
-        return len(learning_class_year.find_by_learning_component_year(self))
+    @cached_property
+    def real_classes(self) -> int:
+        return self.learningclassyear_set.count()
 
     @property
     def warnings(self):

@@ -25,10 +25,12 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
+
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class CertificateAimAdmin(OsisModelAdmin):
+class CertificateAimAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('section', 'description', 'changed')
     search_fields = ('description',)
     list_filter = ('section',)

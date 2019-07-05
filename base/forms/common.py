@@ -98,11 +98,10 @@ class ValidationRuleMixin(WarningFormMixin):
 
     def get_rules(self):
         result = {}
-
+        bulk_rules = ValidationRule.objects.in_bulk()
         for name, field in self.fields.items():
-            qs = ValidationRule.objects.filter(field_reference=self.field_reference(name))
-            if qs:
-                result[name] = qs.get()
+            if self.field_reference(name) in bulk_rules:
+                result[name] = bulk_rules[self.field_reference(name)]
 
         return result
 

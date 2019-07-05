@@ -194,7 +194,7 @@ class LearningUnitProposalEndYearPage(NewLearningUnitProposalPage):
 class NewPartimPage(NewLearningUnitPage):
     code_dedie_au_partim = InputField(By.ID, "id_acronym_2")
     save_button = ButtonField(By.XPATH,
-                              '//*[@id="LearningUnitYearForm"]/div[1]/div/div/button')
+                              '//*[@id="LearningUnitYearForm"]/div[1]/div/div/div/button')
 
 
 class DescriptionPage(pypom.Page):
@@ -261,7 +261,7 @@ class LearningUnitEditPage(pypom.Page):
     session_derogation = SelectField(By.ID, "id_session")
 
     save_button = ButtonField(By.CSS_SELECTOR,
-                              "#main > div.panel.panel-default > div.panel-heading > div > div > button")
+                              "#main > div.panel.panel-default > div.panel-heading > div > div > div > button")
 
     no_postponement = Link(LearningUnitPage, By.ID, "btn_without_postponement")
     with_postponement = Link(LearningUnitPage, By.ID, "btn_with_postponement")

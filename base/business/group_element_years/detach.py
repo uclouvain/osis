@@ -31,11 +31,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, ngettext
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
-from base.business.group_element_years import management
+from base.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
@@ -62,10 +61,9 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                     - the minimum of children is reached
                     - try to remove option (2m) which are present in one of its finality
         """
-        try:
-            management.can_link_be_detached(self.parent, self.link)
-        except AuthorizedRelationshipNotRespectedException as e:
-            self.errors.append(str(e))
+        check = CheckAuthorizedRelationshipDetach(self.parent, link_to_detach=self.link)
+        if not check.is_valid():
+            self.errors.extend(check.errors)
 
         self._check_detach_prerequisite_rules()
 

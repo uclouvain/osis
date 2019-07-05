@@ -61,5 +61,5 @@ def get_verbose_field_value(instance, key):
     if hasattr(instance, "get_" + key + "_display"):
         value = getattr(instance, "get_" + key + "_display")()
     else:
-        value = getattr(instance, key, None)
+        value = getattr(instance, key, "")
     return value

@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from django.db import models
+from reversion.admin import VersionAdmin
 
 from base.models.enums import education_group_language
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class EducationGroupLanguageAdmin(OsisModelAdmin):
+class EducationGroupLanguageAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('type', 'order', 'education_group_year', 'language')
     raw_id_fields = ('education_group_year', 'language')
 

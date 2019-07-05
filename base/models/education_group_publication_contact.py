@@ -25,15 +25,14 @@
 ##############################################################################
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
-
-from django.db import models
 from ordered_model.admin import OrderedModelAdmin
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from base.models.enums.publication_contact_type import PublicationContactType
-
 
 ROLE_REQUIRED_FOR_TYPES = (
     PublicationContactType.JURY_MEMBER.name,
@@ -48,7 +47,7 @@ class EducationGroupPublicationQuerySet(models.QuerySet):
         )
 
 
-class EducationGroupPublicationContactAdmin(OrderedModelAdmin):
+class EducationGroupPublicationContactAdmin(VersionAdmin, OrderedModelAdmin):
     list_display = ('education_group_year', 'type', 'role_fr', 'role_en', 'email', 'order', 'move_up_down_links',)
     readonly_fields = ['order']
     search_fields = ['education_group_year__acronym', 'role_fr', 'role_en', 'email']

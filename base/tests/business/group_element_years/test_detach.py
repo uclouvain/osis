@@ -28,6 +28,7 @@ from unittest import mock
 from django.test import TestCase
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy
+from base.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.prerequisite import Prerequisite
@@ -64,12 +65,13 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
 
     def setUp(self):
-        self.authorized_relationship_patcher = mock.patch(
-            "base.business.group_element_years.management.check_authorized_relationship",
-            return_value=True
+        self.mock_authorized_relationship_check_is_valid = mock.patch.object(
+            CheckAuthorizedRelationshipDetach,
+            "is_valid"
         )
-        self.mocked_perm = self.authorized_relationship_patcher.start()
-        self.addCleanup(self.authorized_relationship_patcher.stop)
+        self.mock_authorized_relationship_check_is_valid.return_value = True
+        self.mocked_perm = self.mock_authorized_relationship_check_is_valid.start()
+        self.addCleanup(self.mock_authorized_relationship_check_is_valid.stop)
 
     def test_is_valid_case_detach_option_which_are_not_within_finality_master_120(self):
         """
@@ -179,17 +181,6 @@ class TestOptionDetachEducationGroupYearStrategy(TestCase):
         strategy = DetachEducationGroupYearStrategy(link=group1_link_opt1)
         self.assertFalse(strategy.is_valid())
 
-    def test_not_valid_detach_technical_group(self):
-        gey = GroupElementYearFactory(parent=self.master_120)
-        AuthorizedRelationshipFactory(
-            parent_type=self.master_120.education_group_type,
-            child_type=gey.child_branch.education_group_type,
-            min_count_authorized=1
-        )
-
-        strategy = DetachEducationGroupYearStrategy(link=gey)
-        self.assertFalse(strategy.is_valid())
-
 
 class TestDetachPrerequisiteCheck(TestCase):
     @classmethod
@@ -230,12 +221,13 @@ class TestDetachPrerequisiteCheck(TestCase):
         )
 
     def setUp(self):
-        self.authorized_relationship_patcher = mock.patch(
-            "base.business.group_element_years.management.check_authorized_relationship",
-            return_value=True
+        self.mock_authorized_relationship_check_is_valid = mock.patch.object(
+            CheckAuthorizedRelationshipDetach,
+            "is_valid"
         )
-        self.mocked_perm = self.authorized_relationship_patcher.start()
-        self.addCleanup(self.authorized_relationship_patcher.stop)
+        self.mock_authorized_relationship_check_is_valid.return_value = True
+        self.mocked_perm = self.mock_authorized_relationship_check_is_valid.start()
+        self.addCleanup(self.mock_authorized_relationship_check_is_valid.stop)
 
         self.prerequisite = PrerequisiteFactory(
             learning_unit_year=self.lu_children_level_3[0].child_leaf,

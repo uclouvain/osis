@@ -33,6 +33,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
@@ -94,11 +95,12 @@ class Node:
         }
 
 
-class EntityVersionAdmin(SerializableModelAdmin):
+class EntityVersionAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('id', 'entity', 'acronym', 'parent', 'title', 'entity_type', 'start_date', 'end_date',)
     search_fields = ['entity__id', 'entity__external_id', 'title', 'acronym', 'entity_type', 'start_date', 'end_date']
     raw_id_fields = ('entity', 'parent')
     readonly_fields = ('find_direct_children', 'count_direct_children', 'find_descendants', 'get_parent_version')
+    list_filter = ['entity_type']
 
 
 class EntityVersionQuerySet(models.QuerySet):
