@@ -184,7 +184,10 @@ class EducationGroupHierarchy:
         }
 
         condition = self.tab_to_show_available
-        url = urls[self.tab_to_show][condition]
+        try:
+            url = urls[self.tab_to_show][condition]
+        except KeyError:
+            return default_url + self.url_group_to_parent()
         if self.tab_to_show and condition:
             add_to_url = "&tab_to_show=" + self.tab_to_show
         return url + self.url_group_to_parent() + add_to_url
