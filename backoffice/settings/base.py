@@ -134,6 +134,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
                 'base.context_processors.user_manual.user_manual_url',
+                'base.context_processors.settings.virtual_desktop',
                 'django.template.context_processors.i18n',
             ],
         },
@@ -451,3 +452,4 @@ YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 0))  # By default, no restriction
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
+VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
