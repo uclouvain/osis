@@ -43,7 +43,7 @@ class EducationGroupHierarchy:
     _cache_hierarchy = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None, tab_to_show: dict = None):
+                 cache_hierarchy: dict = None, tab_to_show: dict = {}):
 
         self.children = []
         self.root = root
@@ -52,8 +52,8 @@ class EducationGroupHierarchy:
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
-        self.tab_to_show = tab_to_show['name']
-        self.tab_to_show_available = tab_to_show['available']
+        self.tab_to_show = tab_to_show.get('name')
+        self.tab_to_show_available = tab_to_show.get('available', False)
         self.generate_children()
 
     @property
