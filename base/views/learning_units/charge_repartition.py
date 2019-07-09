@@ -99,6 +99,7 @@ class AddChargeRepartition(EditAttributionView):
     def get_copy_attribution(self):
         copy_attribution = self.attribution
         copy_attribution.id = None
+        copy_attribution.external_id = None
         copy_attribution.save()
         return copy_attribution
 
