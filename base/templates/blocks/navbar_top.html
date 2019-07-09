@@ -65,6 +65,14 @@
                                         </a>
                                     </li>
                                 {% endif %}
+                                {% if virtual_desktop_url %}
+                                    <li>
+                                        <a href="{{ virtual_desktop_url }}" id="lnk_dropdown_virtual_desktop">
+                                            <span class="fas fa-desktop"></span>
+                                            {% trans 'Virtual Desktop' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                                 {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
                                     <li>
                                         <a href="{% url 'assessments' %}" id="lnk_dropdown_evaluations">

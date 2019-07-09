@@ -182,8 +182,9 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
                                          allocation_charge=50)
         AttributionChargeNew.objects.get(learning_component_year=self.practical_component,
                                          allocation_charge=10)
-        AttributionNew.objects.exclude(id=self.attribution_full.id).get(tutor=self.attribution_full.tutor)
-
+        attribution_partim = AttributionNew.objects.exclude(id=self.attribution_full.id).get(tutor=self.attribution_full.tutor)
+        self.assertNotEqual(attribution_partim.external_id, self.attribution_full.external_id)
+        self.assertIsNone(attribution_partim.external_id)
         self.assertRedirects(response,
                              reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))
 
