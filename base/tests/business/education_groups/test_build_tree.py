@@ -97,26 +97,35 @@ class TestBuildTree(TestCase):
 
     def test_tree_get_url(self):
         test_cases = [
-            {'node': EducationGroupHierarchy(self.parent,
+            {'name': 'with tab and available',
+             'node': EducationGroupHierarchy(self.parent,
                                              tab_to_show={'name': 'show_identification', 'available': True}),
              'correct_url': reverse('education_group_read',
                                     args=[self.parent.pk, self.parent.pk]) +
              "?group_to_parent=0&tab_to_show=show_identification"},
-            {'node': EducationGroupHierarchy(self.parent,
+            {'name': 'with tab and not available',
+             'node': EducationGroupHierarchy(self.parent,
                                              tab_to_show={'name': 'show_identification', 'available': False}),
              'correct_url': reverse('education_group_read',
                                     args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
-            {'node': EducationGroupHierarchy(self.parent),
+            {'name': 'without tab',
+             'node': EducationGroupHierarchy(self.parent),
              'correct_url': reverse('education_group_read',
                                     args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
-            {'node': EducationGroupHierarchy(self.parent,
+            {'name': 'with wrong tab and available',
+             'node': EducationGroupHierarchy(self.parent,
                                              tab_to_show={'name': 'not_existing', 'available': True}),
+             'correct_url': reverse('education_group_read',
+                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
+            {'name': 'with wrong tab and not available',
+             'node': EducationGroupHierarchy(self.parent,
+                                             tab_to_show={'name': 'not_existing', 'available': False}),
              'correct_url': reverse('education_group_read',
                                     args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
         ]
 
         for case in test_cases:
-            with self.subTest(type=case):
+            with self.subTest(type=case['name']):
                 self.assertEqual(case['correct_url'], case['node'].get_url())
 
     def test_tree_luy_has_prerequisite(self):
