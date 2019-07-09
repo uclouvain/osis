@@ -80,11 +80,14 @@ def li_edit_proposal(context, url, message, url_id="link_proposal_edit", js_scri
     return li_with_permission_for_proposal(data)
 
 
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_cancel_proposal(context, url, message, url_id="link_cancel_proposal", js_script=''):
+@register.inclusion_tag('blocks/button/li_template_lu.html', takes_context=True)
+def li_cancel_proposal(context, url, message, data_target, url_id="link_cancel_proposal", js_script=''):
     data = _get_common_proposal_data(context, message, url, url_id)
     data['permission_function'] = is_eligible_for_cancel_of_proposal
     data['obj'] = context['proposal']
+    data['js_script'] = js_script
+    data['load_modal'] = True
+    data['data_target'] = data_target
     return li_with_permission_for_proposal(data)
 
 
