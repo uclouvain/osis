@@ -134,9 +134,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['root_id'] = self.root.pk
         context['parent'] = self.root
         context['parent_training'] = self.object.parent_by_training()
-
+        context["show_identification"] = self.show_identification()
+        context["show_diploma"] = self.show_diploma()
+        context["show_general_information"] = self.show_general_information()
+        context["show_skills_and_achievements"] = self.show_skills_and_achievements()
+        context["show_administrative"] = self.show_administrative()
+        context["show_content"] = self.show_content()
+        context["show_utilization"] = self.show_utilization()
+        context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            context['tree'] = json.dumps(EducationGroupHierarchy(self.root).to_json())
+            context['tree'] = json.dumps(EducationGroupHierarchy(self.root,
+                                                                 tab_to_show=self.request.GET.get('tab_to_show'),
+                                                                 tab_to_show_available=context.get(
+                                                                     self.request.GET.get('tab_to_show')))
+                                         .to_json())
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
@@ -149,15 +160,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         )
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.current_academic_year
-
-        context["show_identification"] = self.show_identification()
-        context["show_diploma"] = self.show_diploma()
-        context["show_general_information"] = self.show_general_information()
-        context["show_skills_and_achievements"] = self.show_skills_and_achievements()
-        context["show_administrative"] = self.show_administrative()
-        context["show_content"] = self.show_content()
-        context["show_utilization"] = self.show_utilization()
-        context["show_admission_conditions"] = self.show_admission_conditions()
         return context
 
     def get(self, request, *args, **kwargs):

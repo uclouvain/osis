@@ -43,7 +43,7 @@ class EducationGroupHierarchy:
     _cache_hierarchy = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None):
+                 cache_hierarchy: dict = None, tab_to_show: str = None, tab_to_show_available: bool = False):
 
         self.children = []
         self.root = root
@@ -52,6 +52,8 @@ class EducationGroupHierarchy:
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
+        self.tab_to_show = tab_to_show
+        self.tab_to_show_available = tab_to_show_available
         self.generate_children()
 
     @property
@@ -66,10 +68,13 @@ class EducationGroupHierarchy:
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
+                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
+                                               tab_to_show=self.tab_to_show,
+                                               tab_to_show_available=self.tab_to_show_available)
 
             elif group_element_year.child_leaf:
-                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
+                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
+                                      tab_to_show=self.tab_to_show, tab_to_show_available=self.tab_to_show_available)
 
             else:
                 continue
@@ -150,8 +155,39 @@ class EducationGroupHierarchy:
         return "?group_to_parent=" + str(self.group_element_year.pk if self.group_element_year else 0)
 
     def get_url(self):
-        url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
-        return url + self.url_group_to_parent()
+        default_url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
+        add_to_url = ""
+        urls = {
+            'show_identification': {True: default_url, False: default_url},
+            'show_diploma': {True: reverse('education_group_diplomas',
+                                           args=[self.root.pk, self.education_group_year.pk]),
+                             False: default_url},
+            'show_administrative': {True: reverse('education_group_administrative',
+                                                  args=[self.root.pk, self.education_group_year.pk]),
+                                    False: default_url},
+            'show_content': {True: reverse('education_group_content',
+                                           args=[self.root.pk, self.education_group_year.pk]),
+                             False: default_url},
+            'show_utilization': {True: reverse('education_group_utilization',
+                                               args=[self.root.pk, self.education_group_year.pk]),
+                                 False: default_url},
+            'show_general_information': {True: reverse('education_group_general_informations',
+                                                       args=[self.root.pk, self.education_group_year.pk]),
+                                         False: default_url},
+            'show_skills_and_achievements': {True: reverse('education_group_skills_achievements',
+                                                           args=[self.root.pk, self.education_group_year.pk]),
+                                             False: default_url},
+            'show_admission_conditions': {True: reverse('education_group_year_admission_condition_edit',
+                                                        args=[self.root.pk, self.education_group_year.pk]),
+                                          False: default_url},
+            None: {True: default_url, False: default_url, None: default_url}
+        }
+
+        condition = self.tab_to_show_available
+        url = urls[self.tab_to_show][condition]
+        if self.tab_to_show and condition:
+            add_to_url = "&tab_to_show=" + self.tab_to_show
+        return url + self.url_group_to_parent() + add_to_url
 
     def get_option_list(self):
         def pruning_function(node):
