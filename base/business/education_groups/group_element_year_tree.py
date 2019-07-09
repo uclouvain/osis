@@ -158,28 +158,15 @@ class EducationGroupHierarchy:
         default_url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
         add_to_url = ""
         urls = {
-            'show_identification': {True: default_url, False: default_url},
-            'show_diploma': {True: reverse('education_group_diplomas',
-                                           args=[self.root.pk, self.education_group_year.pk]),
-                             False: default_url},
-            'show_administrative': {True: reverse('education_group_administrative',
-                                                  args=[self.root.pk, self.education_group_year.pk]),
-                                    False: default_url},
-            'show_content': {True: reverse('education_group_content',
-                                           args=[self.root.pk, self.education_group_year.pk]),
-                             False: default_url},
-            'show_utilization': {True: reverse('education_group_utilization',
-                                               args=[self.root.pk, self.education_group_year.pk]),
-                                 False: default_url},
-            'show_general_information': {True: reverse('education_group_general_informations',
-                                                       args=[self.root.pk, self.education_group_year.pk]),
-                                         False: default_url},
-            'show_skills_and_achievements': {True: reverse('education_group_skills_achievements',
-                                                           args=[self.root.pk, self.education_group_year.pk]),
-                                             False: default_url},
-            'show_admission_conditions': {True: reverse('education_group_year_admission_condition_edit',
-                                                        args=[self.root.pk, self.education_group_year.pk]),
-                                          False: default_url},
+            'show_identification': self.__get_base_url('education_group_read', default_url),
+            'show_diploma': self.__get_base_url('education_group_diplomas', default_url),
+            'show_administrative': self.__get_base_url('education_group_administrative', default_url),
+            'show_content': self.__get_base_url('education_group_content', default_url),
+            'show_utilization': self.__get_base_url('education_group_utilization', default_url),
+            'show_general_information': self.__get_base_url('education_group_general_informations', default_url),
+            'show_skills_and_achievements': self.__get_base_url('education_group_skills_achievements', default_url),
+            'show_admission_conditions': self.__get_base_url('education_group_year_admission_condition_edit',
+                                                             default_url),
             None: {True: default_url, False: default_url, None: default_url}
         }
 
@@ -191,6 +178,11 @@ class EducationGroupHierarchy:
         if self.tab_to_show and condition:
             add_to_url = "&tab_to_show=" + self.tab_to_show
         return url + self.url_group_to_parent() + add_to_url
+
+    def __get_base_url(self, view_name, default_url):
+        return {True: reverse(view_name,
+                              args=[self.root.pk, self.education_group_year.pk]),
+                False: default_url}
 
     def get_option_list(self):
         def pruning_function(node):
