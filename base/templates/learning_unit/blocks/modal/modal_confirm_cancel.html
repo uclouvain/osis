@@ -23,27 +23,25 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block modal_id %}modalBackToInitial{% endblock %}
+{% block modal_id %}modalConfirmToCancel{% endblock %}
 
-{% block modal_header %}
-    <h3>{% trans 'Do you want to get back to initial data?' %}</h3>
-    <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
-{% endblock %}
-
-{% block modal_body %}
-    {% trans 'Do you want to get back to initial data?' %}
-    <input type="hidden" id="action" name="action" class="action"/>
-{% endblock %}
-
-{% block modal_footer %}
-    <button type="button" class="btn btn-primary" onclick="submit_form_initial();">{% trans 'yes' %}</button>
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
-    <script>
-        function submit_form_initial(){
-        $(".action").val('back_to_initial');
-        $('#proposals_form').submit()
-    }
-    </script>
+{% block modal_content %}
+    <form method="POST" action="{% url 'learning_unit_cancel_proposal' learning_unit_year_id=learning_unit_year.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+            <h3>{% trans 'Do you want to get back to initial data?' %}</h3>
+            <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
+        </div>
+        {% if has_partim %}
+            <div class="modal-body">
+                <div>{% trans "The learning unit have partim" %}</div>
+             </div>
+        {% endif %}
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            <button type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
+         </div>
+    </form>
 {% endblock %}
 
 
