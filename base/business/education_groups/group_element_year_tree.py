@@ -43,7 +43,7 @@ class EducationGroupHierarchy:
     _cache_hierarchy = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None, tab_to_show: str = None, tab_to_show_available: bool = False):
+                 cache_hierarchy: dict = None, tab_to_show: dict = None):
 
         self.children = []
         self.root = root
@@ -52,8 +52,8 @@ class EducationGroupHierarchy:
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
-        self.tab_to_show = tab_to_show
-        self.tab_to_show_available = tab_to_show_available
+        self.tab_to_show = tab_to_show['name']
+        self.tab_to_show_available = tab_to_show['available']
         self.generate_children()
 
     @property
@@ -69,12 +69,12 @@ class EducationGroupHierarchy:
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
                 node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                               tab_to_show=self.tab_to_show,
-                                               tab_to_show_available=self.tab_to_show_available)
+                                               tab_to_show={'name': self.tab_to_show,
+                                                            'available': self.tab_to_show_available})
 
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                      tab_to_show=self.tab_to_show, tab_to_show_available=self.tab_to_show_available)
+                                      tab_to_show={'name': self.tab_to_show, 'available': self.tab_to_show_available})
 
             else:
                 continue
