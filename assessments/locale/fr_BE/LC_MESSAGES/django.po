@@ -875,7 +875,7 @@ msgid ""
 "The period of scores' encoding %(session_number)s is closed since "
 "%(str_date)s"
 msgstr ""
-"La période d'encodage de note %(session_number)s est fermée depuis "
+"La période d'encodage de notes %(session_number)s est fermée depuis "
 "%(str_date)s"
 
 #: tests/functionals/test_score_encoding.py:235
