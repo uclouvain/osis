@@ -26,6 +26,7 @@ import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.support.wait import WebDriverWait
 
 from base.models.entity_version import EntityVersion
 
@@ -41,7 +42,7 @@ class Field:
         self.current_page = None
 
     def __get__(self, obj, owner):
-        self.element = obj.find_element(*self.locator)
+        self.element = WebDriverWait(obj, 20).until(lambda obj: obj.find_element(*self.locator))
         self.current_page = obj
         return self
 
@@ -81,7 +82,7 @@ class Link(Field):
 class InputField(Field):
 
     def __set__(self, obj, value):
-        element = obj.find_element(*self.locator)
+        element = WebDriverWait(obj, 20).until(lambda obj: obj.find_element(*self.locator))
         element.clear()
         if value is not None:
             element.send_keys(value)
