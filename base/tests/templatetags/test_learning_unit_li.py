@@ -361,7 +361,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.proposal.state = ProposalState.CENTRAL.name
         self.proposal.save()
         self.context['proposal'] = self.proposal
-        result = li_cancel_proposal(self.context, self.url_edit, "")
+        result = li_cancel_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(result,
                          self._get_result_data_expected_for_proposal('link_cancel_proposal',
                                                                      MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE,
@@ -369,7 +369,7 @@ class LearningUnitTagLiEditTest(TestCase):
                          )
         self.proposal.state = ProposalState.FACULTY.name
         self.proposal.save()
-        result = li_cancel_proposal(self.context, self.url_edit, "")
+        result = li_cancel_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(result,
                          self._get_result_data_expected_for_proposal('link_cancel_proposal',
                                                                      MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, DISABLED))
@@ -377,7 +377,7 @@ class LearningUnitTagLiEditTest(TestCase):
     def test_li_consolidate_proposal_no_rights_to_consolidate(self):
         person = PersonFactory()
         self.context['user'] = person.user
-        result = li_consolidate_proposal(self.context, self.url_edit, "")
+        result = li_consolidate_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(result,
                          self._get_result_data_expected_for_proposal('link_consolidate_proposal',
                                                                      MSG_NO_RIGHTS_TO_CONSOLIDATE, DISABLED))
@@ -387,7 +387,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.proposal.state = ProposalState.SUSPENDED.name
         self.proposal.save()
         self.context['proposal'] = self.proposal
-        result = li_consolidate_proposal(self.context, self.url_edit, "")
+        result = li_consolidate_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(result,
                          self._get_result_data_expected_for_proposal('link_consolidate_proposal',
                                                                      MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES,
@@ -398,7 +398,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.proposal.state = ProposalState.ACCEPTED.name
         self.proposal.save()
         self.context['proposal'] = self.proposal
-        result = li_consolidate_proposal(self.context, self.url_edit, "")
+        result = li_consolidate_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(result,
                          self._get_result_data_expected_for_proposal('link_consolidate_proposal',
                                                                      MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, DISABLED))
@@ -410,9 +410,9 @@ class LearningUnitTagLiEditTest(TestCase):
         self.proposal.state = ProposalState.ACCEPTED.name
         self.proposal.save()
         self.context['proposal'] = self.proposal
-        result = li_consolidate_proposal(self.context, self.url_edit, "")
+        result = li_consolidate_proposal(self.context, self.url_edit, "", "")
         self.assertEqual(result,
-                         self._get_result_data_expected_for_proposal('link_consolidate_proposal', "", ""))
+                         self._get_result_data_expected_for_proposal('link_consolidate_proposal', "", "", True))
 
     def test_li_delete_all_lu_cannot_delete_learning_unit_year_according_type(self):
         a_person = create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_delete_learningunit')
@@ -556,23 +556,24 @@ class LearningUnitTagLiEditTest(TestCase):
         a_person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
         return a_person.user
 
-    def _get_result_data_expected_for_proposal(self, id_li, title, class_li):
+    def _get_result_data_expected_for_proposal(self, id_li, title, class_li, load_modal=False):
         if class_li != "":
             url = "#"
         else:
             url = self.url_edit
         return {
-            'load_modal': False,
+            'load_modal': load_modal,
             'id_li': id_li,
             'url': url,
             'title': title,
             'class_li': class_li,
             'text': "",
-            'js_script': ""
+            'js_script': "",
+            'data_target': '',
 
         }
 
-    def _get_result_data_expected(self, id_li, title='', url="#"):
+    def _get_result_data_expected(self, id_li, title='', url="#", load_modal=False):
 
         return {
             'load_modal': False,
