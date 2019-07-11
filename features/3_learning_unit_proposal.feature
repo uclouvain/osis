@@ -88,9 +88,9 @@ Feature: Propositions d’UE
 
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Mettre en proposition de modification »
+    And Encoder DRT4321 comme Dossier
     And Encoder 4 comme Crédits
     And Encoder bisannuelle paire comme Périodicité
-    And Encoder DRT4321 comme Dossier
     Then Vérifier que la zone Etat est bien grisée
     And Vérifier que la zone Type est bien grisée
     And Cliquer sur le bouton « Enregistrer »
