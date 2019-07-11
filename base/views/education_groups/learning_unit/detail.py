@@ -69,21 +69,21 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
 
         root = self.get_root()
         types_with_no_prerequisites = [
-            TrainingType.MASTER_MA_120,
-            TrainingType.MASTER_MD_120,
-            TrainingType.MASTER_MS_120,
-            TrainingType.MASTER_MA_180_240,
-            TrainingType.MASTER_MD_180_240,
-            TrainingType.MASTER_MS_180_240,
-            MiniTrainingType.OPTION,
-            MiniTrainingType.MOBILITY_PARTNERSHIP,
-            GroupType.COMMON_CORE,
-            GroupType.COMPLEMENTARY_MODULE,
-            GroupType.MINOR_LIST_CHOICE,
-            GroupType.MAJOR_LIST_CHOICE,
-            GroupType.OPTION_LIST_CHOICE,
-            GroupType.FINALITY_120_LIST_CHOICE,
-            GroupType.FINALITY_180_LIST_CHOICE,
+            TrainingType.MASTER_MA_120.name,
+            TrainingType.MASTER_MD_120.name,
+            TrainingType.MASTER_MS_120.name,
+            TrainingType.MASTER_MA_180_240.name,
+            TrainingType.MASTER_MD_180_240.name,
+            TrainingType.MASTER_MS_180_240.name,
+            MiniTrainingType.OPTION.name,
+            MiniTrainingType.MOBILITY_PARTNERSHIP.name,
+            GroupType.COMMON_CORE.name,
+            GroupType.COMPLEMENTARY_MODULE.name,
+            GroupType.MINOR_LIST_CHOICE.name,
+            GroupType.MAJOR_LIST_CHOICE.name,
+            GroupType.OPTION_LIST_CHOICE.name,
+            GroupType.FINALITY_120_LIST_CHOICE.name,
+            GroupType.FINALITY_180_LIST_CHOICE.name,
         ]
         # TODO remove parent in context
         context['person'] = self.get_person()
@@ -92,6 +92,9 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['parent'] = root
         context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['show_prerequisites'] = root.education_group_type not in types_with_no_prerequisites
+        print(root.education_group_type, TrainingType.MASTER_MA_120.value)
+        print(context['show_prerequisites'])
         print(context)
         return context
 
