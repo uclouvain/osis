@@ -28,7 +28,7 @@ from http import HTTPStatus
 import reversion
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 
@@ -401,9 +401,10 @@ class EducationGroupDiplomas(TestCase):
         url = reverse("education_group_diplomas",
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
-
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        expected_url = reverse("education_group_read",
+                               args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_with_education_group_year_of_type_group(self):
         group_education_group_year = EducationGroupYearFactory()
@@ -413,10 +414,12 @@ class EducationGroupDiplomas(TestCase):
         url = reverse("education_group_diplomas",
                       args=[group_education_group_year.id, group_education_group_year.id]
                       )
-        response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        response = self.client.get(url)
+        expected_url = reverse("education_group_read",
+                               args=[group_education_group_year.id, group_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_without_get_data(self):
         response = self.client.get(self.url)
