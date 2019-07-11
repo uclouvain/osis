@@ -5972,3 +5972,6 @@ msgstr ""
 #: templates/learning_unit/identification.html:166
 msgid "yes,no"
 msgstr ""
+
+msgid "Generate PDF not available. Please use EPC."
+msgstr ""
