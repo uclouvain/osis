@@ -25,17 +25,22 @@
 #############################################################################
 import itertools
 
+from django.contrib.auth.models import Permission
 from django.test import TestCase
+from django.urls import reverse
 
 from base.business.education_groups.learning_units.prerequisite import extract_learning_units_acronym_from_prerequisite, \
     get_learning_units_which_are_outside_of_education_group
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from base.tests.factories.user import UserFactory
+from base.views.education_groups.learning_unit.detail import NO_PREREQUISITES
 
 
 class TestLearningUnitsAcronymsFromPrerequisite(TestCase):
@@ -189,3 +194,22 @@ class TestGetLearningUnitsWhichAreNotInsideTraining(TestCase):
         self.assertCountEqual(get_learning_units_which_are_outside_of_education_group(self.education_group_year_root,
                                                                                       learning_units_acronym),
                               [luy_outside.acronym, luy_outside_2.acronym])
+
+
+class TestShowPrerequisites(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.person = PersonFactory(user=cls.user)
+        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_should_return_false_if_in_no_prerequisites(self):
+        for edy_type in NO_PREREQUISITES:
+            edy = EducationGroupYearFactory(education_group_type__name=edy_type)
+            lu = LearningUnitYearFactory()
+            url = reverse("learning_unit_utilization", args=[edy.pk, lu.pk])
+            response = self.client.get(url)
+            self.assertFalse(response.context['show_prerequisites'])
