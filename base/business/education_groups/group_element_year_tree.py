@@ -167,10 +167,15 @@ class EducationGroupHierarchy:
             None: default_url
         }
 
-        url = urls[self.tab_to_show]
-        if self.tab_to_show:
-            add_to_url = "&tab_to_show=" + self.tab_to_show
-        return url + self.url_group_to_parent() + add_to_url
+        try:
+            url = urls[self.tab_to_show]
+        except KeyError:
+            self.tab_to_show = None
+            url = urls[None]
+        finally:
+            if self.tab_to_show:
+                add_to_url = "&tab_to_show=" + self.tab_to_show
+            return url + self.url_group_to_parent() + add_to_url
 
     def __get_base_url(self, view_name):
         return reverse(view_name, args=[self.root.pk, self.education_group_year.pk])
