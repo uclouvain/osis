@@ -171,7 +171,7 @@ class EducationGroupHierarchy:
             url = urls[self.tab_to_show]
         except KeyError:
             self.tab_to_show = None
-            url = urls[None]
+            url = urls[self.tab_to_show]
         finally:
             if self.tab_to_show:
                 add_to_url = "&tab_to_show=" + self.tab_to_show
