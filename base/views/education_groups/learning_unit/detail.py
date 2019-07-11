@@ -48,6 +48,24 @@ from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages
 
+NO_PREREQUISITES = [
+    TrainingType.MASTER_MA_120.name,
+    TrainingType.MASTER_MD_120.name,
+    TrainingType.MASTER_MS_120.name,
+    TrainingType.MASTER_MA_180_240.name,
+    TrainingType.MASTER_MD_180_240.name,
+    TrainingType.MASTER_MS_180_240.name,
+    MiniTrainingType.OPTION.name,
+    MiniTrainingType.MOBILITY_PARTNERSHIP.name,
+    GroupType.COMMON_CORE.name,
+    GroupType.COMPLEMENTARY_MODULE.name,
+    GroupType.MINOR_LIST_CHOICE.name,
+    GroupType.MAJOR_LIST_CHOICE.name,
+    GroupType.OPTION_LIST_CHOICE.name,
+    GroupType.FINALITY_120_LIST_CHOICE.name,
+    GroupType.FINALITY_180_LIST_CHOICE.name,
+]
+
 
 @method_decorator(login_required, name='dispatch')
 class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
@@ -68,23 +86,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
 
         root = self.get_root()
-        types_with_no_prerequisites = [
-            TrainingType.MASTER_MA_120.name,
-            TrainingType.MASTER_MD_120.name,
-            TrainingType.MASTER_MS_120.name,
-            TrainingType.MASTER_MA_180_240.name,
-            TrainingType.MASTER_MD_180_240.name,
-            TrainingType.MASTER_MS_180_240.name,
-            MiniTrainingType.OPTION.name,
-            MiniTrainingType.MOBILITY_PARTNERSHIP.name,
-            GroupType.COMMON_CORE.name,
-            GroupType.COMPLEMENTARY_MODULE.name,
-            GroupType.MINOR_LIST_CHOICE.name,
-            GroupType.MAJOR_LIST_CHOICE.name,
-            GroupType.OPTION_LIST_CHOICE.name,
-            GroupType.FINALITY_120_LIST_CHOICE.name,
-            GroupType.FINALITY_180_LIST_CHOICE.name,
-        ]
+
         # TODO remove parent in context
         context['person'] = self.get_person()
         context['root'] = root
@@ -92,11 +94,11 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['parent'] = root
         context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['show_prerequisites'] = root.education_group_type not in types_with_no_prerequisites
-        print(root.education_group_type, TrainingType.MASTER_MA_120.value)
-        print(context['show_prerequisites'])
-        print(context)
+        context['show_prerequisites'] = self.show_prerequisites(root)
         return context
+
+    def show_prerequisites(self, education_group_year):
+        return education_group_year.education_group_type.name not in NO_PREREQUISITES
 
 
 class LearningUnitUtilization(LearningUnitGenericDetailView):
