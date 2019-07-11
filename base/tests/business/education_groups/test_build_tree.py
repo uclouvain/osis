@@ -97,29 +97,16 @@ class TestBuildTree(TestCase):
 
     def test_tree_get_url(self):
         test_cases = [
-            {'name': 'with tab and available',
-             'node': EducationGroupHierarchy(self.parent,
-                                             tab_to_show={'name': 'show_identification', 'available': True}),
-             'correct_url': reverse('education_group_read',
-                                    args=[self.parent.pk, self.parent.pk]) +
+            {'name': 'with tab',
+             'node': EducationGroupHierarchy(self.parent, tab_to_show='show_identification'),
+             'correct_url': reverse('education_group_read', args=[self.parent.pk, self.parent.pk]) +
              "?group_to_parent=0&tab_to_show=show_identification"},
-            {'name': 'with tab and not available',
-             'node': EducationGroupHierarchy(self.parent,
-                                             tab_to_show={'name': 'show_identification', 'available': False}),
-             'correct_url': reverse('education_group_read',
-                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
             {'name': 'without tab',
              'node': EducationGroupHierarchy(self.parent),
              'correct_url': reverse('education_group_read',
                                     args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
-            {'name': 'with wrong tab and available',
-             'node': EducationGroupHierarchy(self.parent,
-                                             tab_to_show={'name': 'not_existing', 'available': True}),
-             'correct_url': reverse('education_group_read',
-                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
-            {'name': 'with wrong tab and not available',
-             'node': EducationGroupHierarchy(self.parent,
-                                             tab_to_show={'name': 'not_existing', 'available': False}),
+            {'name': 'with wrong tab',
+             'node': EducationGroupHierarchy(self.parent, tab_to_show='not_existing'),
              'correct_url': reverse('education_group_read',
                                     args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
         ]
