@@ -57,14 +57,7 @@ NO_PREREQUISITES = [
     TrainingType.MASTER_MS_180_240.name,
     MiniTrainingType.OPTION.name,
     MiniTrainingType.MOBILITY_PARTNERSHIP.name,
-    GroupType.COMMON_CORE.name,
-    GroupType.COMPLEMENTARY_MODULE.name,
-    GroupType.MINOR_LIST_CHOICE.name,
-    GroupType.MAJOR_LIST_CHOICE.name,
-    GroupType.OPTION_LIST_CHOICE.name,
-    GroupType.FINALITY_120_LIST_CHOICE.name,
-    GroupType.FINALITY_180_LIST_CHOICE.name,
-]
+] + GroupType.get_names()
 
 
 @method_decorator(login_required, name='dispatch')

@@ -43,6 +43,10 @@ class ChoiceEnum(Enum):
     def get_value(cls, key):
         return getattr(cls, key, key).value if hasattr(cls, key) else key
 
+    @classmethod
+    def get_names(cls):
+        return [x.name for x in cls]
+
 
 def get_object_or_none(klass, *args, **kwargs):
     try:
