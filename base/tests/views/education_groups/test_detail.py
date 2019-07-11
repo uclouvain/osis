@@ -406,6 +406,12 @@ class EducationGroupDiplomas(TestCase):
         self.assertEqual(expected_url, response.url)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
+        url += "?group_to_parent=0"
+        response = self.client.get(url)
+        expected_url += "?group_to_parent=0"
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
     def test_with_education_group_year_of_type_group(self):
         group_education_group_year = EducationGroupYearFactory()
         group_education_group_year.education_group_type.category = education_group_categories.GROUP
@@ -418,6 +424,12 @@ class EducationGroupDiplomas(TestCase):
         response = self.client.get(url)
         expected_url = reverse("education_group_read",
                                args=[group_education_group_year.id, group_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+        url += "?group_to_parent=0"
+        response = self.client.get(url)
+        expected_url += "?group_to_parent=0"
         self.assertEqual(expected_url, response.url)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
