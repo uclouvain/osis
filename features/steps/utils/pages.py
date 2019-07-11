@@ -228,7 +228,7 @@ class SpecificationPage(pypom.Page):
 class LearningUnitPage(CommonPageMixin, pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
     edit_button = Link('LearningUnitEditPage', By.CSS_SELECTOR, "#link_edit_lu > a")
-    proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a")
+    proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a", 1)
     edit_proposal_button = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_edit > a")
     proposal_suppression = Link(LearningUnitProposalEndYearPage, By.CSS_SELECTOR, "#link_proposal_suppression > a")
     new_partim = Link(NewPartimPage, By.ID, "new_partim")
