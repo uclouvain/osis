@@ -44,7 +44,7 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base import models as mdl
-from base.business.education_group import can_user_edit_administrative_data, assert_category_of_education_group_year
+from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
@@ -164,10 +164,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if self.limited_by_category and self.get_object().education_group_type.category not in self.limited_by_category:
-            if default_url:
-                return HttpResponseRedirect(default_url)
-            else:
-                assert_category_of_education_group_year(self.get_object(), self.limited_by_category)
+            return HttpResponseRedirect(default_url)
         return super().get(request, *args, **kwargs)
 
     def show_identification(self):
