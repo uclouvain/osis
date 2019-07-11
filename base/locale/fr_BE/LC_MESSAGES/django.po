@@ -5344,7 +5344,7 @@ msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
 
 #: business/learning_units/perms.py:71
 msgid "You are not eligible to cancel proposal"
-msgstr "Vous ne pouvez pas consolider les propositions"
+msgstr "Vous ne pouvez pas annuler les propositions"
 
 #: business/learning_units/perms.py:76
 msgid "You are not eligible to consolidate proposal"
