@@ -40,6 +40,7 @@ from base.business.education_groups.learning_units.prerequisite import \
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.group_element_year import find_learning_unit_formations
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
@@ -67,6 +68,23 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
 
         root = self.get_root()
+        types_with_no_prerequisites = [
+            TrainingType.MASTER_MA_120,
+            TrainingType.MASTER_MD_120,
+            TrainingType.MASTER_MS_120,
+            TrainingType.MASTER_MA_180_240,
+            TrainingType.MASTER_MD_180_240,
+            TrainingType.MASTER_MS_180_240,
+            MiniTrainingType.OPTION,
+            MiniTrainingType.MOBILITY_PARTNERSHIP,
+            GroupType.COMMON_CORE,
+            GroupType.COMPLEMENTARY_MODULE,
+            GroupType.MINOR_LIST_CHOICE,
+            GroupType.MAJOR_LIST_CHOICE,
+            GroupType.OPTION_LIST_CHOICE,
+            GroupType.FINALITY_120_LIST_CHOICE,
+            GroupType.FINALITY_180_LIST_CHOICE,
+        ]
         # TODO remove parent in context
         context['person'] = self.get_person()
         context['root'] = root
@@ -74,6 +92,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['parent'] = root
         context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        print(context)
         return context
 
 
