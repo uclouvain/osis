@@ -1041,7 +1041,11 @@ class Scenario7FunctionalTest(SeleniumTestCase, BusinessMixin):
         self.click_on('lnk_notes_printing_{}'.format(learning_unit_year.id))
         time.sleep(1)
 
-        filename = 'Feuille de notes.pdf'
+        filename = 'session_{year}_{session_number}_{luy_acronym}.pdf'.format(
+            year=academic_year.year,
+            session_number=session_exam.number_session,
+            luy_acronym=learning_unit_year.acronym
+        )
         self.assertBrowserFileExists(filename, 'application/pdf')
 
     def assertBrowserFileExists(self, filename, mimetype=None):
