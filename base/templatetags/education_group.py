@@ -219,13 +219,16 @@ def link_pdf_content_education_group(url):
     if waffle.switch_is_active('education_group_year_generate_pdf'):
         disabled = ''
         title = action
+        load_modal = True
     else:
         disabled = 'disabled'
         title = _('Generate PDF not available. Please use EPC.')
+        load_modal = False
+        url = '#'
 
     return {
         "class_li": disabled,
-        "load_modal": True,
+        "load_modal": load_modal,
         "url": url,
         "id_li": "btn_operation_pdf_content",
         "title": title,
