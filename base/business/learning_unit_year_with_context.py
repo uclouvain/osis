@@ -101,7 +101,9 @@ def append_components(learning_unit_year):
                 entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0)
             vol_add_req_entity_2 = req_entities_volumes.get(
                 entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)
-            volume_global = (vol_req_entity or Decimal(0)) + (vol_add_req_entity_1 or Decimal(0)) + (vol_add_req_entity_2 or Decimal(0))
+            volume_global = (vol_req_entity or Decimal(0)) + \
+                            (vol_add_req_entity_1 or Decimal(0)) + \
+                            (vol_add_req_entity_2 or Decimal(0))
             planned_classes = component.planned_classes or 0
 
             learning_unit_year.components[component] = {
