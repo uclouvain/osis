@@ -50,13 +50,13 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
         if hasattr(self.object.child, 'partial_acronym'):
-            msg = "%(code)s - %(acronym)s" % {
-                "acronym": self.object.child.acronym,
-                "code": self.object.child.partial_acronym or ''
+            msg = "%(partial_acronym)s - %(acronym)s" % {
+                "acronym": msg,
+                "partial_acronym": self.object.child.partial_acronym
             }
-        else:
-            msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
+
         if self.strategy.is_valid():
             context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
                 "acronym": msg
