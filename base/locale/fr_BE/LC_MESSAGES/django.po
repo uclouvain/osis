@@ -6199,3 +6199,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
+
+msgid "Generate PDF not available. Please use EPC."
+msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."

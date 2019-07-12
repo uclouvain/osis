@@ -30,6 +30,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
+from waffle.testutils import override_switch
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
@@ -255,6 +256,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         self.maxDiff = None
         self.assertHTMLEqual(result, expected_result)
 
+    @override_switch('education_group_year_generate_pdf', active=True)
     def test_tag_link_pdf_content_education_group_not_permitted(self):
         result = link_pdf_content_education_group(self.context)
         expected_result = CUSTOM_LI_TEMPLATE.format(
@@ -276,6 +278,33 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'text': 'Générer le pdf',
                 'class_li': '',
                 'title': 'Générer le pdf',
+                'id_li': 'btn_operation_pdf_content',
+                'load_modal': True
+            }
+        )
+
+    @override_switch('education_group_year_generate_pdf', active=False)
+    def test_tag_link_pdf_content_education_group_not_permitted_with_sample_deactivated(self):
+        result = link_pdf_content_education_group(self.context)
+        expected_result = CUSTOM_LI_TEMPLATE.format(
+            li_attributes=""" id="btn_operation_pdf_content" """,
+            a_attributes=""" href="#" title="{}" {} """.format(
+                _("Generate pdf"),
+                "", ),
+            text=_('Generate pdf'),
+        )
+        self.assertEqual(
+            result,
+            {
+                'url': {
+                    'person': self.person,
+                    'education_group_year': self.education_group_year,
+                    'request': self.request,
+                    'root': self.education_group_year
+                },
+                'text': 'Générer le pdf',
+                'class_li': 'disabled',
+                'title': 'Générer le PDF n\'est pas disponible. Veuillez utiliser EPC.',
                 'id_li': 'btn_operation_pdf_content',
                 'load_modal': True
             }
