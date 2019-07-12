@@ -37,7 +37,7 @@
             {% if source_link %}
                 {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
             {% else %}
-                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy {{ object_acronym }} ?{% endblocktrans %}
+                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to attach {{ object_acronym }} ?{% endblocktrans %}
             {% endif %}
            </div>
         </div>
