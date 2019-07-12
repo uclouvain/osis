@@ -157,11 +157,13 @@
                         </tr>
                     </thead>
                     {% for program_manager in programs_managers %}
-                        <tr>
-                            <td><a href="{% url 'offer_read' offer_year_id=program_manager.offer_year.id %}"
-                                   id="lnk_program_managed_{{ program_manager.offer_year.id }}">
-                                    {{ program_manager.offer_year }} - {{ program_manager.offer_year.title }}</a></td>
-                        </tr>
+                        {% with edy=program_manager.education_group.current_education_group_year %}
+                            <tr>
+                                <td><a href="{% url 'education_group_read' root_id=edy.id education_group_year_id=edy.id %}"
+                                       id="lnk_program_managed_{{ edy.id }}">
+                                        {{ edy }} - {{ edy.title }}</a></td>
+                            </tr>
+                        {% endwith %}
                     {% endfor %}
                 </table>
             </div>

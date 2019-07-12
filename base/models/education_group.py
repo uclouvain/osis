@@ -25,11 +25,12 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Case, When, Q
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _, ngettext
 from reversion.admin import VersionAdmin
 
 from base.business.education_groups import shorten
+from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
@@ -97,6 +98,13 @@ class EducationGroup(SerializableModel):
         most_recent_education_group = self.educationgroupyear_set.filter(education_group_id=self.id)\
                                                                  .latest('academic_year__year')
         return most_recent_education_group.acronym
+
+    @property
+    def current_education_group_year(self):
+        return self.educationgroupyear_set.filter(
+            education_group_id=self.id,
+            academic_year=starting_academic_year()
+        ).first()
 
     def __str__(self):
         return "{}".format(self.id)
