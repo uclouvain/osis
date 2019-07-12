@@ -211,7 +211,7 @@
                 {% endblock panel_external %}
             </div>
             <div class="col-md-4">
-                {% if object.is_external %}
+                {% if object.is_external and not object.is_external_mobility %}
                     <div class="panel panel-default">
                         <div class="panel-body">
                             {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}
