@@ -19,8 +19,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import Select
 
 from attribution.tests.factories.attribution import AttributionFactory
