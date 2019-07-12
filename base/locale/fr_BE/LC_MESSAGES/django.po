@@ -6205,5 +6205,5 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
-#~ msgid "Are you certain that you want to cancel the learning unit proposal ?"
-#~ msgstr "Êtes-vous certain de vouloir annuler la proposition ?"
+msgid "Generate PDF not available. Please use EPC."
+msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."

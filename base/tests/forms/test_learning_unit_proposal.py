@@ -311,7 +311,7 @@ def build_initial_data(learning_unit_year, entity):
             "specific_title": learning_unit_year.specific_title,
             "internship_subtype": learning_unit_year.internship_subtype,
             "language": learning_unit_year.language.pk,
-            "credits": Decimal(5),
+            "credits": '5',
             "campus": learning_unit_year.campus.id,
             "periodicity": learning_unit_year.periodicity,
             "status": learning_unit_year.status,

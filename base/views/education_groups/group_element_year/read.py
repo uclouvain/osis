@@ -28,6 +28,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import translation
 from django.views.generic import FormView
+from waffle.decorators import waffle_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.forms.education_group.common import SelectLanguage
@@ -37,6 +38,7 @@ from osis_common.document.pdf_build import render_pdf
 
 
 @login_required
+@waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     tree = EducationGroupHierarchy(education_group_year).to_list()
