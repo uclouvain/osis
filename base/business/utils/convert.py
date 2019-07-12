@@ -31,4 +31,4 @@ def volume_format(value):
     else:
         if value % 1 != 0:
             return "{0:.2f}".format(value)
-        return str(value)
+        return str(int(value))

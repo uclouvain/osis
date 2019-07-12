@@ -36,4 +36,4 @@ class ConvertUtilsTestCase(TestCase):
         self.assertEqual(convert.volume_format(4.2), '4.20')
 
     def test_convert_integer_return_string_integer(self):
-        self.assertEqual(convert.volume_format(4.0), '4.0')
+        self.assertEqual(convert.volume_format(4.0), '4')
