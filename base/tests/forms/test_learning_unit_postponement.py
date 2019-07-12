@@ -620,7 +620,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                   "(%(new_value)s instead of %(current_value)s)") % {
                     'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
                     'new_value': component.repartition_volume_requirement_entity,
-                    'current_value': Decimal(0)
+                    'current_value': "0.00"
                 }
             ],
         })
