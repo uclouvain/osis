@@ -1146,10 +1146,8 @@ msgstr "Liste personnalisée des unités d'enseignement"
 
 #: templates/learning_unit/blocks/modal/modal_confirm_cancel.html:42
 #: templates/learning_unit/blocks/modal/modal_confirm_consolidate.html:44
-#, fuzzy
-#| msgid "confirm"
 msgid "Confirm"
-msgstr "confirmer"
+msgstr "Confirmer"
 
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:10
 msgid "Confirm your action."
