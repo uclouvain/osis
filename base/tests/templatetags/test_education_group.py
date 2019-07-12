@@ -296,17 +296,12 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         self.assertEqual(
             result,
             {
-                'url': {
-                    'person': self.person,
-                    'education_group_year': self.education_group_year,
-                    'request': self.request,
-                    'root': self.education_group_year
-                },
+                'url': '#',
                 'text': 'Générer le pdf',
                 'class_li': 'disabled',
                 'title': 'Générer le PDF n\'est pas disponible. Veuillez utiliser EPC.',
                 'id_li': 'btn_operation_pdf_content',
-                'load_modal': True
+                'load_modal': False
             }
         )
 
