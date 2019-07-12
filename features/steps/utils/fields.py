@@ -41,7 +41,7 @@ class Field:
         self.current_page = None
 
     def __get__(self, obj, owner):
-        self.element = obj.find_element(*self.locator)
+        self.element = obj.wait.until(lambda obj: obj.find_element(*self.locator))
         self.current_page = obj
         return self
 
@@ -81,7 +81,7 @@ class Link(Field):
 class InputField(Field):
 
     def __set__(self, obj, value):
-        element = obj.find_element(*self.locator)
+        element = obj.wait.until(lambda obj: obj.find_element(*self.locator))
         element.clear()
         if value is not None:
             element.send_keys(value)

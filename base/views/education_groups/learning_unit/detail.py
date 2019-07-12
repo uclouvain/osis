@@ -85,7 +85,8 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['root'] = root
         context['root_id'] = root.pk
         context['parent'] = root
-        context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
+        context['tree'] = json.dumps(EducationGroupHierarchy(root,
+                                                             tab_to_show=self.request.GET.get("tab_to_show")).to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(root)
         return context

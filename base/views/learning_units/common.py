@@ -26,7 +26,7 @@
 import re
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 
 from base import models as mdl
@@ -53,7 +53,10 @@ def show_success_learning_unit_year_creation_message(request, learning_unit_year
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def check_acronym(request, subtype):
     acronym = request.GET['acronym']
-    academic_yr = mdl.academic_year.find_academic_year_by_id(request.GET['year_id'])
+    academic_yr_id = request.GET.get('year_id', None)
+    if not academic_yr_id:
+        raise HttpResponseNotFound
+    academic_yr = mdl.academic_year.find_academic_year_by_id(int(academic_yr_id))
     existed_acronym = False
     existing_acronym = False
     first_using = ""

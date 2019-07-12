@@ -27,6 +27,7 @@ from django.db.models import F, When, Case
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from waffle.testutils import override_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
@@ -75,6 +76,7 @@ class TestRead(TestCase):
                                                            comment_english="english")
         cls.a_superuser = SuperUserFactory()
 
+    @override_switch('education_group_year_generate_pdf', active=True)
     def test_pdf_content(self):
         self.client.force_login(self.a_superuser)
         url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, "fr-be"])

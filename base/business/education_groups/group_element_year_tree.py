@@ -167,6 +167,9 @@ class EducationGroupHierarchy:
             None: default_url
         }
 
+        return self._construct_url(add_to_url, urls)
+
+    def _construct_url(self, add_to_url, urls):
         try:
             url = urls[self.tab_to_show]
         except KeyError:
@@ -273,8 +276,15 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         return class_by_proposal_type[proposal.type] if proposal else ""
 
     def get_url(self):
-        url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
-        return url + self.url_group_to_parent()
+        default_url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
+        add_to_url = ''
+        urls = {
+            'show_utilization': default_url,
+            'show_prerequisite': reverse('learning_unit_prerequisite', args=[self.root.pk, self.learning_unit_year.pk]),
+            None: default_url
+        }
+
+        return self._construct_url(add_to_url, urls)
 
     def generate_children(self):
         """ The leaf does not have children """
