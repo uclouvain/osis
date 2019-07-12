@@ -266,7 +266,7 @@ def _build_table_proposal_data(proposals_with_results):
             proposal.get_type_display(),
             proposal.get_state_display(),
             _("Success") if ERROR not in results else _("Failure"),
-            "\n".join([str(error_msg) for error_msg in results.get(ERROR, [])])
+            "".join([str(error_msg) for error_msg in results.get(ERROR, [])])
         ) for (proposal, results) in proposals_with_results
     ]
 
