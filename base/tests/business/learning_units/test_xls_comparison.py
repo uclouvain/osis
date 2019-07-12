@@ -79,7 +79,7 @@ class TestComparisonXls(TestCase):
             data[0][5],
             str(_(learning_unit_yr.get_internship_subtype_display())) if learning_unit_yr.internship_subtype else ''
         )
-        self.assertEqual(data[0][6], learning_unit_yr.credits)
+        self.assertEqual(data[0][6], str(learning_unit_yr.credits))
         self.assertEqual(data[0][7], learning_unit_yr.language.name if learning_unit_yr.language else '')
         self.assertEqual(data[0][8],
                          str(_(learning_unit_yr.get_periodicity_display())) if learning_unit_yr.periodicity else '')
@@ -175,7 +175,7 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[6],
                          str(_(
                              self.learning_unit_year_1.get_internship_subtype_display())) if self.learning_unit_year_1.internship_subtype else '')
-        self.assertEqual(data[7], self.learning_unit_year_1.credits)
+        self.assertEqual(data[7], str(self.learning_unit_year_1.credits))
         self.assertEqual(data[8], self.learning_unit_year_1.language.name if self.learning_unit_year_1.language else '')
         self.assertEqual(data[9],
                          str(_(self.learning_unit_year_1.get_periodicity_display())) if self.learning_unit_year_1.periodicity else '')

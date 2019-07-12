@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,12 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.test import TestCase
+
+from base.business.utils import convert
 
 
-def volume_format(value):
-    if value is None:
-        return ''
-    else:
-        if value % 1 != 0:
-            return "{0:.2f}".format(value)
-        return str(int(value))
+class ConvertUtilsTestCase(TestCase):
+    def test_convert_none_return_empty_string(self):
+        self.assertEqual(convert.volume_format(None), '')
+
+    def test_convert_float_number_return_string_number_with_two_decimals(self):
+        self.assertEqual(convert.volume_format(4.2), '4.20')
+
+    def test_convert_integer_return_string_integer(self):
+        self.assertEqual(convert.volume_format(4.0), '4')
