@@ -42,8 +42,7 @@ from base.views.common import display_error_messages, display_messages_by_level
 @waffle_flag('learning_unit_proposal_delete')
 @login_required
 @require_POST
-def consolidate_proposal(request):
-    learning_unit_year_id = request.POST.get("learning_unit_year_id")
+def consolidate_proposal(request, learning_unit_year_id):
     proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year__id=learning_unit_year_id)
     user_person = get_object_or_404(Person, user=request.user)
 

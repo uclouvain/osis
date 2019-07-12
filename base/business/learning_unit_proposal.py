@@ -292,7 +292,7 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
 def _apply_action_on_proposals(proposals, action_method, author, permission_check):
     proposals_with_results = []
     for proposal in proposals:
-        proposal_with_result = (proposal, {ERROR: ["User %(person)s do not have rights on this proposal." % {
+        proposal_with_result = (proposal, {ERROR: [_("User %(person)s do not have rights on this proposal.") % {
             "person": str(author)
         }]})
         if permission_check(proposal, author):

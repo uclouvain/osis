@@ -141,6 +141,7 @@ class TestEditLearningUnit(TestCase):
         cls.allocation_entity = EntityVersionFactory(
             start_date=today.replace(year=1900),
             entity__organization__type=organization_type.MAIN,
+            entity_type=entity_type.FACULTY
         )
         cls.additional_entity_1 = EntityVersionFactory(
             start_date=today.replace(year=1900),
@@ -647,4 +648,3 @@ class TestEntityAutocomplete(TestCase):
         self.assertIn('AAA - ', results[0]['text'])
         self.assertIn('BBB - ', results[1]['text'])
         self.assertIn('CCC - ', results[2]['text'])
-

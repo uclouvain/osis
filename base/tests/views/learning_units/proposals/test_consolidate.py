@@ -63,7 +63,8 @@ class TestConsolidate(TestCase):
         person_entity = PersonEntityFactory(person=cls.person,
                                             entity=cls.learning_unit_year.learning_container_year.requirement_entity)
         EntityVersionFactory(entity=person_entity.entity)
-        cls.url = reverse("learning_unit_consolidate_proposal")
+        cls.url = reverse("learning_unit_consolidate_proposal",
+                          kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
         cls.post_data = {"learning_unit_year_id": cls.learning_unit_year.id}
 
     def setUp(self):
@@ -93,13 +94,13 @@ class TestConsolidate(TestCase):
     def test_when_no_proposal(self):
         post_data = {"learning_unit_year_id": self.learning_unit_year.id + 1}
 
-        response = self.client.post(self.url, data=post_data)
+        response = self.client.post("learning_unit_consolidate_proposal", data=post_data)
 
         self.assertTemplateUsed(response, "page_not_found.html")
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_when_no_post_data(self):
-        response = self.client.post(self.url, data={})
+        response = self.client.post("learning_unit_consolidate_proposal", data={})
 
         self.assertTemplateUsed(response, "page_not_found.html")
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
@@ -123,5 +124,5 @@ class TestConsolidate(TestCase):
             learning_unit_year__learning_container_year__academic_year=self.current_academic_year
         )
         lu_id = creation_proposal.learning_unit_year.learning_unit.id
-        self.client.post(self.url, data={"learning_unit_year_id": creation_proposal.learning_unit_year.id}, follow=False)
+        self.client.post("learning_unit_consolidate_proposal", data={"learning_unit_year_id": creation_proposal.learning_unit_year.id}, follow=False)
         self.assertTrue(mdl_base.learning_unit.LearningUnit.objects.filter(pk=lu_id).exists())

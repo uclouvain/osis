@@ -43,7 +43,7 @@ class EducationGroupHierarchy:
     _cache_hierarchy = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None):
+                 cache_hierarchy: dict = None, tab_to_show: str = None):
 
         self.children = []
         self.root = root
@@ -52,6 +52,7 @@ class EducationGroupHierarchy:
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
+        self.tab_to_show = tab_to_show
         self.generate_children()
 
     @property
@@ -66,10 +67,12 @@ class EducationGroupHierarchy:
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
+                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
+                                               tab_to_show=self.tab_to_show)
 
             elif group_element_year.child_leaf:
-                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
+                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
+                                      tab_to_show=self.tab_to_show)
 
             else:
                 continue
@@ -150,8 +153,35 @@ class EducationGroupHierarchy:
         return "?group_to_parent=" + str(self.group_element_year.pk if self.group_element_year else 0)
 
     def get_url(self):
-        url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
-        return url + self.url_group_to_parent()
+        default_url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
+        add_to_url = ""
+        urls = {
+            'show_identification': self.__get_base_url('education_group_read'),
+            'show_diploma': self.__get_base_url('education_group_diplomas'),
+            'show_administrative': self.__get_base_url('education_group_administrative'),
+            'show_content': self.__get_base_url('education_group_content'),
+            'show_utilization': self.__get_base_url('education_group_utilization'),
+            'show_general_information': self.__get_base_url('education_group_general_informations'),
+            'show_skills_and_achievements': self.__get_base_url('education_group_skills_achievements'),
+            'show_admission_conditions': self.__get_base_url('education_group_year_admission_condition_edit'),
+            None: default_url
+        }
+
+        return self._construct_url(add_to_url, urls)
+
+    def _construct_url(self, add_to_url, urls):
+        try:
+            url = urls[self.tab_to_show]
+        except KeyError:
+            self.tab_to_show = None
+            url = urls[self.tab_to_show]
+        finally:
+            if self.tab_to_show:
+                add_to_url = "&tab_to_show=" + self.tab_to_show
+            return url + self.url_group_to_parent() + add_to_url
+
+    def __get_base_url(self, view_name):
+        return reverse(view_name, args=[self.root.pk, self.education_group_year.pk])
 
     def get_option_list(self):
         def pruning_function(node):
@@ -246,8 +276,15 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         return class_by_proposal_type[proposal.type] if proposal else ""
 
     def get_url(self):
-        url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
-        return url + self.url_group_to_parent()
+        default_url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
+        add_to_url = ''
+        urls = {
+            'show_utilization': default_url,
+            'show_prerequisite': reverse('learning_unit_prerequisite', args=[self.root.pk, self.learning_unit_year.pk]),
+            None: default_url
+        }
+
+        return self._construct_url(add_to_url, urls)
 
     def generate_children(self):
         """ The leaf does not have children """
