@@ -32,8 +32,8 @@ class ConvertUtilsTestCase(TestCase):
     def test_convert_none_return_empty_string(self):
         self.assertEqual(convert.volume_format(None), '')
 
-    def test_convert_float_number_return_number_with_two_decimals(self):
+    def test_convert_float_number_return_string_number_with_two_decimals(self):
         self.assertEqual(convert.volume_format(4.2), '4.20')
 
-    def test_convert_integer_return_integer(self):
+    def test_convert_integer_return_string_integer(self):
         self.assertEqual(convert.volume_format(4.0), '4.0')
