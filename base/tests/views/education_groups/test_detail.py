@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import timedelta, datetime
 from http import HTTPStatus
 
 import reversion
@@ -32,6 +33,7 @@ from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpRespons
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.academic_year import AcademicYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType
@@ -266,6 +268,19 @@ class TestReadEducationGroup(TestCase):
         self.assertTrue('show_content' in response.context)
         self.assertTrue('show_utilization' in response.context)
         self.assertTrue('show_admission_conditions' in response.context)
+
+    def test_fetching_starting_academic_year(self):
+        current_academic_year = self.academic_year
+        starting_academic_year, created = AcademicYear.objects.update_or_create(
+            year=current_academic_year.year + 1,
+            defaults={'start_date': datetime.now() - timedelta(days=10)},
+        )
+
+        training = TrainingFactory()
+        url = reverse("education_group_read", args=[training.pk, training.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.context["current_academic_year"], starting_academic_year)
+        self.assertNotEqual(response.context["current_academic_year"], current_academic_year)
 
     def test_main_common_show_only_identification_and_general_information(self):
         main_common = EducationGroupYearCommonFactory(

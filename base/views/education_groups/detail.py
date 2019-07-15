@@ -51,7 +51,7 @@ from base.business.education_groups.general_information_sections import SECTION_
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -120,8 +120,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     @cached_property
-    def current_academic_year(self):
-        return current_academic_year()
+    def starting_academic_year(self):
+        return starting_academic_year()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -156,7 +156,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             education_group=context['object'],
         )
         context['enums'] = mdl.enums.education_group_categories
-        context['current_academic_year'] = self.current_academic_year
+        context['current_academic_year'] = self.starting_academic_year
         return context
 
     def get(self, request, *args, **kwargs):
@@ -205,7 +205,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
-               self.current_academic_year.year + 2
+               self.starting_academic_year.year + 2
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
