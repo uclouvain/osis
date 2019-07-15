@@ -273,7 +273,7 @@ class TestReadEducationGroup(TestCase):
         current_academic_year = self.academic_year
         starting_academic_year, created = AcademicYear.objects.update_or_create(
             year=current_academic_year.year + 1,
-            defaults={'start_date': datetime.now().date() - timedelta(days=10)},
+            defaults={'start_date': datetime.now() - timedelta(days=10)},
         )
 
         training = TrainingFactory()
