@@ -30,7 +30,7 @@ from base.business.institution import find_summary_course_submission_dates_for_e
 from base.forms.utils.datefield import DatePickerInput, DATE_FORMAT
 from base.models import entity_calendar
 from base.models.academic_calendar import get_by_reference_and_academic_year
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.entity_calendar import EntityCalendar
 from base.models.enums import academic_calendar_type
 
@@ -62,5 +62,5 @@ class EntityCalendarEducationalInformationForm(forms.ModelForm):
     def save_entity_calendar(self, entity, *args, **kwargs):
         self.instance.entity = entity
         self.instance.academic_calendar = get_by_reference_and_academic_year(
-            academic_calendar_type.SUMMARY_COURSE_SUBMISSION, current_academic_year())
+            academic_calendar_type.SUMMARY_COURSE_SUBMISSION, starting_academic_year())
         return self.save(*args, **kwargs)
