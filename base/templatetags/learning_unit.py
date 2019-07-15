@@ -185,7 +185,7 @@ def _get_label(data, key_comp, val):
 
 @register.simple_tag
 def changed_label(value, other=None):
-    if value != other and other:
+    if str(value) != str(other) and other:
         return mark_safe(
             "<td><label {}>{}</label></td>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
     else:
