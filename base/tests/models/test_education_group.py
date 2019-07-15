@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 
 from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
@@ -31,7 +30,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ngettext
 
-from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import GROUP
@@ -55,20 +53,6 @@ class EducationGroupTest(TestCase):
         most_recent_educ_group_year = EducationGroupYear.objects.get(academic_year__year=most_recent_year,
                                                                      education_group=education_group)
         self.assertEqual(education_group.most_recent_acronym, most_recent_educ_group_year.acronym)
-
-    def test_current_education_group_year(self):
-        education_group = EducationGroupFactory()
-        most_recent_year = date.today().year
-        for year in range(most_recent_year - 2, most_recent_year + 2):
-            EducationGroupYearFactory(
-                education_group=education_group,
-                academic_year=AcademicYearFactory(year=year)
-            )
-        current_educ_group_year = EducationGroupYear.objects.get(
-            academic_year=starting_academic_year(),
-            education_group=education_group
-        )
-        self.assertEqual(education_group.current_education_group_year, current_educ_group_year)
 
     def test_clean_case_start_year_greater_than_end_year_error(self):
         education_group = EducationGroupFactory.build(
