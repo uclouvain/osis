@@ -70,7 +70,9 @@ class ProgramManager(models.Model):
 
 
 def find_by_person(a_person):
-    return ProgramManager.objects.select_related("offer_year").filter(person=a_person)
+    return ProgramManager.objects.filter(person=a_person).select_related(
+        'education_group', 'person', 'offer_year'
+    )
 
 
 def is_program_manager(user, offer_year=None, learning_unit_year=None, education_group=None):
