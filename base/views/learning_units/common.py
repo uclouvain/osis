@@ -118,7 +118,7 @@ def get_common_context_learning_unit_year(learning_unit_year_id, person):
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     return {
         'learning_unit_year': learning_unit_year,
-        'current_academic_year': mdl.academic_year.current_academic_year(),
+        'current_academic_year': mdl.academic_year.starting_academic_year(),
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
     }
 
