@@ -41,7 +41,7 @@ from base.business.xls import get_name_or_username
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
@@ -276,7 +276,7 @@ def get_academic_year_of_reference(objects):
     criteria : academic_year = 'ALL' """
     if objects:
         return _get_academic_year(objects[0])
-    return current_academic_year()
+    return starting_academic_year()
 
 
 def _get_academic_year(obj):

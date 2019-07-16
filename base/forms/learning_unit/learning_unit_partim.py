@@ -35,7 +35,7 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.utils.acronym_field import split_acronym
 from base.forms.utils.choice_field import add_blank
-from base.models.academic_year import current_academic_year, LEARNING_UNIT_CREATION_SPAN_YEARS
+from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, starting_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.learning_component_year import LearningComponentYear
@@ -53,7 +53,7 @@ class YearChoiceField(forms.ChoiceField):
     def __init__(self, *args, start_year=None, end_year=None, **kwargs):
         super().__init__(*args, **kwargs)
         if not start_year:
-            start_year = current_academic_year().year
+            start_year = starting_academic_year().year
 
         if not end_year:
             end_year = start_year + LEARNING_UNIT_CREATION_SPAN_YEARS
