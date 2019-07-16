@@ -7,6 +7,7 @@
     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
        aria-expanded="false" id="bt_user">
         <span class="glyphicon glyphicon-bell {% if number_unread_notifications %}notification{% endif %}" id="notifications_bell"></span>
+        <span class="visible-xs-inline">{% blocktrans %}Notification{{ number_unread_notifications|pluralize }}{% endblocktrans %}</span>
     </a>
     <div class="dropdown-menu" aria-labelledby="dLabel" id="notifications_content">
         {% include "blocks/notifications_inner.html" %}
