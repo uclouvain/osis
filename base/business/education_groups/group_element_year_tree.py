@@ -372,6 +372,7 @@ class DetachPermission(LinkActionPermission):
 class ModificationPermission(LinkActionPermission):
     def is_permitted(self):
         self._check_year_is_editable()
+        self._check_if_root()
         return super().is_permitted()
 
     def _check_year_is_editable(self):
@@ -380,4 +381,10 @@ class ModificationPermission(LinkActionPermission):
                 str(_("Cannot perform action on a education group before %(limit_year)s") % {
                     "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
                 })
+            )
+
+    def _check_if_root(self):
+        if self.link is None:
+            self.errors.append(
+                str(_("Cannot perform modification action on root."))
             )
