@@ -25,6 +25,7 @@ from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import perms as education_group_perms
@@ -126,11 +127,11 @@ class EducationGroupHierarchy:
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
                 'attach_disabled': not self.attach_perm.is_permitted(),
-                'attach_msg': self.attach_perm.errors[0] if self.attach_perm.errors else "",
+                'attach_msg': escape(self.attach_perm.errors[0]) if self.attach_perm.errors else "",
                 'detach_disabled': not self.detach_perm.is_permitted(),
-                'detach_msg': self.detach_perm.errors[0] if self.detach_perm.errors else "",
+                'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
                 'modification_disabled': not self.modification_perm.is_permitted(),
-                'modification_msg': self.modification_perm.errors[0] if self.modification_perm.errors else "",
+                'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
             },
         }
 
@@ -242,11 +243,11 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                     self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
                 'attach_disabled': not self.attach_perm.is_permitted(),
-                'attach_msg': self.attach_perm.errors[0] if self.attach_perm.errors else "",
+                'attach_msg': escape(self.attach_perm.errors[0]) if self.attach_perm.errors else "",
                 'detach_disabled': not self.detach_perm.is_permitted(),
-                'detach_msg': self.detach_perm.errors[0] if self.detach_perm.errors else "",
+                'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
                 'modification_disabled': not self.modification_perm.is_permitted(),
-                'modification_msg': self.modification_perm.errors[0] if self.modification_perm.errors else "",
+                'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
                 'class': self._get_class()
             },
         }
@@ -371,6 +372,7 @@ class DetachPermission(LinkActionPermission):
 class ModificationPermission(LinkActionPermission):
     def is_permitted(self):
         self._check_year_is_editable()
+        self._check_if_root()
         return super().is_permitted()
 
     def _check_year_is_editable(self):
@@ -379,4 +381,10 @@ class ModificationPermission(LinkActionPermission):
                 str(_("Cannot perform action on a education group before %(limit_year)s") % {
                     "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
                 })
+            )
+
+    def _check_if_root(self):
+        if self.link is None:
+            self.errors.append(
+                str(_("Cannot perform modification action on root."))
             )
