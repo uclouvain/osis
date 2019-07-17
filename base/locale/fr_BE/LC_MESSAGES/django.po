@@ -968,11 +968,9 @@ msgstr ""
 #: business/education_groups/group_element_year_tree.py:331
 #: business/education_groups/group_element_year_tree.py:353
 #: business/education_groups/group_element_year_tree.py:379
-#, fuzzy, python-format
-#| msgid "You cannot change a education group before %(limit_year)s"
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas modifier une organisation de formation datant d'avant "
+"Interdit de réalister des actions sur une organisation de formation antérieure à "
 "%(limit_year)s"
 
 #: business/education_groups/group_element_year_tree.py:361
