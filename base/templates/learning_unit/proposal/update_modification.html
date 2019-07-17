@@ -1,10 +1,6 @@
 {% extends "learning_unit/learning_unit_layout.html" %}
 {% load bootstrap3 %}
 
-{% block tabs %}
-    {% include "learning_unit/proposal/tabs.html" %}
-{% endblock tabs %}
-
 {% block proposal_management %}
     {% include "learning_unit/blocks/form/update_proposal.html" with form=form_proposal %}
 
