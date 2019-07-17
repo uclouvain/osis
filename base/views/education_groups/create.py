@@ -38,7 +38,7 @@ from base.forms.education_group.common import EducationGroupModelForm, Education
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
-from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
@@ -100,7 +100,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
 
     academic_year = cached_data.get('academic_year')
     if not academic_year:
-        cached_data['academic_year'] = current_academic_year()
+        cached_data['academic_year'] = starting_academic_year()
 
     initial_academic_year = parent.academic_year_id if parent else cached_data.get('academic_year')
     form_education_group_year = FORMS_BY_CATEGORY[category](

@@ -66,7 +66,7 @@ class LearningUnitEndDateForm(forms.Form):
             self.fields['academic_year'].initial = None
 
     def _get_academic_years(self, max_year):
-        current_academic_year = academic_year.current_academic_year()
+        current_academic_year = academic_year.starting_academic_year()
         min_year = current_academic_year.year
 
         if not max_year:
