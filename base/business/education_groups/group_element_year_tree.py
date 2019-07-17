@@ -58,8 +58,7 @@ class EducationGroupHierarchy:
         self.generate_children()
 
     def is_modification_disabled(self):
-        return self.group_element_year is None or\
-               not education_group_perms._is_year_editable(self.root, False)
+        return not education_group_perms._is_year_editable(self.root, False)
 
     def is_attach_disabled(self):
         return not education_group_perms._is_year_editable(self.root, False)
