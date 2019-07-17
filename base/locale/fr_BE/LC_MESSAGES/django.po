@@ -970,7 +970,7 @@ msgstr ""
 #: business/education_groups/group_element_year_tree.py:379
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
-"Interdit de réalister des actions sur une organisation de formation antérieure à "
+"Interdit de réaliser des actions sur une organisation de formation antérieure à "
 "%(limit_year)s"
 
 #: business/education_groups/group_element_year_tree.py:361
@@ -3052,8 +3052,6 @@ msgid "Not required"
 msgstr "Non requis"
 
 #: templates/blocks/notifications.html:10
-#, fuzzy, python-format
-#| msgid "%(number_notifications)s unread notification(s)"
 msgid "Notification%(number_unread_notifications|pluralize)s"
 msgstr "%(number_notifications)s notification(s) non lu(s)"
 
