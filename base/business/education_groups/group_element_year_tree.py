@@ -24,8 +24,10 @@
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
@@ -54,6 +56,17 @@ class EducationGroupHierarchy:
         self._cache_hierarchy = cache_hierarchy
         self.tab_to_show = tab_to_show
         self.generate_children()
+
+    def is_modification_disabled(self):
+        return self.group_element_year is None or\
+               not education_group_perms._is_year_editable(self.root, False)
+
+    def is_attach_disabled(self):
+        return not education_group_perms._is_year_editable(self.root, False)
+
+    def is_detach_disabled(self):
+        return self.group_element_year is None or \
+               not education_group_perms._is_year_editable(self.root, False)
 
     @property
     def cache_hierarchy(self):
@@ -119,6 +132,9 @@ class EducationGroupHierarchy:
                 'modify_url': reverse('group_element_year_update', args=[
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
+                'attach_disabled': self.is_attach_disabled(),
+                'detach_disabled': self.is_detach_disabled(),
+                'modification_disabled': self.is_modification_disabled(),
             },
         }
 
@@ -210,6 +226,13 @@ class NodeLeafJsTree(EducationGroupHierarchy):
     def education_group_year(self):
         return
 
+    def is_attach_disabled(self):
+        return True
+
+    def is_detach_disabled(self):
+        return super().is_detach_disabled() or self.group_element_year.has_prerequisite or \
+               self.group_element_year.is_prerequisite
+
     def to_json(self):
         return {
             'text': self._get_acronym(),
@@ -229,6 +252,9 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'modify_url': reverse('group_element_year_update', args=[
                     self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
+                'attach_disabled': self.is_attach_disabled(),
+                'detach_disabled': self.is_detach_disabled(),
+                'modification_disabled': self.is_modification_disabled(),
                 'class': self._get_class()
             },
         }

@@ -34,7 +34,10 @@ $(document).ready(function () {
             view_url: obj.a_attr.href,
             attach_url: obj.a_attr.attach_url,
             detach_url: obj.a_attr.detach_url,
-            modify_url: obj.a_attr.modify_url
+            modify_url: obj.a_attr.modify_url,
+            attach_disabled: obj.a_attr.attach_disabled,
+            detach_disabled: obj.a_attr.detach_disabled,
+            modification_disabled: obj.a_attr.modification_disabled
         };
     }
 
@@ -118,7 +121,7 @@ $(document).ready(function () {
                         "_disabled": function (data) {
                             let __ret = get_data_from_tree(data);
                             // tree's root cannot be edit (no link with parent...)
-                            return __ret.group_element_year_id === null
+                            return __ret.modification_disabled === true;
                         }
                     },
 
@@ -140,7 +143,7 @@ $(document).ready(function () {
                         },
                         "_disabled": function (data) {
                             let __ret = get_data_from_tree(data);
-                            return __ret.element_type === "learningunityear";
+                            return __ret.attach_disabled === true;
                         }
                     },
 
@@ -167,9 +170,7 @@ $(document).ready(function () {
                         "_disabled": function (data) {
                             let __ret = get_data_from_tree(data);
                             // tree's root and learning_unit having/being prerequisite(s) cannot be detached
-                            return __ret.group_element_year_id === null ||
-                                __ret.has_prerequisite === true ||
-                                __ret.is_prerequisite === true;
+                            return __ret.detach_disabled === true;
                         }
                     },
 
