@@ -38,9 +38,8 @@ from django.utils.translation import gettext_lazy as _
 from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
-    UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP
+    UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
 
@@ -89,7 +88,7 @@ class Person(SerializableModel):
             if settings.INTERNAL_EMAIL_SUFFIX.strip():
                 # It limits the creation of person with external emails. The domain name is case insensitive.
                 if self.source and self.source != person_source_type.BASE \
-                               and settings.INTERNAL_EMAIL_SUFFIX in str(self.email).lower():
+                        and settings.INTERNAL_EMAIL_SUFFIX in str(self.email).lower():
                     raise AttributeError('Invalid email for external person.')
 
         super(Person, self).save()
@@ -122,6 +121,10 @@ class Person(SerializableModel):
     @cached_property
     def is_administrative_manager(self):
         return self.user.groups.filter(name=ADMINISTRATIVE_MANAGER_GROUP).exists()
+
+    @cached_property
+    def is_program_manager(self):
+        return self.user.groups.filter(name=PROGRAM_MANAGER_GROUP).exists()
 
     @cached_property
     def is_sic(self):
@@ -188,9 +191,11 @@ def find_by_id(person_id):
         return None
 
 
-def find_by_user(user):
-    person = Person.objects.filter(user=user).first()
-    return person
+def find_by_user(user: User):
+    try:
+        return user.person
+    except Person.DoesNotExist:
+        return None
 
 
 def get_user_interface_language(user):
@@ -230,7 +235,7 @@ def count_by_email(email):
 def search_employee(full_name):
     queryset = annotate_with_first_last_names()
     if full_name:
-        return queryset.filter(employee=True)\
+        return queryset.filter(employee=True) \
             .filter(Q(begin_by_first_name__iexact='{}'.format(full_name.lower())) |
                     Q(begin_by_last_name__iexact='{}'.format(full_name.lower())) |
                     Q(first_name__icontains=full_name) |
@@ -258,4 +263,3 @@ def find_by_firstname_or_lastname(name):
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception=False):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
-

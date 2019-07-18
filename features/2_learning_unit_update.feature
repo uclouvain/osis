@@ -121,8 +121,8 @@ Feature: Mise à jour en gestion journalière
   Scenario: 14. En tant que gestionnaire facultaire, je dois pouvoir consulter l’onglet « Enseignants ».
     Given Aller sur la page de detail de l'ue: LCHM1211 en 2018-19
     When Cliquer sur l'onglet Enseignant·e·s
-    Then Vérifier que à la ligne 1, l'enseignant est bien DEVILLERS, Michel avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
     Then Vérifier que à la ligne 2, l'enseignant est bien HAUTIER, Geoffroy avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
+    Then Vérifier que à la ligne 3, l'enseignant est bien DEVILLERS, Michel avec comme fonction Co-titulaire débutant en 2017 pour une durée de 3 ans avec un volume en Q1 de 15,00 et en Q2 de 27,00
 
   Scenario: 15. En tant que gestionnaire facultaire, je dois pouvoir modifier l’onglet « Enseignant ».
     Given La période de modification des programmes est en cours
@@ -139,7 +139,6 @@ Feature: Mise à jour en gestion journalière
     And Encoder 2.0 comme Volume 1
     And Cliquer sur le bouton « Enregistrer »
     Then Vérifier que à la ligne 1, l'enseignant a comme fonction Coordinateur(trice) avec un volume en Q1 de 2,00 et en Q2 de 0,00
-
 
   Scenario: 16. En tant que gestionnaire facultaire, je dois pouvoir mettre à jour les fiches descriptives.
     Given L’utilisateur est attaché à l’entité FARM
@@ -183,4 +182,3 @@ Feature: Mise à jour en gestion journalière
 
     Then Vérifier que Test AA2 est bien présent à la ligne 1 des acquis d'apprentissage.
     And Vérifier que Test AA1 est bien présent à la ligne 2 des acquis d'apprentissage.
-

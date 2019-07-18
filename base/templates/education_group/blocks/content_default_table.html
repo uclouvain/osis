@@ -38,24 +38,33 @@
     </tr>
     </thead>
     <tbody>
-    {% for group in group_element_years %}
+    {% for group in object.groupelementyear_set.all %}
         <tr>
-            <td width="10%"><a href="{% url 'learning_unit' group.child_id %}"
-                               id="lnk_learning_unit_{{ group.id }}">{{ group.acronym }}</a></td>
-            <td>{{ group.child_branch.partial_acronym }}</td>
-            <td width="20%">
-                {% if group.child_branch %}
+            {% if  group.child_branch %}
+                <td width="10%">{{ group.child_branch.acronym }}</td>
+                <td>
+                    <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
+                       id="lnk_education_group_{{ group.pk }}">{{ group.child_branch.partial_acronym }}</a>
+                </td>
+                <td width="30%">
                     {{ group.child_branch.title }}
-                {% else %}
+                </td>
+            {% else %}
+                <td width="10%"></td>
+                <td>
+                    <a href="{% url 'learning_unit' group.child_leaf.pk %}"
+                       id="lnk_learning_unit_{{ group.pk }}">{{ group.child_leaf.acronym }}</a>
+                </td>
+                <td width="30%">
                     {{ group.child_leaf.complete_title }}
-                {% endif %}
-            </td>
+                </td>
+            {% endif %}
             <td width="12%">{{ group.relative_credits | default_if_none:'-' }}
                 /{{ group.child.credits|floatformat:-2 | default_if_none:'-' }}</td>
             <td width="6%">{{ group.is_mandatory | yesno }}</td>
             <td width="6%">{{ group.block | default_if_none:'-' }}</td>
             <td width="14%">{{ group.get_link_type_display|default_if_none:'-' }}</td>
-            <td width="20%">
+            <td width="10%">
                 {% include "education_group/blocks/content_actions.html" %}
             </td>
         </tr>

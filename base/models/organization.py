@@ -34,6 +34,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 class OrganizationAdmin(SerializableModelAdmin):
     list_display = ('name', 'acronym', 'type', 'changed', 'logo_tag')
     search_fields = ['acronym', 'name']
+    list_filter = ['type']
 
 
 class Organization(SerializableModel):

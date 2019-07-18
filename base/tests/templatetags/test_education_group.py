@@ -30,11 +30,12 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, pgettext
+from waffle.testutils import override_switch
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
-from base.templatetags.education_group import li_with_deletion_perm, button_with_permission, \
-    button_order_with_permission, BUTTON_ORDER_TEMPLATE, li_with_create_perm_training, \
+from base.templatetags.education_group import li_with_deletion_perm, \
+    button_order_with_permission, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
@@ -92,21 +93,10 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             }
         )
 
-    def test_button_with_permission(self):
-        result = button_with_permission(self.context, "title", "edit", "#")
-        self.assertDictEqual(
-            result, {
-                'title': 'title',
-                'class_button': 'btn-default btn-sm ',
-                'load_modal': True,
-                'url': '#',
-                'icon': 'fa-edit'
-            }
-        )
-
     def test_button_order_with_permission(self):
         result = button_order_with_permission(self.context, "title", "id", "edit")
-        self.assertEqual(result, BUTTON_ORDER_TEMPLATE.format("title", "id", "edit", "", "fa-edit"))
+        self.assertEqual(result, {"title": "title", "id": "id", "value": "edit", 'disabled': "",
+                                  'icon': "glyphicon glyphicon-edit"})
 
     def test_li_with_create_perm_training(self):
         relation = AuthorizedRelationshipFactory(parent_type=self.education_group_year.education_group_type)
@@ -266,6 +256,7 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
         self.maxDiff = None
         self.assertHTMLEqual(result, expected_result)
 
+    @override_switch('education_group_year_generate_pdf', active=True)
     def test_tag_link_pdf_content_education_group_not_permitted(self):
         result = link_pdf_content_education_group(self.context)
         expected_result = CUSTOM_LI_TEMPLATE.format(
@@ -289,6 +280,28 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'title': 'Générer le pdf',
                 'id_li': 'btn_operation_pdf_content',
                 'load_modal': True
+            }
+        )
+
+    @override_switch('education_group_year_generate_pdf', active=False)
+    def test_tag_link_pdf_content_education_group_not_permitted_with_sample_deactivated(self):
+        result = link_pdf_content_education_group(self.context)
+        expected_result = CUSTOM_LI_TEMPLATE.format(
+            li_attributes=""" id="btn_operation_pdf_content" """,
+            a_attributes=""" href="#" title="{}" {} """.format(
+                _("Generate pdf"),
+                "", ),
+            text=_('Generate pdf'),
+        )
+        self.assertEqual(
+            result,
+            {
+                'url': '#',
+                'text': 'Générer le pdf',
+                'class_li': 'disabled',
+                'title': 'Générer le PDF n\'est pas disponible. Veuillez utiliser EPC.',
+                'id_li': 'btn_operation_pdf_content',
+                'load_modal': False
             }
         )
 
@@ -335,35 +348,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             "education_group_year": self.education_group_year,
             "request": RequestFactory().get("")
         }
-
-    def test_button_tag_case_not_in_education_group_edition_period(self):
-        """ This test ensure that as faculty manager, the button tag is disabled when outside of encoding period"""
-        self.academic_calendar.delete()
-
-        result = button_with_permission(self.context, "title", "edit", "#")
-        self.assertDictEqual(
-            result,
-            {
-                'class_button': 'btn-default btn-sm disabled',
-                'load_modal': False,
-                'url': '#',
-                'title': _("The education group edition period is not open."),
-                'icon': 'fa-edit'
-            }
-        )
-
-    def test_button_tag_case_inside_education_group_edition_period(self):
-        result = button_with_permission(self.context, "title", "edit", "#")
-        self.assertDictEqual(
-            result,
-            {
-                'title': 'title',
-                'class_button': 'btn-default btn-sm ',
-                'load_modal': True,
-                'url': '#',
-                'icon': 'fa-edit'
-            }
-        )
 
     def test_li_tag_case_not_in_education_group_edition_period(self):
         """ This test ensure that as faculty manager, the li tag is disabled when outside of encoding period"""

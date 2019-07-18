@@ -83,7 +83,7 @@ class TestLearningUnitProposalCancel(TestCase):
                                                    end_date=today.replace(year=today.year + 1))
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
-            acronym="TP",
+            acronym="PM",
             learning_unit_year=self.learning_unit_year
         )
         self.learning_component_year_practical = LearningComponentYearFactory(

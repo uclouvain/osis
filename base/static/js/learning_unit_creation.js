@@ -198,7 +198,8 @@ $(document).ready(function() {
         return window.valid_acronym;
     });
 
-    $("button[name='learning_unit_year_add']").click(function() {
+    $("button[name='learning_unit_year_add']").click(function(event) {
+        event.preventDefault();
         if(window.acronym_already_used){
             $form = $("#LearningUnitYearForm");
             $form.validate();

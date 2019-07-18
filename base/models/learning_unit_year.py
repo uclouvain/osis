@@ -313,7 +313,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             .order_by('academic_year__year')
 
     def is_past(self):
-        return self.academic_year.is_past()
+        return self.academic_year.is_past
 
     # FIXME move this method to business/perm file
     def can_update_by_faculty_manager(self):
@@ -377,7 +377,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         children = self.get_partims_related()
         return [_('The credits value of the partim %(acronym)s is greater or equal than the credits value of the '
                   'parent learning unit.') % {'acronym': child.acronym}
-                for child in children if child.credits and child.credits >= self.credits]
+                for child in children if child.credits and child.credits >= (self.credits or 0)]
 
     def _check_internship_subtype(self):
         warnings = []

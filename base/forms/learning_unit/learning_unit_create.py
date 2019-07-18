@@ -48,7 +48,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
-from osis_common.forms.widgets import FloatFormatInput
+from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import find_all_languages
 
@@ -135,7 +135,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
             }
         }
         widgets = {
-            'credits': FloatFormatInput(render_value=True),
+            'credits': DecimalFormatInput(render_value=True),
         }
 
     def __clean_acronym_external(self):
@@ -214,7 +214,6 @@ class CountryEntityField(forms.ChoiceField):
 
 
 class LearningContainerYearModelForm(forms.ModelForm):
-
     # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
     requirement_entity = EntitiesVersionChoiceField(
         widget=autocomplete.ModelSelect2(
@@ -231,7 +230,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
             },
             forward=['country_requirement_entity']
         ),
-        queryset=find_additional_requirement_entities_choices(),
+        queryset=find_pedagogical_entities_version(),
         label=_('Requirement entity')
     )
 
@@ -262,6 +261,18 @@ class LearningContainerYearModelForm(forms.ModelForm):
                 'onchange': (
                     'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
                     'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", false);'
+                    'updateAdditionalEntityEditability(this.value, '
+                    '"id_component-0-repartition_volume_additional_entity_1",'
+                    ' false);'
+                    'updateAdditionalEntityEditability(this.value, '
+                    '"id_component-1-repartition_volume_additional_entity_1",'
+                    ' false);'
+                    'updateAdditionalEntityEditability(this.value,'
+                    ' "id_component-0-repartition_volume_additional_entity_2",'
+                    ' true);'
+                    'updateAdditionalEntityEditability(this.value,'
+                    ' "id_component-1-repartition_volume_additional_entity_2",'
+                    ' true);'
                 ),
             },
             forward=['country_additional_entity_1']
@@ -282,8 +293,10 @@ class LearningContainerYearModelForm(forms.ModelForm):
                 'id': 'id_additional_requirement_entity_2',
                 'data-html': True,
                 'onchange': (
-                    'updateAdditionalEntityEditability(this.value, "id_additional_requirement_entity_2", false);'
-                    'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", false);'
+                    'updateAdditionalEntityEditability(this.value,'
+                    ' "id_component-0-repartition_volume_additional_entity_2", false);'
+                    'updateAdditionalEntityEditability(this.value,'
+                    ' "id_component-1-repartition_volume_additional_entity_2", false);'
                 ),
             },
             forward=['country_additional_entity_2']

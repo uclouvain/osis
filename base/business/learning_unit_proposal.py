@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import functools
+from decimal import Decimal
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -76,8 +77,8 @@ INITIAL_DATA_FIELDS = {
         "attribution_procedure",
     ],
     'learning_component_year': [
-        "id", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2", "planned_classes",
-        "type", "repartition_volume_requirement_entity", "repartition_volume_additional_entity_1",
+        "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
+        "planned_classes", "type", "repartition_volume_requirement_entity", "repartition_volume_additional_entity_1",
         "repartition_volume_additional_entity_2"
     ],
 }
@@ -291,7 +292,7 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
 def _apply_action_on_proposals(proposals, action_method, author, permission_check):
     proposals_with_results = []
     for proposal in proposals:
-        proposal_with_result = (proposal, {ERROR: ["User %(person)s do not have rights on this proposal." % {
+        proposal_with_result = (proposal, {ERROR: [_("User %(person)s do not have rights on this proposal.") % {
             "person": str(author)
         }]})
         if permission_check(proposal, author):
@@ -395,7 +396,7 @@ def copy_learning_unit_data(learning_unit_year):
 
     learning_unit_year_values = _get_attributes_values(learning_unit_year,
                                                        INITIAL_DATA_FIELDS['learning_unit_year'])
-    learning_unit_year_values["credits"] = float(learning_unit_year.credits) if learning_unit_year.credits else None
+    learning_unit_year_values["credits"] = learning_unit_year.credits if learning_unit_year.credits else None
 
     return {
         "learning_container_year": _get_attributes_values(learning_container_year,
@@ -425,10 +426,6 @@ def get_entity_by_type(entity_type, entities_by_type):
         return None
 
 
-def convert_volume_to_float(data, key):
-    return {key: float(data.get(key))} if key in data and data.get(key) else {key: None}
-
-
 def update_or_create_learning_unit_component(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
         if attribute_name != "id":
@@ -451,12 +448,6 @@ def get_components_initial_data(learning_unit_year):
     component_values_list = []
     for component in components:
         data = _get_attributes_values(component, INITIAL_DATA_FIELDS['learning_component_year'])
-        data.update(convert_volume_to_float(data, 'hourly_volume_total_annual'))
-        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q1'))
-        data.update(convert_volume_to_float(data, 'hourly_volume_partial_q2'))
-        data.update(convert_volume_to_float(data, 'repartition_volume_requirement_entity'))
-        data.update(convert_volume_to_float(data, 'repartition_volume_additional_entity_1'))
-        data.update(convert_volume_to_float(data, 'repartition_volume_additional_entity_2'))
         component_values_list.append(data)
     return component_values_list
 
@@ -472,11 +463,10 @@ def get_components_identification_initial_data(proposal):
                     'learning_component_year': learning_component_year,
                     'volumes': volume_from_initial_learning_component_year(
                         learning_component_year,
-                        proposal.initial_data.get('volumes')[learning_component_year['type']]
+                        proposal.initial_data.get('volumes')[learning_component_year['acronym']]
                     )
                 }
             )
-
         return compose_components_dict(components, additional_entities)
     return None
 
@@ -511,6 +501,8 @@ def _get_name_attribute(obj):
 def _get_model_differences(actual_data, differences_param, initial_data_by_model, model):
     differences = differences_param
     for column_name, value in initial_data_by_model.items():
+        if value is not None and column_name == 'credits':
+            value = Decimal(value)
         if not (value is None and actual_data[model][column_name] == '') and value != actual_data[model][column_name]:
             differences[column_name] = _get_the_old_value(column_name, actual_data[model], initial_data_by_model)
     return differences
@@ -526,6 +518,6 @@ def _get_volumes_for_initial(learning_unit_year):
 
     volumes_for_initial = {}
     for component_key, volume_data in volumes.items():
-        volumes_for_initial[component_key.type] = volume_data
+        volumes_for_initial[component_key.acronym] = volume_data
 
     return volumes_for_initial

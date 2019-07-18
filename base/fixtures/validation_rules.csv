@@ -107,15 +107,15 @@ Examples: <i>ALLE LV, JAPO LV, FRAN LV</i>","Sigle d’un Cours de langue est co
 <li>2-4 lettres + espace + <b>LV</b></li>
 </ul>
 Exemples: <i>ALLE LV, JAPO LV, FRAN LV</i>",Ex: FRAN LV
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})[ ]([Ii])([Ss])$",,"Acronym of Isolated class is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})[ ](([Ii][Ss])|([Ii][Ss]\/([A-Za-z]{1,2}))|([Ii][Nn]))$",,"Acronym of Isolated class is composed of:
 <ul>
-<li>2-4 letters + space + <b>IS</b></li>
+<li>2-4 letters </li> <li>space</li> <li> <b>IS</b> <u>OR</u> <b>IS/</b> + letters <u>OR</u> <b>IN</b></li>
 </ul>
-Examples: <i>ACTU IS, CFAR IS, COMU IS</i>","Sigle d’un Cours isolés est composé de:
+Examples: <i>ACTU IS, SC IS/G, SC IN</i>","Sigle d’un Cours isolés est composé de:
 <ul>
-<li>2-4 lettres + espace + <b>IS</b></li>
+<li>2-4 lettres </li> <li> espace </li> <li> <b>IS</b> <u>OU</u> <b>IS/</b> + lettres <u>OU</u> <b>IN</b></li>
 </ul>
-Exemples: <i>ACTU IS, CFAR IS, COMU IS</i>",Ex: ACTU IS
+Exemples: <i>ACTU IS, SC IS/G, SC IN</i>","Ex: ACTU IS,SC IS/G,SC IN"
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)([Dd])([Pp])$",,"Acronym of PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3DP</b></li>
@@ -170,13 +170,13 @@ Examples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>","Sigle d’un Master en 120 crédits 
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
 Exemples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>",Ex: BBMC2MD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.*)$",,"Acronym of Master MS 120 is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 120 is composed of:
 <ul>
-<li>2-4 letters + <b>2MS/</b> + letters</li>
+<li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
 </ul>
 Examples: <i>ACTU2MS/SA, BBMC2MS/BT, FYAP2MS/G</i>","Sigle d’un Master en 120 crédits à finalité spécialisée est composé de:
 <ul>
-<li>2-4 lettres + <b>2MS/</b> + lettres</li>
+<li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
 Exemples: <i>ACTU2MS/SA,BBMC2MS/BT, FYAP2MS/G</i>",Ex: BBMC2MS/BT
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M180,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 180-240 is composed of:
@@ -206,13 +206,13 @@ Examples: <i>MED2MD</i>","Sigle d’un Master en 180-240 crédits à finalité d
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
 Exemples: <i>MED2MD</i>",Ex: MED2MD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS180,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.*)$",,"Acronym of Master MS 180-240 is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2MS180,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"Acronym of Master MS 180-240 is composed of:
 <ul>
-<li>2-4 letters + <b>2MS/</b> + letters</li>
+<li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
 </ul>
 Examples: <i>MED2MS/G, MED2MS/SG</i>","Sigle d’un Master en 180-240 crédits à finalité spécialisée est composé de:
 <ul>
-<li>2-4 lettres + <b>2MS/</b> + lettres</li>
+<li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
 Exemples: <i>MED2MS/G, MED2MS/SG</i>",Ex: MED2MS/G
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M1,REQUIRED,2M1,"^([A-Za-z]{2,4})(2)([Mm])(1)$",,"Acronym of Master 60 is composed of:
@@ -659,7 +659,7 @@ base.validationrule,base_educationgroupyear.title.osis.education_group_type_1FC,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2FC,REQUIRED,Certificat,^(Certificat)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_CA,REQUIRED,Préparation concours d'accès,^(Préparation concours d'accès)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_LV,REQUIRED,Langue,^(.*)(Langue)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_IS,REQUIRED,Cours isolé(s),^(Cours isolé\(s\))(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_IS,REQUIRED,Cours isolé(s),,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_3DP,REQUIRED,Doctorat en,^(Doctorat en)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_3FP,REQUIRED,Formation doctorale en,^(Formation doctorale en)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_JY,REQUIRED,Baccalauréat par affiliation,^(Baccalauréat par affiliation)(.*)$,,,,

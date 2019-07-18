@@ -23,20 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
 
 from base.business.group_element_years.detach import DetachEducationGroupYearStrategy, DetachLearningUnitYearStrategy
-from base.models.exceptions import AuthorizedRelationshipNotRespectedException
-from base.views.common import display_error_messages, display_success_messages
+from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
-    # DeleteView
     template_name = "education_group/group_element_year/confirm_detach_inner.html"
 
     rules = [group_element_year_perms.can_detach_group_element_year]
@@ -44,42 +42,35 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())
 
+    @cached_property
+    def strategy(self):
+        obj = self.get_object()
+        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+        return strategy_class(obj)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self._check_if_deletable(self.object):
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
-                "acronym": self.object.child.acronym
+        msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
+        if hasattr(self.object.child, 'partial_acronym'):
+            msg = "%(partial_acronym)s - %(acronym)s" % {
+                "acronym": msg,
+                "partial_acronym": self.object.child.partial_acronym
             }
 
+        if self.strategy.is_valid():
+            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
+                "acronym": msg
+            }
+            display_warning_messages(self.request, self.strategy.warnings)
+        else:
+            display_error_messages(self.request, self.strategy.errors)
         return context
-
-    def _check_if_deletable(self, obj):
-        """
-        The use cannot delete the object if :
-            - the child has or is prerequisite
-            - the minimum of children is reached
-            - try to remove option (2m) which are present in one of its finality
-
-        In that case, a message will be display in the modal to block the post action.
-        """
-        error_msg = None
-        try:
-            strategy = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
-            strategy(obj).is_valid()
-        except AuthorizedRelationshipNotRespectedException as e:
-            error_msg = e.errors
-        except ValidationError as e:
-            error_msg = e.messages
-
-        if error_msg:
-            display_error_messages(self.request, error_msg)
-            return False
-        return True
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
-        if not self._check_if_deletable(obj):
+        if not self.strategy.is_valid():
             return JsonResponse({"error": True})
+        self.strategy.post_valid()
 
         success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
             'child': obj.child,

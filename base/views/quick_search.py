@@ -29,7 +29,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.views.generic import ListView
 
-from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
@@ -78,7 +78,7 @@ class QuickSearchGenericView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemp
 
         context['form'] = QuickSearchForm(
             initial={
-                'academic_year': self.request.GET.get('academic_year', current_academic_year()),
+                'academic_year': self.request.GET.get('academic_year', starting_academic_year()),
                 'search_text': self.request.GET.get('search_text', ''),
             }
         )

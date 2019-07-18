@@ -95,6 +95,26 @@ class TestBuildTree(TestCase):
             ) + "?group_to_parent={}".format(self.group_element_year_2_1.pk)
         )
 
+    def test_tree_get_url(self):
+        test_cases = [
+            {'name': 'with tab',
+             'node': EducationGroupHierarchy(self.parent, tab_to_show='show_identification'),
+             'correct_url': reverse('education_group_read', args=[self.parent.pk, self.parent.pk]) +
+             "?group_to_parent=0&tab_to_show=show_identification"},
+            {'name': 'without tab',
+             'node': EducationGroupHierarchy(self.parent),
+             'correct_url': reverse('education_group_read',
+                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
+            {'name': 'with wrong tab',
+             'node': EducationGroupHierarchy(self.parent, tab_to_show='not_existing'),
+             'correct_url': reverse('education_group_read',
+                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
+        ]
+
+        for case in test_cases:
+            with self.subTest(type=case['name']):
+                self.assertEqual(case['correct_url'], case['node'].get_url())
+
     def test_tree_luy_has_prerequisite(self):
         # self.learning_unit_year_1 has prerequisite
         PrerequisiteItemFactory(
@@ -183,26 +203,6 @@ class TestBuildTree(TestCase):
         ])
         self.assertEqual(json['children'][0]['a_attr']['detach_url'], expected_detach_url)
 
-    def test_tree_to_json_ids(self):
-        node = EducationGroupHierarchy(self.parent)
-        json = node.to_json()
-
-        self.assertEquals(
-            json['children'][1]['id'],
-            "id_{}_{}".format(
-                node.children[1].education_group_year.pk,
-                node.children[1].group_element_year.pk if node.children[1].group_element_year else '#'
-            )
-        )
-
-        self.assertEquals(
-            json['children'][1]['children'][0]['id'],
-            "id_{}_{}".format(
-                node.children[1].children[0].learning_unit_year.pk,
-                node.children[1].children[0].group_element_year.pk if node.children[1].group_element_year else '#'
-            )
-        )
-
     def test_build_tree_reference(self):
         """
         This tree contains a reference link.
@@ -212,7 +212,7 @@ class TestBuildTree(TestCase):
 
         node = EducationGroupHierarchy(self.parent)
 
-        self.assertEqual(node.children[0]._get_icon(),  static('img/reference.jpg'))
+        self.assertEqual(node.children[0]._get_icon(), static('img/reference.jpg'))
 
         list_children = node.to_list()
         self.assertEqual(list_children, [

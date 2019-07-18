@@ -56,10 +56,10 @@ class ReuseOldLearningUnitYearWarning(CopyWarning):
     def __str__(self):
         return _("Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
                  "Learning unit is postponed with academic year of %(learning_unit_academic_year)s.") % {
-            "learning_unit_year": self.learning_unit_year.acronym,
-            "academic_year": self.academic_year,
-            "learning_unit_academic_year": self.learning_unit_year.academic_year
-        }
+                   "learning_unit_year": self.learning_unit_year.acronym,
+                   "academic_year": self.academic_year,
+                   "learning_unit_academic_year": self.learning_unit_year.academic_year
+               }
 
 
 class PrerequisiteItemWarning(CopyWarning):
@@ -73,10 +73,10 @@ class PrerequisiteItemWarning(CopyWarning):
                  "%(education_group_year_root)s "
                  "=> the prerequisite for %(learning_unit_year)s "
                  "having %(prerequisite_item)s as prerequisite is not copied.") % {
-            "education_group_year_root": _display_education_group_year(self.egy),
-            "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
-            "prerequisite_item": self.item.learning_unit.acronym
-        }
+                   "education_group_year_root": _display_education_group_year(self.egy),
+                   "learning_unit_year": self.prerequisite.learning_unit_year.acronym,
+                   "prerequisite_item": self.item.learning_unit.acronym
+               }
 
 
 class PrerequisiteWarning(CopyWarning):
@@ -88,9 +88,9 @@ class PrerequisiteWarning(CopyWarning):
         return _("%(learning_unit_year)s is not anymore contained in "
                  "%(education_group_year_root)s "
                  "=> the prerequisite for %(learning_unit_year)s is not copied.") % {
-            "education_group_year_root": _display_education_group_year(self.egy),
-            "learning_unit_year": self.luy.acronym,
-        }
+                   "education_group_year_root": _display_education_group_year(self.egy),
+                   "learning_unit_year": self.luy.acronym,
+               }
 
 
 class EducationGroupYearNotEmptyWarning(CopyWarning):
@@ -101,9 +101,9 @@ class EducationGroupYearNotEmptyWarning(CopyWarning):
     def __str__(self):
         return _("%(education_group_year)s has already been copied in %(academic_year)s in another program. "
                  "It may have been already modified.") % {
-                    "education_group_year": _display_education_group_year(self.education_group_year),
-                    "academic_year": self.academic_year
-                }
+                   "education_group_year": _display_education_group_year(self.education_group_year),
+                   "academic_year": self.academic_year
+               }
 
 
 class ReferenceLinkEmptyWarning(CopyWarning):
@@ -112,8 +112,8 @@ class ReferenceLinkEmptyWarning(CopyWarning):
 
     def __str__(self):
         return _("%(education_group_year)s (reference link) has not been copied. Its content is empty.") % {
-                    "education_group_year": _display_education_group_year(self.education_group_year)
-                }
+            "education_group_year": _display_education_group_year(self.education_group_year)
+        }
 
 
 class EducationGroupEndYearWarning(CopyWarning):
@@ -142,11 +142,11 @@ class FinalityOptionNotValidWarning(CopyWarning):
         return _("The option %(education_group_year_option)s is not anymore accessible in "
                  "%(education_group_year_root)s "
                  "in %(academic_year)s => It is retired of the finality %(education_group_year_finality)s.") % {
-            "education_group_year_option": _display_education_group_year(self.education_group_year_option),
-            "education_group_year_root": _display_education_group_year(self.education_group_year_root),
-            "education_group_year_finality": _display_education_group_year(self.education_group_year_finality),
-            "academic_year": self.academic_year
-        }
+                   "education_group_year_option": _display_education_group_year(self.education_group_year_option),
+                   "education_group_year_root": _display_education_group_year(self.education_group_year_root),
+                   "education_group_year_finality": _display_education_group_year(self.education_group_year_finality),
+                   "academic_year": self.academic_year
+               }
 
 
 class NotPostponeError(Error):
@@ -186,7 +186,7 @@ class PostponeContent:
     def check_instance(self):
         if self.instance.academic_year.year < self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
-        if self.instance.academic_year.year-1 > self.current_year.year:
+        if self.instance.academic_year.year - 1 > self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         end_year = self.instance.education_group.end_year
@@ -358,7 +358,7 @@ class PostponeContent:
         First we have to check the progeny of the education group (! recursive search )
         After verify if all nodes have an authorized relationship with a min count to 1 or a learning unit.
         """
-        for gr in education_group_year.groupelementyear_set.all():
+        for gr in education_group_year.groupelementyear_set.all().select_related('child_branch__education_group_type'):
             if gr.child_leaf:
                 return True
 

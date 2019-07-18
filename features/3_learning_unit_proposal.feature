@@ -88,12 +88,14 @@ Feature: Propositions d’UE
 
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Mettre en proposition de modification »
-    And Encoder 4 comme Crédits
+
+    When Encoder 4 comme Crédits
     And Encoder bisannuelle paire comme Périodicité
     And Encoder DRT4321 comme Dossier
     Then Vérifier que la zone Etat est bien grisée
     And Vérifier que la zone Type est bien grisée
-    And Cliquer sur le bouton « Enregistrer »
+
+    When Cliquer sur le bouton « Enregistrer »
     Then Vérifier que une proposition de Modification a été faite pour l'unité d'enseignement LDROI1006
     And Vérifier que le champ Crédits est bien 4
     And Vérifier que la Périodicité est bien bisannuelle paire
@@ -174,11 +176,12 @@ Feature: Propositions d’UE
   Scenario Outline: 28 : En tant que gestionnaire central, je dois pouvoir consolider une proposition.
     Given L'ue LDROI1234 en 2019-20 et liée à DRT est en proposition de création
     Given L'ue LDROI1006 en 2019-20 et liée à DRT est en proposition de modification
-    Given L'ue LDROI1007 en 2019-20 et liée à DRT est en proposition de suppression
-    Given S’assurer que la date de fin de LDROI1007 est 2020-21.
+    Given L'ue LSINF1121 en 2019-20 et liée à EPL est en proposition de suppression
+    Given S’assurer que la date de fin de LSINF1121 est 2020-21.
 
     Given L’utilisateur est dans le groupe central manager
     And L’utilisateur est attaché à l’entité DRT
+    And L’utilisateur est attaché à l’entité EPL
     And Aller sur la page de detail de l'ue: <acronym> en <year>
     When Cliquer sur le menu « Actions »
     And Cliquer sur « Editer la proposition »
@@ -211,4 +214,4 @@ Feature: Propositions d’UE
       | acronym   | year    | proposal_type |
       | LDROI1234 | 2019-20 | Création      |
       | LDROI1006 | 2019-20 | Modification  |
-      | LDROI1007 | 2019-20 | Suppression   |
+      | LSINF1121 | 2019-20 | Suppression   |

@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
 from copy import deepcopy
 from datetime import timedelta
+from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
+from base.enums.component_detail import COMPONENT_DETAILS
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
@@ -44,8 +46,6 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from reference.tests.factories.language import LanguageFactory
-from base.enums.component_detail import COMPONENT_DETAILS
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1
 
 
 class LearningUnitEditionTestCase(TestCase):
@@ -72,15 +72,15 @@ class LearningUnitEditionTestCase(TestCase):
             self.learning_unit_year,
             entity_container_year_link_type.REQUIREMENT_ENTITY,
             self.entity_version.entity,
-            repartition_lecturing=30,
-            repartition_practical_exercises=10
+            repartition_lecturing=Decimal(30),
+            repartition_practical_exercises=Decimal(10)
         )
         self.add_requirement_entity_1 = _create_entity_container_with_components(
             self.learning_unit_year,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
             self.entity_version.entity,
-            repartition_lecturing=10,
-            repartition_practical_exercises=5
+            repartition_lecturing=Decimal(10),
+            repartition_practical_exercises=Decimal(5)
         )
 
     def test_check_postponement_conflict_learning_unit_year_no_differences(self):
@@ -272,7 +272,6 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIn(error_entity_not_exist, error_list)
 
     def test_check_postponement_conflict_entity_container_year_differences_found(self):
-
         # Copy the same container and entities + change academic year
         another_learning_container_year = _build_copy(self.learning_container_year)
         another_learning_container_year.academic_year = self.next_academic_year
@@ -364,16 +363,16 @@ class LearningUnitEditionTestCase(TestCase):
         LearningComponentYear.objects.filter(
             learning_unit_year=self.learning_unit_year
         ).update(
-            hourly_volume_total_annual=60,
-            hourly_volume_partial_q1=40,
-            hourly_volume_partial_q2=20
+            hourly_volume_total_annual=Decimal(60),
+            hourly_volume_partial_q1=Decimal(40),
+            hourly_volume_partial_q2=Decimal(20)
         )
         LearningComponentYear.objects.filter(
             learning_unit_year=another_learning_unit_year
         ).update(
-            hourly_volume_total_annual=50,
-            hourly_volume_partial_q1=35,
-            hourly_volume_partial_q2=15
+            hourly_volume_total_annual=Decimal(50),
+            hourly_volume_partial_q1=Decimal(35),
+            hourly_volume_partial_q2=Decimal(15)
         )
         another_learning_unit_year.save()
 
@@ -383,13 +382,13 @@ class LearningUnitEditionTestCase(TestCase):
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.REQUIREMENT_ENTITY,
                                                  self.requirement_entity,
-                                                 repartition_lecturing=30,
-                                                 repartition_practical_exercises=10)
+                                                 repartition_lecturing=Decimal(30),
+                                                 repartition_practical_exercises=Decimal(10))
         _create_entity_container_with_components(another_learning_unit_year,
                                                  entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
                                                  self.add_requirement_entity_1,
-                                                 repartition_lecturing=20,
-                                                 repartition_practical_exercises=10)
+                                                 repartition_lecturing=Decimal(20),
+                                                 repartition_practical_exercises=Decimal(10))
 
         error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
                                                                               another_learning_container_year)
@@ -397,10 +396,10 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertEqual(len(error_list), 10)
 
         tests_cases = [
-            {'field': VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 'value': 10.0, 'next_value': 20.0},
-            {'field': VOLUME_TOTAL, 'value': 60.0, 'next_value': 50.0},
-            {'field': VOLUME_Q1, 'value': 40.0, 'next_value': 35.0},
-            {'field': VOLUME_Q2, 'value': 20.0, 'next_value': 15.0}
+            {'field': VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 'value': Decimal(10), 'next_value': Decimal(20)},
+            {'field': VOLUME_TOTAL, 'value': Decimal(60), 'next_value': Decimal(50)},
+            {'field': VOLUME_Q1, 'value': Decimal(40), 'next_value': Decimal(35)},
+            {'field': VOLUME_Q2, 'value': Decimal(20), 'next_value': Decimal(15)}
         ]
         for test in tests_cases:
             with self.subTest(test=test):

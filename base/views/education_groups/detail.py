@@ -32,7 +32,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When, Prefetch
+from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -44,14 +44,14 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base import models as mdl
-from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
+from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -62,10 +62,9 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.group_element_year import find_learning_unit_formations
+from base.models.group_element_year import find_learning_unit_formations, GroupElementYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
-from base.models.person import Person
 from base.models.program_manager import ProgramManager
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
@@ -102,39 +101,39 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     with_tree = True
 
-    def get_person(self):
-        return get_object_or_404(Person.objects.select_related('user'), user=self.request.user)
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'education_group_type', 'enrollment_campus__organization', 'main_teaching_campus__organization'
+        ).prefetch_related(
+            Prefetch(
+                'education_group__educationgroupyear_set',
+                queryset=EducationGroupYear.objects.select_related('management_entity', 'academic_year'),
+            ),
+        )
 
-    def get_root(self):
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    @cached_property
+    def root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
+
+    @cached_property
+    def starting_academic_year(self):
+        return starting_academic_year()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         # This objects are mandatory for all education group views
-        context['person'] = self.get_person()
+        context['person'] = self.person
 
-        self.root = self.get_root()
         # FIXME same param
         context['root'] = self.root
         context['root_id'] = self.root.pk
         context['parent'] = self.root
         context['parent_training'] = self.object.parent_by_training()
-
-        if self.with_tree:
-            context['tree'] = json.dumps(EducationGroupHierarchy(self.root).to_json())
-
-        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
-            person=self.get_person(),
-            education_group=context['object'],
-        )
-        context['can_change_coorganization'] = perms.is_eligible_to_change_coorganization(
-            person=self.get_person(),
-            education_group=context['object'],
-        )
-        context['enums'] = mdl.enums.education_group_categories
-
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
         context["show_general_information"] = self.show_general_information()
@@ -143,11 +142,28 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context["show_content"] = self.show_content()
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
+        if self.with_tree:
+            context['tree'] = json.dumps(EducationGroupHierarchy(
+                self.root, tab_to_show=self.request.GET.get('tab_to_show')).to_json())
+        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
+            person=self.person,
+            education_group=context['object'],
+        )
+        context['can_change_coorganization'] = perms.is_eligible_to_change_coorganization(
+            person=self.person,
+            education_group=context['object'],
+        )
+        context['enums'] = mdl.enums.education_group_categories
+        context['current_academic_year'] = self.starting_academic_year
         return context
 
     def get(self, request, *args, **kwargs):
-        if self.limited_by_category:
-            assert_category_of_education_group_year(self.get_object(), self.limited_by_category)
+        default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+        if self.request.GET.get('group_to_parent'):
+            default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
+        if self.limited_by_category and self.get_object().education_group_type.category not in self.limited_by_category:
+            return HttpResponseRedirect(default_url)
         return super().get(request, *args, **kwargs)
 
     def show_identification(self):
@@ -188,7 +204,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
-               current_academic_year().year + 2
+               self.starting_academic_year.year + 2
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
@@ -356,7 +372,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         ).select_related("text_label") if common_edy else None
 
         labels = TranslatedTextLabel.objects.filter(
-            text_label__label__in=sections_to_display['common']+sections_to_display['specific'],
+            text_label__label__in=sections_to_display['common'] + sections_to_display['specific'],
             text_label__entity=entity_name.OFFER_YEAR,
             language=user_language
         ).select_related("text_label")
@@ -479,24 +495,18 @@ def get_dates(an_academic_calendar_type, an_education_group_year):
 class EducationGroupContent(EducationGroupGenericDetailView):
     template_name = "education_group/tab_content.html"
 
+    def get_queryset(self):
+        prefetch = Prefetch(
+            'groupelementyear_set',
+            queryset=GroupElementYear.objects.select_related(
+                'child_leaf__learning_container_year',
+                'child_branch'
+            )
+        )
+        return super().get_queryset().prefetch_related(prefetch)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context["group_element_years"] = self.object.groupelementyear_set.annotate(
-            acronym=Case(
-                When(child_leaf__isnull=False, then=F("child_leaf__acronym")),
-                When(child_branch__isnull=False, then=F("child_branch__acronym")),
-            ),
-            code=Case(
-                When(child_branch__isnull=False, then=F("child_branch__partial_acronym")),
-                default=None
-            ),
-            child_id=Case(
-                When(child_leaf__isnull=False, then=F("child_leaf__id")),
-                When(child_branch__isnull=False, then=F("child_branch__id")),
-            ),
-        ).order_by('order')
-
         context['show_minor_major_option_table'] = self.object.is_minor_major_option_list_choice
         return context
 

@@ -79,7 +79,7 @@ class TestComparisonXls(TestCase):
             data[0][5],
             str(_(learning_unit_yr.get_internship_subtype_display())) if learning_unit_yr.internship_subtype else ''
         )
-        self.assertEqual(data[0][6], learning_unit_yr.credits)
+        self.assertEqual(data[0][6], str(learning_unit_yr.credits))
         self.assertEqual(data[0][7], learning_unit_yr.language.name if learning_unit_yr.language else '')
         self.assertEqual(data[0][8],
                          str(_(learning_unit_yr.get_periodicity_display())) if learning_unit_yr.periodicity else '')
@@ -175,7 +175,7 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[6],
                          str(_(
                              self.learning_unit_year_1.get_internship_subtype_display())) if self.learning_unit_year_1.internship_subtype else '')
-        self.assertEqual(data[7], self.learning_unit_year_1.credits)
+        self.assertEqual(data[7], str(self.learning_unit_year_1.credits))
         self.assertEqual(data[8], self.learning_unit_year_1.language.name if self.learning_unit_year_1.language else '')
         self.assertEqual(data[9],
                          str(_(self.learning_unit_year_1.get_periodicity_display())) if self.learning_unit_year_1.periodicity else '')
@@ -205,15 +205,15 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display())
 
         self.assertEqual(data[29], DEFAULT_ACRONYM_COMPONENT.get(lecturing_component.type))
-        self.assertEqual(data[30], float(lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0)
-        self.assertEqual(data[31], float(lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0)
-        self.assertEqual(data[32], float(lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0)
+        self.assertEqual(data[30], lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0
+        self.assertEqual(data[31], lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0
+        self.assertEqual(data[32], lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0
         self.assertEqual(data[33], lecturing_component.real_classes)
         self.assertEqual(data[34], lecturing_component.planned_classes)
         self.assertEqual(data[39], DEFAULT_ACRONYM_COMPONENT.get(practical_component.type))
-        self.assertEqual(data[40], float(practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0)
-        self.assertEqual(data[41], float(practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0)
-        self.assertEqual(data[42], float(practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0)
+        self.assertEqual(data[40], practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0
+        self.assertEqual(data[41], practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0
+        self.assertEqual(data[42], practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0
         self.assertEqual(data[43], practical_component.real_classes)
         self.assertEqual(data[44], practical_component.planned_classes)
 

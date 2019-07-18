@@ -39,7 +39,7 @@ from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm, CertificateAimsForm
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
@@ -47,6 +47,7 @@ from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
+from base.views.education_groups.perms import can_change_education_group
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
@@ -60,8 +61,11 @@ def update_education_group(request, root_id, education_group_year_id):
     education_group_year.root = root_id
 
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
-            education_group_year.academic_year.year < current_academic_year().year:
+            education_group_year.academic_year.year < starting_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
+
+    # Proctect the view
+    can_change_education_group(request.user, education_group_year)
     return update_education_group_year(request, root_id, education_group_year)
 
 
@@ -243,7 +247,7 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
 
     def post(self, request, **kwargs):
         try:
-            postponer = PostponeContent(self.get_root().previous_year())
+            postponer = PostponeContent(self.root.previous_year())
             postponer.postpone()
             success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
                 'count_elements': postponer.number_elements_created,

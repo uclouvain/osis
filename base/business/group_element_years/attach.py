@@ -59,7 +59,9 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
             self._check_attach_options_rules()
-            self._check_new_attach_is_not_duplication()
+
+            if not self.instance:
+                self._check_new_attach_is_not_duplication()
         return True
 
     def _check_end_year_constraints_on_2m(self):
@@ -117,6 +119,8 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         finalities_pks = finalities_qs.filter(
             education_group_type__name__in=TrainingType.finality_types()
         ).values_list('pk', flat=True)
+        if self.child.education_group_type.name in TrainingType.finality_types():
+            finalities_pks = list(finalities_pks) + [self.parent.pk]
         if finalities_pks:
             root_2m_qs = EducationGroupYear.hierarchy.filter(pk__in=finalities_pks).get_parents().filter(
                 education_group_type__name__in=TrainingType.root_master_2m_types()

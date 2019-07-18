@@ -30,7 +30,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
@@ -51,7 +51,10 @@ class TestCanUpdateGroupElementYear(TestCase):
         cls.current_acy, cls.previous_acy = AcademicYearFactory.produce_in_past(from_year=2019, quantity=2)
         cls.group_element_year = GroupElementYearFactory(
             parent=TrainingFactory(academic_year=cls.current_acy),
-            child_branch=MiniTrainingFactory(academic_year=cls.current_acy),
+            child_branch=MiniTrainingFactory(
+                academic_year=cls.current_acy,
+                education_group_type__name=MiniTrainingType.DEEPENING.name
+            ),
         )
         cls.faculty_manager = FacultyManagerFactory()
         cls.faculty_manager.user.user_permissions.add(Permission.objects.get(codename="change_educationgroup"))

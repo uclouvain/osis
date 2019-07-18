@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import timedelta, datetime
 from http import HTTPStatus
 
 import reversion
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.academic_year import AcademicYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType
@@ -267,6 +269,19 @@ class TestReadEducationGroup(TestCase):
         self.assertTrue('show_utilization' in response.context)
         self.assertTrue('show_admission_conditions' in response.context)
 
+    def test_fetching_starting_academic_year(self):
+        current_academic_year = self.academic_year
+        starting_academic_year, created = AcademicYear.objects.update_or_create(
+            year=current_academic_year.year + 1,
+            defaults={'start_date': datetime.now() - timedelta(days=10)},
+        )
+
+        training = TrainingFactory()
+        url = reverse("education_group_read", args=[training.pk, training.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.context["current_academic_year"], starting_academic_year)
+        self.assertNotEqual(response.context["current_academic_year"], current_academic_year)
+
     def test_main_common_show_only_identification_and_general_information(self):
         main_common = EducationGroupYearCommonFactory(
             academic_year=self.academic_year,
@@ -401,9 +416,16 @@ class EducationGroupDiplomas(TestCase):
         url = reverse("education_group_diplomas",
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
+        expected_url = reverse("education_group_read",
+                               args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        url += "?group_to_parent=0"
+        response = self.client.get(url)
+        expected_url += "?group_to_parent=0"
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_with_education_group_year_of_type_group(self):
         group_education_group_year = EducationGroupYearFactory()
@@ -413,10 +435,18 @@ class EducationGroupDiplomas(TestCase):
         url = reverse("education_group_diplomas",
                       args=[group_education_group_year.id, group_education_group_year.id]
                       )
-        response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        response = self.client.get(url)
+        expected_url = reverse("education_group_read",
+                               args=[group_education_group_year.id, group_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+        url += "?group_to_parent=0"
+        response = self.client.get(url)
+        expected_url += "?group_to_parent=0"
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_without_get_data(self):
         response = self.client.get(self.url)
@@ -574,7 +604,7 @@ class TestContent(TestCase):
 
         self.assertTemplateUsed(response, "education_group/tab_content.html")
 
-        geys = response.context["group_element_years"]
+        geys = response.context["object"].groupelementyear_set.all()
         self.assertIn(self.group_element_year_1, geys)
         self.assertIn(self.group_element_year_2, geys)
         self.assertIn(self.group_element_year_3, geys)

@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Sum
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -33,10 +34,9 @@ from reversion.admin import VersionAdmin
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriNoStrategy
-from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2,\
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2, \
     ADDITIONAL_REQUIREMENT_ENTITY_1
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -63,7 +63,7 @@ class LearningComponentYear(SerializableModel):
     type = models.CharField(max_length=30, choices=learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES,
                             blank=True, null=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
-    planned_classes = models.IntegerField(blank=True, null=True, default=1)
+    planned_classes = models.IntegerField(blank=True, null=True)
     hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                      verbose_name=_("hourly volume total annual"))
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
@@ -106,9 +106,9 @@ class LearningComponentYear(SerializableModel):
         else:
             return '{}/{}'.format(self.learning_unit_year.acronym, self.acronym)
 
-    @property
-    def real_classes(self):
-        return len(learning_class_year.find_by_learning_component_year(self))
+    @cached_property
+    def real_classes(self) -> int:
+        return self.learningclassyear_set.count()
 
     @property
     def warnings(self):
@@ -128,7 +128,7 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
-        if self.vol_global != float(sum(self.repartition_volumes.values())):
+        if self.vol_global != sum([value or Decimal(0) for value in self.repartition_volumes.values()]):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('the sum of repartition volumes must be equal to the global volume')))
@@ -162,15 +162,14 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def vol_global(self):
-        return float(float(self.hourly_volume_total_annual or 0.0) * float(self.planned_classes or 0.0))
+        return (self.hourly_volume_total_annual or Decimal(0)) * (self.planned_classes or Decimal(0))
 
     @property
     def repartition_volumes(self):
-        default_value = 0.0
         return {
-            REQUIREMENT_ENTITY: float(self.repartition_volume_requirement_entity or default_value),
-            ADDITIONAL_REQUIREMENT_ENTITY_1: float(self.repartition_volume_additional_entity_1 or default_value),
-            ADDITIONAL_REQUIREMENT_ENTITY_2: float(self.repartition_volume_additional_entity_2 or default_value),
+            REQUIREMENT_ENTITY: self.repartition_volume_requirement_entity,
+            ADDITIONAL_REQUIREMENT_ENTITY_1: self.repartition_volume_additional_entity_1,
+            ADDITIONAL_REQUIREMENT_ENTITY_2: self.repartition_volume_additional_entity_2,
         }
 
     def set_repartition_volume(self, entity_container_type, repartition_volume):

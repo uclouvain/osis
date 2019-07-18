@@ -23,31 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import offer_type
-
-from base.tests.factories.offer_type import OfferTypeFactory
-from django.test import TestCase
-from django.utils import timezone
+from django.conf import settings
 
 
-class OfferTypeTest(TestCase):
-
-    def test_find_all_result_none(self):
-        self.assertEqual(len(offer_type.find_all()), 0)
-
-    def test_find_all_existing_results(self):
-        an_offer_type_1 = offer_type.OfferType(name="Bachelier")
-        an_offer_type_1.save()
-        an_offer_type_2 = offer_type.OfferType(name="Doctorat")
-        an_offer_type_2.save()
-
-        self.assertEqual(len(offer_type.find_all()), 2)
+def virtual_desktop(request):
+    url = ''
+    if request.user.is_authenticated():
+        url = _get_virtual_desktop_url_if_program_manager(request, url)
+    return {"virtual_desktop_url": url}
 
 
-    def test_find_all_distinct_existing_results(self):
-        an_offer_type_1 = offer_type.OfferType(name="Bachelier")
-        an_offer_type_1.save()
-        an_offer_type_2 = offer_type.OfferType(name="Bachelier")
-        an_offer_type_2.save()
-
-        self.assertEqual(len(offer_type.find_all()), 1)
+def _get_virtual_desktop_url_if_program_manager(request, url):
+    if hasattr(request.user, 'person') and request.user.person.is_program_manager:
+        url = settings.VIRTUAL_DESKTOP_URL
+    return url
