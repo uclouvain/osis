@@ -3058,7 +3058,7 @@ msgstr "Non requis"
 
 #: templates/blocks/notifications.html:10
 msgid "Notification%(number_unread_notifications|pluralize)s"
-msgstr "%(number_notifications)s notification(s) non lu(s)"
+msgstr "%(number_notifications)s notification(s) non lue(s)"
 
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
