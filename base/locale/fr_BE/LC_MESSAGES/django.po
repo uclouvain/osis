@@ -979,8 +979,6 @@ msgid "Cannot perform detach action on root."
 msgstr "Interdit de détacher la racine."
 
 #: business/education_groups/group_element_year_tree.py:388
-#, fuzzy
-#| msgid "Cannot perform detach action on root."
 msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
 
@@ -3059,10 +3057,8 @@ msgid "Not required"
 msgstr "Non requis"
 
 #: templates/blocks/notifications.html:10
-#, fuzzy, python-format
-#| msgid "Notification%(number_unread_notifications|pluralize)s"
 msgid "Notification%(number_unread_notifications|pluralize)s"
-msgstr "%(number_notifications)s notification(s) non lu(s)"
+msgstr "%(number_notifications)s notification(s) non lue(s)"
 
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
