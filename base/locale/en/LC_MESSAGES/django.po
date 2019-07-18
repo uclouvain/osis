@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-17 17:04+0200\n"
+"POT-Creation-Date: 2019-07-18 13:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -921,7 +921,7 @@ msgstr ""
 
 #: business/education_groups/group_element_year_tree.py:332
 #: business/education_groups/group_element_year_tree.py:354
-#: business/education_groups/group_element_year_tree.py:380
+#: business/education_groups/group_element_year_tree.py:381
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
@@ -930,7 +930,7 @@ msgstr ""
 msgid "Cannot perform detach action on root."
 msgstr ""
 
-#: business/education_groups/group_element_year_tree.py:388
+#: business/education_groups/group_element_year_tree.py:389
 msgid "Cannot perform modification action on root."
 msgstr ""
 
@@ -2165,11 +2165,6 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-#: models/group_element_year.py:272
-msgid ""
-"It is forbidden to attach an element to an element of another academic year."
-msgstr ""
-
 #: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr ""
@@ -2197,6 +2192,12 @@ msgstr ""
 
 #: tests/templatetags/test_education_group.py:252
 msgid "It is not possible to detach the root element."
+msgstr ""
+
+#: models/group_element_year.py:272
+msgid ""
+"It is prohibited to attach a group, mini-training or training to an element "
+"of another academic year."
 msgstr ""
 
 #: utils/send_mail.py:66
