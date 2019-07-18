@@ -34,7 +34,7 @@ from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
-    starting_academic_year, current_academic_year
+    starting_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
@@ -642,12 +642,12 @@ def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise
 
 def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
     result = True
-    max_limit = current_academic_year().year + 6
+    max_limit = starting_academic_year().year + 6
     if person.is_faculty_manager and not person.is_central_manager:
-        n_year = current_academic_year().next().year
+        n_year = starting_academic_year().next().year
 
     elif person.is_central_manager:
-        n_year = current_academic_year().year
+        n_year = starting_academic_year().year
     else:
         return False
 
@@ -679,11 +679,11 @@ def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
     result = True
 
     if person.is_faculty_manager and not person.is_central_manager:
-        n_year = current_academic_year().next().year
+        n_year = starting_academic_year().next().year
         max_limit = n_year
 
     elif person.is_central_manager:
-        n_year = current_academic_year().year
+        n_year = starting_academic_year().year
         max_limit = n_year+1
     else:
         return False

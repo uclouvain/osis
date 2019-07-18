@@ -128,7 +128,7 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
-        if self.vol_global != sum(self.repartition_volumes.values()):
+        if self.vol_global != sum([value or Decimal(0) for value in self.repartition_volumes.values()]):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('the sum of repartition volumes must be equal to the global volume')))
@@ -166,11 +166,10 @@ class LearningComponentYear(SerializableModel):
 
     @property
     def repartition_volumes(self):
-        default_value = Decimal(0)
         return {
-            REQUIREMENT_ENTITY: self.repartition_volume_requirement_entity or default_value,
-            ADDITIONAL_REQUIREMENT_ENTITY_1: self.repartition_volume_additional_entity_1 or default_value,
-            ADDITIONAL_REQUIREMENT_ENTITY_2: self.repartition_volume_additional_entity_2 or default_value,
+            REQUIREMENT_ENTITY: self.repartition_volume_requirement_entity,
+            ADDITIONAL_REQUIREMENT_ENTITY_1: self.repartition_volume_additional_entity_1,
+            ADDITIONAL_REQUIREMENT_ENTITY_2: self.repartition_volume_additional_entity_2,
         }
 
     def set_repartition_volume(self, entity_container_type, repartition_volume):

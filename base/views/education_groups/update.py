@@ -39,7 +39,7 @@ from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm, CertificateAimsForm
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
@@ -61,7 +61,7 @@ def update_education_group(request, root_id, education_group_year_id):
     education_group_year.root = root_id
 
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
-            education_group_year.academic_year.year < current_academic_year().year:
+            education_group_year.academic_year.year < starting_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
 
     # Proctect the view

@@ -1,7 +1,7 @@
 {% load bootstrap3 %}
 {% load i18n %}
 
-<div class="col-md-9">
+<div class="col-md-6">
     <div class="row">
     {% if can_edit_summary_locked_field %}
         <form method="POST"
@@ -28,11 +28,10 @@
     {% endif %}
     </div>
     {% if version %}
-
-    <div class="row">
-        <p class="small pull-right">
-            {% trans "Modified by" %} <strong>{{ version.revision.user.author }}</strong> {% trans "the" %} <strong>{{ version.revision.date_created|date:"d/m/Y" }}</strong>
-        </p>
-    </div>
+        <div class="row">
+            <p class="small pull-right">
+                {% trans "Modified by" %} <strong>{{ version.revision.user.author }}</strong> {% trans "the" %} <strong>{{ version.revision.date_created|date:"d/m/Y" }}</strong>
+            </p>
+        </div>
     {% endif %}
 </div>

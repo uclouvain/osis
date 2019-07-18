@@ -31,7 +31,7 @@ from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from osis_common.models.serializable_model import SerializableModel, \
@@ -125,7 +125,7 @@ class LearningUnit(SerializableModel):
         return super().delete(*args, **kwargs)
 
     def is_past(self):
-        return self.end_year and current_academic_year().year > self.end_year
+        return self.end_year and starting_academic_year().year > self.end_year
 
     def most_recent_learning_unit_year(self):
         return self.learningunityear_set.latest('academic_year__year')

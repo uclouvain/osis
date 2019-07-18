@@ -20,8 +20,6 @@ after_script:
   - "coverage xml"
   - "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT"
 
-notifications:
-  slack: osisteam:2M3DtIOGE4clU1DF8r6k8NQD
 services:
   - rabbitmq
 addons:

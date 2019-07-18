@@ -1,6 +1,5 @@
-{% extends "layout.html" %}
-{% load i18n %}
-{% load staticfiles %}
+{% extends 'blocks/modal/generic_modal.html' %}
+{% load i18n bootstrap3 %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,16 +23,25 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
+{% block modal_id %}modalConfirmToCancel{% endblock %}
 
-{% block breadcrumb %}
-<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Academic background' %}</a></li>
-<li><a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a></li>
-<li class="active">{% trans 'Scores encoding' %}</li>
+{% block modal_content %}
+    <form method="POST" action="{% url 'learning_unit_cancel_proposal' learning_unit_year_id=learning_unit_year.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+            <h3>{% trans 'Do you want to get back to initial data?' %}</h3>
+            <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
+        </div>
+        {% if has_partim %}
+            <div class="modal-body">
+                <div>{% trans "The learning unit have partim" %}</div>
+             </div>
+        {% endif %}
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            <button type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
+         </div>
+    </form>
 {% endblock %}
 
-{% block content %}
-<div class="page-header">
-    <h2>{% trans 'Scores encoding' %}</h2>
-</div>
 
-{% endblock %}

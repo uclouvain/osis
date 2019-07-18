@@ -29,6 +29,6 @@ def volume_format(value):
     if value is None:
         return ''
     else:
-        if value - int(value) != 0:
+        if value % 1 != 0:
             return "{0:.2f}".format(value)
-        return int(value)
+        return str(int(value))
