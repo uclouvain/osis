@@ -27,7 +27,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from base.models.academic_year import AcademicYear
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 
 LIMIT_OF_CHOICES = 2
 
@@ -40,7 +40,7 @@ class SelectComparisonYears(forms.Form):
 
         super(SelectComparisonYears, self).__init__(*args, **kwargs)
         if academic_year is None:
-            academic_year = current_academic_year()
+            academic_year = starting_academic_year()
 
         years = AcademicYear.objects.filter(
             Q(year=academic_year.year + 1) | Q(year=academic_year.year - 1)).order_by('year')

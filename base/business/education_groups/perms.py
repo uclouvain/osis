@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _, pgettext
 from base.business.group_element_years import management
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -273,7 +273,7 @@ class CommonEducationGroupStrategyPerms(object):
         return True
 
     def _is_current_academic_year_in_range_of_editable_education_group_year(self):
-        return self.education_group_year.academic_year.year < current_academic_year().year + 2
+        return self.education_group_year.academic_year.year < starting_academic_year().year + 2
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
@@ -303,7 +303,7 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if self.education_group_year.academic_year.year < current_academic_year().year:
+        if self.education_group_year.academic_year.year < starting_academic_year().year:
             raise PermissionDenied(_("The faculty manager cannot modify general information which are lower than N"))
         return True
 
@@ -335,7 +335,7 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if self.education_group_year.academic_year.year < current_academic_year().year:
+        if self.education_group_year.academic_year.year < starting_academic_year().year:
             raise PermissionDenied(_("The faculty manager cannot modify admission which are lower than N"))
         if not is_education_group_edit_period_opened(self.education_group_year):
             raise PermissionDenied(_("The faculty manager cannot modify outside of program edition period"))

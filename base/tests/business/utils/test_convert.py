@@ -23,47 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from enum import Enum
+from django.test import TestCase
 
-from django.http import Http404
-from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from base.business.utils import convert
 
 
-class ChoiceEnum(Enum):
-    @classmethod
-    def choices(cls):
-        return tuple((x.name, x.value) for x in cls)
+class ConvertUtilsTestCase(TestCase):
+    def test_convert_none_return_empty_string(self):
+        self.assertEqual(convert.volume_format(None), '')
 
-    @classmethod
-    def translation_choices(cls):
-        return tuple((x.name, _(x.value)) for x in cls)
+    def test_convert_float_number_return_string_number_with_two_decimals(self):
+        self.assertEqual(convert.volume_format(4.2), '4.20')
 
-    @classmethod
-    def get_value(cls, key):
-        return getattr(cls, key, key).value if hasattr(cls, key) else key
-
-    @classmethod
-    def get_names(cls):
-        return [x.name for x in cls]
-
-
-def get_object_or_none(klass, *args, **kwargs):
-    try:
-        return get_object_or_404(klass, *args, **kwargs)
-    except Http404:
-        return None
-    except ValueError:
-        klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
-        raise ValueError(
-            "First argument to get_object_or_none() must be a Model, Manager, "
-            "or QuerySet, not '%s'." % klass__name
-        )
-
-
-def get_verbose_field_value(instance, key):
-    if hasattr(instance, "get_" + key + "_display"):
-        value = getattr(instance, "get_" + key + "_display")()
-    else:
-        value = getattr(instance, key, "")
-    return value
+    def test_convert_integer_return_string_integer(self):
+        self.assertEqual(convert.volume_format(4.0), '4')

@@ -35,7 +35,7 @@ from base.business.learning_unit_proposal import compute_proposal_type, \
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_type import FACULTY
@@ -168,7 +168,7 @@ class CreationProposalBaseForm(ProposalBaseForm):
 
     def __init__(self, data, person, default_ac_year=None):
         if not default_ac_year:
-            default_ac_year = current_academic_year().next()
+            default_ac_year = starting_academic_year().next()
 
         super().__init__(data, person, default_ac_year=default_ac_year, proposal_type=ProposalType.CREATION.name)
         self._restrict_type_choice_for_proposal_creation(self.proposal_type)

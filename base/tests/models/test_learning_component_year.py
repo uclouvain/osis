@@ -65,9 +65,9 @@ class LearningUnitYearWithContextTestCase(TestCase):
         self.assertDictEqual(self.component_with_repartition.repartition_volumes, expected_result)
 
         expected_result = {
-            "REQUIREMENT_ENTITY": 0.0,
-            "ADDITIONAL_REQUIREMENT_ENTITY_1": 0.0,
-            "ADDITIONAL_REQUIREMENT_ENTITY_2": 0.0,
+            "REQUIREMENT_ENTITY": None,
+            "ADDITIONAL_REQUIREMENT_ENTITY_1": None,
+            "ADDITIONAL_REQUIREMENT_ENTITY_2": None,
         }
         self.assertDictEqual(self.component_without_repartition.repartition_volumes, expected_result)
 

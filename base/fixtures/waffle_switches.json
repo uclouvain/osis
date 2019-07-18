@@ -1,0 +1,13 @@
+[
+{
+    "model": "waffle.switch",
+    "pk": 1,
+    "fields": {
+        "name": "education_group_year_generate_pdf",
+        "active": false,
+        "note": "Fonctionnalit\u00e9 \"G\u00e9n\u00e9rer le pdf\" pour les offres",
+        "created": "2019-07-11T11:25:22",
+        "modified": "2019-07-11T11:34:40.995"
+    }
+}
+]

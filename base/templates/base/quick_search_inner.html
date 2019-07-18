@@ -28,13 +28,13 @@
         {% url 'quick_search_learning_unit' as quick_search_lu %}
         <li {% if request.path == quick_search_lu %} class="active" {% endif %}>
             <a href="#" onclick="submit_with_url('{{ quick_search_lu }}')" role="tab">
-                {% trans 'Learning unit' %}
+                {% trans 'Learning units' %}
             </a>
         </li>
         {% url 'quick_search_education_group' as quick_search_eg %}
         <li {% if request.path == quick_search_eg %} class="active" {% endif %}>
             <a href="#" onclick="submit_with_url('{{ quick_search_eg }}')" role="tab">
-                {% trans 'Education group' %}
+                {% trans 'Trainings' %}
             </a>
         </li>
     </ul>
