@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-17 17:04+0200\n"
+"POT-Creation-Date: 2019-07-18 14:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -916,7 +916,7 @@ msgstr ""
 #: templates/education_group/tab_edit_administrative_data.html:100
 #: templates/learning_unit/achievement_edit.html:50
 #: templates/learning_unit/add_charge_repartition_inner.html:66
-#: templates/learning_unit/blocks/form/volumes_management_form.html:84
+#: templates/learning_unit/blocks/form/volumes_management_form.html:85
 #: templates/learning_unit/blocks/modal/modal_comparison.html:43
 #: templates/learning_unit/blocks/modal/modal_confirm_cancel.html:41
 #: templates/learning_unit/blocks/modal/modal_confirm_consolidate.html:43
@@ -967,7 +967,7 @@ msgstr ""
 
 #: business/education_groups/group_element_year_tree.py:332
 #: business/education_groups/group_element_year_tree.py:354
-#: business/education_groups/group_element_year_tree.py:380
+#: business/education_groups/group_element_year_tree.py:381
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
@@ -978,7 +978,7 @@ msgstr ""
 msgid "Cannot perform detach action on root."
 msgstr "Interdit de détacher la racine."
 
-#: business/education_groups/group_element_year_tree.py:388
+#: business/education_groups/group_element_year_tree.py:389
 msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
 
@@ -3864,7 +3864,7 @@ msgstr "Commande SQL"
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
 #: templates/learning_unit/achievement_edit.html:51
 #: templates/learning_unit/add_charge_repartition_inner.html:67
-#: templates/learning_unit/blocks/form/volumes_management_form.html:80
+#: templates/learning_unit/blocks/form/volumes_management_form.html:81
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:15
@@ -4456,15 +4456,19 @@ msgstr ""
 "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
 "le changement à partir de l'année %(academic_year)s"
 
+#: views/learning_units/update.py:178
+msgid "The learning unit has been updated (with report)."
+msgstr "L'unité d'enseignement a été modifiée (avec report)."
+
+#: views/learning_units/update.py:180
+msgid "The learning unit has been updated (without report)."
+msgstr "L'unité d'enseignement a été modifiée (sans report)."
+
 #: forms/learning_unit/learning_unit_postponement.py:322
-#: views/learning_units/update.py:181
+#: views/learning_units/update.py:184
 #, python-format
 msgid "The learning unit has been updated until %(year)s."
 msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
-
-#: views/learning_units/update.py:177
-msgid "The learning unit has been updated."
-msgstr "L'unité d'enseignement a été modifiée."
 
 #: business/education_groups/group_element_year_tree.py:260
 #: tests/business/education_groups/test_build_tree.py:132
