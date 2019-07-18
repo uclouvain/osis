@@ -2228,13 +2228,6 @@ msgstr "Ce n'est pas une proposition"
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
-#: models/group_element_year.py:272
-msgid ""
-"It is forbidden to attach an element to an element of another academic year."
-msgstr ""
-"Il est interdit d'attacher un élément à un élément d'une autre année "
-"académique."
-
 #: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
@@ -2266,6 +2259,13 @@ msgstr "Il n'est pas possible de %(action)s l'élément racine."
 #: tests/templatetags/test_education_group.py:252
 msgid "It is not possible to detach the root element."
 msgstr "Il n'est pas possible de détacher l'élément racine."
+
+#: models/group_element_year.py:272
+msgid ""
+"It is prohibited to attach a group, mini-training or training to an element "
+"of another academic year."
+msgstr ""
+"Il est interdit d'attacher un groupement, une mini-formation ou une formation à un élément d'une autre année académique."
 
 #: utils/send_mail.py:66
 msgid "It remains notes to encode."
@@ -3057,8 +3057,9 @@ msgid "Not required"
 msgstr "Non requis"
 
 #: templates/blocks/notifications.html:10
+#, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
-msgstr "%(number_notifications)s notification(s) non lue(s)"
+msgstr "Notification%(number_unread_notifications|pluralize)s"
 
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"

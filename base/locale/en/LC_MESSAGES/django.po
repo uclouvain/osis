@@ -2165,11 +2165,6 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-#: models/group_element_year.py:272
-msgid ""
-"It is forbidden to attach an element to an element of another academic year."
-msgstr ""
-
 #: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr ""
@@ -2197,6 +2192,12 @@ msgstr ""
 
 #: tests/templatetags/test_education_group.py:252
 msgid "It is not possible to detach the root element."
+msgstr ""
+
+#: models/group_element_year.py:272
+msgid ""
+"It is prohibited to attach a group, mini-training or training to an element "
+"of another academic year."
 msgstr ""
 
 #: utils/send_mail.py:66
