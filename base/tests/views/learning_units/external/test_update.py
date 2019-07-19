@@ -68,6 +68,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
 
         self.data = get_valid_external_learning_unit_form_data(self.academic_year, self.person,
                                                                self.external.learning_unit_year)
+        self.data['postponement'] = "1"
 
         self.url = reverse(update_learning_unit, args=[self.external.learning_unit_year.pk])
 
