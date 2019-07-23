@@ -276,7 +276,6 @@ class TestUpdate(TestCase):
                                                   education_group_year.pk]),
                                     data={'certificate_aims': str(first_certificate_aim)})
         self.assertEqual(response.status_code, 302)
-        self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
 
     def test_post_training(self):
         old_domain = DomainFactory()
