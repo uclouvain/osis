@@ -33,11 +33,20 @@ from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
 class LearningAchievementEditForm(forms.ModelForm):
-    text = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False, label=_('Text'))
+    text_fr = forms.CharField(
+        widget=CKEditorWidget(config_name='minimal_plus_headers'),
+        required=False,
+        label=_('French')
+    )
+    text_en = forms.CharField(
+        widget=CKEditorWidget(config_name='minimal_plus_headers'),
+        required=False,
+        label=_('English')
+    )
 
     class Meta:
         model = LearningAchievement
-        fields = ['code_name', 'text']
+        fields = ['code_name', 'text_fr', 'text_en']
 
     def __init__(self, data=None, initial=None, **kwargs):
         initial = initial or {}

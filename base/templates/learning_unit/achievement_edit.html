@@ -43,7 +43,19 @@
     </div>
     <div class="modal-body">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        {% bootstrap_field form.code_name %}
+        <ul class="nav nav-tabs" id="modification_tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#modification_fr">{% trans 'French' %}</a></li>
+            <li role="presentation"><a href="#modification_en">{% trans 'English' %}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="modification_fr">
+                {{ form.text_fr }}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="modification_en">
+                {{ form.text_en }}
+            </div>
+        </div>
     </div>
 
     <div class="modal-footer">
@@ -53,3 +65,18 @@
     </div>
 </form>
 
+<script>
+    $(function () {
+        var richText = $('#id_text_fr');
+        var config = richText.data('config');
+        CKEDITOR.replace('id_text_fr', config);
+
+        var richText = $('#id_text_en');
+        var config = richText.data('config');
+        CKEDITOR.replace('id_text_en', config);
+    });
+    $('#modification_tabs a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+</script>

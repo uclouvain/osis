@@ -80,10 +80,10 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         self.fields['trans_text_en'].initial = value_en.text
 
     def save(self):
-        cleaned_data = self.cleaned_data
-        trans_text_fr = translated_text.find_by_id(cleaned_data['cms_fr_id'])
-        trans_text_fr.text = cleaned_data.get('trans_text_fr')
-        trans_text_fr.save()
-        trans_text_en = translated_text.find_by_id(cleaned_data['cms_en_id'])
-        trans_text_en.text = cleaned_data.get('trans_text_en')
-        trans_text_en.save()
+        self._save_text_language('fr')
+        self._save_text_language('en')
+
+    def _save_text_language(self, language):
+        trans_text = translated_text.find_by_id(self.cleaned_data['cms_' + language + '_id'])
+        trans_text.text = self.cleaned_data.get('trans_text_' + language)
+        trans_text.save()
