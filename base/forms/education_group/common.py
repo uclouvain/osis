@@ -304,6 +304,10 @@ class CommonBaseForm:
             post_save = self._post_save()
             self.education_group_year_deleted = post_save.get('object_list_deleted', [])
 
+        # FIXME Solution when the new end date is before the end date of the current education group year
+        if not EducationGroupYear.objects.filter(id=education_group_year.id).exists():
+            education_group_year.id = None
+
         return education_group_year
 
     def _is_creation(self):

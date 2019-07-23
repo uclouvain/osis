@@ -315,7 +315,8 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
 
     def save(self):
         egy_instance = super().save()
-        if self.hops_form.is_valid():
+        # FIXME Because the egy_isntance could be deleted when modifying end date
+        if self.hops_form.is_valid() and egy_instance.id:
             self.hops_form.save(education_group_year=egy_instance)
         return egy_instance
 
