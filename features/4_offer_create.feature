@@ -37,7 +37,7 @@ Feature: Création d'offre
 
     Examples:
       | acronym    | code      | type_de_formation                            | entite_de_gestion | entite_dadministration | intitule_du_diplome | children                         |
-      | DROI2MS/TT | LDROI200S | Master en 120 crédits à finalité spécialisée | DRT               | DRT                    | Diplome en droit    | PARTIEDEBASEDROI2MS/TT,LDROI301G |
+      | DROI2MS/TT | LDROI200S | Master en 120 crédits à finalité spécialisée | DRT               | DRT                    | Diplome en droit    | PARTIEDEBASEDROI2MS/TT,LDROI300G |
       | CUIS2FC    | LCUIS100Q | Certificat d’université 2ème cycle           | AGRO              | AGRO                   | Diplome en cuisine  | LCUIS100T                        |
 
   Scenario: 30 : En tant que gestionnaire central, je dois pouvoir créer une offre de type « mini- formation ».

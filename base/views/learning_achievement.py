@@ -124,10 +124,10 @@ def create(request, learning_unit_year_id, learning_achievement_id):
 
 def _save_and_redirect(form, learning_unit_year_id):
     achievement = form.save()
-    return HttpResponseRedirect(reverse(learning_unit_specifications,
-                                        kwargs={'learning_unit_year_id': learning_unit_year_id}) + "{}{}".format(
-        HTML_ANCHOR,
-        achievement.id))
+    return HttpResponseRedirect(
+        reverse(learning_unit_specifications, kwargs={'learning_unit_year_id': learning_unit_year_id})
+        + "{}{}".format(HTML_ANCHOR, achievement.id)
+    )
 
 
 @login_required

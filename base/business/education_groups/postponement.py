@@ -27,7 +27,7 @@ from django.utils.translation import ugettext as _
 
 from base.business.education_groups import create
 from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.hops import Hops
 
@@ -50,7 +50,7 @@ def _compute_end_year(education_group):
     """
 
     # Compute max postponement based on config EDUCATION_GROUP_MAX_POSTPONE_YEARS
-    max_postponement_end_year = current_academic_year().year + EDUCATION_GROUP_MAX_POSTPONE_YEARS
+    max_postponement_end_year = starting_academic_year().year + EDUCATION_GROUP_MAX_POSTPONE_YEARS
 
     if education_group.end_year:
         # Get the min [Prevent education_group.end_year > academic_year.year provided by system]

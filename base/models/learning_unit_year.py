@@ -28,7 +28,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -523,6 +523,10 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
         queryset = queryset.filter(campus__organization__organizationaddress__city=city)
     elif country:
         queryset = queryset.filter(campus__organization__organizationaddress__country=country)
+
+    quadrimester = kwargs.get('quadrimester')
+    if quadrimester:
+        queryset = queryset.filter(quadrimester=quadrimester)
 
     return queryset.select_related('learning_container_year', 'academic_year')
 

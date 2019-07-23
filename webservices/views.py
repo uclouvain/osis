@@ -38,7 +38,6 @@ from rest_framework.response import Response
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
-from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
@@ -60,6 +59,8 @@ Context = collections.namedtuple(
      'title', 'description',
      'academic_year', 'education_group_year']
 )
+
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
 
 
 class AcronymError(Exception):

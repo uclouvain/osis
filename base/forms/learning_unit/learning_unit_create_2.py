@@ -374,7 +374,7 @@ class FullForm(LearningUnitBaseForm):
     def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
             if self.person.is_faculty_manager and proposal_type == ProposalType.CREATION.name:
-                starting_academic_year = academic_year.current_academic_year().next()
+                starting_academic_year = academic_year.starting_academic_year().next()
             else:
                 starting_academic_year = academic_year.starting_academic_year()
 
