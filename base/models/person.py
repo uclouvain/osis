@@ -198,15 +198,13 @@ class Person(SerializableModel):
         entity_structure = build_current_entity_version_structure_in_memory(timezone.now().date())
         faculties = set()
         for entity in self.directly_linked_entities:
-            faculties = faculties.union(
-                {e.entity for e in entity_structure[entity.id]['all_children'] if e.entity_type == FACULTY}
-            )
+            faculties = faculties.union({
+                e.entity for e in entity_structure[entity.id]['all_children']
+                if e.entity_type == FACULTY or (acronym_exceptions and e.acronym in acronym_exceptions)
+            })
 
             entity_version = entity_structure[entity.id]['entity_version']
             if acronym_exceptions and entity_version.acronym in acronym_exceptions:
-                faculties = faculties.union(
-                    {e.entity for e in entity_structure[entity.id]['all_children'] if e.acronym in acronym_exceptions}
-                )
                 faculties.add(entity)
             else:
                 faculties.add(find_parent_of_type_into_entity_structure(entity_version, entity_structure, FACULTY))
