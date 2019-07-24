@@ -36,8 +36,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
-from base.models.entity_version import find_pedagogical_entities_version, EntityVersion, \
-    find_all_current_entities_version
+from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
@@ -158,9 +157,8 @@ class Person(SerializableModel):
     @cached_property
     def directly_linked_entities(self):
         entities_id = set()
-        for person_entity in self.personentity_set.all():
+        for person_entity in self.personentity_set.all().select_related('entity'):
             entities_id.add(person_entity.entity.id)
-
         return entities_id
 
     def get_managed_programs(self):
@@ -195,18 +193,14 @@ class Person(SerializableModel):
 
     @cached_property
     def find_attached_faculty_entities_version(self):
-        entities = EntityVersion.objects.filter(entity__in=self.directly_linked_entities).select_related(
-            'parent', 'entity'
-        )
-        ids = []
+        entities = find_pedagogical_entities_version().filter(entity__in=self.directly_linked_entities)
+        desired_entities = []
         for e in entities:
-            if e.entity_type == FACULTY or e.acronym == "ILV":
-                id = e.entity.id
+            if e.acronym == 'ILV':
+                desired_entities.append(e.entity)
             else:
-                id = e.parent.id
-            if id not in ids:
-                ids.append(id)
-        return find_all_current_entities_version().filter(entity__in=ids)
+                desired_entities.append(e.find_parent_of_type(FACULTY))
+        return find_pedagogical_entities_version().filter(entity__in=desired_entities)
 
 
 def find_by_id(person_id):
