@@ -215,9 +215,9 @@ class EntityVersion(SerializableModel):
         return complete_title
 
     def can_save_entity_version(self):
-        return self.count_entity_versions_same_entity_overlapping_dates() == 0 and \
-               self.count_entity_versions_same_acronym_overlapping_dates() == 0 and \
-               self.parent != self.entity
+        return not self.search_entity_versions_with_overlapping_dates().filter(
+            Q(entity=self.entity) | Q(acronym=self.acronym)
+        ).exists() and self.parent != self.entity
 
     def search_entity_versions_with_overlapping_dates(self):
         if self.end_date:
@@ -234,12 +234,6 @@ class EntityVersion(SerializableModel):
             )
 
         return qs.exclude(id=self.id)
-
-    def count_entity_versions_same_entity_overlapping_dates(self):
-        return self.search_entity_versions_with_overlapping_dates().filter(entity=self.entity).count()
-
-    def count_entity_versions_same_acronym_overlapping_dates(self):
-        return self.search_entity_versions_with_overlapping_dates().filter(acronym=self.acronym).count()
 
     def _direct_children(self, date=None):
         if date is None:
