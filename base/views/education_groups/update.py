@@ -61,7 +61,7 @@ def update_education_group(request, root_id, education_group_year_id):
     education_group_year.root = root_id
 
     if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
-            education_group_year.academic_year.year < starting_academic_year().year:
+            education_group_year.academic_year.year <= starting_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
 
     # Proctect the view
