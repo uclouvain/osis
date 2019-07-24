@@ -267,15 +267,6 @@ class EntityVersion(SerializableModel):
     def find_descendants(self, date=None):
         return EntityVersion.objects.descendants([self.entity], date)
 
-    def find_parent_of_type_into_entity_structure(self, entities_structure, parent_type):
-        if self.entity_type == parent_type:
-            return self.entity
-        elif not entities_structure[self.entity_id]['entity_version_parent']:
-            return None
-        else:
-            parent = entities_structure[self.entity_id]['entity_version_parent']
-            return parent.find_parent_of_type_into_entity_structure(entities_structure, parent_type)
-
     def find_faculty_version(self, academic_yr):
         if self.entity_type == entity_type.FACULTY:
             return self
@@ -331,6 +322,16 @@ class EntityVersion(SerializableModel):
                 nodes[row['parent_id']].append_child(node)
 
         return nodes[tree[0]['entity_id']].to_json(limit)
+
+
+def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):
+    if entity_version.entity_type == parent_type:
+        return entity_version.entity
+    elif not entities_structure[entity_version.entity_id]['entity_version_parent']:
+        return None
+    else:
+        parent = entities_structure[entity_version.entity_id]['entity_version_parent']
+        return find_parent_of_type_into_entity_structure(parent, entities_structure, parent_type)
 
 
 def find(acronym, date=None):

@@ -38,7 +38,8 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version, \
-    build_current_entity_version_structure_in_memory, find_all_current_entities_version
+    build_current_entity_version_structure_in_memory, find_all_current_entities_version, \
+    find_parent_of_type_into_entity_structure
 from base.models.enums import person_source_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
@@ -193,17 +194,16 @@ class Person(SerializableModel):
     def find_main_entities_version(self):
         return find_pedagogical_entities_version().filter(entity__in=self.linked_entities)
 
-    @cached_property
-    def find_attached_ilv_and_faculty_entities_version(self):
-        entity_struct = build_current_entity_version_structure_in_memory(timezone.now().date())
-        entities = find_all_current_entities_version().filter(entity__in=self.directly_linked_entities)
-        desired_entities = []
-        for e in entities:
-            if e.acronym == 'ILV':
-                desired_entities.append(e.entity)
+    def find_attached_faculty_entities_version(self, acronym_exceptions=None):
+        entity_structure = build_current_entity_version_structure_in_memory(timezone.now().date())
+        faculties = []
+        for e in self.directly_linked_entities:
+            entity_version = entity_structure[e.id]['entity_version']
+            if acronym_exceptions and entity_version.acronym in acronym_exceptions:
+                faculties.append(e)
             else:
-                desired_entities.append(e.find_parent_of_type_into_entity_structure(entity_struct, FACULTY))
-        return find_all_current_entities_version().filter(entity__in=desired_entities)
+                faculties.append(find_parent_of_type_into_entity_structure(entity_version, entity_structure, FACULTY))
+        return find_all_current_entities_version().filter(entity__in=faculties)
 
 
 def find_by_id(person_id):
