@@ -304,8 +304,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
                                               instance=education_group_yr_hops)
 
     def _post_save(self):
-        if self.hops_form.is_valid():
-            self.hops_form.save(education_group_year=self.education_group_year_form.instance)
+        self.hops_form.save(education_group_year=self.education_group_year_form.instance)
 
         education_group_instance = self.forms[EducationGroupModelForm].instance
         egy_deleted = []
