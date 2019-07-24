@@ -26,6 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -60,8 +61,9 @@ def update_education_group(request, root_id, education_group_year_id):
     # it will be used in the templates.
     education_group_year.root = root_id
 
-    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
-            education_group_year.academic_year.year <= starting_academic_year().year:
+    year = education_group_year.academic_year.year
+    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and \
+            settings.YEAR_LIMIT_EDG_MODIFICATION <= year <= starting_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
 
     # Proctect the view
