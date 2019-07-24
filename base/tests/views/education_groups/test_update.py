@@ -248,7 +248,7 @@ class TestUpdate(TestCase):
         permission = Permission.objects.get(codename='change_educationgroup')
         self.faculty_user.user_permissions.add(permission)
         self._assert_redirects_to_modal_to_update_certificate_aims(self.previous_training_education_group_year)
-        self._assert_redirects_to_modal_to_update_certificate_aims(self.education_group_year)
+        self._assert_redirects_to_modal_to_update_certificate_aims(self.training_education_group_year)
 
         certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
         first_certificate_aim = certificate_aims[0].id
@@ -259,7 +259,7 @@ class TestUpdate(TestCase):
         )
         self._assert_post_to_modal_to_update_certificate_aims(
             first_certificate_aim,
-            self.education_group_year
+            self.training_education_group_year
         )
 
     def _assert_redirects_to_modal_to_update_certificate_aims(self, education_group_year):
