@@ -364,14 +364,28 @@ class EntityVersionTest(TestCase):
     def test_find_attached_faculty_entities_version_filtered_by_person(self):
         person = PersonFactory()
         entity_attached = EntityFactory(organization=self.organization)
-        entity_version_attached = EntityVersionFactory(entity=entity_attached, entity_type="FACULTY", parent=None)
+        entity_version_attached = EntityVersionFactory(entity=entity_attached, entity_type="FACULTY")
+        
         entity_not_attached = EntityFactory(organization=self.organization)
-        EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR", parent=None)
+        EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR")
+        
+        entity_ilv = EntityFactory(organization=self.organization)
+        entity_version_ilv = EntityVersionFactory(entity=entity_ilv, acronym="ILV")
+        
+        entity_parent = EntityFactory(organization=self.organization)
+        entity_version_parent = EntityVersionFactory(entity=entity_parent, entity_type='FACULTY')
+        EntityVersionFactory(parent=entity_parent)
+
         PersonEntityFactory(person=person, entity=entity_attached)
+        PersonEntityFactory(person=person, entity=entity_ilv)
+        PersonEntityFactory(person=person, entity=entity_parent)
+
         entity_list = list(person.find_attached_faculty_entities_version)
         self.assertTrue(entity_list)
-        self.assertEqual(len(entity_list), 1)
-        self.assertEqual(entity_list[0], entity_version_attached)
+        self.assertEqual(len(entity_list), 3)
+        self.assertIn(entity_version_attached, entity_list)
+        self.assertIn(entity_version_ilv, entity_list)
+        self.assertIn(entity_version_parent, entity_list)
 
 
 class EntityVersionLoadInMemoryTest(TestCase):
