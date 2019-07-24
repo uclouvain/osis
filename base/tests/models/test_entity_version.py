@@ -395,7 +395,7 @@ class EntityVersionTest(TestCase):
         PersonEntityFactory(person=person, entity=entity_ilv)
         PersonEntityFactory(person=person, entity=entity_parent)
 
-        entity_list = list(person.find_attached_faculty_entities_version())
+        entity_list = list(person.find_attached_faculty_entities_version(acronym_exceptions=['ILV']))
         self.assertTrue(entity_list)
         self.assertEqual(len(entity_list), 3)
         self.assertIn(entity_version_attached, entity_list)

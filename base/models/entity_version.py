@@ -350,7 +350,7 @@ def find(acronym, date=None):
 
 
 def find_latest_version(date):
-    return EntityVersion.objects.current(date).select_related('entity__organization').order_by('-start_date')
+    return EntityVersion.objects.current(date).select_related('entity', 'entity__organization').order_by('-start_date')
 
 
 def get_last_version(entity, date=None):
