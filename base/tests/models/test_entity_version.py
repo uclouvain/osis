@@ -402,6 +402,27 @@ class EntityVersionTest(TestCase):
         self.assertIn(entity_version_ilv, entity_list)
         self.assertIn(entity_version_parent, entity_list)
 
+    def test_find_attached_faculty_entities_version_filtered_by_person_but_faculty_below_attached_entities(self):
+        person = PersonFactory()
+
+        entity_attached = EntityFactory(organization=self.organization)
+        EntityVersionFactory(entity=entity_attached, entity_type="SECTOR")
+
+        entity_fac = EntityFactory(organization=self.organization)
+        entity_version_fac = EntityVersionFactory(
+            entity=entity_fac,
+            acronym="FAC",
+            entity_type="FACULTY",
+            parent=entity_attached
+        )
+
+        PersonEntityFactory(person=person, entity=entity_attached)
+
+        entity_list = list(person.find_attached_faculty_entities_version())
+        self.assertTrue(entity_list)
+        self.assertEqual(len(entity_list), 1)
+        self.assertIn(entity_version_fac, entity_list)
+
 
 class EntityVersionLoadInMemoryTest(TestCase):
     def setUp(self):
