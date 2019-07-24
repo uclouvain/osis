@@ -96,15 +96,6 @@ $(document).ready(function () {
                             }
                         },
 
-                        "open": {
-                            "label": gettext("Open"),
-                            "action": function (data) {
-                                let __ret = get_data_from_tree(data);
-                                window.open(__ret.view_url, '_blank');
-                            },
-                            "_disabled": true
-                        },
-
                         "modify": {
                             "label": gettext("Modify"),
                             "action": function (data) {
