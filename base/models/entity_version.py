@@ -267,15 +267,14 @@ class EntityVersion(SerializableModel):
     def find_descendants(self, date=None):
         return EntityVersion.objects.descendants([self.entity], date)
 
-    def find_parent_of_type(self, parent_type):
+    def find_parent_of_type_into_entity_structure(self, entities_structure, parent_type):
         if self.entity_type == parent_type:
             return self.entity
-        elif not self.parent:
+        elif not entities_structure[self.entity_id]['entity_version_parent']:
             return None
         else:
-            parent = self._find_latest_version_by_parent(timezone.now().date())
-            if parent:
-                return parent.find_parent_of_type(parent_type)
+            parent = entities_structure[self.entity_id]['entity_version_parent']
+            return parent.find_parent_of_type_into_entity_structure(entities_structure, parent_type)
 
     def find_faculty_version(self, academic_yr):
         if self.entity_type == entity_type.FACULTY:

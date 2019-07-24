@@ -32,11 +32,13 @@ from django.db import models
 from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
-from base.models.entity_version import find_pedagogical_entities_version
+from base.models.entity_version import find_pedagogical_entities_version, \
+    build_current_entity_version_structure_in_memory, find_all_current_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
@@ -156,10 +158,10 @@ class Person(SerializableModel):
 
     @cached_property
     def directly_linked_entities(self):
-        entities_id = set()
+        entities = []
         for person_entity in self.personentity_set.all().select_related('entity'):
-            entities_id.add(person_entity.entity.id)
-        return entities_id
+            entities.append(person_entity.entity)
+        return entities
 
     def get_managed_programs(self):
         return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
@@ -192,15 +194,16 @@ class Person(SerializableModel):
         return find_pedagogical_entities_version().filter(entity__in=self.linked_entities)
 
     @cached_property
-    def find_attached_faculty_entities_version(self):
-        entities = find_pedagogical_entities_version().filter(entity__in=self.directly_linked_entities)
+    def find_attached_ilv_and_faculty_entities_version(self):
+        entity_struct = build_current_entity_version_structure_in_memory(timezone.now().date())
+        entities = find_all_current_entities_version().filter(entity__in=self.directly_linked_entities)
         desired_entities = []
         for e in entities:
             if e.acronym == 'ILV':
                 desired_entities.append(e.entity)
             else:
-                desired_entities.append(e.find_parent_of_type(FACULTY))
-        return find_pedagogical_entities_version().filter(entity__in=desired_entities)
+                desired_entities.append(e.find_parent_of_type_into_entity_structure(entity_struct, FACULTY))
+        return find_all_current_entities_version().filter(entity__in=desired_entities)
 
 
 def find_by_id(person_id):
