@@ -154,8 +154,8 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(statistic
         .distinct()
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
-        'academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
-        'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
+        'past_academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
+        'current_academic_year': statistics_context['max_academic_year_to_postpone'].year,
 
         # Use len instead of count() (it's buggy when a queryset is built with a difference())
         'egys_to_postpone': len(statistics_context['to_duplicate']),
