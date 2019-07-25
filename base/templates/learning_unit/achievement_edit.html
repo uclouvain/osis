@@ -51,17 +51,18 @@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="modification_fr">
                 {{ form.text_fr }}
+                {{ form.lua_fr_id }}
             </div>
             <div role="tabpanel" class="tab-pane" id="modification_en">
                 {{ form.text_en }}
+                {{ form.lua_en_id }}
             </div>
         </div>
     </div>
 
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
-               onclick="CKupdate();"/>
+        <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"/>
     </div>
 </form>
 

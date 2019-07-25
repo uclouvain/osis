@@ -83,8 +83,8 @@ def get_action(request):
 def update(request, learning_unit_year_id, learning_achievement_id):
     learning_achievement = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    print(learning_achievement.text)
-    form = LearningAchievementEditForm(request.POST or None, instance=learning_achievement)
+    form = LearningAchievementEditForm(request.POST or None, luy=learning_unit_year, code=learning_achievement.code_name)
+    form.load_initial()
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
 
@@ -103,12 +103,16 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     a_language_code = request.GET.get('language_code', None)
     learning_achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
-
-    form = LearningAchievementEditForm(request.POST or None,
-                                       initial={'learning_unit_year': learning_unit_yr,
-                                                'language_code': a_language_code,
-                                                'code_name': get_code_name(learning_achievement_fr,
-                                                                           a_language_code)})
+    form = LearningAchievementEditForm(
+        request.POST or None,
+        luy=learning_unit_yr,
+        initial={
+            'learning_unit_year': learning_unit_yr,
+            'language_code': a_language_code,
+            'code_name': get_code_name(learning_achievement_fr, a_language_code)
+        }
+    )
+    form.load_initial()
 
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
@@ -136,10 +140,15 @@ def _save_and_redirect(form, learning_unit_year_id):
 @perms.can_update_learning_achievement
 def create_first(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    form = LearningAchievementEditForm(request.POST or None,
-                                       initial={'language': language.find_by_code(FR_CODE_LANGUAGE),
-                                                'learning_unit_year': learning_unit_yr})
-
+    form = LearningAchievementEditForm(
+        request.POST or None,
+        luy=learning_unit_yr,
+        initial={
+            'language': language.find_by_code(FR_CODE_LANGUAGE),
+            'learning_unit_year': learning_unit_yr
+        }
+    )
+    form.load_initial()
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
 
