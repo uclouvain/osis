@@ -181,7 +181,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
                       if edy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
-        'academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
+        'academic_year': statistics_context['max_academic_year_to_postpone'].year,
         'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
         'egys_postponed': len(egys_postponed),
         'egys_postponed_qs': sorted(egys_postponed, key=__sort_education_group_type),
