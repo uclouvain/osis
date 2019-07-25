@@ -191,7 +191,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
         'egys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
         'egys_ending_this_year_qs': statistics_context['ending_on_max_academic_year'].order_by(
           'educationgroupyear__education_group_type__name', 'educationgroupyear__acronym'),
-        'egys_with_errors': sorted(egys_with_errors)
+        'egys_with_errors': egys_with_errors
     }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
