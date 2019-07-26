@@ -96,18 +96,19 @@ def _get_url_to_publish(education_group_year):
 
 
 def _get_code_according_type(education_group_year):
+    code = education_group_year.acronym
     if education_group_year.is_minor:
-        return "min-{}".format(education_group_year.partial_acronym)
+        code = "min-{}".format(education_group_year.partial_acronym)
     elif education_group_year.is_deepening:
-        return "app-{}".format(education_group_year.partial_acronym)
+        code = "app-{}".format(education_group_year.partial_acronym)
     elif education_group_year.is_option or education_group_year.is_finality:
         parent = EducationGroupYear.hierarchy.filter(pk=education_group_year.pk).get_parents().get(
             education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name]
         )
-        return "{}-{}".format(parent.acronym, education_group_year.partial_acronym)
+        code = "{}-{}".format(parent.acronym, education_group_year.partial_acronym)
     elif education_group_year.is_major:
-        return "fsa1ba-{}".format(education_group_year.partial_acronym)
-    return education_group_year.acronym
+        code = "fsa1ba-{}".format(education_group_year.partial_acronym)
+    return code
 
 
 class PublishException(Exception):
