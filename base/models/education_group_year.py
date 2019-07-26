@@ -633,10 +633,6 @@ class EducationGroupYear(SerializableModel):
         return self.type == TrainingType.PGRM_MASTER_180_240.name
 
     @property
-    def is_master_program(self):
-        return self.is_master180 or self.is_master120
-
-    @property
     def verbose(self):
         return "{} - {}".format(self.partial_acronym or "", self.acronym)
 
