@@ -26,7 +26,7 @@
 
 from unittest import mock
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import IntegrityError
 from django.test import TestCase, RequestFactory
 

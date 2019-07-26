@@ -29,10 +29,10 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -66,7 +66,6 @@ from base.models.person import Person
 from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
-from reference.models import language
 from reference.models.language import find_language_in_settings
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
