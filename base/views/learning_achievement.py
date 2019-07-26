@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.achievement import get_code_name, get_anchor_reference, DELETE, DOWN, UP, \
@@ -83,7 +83,11 @@ def get_action(request):
 def update(request, learning_unit_year_id, learning_achievement_id):
     learning_achievement = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    form = LearningAchievementEditForm(request.POST or None, luy=learning_unit_year, code=learning_achievement.code_name)
+    form = LearningAchievementEditForm(
+        request.POST or None,
+        luy=learning_unit_year,
+        code=learning_achievement.code_name
+    )
     form.load_initial()
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
