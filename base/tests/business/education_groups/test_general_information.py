@@ -38,7 +38,7 @@ from base.business.education_groups.general_information import PublishException,
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
-    EducationGroupYearCommonBachelorFactory, MiniTrainingFactory
+    EducationGroupYearCommonBachelorFactory, MiniTrainingFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
@@ -131,7 +131,7 @@ class TestGetUrlToPublish(TestCase):
         self.assertEqual(expected_url, _get_url_to_publish(training))
 
     def test_get_publish_url_case_not_common_and_finality_or_option_case(self):
-        training = TrainingFactory(
+        training = EducationGroupYearFactory(
             education_group_type__name=random.choice(TrainingType.finality_types() + [MiniTrainingType.OPTION.name])
         )
         parent = TrainingFactory(
