@@ -51,7 +51,9 @@ def publish(education_group_year):
         parents_as_instances=True
     ).get(education_group_year.pk, [])
 
-    education_groups_to_publish = [education_group_year] + trainings
+    education_groups_to_publish = [education_group_year] + trainings \
+        if education_group_year.education_group_type.name != GroupType.COMMON_CORE.name \
+        else trainings
     t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
     t.start()
     return True
