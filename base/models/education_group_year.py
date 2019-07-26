@@ -589,6 +589,10 @@ class EducationGroupYear(SerializableModel):
         return self.type in MiniTrainingType.minors()
 
     @property
+    def is_major(self):
+        return self.type == MiniTrainingType.FSA_SPECIALITY.name
+
+    @property
     def is_deepening(self):
         return self.type == MiniTrainingType.DEEPENING.name
 
@@ -627,6 +631,10 @@ class EducationGroupYear(SerializableModel):
     @property
     def is_master180(self):
         return self.type == TrainingType.PGRM_MASTER_180_240.name
+
+    @property
+    def is_master_program(self):
+        return self.is_master180 or self.is_master120
 
     @property
     def verbose(self):

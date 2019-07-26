@@ -31,6 +31,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import TrainingType
 from base.models.group_element_year import find_learning_unit_formations
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -44,9 +46,12 @@ def publish(education_group_year):
                                    'ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
                                    'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
 
-    trainings = find_learning_unit_formations([education_group_year], parents_as_instances=True)
+    trainings = find_learning_unit_formations(
+        [education_group_year],
+        parents_as_instances=True
+    ).get(education_group_year.pk, [])
 
-    education_groups_to_publish = [education_group_year] + trainings.get(education_group_year.pk, [])
+    education_groups_to_publish = [education_group_year] + trainings
     t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
     t.start()
     return True
@@ -96,7 +101,12 @@ def _get_code_according_type(education_group_year):
     elif education_group_year.is_deepening:
         return "app-{}".format(education_group_year.partial_acronym)
     elif education_group_year.is_option or education_group_year.is_finality:
-        return education_group_year.partial_acronym
+        parent = EducationGroupYear.hierarchy.filter(pk=education_group_year.pk).get_parents().get(
+            education_group_type__name__in=[TrainingType.PGRM_MASTER_120.name, TrainingType.PGRM_MASTER_180_240.name]
+        )
+        return "{}-{}".format(parent.acronym, education_group_year.partial_acronym)
+    elif education_group_year.is_major:
+        return "fsa1ba-{}".format(education_group_year.partial_acronym)
     return education_group_year.acronym
 
 
