@@ -45,7 +45,7 @@ ITEMS_PER_PAGE = 25
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def page_not_found(request):
+def page_not_found(request, exception):
     response = render(request, 'page_not_found.html', {})
     response.status_code = 404
     return response
