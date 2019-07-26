@@ -32,7 +32,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.group_element_year import find_learning_unit_formations
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -58,7 +58,10 @@ def publish(education_group_year):
 
 
 def _bulk_publish(education_group_years):
-    return [_publish(education_group_year) for education_group_year in education_group_years]
+    return [
+        _publish(education_group_year) for education_group_year in education_group_years
+        if education_group_year.education_group_type.name != GroupType.COMMON_CORE.name
+    ]
 
 
 def _publish(education_group_year):
