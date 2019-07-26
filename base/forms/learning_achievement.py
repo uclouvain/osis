@@ -56,8 +56,8 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.luy = kwargs.pop('luy', None)
         self.code = kwargs.pop('code', None)
 
-        if data and data.get('language_code'):
-            initial['language'] = language.find_by_code(data.get('language_code'))
+        # if data and data.get('language_code'):
+        #     initial['language'] = language.find_by_code(data.get('language_code'))
 
         super().__init__(data, initial=initial, **kwargs)
 
@@ -67,7 +67,7 @@ class LearningAchievementEditForm(forms.ModelForm):
             setattr(self.instance, key, value)
 
     def load_initial(self):
-        value_fr, _ = LearningAchievement.objects.get_or_create(
+        self.value_fr, _ = LearningAchievement.objects.get_or_create(
             learning_unit_year_id=self.luy.id,
             code_name=self.code if self.code else '',
             language=language.find_by_code(FR_CODE_LANGUAGE)
@@ -77,11 +77,11 @@ class LearningAchievementEditForm(forms.ModelForm):
             code_name=self.code if self.code else '',
             language=language.find_by_code(EN_CODE_LANGUAGE)
         )
-        self.fields['text_fr'].initial = value_fr.text
+        self.fields['text_fr'].initial = self.value_fr.text
         self.fields['text_en'].initial = value_en.text
-        self.fields['lua_fr_id'].initial = value_fr.id
+        self.fields['lua_fr_id'].initial = self.value_fr.id
         self.fields['lua_en_id'].initial = value_en.id
-        self.fields['code_name'].initial = value_fr.code_name
+        self.fields['code_name'].initial = self.value_fr.code_name
 
     def _get_code_name_disabled_status(self):
         if self.instance.pk and self.instance.language.code == EN_CODE_LANGUAGE:
@@ -99,18 +99,14 @@ class LearningAchievementEditForm(forms.ModelForm):
 
         text_fr.save()
         text_en.save()
-        return text_fr
-        # instance = super().save(commit)
-        # learning_achievement_other_language = search(instance.learning_unit_year,
-        #                                              instance.order)
-        # if learning_achievement_other_language:
-        #     learning_achievement_other_language.update(code_name=instance.code_name)
-        #
-        # # FIXME : We must have a English entry for each french entries
         # # Needs a refactoring of its model to include all languages in a single row.
-        # if instance.language == language.find_by_code(FR_CODE_LANGUAGE):
-        #     LearningAchievement.objects.get_or_create(learning_unit_year=instance.learning_unit_year,
-        #                                               code_name=instance.code_name,
-        #                                               language=language.find_by_code(EN_CODE_LANGUAGE))
+        return text_fr
 
-        # return instance
+    def clean(self):
+        code_name = self.cleaned_data.get('code_name')
+        luy_id = self.luy.id
+        objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=luy_id)
+        if len(objects) > 0 and self.value_fr not in objects:
+            raise forms.ValidationError(_("This code already exists for this learning unit"))
+
+        return self.cleaned_data
