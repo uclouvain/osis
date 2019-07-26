@@ -60,10 +60,7 @@ def publish(education_group_year):
 
 
 def _bulk_publish(education_group_years):
-    return [
-        _publish(education_group_year) for education_group_year in education_group_years
-        if education_group_year.education_group_type.name != GroupType.COMMON_CORE.name
-    ]
+    return [_publish(education_group_year) for education_group_year in education_group_years]
 
 
 def _publish(education_group_year):
