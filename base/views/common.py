@@ -30,7 +30,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.contrib.auth.views import login as django_login
+from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.utils import translation
@@ -119,7 +119,7 @@ def login(request):
                 request.session[translation.LANGUAGE_SESSION_KEY] = user_language
     elif settings.OVERRIDED_LOGIN_URL:
         return redirect(settings.OVERRIDED_LOGIN_URL)
-    return django_login(request)
+    return LoginView.as_view()(request)
 
 
 @login_required
