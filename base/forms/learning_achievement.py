@@ -55,7 +55,6 @@ class LearningAchievementEditForm(forms.ModelForm):
 
         self.luy = kwargs.pop('luy', None)
         self.code = kwargs.pop('code', None)
-
         super().__init__(data, initial=initial, **kwargs)
 
         self._get_code_name_disabled_status()
@@ -86,10 +85,8 @@ class LearningAchievementEditForm(forms.ModelForm):
     def save(self, commit=True):
         text_fr = LearningAchievement.objects.get(id=self.cleaned_data['lua_fr_id'])
         text_en = LearningAchievement.objects.get(id=self.cleaned_data['lua_en_id'])
-
         text_fr.code_name = self.cleaned_data.get('code_name')
         text_en.code_name = self.cleaned_data.get('code_name')
-
         text_fr.text = self.cleaned_data.get('text_fr')
         text_en.text = self.cleaned_data.get('text_en')
 
@@ -99,10 +96,9 @@ class LearningAchievementEditForm(forms.ModelForm):
         return text_fr
 
     def clean_code_name(self):
-        code_name = self.cleaned_data.get('code_name')
+        code_name = self.cleaned_data.pop('code_name')
         luy_id = self.luy.id
         objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=luy_id)
         if len(objects) > 0 and self.value_fr not in objects:
-            raise forms.ValidationError(_("This code already exists for this learning unit"))
-
-        return self.cleaned_data
+            raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
+        return code_name
