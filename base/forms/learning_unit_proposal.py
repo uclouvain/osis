@@ -169,6 +169,8 @@ class CreationProposalBaseForm(ProposalBaseForm):
 
         super().__init__(data, person, default_ac_year=default_ac_year, proposal_type=ProposalType.CREATION.name)
         self._restrict_type_choice_for_proposal_creation(self.proposal_type)
+        self.fields['entity'].required = True
+        self.fields['folder_id'].required = True
 
     @transaction.atomic
     def save(self):
