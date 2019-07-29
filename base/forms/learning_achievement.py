@@ -98,7 +98,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         # # Needs a refactoring of its model to include all languages in a single row.
         return text_fr
 
-    def clean(self):
+    def clean_code_name(self):
         code_name = self.cleaned_data.get('code_name')
         luy_id = self.luy.id
         objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=luy_id)

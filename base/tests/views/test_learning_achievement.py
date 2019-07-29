@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
@@ -261,9 +260,10 @@ class TestLearningAchievementActions(TestCase):
             }
         )
 
-        expected_redirection = reverse("learning_unit_specifications",
-                                       kwargs={'learning_unit_year_id': self.learning_unit_year.id}) + "{}{}".format(
-            HTML_ANCHOR, learning_achievement.id)
+        expected_redirection = reverse(
+            "learning_unit_specifications",
+            kwargs={'learning_unit_year_id': self.learning_unit_year.id}
+        ) + "{}{}".format(HTML_ANCHOR, learning_achievement.id)
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
     def test_learning_achievement_create(self):
