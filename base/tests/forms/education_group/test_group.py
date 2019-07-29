@@ -89,7 +89,7 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
 
         self.assertEqual(form.fields["acronym"].initial, "yolo")
         self.assertEqual(form.fields["acronym"].required, False)
-        self.assertEqual(form.fields["acronym"].validators[1].regex, _lazy_re_compile("([A-Z]{2})(.*)"))
+        self.assertEqual(form.fields["acronym"].validators[2].regex, _lazy_re_compile("([A-Z]{2})(.*)"))
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def test_get_context_for_field_references_case_not_in_editing_pgrm_period(self, mock_authorized_types):

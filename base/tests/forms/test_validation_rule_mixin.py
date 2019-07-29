@@ -76,13 +76,13 @@ class TestValidationRuleMixin(TestCase):
         self.assertFalse(form.fields["iso_code"].disabled)
         self.assertIsNone(form.fields["iso_code"].initial)
         self.assertEqual(form.fields["iso_code"].widget.attrs['placeholder'], "LA")
-        self.assertIsInstance(form.fields["iso_code"].validators[1], RegexValidator)
+        self.assertIsInstance(form.fields["iso_code"].validators[2], RegexValidator)
 
         self.assertFalse(form.fields["cref_code"].required)
         self.assertFalse(form.fields["cref_code"].disabled)
         self.assertTrue(form.fields["cref_code"].warning)
         self.assertEqual(form.fields["cref_code"].initial, "LA")
-        self.assertIsInstance(form.fields["cref_code"].validators[1], RegexValidator)
+        self.assertIsInstance(form.fields["cref_code"].validators[2], RegexValidator)
 
     def test_is_valid(self):
         form = TestForm(
