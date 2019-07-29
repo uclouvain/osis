@@ -109,12 +109,7 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     learning_achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     form = LearningAchievementEditForm(
         request.POST or None,
-        luy=learning_unit_yr,
-        initial={
-            'learning_unit_year': learning_unit_yr,
-            'language_code': a_language_code,
-            'code_name': get_code_name(learning_achievement_fr, a_language_code)
-        }
+        luy=learning_unit_yr
     )
     form.load_initial()
 
@@ -146,11 +141,7 @@ def create_first(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     form = LearningAchievementEditForm(
         request.POST or None,
-        luy=learning_unit_yr,
-        initial={
-            'language': language.find_by_code(FR_CODE_LANGUAGE),
-            'learning_unit_year': learning_unit_yr
-        }
+        luy=learning_unit_yr
     )
     form.load_initial()
     if form.is_valid():

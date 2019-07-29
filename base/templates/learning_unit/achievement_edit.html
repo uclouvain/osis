@@ -29,6 +29,7 @@
     <button type="button" class="close" data-dismiss="modal">×</button>
     <h4>{% trans 'Learning achievements' %}</h4>
 </div>
+
 <div class="modal-body">
     <form id="form_achievement" role="form" method="post"
             {% if learning_achievement %}
@@ -63,24 +64,14 @@
             </div>
         </div>
     </form>
-
 </div>
 
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-    <input type="submit" value="{% trans "Save" %}" class="btn btn-primary" onclick="$('#form_achievement').submit();"/>
+    <input type="submit" value="{% trans "Save" %}" class="btn btn-primary" onclick="CKupdate(); $('#form_achievement').submit();"/>
 </div>
-{#{{ form.media }}#}
-<script>
-    $(function () {
-        var richText = $('#id_text_fr');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_fr', config);
 
-        var richText = $('#id_text_en');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_en', config);
-    });
+<script>
     $('#modification_tabs a').click(function (e) {
         e.preventDefault();
         $(this).tab('show');

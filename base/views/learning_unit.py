@@ -167,7 +167,6 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
 
     user_language = mdl.person.get_user_interface_language(request.user)
     context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
-    context['language_translated'] = find_language_in_settings(language)
     return render(request, "learning_unit/specifications_edit.html", context)
 
 

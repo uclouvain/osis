@@ -56,13 +56,9 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.luy = kwargs.pop('luy', None)
         self.code = kwargs.pop('code', None)
 
-        # if data and data.get('language_code'):
-        #     initial['language'] = language.find_by_code(data.get('language_code'))
-
         super().__init__(data, initial=initial, **kwargs)
 
         self._get_code_name_disabled_status()
-
         for key, value in initial.items():
             setattr(self.instance, key, value)
 
