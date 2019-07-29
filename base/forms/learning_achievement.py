@@ -43,8 +43,8 @@ class LearningAchievementEditForm(forms.ModelForm):
         required=False,
         label=_('English')
     )
-    lua_fr_id = forms.IntegerField(widget=forms.HiddenInput)
-    lua_en_id = forms.IntegerField(widget=forms.HiddenInput)
+    lua_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    lua_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     class Meta:
         model = LearningAchievement

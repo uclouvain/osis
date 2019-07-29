@@ -29,14 +29,13 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
-from base.business.learning_units.achievement import get_code_name, get_anchor_reference, DELETE, DOWN, UP, \
+from base.business.learning_units.achievement import get_anchor_reference, DELETE, DOWN, UP, \
     AVAILABLE_ACTIONS, HTML_ANCHOR
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.learning_unit import learning_unit_specifications
 from base.views.learning_units import perms
-from reference.models import language
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
@@ -89,6 +88,7 @@ def update(request, learning_unit_year_id, learning_achievement_id):
         code=learning_achievement.code_name
     )
     form.load_initial()
+
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
 
