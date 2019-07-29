@@ -24,46 +24,24 @@
 #
 ##############################################################################
 from django.test import TestCase
-from django.utils.translation import gettext_lazy as _
 
-from base.forms.learning_achievement import LearningAchievementEditForm
+from base.forms.learning_unit_specifications import LearningUnitSpecificationsEditForm
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import LanguageFactory
 
 
-class TestLearningAchievementForm(TestCase):
+class TestLearningSpecificationsForm(TestCase):
     def setUp(self):
-        self.language_fr = LanguageFactory(code="FR")
-        self.language_en = LanguageFactory(code="EN")
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year()
         )
 
-    def test_should_raise_validation_error_case_existing_code(self):
-        LearningAchievementFactory(
-            learning_unit_year=self.learning_unit_year,
-            language=self.language_fr,
-            code_name='TEST'
-        )
-
+    def test_valid_form(self):
         data = {
-            'code_name': 'TEST',
-            'lua_fr_id': 1,
-            'lua_en_id': 2
+            'trans_text_fr': 'FR_TEXT',
+            'trans_text_en': 'EN_TEXT',
+            'cms_fr_id': 1,
+            'cms_en_id': 2
         }
-        form = LearningAchievementEditForm(
-            luy=self.learning_unit_year,
-            data=data
-        )
-        form.load_initial()
-        self.assertFalse(form.is_valid(), form.errors)
-        self.assertDictEqual(
-            form.errors,
-            {
-                'code_name': [
-                    _("This code already exists for this learning unit")
-                ],
-            }
-        )
+        form = LearningUnitSpecificationsEditForm(data=data)
+        self.assertTrue(form.is_valid(), form.errors)
