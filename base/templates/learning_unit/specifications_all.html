@@ -104,12 +104,12 @@
                 <div class="row" style="margin-top:10px;">
                     <div class="col-md-2">
                         <label>{% trans 'Learning achievements' %}</label>
+                        <br>
                         {% if perms.base.can_edit_learningunit_specification and not achievements_FR and can_update_learning_achievement %}
-                            <a class="btn btn-info btn-sm trigger_modal"
-                               data-url="{% url 'achievement_create_first' learning_unit_year_id=learning_unit_year.id %}?language_code=FR"
-                               data-modal_class="modal-lg"
-                               title="{% trans 'Create' %}">
-                                {% trans 'Add another' %}
+                            <a class="btn btn-primary trigger_modal"
+                               data-url="{% url 'achievement_create_first' learning_unit_year_id=learning_unit_year.id %}"
+                               data-modal_class="modal-lg" title="{% trans 'Create' %}">
+                                {% trans 'Add' %}
                             </a>
                         {% endif %}
                     </div>
