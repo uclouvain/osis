@@ -28,6 +28,8 @@ from django.test import TestCase
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsEditForm
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from cms.models.translated_text import TranslatedText
+from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class TestLearningSpecificationsForm(TestCase):
@@ -35,13 +37,28 @@ class TestLearningSpecificationsForm(TestCase):
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year()
         )
+        self.laa = TranslatedTextFactory(
+            reference=self.learning_unit_year.id
+        )
+        self.laa_en = TranslatedTextFactory(
+            reference=self.learning_unit_year.id
+        )
 
-    def test_valid_form(self):
+    def test_valid_form_and_save_correctly_text(self):
         data = {
             'trans_text_fr': 'FR_TEXT',
             'trans_text_en': 'EN_TEXT',
-            'cms_fr_id': 1,
-            'cms_en_id': 2
+            'cms_fr_id': self.laa.id,
+            'cms_en_id': self.laa_en.id
         }
-        form = LearningUnitSpecificationsEditForm(data=data)
+        form = LearningUnitSpecificationsEditForm(
+            learning_unit_year=self.learning_unit_year,
+            data=data
+        )
+        form.load_initial()
         self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        text_fr = TranslatedText.objects.get(id=self.laa.id)
+        self.assertEqual(text_fr.text, 'FR_TEXT')
+        text_en = TranslatedText.objects.get(id=self.laa_en.id)
+        self.assertEqual(text_en.text, 'EN_TEXT')
