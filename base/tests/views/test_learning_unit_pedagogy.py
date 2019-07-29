@@ -307,7 +307,7 @@ class LearningUnitPedagogySummaryLockedTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.faculty_person = FacultyManagerFactory()
+        cls.faculty_person = FacultyManagerFactory('can_access_learningunit')
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,
