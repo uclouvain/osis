@@ -33,6 +33,7 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.person import PersonFactory
 
 
 class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
@@ -48,3 +49,4 @@ class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
     initial_data = {}
     entity = factory.SubFactory(EntityFactory)
     folder_id = factory.fuzzy.FuzzyInteger(100)
+    author = factory.SubFactory(PersonFactory)
