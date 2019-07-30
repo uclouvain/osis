@@ -34,10 +34,9 @@ def admin_permission_required(login_url=None, raise_exception=False):
     If the raise_exception parameter is given the PermissionDenied exception
     is raised.
     """
-
     def check_perms(user):
         # First check if the user has the permission (even anon users)
-        if user.is_superuser:
+        if user and user.is_superuser:
             return True
         # In case the 403 handler should be called raise the exception
         if raise_exception:
