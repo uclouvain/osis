@@ -31,7 +31,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
@@ -71,6 +71,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -486,7 +487,9 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.assertTemplateUsed(response, "page_not_found.html")
 
     def test_with_none_person(self):
-        self.person.delete()
+        user = UserFactory()
+        user.user_permissions.add(self.permission)
+        self.client.force_login(user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
