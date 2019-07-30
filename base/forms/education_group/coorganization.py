@@ -60,7 +60,9 @@ class CoorganizationEditForm(forms.ModelForm):
         css = {
             'all': ('css/select2-bootstrap.css',)
         }
-        js = ('js/education_group/coorganization.js',)
+        js = (
+            'js/education_group/coorganization.js',
+        )
 
     def __init__(self, education_group_year=None, *args, **kwargs):
         if not education_group_year and not kwargs.get('instance'):

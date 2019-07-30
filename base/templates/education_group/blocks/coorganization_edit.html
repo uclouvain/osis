@@ -25,6 +25,7 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
+
 <div class="panel panel-default">
     <div class="panel-body" id="panel_coorganization" id="formset"
          data-formset-prefix="{{ form_coorganization.prefix }}">
@@ -73,7 +74,7 @@
                                 {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                             </td>
                         </tr>
-{#                        {{ form.media }}#}
+                        {{ form.media }}
                     {% endfor %}
                     </tbody>
                 </table>
@@ -82,8 +83,10 @@
     </div>
 </div>
 
-{{ form_coorganization.media }}
 <script src="{% static 'js/jquery.formset.js' %}"></script>
+
+
+{{ form_coorganization.media }}
 
 <script>
     $(document).ready(function () {
