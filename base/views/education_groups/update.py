@@ -54,7 +54,6 @@ from base.views.common import display_success_messages, display_warning_messages
 from base.views.education_groups.detail import EducationGroupGenericDetailView
 from base.views.education_groups.perms import can_change_education_group
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
-from reference.models.country import Country
 
 
 @login_required
@@ -190,8 +189,7 @@ def _update_training(request, education_group_year, root):
         formset_list = OrganizationFormset(
             data=request.POST,
             form_kwargs={'education_group_year': education_group_year},
-            queryset=education_group_year.coorganizations,
-            initial=[{'country': Country.objects.get(name='France')}]
+            queryset=education_group_year.coorganizations
         )
         pprint(formset_list)
         if form_education_group_year.is_valid() and formset_list.is_valid():
@@ -202,8 +200,7 @@ def _update_training(request, education_group_year, root):
         formset_list = OrganizationFormset(
             request.GET or None,
             form_kwargs={'education_group_year': education_group_year},
-            queryset=education_group_year.coorganizations,
-            initial=[{'country': Country.objects.get(name='France')}]
+            queryset=education_group_year.coorganizations
         )
 
     return render(request, "education_group/update_trainings.html", {

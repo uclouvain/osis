@@ -44,9 +44,8 @@
                         <th></th>
                     </tr>
                     </thead>
-                    <tbody data-formset-body>
+                    <tbody data-formset-body id="coorganization-form">
                     {% for form in form_coorganization.forms %}
-
                         <tr class="link-formset" data-formset-form>
                             {{ form.id }}
                             <td>
@@ -74,6 +73,7 @@
                                 {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
                             </td>
                         </tr>
+{#                        {{ form.media }}#}
                     {% endfor %}
                     </tbody>
                 </table>
@@ -81,22 +81,17 @@
         {% endif %}
     </div>
 </div>
-<script src="{% static 'js/jquery.formset.js' %}"></script>
-{#<script>#}
-{#    $(function() {#}
-{#        $('.link-formset').formset({#}
-{#            addText: '<span class="fas fa-plus"></span>',#}
-{#            deleteText: '<span class="fas fa-trash-alt"></span>',#}
-{#            deleteCssClass: 'delete-row'#}
-{#        });#}
-{#    })#}
-{#</script>#}
-<script>
 
-    $('.link-formset').formset({
-        addText: '<span class="fas fa-plus"></span>',
-        deleteText: '<span class="fas fa-trash-alt"></span>',
-        deleteCssClass: 'delete-row btn',
-        prefix: '{{ formset.prefix }}'
+{{ form_coorganization.media }}
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.link-formset').formset({
+            addText: '<span class="fas fa-plus"></span>',
+            deleteText: '<span class="fas fa-trash-alt"></span>',
+            deleteCssClass: 'delete-row',
+            prefix: '{{ form_coorganization.prefix }}'
+        });
     });
 </script>
