@@ -182,8 +182,6 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
