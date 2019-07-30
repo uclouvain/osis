@@ -45,25 +45,25 @@ ITEMS_PER_PAGE = 25
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def page_not_found(request, exception):
+def page_not_found(request, **kwargs):
     response = render(request, 'page_not_found.html', {})
     response.status_code = 404
     return response
 
 
-def method_not_allowed(request):
+def method_not_allowed(request, **kwargs):
     response = render(request, 'method_not_allowed.html', {})
     response.status_code = 405
     return response
 
 
-def access_denied(request, exception):
+def access_denied(request, exception, **kwargs):
     response = render(request, 'access_denied.html', {'exception': exception})
     response.status_code = 403
     return response
 
 
-def server_error(request):
+def server_error(request, **kwargs):
     response = render(request, 'server_error.html', {})
     response.status_code = 500
     return response
