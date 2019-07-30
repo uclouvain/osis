@@ -39,6 +39,7 @@ pyyaml>=4.2b1
 mock==2.0.0
 behave-django==1.3.0
 exrex==0.10.5
+django-autocomplete-light==3.4.1
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
