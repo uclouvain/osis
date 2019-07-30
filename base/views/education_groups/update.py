@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from pprint import pprint
 
 from dal import autocomplete
 from django import forms
@@ -185,15 +184,12 @@ def _update_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
     if request.method == 'POST':
-        pprint(request.POST)
         formset_list = OrganizationFormset(
             data=request.POST,
             form_kwargs={'education_group_year': education_group_year},
             queryset=education_group_year.coorganizations
         )
-        pprint(formset_list)
         if form_education_group_year.is_valid() and formset_list.is_valid():
-            pprint(formset_list.cleaned_data)
             formset_list.save()
             return _common_success_redirect(request, form_education_group_year, root)
     else:
