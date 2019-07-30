@@ -1,6 +1,7 @@
 {% load staticfiles bootstrap3 %}
 {% load format %}
 {% load i18n education_group %}
+
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -25,67 +26,77 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 <div class="panel panel-default">
-    <div class="panel-body" id="panel_coorganization">
+    <div class="panel-body" id="panel_coorganization" id="formset"
+         data-formset-prefix="{{ form_coorganization.prefix }}">
+        {{ form_coorganization.management_form }}
         <label>{% trans 'Program organized with other institutes' %}</label>
         {% if education_group_year.coorganizations %}
             <div class="table-responsive">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>{% trans 'Country' %}</th>
-                    <th>{% trans 'Institution' %}</th>
-                    <th></th>
-                    <th></th>
-                    <th>{% trans 'UCL Diploma' %}</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ form_coorganization.management_form }}
-                {% for form in form_coorganization.forms %}
-                    {{ form.id }}
-                    <tr class="link-formset">
-                        <td>
-                            {% bootstrap_field form.country show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.organization show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.all_students %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.enrollment_place show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.diploma show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.is_producing_cerfificate %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.is_producing_annexe %}
-                        </td>
-                        <td></td>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>{% trans 'Country' %}</th>
+                        <th>{% trans 'Institution' %} *</th>
+                        <th></th>
+                        <th></th>
+                        <th>{% trans 'UCL Diploma' %}</th>
+                        <th></th>
+                        <th></th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody data-formset-body>
+                    {% for form in form_coorganization.forms %}
+
+                        <tr class="link-formset" data-formset-form>
+                            {{ form.id }}
+                            <td>
+                                {% bootstrap_field form.country show_label=False %}
+                            </td>
+                            <td>
+                                {% bootstrap_field form.organization show_label=False %}
+                            </td>
+                            <td>
+                                {% bootstrap_field form.all_students %}
+                            </td>
+                            <td>
+                                {% bootstrap_field form.enrollment_place show_label=False %}
+                            </td>
+                            <td>
+                                {% bootstrap_field form.diploma show_label=False %}
+                            </td>
+                            <td>
+                                {% bootstrap_field form.is_producing_cerfificate %}
+                            </td>
+                            <td>
+                                {% bootstrap_field form.is_producing_annexe %}
+                            </td>
+                            <td>
+                                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         {% endif %}
     </div>
 </div>
-
- <script src="{% static 'js/jquery.formset.js' %}"></script>
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+{#<script>#}
+{#    $(function() {#}
+{#        $('.link-formset').formset({#}
+{#            addText: '<span class="fas fa-plus"></span>',#}
+{#            deleteText: '<span class="fas fa-trash-alt"></span>',#}
+{#            deleteCssClass: 'delete-row'#}
+{#        });#}
+{#    })#}
+{#</script>#}
 <script>
+
     $('.link-formset').formset({
         addText: '<span class="fas fa-plus"></span>',
         deleteText: '<span class="fas fa-trash-alt"></span>',
-        deleteCssClass: 'delete-row btn'
+        deleteCssClass: 'delete-row btn',
+        prefix: '{{ formset.prefix }}'
     });
-    var deleteButton = document.getElementsByClassName("delete-row");
-    for (var i = 0; i < deleteButton.length; i++) {
-        deleteButton[i].innerHTML = '<span class="fas fa-trash-alt"></span>';
-    }
-</script> 
+</script>

@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from pprint import pprint
+
 from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.forms import modelformset_factory
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -39,13 +40,12 @@ from base import models as mdl_base
 from base.business.education_groups import perms
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.forms.education_group.common import EducationGroupModelForm
-from base.forms.education_group.coorganization import CoorganizationEditForm
+from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm, CertificateAimsForm
 from base.models.academic_year import starting_academic_year
 from base.models.certificate_aim import CertificateAim
-from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
@@ -54,6 +54,7 @@ from base.views.common import display_success_messages, display_warning_messages
 from base.views.education_groups.detail import EducationGroupGenericDetailView
 from base.views.education_groups.perms import can_change_education_group
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
+from reference.models.country import Country
 
 
 @login_required
@@ -184,20 +185,25 @@ def _update_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
-    OrganizationFormset = modelformset_factory(model=EducationGroupOrganization, form=CoorganizationEditForm, extra=0)
     if request.method == 'POST':
+        pprint(request.POST)
         formset_list = OrganizationFormset(
             data=request.POST,
             form_kwargs={'education_group_year': education_group_year},
-            queryset=education_group_year.coorganizations
+            queryset=education_group_year.coorganizations,
+            initial=[{'country': Country.objects.get(name='France')}]
         )
+        pprint(formset_list)
         if form_education_group_year.is_valid() and formset_list.is_valid():
+            pprint(formset_list.cleaned_data)
             formset_list.save()
             return _common_success_redirect(request, form_education_group_year, root)
     else:
         formset_list = OrganizationFormset(
+            request.GET or None,
             form_kwargs={'education_group_year': education_group_year},
-            queryset=education_group_year.coorganizations
+            queryset=education_group_year.coorganizations,
+            initial=[{'country': Country.objects.get(name='France')}]
         )
 
     return render(request, "education_group/update_trainings.html", {
@@ -215,8 +221,7 @@ def _update_training(request, education_group_year, root):
         'can_change_coorganization': perms.is_eligible_to_change_coorganization(
             person=request.user.person,
             education_group=education_group_year,
-        ),
-        'is_edit': True
+        )
     })
 
 

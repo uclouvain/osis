@@ -26,12 +26,12 @@
 from dal import autocomplete
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import ModelChoiceField
+from django.forms import ModelChoiceField, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.education_group_organization import EducationGroupOrganization
-from reference.models.country import Country
 from base.models.organization import Organization
+from reference.models.country import Country
 
 
 class CoorganizationEditForm(forms.ModelForm):
@@ -92,3 +92,11 @@ class CoorganizationEditForm(forms.ModelForm):
     def is_valid(self):
         return super(CoorganizationEditForm, self).is_valid() and \
                self.check_unique_constraint_between_education_group_year_organization()
+
+
+OrganizationFormset = modelformset_factory(
+    model=EducationGroupOrganization,
+    form=CoorganizationEditForm,
+    extra=0,
+    can_delete=True
+)
