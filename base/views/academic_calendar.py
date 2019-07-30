@@ -96,7 +96,6 @@ def _get_undated_calendars(academic_calendar_list):
 
 
 @login_required
-@admin_permission_required(raise_exception=True)
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
 @cache_filter(show_academic_events='on', show_project_events='on')
 def academic_calendars(request):
@@ -144,7 +143,6 @@ def _build_gantt_markers_data(academic_calendar_list, show_ad_hoc_events):
 
 
 @login_required
-@admin_permission_required(raise_exception=True)
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
 def academic_calendar_read(request, academic_calendar_id):
     academic_calendar = get_object_or_404(mdl.academic_calendar.AcademicCalendar, pk=academic_calendar_id)
