@@ -233,6 +233,11 @@ class PersonTest(PersonTestCase):
     def test_get_user_interface_language_with_user_without_person(self):
         self.assertEqual(get_user_interface_language(self.an_user), "fr-be")
 
+    def test_get_user_interface_language_with_person_without_language(self):
+        user_1 = user.UserFactory()
+        PersonFactory(user=user_1, language=None)
+        self.assertEqual(get_user_interface_language(user_1), "fr-be")
+
     def test_str_function_with_data(self):
         self.person_with_user.middle_name = "Junior"
         self.person_with_user.save()

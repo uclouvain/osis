@@ -158,10 +158,8 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
                                                     get_object_or_404(Person, user=request.user))
     label_name = request.GET.get('label')
     text_lb = text_label.get_by_name(label_name)
-    language = request.GET.get('language')
     form = LearningUnitSpecificationsEditForm(**{
         'learning_unit_year': context['learning_unit_year'],
-        'language': language,
         'text_label': text_lb
     })
     form.load_initial()  # Load data from database
@@ -169,7 +167,6 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
 
     user_language = mdl.person.get_user_interface_language(request.user)
     context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
-    context['language_translated'] = find_language_in_settings(language)
     return render(request, "learning_unit/specifications_edit.html", context)
 
 
