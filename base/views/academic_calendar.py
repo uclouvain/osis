@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -41,7 +41,6 @@ from base.models.enums.academic_calendar_type import ACADEMIC_CATEGORY, PROJECT_
 from base.models.utils.utils import get_object_or_none
 from base.utils.cache import cache_filter
 from base.views import common
-from base.views.decorators import admin_permission_required
 from base.views.mixins import RulesRequiredMixin
 
 
@@ -156,7 +155,7 @@ def academic_calendar_read(request, academic_calendar_id):
 
 
 @login_required
-@admin_permission_required(raise_exception=True)
+@user_passes_test(lambda u: u.is_superuser, login_url='academic_calendars', redirect_field_name=None)
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
 def academic_calendar_form(request, academic_calendar_id):
     academic_calendar = get_object_or_none(AcademicCalendar, pk=academic_calendar_id)
