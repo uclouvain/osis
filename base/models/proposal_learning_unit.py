@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -67,7 +68,7 @@ class ProposalLearningUnit(models.Model):
 
     initial_data = JSONField(default={}, encoder=DjangoJSONEncoder)
     entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
-    folder_id = models.PositiveIntegerField()
+    folder_id = models.PositiveIntegerField(validators=[MaxValueValidator(9999999)])
 
     class Meta:
         permissions = (

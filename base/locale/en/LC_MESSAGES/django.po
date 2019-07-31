@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-19 15:54+0200\n"
+"POT-Creation-Date: 2019-07-26 09:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -471,12 +471,12 @@ msgstr ""
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
 #: templates/learning_unit/blocks/panel/educational_informations.html:99
 #: templates/learning_unit/select_attribution.html:67
+#: templates/learning_unit/specifications_all.html:243
 msgid "Add"
 msgstr ""
 
 #: templates/education_group/blocks/coorganization.html:158
-#: templates/learning_unit/specifications_all.html:115
-#: templates/learning_unit/specifications_all.html:238
+#: templates/learning_unit/specifications_all.html:112
 msgid "Add another"
 msgstr ""
 
@@ -534,8 +534,8 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:281
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:51
-#: templates/learning_unit/identification.html:245 views/learning_unit.py:245
-#: views/learning_unit.py:365 views/learning_unit.py:383
+#: templates/learning_unit/identification.html:245 views/learning_unit.py:243
+#: views/learning_unit.py:363 views/learning_unit.py:381
 msgid "Additional requirement entity 1"
 msgstr ""
 
@@ -544,8 +544,8 @@ msgstr ""
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:53
 #: templates/learning_unit/identification.html:246
 #: tests/forms/test_learning_unit_postponement.py:677
-#: views/learning_unit.py:248 views/learning_unit.py:366
-#: views/learning_unit.py:384
+#: views/learning_unit.py:246 views/learning_unit.py:364
+#: views/learning_unit.py:382
 msgid "Additional requirement entity 2"
 msgstr ""
 
@@ -666,7 +666,7 @@ msgstr ""
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr ""
 
-#: templates/learning_unit/specifications_all.html:260
+#: templates/learning_unit/specifications_all.html:267
 msgid "Are you sure you want to delete the achievement?"
 msgstr ""
 
@@ -719,8 +719,8 @@ msgid ""
 "At least a partim volume value is greater than corresponding volume of parent"
 msgstr ""
 
-#: templates/learning_unit/specifications_all.html:124
-#: templates/learning_unit/specifications_all.html:129
+#: templates/learning_unit/specifications_all.html:121
+#: templates/learning_unit/specifications_all.html:126
 msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
@@ -873,7 +873,7 @@ msgstr ""
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
 #: templates/education_group/tab_edit_administrative_data.html:100
-#: templates/learning_unit/achievement_edit.html:50
+#: templates/learning_unit/achievement_edit.html:69
 #: templates/learning_unit/add_charge_repartition_inner.html:66
 #: templates/learning_unit/blocks/form/volumes_management_form.html:85
 #: templates/learning_unit/blocks/modal/modal_comparison.html:43
@@ -888,7 +888,7 @@ msgstr ""
 #: templates/learning_unit/proposal/create_suppression.html:20
 #: templates/learning_unit/proposal/update_suppression.html:20
 #: templates/learning_unit/simple/update_end_date.html:14
-#: templates/learning_unit/specifications_edit.html:42
+#: templates/learning_unit/specifications_edit.html:54
 #: templates/learning_unit/teaching_material/modal_edit.html:44
 msgid "Cancel"
 msgstr ""
@@ -1204,8 +1204,8 @@ msgstr ""
 #: templates/education_group/blocks/panel/panel_achievements.html:99
 #: templates/education_group/blocks/panel/panel_achievements.html:111
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:28
-#: templates/learning_unit/specifications_all.html:114
-#: templates/learning_unit/specifications_all.html:236
+#: templates/learning_unit/specifications_all.html:111
+#: templates/learning_unit/specifications_all.html:241
 msgid "Create"
 msgstr ""
 
@@ -1460,7 +1460,7 @@ msgstr ""
 #: templates/education_group/blocks/admission_condition_table_row.html:70
 #: templates/education_group/blocks/content_actions.html:39
 #: templates/education_group/blocks/form/achievement_action_bar.html:19
-#: templates/learning_unit/specifications_all.html:148
+#: templates/learning_unit/specifications_all.html:145
 msgid "Down"
 msgstr ""
 
@@ -1489,10 +1489,9 @@ msgstr ""
 #: templates/education_group/blocks/row_label_general_informations.html:36
 #: templates/learning_unit/blocks/panel/cms_informations.html:38
 #: templates/learning_unit/blocks/panel/cms_informations.html:65
-#: templates/learning_unit/specifications_all.html:54
-#: templates/learning_unit/specifications_all.html:82
-#: templates/learning_unit/specifications_all.html:187
-#: templates/learning_unit/specifications_all.html:220
+#: templates/learning_unit/specifications_all.html:48
+#: templates/learning_unit/specifications_all.html:189
+#: templates/learning_unit/specifications_all.html:224
 #: templates/organization/organization_address.html:69
 #: templates/organization/organization_address.html:72
 msgid "Edit"
@@ -1594,10 +1593,12 @@ msgid "Ending of exam registration"
 msgstr ""
 
 #: forms/education_group/achievement.py:55
-#: forms/education_group/achievement.py:85
+#: forms/education_group/achievement.py:85 forms/learning_achievement.py:44
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
+#: templates/learning_unit/achievement_edit.html:52
 #: templates/learning_unit/blocks/panel/educational_informations.html:57
+#: templates/learning_unit/specifications_edit.html:38
 msgid "English"
 msgstr ""
 
@@ -1868,10 +1869,12 @@ msgid "Formerly"
 msgstr ""
 
 #: forms/education_group/achievement.py:49
-#: forms/education_group/achievement.py:79
+#: forms/education_group/achievement.py:79 forms/learning_achievement.py:39
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
+#: templates/learning_unit/achievement_edit.html:51
 #: templates/learning_unit/blocks/panel/educational_informations.html:56
+#: templates/learning_unit/specifications_edit.html:37
 msgid "French"
 msgstr ""
 
@@ -2253,7 +2256,6 @@ msgstr ""
 #: business/proposal_xls.py:58 models/abstracts/abstract_achievement.py:48
 #: models/learning_unit_year.py:171
 #: templates/learning_unit/blocks/panel/educational_informations.html:55
-#: templates/learning_unit/specifications_all.html:29
 #: templates/my_osis/profile.html:102
 #: tests/business/learning_units/test_edition.py:170
 #: tests/business/test_proposal_xls.py:111
@@ -2289,8 +2291,8 @@ msgid ""
 "successfuly created."
 msgstr ""
 
-#: templates/learning_unit/achievement_edit.html:42
-#: templates/learning_unit/specifications_all.html:109
+#: templates/learning_unit/achievement_edit.html:30
+#: templates/learning_unit/specifications_all.html:106
 msgid "Learning achievements"
 msgstr ""
 
@@ -3246,8 +3248,8 @@ msgstr ""
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:46
 #: tests/business/test_proposal_xls.py:151
 #: tests/business/test_proposal_xls.py:161
-#: tests/views/test_learning_unit.py:1539 views/learning_unit.py:236
-#: views/learning_unit.py:361 views/learning_unit.py:379
+#: tests/views/test_learning_unit.py:1539 views/learning_unit.py:234
+#: views/learning_unit.py:359 views/learning_unit.py:377
 msgid "Planned classes"
 msgstr ""
 
@@ -3713,8 +3715,8 @@ msgstr ""
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
 #: templates/learning_unit/identification.html:243
 #: tests/forms/test_learning_unit_postponement.py:596
-#: views/learning_unit.py:242 views/learning_unit.py:364
-#: views/learning_unit.py:382
+#: views/learning_unit.py:240 views/learning_unit.py:362
+#: views/learning_unit.py:380
 msgid "Requirement entity"
 msgstr ""
 
@@ -3761,14 +3763,14 @@ msgstr ""
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
-#: templates/learning_unit/achievement_edit.html:51
+#: templates/learning_unit/achievement_edit.html:70
 #: templates/learning_unit/add_charge_repartition_inner.html:67
 #: templates/learning_unit/blocks/form/volumes_management_form.html:81
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:15
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:19
-#: templates/learning_unit/specifications_edit.html:41
+#: templates/learning_unit/specifications_edit.html:53
 #: templates/learning_unit/teaching_material/modal_edit.html:43
 msgid "Save"
 msgstr ""
@@ -4100,10 +4102,6 @@ msgstr ""
 #: models/enums/academic_calendar_type.py:62
 #: tests/models/test_academic_calendar.py:113
 msgid "Testing"
-msgstr ""
-
-#: forms/learning_achievement.py:36
-msgid "Text"
 msgstr ""
 
 #: templates/learning_unit/blocks/panel/proposal.html:28
@@ -4516,7 +4514,7 @@ msgid ""
 "The sum of the volumes of the entities must be equal to the global volume"
 msgstr ""
 
-#: tests/views/test_learning_unit.py:1337 views/learning_unit.py:497
+#: tests/views/test_learning_unit.py:1337 views/learning_unit.py:495
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4645,6 +4643,10 @@ msgstr ""
 #: models/enums/learning_container_year_types.py:42
 #: models/enums/learning_container_year_types.py:52
 msgid "Thesis"
+msgstr ""
+
+#: forms/learning_achievement.py:110
+msgid "This code already exists for this learning unit"
 msgstr ""
 
 #: business/education_groups/perms.py:140
@@ -4913,7 +4915,7 @@ msgstr ""
 #: templates/education_group/blocks/admission_condition_table_row.html:64
 #: templates/education_group/blocks/content_actions.html:38
 #: templates/education_group/blocks/form/achievement_action_bar.html:14
-#: templates/learning_unit/specifications_all.html:142
+#: templates/learning_unit/specifications_all.html:139
 msgid "Up"
 msgstr ""
 
@@ -5042,8 +5044,8 @@ msgstr ""
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:335
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:38
-#: tests/views/test_learning_unit.py:1540 views/learning_unit.py:238
-#: views/learning_unit.py:362 views/learning_unit.py:380
+#: tests/views/test_learning_unit.py:1540 views/learning_unit.py:236
+#: views/learning_unit.py:360 views/learning_unit.py:378
 msgid "Volume Q1"
 msgstr ""
 
@@ -5051,8 +5053,8 @@ msgstr ""
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:339
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:40
-#: tests/views/test_learning_unit.py:1541 views/learning_unit.py:240
-#: views/learning_unit.py:363 views/learning_unit.py:381
+#: tests/views/test_learning_unit.py:1541 views/learning_unit.py:238
+#: views/learning_unit.py:361 views/learning_unit.py:379
 msgid "Volume Q2"
 msgstr ""
 
@@ -5062,8 +5064,8 @@ msgstr ""
 
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:105
-#: tests/views/test_learning_unit.py:1538 views/learning_unit.py:234
-#: views/learning_unit.py:360 views/learning_unit.py:378
+#: tests/views/test_learning_unit.py:1538 views/learning_unit.py:232
+#: views/learning_unit.py:358 views/learning_unit.py:376
 msgid "Volume total annual"
 msgstr ""
 
@@ -5571,7 +5573,7 @@ msgstr ""
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:17
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:17
 #: templates/learning_unit/remove_charge_repartition_confirmation_inner.html:31
-#: templates/learning_unit/specifications_all.html:154
+#: templates/learning_unit/specifications_all.html:150
 #: templates/my_osis/my_message.html:62
 msgid "delete"
 msgstr ""
