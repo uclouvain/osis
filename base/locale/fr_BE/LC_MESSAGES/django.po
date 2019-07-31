@@ -6258,6 +6258,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:176
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Text"
-#~ msgstr "Texte"

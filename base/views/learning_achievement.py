@@ -87,7 +87,6 @@ def update(request, learning_unit_year_id, learning_achievement_id):
         luy=learning_unit_year,
         code=learning_achievement.code_name
     )
-    form.load_initial()
 
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
@@ -111,7 +110,6 @@ def create(request, learning_unit_year_id, learning_achievement_id):
         request.POST or None,
         luy=learning_unit_yr
     )
-    form.load_initial()
 
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
@@ -143,7 +141,7 @@ def create_first(request, learning_unit_year_id):
         request.POST or None,
         luy=learning_unit_yr
     )
-    form.load_initial()
+
     if form.is_valid():
         return _save_and_redirect(form, learning_unit_year_id)
 

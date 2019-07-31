@@ -60,6 +60,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         self._get_code_name_disabled_status()
         for key, value in initial.items():
             setattr(self.instance, key, value)
+        self.load_initial()
 
     def load_initial(self):
         self.value_fr, _ = LearningAchievement.objects.get_or_create(
