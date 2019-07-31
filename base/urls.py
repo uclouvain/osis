@@ -42,7 +42,6 @@ from base.views import learning_achievement, search, education_groups
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
-from base.views.decorators import admin_permission_required
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
@@ -100,9 +99,7 @@ urlpatterns = [
             name='academic_calendar_read'),
         url(r'^form(?:/(?P<academic_calendar_id>[0-9]+))?/$', academic_calendar.academic_calendar_form,
             name='academic_calendar_form'),
-        url(r'^delete(?:/(?P<pk>[0-9]+))?/$', admin_permission_required(raise_exception=True)(academic_calendar.
-                                                                                              AcademicCalendarDelete.
-                                                                                              as_view()),
+        url(r'^delete(?:/(?P<pk>[0-9]+))?/$', academic_calendar.AcademicCalendarDelete.as_view(),
             name='academic_calendar_delete'),
     ])),
 
