@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -155,9 +155,10 @@ def academic_calendar_read(request, academic_calendar_id):
 
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser, login_url='academic_calendars', redirect_field_name=None)
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
 def academic_calendar_form(request, academic_calendar_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     academic_calendar = get_object_or_none(AcademicCalendar, pk=academic_calendar_id)
 
     if request.method == 'GET':
