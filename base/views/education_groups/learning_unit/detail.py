@@ -137,7 +137,7 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
         context['is_prerequisites_list'] = Prerequisite.objects.filter(
             prerequisiteitem__learning_unit=luy.learning_unit,
             education_group_year=root
-        )
+        ).select_related('learning_unit_year')
         return context
 
     def render_to_response(self, context, **response_kwargs):
