@@ -419,7 +419,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         all_components = components_queryset.order_by('acronym') \
             .select_related('learning_unit_year')
         for learning_component_year in all_components:
-            _warnings.extend(learning_component_year.warnings)
+            if self.is_partim():
+                if learning_component_year.learning_unit_year == self\
+                        or self.parent == learning_component_year.learning_unit_year:
+                    _warnings.extend(learning_component_year.warnings)
+            else:
+                _warnings.extend(learning_component_year.warnings)
 
         return _warnings
 
