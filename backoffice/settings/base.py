@@ -56,7 +56,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
     'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
-    'dal_legacy_static',
+    'dal_legacy_static',  # TODO : Useless in Django 2.0
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -31,7 +31,7 @@
          data-formset-prefix="{{ form_coorganization.prefix }}">
         {{ form_coorganization.management_form }}
         <label>{% trans 'Program organized with other institutes' %}</label>
-        {% if education_group_year.coorganizations %}
+{#        {% if education_group_year.coorganizations %}#}
             <div class="table-responsive">
                 <table class="table">
                     <thead>
@@ -59,7 +59,7 @@
                                 {% bootstrap_field form.all_students %}
                             </td>
                             <td>
-                                {% bootstrap_field form.enrollment_place show_label=False %}
+                                {% bootstrap_field form.enrollment_place %}
                             </td>
                             <td>
                                 {% bootstrap_field form.diploma show_label=False %}
@@ -79,9 +79,10 @@
                     </tbody>
                 </table>
             </div>
-        {% endif %}
+{#        {% endif %}#}
     </div>
 </div>
+
 
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 
@@ -93,7 +94,6 @@
         $('.link-formset').formset({
             addText: '<span class="fas fa-plus"></span>',
             deleteText: '<span class="fas fa-trash-alt"></span>',
-            deleteCssClass: 'delete-row',
             prefix: '{{ form_coorganization.prefix }}'
         });
     });
