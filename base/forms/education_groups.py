@@ -72,9 +72,6 @@ class EducationGroupFilter(FilterSet):
         label=_('Type'),
         widget=autocomplete.ModelSelect2Multiple(
             url='education_group_type_autocomplete',
-            attrs={
-                'minimumResultsForSearch': -1,
-            },
             forward=['category'],
         ),
     )
