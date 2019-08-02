@@ -62,17 +62,26 @@
                     <a href="{% url 'learning_unit' learning_unit_year.pk %}">
                         <ins>{{ learning_unit_year.acronym }}</ins>
                     </a>
-                    {% trans 'is a prereqisite of' %}:
+                    {% trans 'is a prereqisite of' %} :
                 </p>
-
-                {% for p in is_prerequisites_list %}
-                    <a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a>
-                    {% if is_prerequisites_list|length > 1 %}
-                        {% if not forloop.last %}
-                            ,
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Title' %}</th>
+                            <th>{% trans 'Credits' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in is_prerequisites_list %}
+                            <tr>
+                                <td><a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a></td>
+                                <td>{{ p.learning_unit_year.complete_title }}</td>
+                                <td>{{ p.learning_unit_year.credits }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     {% endif %}
