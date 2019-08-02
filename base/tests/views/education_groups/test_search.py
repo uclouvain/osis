@@ -46,7 +46,7 @@ from base.tests.factories.user import UserFactory
 from base.utils.cache import RequestCache
 from education_group.api.serializers.education_group import EducationGroupSerializer
 
-FILTER_DATA = {"acronym": "LBIR", "title": "dummy filter"}
+FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 
 
 class TestEducationGroupSearchView(TestCase):

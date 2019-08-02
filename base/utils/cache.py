@@ -106,7 +106,10 @@ class RequestCache(OsisCache):
         new_get_request = QueryDict(mutable=True)
         new_get_request.update({**request.GET.dict()})
         for key, value in cached_value.items():
-            new_get_request.setlist(key, value)
+            if type(value) == list:
+                new_get_request.setlist(key, value)
+            else:
+                new_get_request[key] = value
         return new_get_request
 
 
