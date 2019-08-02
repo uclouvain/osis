@@ -73,9 +73,7 @@ class EducationGroupFilter(FilterSet):
         widget=autocomplete.ModelSelect2Multiple(
             url='education_group_type_autocomplete',
             attrs={
-                'data-html': True,
-                'data-placeholder': _('Search...'),
-                'data-width': '100%',
+                'minimumResultsForSearch': -1,
             },
             forward=['category'],
         ),

@@ -263,6 +263,12 @@
             var field_name = element.replace(id_search, "");
             return field_name;
         }
+
+        // Disable typing on education group type select input
+        $('#id_education_group_type').on('select2:opening select2:closing', function( event ) {
+            var $searchfield = $(this).parent().find('.select2-search__field');
+            $searchfield.prop('disabled', true);
+        });
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
 {% endblock %}
