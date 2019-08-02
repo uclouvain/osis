@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
@@ -69,7 +70,15 @@ class EducationGroupFilter(FilterSet):
         queryset=EducationGroupType.objects.none(),
         required=False,
         label=_('Type'),
-        widget=SelectMultipleWithData
+        widget=autocomplete.ModelSelect2Multiple(
+            url='education_group_type_autocomplete',
+            attrs={
+                'data-html': True,
+                'data-placeholder': _('Search...'),
+                'data-width': '100%',
+            },
+            forward=['category'],
+        ),
     )
     management_entity = filters.CharFilter(
         method='filter_with_entity_subordinated',

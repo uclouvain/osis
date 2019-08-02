@@ -96,6 +96,7 @@
                 <input type="hidden" id="xls_order" name="xls_order">
 
                 {% bootstrap_field form.ordering %}
+                {{ form.media }}
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
@@ -162,42 +163,6 @@
 
 {% block script %}
     <script>
-        jQuery.fn.filterTypeByCategory = function (category) {
-            return this.each(function () {
-                var select = this;
-                var options = [];
-                $(select).find('option').each(function () {
-                    options.push({
-                        value: $(this).val(),
-                        category: $(this).data('category'),
-                        text: $(this).text()
-                    });
-                });
-                $(select).data('options', options);
-
-                $(category).on('change', function () {
-                    var currentValues = $(select).val();
-                    var options = $(select).empty().data('options');
-                    var newCategory = $(category).val();
-                    var valuesToReselect = [];
-
-                    $.each(options, function (i) {
-                        var option = options[i];
-                        if (option.category === newCategory || option.value === "" || newCategory === "") {
-                            $(select).append(
-                                $('<option>').text(option.text).val(option.value).data('category', option.category)
-                            );
-                            // Try to keep the old value
-                            if (currentValues.indexOf(option.value) !== -1) {
-                                valuesToReselect.push(option.value);
-                            }
-                        }
-                    });
-                    $(select).val(valuesToReselect);
-                }).trigger('change');
-            });
-        };
-
         $(document).ready(function () {
             let domTable = $('#table_education_groups');
             domTable.DataTable({
@@ -258,7 +223,6 @@
                     }
                 }
             });
-           $('#id_education_group_type').filterTypeByCategory($('#id_category'));
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
