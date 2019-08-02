@@ -271,13 +271,30 @@ class TestLearningAchievementActions(TestCase):
 
     @mock.patch("cms.models.translated_text.update_or_create")
     def test_learning_achievement_save_triggers_cms_save(self, mock_translated_text_update_or_create):
-        learning_achievement = LearningAchievementFactory(learning_unit_year=self.learning_unit_year,
-                                                          language=self.language_fr)
+        learning_achievement = LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language=self.language_fr
+        )
+        learning_achievement_en = LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language=self.language_en
+        )
         TextLabelFactory(label='themes_discussed')
-        self.client.post(reverse('achievement_edit',
-                                 kwargs={'learning_unit_year_id': self.learning_unit_year.id,
-                                         'learning_achievement_id': learning_achievement.id}),
-                         data={'code_name': 'AA1', 'text': 'Text'})
+
+        self.client.post(reverse(
+            'achievement_edit',
+            kwargs={
+                'learning_unit_year_id': self.learning_unit_year.id,
+                'learning_achievement_id': learning_achievement.id
+            }
+        ),
+            data={
+                'code_name': 'AA1',
+                'text_fr': 'Text',
+                'lua_fr_id': learning_achievement.id,
+                'lua_en_id': learning_achievement_en.id
+            }
+        )
 
         self.assertTrue(mock_translated_text_update_or_create.called)
 
