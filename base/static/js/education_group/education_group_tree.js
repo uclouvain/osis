@@ -184,7 +184,28 @@ $(document).ready(function () {
                                 let tree = $("#panel_file_tree").jstree(true);
                                 tree.close_all(node.reference);
                             }
-                        }
+                        },
+                        "search": {
+                            "id": 'test',
+                            "separator_before": true,
+                            "label": gettext("Search"),
+                            "data-modal_class": "modal-lg",
+                            "action": function (data) {
+                                document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                                let __detach_url = '/quick_search_education_group/?academic_year='+ getYear();
+                                $('#form-modal-ajax-content').load(__detach_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = '/quick_search_education_group/?academic_year='+ getYear();
+                                    }
+
+                                });
+                            },
+                        },
                     };
                 }
             }
@@ -248,3 +269,15 @@ $(document).mouseup(function () {
     $(document).unbind('mousemove');
 });
 
+function getYear(){
+    var yr = $('#id_academic_year_search option:selected').text();
+    yr = yr.trim();
+    return yr.substring(0,4);
+}
+
+$("a[id^='quick-search']").click(function(event) {
+    event.preventDefault();
+    var data_url = $(this).attr('data-url');
+    data_url = data_url + '?academic_year='+getYear();
+    $(this).attr('data-url', data_url);
+});
