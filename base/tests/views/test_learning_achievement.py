@@ -295,7 +295,6 @@ class TestLearningAchievementActions(TestCase):
                 'lua_en_id': learning_achievement_en.id
             }
         )
-
         self.assertTrue(mock_translated_text_update_or_create.called)
 
     def test_learning_achievement_create(self):
