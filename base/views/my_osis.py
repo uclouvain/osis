@@ -125,13 +125,13 @@ def messages_templates_index(request):
 
 @login_required
 def profile_attributions(request):
-    data = _get_data(request, True)
+    data = _get_data(request)
     data.update({'tab_attribution_on': True})
     return render(request, "my_osis/profile.html", data)
 
 
 @login_required
-def _get_data(request, with_attributions=False):
+def _get_data(request):
     person = mdl.person.find_by_user(request.user)
     tutor = mdl.tutor.find_by_person(person)
     programs = mdl.program_manager.find_by_person(person).prefetch_related(
