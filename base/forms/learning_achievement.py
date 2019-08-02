@@ -122,4 +122,3 @@ class LearningAchievementEditForm(forms.ModelForm):
         if len(objects) > 0 and self.value_fr not in objects:
             raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
         return code_name
-
