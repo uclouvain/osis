@@ -36,7 +36,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 
 
-class SelectWithData(forms.Select):
+class SelectMultipleWithData(forms.SelectMultiple):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         label = _(label)
         option_dict = super().create_option(name, value, label, selected, index,
@@ -65,12 +65,11 @@ class EducationGroupFilter(FilterSet):
         field_name='education_group_type__category',
         empty_label=pgettext_lazy("plural", "All")
     )
-    education_group_type = filters.ModelChoiceFilter(
+    education_group_type = filters.ModelMultipleChoiceFilter(
         queryset=EducationGroupType.objects.none(),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
         label=_('Type'),
-        widget=SelectWithData
+        widget=SelectMultipleWithData
     )
     management_entity = filters.CharFilter(
         method='filter_with_entity_subordinated',

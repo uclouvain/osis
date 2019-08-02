@@ -176,9 +176,10 @@
                 $(select).data('options', options);
 
                 $(category).on('change', function () {
-                    var current = $(select).val();
+                    var currentValues = $(select).val();
                     var options = $(select).empty().data('options');
                     var newCategory = $(category).val();
+                    var valuesToReselect = [];
 
                     $.each(options, function (i) {
                         var option = options[i];
@@ -187,11 +188,12 @@
                                 $('<option>').text(option.text).val(option.value).data('category', option.category)
                             );
                             // Try to keep the old value
-                            if (current === option.value) {
-                                $(select).val(option.value)
+                            if (currentValues.indexOf(option.value) !== -1) {
+                                valuesToReselect.push(option.value);
                             }
                         }
                     });
+                    $(select).val(valuesToReselect);
                 }).trigger('change');
             });
         };
@@ -227,7 +229,11 @@
                         let formdata = $('#search_form').serializeArray();
                         let queryString = {};
                         $(formdata).each(function(index, obj){
-                            queryString[obj.name] = obj.value;
+                            if (!queryString.hasOwnProperty(obj.name)){
+                                queryString[obj.name] = [obj.value];
+                            } else {
+                                queryString[obj.name].push([obj.value]);
+                            }
                         });
 
                         // Append ordering to querystring
@@ -240,7 +246,8 @@
                         // Append page to querystring
                         queryString['page'] = {{ object_list.number }}
                         return queryString;
-                    }
+                    },
+                    "traditional": true
                 },
                 "info": false,
                 "searching": false,
