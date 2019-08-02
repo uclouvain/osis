@@ -1989,6 +1989,16 @@
                 "can_edit_education_group_administrative_data",
                 "base",
                 "person"
+            ],
+            [
+                "change_scoresresponsible",
+                "assessments",
+                "scoresencoding"
+            ],
+            [
+                "view_scoresresponsible",
+                "assessments",
+                "scoresencoding"
             ]
         ]
     }
@@ -2682,6 +2692,26 @@
                 "is_entity_manager",
                 "base",
                 "entitymanager"
+            ],
+            [
+                "change_scoresresponsible",
+                "assessments",
+                "scoresencoding"
+            ],
+            [
+                "view_scoresresponsible",
+                "assessments",
+                "scoresencoding"
+            ],
+            [
+                "change_program_manager",
+                "base",
+                "programmanager"
+            ],
+            [
+                "can_access_program_manager",
+                "base",
+                "programmanager"
             ],
             [
                 "can_access_catalog",
