@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-17 17:04+0200\n"
+"POT-Creation-Date: 2019-07-26 09:22+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -507,12 +507,12 @@ msgstr "Horaire adapté"
 #: templates/blocks/forms/create_cancel_buttons_modal.html:29
 #: templates/learning_unit/blocks/panel/educational_informations.html:99
 #: templates/learning_unit/select_attribution.html:67
+#: templates/learning_unit/specifications_all.html:243
 msgid "Add"
 msgstr "Ajouter"
 
 #: templates/education_group/blocks/coorganization.html:158
-#: templates/learning_unit/specifications_all.html:115
-#: templates/learning_unit/specifications_all.html:238
+#: templates/learning_unit/specifications_all.html:112
 msgid "Add another"
 msgstr "Ajouter un autre"
 
@@ -570,8 +570,8 @@ msgstr "Infos complémentaires"
 #: forms/learning_unit/learning_unit_create.py:281
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:51
-#: templates/learning_unit/identification.html:245 views/learning_unit.py:245
-#: views/learning_unit.py:365 views/learning_unit.py:383
+#: templates/learning_unit/identification.html:245 views/learning_unit.py:243
+#: views/learning_unit.py:363 views/learning_unit.py:381
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
 
@@ -580,8 +580,8 @@ msgstr "Entité resp. cahier des charges complémentaire 1"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:53
 #: templates/learning_unit/identification.html:246
 #: tests/forms/test_learning_unit_postponement.py:677
-#: views/learning_unit.py:248 views/learning_unit.py:366
-#: views/learning_unit.py:384
+#: views/learning_unit.py:246 views/learning_unit.py:364
+#: views/learning_unit.py:382
 msgid "Additional requirement entity 2"
 msgstr "Entité resp. cahier des charges complémentaire 2"
 
@@ -657,7 +657,7 @@ msgstr "Toutes les notes ont été soumises."
 
 #: business/learning_unit.py:97 business/learning_unit_xls.py:84
 #: business/proposal_xls.py:41 business/proposal_xls.py:67
-#: forms/learning_unit/search_form.py:91 forms/learning_unit/search_form.py:198
+#: forms/learning_unit/search_form.py:91 forms/learning_unit/search_form.py:203
 #: templates/learning_unit/by_activity.html:84
 #: tests/business/test_learning_unit_xls.py:325
 #: tests/business/test_proposal_xls.py:120
@@ -704,7 +704,7 @@ msgstr "Êtes-vous sûr de vouloir changer l'état de"
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
 
-#: templates/learning_unit/specifications_all.html:260
+#: templates/learning_unit/specifications_all.html:267
 msgid "Are you sure you want to delete the achievement?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
 
@@ -759,8 +759,8 @@ msgstr ""
 "Au moins une valeur de volume d'un partim est supérieure à celle du volume "
 "correspondant du parent"
 
-#: templates/learning_unit/specifications_all.html:124
-#: templates/learning_unit/specifications_all.html:129
+#: templates/learning_unit/specifications_all.html:121
+#: templates/learning_unit/specifications_all.html:126
 msgid "At the end of this learning unit, the student is able to:"
 msgstr "A la fin de cette unité d'enseignement, l'étudiant est capable de:"
 
@@ -914,9 +914,9 @@ msgstr ""
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
 #: templates/education_group/tab_edit_administrative_data.html:100
-#: templates/learning_unit/achievement_edit.html:50
+#: templates/learning_unit/achievement_edit.html:69
 #: templates/learning_unit/add_charge_repartition_inner.html:66
-#: templates/learning_unit/blocks/form/volumes_management_form.html:84
+#: templates/learning_unit/blocks/form/volumes_management_form.html:85
 #: templates/learning_unit/blocks/modal/modal_comparison.html:43
 #: templates/learning_unit/blocks/modal/modal_confirm_cancel.html:41
 #: templates/learning_unit/blocks/modal/modal_confirm_consolidate.html:43
@@ -929,7 +929,7 @@ msgstr ""
 #: templates/learning_unit/proposal/create_suppression.html:20
 #: templates/learning_unit/proposal/update_suppression.html:20
 #: templates/learning_unit/simple/update_end_date.html:14
-#: templates/learning_unit/specifications_edit.html:42
+#: templates/learning_unit/specifications_edit.html:54
 #: templates/learning_unit/teaching_material/modal_edit.html:44
 msgid "Cancel"
 msgstr "Annuler"
@@ -967,7 +967,7 @@ msgstr ""
 
 #: business/education_groups/group_element_year_tree.py:332
 #: business/education_groups/group_element_year_tree.py:354
-#: business/education_groups/group_element_year_tree.py:380
+#: business/education_groups/group_element_year_tree.py:381
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
@@ -978,7 +978,7 @@ msgstr ""
 msgid "Cannot perform detach action on root."
 msgstr "Interdit de détacher la racine."
 
-#: business/education_groups/group_element_year_tree.py:388
+#: business/education_groups/group_element_year_tree.py:389
 msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
 
@@ -1035,7 +1035,7 @@ msgstr "Triche"
 msgid "Choose academic years"
 msgstr "Choisir les années"
 
-#: forms/learning_unit/search_form.py:409 models/organization_address.py:47
+#: forms/learning_unit/search_form.py:414 models/organization_address.py:47
 #: templates/organization/organization_address.html:58
 msgid "City"
 msgstr "Ville"
@@ -1138,7 +1138,7 @@ msgstr "Partie de base (Tronc commun)"
 #: models/learning_container_year.py:61
 #: tests/business/learning_units/test_edition.py:208
 #: tests/business/test_proposal_xls.py:115
-#: tests/views/test_learning_unit.py:1515
+#: tests/views/test_learning_unit.py:1529
 msgid "Common title"
 msgstr "Intitulé commun"
 
@@ -1224,7 +1224,7 @@ msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
 #: forms/education_group/coorganization.py:40
 #: forms/learning_unit/external_learning_unit.py:68
 #: forms/learning_unit/learning_unit_create.py:202
-#: forms/learning_unit/search_form.py:405 models/organization_address.py:48
+#: forms/learning_unit/search_form.py:410 models/organization_address.py:48
 #: templates/learning_unit/external/read.html:58
 #: templates/learning_unit/identification.html:219
 #: templates/organization/organization_address.html:62
@@ -1252,8 +1252,8 @@ msgstr "Activité non dispensée en"
 #: templates/education_group/blocks/panel/panel_achievements.html:99
 #: templates/education_group/blocks/panel/panel_achievements.html:111
 #: templates/learning_unit/blocks/modal/prolongOrCreateModal.html:28
-#: templates/learning_unit/specifications_all.html:114
-#: templates/learning_unit/specifications_all.html:236
+#: templates/learning_unit/specifications_all.html:111
+#: templates/learning_unit/specifications_all.html:241
 msgid "Create"
 msgstr "Créer"
 
@@ -1278,7 +1278,7 @@ msgstr "Créd. rel./abs."
 #: templates/learning_unit/proposal_comparison.html:68
 #: tests/business/test_learning_unit_xls.py:324
 #: tests/business/test_proposal_xls.py:110
-#: tests/views/test_learning_unit.py:1501
+#: tests/views/test_learning_unit.py:1515
 msgid "Credits"
 msgstr "Crédits"
 
@@ -1314,7 +1314,7 @@ msgstr "Jour"
 
 #: business/proposal_xls.py:40 business/proposal_xls.py:82
 #: models/learning_container_year.py:69 tests/business/test_proposal_xls.py:137
-#: tests/views/test_learning_unit.py:1514
+#: tests/views/test_learning_unit.py:1528
 msgid "Decision"
 msgstr "Décision"
 
@@ -1449,7 +1449,7 @@ msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
 #: models/enums/vacant_declaration_type.py:41
-#: tests/views/test_learning_unit.py:1514
+#: tests/views/test_learning_unit.py:1528
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1510,7 +1510,7 @@ msgstr "Documentation"
 #: templates/education_group/blocks/admission_condition_table_row.html:70
 #: templates/education_group/blocks/content_actions.html:39
 #: templates/education_group/blocks/form/achievement_action_bar.html:19
-#: templates/learning_unit/specifications_all.html:148
+#: templates/learning_unit/specifications_all.html:145
 msgid "Down"
 msgstr "Descendre"
 
@@ -1539,10 +1539,9 @@ msgstr "Durée"
 #: templates/education_group/blocks/row_label_general_informations.html:36
 #: templates/learning_unit/blocks/panel/cms_informations.html:38
 #: templates/learning_unit/blocks/panel/cms_informations.html:65
-#: templates/learning_unit/specifications_all.html:54
-#: templates/learning_unit/specifications_all.html:82
-#: templates/learning_unit/specifications_all.html:187
-#: templates/learning_unit/specifications_all.html:220
+#: templates/learning_unit/specifications_all.html:48
+#: templates/learning_unit/specifications_all.html:189
+#: templates/learning_unit/specifications_all.html:224
 #: templates/organization/organization_address.html:69
 #: templates/organization/organization_address.html:72
 msgid "Edit"
@@ -1650,10 +1649,12 @@ msgid "Ending of exam registration"
 msgstr "Fin inscription aux examens"
 
 #: forms/education_group/achievement.py:55
-#: forms/education_group/achievement.py:85
+#: forms/education_group/achievement.py:85 forms/learning_achievement.py:44
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
+#: templates/learning_unit/achievement_edit.html:52
 #: templates/learning_unit/blocks/panel/educational_informations.html:57
+#: templates/learning_unit/specifications_edit.html:38
 msgid "English"
 msgstr "Anglais"
 
@@ -1788,7 +1789,7 @@ msgstr "Exporter"
 #: forms/learning_unit/external_learning_unit.py:55
 #: models/enums/attribution_procedure.py:35
 #: models/enums/learning_container_year_types.py:53
-#: tests/views/test_learning_unit.py:1503
+#: tests/views/test_learning_unit.py:1517
 msgid "External"
 msgstr "Externe"
 
@@ -1813,7 +1814,7 @@ msgstr "Spécialité FSA (Majeure)"
 msgid "Faculty"
 msgstr "Faculté"
 
-#: forms/learning_unit/search_form.py:203
+#: forms/learning_unit/search_form.py:208
 msgid "Faculty borrowing"
 msgstr "Faculté emprunteuse"
 
@@ -1929,10 +1930,12 @@ msgid "Formerly"
 msgstr "Anciennement"
 
 #: forms/education_group/achievement.py:49
-#: forms/education_group/achievement.py:79
+#: forms/education_group/achievement.py:79 forms/learning_achievement.py:39
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
+#: templates/learning_unit/achievement_edit.html:51
 #: templates/learning_unit/blocks/panel/educational_informations.html:56
+#: templates/learning_unit/specifications_edit.html:37
 msgid "French"
 msgstr "Français"
 
@@ -2123,7 +2126,7 @@ msgstr "En proposition"
 msgid "Inactive"
 msgstr "Inactif"
 
-#: forms/education_groups.py:81 forms/learning_unit/search_form.py:94
+#: forms/education_groups.py:81 forms/learning_unit/search_form.py:99
 msgid "Include subordinate entities"
 msgstr "Inclure les entités subordonnées"
 
@@ -2149,7 +2152,7 @@ msgid "Institute"
 msgstr "Institut"
 
 #: business/proposal_xls.py:71 forms/education_group/coorganization.py:46
-#: forms/learning_unit/search_form.py:407 templates/academic_actors.html:30
+#: forms/learning_unit/search_form.py:412 templates/academic_actors.html:30
 #: templates/academic_calendar/academic_calendar.html:31
 #: templates/academic_calendar/academic_calendar_form.html:34
 #: templates/academic_calendar/academic_calendars.html:37
@@ -2228,13 +2231,6 @@ msgstr "Ce n'est pas une proposition"
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
-#: models/group_element_year.py:272
-msgid ""
-"It is forbidden to attach an element to an element of another academic year."
-msgstr ""
-"Il est interdit d'attacher un élément à un élément d'une autre année "
-"académique."
-
 #: models/group_element_year.py:258
 msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
@@ -2266,6 +2262,14 @@ msgstr "Il n'est pas possible de %(action)s l'élément racine."
 #: tests/templatetags/test_education_group.py:252
 msgid "It is not possible to detach the root element."
 msgstr "Il n'est pas possible de détacher l'élément racine."
+
+#: models/group_element_year.py:272
+msgid ""
+"It is prohibited to attach a group, mini-training or training to an element "
+"of another academic year."
+msgstr ""
+"Il est interdit d'attacher un groupement, une mini-formation ou une "
+"formation à un élément d'une autre année académique."
 
 #: utils/send_mail.py:66
 msgid "It remains notes to encode."
@@ -2309,7 +2313,7 @@ msgstr "Partie magistrale"
 msgid "LU"
 msgstr "UE"
 
-#: forms/learning_unit/search_form.py:221 tests/views/test_learning_unit.py:461
+#: forms/learning_unit/search_form.py:226 tests/views/test_learning_unit.py:461
 msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
 msgstr "Expression régulière incorrecte!"
 
@@ -2322,7 +2326,6 @@ msgstr "Label"
 #: business/proposal_xls.py:58 models/abstracts/abstract_achievement.py:48
 #: models/learning_unit_year.py:171
 #: templates/learning_unit/blocks/panel/educational_informations.html:55
-#: templates/learning_unit/specifications_all.html:29
 #: templates/my_osis/profile.html:102
 #: tests/business/learning_units/test_edition.py:170
 #: tests/business/test_proposal_xls.py:111
@@ -2360,8 +2363,8 @@ msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
 
-#: templates/learning_unit/achievement_edit.html:42
-#: templates/learning_unit/specifications_all.html:109
+#: templates/learning_unit/achievement_edit.html:30
+#: templates/learning_unit/specifications_all.html:106
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
 
@@ -2407,7 +2410,7 @@ msgstr ""
 
 #: templates/blocks/forms/search_form.html:44
 #: templates/learning_unit/blocks/form/search_form_external_learning_unit.html:46
-#: templates/learning_unit/blocks/form/search_form_learning_unit.html:70
+#: templates/learning_unit/blocks/form/search_form_learning_unit.html:68
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
 
@@ -3057,8 +3060,9 @@ msgid "Not required"
 msgstr "Non requis"
 
 #: templates/blocks/notifications.html:10
+#, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
-msgstr "%(number_notifications)s notification(s) non lue(s)"
+msgstr "Notification%(number_unread_notifications|pluralize)s"
 
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
@@ -3310,7 +3314,7 @@ msgstr "Activité cyclique dispensée en"
 #: business/learning_unit.py:70 business/proposal_xls.py:40
 #: business/proposal_xls.py:59 models/learning_unit_year.py:174
 #: tests/business/test_proposal_xls.py:112
-#: tests/views/test_learning_unit.py:1502
+#: tests/views/test_learning_unit.py:1516
 msgid "Periodicity"
 msgstr "Périodicité"
 
@@ -3343,8 +3347,8 @@ msgstr ""
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:46
 #: tests/business/test_proposal_xls.py:151
 #: tests/business/test_proposal_xls.py:161
-#: tests/views/test_learning_unit.py:1525 views/learning_unit.py:236
-#: views/learning_unit.py:361 views/learning_unit.py:379
+#: tests/views/test_learning_unit.py:1539 views/learning_unit.py:234
+#: views/learning_unit.py:359 views/learning_unit.py:377
 msgid "Planned classes"
 msgstr "Classes prévues"
 
@@ -3362,11 +3366,11 @@ msgstr ""
 "Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
 "dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
-#: forms/learning_unit/search_form.py:408
+#: forms/learning_unit/search_form.py:413
 msgid "Please select a country and a city first"
 msgstr "Veuillez d'abord sélectionner un pays et une ville"
 
-#: forms/learning_unit/search_form.py:410
+#: forms/learning_unit/search_form.py:415
 msgid "Please select a country first"
 msgstr "Veuillez d'abord sélectionner un pays"
 
@@ -3394,7 +3398,7 @@ msgstr "Code postal"
 
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
-#: tests/views/test_learning_unit.py:1523
+#: tests/views/test_learning_unit.py:1537
 msgid "Practical exercises"
 msgstr "Partie pratique"
 
@@ -3450,7 +3454,7 @@ msgstr "Langue principale"
 
 #: business/proposal_xls.py:83 models/learning_unit_year.py:161
 #: tests/business/test_proposal_xls.py:138
-#: tests/views/test_learning_unit.py:1503
+#: tests/views/test_learning_unit.py:1517
 msgid "Procedure"
 msgstr "Procédure"
 
@@ -3682,6 +3686,10 @@ msgstr "Q1 ou Q2"
 msgid "Q2"
 msgstr "Q2"
 
+#: forms/learning_unit/search_form.py:95
+msgid "Quadri"
+msgstr "Quadri"
+
 #: business/learning_unit.py:80 business/learning_units/edition.py:376
 #: business/proposal_xls.py:60 models/enums/duration_unit.py:37
 #: models/learning_unit_year.py:156
@@ -3814,8 +3822,8 @@ msgstr "Obligatoire"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
 #: templates/learning_unit/identification.html:243
 #: tests/forms/test_learning_unit_postponement.py:596
-#: views/learning_unit.py:242 views/learning_unit.py:364
-#: views/learning_unit.py:382
+#: views/learning_unit.py:240 views/learning_unit.py:362
+#: views/learning_unit.py:380
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
@@ -3862,14 +3870,14 @@ msgstr "Commande SQL"
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
-#: templates/learning_unit/achievement_edit.html:51
+#: templates/learning_unit/achievement_edit.html:70
 #: templates/learning_unit/add_charge_repartition_inner.html:67
-#: templates/learning_unit/blocks/form/volumes_management_form.html:80
+#: templates/learning_unit/blocks/form/volumes_management_form.html:81
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:15
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:19
-#: templates/learning_unit/specifications_edit.html:41
+#: templates/learning_unit/specifications_edit.html:53
 #: templates/learning_unit/teaching_material/modal_edit.html:43
 msgid "Save"
 msgstr "Enregistrer"
@@ -4070,7 +4078,7 @@ msgid "State"
 msgstr "État"
 
 #: business/learning_units/edition.py:374
-#: forms/learning_unit/search_form.py:187 models/education_group_year.py:206
+#: forms/learning_unit/search_form.py:192 models/education_group_year.py:206
 #: templates/learning_unit/by_activity.html:86
 #: templates/learning_unit/by_external.html:50
 #: templates/learning_unit/summary_list.html:81
@@ -4134,7 +4142,7 @@ msgstr "Suppléé"
 
 #: business/learning_unit.py:92 business/learning_unit_xls.py:79
 #: business/learning_units/edition.py:371 business/proposal_xls.py:55
-#: forms/learning_unit/search_form.py:182
+#: forms/learning_unit/search_form.py:187
 #: templates/learning_unit/by_activity.html:82
 #: templates/learning_unit/summary_list.html:80
 #: tests/business/test_learning_unit_xls.py:320
@@ -4202,10 +4210,6 @@ msgstr "Terminaison"
 #: tests/models/test_academic_calendar.py:113
 msgid "Testing"
 msgstr "Essai"
-
-#: forms/learning_achievement.py:36
-msgid "Text"
-msgstr "Texte"
 
 #: templates/learning_unit/blocks/panel/proposal.html:28
 #: templates/learning_unit/blocks/proposal_user.html:16
@@ -4456,15 +4460,21 @@ msgstr ""
 "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
 "le changement à partir de l'année %(academic_year)s"
 
+#: tests/views/learning_units/external/test_update.py:96
+#: views/learning_units/update.py:178
+msgid "The learning unit has been updated (with report)."
+msgstr "L'unité d'enseignement a été modifiée (avec report)."
+
+#: tests/views/learning_units/external/test_update.py:103
+#: views/learning_units/update.py:180
+msgid "The learning unit has been updated (without report)."
+msgstr "L'unité d'enseignement a été modifiée (sans report)."
+
 #: forms/learning_unit/learning_unit_postponement.py:322
-#: views/learning_units/update.py:181
+#: views/learning_units/update.py:184
 #, python-format
 msgid "The learning unit has been updated until %(year)s."
 msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
-
-#: views/learning_units/update.py:177
-msgid "The learning unit has been updated."
-msgstr "L'unité d'enseignement a été modifiée."
 
 #: business/education_groups/group_element_year_tree.py:260
 #: tests/business/education_groups/test_build_tree.py:132
@@ -4654,7 +4664,7 @@ msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
 
-#: tests/views/test_learning_unit.py:1323 views/learning_unit.py:497
+#: tests/views/test_learning_unit.py:1337 views/learning_unit.py:495
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -4800,6 +4810,10 @@ msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
 msgid "Thesis"
 msgstr "Thèse"
 
+#: forms/learning_achievement.py:110
+msgid "This code already exists for this learning unit"
+msgstr "Ce code existe déja pour cette unité d'enseignement"
+
 #: business/education_groups/perms.py:140
 msgid "This education group is not editable during this period."
 msgstr ""
@@ -4880,7 +4894,7 @@ msgstr "La formation n'a pas de contenu à reporter."
 #: business/education_group.py:49 business/learning_unit.py:90
 #: business/learning_unit_xls.py:77 business/learning_units/xls_generator.py:51
 #: business/proposal_xls.py:38 forms/education_groups.py:96 forms/entity.py:38
-#: forms/learning_unit/search_form.py:193 models/teaching_material.py:44
+#: forms/learning_unit/search_form.py:198 models/teaching_material.py:44
 #: templates/academic_calendar/academic_calendar.html:47
 #: templates/academic_calendar/academic_calendar_form.html:64
 #: templates/education_group/blocks/content_default_table.html:32
@@ -4996,7 +5010,7 @@ msgstr "Enseignant·e·s"
 #: business/education_group.py:49 business/education_group.py:61
 #: business/learning_unit.py:91 business/learning_unit_xls.py:78
 #: business/proposal_xls.py:38 business/proposal_xls.py:53
-#: forms/education_groups.py:72 forms/learning_unit/search_form.py:176
+#: forms/education_groups.py:72 forms/learning_unit/search_form.py:181
 #: models/entity_version.py:172 models/learning_container_year.py:55
 #: models/proposal_learning_unit.py:57
 #: templates/education_group/search.html:147 templates/entities.html:68
@@ -5074,7 +5088,7 @@ msgstr "Événements non planifiés"
 #: templates/education_group/blocks/admission_condition_table_row.html:64
 #: templates/education_group/blocks/content_actions.html:38
 #: templates/education_group/blocks/form/achievement_action_bar.html:14
-#: templates/learning_unit/specifications_all.html:142
+#: templates/learning_unit/specifications_all.html:139
 msgid "Up"
 msgstr "Haut"
 
@@ -5130,7 +5144,7 @@ msgid "Vacant"
 msgstr "Vacant"
 
 #: models/enums/vacant_declaration_type.py:40
-#: tests/views/test_learning_unit.py:1514
+#: tests/views/test_learning_unit.py:1528
 msgid "Vacant not publish"
 msgstr "Vacant pas publier"
 
@@ -5203,8 +5217,8 @@ msgstr "Volume 2"
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:335
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:38
-#: tests/views/test_learning_unit.py:1526 views/learning_unit.py:238
-#: views/learning_unit.py:362 views/learning_unit.py:380
+#: tests/views/test_learning_unit.py:1540 views/learning_unit.py:236
+#: views/learning_unit.py:360 views/learning_unit.py:378
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
@@ -5212,8 +5226,8 @@ msgstr "Volume Q1"
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:339
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:40
-#: tests/views/test_learning_unit.py:1527 views/learning_unit.py:240
-#: views/learning_unit.py:363 views/learning_unit.py:381
+#: tests/views/test_learning_unit.py:1541 views/learning_unit.py:238
+#: views/learning_unit.py:361 views/learning_unit.py:379
 msgid "Volume Q2"
 msgstr "Volume Q2"
 
@@ -5223,8 +5237,8 @@ msgstr "Volume total annuel"
 
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:105
-#: tests/views/test_learning_unit.py:1524 views/learning_unit.py:234
-#: views/learning_unit.py:360 views/learning_unit.py:378
+#: tests/views/test_learning_unit.py:1538 views/learning_unit.py:232
+#: views/learning_unit.py:358 views/learning_unit.py:376
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
@@ -5648,12 +5662,12 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 #: models/enums/learning_unit_year_periodicity.py:34
-#: tests/views/test_learning_unit.py:1502
+#: tests/views/test_learning_unit.py:1516
 msgid "biennial even"
 msgstr "bisannuelle paire"
 
 #: models/enums/learning_unit_year_periodicity.py:35
-#: tests/views/test_learning_unit.py:1502
+#: tests/views/test_learning_unit.py:1516
 msgid "biennial odd"
 msgstr "bisannuelle impaire"
 
@@ -5776,7 +5790,7 @@ msgstr "jours"
 #: templates/education_group/blocks/modal/modal_organization_confirm_delete_inner.html:17
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:17
 #: templates/learning_unit/remove_charge_repartition_confirmation_inner.html:31
-#: templates/learning_unit/specifications_all.html:154
+#: templates/learning_unit/specifications_all.html:150
 #: templates/my_osis/my_message.html:62
 msgid "delete"
 msgstr "supprimer"

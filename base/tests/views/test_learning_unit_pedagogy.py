@@ -30,7 +30,7 @@ from unittest.mock import patch
 from django.contrib.auth.models import Group
 from django.contrib.messages import get_messages
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
