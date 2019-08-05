@@ -28,11 +28,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.forms.search.search_tutor import TutorSearchForm
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
+from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import SuperUserFactory
 
 NUMBER_TUTORS = 10
 
@@ -69,43 +66,3 @@ class TestSearchTutors(TestCase):
         self.assertTemplateUsed(response, "search/search.html")
 
         self.assertIsInstance(response.context["form"], TutorSearchForm)
-
-
-class TestSearch(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.a_superuser = SuperUserFactory()
-        cls.person = PersonFactory(user=cls.a_superuser)
-        cls.academic_yr = AcademicYearFactory(year=2019)
-
-    def setUp(self):
-        self.client.force_login(self.a_superuser)
-
-    def test_search_year(self):
-
-        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-
-        url = reverse('search_year_id')
-        get_data = {'year': '2019'}
-        response = self.client.get(url, get_data, **kwargs)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'academic_year': self.academic_yr.id}
-        )
-
-    def test_search_inexisting_year(self):
-
-        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-
-        url = reverse('search_year_id')
-        get_data = {'year': '2020'}
-        response = self.client.get(url, get_data, **kwargs)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'academic_year': None}
-        )

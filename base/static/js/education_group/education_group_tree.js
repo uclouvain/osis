@@ -22,6 +22,7 @@ $(document).ready(function () {
     });
 
     function get_data_from_tree(data) {
+        alert(data.reference);
         let inst = $.jstree.reference(data.reference),
             obj = inst.get_node(data.reference);
 
@@ -37,7 +38,8 @@ $(document).ready(function () {
             modify_url: obj.a_attr.modify_url,
             attach_disabled: obj.a_attr.attach_disabled,
             detach_disabled: obj.a_attr.detach_disabled,
-            modification_disabled: obj.a_attr.modification_disabled
+            modification_disabled: obj.a_attr.modification_disabled,
+            academic_year: obj.a_attr.academic_year
         };
     }
 
@@ -186,13 +188,14 @@ $(document).ready(function () {
                             }
                         },
                         "search": {
-                            "id": 'test',
                             "separator_before": true,
                             "label": gettext("Search"),
                             "data-modal_class": "modal-lg",
                             "action": function (data) {
+
+                                let __ret = get_data_from_tree(data);
                                 document.getElementById("modal_dialog_id").classList.add("modal-lg");
-                                let __detach_url = '/quick_search_education_group/?academic_year='+ getYear();
+                                let __detach_url = '/quick_search_education_group/?academic_year='+ __ret.academic_year;
                                 $('#form-modal-ajax-content').load(__detach_url, function (response, status, xhr) {
                                     if (status === "success") {
                                         $('#form-ajax-modal').modal('toggle');
@@ -200,7 +203,7 @@ $(document).ready(function () {
                                         let form = $(this).find('form').first();
                                         formAjaxSubmit(form, '#form-ajax-modal');
                                     } else {
-                                        window.location.href = '/quick_search_education_group/?academic_year='+ getYear();
+                                        window.location.href = '/quick_search_education_group/?academic_year='+ __ret.academic_year;
                                     }
 
                                 });
@@ -269,27 +272,9 @@ $(document).mouseup(function () {
     $(document).unbind('mousemove');
 });
 
-function getYear(){
-    var yr = $('#id_academic_year_search option:selected').text();
-    yr = yr.trim();
-    yr = yr.substring(0,4);
-    var year_id = '';
-    $.ajax({
-        url: "/get_academic_year_pk/",
-        data: {
-            'year': yr
-        },
-        success: function (data) {
-            year_id = data['academic_year'];
-        }
-    });
-
-    return year_id;
-}
-
 $("a[id^='quick-search']").click(function(event) {
     event.preventDefault();
     var data_url = $(this).attr('data-url');
-    data_url = data_url + '?academic_year='+getYear();
+    data_url = data_url + '?academic_year='+ $('#j1_1_anchor').attr('academic_year');
     $(this).attr('data-url', data_url);
 });
