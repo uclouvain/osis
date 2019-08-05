@@ -2704,12 +2704,12 @@
                 "scoresencoding"
             ],
             [
-                "change_program_manager",
+                "change_programmanager",
                 "base",
                 "programmanager"
             ],
             [
-                "can_access_program_manager",
+                "view_programmanager",
                 "base",
                 "programmanager"
             ],

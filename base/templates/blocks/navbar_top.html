@@ -1,4 +1,4 @@
-{% load i18n staticfiles %}
+{% load i18n staticfiles perms %}
 
 <nav class="navbar navbar-default navbar-fixed-top  justify-content-start flex-nowrap">
     <div class="container-fluid ">
@@ -123,7 +123,8 @@
                                         </a>
                                     </li>
                                 {% endif %}
-                                {% if perms.base.is_entity_manager %}
+                                {% view_academicactors as can_view_academicactors %}
+                                {% if can_view_academicactors %}
                                     <li>
                                         <a href="{% url 'academic_actors' %}" id="lnk_dropdown_academic actors">
                                             <span class="fa fa-users"></span>

@@ -31,7 +31,7 @@ from django.shortcuts import render
 from attribution import models as mdl_attr
 from attribution.business.attribution import get_attributions_list
 from attribution.business.entity_manager import _append_entity_version
-from attribution.business.summary_responsible import get_attributions_data
+from attribution.business.score_responsible import get_attributions_data
 from base import models as mdl_base
 from base.models.entity_manager import find_entities_with_descendants_from_entity_managers
 

@@ -95,10 +95,6 @@ class ScoresResponsibleViewTestCase(TestCase):
             score_responsible=True
         )
 
-    def test_is_faculty_admin(self):
-        entities_manager = mdl_base.entity_manager.is_entity_manager(self.user)
-        self.assertTrue(entities_manager)
-
     def test_scores_responsible(self):
         self.client.force_login(self.user)
         url = reverse('scores_responsible')
