@@ -22,7 +22,6 @@ $(document).ready(function () {
     });
 
     function get_data_from_tree(data) {
-        alert(data.reference);
         let inst = $.jstree.reference(data.reference),
             obj = inst.get_node(data.reference);
 
