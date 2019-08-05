@@ -24,13 +24,17 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from base.forms.search.search_tutor import TutorSearchForm
+from base.models.academic_year import find_academic_year_by_year
 from base.models.tutor import Tutor
 from base.utils.cache import RequestCache
 from base.views.common import paginate_queryset
+
+from osis_common.decorators.ajax import ajax_required
 
 
 @login_required
@@ -56,3 +60,12 @@ def clear_filter(request):
     path = request.POST['current_url']
     RequestCache(request.user, path).clear()
     return redirect(path)
+
+
+@ajax_required
+@login_required
+def get_year(request):
+    yr = request.GET.get('year')
+    if yr:
+        return JsonResponse({'academic_year': find_academic_year_by_year(yr).pk}, safe=False)
+    return None

@@ -51,8 +51,7 @@ class QuickSearchGenericView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemp
     def get_queryset(self):
         qs = super().get_queryset()
         if self.request.GET.get('academic_year'):
-            yr = AcademicYear.objects.filter(year=self.request.GET.get('academic_year'))
-            qs = qs.filter(academic_year=yr)
+            qs = qs.filter(academic_year=self.request.GET.get('academic_year'))
 
         search_text = self.request.GET.get('search_text')
         if search_text:
@@ -77,7 +76,7 @@ class QuickSearchGenericView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemp
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        academic_yr = AcademicYear.objects.get(year=self.request.GET.get('academic_year')) \
+        academic_yr = AcademicYear.objects.get(pk=self.request.GET.get('academic_year')) \
             if self.request.GET.get('academic_year') else starting_academic_year()
 
         context['form'] = QuickSearchForm(

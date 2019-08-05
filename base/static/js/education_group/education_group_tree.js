@@ -272,7 +272,19 @@ $(document).mouseup(function () {
 function getYear(){
     var yr = $('#id_academic_year_search option:selected').text();
     yr = yr.trim();
-    return yr.substring(0,4);
+    yr = yr.substring(0,4);
+    var year_id = '';
+    $.ajax({
+        url: "/get_academic_year_pk/",
+        data: {
+            'year': yr
+        },
+        success: function (data) {
+            year_id = data['academic_year'];
+        }
+    });
+
+    return year_id;
 }
 
 $("a[id^='quick-search']").click(function(event) {
