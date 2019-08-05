@@ -73,7 +73,7 @@ msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
 
 #: static/js/learning_unit_creation.js:8
 msgid "Please enter a value less than or equal to 500."
-msgstr "Veuillez entrer une valeur inférieur ou égale à 500."
+msgstr "Veuillez entrer une valeur inférieure ou égale à 500."
 
 #: static/js/learning_unit_creation.js:9
 msgid "Please enter a value that is a multiple of 0.5."
