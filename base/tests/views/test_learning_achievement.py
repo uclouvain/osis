@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
@@ -43,6 +44,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.factories.user import UserFactory
 from base.views.learning_achievement import operation, management, create, create_first
+from cms.tests.factories.text_label import TextLabelFactory
 from reference.models.language import FR_CODE_LANGUAGE
 from reference.tests.factories.language import LanguageFactory
 
@@ -238,17 +240,62 @@ class TestLearningAchievementActions(TestCase):
         self.assertIsInstance(response.context['form'], LearningAchievementEditForm)
 
     def test_learning_achievement_save(self):
-        learning_achievement = LearningAchievementFactory(learning_unit_year=self.learning_unit_year,
-                                                          language=self.language_fr)
-        response = self.client.post(reverse('achievement_edit',
-                                            kwargs={'learning_unit_year_id': self.learning_unit_year.id,
-                                                    'learning_achievement_id': learning_achievement.id}),
-                                    data={'code_name': 'AA1', 'text': 'Text'})
+        learning_achievement = LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language=self.language_fr
+        )
+        learning_achievement_en = LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language=self.language_en
+        )
+        response = self.client.post(reverse(
+            'achievement_edit',
+            kwargs={
+                'learning_unit_year_id': self.learning_unit_year.id,
+                'learning_achievement_id': learning_achievement.id
+            }
+        ),
+            data={
+                'code_name': 'AA1',
+                'text_fr': 'Text',
+                'lua_fr_id': learning_achievement.id,
+                'lua_en_id': learning_achievement_en.id
+            }
+        )
 
-        expected_redirection = reverse("learning_unit_specifications",
-                                       kwargs={'learning_unit_year_id': self.learning_unit_year.id}) + "{}{}".format(
-            HTML_ANCHOR, learning_achievement.id)
+        expected_redirection = reverse(
+            "learning_unit_specifications",
+            kwargs={'learning_unit_year_id': self.learning_unit_year.id}
+        ) + "{}{}".format(HTML_ANCHOR, learning_achievement.id)
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
+
+    @mock.patch("cms.models.translated_text.update_or_create")
+    def test_learning_achievement_save_triggers_cms_save(self, mock_translated_text_update_or_create):
+        learning_achievement = LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language=self.language_fr
+        )
+        learning_achievement_en = LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language=self.language_en
+        )
+        TextLabelFactory(label='themes_discussed')
+
+        self.client.post(reverse(
+            'achievement_edit',
+            kwargs={
+                'learning_unit_year_id': self.learning_unit_year.id,
+                'learning_achievement_id': learning_achievement.id
+            }
+        ),
+            data={
+                'code_name': 'AA1',
+                'text_fr': 'Text',
+                'lua_fr_id': learning_achievement.id,
+                'lua_en_id': learning_achievement_en.id
+            }
+        )
+        self.assertTrue(mock_translated_text_update_or_create.called)
 
     def test_learning_achievement_create(self):
         achievement_fr = LearningAchievementFactory(language=self.language_fr,
