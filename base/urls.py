@@ -308,7 +308,7 @@ urlpatterns = [
     url(r'^quick_search_learning_unit/$', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
     url(r'^quick_search_education_group/$', QuickSearchEducationGroupYearView.as_view(),
         name="quick_search_education_group"),
-    url(r'^get_academic_year_pk/$', search.get_year),
+    url(r'^get_academic_year_pk/$', search.get_year, name="search_year_id"),
 ]
 
 if settings.DEBUG:

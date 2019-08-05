@@ -67,5 +67,7 @@ def clear_filter(request):
 def get_year(request):
     yr = request.GET.get('year')
     if yr:
-        return JsonResponse({'academic_year': find_academic_year_by_year(yr).pk}, safe=False)
+        return JsonResponse(
+            {'academic_year': find_academic_year_by_year(yr).pk if find_academic_year_by_year(yr) else None}, safe=False
+        )
     return None
