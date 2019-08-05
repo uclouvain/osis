@@ -85,14 +85,15 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return current_academic_year()
 
     def get_queryset(self):
-        qs_learningcomponentyear = LearningComponentYear.objects.order_by('type', 'acronym')
-        prefetch = Prefetch('learningcomponentyear_set', queryset=qs_learningcomponentyear)
         return super().get_queryset().select_related(
             'learning_container_year__academic_year',
             'academic_year', 'learning_unit',
             'campus__organization', 'externallearningunityear',
         ).prefetch_related(
-            prefetch,
+            Prefetch(
+                'learningcomponentyear_set',
+                queryset=LearningComponentYear.objects.order_by('type', 'acronym')
+            ),
             Prefetch(
                 'learning_unit__learningunityear_set',
                 queryset=LearningUnitYear.objects.select_related('academic_year').filter(academic_year__year__gte=2015)
