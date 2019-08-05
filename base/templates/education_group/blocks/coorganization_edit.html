@@ -53,39 +53,29 @@
                             </td>
                         {% endif %}
                     {% endfor %}
+                    <td></td>
                 </tr>
+
                 {% for form in form_coorganization.forms %}
                     {% if forloop.first %}
                         {{ form.media }}
                     {% endif %}
                     <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                         {{ form.id }}
-                        <td>
-                            {% bootstrap_field form.country show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.organization show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.all_students %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.enrollment_place %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.diploma show_label=False %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.is_producing_cerfificate %}
-                        </td>
-                        <td>
-                            {% bootstrap_field form.is_producing_annexe %}
-                        </td>
-                        <td>
-                            {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-                        </td>
+                        {% for field in form %}
+                            {% if not forloop.last %}
+                                <td>
+                                    {% bootstrap_field field show_label=False %}
+                                </td>
+                            {% else %}
+                                <td>
+                                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
                     </tr>
                 {% endfor %}
+
                 </tbody>
             </table>
             {{ form_coorganization.management_form }}
@@ -101,6 +91,8 @@
         prefix: '{{ form_coorganization.prefix }}',
         formTemplate: '#form_template',
         added: (function (row) {
+            var element = $(row).find("select").get(1);
+            window.__dal__initialize(element);
         })
     });
 </script>
