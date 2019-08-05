@@ -43,4 +43,3 @@ django-autocomplete-light==3.4.1
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
--r ./partnership/requirements.txt
