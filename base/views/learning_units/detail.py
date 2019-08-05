@@ -95,9 +95,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
             prefetch,
             Prefetch(
                 'learning_unit__learningunityear_set',
-                queryset=LearningUnitYear.objects.select_related('academic_year').filter(
-                    academic_year__year__gte=2015
-                ).order_by('academic_year'),
+                queryset=LearningUnitYear.objects.select_related('academic_year').filter(academic_year__year__gte=2015)
             )
         )
 
