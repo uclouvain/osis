@@ -424,6 +424,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                 _warnings.extend(learning_component_year.warnings)
 
         return _warnings
+
     def _check_learning_container_year_warnings(self):
         return self.learning_container_year.warnings
 

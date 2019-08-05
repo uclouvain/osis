@@ -32,5 +32,4 @@ use_step_matcher("parse")
 def step_impl(context):
     warnings = context.current_page.find_element(By.ID, 'CollapseWarnings').text
     context.test.assertIn('LAGRE2020Q', warnings)
-    print(warnings)
     context.test.assertIsNone(re.search('LAGRE2020[a-pA-Pr-zR-Z]', warnings))
