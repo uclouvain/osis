@@ -89,7 +89,7 @@ class EducationGroup(SerializableModel):
     end_year = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_('end')
+        verbose_name=_('Last year of organization')
     )
 
     @property
@@ -115,7 +115,7 @@ class EducationGroup(SerializableModel):
             if self.start_year > self.end_year:
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
-                        "max": _("end").title(),
+                        "max": _("Last year of organization").title(),
                         "min": _("Start"),
                     }
                 })
