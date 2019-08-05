@@ -1999,6 +1999,11 @@
                 "view_scoresresponsible",
                 "assessments",
                 "scoresencoding"
+            ],
+            [
+                "is_institution_administrator",
+                "base",
+                "person"
             ]
         ]
     }

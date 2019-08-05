@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.global_settings import INSTALLED_APPS
+from django.conf import settings
 
 
 def view_academicactors(user):
     return user.has_perm('base.view_programmanager') \
-           or ("assessments" in INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')) \
-           or ("dissertation" in INSTALLED_APPS and user.has_perm('dissertation.change_offerproposition'))
+           or ("assessments" in settings.INSTALLED_APPS and user.has_perm('assessments.view_scoresresponsible')) \
+           or ("dissertation" in settings.INSTALLED_APPS and user.has_perm('dissertation.change_offerproposition'))
