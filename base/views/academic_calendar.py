@@ -157,6 +157,8 @@ def academic_calendar_read(request, academic_calendar_id):
 @login_required
 @permission_required('base.can_access_academic_calendar', raise_exception=True)
 def academic_calendar_form(request, academic_calendar_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     academic_calendar = get_object_or_none(AcademicCalendar, pk=academic_calendar_id)
 
     if request.method == 'GET':
