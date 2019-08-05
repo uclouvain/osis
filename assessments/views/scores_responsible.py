@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required, permission_required
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -31,14 +31,13 @@ from django.shortcuts import render
 from attribution import models as mdl_attr
 from attribution.business.attribution import get_attributions_list
 from attribution.business.entity_manager import _append_entity_version
-from attribution.business.summary_responsible import get_attributions_data
+from attribution.business.score_responsible import get_attributions_data
 from base import models as mdl_base
-from base.models.entity_manager import is_entity_manager, find_entities_with_descendants_from_entity_managers, \
-    has_perm_entity_manager
+from base.models.entity_manager import find_entities_with_descendants_from_entity_managers
 
 
 @login_required
-@user_passes_test(has_perm_entity_manager)
+@permission_required('assessments.view_scoresresponsible', raise_exception=True)
 def scores_responsible(request):
     entities_manager = mdl_base.entity_manager.find_by_user(request.user)
     academic_year = mdl_base.academic_year.current_academic_year()
@@ -49,7 +48,7 @@ def scores_responsible(request):
 
 
 @login_required
-@user_passes_test(is_entity_manager)
+@permission_required('assessments.view_scoresresponsible', raise_exception=True)
 def scores_responsible_search(request):
     entities_manager = mdl_base.entity_manager.find_by_user(request.user)
     academic_year = mdl_base.academic_year.current_academic_year()
@@ -81,7 +80,7 @@ def scores_responsible_search(request):
 
 
 @login_required
-@user_passes_test(is_entity_manager)
+@permission_required('assessments.change_scoresresponsible', raise_exception=True)
 def scores_responsible_management(request):
     context = {
         'course_code': request.GET.get('course_code'),
@@ -96,7 +95,7 @@ def scores_responsible_management(request):
 
 
 @login_required
-@user_passes_test(is_entity_manager)
+@permission_required('assessments.change_scoresresponsible', raise_exception=True)
 def scores_responsible_add(request, pk):
     if request.POST.get('action') == "add":
         mdl_attr.attribution.clear_scores_responsible_by_learning_unit_year(pk)

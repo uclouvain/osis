@@ -33,6 +33,7 @@ from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_create_modification_proposal, \
     FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, is_academic_year_in_range_to_create_partim, \
     _check_proposal_edition
+from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types
@@ -53,6 +54,7 @@ from base.tests.factories.person import PersonFactory, FacultyManagerFactory, Ce
     PersonWithPermissionsFactory, UEFacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.user import UserFactory
 
 TYPES_PROPOSAL_NEEDED_TO_EDIT = (learning_container_year_types.COURSE,
                                  learning_container_year_types.DISSERTATION,
@@ -559,3 +561,16 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
                     self.assertTrue(is_academic_year_in_range_to_create_partim(luy, person))
                 else:
                     self.assertFalse(is_academic_year_in_range_to_create_partim(luy, person))
+
+
+class PermsViewAcademicActorCase(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+
+    def test_has_no_perms(self):
+        self.assertFalse(view_academicactors(self.user))
+
+    def test_has_valid_perms(self):
+        self.user.user_permissions.add(Permission.objects.get(codename="view_programmanager"))
+        self.user.refresh_from_db()
+        self.assertTrue(view_academicactors(self.user))
