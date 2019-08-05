@@ -29,6 +29,7 @@ from collections import OrderedDict
 from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.html import format_html
@@ -92,7 +93,7 @@ def _get_filter_keys(form):
     return OrderedDict(itertools.chain(get_research_criteria(form)))
 
 
-class EducationGroupTypeAutoComplete(autocomplete.Select2QuerySetView):
+class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return EducationGroupType.objects.none()
