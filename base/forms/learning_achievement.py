@@ -25,11 +25,27 @@
 ##############################################################################
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from base.models.learning_achievement import LearningAchievement
+from base.models.learning_achievement import LearningAchievement, search
+from cms.enums import entity_name
+from cms.models import text_label, translated_text
 from reference.models import language
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
+
+
+def update_themes_discussed_changed_field_in_cms(learning_unit_year):
+    txt_label = text_label.get_by_label_or_none('themes_discussed')
+    if txt_label:
+        for lang in settings.LANGUAGES:
+            translated_text.update_or_create(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=learning_unit_year.id,
+                text_label=txt_label,
+                language=lang[0],
+                defaults={}
+            )
 
 
 class LearningAchievementEditForm(forms.ModelForm):
@@ -90,6 +106,9 @@ class LearningAchievementEditForm(forms.ModelForm):
         text_en.code_name = self.cleaned_data.get('code_name')
         text_fr.text = self.cleaned_data.get('text_fr')
         text_en.text = self.cleaned_data.get('text_en')
+
+        # For sync purpose, we need to trigger an update of the THEMES_DISCUSSED cms when we update learning achievement
+        update_themes_discussed_changed_field_in_cms(text_fr.learning_unit_year)
 
         text_fr.save()
         text_en.save()

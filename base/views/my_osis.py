@@ -146,7 +146,7 @@ def _get_data(request):
     return {'person': person,
             'addresses': mdl.person_address.find_by_person(person),
             'tutor': tutor,
-            'attributions': mdl_attr.attribution.search(tutor=tutor),
+            'attributions': mdl_attr.attribution.search(tutor=tutor) if tutor else None,
             'programs': programs,
             'supported_languages': settings.LANGUAGES,
             'default_language': settings.LANGUAGE_CODE,
