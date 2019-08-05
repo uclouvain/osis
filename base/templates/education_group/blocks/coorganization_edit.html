@@ -25,76 +25,82 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
+{{ form_coorganization.media }}
 
 <div class="panel panel-default">
-    <div class="panel-body" id="panel_coorganization" id="formset"
+    <div class="panel-body" id="panel_coorganization"
          data-formset-prefix="{{ form_coorganization.prefix }}">
-        {{ form_coorganization.management_form }}
         <label>{% trans 'Program organized with other institutes' %}</label>
-{#        {% if education_group_year.coorganizations %}#}
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>{% trans 'Country' %}</th>
-                        <th>{% trans 'Institution' %} *</th>
-                        <th></th>
-                        <th></th>
-                        <th>{% trans 'UCL Diploma' %}</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody data-formset-body id="coorganization-form">
-                    {% for form in form_coorganization.forms %}
-                        <tr class="link-formset" data-formset-form>
-                            {{ form.id }}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{% trans 'Country' %}</th>
+                    <th>{% trans 'Institution' %} *</th>
+                    <th></th>
+                    <th></th>
+                    <th>{% trans 'UCL Diploma' %}</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody data-formset-body id="coorganization-form">
+                <tr data-formset-form id="form_template" style="display:none" class="link-formset">
+                    {% for field in form_coorganization.empty_form %}
+                        {% if not forloop.last %}
                             <td>
-                                {% bootstrap_field form.country show_label=False %}
+                                {% bootstrap_field field show_label=False %}
                             </td>
-                            <td>
-                                {% bootstrap_field form.organization show_label=False %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.all_students %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.enrollment_place %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.diploma show_label=False %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.is_producing_cerfificate %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.is_producing_annexe %}
-                            </td>
-                            <td>
-                                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-                            </td>
-                        </tr>
-                        {{ form.media }}
+                        {% endif %}
                     {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-{#        {% endif %}#}
+                </tr>
+                {% for form in form_coorganization.forms %}
+                    {% if forloop.first %}
+                        {{ form.media }}
+                    {% endif %}
+                    <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                        {{ form.id }}
+                        <td>
+                            {% bootstrap_field form.country show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.organization show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.all_students %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.enrollment_place %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.diploma show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.is_producing_cerfificate %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.is_producing_annexe %}
+                        </td>
+                        <td>
+                            {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {{ form_coorganization.management_form }}
+        </div>
     </div>
 </div>
 
-
 <script src="{% static 'js/jquery.formset.js' %}"></script>
-
-
-{{ form_coorganization.media }}
-
 <script>
-    $(document).ready(function () {
-        $('.link-formset').formset({
-            addText: '<span class="fas fa-plus"></span>',
-            deleteText: '<span class="fas fa-trash-alt"></span>',
-            prefix: '{{ form_coorganization.prefix }}'
-        });
+    $('.link-formset').formset({
+        addText: '<span class="fas fa-plus"></span>',
+        deleteText: '<span class="fas fa-trash-alt"></span>',
+        prefix: '{{ form_coorganization.prefix }}',
+        formTemplate: '#form_template',
+        added: (function (row) {
+        })
     });
 </script>

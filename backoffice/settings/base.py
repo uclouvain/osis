@@ -54,8 +54,8 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
     'django.contrib.sites',
-    'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
-    'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
+    'dal',
+    'dal_select2',
     'dal_legacy_static',  # TODO : Useless in Django 2.0
     'django.contrib.admin',
     'django.contrib.auth',
