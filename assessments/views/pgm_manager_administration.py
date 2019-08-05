@@ -182,7 +182,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 
 
 @login_required
-@permission_required('base.access_programmanager', raise_exception=True)
+@permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
     current_academic_yr = mdl.academic_year.current_academic_year()
@@ -192,7 +192,8 @@ def pgm_manager_administration(request):
         'entities_managed_root': administrator_entities,
         'offer_types': OfferType.objects.exclude(name__in=EXCLUDE_OFFER_TYPE_SEARCH),
         'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
-        'init': '1'})
+        'init': '1'
+    })
 
 
 @login_required
