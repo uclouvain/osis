@@ -38,7 +38,7 @@ $(document).ready(function () {
             attach_disabled: obj.a_attr.attach_disabled,
             detach_disabled: obj.a_attr.detach_disabled,
             modification_disabled: obj.a_attr.modification_disabled,
-            academic_year: obj.a_attr.academic_year
+            data_url: obj.a_attr.data_url
         };
     }
 
@@ -191,18 +191,20 @@ $(document).ready(function () {
                             "label": gettext("Search"),
                             "data-modal_class": "modal-lg",
                             "action": function (data) {
-
                                 let __ret = get_data_from_tree(data);
+                                if (__ret.data_url === '#') {
+                                    return;
+                                }
                                 document.getElementById("modal_dialog_id").classList.add("modal-lg");
-                                let __detach_url = '/quick_search_education_group/?academic_year='+ __ret.academic_year;
-                                $('#form-modal-ajax-content').load(__detach_url, function (response, status, xhr) {
+
+                                $('#form-modal-ajax-content').load(__ret.data_url, function (response, status, xhr) {
                                     if (status === "success") {
                                         $('#form-ajax-modal').modal('toggle');
 
                                         let form = $(this).find('form').first();
                                         formAjaxSubmit(form, '#form-ajax-modal');
                                     } else {
-                                        window.location.href = '/quick_search_education_group/?academic_year='+ __ret.academic_year;
+                                        window.location.href = __ret.data_url;
                                     }
 
                                 });
@@ -273,7 +275,5 @@ $(document).mouseup(function () {
 
 $("a[id^='quick-search']").click(function(event) {
     event.preventDefault();
-    var data_url = $(this).attr('data-url');
-    data_url = data_url + '?academic_year='+ $('#j1_1_anchor').attr('academic_year');
-    $(this).attr('data-url', data_url);
+    $(this).attr('data-url', $('#j1_1_anchor').attr('data_url'));
 });
