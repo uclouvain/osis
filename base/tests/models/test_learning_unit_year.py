@@ -436,7 +436,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         excepted_error = "{} ({})".format(
             _('Volumes are inconsistent'),
-            _('At least a partim volume value is greater than corresponding volume of parent'))
+            _('a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
         self.assertIn(excepted_error, luy_partim.warnings)
@@ -466,7 +466,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         excepted_error = "{} ({})".format(
             _('Volumes are inconsistent'),
-            _('At least a partim volume value is greater than corresponding volume of parent'))
+            _('a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
         self.assertIn(excepted_error, luy_partim.warnings)
