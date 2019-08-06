@@ -28,10 +28,10 @@ from django.test import TestCase
 
 from base.models import prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from base.tests.models.test_prerequisite_item import _get_acronym_as_href
 
 
 class TestPrerequisiteSyntaxValidator(TestCase):
@@ -102,7 +102,6 @@ class TestPrerequisiteSyntaxValidator(TestCase):
 
 
 class TestPrerequisiteString(TestCase):
-
     def test_get_acronym_as_href(self):
         current_academic_yr = create_current_academic_year()
 
@@ -118,6 +117,5 @@ class TestPrerequisiteString(TestCase):
         self.assertEqual(prerequisite._get_acronym_as_href(prerequisite_item, previous_academic_yr), '')
 
         self.assertEqual(prerequisite._get_acronym_as_href(prerequisite_item, current_academic_yr),
-                         "<a href='/learning_units/{}/'>{}</a>".format(learning_unit_yr_prerequisite.id,
-                                                                       prerequisite_item.learning_unit.acronym)
+                         _get_acronym_as_href(learning_unit_yr_prerequisite)
                          )
