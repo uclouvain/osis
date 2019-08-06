@@ -21,7 +21,6 @@ class LearningComponentYearQuadriNoStrategy(LearningComponentYearQuadriStrategy)
 class LearningComponentYearQ1Strategy(LearningComponentYearQuadriStrategy):
     def is_valid(self):
         if self.lcy.hourly_volume_partial_q2:
-            print('if')
             raise ValidationError(_('Only the volume Q1 must have a value'))
         return True
 
