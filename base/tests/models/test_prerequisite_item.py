@@ -206,6 +206,6 @@ def _get_acronym_as_href(luy):
         luy.id,
         luy.complete_title,
         _('Credits'),
-        luy.credits,
+        luy.credits.normalize(),
         luy.acronym
     )
