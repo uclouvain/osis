@@ -213,7 +213,7 @@ class DescriptionPage(pypom.Page):
 class SpecificationPage(pypom.Page):
     themes_abordes = CkeditorField(By.CLASS_NAME, 'cke_wysiwyg_frame')
     save_button = Link('SpecificationPage', By.CSS_SELECTOR, 'div.modal-footer > .btn-primary', 1)
-    add_button = ButtonField(By.CSS_SELECTOR, '.btn.btn-info.btn-sm.trigger_modal')
+    add_button = ButtonField(By.CSS_SELECTOR, '.btn.btn-primary.trigger_modal')
 
     code = InputField(By.ID, 'id_code_name')
     texte = CkeditorField(By.CLASS_NAME, 'cke_wysiwyg_frame')
@@ -222,7 +222,7 @@ class SpecificationPage(pypom.Page):
 
     def find_edit_button(self, _):
         # TODO hardcoded value for "Thèmes abordés"
-        return self.find_element(By.XPATH, '//*[@id="cms_text_fr_0"]/a')
+        return self.find_element(By.XPATH, '/html/body/div[3]/div[3]/div[2]/div/div/div[1]/div/div[2]/div[1]/a')
 
 
 class LearningUnitPage(CommonPageMixin, pypom.Page):
