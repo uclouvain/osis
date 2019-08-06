@@ -145,5 +145,17 @@ def _get_acronym_as_href(prerequisite_item, academic_yr):
     ).first()
 
     if luy:
-        return "<a href='/learning_units/{}/'>{}</a>".format(luy.id, prerequisite_item.learning_unit.acronym)
+        return "<a href='/learning_units/{}/' title=\"{}\">{}</a>".format(
+            luy.id,
+            _get_acronym_tooltip(luy),
+            prerequisite_item.learning_unit.acronym
+        )
     return ''
+
+
+def _get_acronym_tooltip(luy):
+    return "{}\n{} : {}".format(
+        luy.complete_title,
+        _('Credits'),
+        luy.credits.normalize()
+    )
