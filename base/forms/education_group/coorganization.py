@@ -46,7 +46,7 @@ class CoorganizationEditForm(forms.ModelForm):
         label=_("Institution"),
         widget=autocomplete.ModelSelect2(
             url='organization_autocomplete',
-            attrs={'data-theme': 'bootstrap', 'data-width': '100%', 'data-placeholder': '---------'},
+            attrs={'data-theme': 'bootstrap', 'data-placeholder': '---------'},
             forward=['country']
         ),
     )
