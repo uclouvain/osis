@@ -26,8 +26,8 @@
 import json
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from base.models import organization_address
 from base.tests.factories.campus import CampusFactory
@@ -92,7 +92,13 @@ class TestOrganizationAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(self.url, data={'q': 'univ'})
 
-        expected_results = [{'text': self.organization.name, 'id': str(self.organization.pk)}]
+        expected_results = [
+            {
+                'selected_text': self.organization.name,
+                'text': self.organization.name,
+                'id': str(self.organization.pk)
+            }
+        ]
 
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
@@ -112,7 +118,13 @@ class TestOrganizationAutocomplete(TestCase):
             self.url,
             data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
         )
-        expected_results = [{'text': self.organization.name, 'id': str(self.organization.pk)}]
+        expected_results = [
+            {
+                'selected_text': self.organization.name,
+                'text': self.organization.name,
+                'id': str(self.organization.pk)
+            }
+        ]
 
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
@@ -160,7 +172,13 @@ class TestCountryAutocomplete(TestCase):
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
 
-        expected_results = [{'text': self.country.name, 'id': str(self.country.pk)}]
+        expected_results = [
+            {
+                'selected_text': self.country.name,
+                'text': self.country.name,
+                'id': str(self.country.pk)
+            }
+        ]
 
         self.assertListEqual(results, expected_results)
 
@@ -182,12 +200,7 @@ class TestCampusAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(self.url, data={'q': 'univ'})
 
-        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'id': str(self.campus.pk)}]
-
-        self.assertEqual(response.status_code, 200)
-        results = _get_results_from_autocomplete_response(response)
-        self.assertListEqual(results, expected_results)
+        self._assert_result_from_autocomplete_as_expected(response)
 
     def test_when_filter_without_country_data_forwarded_no_result_found(self):
         self.client.force_login(user=self.super_user)
@@ -203,8 +216,16 @@ class TestCampusAutocomplete(TestCase):
             self.url,
             data={'forward': '{"country_external_institution": "%s"}' % self.organization_address.country.pk}
         )
-        expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'id': str(self.campus.pk)}]
+        self._assert_result_from_autocomplete_as_expected(response)
+
+    def _assert_result_from_autocomplete_as_expected(self, response):
+        expected_results = [
+            {
+                'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
+                'text': "{} ({})".format(self.organization.name, self.campus.name),
+                'id': str(self.campus.pk)
+            }
+        ]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
         self.assertListEqual(results, expected_results)
