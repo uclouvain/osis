@@ -29,6 +29,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms import ModelChoiceField, modelformset_factory
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.organization import Organization
 from reference.models.country import Country
@@ -46,7 +47,7 @@ class CoorganizationEditForm(forms.ModelForm):
         label=_("Institution"),
         widget=autocomplete.ModelSelect2(
             url='organization_autocomplete',
-            attrs={'data-theme': 'bootstrap', 'data-placeholder': '---------'},
+            attrs={'data-theme': 'bootstrap', 'data-placeholder': BLANK_CHOICE_DISPLAY},
             forward=['country']
         ),
     )
