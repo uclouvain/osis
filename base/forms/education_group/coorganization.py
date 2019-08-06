@@ -96,15 +96,9 @@ class CoorganizationEditForm(forms.ModelForm):
                self.check_unique_constraint_between_education_group_year_organization()
 
 
-class CoorganizationEditFormset(forms.BaseModelFormSet):
-    def __init__(self, data, *args, **kwargs):
-        super().__init__(data, *args, **kwargs)
-
-
 OrganizationFormset = modelformset_factory(
     model=EducationGroupOrganization,
     form=CoorganizationEditForm,
-    formset=CoorganizationEditFormset,
     extra=0,
     can_delete=True
 )

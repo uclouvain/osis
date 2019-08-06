@@ -184,16 +184,16 @@ def _update_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
     if request.method == 'POST':
-        formset_list = OrganizationFormset(
+        coorganization_formset = OrganizationFormset(
             data=request.POST,
             form_kwargs={'education_group_year': education_group_year},
             queryset=education_group_year.coorganizations
         )
-        if form_education_group_year.is_valid() and formset_list.is_valid():
-            formset_list.save()
+        if form_education_group_year.is_valid() and coorganization_formset.is_valid():
+            coorganization_formset.save()
             return _common_success_redirect(request, form_education_group_year, root)
     else:
-        formset_list = OrganizationFormset(
+        coorganization_formset = OrganizationFormset(
             request.GET or None,
             form_kwargs={'education_group_year': education_group_year},
             queryset=education_group_year.coorganizations
@@ -203,7 +203,7 @@ def _update_training(request, education_group_year, root):
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
-        "form_coorganization": formset_list,
+        "form_coorganization": coorganization_formset,
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": _show_coorganization(education_group_year),
         'can_change_coorganization': perms.is_eligible_to_change_coorganization(

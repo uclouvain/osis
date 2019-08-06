@@ -24,13 +24,13 @@
 #
 ##############################################################################
 import json
+import random
 from http import HTTPStatus
 from unittest import mock
 
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
@@ -38,16 +38,19 @@ from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
 from base.business.group_element_years import management
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+# from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
+from base.models.enums.education_group_types import TrainingType
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
@@ -55,6 +58,8 @@ from base.tests.factories.education_group_year_domain import EducationGroupYearD
 from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -328,6 +333,95 @@ class TestUpdate(TestCase):
             list_domains
         )
         self.assertNotIn(old_domain, self.education_group_year.secondary_domains.all())
+
+    def test_post_training_with_a_coorganization(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        organization = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=organization, is_main=True)
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+
+        data = {
+            'title': 'Cours au choix',
+            'education_group_type': egy.education_group_type.pk,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'academic_year': egy.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-country': address.country.pk,
+            'form-0-organization': organization.pk,
+            'form-0-diploma': diploma_choice
+        }
+
+        url = reverse(update_education_group, args=[egy.pk, egy.pk])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        egy.refresh_from_db()
+        coorganizations = egy.coorganizations
+        self.assertEqual(coorganizations.count(), 1)
+        self.assertEqual(coorganizations.first().organization, organization)
+        self.assertEqual(coorganizations.first().diploma, diploma_choice)
+
+    def test_post_training_removing_coorganization(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        address = OrganizationAddressFactory(organization=OrganizationFactory(), is_main=True)
+        egy_organization = EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=egy
+        )
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+
+        data = {
+            'title': 'Cours au choix',
+            'education_group_type': egy.education_group_type.pk,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'academic_year': egy.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-country': address.country.pk,
+            'form-0-organization': egy_organization.organization.pk,
+            'form-0-diploma': diploma_choice,
+            'form-0-DELETE': 'on',
+            'form-0-id': egy_organization.pk
+        }
+
+        url = reverse(update_education_group, args=[egy.pk, egy.pk])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        egy.refresh_from_db()
+        coorganizations = egy.coorganizations
+        self.assertEqual(coorganizations.count(), 0)
 
     def test_post_mini_training(self):
         old_domain = DomainFactory()
@@ -736,7 +830,7 @@ class TestSelectAttach(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please select an item before attach it"))
 
-    @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
+    # @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
     def test_attach_a_not_valid_case(self, mock_attach_strategy):
         ElementCache(self.person.user).save_element_selected(self.child_education_group_year)
         response = self.client.get(
