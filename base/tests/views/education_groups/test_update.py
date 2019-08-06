@@ -53,6 +53,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
 from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
+from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
@@ -70,6 +71,7 @@ from reference.tests.factories.language import LanguageFactory
 class TestUpdate(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
+        FacultyManagerGroupFactory()
         self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
         self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
         self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
