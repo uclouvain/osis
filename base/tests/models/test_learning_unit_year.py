@@ -696,7 +696,6 @@ class TestQuadriConsistency(TestCase):
 
         test_cases = [
             {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
-            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None}
         ]
 
         for case in test_cases:
@@ -741,8 +740,7 @@ class TestQuadriConsistency(TestCase):
         self.luy_full.save()
 
         test_cases = [
-            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
-            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None}
+            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20}
         ]
 
         for case in test_cases:
