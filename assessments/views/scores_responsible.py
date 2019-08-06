@@ -24,16 +24,21 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django_filters.views import FilterView
 
+from assessments.forms.scores_responsible import ScoresResponsibleFilter
 from attribution import models as mdl_attr
 from attribution.business.attribution import get_attributions_list
 from attribution.business.entity_manager import _append_entity_version
 from attribution.business.score_responsible import get_attributions_data
 from base import models as mdl_base
 from base.models.entity_manager import find_entities_with_descendants_from_entity_managers
+from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import CacheFilterMixin
 
 
 @login_required
@@ -108,9 +113,20 @@ def scores_responsible_add(request, pk):
             for a_attribution in attributions:
                 a_attribution.score_responsible = True
                 a_attribution.save()
-    url = reverse('scores_responsible_search')
-    return HttpResponseRedirect(url + "?course_code=%s&learning_unit_title=%s&tutor=%s&scores_responsible=%s"
-                                % (request.POST.get('course_code'),
-                                   request.POST.get('learning_unit_title'),
-                                   request.POST.get('tutor'),
-                                   request.POST.get('scores_responsible')))
+    return HttpResponseRedirect(reverse('scores_responsible_list'))
+
+
+class ScoresResponsibleSearch(CacheFilterMixin, PermissionRequiredMixin, FilterView):
+    model = LearningUnitYear
+    paginate_by = 20
+    template_name = "scores_responsible/list.html"
+
+    filterset_class = ScoresResponsibleFilter
+    permission_required = 'assessments.view_scoresresponsible'
+    raise_exception = True
+
+    def get_filterset_kwargs(self, filterset_class):
+        return {
+            **super().get_filterset_kwargs(filterset_class),
+            'academic_year': mdl_base.academic_year.current_academic_year()
+        }
