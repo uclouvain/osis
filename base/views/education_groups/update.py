@@ -184,7 +184,6 @@ def _update_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
     if request.method == 'POST':
-        print(request.POST)
         formset_list = OrganizationFormset(
             data=request.POST,
             form_kwargs={'education_group_year': education_group_year},
@@ -193,7 +192,6 @@ def _update_training(request, education_group_year, root):
         if form_education_group_year.is_valid() and formset_list.is_valid():
             formset_list.save()
             return _common_success_redirect(request, form_education_group_year, root)
-        print(formset_list.errors)
     else:
         formset_list = OrganizationFormset(
             request.GET or None,
