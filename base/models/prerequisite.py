@@ -157,5 +157,5 @@ def _get_acronym_tooltip(luy):
     return "{}\n{} : {}".format(
         luy.complete_title,
         _('Credits'),
-        luy.credits
+        luy.credits.normalize()
     )
