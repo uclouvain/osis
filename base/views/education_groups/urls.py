@@ -33,6 +33,7 @@ from base.views.education_groups.learning_unit import detail as learning_unit_de
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
+from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.select import education_group_select, learning_unit_select
 from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
@@ -43,6 +44,11 @@ urlpatterns = [
         r'^certificate_aim_autocomplete/$',
         CertificateAimAutocomplete.as_view(),
         name='certificate_aim_autocomplete',
+    ),
+    url(
+        r'^education_group_type_autocomplete/$',
+        EducationGroupTypeAutoComplete.as_view(),
+        name='education_group_type_autocomplete'
     ),
 
     url(r'^$', search.education_groups, name='education_groups'),
