@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.                                                     #
 # ########################################################################################
 from django.conf import settings
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.db.models import OuterRef, Exists
 from django.urls import reverse
 from django.utils.html import escape
