@@ -29,7 +29,7 @@ from base.models import entity_manager
 from base.models.person import Person
 
 
-def filter_learning_unit_year_according_person(queryset, person):
+def filter_learning_unit_year_according_person(queryset: QuerySet, person: Person)->QuerySet:
     """
     This function will filter the learning unit year queryset according to permission of person.
        * As Entity Manager, we will filter on linked entities
@@ -40,11 +40,6 @@ def filter_learning_unit_year_according_person(queryset, person):
     :param person: Person object
     :return: queryset
     """
-    if not isinstance(queryset, QuerySet):
-        raise Exception('Queryset args must be an instance of Queryset')
-    if not isinstance(person, Person):
-        raise Exception('Person args must be an instance of Person')
-
     entities_with_descendants = entity_manager.find_entities_with_descendants_from_entity_managers(
         person.entitymanager_set.all()
     )

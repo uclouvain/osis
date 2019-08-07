@@ -93,7 +93,7 @@ urlpatterns = [
     ])),
 
     url(r'^srm_manager/', include([
-        url(r'^list$', ScoresResponsibleSearch.as_view(), name='scores_responsible_list'),
+        url(r'^list/$', ScoresResponsibleSearch.as_view(), name='scores_responsible_list'),
         url(r'^scores_responsible_management/edit/$', scores_responsible.scores_responsible_management,
             name='scores_responsible_management'),
         url(r'^scores_responsible_add/(?P<pk>[0-9]+)/$', scores_responsible.scores_responsible_add,
