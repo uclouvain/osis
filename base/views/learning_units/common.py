@@ -121,7 +121,7 @@ def get_common_context_learning_unit_year(learning_unit_year_id, person):
     ).prefetch_related(
         Prefetch(
             'learning_unit__learningunityear_set',
-            queryset=LearningUnitYear.objects.select_related('academic_year').filter(academic_year__year__gte=2015)
+            queryset=LearningUnitYear.objects.select_related('academic_year')
         )
     )
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
