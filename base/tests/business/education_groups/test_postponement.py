@@ -115,6 +115,7 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
     def test_compute_end_postponement_case_no_specific_end_date_and_no_data_in_future(self):
         # Set end date of education group to None
         self.education_group_year.education_group.end_year = None
+        self.education_group_year.education_group.save()
         self.education_group_year.refresh_from_db()
         # Remove all data in future
         EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
@@ -126,6 +127,7 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
     def test_compute_end_postponement_case_specific_end_date_and_no_data_in_future(self):
         # Set end date of education group
         self.education_group_year.education_group.end_year = self.current_academic_year.year + 2
+        self.education_group_year.education_group.save()
         self.education_group_year.refresh_from_db()
         # Remove all data in future
         EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
