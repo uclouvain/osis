@@ -35,6 +35,7 @@ from reversion.admin import VersionAdmin
 from base.models import learning_unit, learning_unit_year
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
+from base.models.group_element_year import GroupElementYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 AND_OPERATOR = "ET"
@@ -126,8 +127,7 @@ class Prerequisite(models.Model):
             predicate = predicate_format.format(
                 join_secondary_operator.join(
                     map(
-                        lambda rec: _get_acronym_as_href(rec,
-                                                         self.learning_unit_year.academic_year)
+                        lambda rec: _get_acronym_as_href(rec, self.learning_unit_year.academic_year)
                         if as_href else rec.learning_unit.acronym,
                         list_records
                     )
@@ -145,6 +145,7 @@ def _get_acronym_as_href(prerequisite_item, academic_yr):
     ).first()
 
     if luy:
+        gey = GroupElementYear.objects.filter(child_leaf=luy)
         return "<a href='/learning_units/{}/' title=\"{}\">{}</a>".format(
             luy.id,
             _get_acronym_tooltip(luy),
