@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import PermissionDenied
+from django.db.models import QuerySet
 
-from assessments.business import scores_responsible
-from attribution import models as mdl_attr
-from base.models.learning_unit_year import LearningUnitYear
-
-
-def get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id):
-    qs = LearningUnitYear.objects.filter(pk=learning_unit_year_id)
-    if scores_responsible.filter_learning_unit_year_according_person(qs, user.person).exists():
-        return qs.get()
-    raise PermissionDenied("User is not an entity manager of the requirement entity of the learning unit")
+from base.models import entity_manager
+from base.models.person import Person
 
 
-def get_attributions_data(user, learning_unit_year_id, responsibles_order):
-    a_learning_unit_year = get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id)
-    return {
-        'learning_unit_year': a_learning_unit_year,
-        'attributions': mdl_attr.attribution.find_all_responsible_by_learning_unit_year(
-            a_learning_unit_year, responsibles_order=responsibles_order),
-        'academic_year': a_learning_unit_year.academic_year
-    }
+def filter_learning_unit_year_according_person(queryset: QuerySet, person: Person)->QuerySet:
+    """
+    This function will filter the learning unit year queryset according to permission of person.
+       * As Entity Manager, we will filter on linked entities
+       * As Program Manager, we will filter on learning unit year which are contained in the program
+         that the person manage but not a borrow learning unit year
+
+    :param queryset: LearningUnitYear queryset
+    :param person: Person object
+    :return: queryset
+    """
+    entities_with_descendants = entity_manager.find_entities_with_descendants_from_entity_managers(
+        person.entitymanager_set.all()
+    )
+    queryset = queryset.filter(learning_container_year__requirement_entity__in=entities_with_descendants)
+    return queryset
