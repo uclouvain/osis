@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -32,56 +32,25 @@ from django_filters.views import FilterView
 
 from assessments.forms.scores_responsible import ScoresResponsibleFilter
 from attribution import models as mdl_attr
-from attribution.business.attribution import get_attributions_list
-from attribution.business.entity_manager import _append_entity_version
 from attribution.business.score_responsible import get_attributions_data
 from base import models as mdl_base
-from base.models.entity_manager import find_entities_with_descendants_from_entity_managers
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 
 
-@login_required
-@permission_required('assessments.view_scoresresponsible', raise_exception=True)
-def scores_responsible(request):
-    entities_manager = mdl_base.entity_manager.find_by_user(request.user)
-    academic_year = mdl_base.academic_year.current_academic_year()
-    _append_entity_version(entities_manager, academic_year)
-    return render(request, 'scores_responsible.html', {"entities_manager": entities_manager,
-                                                       "academic_year": academic_year,
-                                                       "init": "0"})
+class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
+    model = LearningUnitYear
+    paginate_by = 20
+    template_name = "scores_responsible/list.html"
 
+    filterset_class = ScoresResponsibleFilter
+    permission_required = 'assessments.view_scoresresponsible'
 
-@login_required
-@permission_required('assessments.view_scoresresponsible', raise_exception=True)
-def scores_responsible_search(request):
-    entities_manager = mdl_base.entity_manager.find_by_user(request.user)
-    academic_year = mdl_base.academic_year.current_academic_year()
-    _append_entity_version(entities_manager, academic_year)
-
-    if request.GET:
-        entities_with_descendants = find_entities_with_descendants_from_entity_managers(entities_manager)
-        attributions = list(mdl_attr.attribution.search_scores_responsible(
-            learning_unit_title=request.GET.get('learning_unit_title'),
-            course_code=request.GET.get('course_code'),
-            entities=entities_with_descendants,
-            tutor=request.GET.get('tutor'),
-            responsible=request.GET.get('scores_responsible')
-        ))
-        dict_attribution = get_attributions_list(attributions, "-score_responsible")
-        return render(request, 'scores_responsible.html', {"entities_manager": entities_manager,
-                                                           "academic_year": academic_year,
-                                                           "dict_attribution": dict_attribution,
-                                                           "learning_unit_title": request.GET.get(
-                                                               'learning_unit_title'),
-                                                           "course_code": request.GET.get('course_code'),
-                                                           "tutor": request.GET.get('tutor'),
-                                                           "scores_responsible": request.GET.get('scores_responsible'),
-                                                           "init": "1"})
-    else:
-        return render(request, 'scores_responsible.html', {"entities_manager": entities_manager,
-                                                           "academic_year": academic_year,
-                                                           "init": "0"})
+    def get_filterset_kwargs(self, filterset_class):
+        return {
+            **super().get_filterset_kwargs(filterset_class),
+            'academic_year': mdl_base.academic_year.current_academic_year()
+        }
 
 
 @login_required
@@ -114,19 +83,3 @@ def scores_responsible_add(request, pk):
                 a_attribution.score_responsible = True
                 a_attribution.save()
     return HttpResponseRedirect(reverse('scores_responsible_list'))
-
-
-class ScoresResponsibleSearch(CacheFilterMixin, PermissionRequiredMixin, FilterView):
-    model = LearningUnitYear
-    paginate_by = 20
-    template_name = "scores_responsible/list.html"
-
-    filterset_class = ScoresResponsibleFilter
-    permission_required = 'assessments.view_scoresresponsible'
-    raise_exception = True
-
-    def get_filterset_kwargs(self, filterset_class):
-        return {
-            **super().get_filterset_kwargs(filterset_class),
-            'academic_year': mdl_base.academic_year.current_academic_year()
-        }

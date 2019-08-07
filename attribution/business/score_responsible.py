@@ -25,22 +25,16 @@
 ##############################################################################
 from django.core.exceptions import PermissionDenied
 
+from assessments.business import scores_responsible
 from attribution import models as mdl_attr
-from base import models as mdl_base
-from base.models.entity_manager import find_entities_with_descendants_from_entity_managers
+from base.models.learning_unit_year import LearningUnitYear
 
 
 def get_learning_unit_year_managed_by_user_from_id(user, learning_unit_year_id):
-    a_learning_unit_year = mdl_base.learning_unit_year.get_by_id(learning_unit_year_id)
-    if _is_user_manager_of_entity_allocation_of_learning_unit_year(user, a_learning_unit_year):
-        return a_learning_unit_year
-    raise PermissionDenied("User is not an entity manager of the allocation entity of the learning unit.")
-
-
-def _is_user_manager_of_entity_allocation_of_learning_unit_year(user, a_learning_unit_year):
-    entities_manager = mdl_base.entity_manager.find_by_user(user)
-    entities_with_descendants = find_entities_with_descendants_from_entity_managers(entities_manager)
-    return a_learning_unit_year.allocation_entity in entities_with_descendants
+    qs = LearningUnitYear.objects.filter(pk=learning_unit_year_id)
+    if scores_responsible.filter_learning_unit_year_according_person(qs, user.person).exists():
+        return qs.get()
+    raise PermissionDenied("User is not an entity manager of the requirement entity of the learning unit")
 
 
 def get_attributions_data(user, learning_unit_year_id, responsibles_order):

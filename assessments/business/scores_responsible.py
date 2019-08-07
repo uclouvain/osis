@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db.models import QuerySet
 
+from base.models import entity_manager
 from base.models.person import Person
 
 
@@ -44,4 +45,8 @@ def filter_learning_unit_year_according_person(queryset, person):
     if not isinstance(person, Person):
         raise Exception('Person args must be an instance of Person')
 
+    entities_with_descendants = entity_manager.find_entities_with_descendants_from_entity_managers(
+        person.entitymanager_set.all()
+    )
+    queryset = queryset.filter(learning_container_year__requirement_entity__in=entities_with_descendants)
     return queryset
