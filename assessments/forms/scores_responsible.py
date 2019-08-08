@@ -80,11 +80,14 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
                 output_field=CharField()
             )
         )
+
         queryset = business_scores_responsible.filter_learning_unit_year_according_person(
             queryset,
             self.request.user.person,
         )
+
         queryset = super().filter_queryset(queryset)
+
         return queryset.select_related('learning_container_year')\
             .prefetch_related(
                 Prefetch(

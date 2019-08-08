@@ -25,11 +25,11 @@
 ##############################################################################
 from django.db.models import QuerySet
 
-from base.models import entity_manager
+from base.models import entity_manager, program_manager
 from base.models.person import Person
 
 
-def filter_learning_unit_year_according_person(queryset: QuerySet, person: Person)->QuerySet:
+def filter_learning_unit_year_according_person(queryset: QuerySet, person: Person) -> QuerySet:
     """
     This function will filter the learning unit year queryset according to permission of person.
        * As Entity Manager, we will filter on linked entities
@@ -43,5 +43,10 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     entities_with_descendants = entity_manager.find_entities_with_descendants_from_entity_managers(
         person.entitymanager_set.all()
     )
+
+    learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_programs(
+        person.programmanager_set.all()
+    )
+
     queryset = queryset.filter(learning_container_year__requirement_entity__in=entities_with_descendants)
-    return queryset
+    return queryset | learning_units_of_prgm_mngr

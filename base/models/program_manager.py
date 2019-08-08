@@ -27,7 +27,10 @@ from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy
 from reversion.admin import VersionAdmin
 
+from base.models import entity_version
+from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
+from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from .learning_unit_enrollment import LearningUnitEnrollment
 
@@ -125,3 +128,20 @@ def find_by_management_entity(administration_entity, academic_yr):
             .distinct('person__last_name', 'person__first_name')
 
     return None
+
+
+def get_learning_unit_years_attached_to_programs(programs_manager):
+    from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+
+    entities_by_id = entity_version.build_current_entity_version_structure_in_memory()
+    current_ac = current_academic_year()
+    luys = LearningUnitYear.objects.none()
+    for program in programs_manager:
+        egy = program.education_group.educationgroupyear_set.get(academic_year=current_ac)
+        entities = [egy.administration_entity] + [
+            ent_version.entity for ent_version in entities_by_id[egy.administration_entity_id].get('all_children')
+        ]
+        luys = luys | EducationGroupHierarchy(root=egy).get_learning_unit_years().filter(
+            learning_container_year__requirement_entity__in=entities
+        )
+    return luys
