@@ -68,7 +68,6 @@
                             <th>{% trans 'Acronym' %}</th>
                             <th>{% trans 'Title' %}</th>
                             <th>{% trans 'Cred. rel./abs.' %}</th>
-                            <th>{% trans 'Test' %}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,8 +76,7 @@
                             <tr>
                                 <td><a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a></td>
                                 <td>{{ p.learning_unit_year.complete_title }}</td>
-                                <td>{{ link.relative_credits }}/{{ p.learning_unit_year.credits.normalize }}</td>
-                                <td>{{ p.education_group_year }}</td>
+                                <td>{{ link.relative_credits }} / {{ p.learning_unit_year.credits.normalize }}</td>
                             </tr>
                             {% endwith %}
                         {% endfor %}

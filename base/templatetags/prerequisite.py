@@ -58,7 +58,7 @@ def _get_acronym_as_href(learning_unit_year_parent, prerequisite_item, academic_
 def _get_acronym_tooltip(luy, learning_unit_year_parent):
     parent = learning_unit_year_parent.get(luy.id)
     relative_credits = str(parent.relative_credits) if parent else "-"
-    return "{}\n{} : {}/{}".format(
+    return "{}\n{} : {} / {}".format(
         luy.complete_title,
         _('Cred. rel./abs.'),
         relative_credits,

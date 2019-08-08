@@ -126,7 +126,7 @@ class TestPrerequisiteString(TestCase):
 
 
 def _get_acronym_as_href(luy):
-    return "<a href='/learning_units/{}/' title=\"{}\n{} : {}/{}\">{}</a>".format(
+    return "<a href='/learning_units/{}/' title=\"{}\n{} : {} / {}\">{}</a>".format(
         luy.id,
         luy.complete_title,
         _('Cred. rel./abs.'),
