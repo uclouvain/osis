@@ -134,11 +134,11 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             context["root"]
         )
 
-        context["learning_unit_year_first_parent"] = {}
+        context["learning_unit_years_parent"] = {}
         for grp in self.hierarchy.included_group_element_years:
             if not grp.child_leaf:
                 continue
-            context["learning_unit_year_first_parent"].setdefault(grp.child_leaf.id, grp)
+            context["learning_unit_years_parent"].setdefault(grp.child_leaf.id, grp)
 
         context['is_prerequisites_list'] = Prerequisite.objects.filter(
             prerequisiteitem__learning_unit=luy.learning_unit,
