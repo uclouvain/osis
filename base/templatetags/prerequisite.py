@@ -30,7 +30,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from base.models import learning_unit_year
-from base.models.group_element_year import GroupElementYear
 
 register = template.Library()
 
@@ -48,7 +47,6 @@ def _get_acronym_as_href(learning_unit_year_parent, prerequisite_item, academic_
     ).first()
 
     if luy:
-        gey = GroupElementYear.objects.filter(child_leaf=luy)
         return "<a href='/learning_units/{}/' title=\"{}\">{}</a>".format(
             luy.id,
             _get_acronym_tooltip(luy, learning_unit_year_parent),
