@@ -436,9 +436,13 @@ class LearningUnitYearWarningsTest(TestCase):
 
         excepted_error = "{} ({})".format(
             _('Volumes are inconsistent'),
-            _('a partim volume value is greater than corresponding volume of parent'))
+            _('At least a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
+        excepted_error = "{} ({})".format(
+            _('Volumes are inconsistent'),
+            _('a partim volume value is greater than corresponding volume of parent'))
+
         self.assertIn(excepted_error, luy_partim.warnings)
 
     def test_warning_one_volume_partim_greater_than_full(self):
@@ -466,9 +470,12 @@ class LearningUnitYearWarningsTest(TestCase):
 
         excepted_error = "{} ({})".format(
             _('Volumes are inconsistent'),
-            _('a partim volume value is greater than corresponding volume of parent'))
+            _('At least a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
+        excepted_error = "{} ({})".format(
+            _('Volumes are inconsistent'),
+            _('a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, luy_partim.warnings)
 
     def test_warning_when_volumes_ok_but_other_component_of_partim_has_higher_values(self):

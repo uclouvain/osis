@@ -5596,7 +5596,7 @@ msgstr ""
 #: business/learning_container_year.py:61
 msgid "a partim volume value is greater than corresponding volume of parent"
 msgstr ""
-"Au moins une valeur de volume du partim est supérieure à celle du volume "
+"au moins une valeur de volume du partim est supérieure à celle du volume "
 "correspondant du parent"
 
 #: forms/academic_calendar.py:47
