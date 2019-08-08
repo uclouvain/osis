@@ -37,7 +37,7 @@ register = template.Library()
 @register.simple_tag
 def prerequisite_string(prerequisite, learning_unit_year_parent):
     display_method = functools.partial(_get_acronym_as_href, learning_unit_year_parent)
-    return mark_safe(prerequisite._get_acronyms_string(display_method=display_method))
+    return mark_safe(prerequisite._get_acronyms_string(display_method=display_method)) if prerequisite else '-'
 
 
 def _get_acronym_as_href(learning_unit_year_parent, prerequisite_item, academic_yr):
