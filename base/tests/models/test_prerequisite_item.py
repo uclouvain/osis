@@ -79,10 +79,6 @@ class TestPrerequisiteString(TestCase):
             self.prerequisite.prerequisite_string,
             ""
         )
-        self.assertEqual(
-            self.prerequisite.prerequisite_string_as_href,
-            ""
-        )
 
     def test_get_prerequisite_string_representation_2_groupq_2_items(self):
         PrerequisiteItemFactory(
@@ -98,18 +94,8 @@ class TestPrerequisiteString(TestCase):
             group_number=2,
             position=1
         )
-        expected_as_href = "{} {} {}".format(
-            _get_acronym_as_href(self.luy_prerequisite_item_1_1),
-            _('AND'),
-            _get_acronym_as_href(self.luy_prerequisite_item_2_1)
-        )
 
-        self.assertEqual(
-            self.prerequisite.prerequisite_string_as_href,
-            expected_as_href
-        )
-
-        expected_as_href = "{} {} {}".format(
+        expected_string = "{} {} {}".format(
             self.luy_prerequisite_item_1_1.acronym,
             _('AND'),
             self.luy_prerequisite_item_2_1.acronym
@@ -117,7 +103,7 @@ class TestPrerequisiteString(TestCase):
 
         self.assertEqual(
             self.prerequisite.prerequisite_string,
-            expected_as_href
+            expected_string
         )
 
     def test_get_prerequisite_string_representation_two_groups(self):
@@ -159,30 +145,11 @@ class TestPrerequisiteString(TestCase):
             position=3
         )
 
-        expected_as_href = \
-            "({} {} {} {} {}) {} ({} {} {} {} {})".format(
-                _get_acronym_as_href(self.luy_prerequisite_item_1_1),
-                _('OR'),
-                _get_acronym_as_href(self.luy_prerequisite_item_1_2),
-                _('OR'),
-                _get_acronym_as_href(self.luy_prerequisite_item_1_3),
-                _('AND'),
-                _get_acronym_as_href(self.luy_prerequisite_item_2_1),
-                _('OR'),
-                _get_acronym_as_href(self.luy_prerequisite_item_2_2),
-                _('OR'),
-                _get_acronym_as_href(self.luy_prerequisite_item_2_3),
-            )
-
-        self.assertEqual(
-            self.prerequisite.prerequisite_string_as_href,
-            expected_as_href
-        )
 
         expected = \
             "(%s %s %s %s " \
             "%s) %s (%s %s " \
-            "%s %s %s)" %(
+            "%s %s %s)" % (
                 self.luy_prerequisite_item_1_1.acronym,
                 _('OR'),
                 self.luy_prerequisite_item_1_2.acronym,
@@ -199,13 +166,3 @@ class TestPrerequisiteString(TestCase):
             self.prerequisite.prerequisite_string,
             expected
         )
-
-
-def _get_acronym_as_href(luy):
-    return "<a href='/learning_units/{}/' title=\"{}\n{} : {}\">{}</a>".format(
-        luy.id,
-        luy.complete_title,
-        _('Credits'),
-        luy.credits.normalize(),
-        luy.acronym
-    )
