@@ -32,8 +32,7 @@ register = template.Library()
 
 @register.filter
 def date_in_form_format(value):
-    pattern = _('date_format_string')
-
+    pattern = str(_('date_format_string'))
     if type(value).__name__ == 'str':
         return value
     else:
