@@ -25,7 +25,7 @@
 ##############################################################################
 from django.db.models import QuerySet
 
-from base.models import entity_manager, program_manager
+from base.models import entity_manager, program_manager, entity_version
 from base.models.person import Person
 
 
@@ -40,12 +40,15 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     :param person: Person object
     :return: queryset
     """
+    structure = entity_version.build_current_entity_version_structure_in_memory()
     entities_with_descendants = entity_manager.find_entities_with_descendants_from_entity_managers(
-        person.entitymanager_set.all()
+        person.entitymanager_set.all().select_related('entity'),
+        structure
     )
 
     learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_programs(
-        person.programmanager_set.all()
+        person.programmanager_set.all().prefetch_related('education_group'),
+        structure
     )
 
     queryset = queryset.filter(learning_container_year__requirement_entity__in=entities_with_descendants)
