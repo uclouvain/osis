@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.views.generic import ListView
@@ -38,15 +39,25 @@ class UserListView(LoginRequiredMixin, ListView):
     # template_name = ''
 
     def get_queryset(self):
-        qs = super().get_queryset().select_related('user')\
-                    .prefetch_related('managed_entities',
-                                      'personentity_set',
-                                      'partnershipentitymanager_set',
-                                      'programmanager_set',
-                                      'user__groups')\
-                    .filter(user__is_active=True)\
-                    .exclude(user__groups__name='tutors')\
-                    .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
+        if 'partnership' in settings.INSTALLED_APPS:
+            qs = super().get_queryset().select_related('user')\
+                        .prefetch_related('managed_entities',
+                                          'personentity_set',
+                                          'partnershipentitymanager_set',
+                                          'programmanager_set',
+                                          'user__groups')\
+                        .filter(user__is_active=True)\
+                        .exclude(user__groups__name='tutors')\
+                        .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
+        else:
+            qs = super().get_queryset().select_related('user') \
+                .prefetch_related('managed_entities',
+                                  'personentity_set',
+                                  'programmanager_set',
+                                  'user__groups') \
+                .filter(user__is_active=True) \
+                .exclude(user__groups__name='tutors') \
+                .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
         return qs
 
     def paginate_queryset(self, queryset, page_size):
