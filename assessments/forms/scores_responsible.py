@@ -85,11 +85,14 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
             self.request.user.person,
         )
         queryset = super().filter_queryset(queryset)
-        return queryset.select_related('learning_container_year')\
+        return queryset.select_related('learning_container_year__requirement_entity') \
             .prefetch_related(
-                Prefetch(
-                    'attribution_set',
-                    queryset=Attribution.objects.all().select_related('tutor__person')
-                    .order_by('-score_responsible', 'tutor__person__last_name', 'tutor__person__first_name')
+            Prefetch(
+                'attribution_set',
+                queryset=Attribution.objects.all().select_related('tutor__person').order_by(
+                    '-score_responsible',
+                    'tutor__person__last_name',
+                    'tutor__person__first_name'
                 )
+            )
         )
