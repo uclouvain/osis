@@ -85,6 +85,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
             self.request.user.person,
         )
         queryset = super().filter_queryset(queryset)
+
         return queryset.select_related('learning_container_year')\
             .prefetch_related(
                 Prefetch(

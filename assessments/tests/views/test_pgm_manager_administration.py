@@ -296,7 +296,6 @@ class TestAddSaveProgramManager(TestCase):
     def setUpTestData(cls):
         ProgramManagerGroupFactory()
         cls.person = PersonFactory()
-        ProgramManagerGroupFactory()
         cls.offer_year_without_equivalent_education_group_year = OfferYearFactory(
             corresponding_education_group_year=None
         )

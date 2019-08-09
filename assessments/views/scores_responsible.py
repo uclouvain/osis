@@ -25,9 +25,9 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django_filters.views import FilterView
 
 from assessments.forms.scores_responsible import ScoresResponsibleFilter
@@ -39,7 +39,9 @@ from base.utils.cache import CacheFilterMixin
 
 
 class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
-    model = LearningUnitYear
+    queryset = LearningUnitYear.objects.select_related(
+        'learning_container_year__requirement_entity'
+    )
     paginate_by = 20
     template_name = "scores_responsible/list.html"
 

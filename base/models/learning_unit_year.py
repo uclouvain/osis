@@ -432,9 +432,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external_with_co_graduation(self):
         return self.is_external() and self.externallearningunityear.co_graduation
 
-    def is_external_mobility(self):
-        return self.is_external() and self.externallearningunityear.mobility
-
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
