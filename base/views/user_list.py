@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import Http404
 from django.views.generic import ListView
 
@@ -32,10 +32,12 @@ from base.models.person import Person
 from base.models.student import Student
 
 
-class UserListView(LoginRequiredMixin, ListView):
+class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Person
     paginate_by = "20"
     ordering = 'last_name', 'first_name', 'global_id'
+    permission_required = 'base.can_access_person'
+    raise_exception = True
 
     def get_queryset(self):
         qs = super().get_queryset().select_related('user') \
