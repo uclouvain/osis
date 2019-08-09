@@ -132,7 +132,6 @@ def find_by_management_entity(administration_entity, academic_yr):
 def get_learning_unit_years_attached_to_programs(programs_manager, entities_by_id):
     from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 
-    # entities_by_id = entity_version.build_current_entity_version_structure_in_memory()
     current_ac = current_academic_year()
     luys = LearningUnitYear.objects.none()
     for program in programs_manager:
