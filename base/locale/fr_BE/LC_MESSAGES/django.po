@@ -4996,7 +4996,7 @@ msgstr "Formations"
 
 #: templates/base/person_list.html:49
 msgid "Trainings and learning units"
-msgstr "Formations et unités d'enseignement"
+msgstr "Formations et unités d&apos;enseignement"
 
 #: models/enums/proposal_type.py:35
 msgid "Transformation"
