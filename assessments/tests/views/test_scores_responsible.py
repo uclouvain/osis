@@ -163,9 +163,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
 class ScoresResponsibleManagementTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        group = EntityManagerGroupFactory()
-        group_prgm = ProgramManagerGroupFactory()
-        for g in [group, group_prgm]:
+        for g in [EntityManagerGroupFactory(), ProgramManagerGroupFactory()]:
             g.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
             g.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
 
