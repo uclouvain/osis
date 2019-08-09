@@ -57,7 +57,7 @@ if 'partnership' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^partnerships/', include('partnership.urls', namespace='partnerships')),
         # API
-        url(r'^partnerships/v1/', include('partnership.api.url_v1', namespace='partnerships'))
+        url(r'^partnerships/v1/', include('partnership.api.url_v1', namespace='partnership_api_v1'))
     )
 if 'continuing_education' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^continuing_education/', include('continuing_education.urls')),)
