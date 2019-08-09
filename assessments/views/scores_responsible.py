@@ -39,9 +39,7 @@ from base.utils.cache import CacheFilterMixin
 
 
 class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
-    queryset = LearningUnitYear.objects.select_related(
-        'learning_container_year__requirement_entity'
-    )
+    model = LearningUnitYear
     paginate_by = 20
     template_name = "scores_responsible/list.html"
 
