@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 
 from base.models import entity_manager, program_manager, entity_version
 from base.models.person import Person
@@ -47,9 +47,13 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     )
 
     learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_programs(
-        person.programmanager_set.all().prefetch_related('education_group'),
+        person.programmanager_set.all().select_related('education_group'),
         structure
     )
 
-    queryset = queryset.filter(learning_container_year__requirement_entity__in=entities_with_descendants)
-    return queryset | learning_units_of_prgm_mngr
+    queryset = queryset.filter(
+        Q(learning_container_year__requirement_entity__in=entities_with_descendants)
+        |
+        Q(id__in=learning_units_of_prgm_mngr)
+    )
+    return queryset

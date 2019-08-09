@@ -144,4 +144,4 @@ def get_learning_unit_years_attached_to_programs(programs_manager, entities_by_i
         luys = luys | EducationGroupHierarchy(root=egy).get_learning_unit_years().filter(
             learning_container_year__requirement_entity__in=entities
         )
-    return luys
+    return luys.values_list('id', flat=True)
