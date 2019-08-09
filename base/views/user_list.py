@@ -39,26 +39,16 @@ class UserListView(LoginRequiredMixin, ListView):
     # template_name = ''
 
     def get_queryset(self):
-        if 'partnership' in settings.INSTALLED_APPS:
-            qs = super().get_queryset().select_related('user')\
-                        .prefetch_related('managed_entities',
-                                          'personentity_set',
-                                          'partnershipentitymanager_set',
-                                          'programmanager_set',
-                                          'user__groups')\
-                        .filter(user__is_active=True)\
-                        .exclude(user__groups__name='tutors')\
-                        .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
-        else:
-            qs = super().get_queryset().select_related('user') \
-                .prefetch_related('managed_entities',
-                                  'personentity_set',
-                                  'programmanager_set',
-                                  'user__groups') \
-                .filter(user__is_active=True) \
-                .exclude(user__groups__name='tutors') \
-                .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
-        return qs
+        qs = super().get_queryset().select_related('user') \
+            .prefetch_related('managed_entities',
+                              'personentity_set',
+                              'programmanager_set',
+                              'user__groups') \
+            .filter(user__is_active=True) \
+            .exclude(user__groups__name='tutors') \
+            .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
+
+        return qs.prefetch_related('partnershipentitymanager_set') if 'partnership' in settings.INSTALLED_APPS else qs
 
     def paginate_queryset(self, queryset, page_size):
         """ The cache can store a wrong page number,
