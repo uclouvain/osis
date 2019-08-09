@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-09 13:54+0200\n"
+"POT-Creation-Date: 2019-08-09 14:49+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -330,7 +330,8 @@ msgid "Academic"
 msgstr "Académique"
 
 #: templates/academic_actors.html:31 templates/academic_actors.html:35
-#: templates/blocks/navbar_top.html:130 templates/institution.html:59
+#: templates/base/person_list.html:31 templates/blocks/navbar_top.html:130
+#: templates/institution.html:59
 msgid "Academic actors"
 msgstr "Acteurs académiques"
 
@@ -1715,9 +1716,11 @@ msgstr "Entrez le texte à rechercher"
 msgid "Entities"
 msgstr "Entités"
 
-#: templates/base/person_list.html:43
+#: templates/base/person_list.html:48
 msgid "Entities for DAFs + designation of note holders and program managers"
-msgstr "Entités pour DAFs + désignation responsables de notes et gestionnaires de programme"
+msgstr ""
+"Entités pour DAFs + désignation responsables de notes et gestionnaires de "
+"programme"
 
 #: business/education_group.py:49 forms/education_groups.py:80
 #: templates/education_group/blocks/contacts_general_informations.html:30
@@ -1730,7 +1733,7 @@ msgstr "Entité"
 msgid "Entity charges"
 msgstr "Entités de charges"
 
-#: templates/base/person_list.html:43
+#: templates/base/person_list.html:48
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
 
@@ -1855,7 +1858,7 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
-#: templates/base/person_list.html:40
+#: templates/base/person_list.html:45
 #: templates/education_group/pdf_content.html:81
 #: templates/my_osis/profile.html:72 templates/search/search.html:45
 msgid "Firstname"
@@ -2033,7 +2036,7 @@ msgstr "Générer le pdf"
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
 
-#: templates/base/person_list.html:41
+#: templates/base/person_list.html:46
 msgid "Global ID"
 msgstr "Matricule FGS"
 
@@ -2049,7 +2052,7 @@ msgstr "Diplômés"
 msgid "Group"
 msgstr "Groupe"
 
-#: templates/base/person_list.html:42
+#: templates/base/person_list.html:47
 msgid "Groups"
 msgstr "Groupes"
 
@@ -2166,7 +2169,7 @@ msgstr "Institut"
 #: templates/academic_calendar/academic_calendar.html:31
 #: templates/academic_calendar/academic_calendar_form.html:34
 #: templates/academic_calendar/academic_calendars.html:37
-#: templates/blocks/navbar_top.html:106
+#: templates/base/person_list.html:30 templates/blocks/navbar_top.html:106
 #: templates/education_group/blocks/coorganization.html:34
 #: templates/education_group/blocks/coorganization_edit.html:39
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
@@ -2356,7 +2359,7 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
-#: templates/base/person_list.html:39 templates/my_osis/profile.html:79
+#: templates/base/person_list.html:44 templates/my_osis/profile.html:79
 #: templates/search/search.html:44
 msgid "Lastname"
 msgstr "Nom"
@@ -2533,6 +2536,10 @@ msgstr "Liste des formations"
 #: business/education_group.py:56 templates/education_group/search.html:130
 msgid "List of trainings with administrative data"
 msgstr "Liste des formations avec données administratives"
+
+#: templates/base/person_list.html:32
+msgid "List of users"
+msgstr "Liste des utilisateurs"
 
 #: business/proposal_xls.py:36
 msgid "List proposals"
@@ -3075,7 +3082,7 @@ msgstr ""
 msgid "Not required"
 msgstr "Non requis"
 
-#: templates/base/person_list.html:48
+#: templates/base/person_list.html:53
 msgid "Note encoding"
 msgstr "Encodage des notes"
 
@@ -3307,7 +3314,7 @@ msgstr "Partims"
 msgid "Partners"
 msgstr "Partenaires"
 
-#: templates/base/person_list.html:46
+#: templates/base/person_list.html:51
 msgid "Partnership entities"
 msgstr "Partenariats"
 
@@ -3338,7 +3345,7 @@ msgstr "Activité cyclique dispensée en"
 msgid "Periodicity"
 msgstr "Périodicité"
 
-#: templates/base/person_list.html:44
+#: templates/base/person_list.html:49
 msgid "Person entities"
 msgstr "Entités attachées"
 
@@ -3544,7 +3551,7 @@ msgstr "Commission du programme"
 msgid "Program manager"
 msgstr "Gestionnaire de parcours étudiant"
 
-#: templates/base/person_list.html:48
+#: templates/base/person_list.html:53
 #: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
@@ -4987,7 +4994,7 @@ msgstr "Type d'OF"
 msgid "Trainings"
 msgstr "Formations"
 
-#: templates/base/person_list.html:44
+#: templates/base/person_list.html:49
 msgid "Trainings and learning units"
 msgstr "Formations et unités d'enseignement"
 
@@ -5161,7 +5168,7 @@ msgstr "L'utilisateur %(person)s n'a pas de droits sur cette proposition."
 msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
-#: templates/base/person_list.html:35
+#: templates/base/person_list.html:38
 msgid "Users"
 msgstr "Utilisateurs"
 
