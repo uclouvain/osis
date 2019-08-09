@@ -36,7 +36,6 @@ class UserListView(LoginRequiredMixin, ListView):
     model = Person
     paginate_by = "20"
     ordering = 'last_name', 'first_name', 'global_id'
-    # template_name = ''
 
     def get_queryset(self):
         qs = super().get_queryset().select_related('user') \
