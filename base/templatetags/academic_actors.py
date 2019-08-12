@@ -1,4 +1,4 @@
-##############################################################################
+#############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import template
 
-CENTRAL_MANAGER_GROUP = "central_managers"
-FACULTY_MANAGER_GROUP = "faculty_managers"
-UE_FACULTY_MANAGER_GROUP = "faculty_managers_for_ue"
-ADMINISTRATIVE_MANAGER_GROUP = "administrative_manager"
-PROGRAM_MANAGER_GROUP = "program_managers"
-SIC_GROUP = "sic"
+register = template.Library()
+
+
+@register.filter
+def has_permission_can_read_persons_roles(the_user):
+    if the_user:
+        return the_user.has_perm("can_read_persons_roles")
+    return False
