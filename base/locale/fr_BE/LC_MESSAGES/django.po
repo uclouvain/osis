@@ -5204,7 +5204,8 @@ msgstr "Versions"
 #: templates/academic_actors.html:68
 msgid "View list of users with groups and person entities"
 msgstr ""
-"Permet de consulter la liste des utilisateurs pour voir les groupes auxquels ils appartiennent, ainsi qu'une liste des entités auxquelles ils sont rattachés"
+"Permet de consulter la liste des utilisateurs pour voir les groupes auxquels ils appartiennent, ainsi qu'une liste des"
+" entités auxquelles ils sont rattachés"
 
 #: templates/blocks/navbar_top.html:73 templates/studies.html:69
 msgid "Virtual Desktop"
