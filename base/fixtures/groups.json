@@ -3625,7 +3625,7 @@
             "name": "administrator_for_user",
             "permissions": [
                 [
-                    "can_access_person",
+                    "can_read_persons_roles",
                     "base",
                     "person"
                 ]

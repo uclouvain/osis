@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='person',
-            options={'permissions': (('can_access_person', 'Can access person'),)},
+            options={'permissions': (('can_read_persons_roles', 'Can read persons roles'),)},
         ),
     ]

@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth.models import Permission
 from django.http import HttpResponseRedirect, HttpResponse
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-
+from django.test import TestCase
 from base.tests.factories.person import PersonFactory
 
 
-class UserListViewTestCase(APITestCase):
+class UserListViewTestCase(TestCase):
     def setUp(self):
         self.user = PersonFactory().user
+        self.permission = Permission.objects.get(codename='can_read_persons_roles')
 
     def test_user_list_connected(self):
         self.client.force_login(self.user)
         url = reverse('academic_actors_list')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, 403)
 
-    def test_user_list_not_connected(self):
-        url = reverse('academic_actors_list')
+        self.user.user_permissions.add(self.permission)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
