@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-09 14:49+0200\n"
+"POT-Creation-Date: 2019-08-12 14:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2459,7 +2459,7 @@ msgstr ""
 msgid "List of trainings with administrative data"
 msgstr ""
 
-#: templates/base/person_list.html:32
+#: templates/academic_actors.html:67 templates/base/person_list.html:32
 msgid "List of users"
 msgstr ""
 
@@ -4993,7 +4993,7 @@ msgstr ""
 msgid "User interface language"
 msgstr ""
 
-#: templates/base/person_list.html:38
+#: templates/base/person_list.html:37
 msgid "Users"
 msgstr ""
 
@@ -5024,6 +5024,10 @@ msgstr ""
 
 #: templates/entity/tabs.html:41
 msgid "Versions"
+msgstr ""
+
+#: templates/academic_actors.html:68
+msgid "View list of users with groups and person entities"
 msgstr ""
 
 #: templates/blocks/navbar_top.html:73 templates/studies.html:69
