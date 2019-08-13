@@ -66,14 +66,14 @@
                                 </ul>
                             </td>
                             <td>
-                                <ul>{% for entity in object.managed_entities.all %}
-                                    <li>{{ entity.entity }}</li>
+                                <ul>{% for entity in object.entitymanager_set.all %}
+                                    <li>{{ entity.entity_recent_acronym }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>
                             <td>
                                 <ul>{% for entity in object.personentity_set.all %}
-                                    <li>{{ entity.entity }}</li>
+                                    <li>{{ entity.entity_recent_acronym }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>

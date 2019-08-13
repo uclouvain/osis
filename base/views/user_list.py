@@ -48,50 +48,64 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     raise_exception = True
 
     def get_queryset(self):
-        prefetch_pgm_mgr = Prefetch("programmanager_set",
-                                    queryset=ProgramManager.objects.all().select_related('education_group')
-                                    .annotate(most_recent_acronym=Subquery(
-                                        EducationGroupYear.objects
-                                            .filter(education_group=OuterRef('education_group__pk'))
-                                            .filter(academic_year=current_academic_year())
-                                            .values('acronym')
-                                    )).order_by('most_recent_acronym')
-                                    )
+        prefetch_pgm_mgr = Prefetch(
+            "programmanager_set",
+            queryset=ProgramManager.objects.all().annotate(
+                most_recent_acronym=Subquery(
+                    EducationGroupYear.objects.filter(
+                        education_group=OuterRef('education_group__pk'),
+                        academic_year=current_academic_year()
+                    ).values('acronym')
+                )
+            ).order_by('most_recent_acronym')
+        )
 
-        prefetch_managed_entity = Prefetch("managed_entities",
-                                           queryset=EntityManager.objects.select_related('entity')
-                                           .annotate(
-                                               entity_recent_acronym=Subquery(
-                                                   EntityVersion.objects
-                                                       .filter(entity=OuterRef('entity__pk'))
-                                                       .order_by('-start_date')
-                                                       .values('acronym')[:1]
-                                               )
-                                           ).order_by('entity_recent_acronym')
-                                           )
+        most_recent_acronym_subquery = Subquery(
+            EntityVersion.objects.filter(
+                entity=OuterRef('entity__pk')
+            ).order_by('-start_date').values('acronym')[:1]
+        )
 
-        prefetch_personentity = Prefetch("personentity_set",
-                                         queryset=PersonEntity.objects.select_related('entity')
-                                         .annotate(
-                                             entity_recent_acronym=Subquery(
-                                                 EntityVersion.objects
-                                                     .filter(entity=OuterRef('entity__pk'))
-                                                     .order_by('-start_date')
-                                                     .values('acronym')[:1]
-                                             )
-                                         ).order_by('entity_recent_acronym')
-                                         )
+        prefetch_managed_entity = Prefetch(
+            "entitymanager_set",
+            queryset=EntityManager.objects.annotate(
+                entity_recent_acronym=most_recent_acronym_subquery
+            ).order_by('entity_recent_acronym')
+        )
 
-        qs = super().get_queryset().select_related('user') \
-            .prefetch_related('user__groups') \
-            .prefetch_related(prefetch_pgm_mgr) \
-            .prefetch_related(prefetch_managed_entity) \
-            .prefetch_related(prefetch_personentity) \
-            .filter(user__is_active=True) \
-            .exclude(user__groups__name='tutors') \
-            .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
+        prefetch_personentity = Prefetch(
+            "personentity_set",
+            queryset=PersonEntity.objects.annotate(
+                entity_recent_acronym=most_recent_acronym_subquery
+            ).order_by('entity_recent_acronym')
+        )
 
-        return qs.prefetch_related('partnershipentitymanager_set') if 'partnership' in settings.INSTALLED_APPS else qs
+        qs = super().get_queryset().select_related(
+                'user'
+            ).prefetch_related(
+                'user__groups'
+            ).prefetch_related(
+                prefetch_pgm_mgr,
+                prefetch_managed_entity,
+                prefetch_personentity
+            ).filter(
+                user__is_active=True,
+                student__isnull=True,
+                tutor__isnull=True,
+            )
+
+        if 'partnership' in settings.INSTALLED_APPS:
+            from partnership.models import Partnership
+            qs = qs.prefetch_related(
+                Prefetch(
+                    'partnershipentitymanager_set',
+                    queryset=Partnership.objects.annotate(
+                        entity_recent_acronym=most_recent_acronym_subquery
+                    ).order_by('entity_recent_acronym')
+                )
+            )
+
+        return qs
 
     def paginate_queryset(self, queryset, page_size):
         """ The cache can store a wrong page number,
