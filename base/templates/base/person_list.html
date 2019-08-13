@@ -67,7 +67,7 @@
                             </td>
                             <td>
                                 <ul>{% for entity in object.managed_entities.all %}
-                                    <li>{{ entity }}</li>
+                                    <li>{{ entity.entity }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>
@@ -87,7 +87,7 @@
                             {% endif %}
                             <td>
                                 <ul>{% for ed in object.programmanager_set.all %}
-                                    <li>{{ ed.offer_year }}</li>
+                                    <li>{{ ed.most_recent_acronym }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>
