@@ -137,7 +137,7 @@
 
 {% if subject %}
     <div class="container-fluid p0-50">
-        <div class="alert alert-warning" role="alert"><b>{{ subject }}</b><br>{{ notice|safe }}</div>
+        <div class="alert alert-warning" role="alert"><b>{{ subject|safe }}</b><br>{{ notice|safe }}</div>
     </div>
 {% endif %}
 
@@ -193,7 +193,7 @@
     {% block content %}{% endblock %}
     {% block modal %}{% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" role="dialog" tabindex='-1'>
+    <div class="modal fade" id="form-ajax-modal" role="dialog">
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}

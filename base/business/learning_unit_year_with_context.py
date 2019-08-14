@@ -27,17 +27,16 @@ from collections import OrderedDict
 from decimal import Decimal
 
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 
 from base.business import entity_version as business_entity_version
-from base.models import learning_unit_year
-from base.models.entity import Entity
-from base.models.enums import entity_container_year_link_type as entity_types
-
-from base.models.learning_component_year import LearningComponentYear
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
+from base.models import learning_unit_year
+from base.models.entity import Entity
+from base.models.enums import entity_container_year_link_type as entity_types
+from base.models.learning_component_year import LearningComponentYear
 
 
 def get_with_context(**learning_unit_year_data):
@@ -97,12 +96,14 @@ def append_components(learning_unit_year):
     if learning_unit_year.learning_components:
         for component in learning_unit_year.learning_components:
             req_entities_volumes = component.repartition_volumes
-            vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or Decimal(0)
+            vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0)
             vol_add_req_entity_1 = req_entities_volumes.get(
-                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or Decimal(0)
+                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0)
             vol_add_req_entity_2 = req_entities_volumes.get(
-                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or Decimal(0)
-            volume_global = vol_req_entity + vol_add_req_entity_1 + vol_add_req_entity_2
+                entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)
+            volume_global = (vol_req_entity or Decimal(0)) + \
+                            (vol_add_req_entity_1 or Decimal(0)) + \
+                            (vol_add_req_entity_2 or Decimal(0))
             planned_classes = component.planned_classes or 0
 
             learning_unit_year.components[component] = {
@@ -114,7 +115,7 @@ def append_components(learning_unit_year):
                 VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
                 VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: vol_add_req_entity_2,
                 VOLUME_TOTAL_REQUIREMENT_ENTITIES: volume_global,
-                REAL_CLASSES: component.real_classes  # Necessary for xls comparison with proposition
+                REAL_CLASSES: component.count_real_classes  # Necessary for xls comparison with proposition
             }
     return learning_unit_year
 
@@ -151,7 +152,9 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
 def get_learning_component_prefetch():
     return models.Prefetch(
         'learningcomponentyear_set',
-        queryset=LearningComponentYear.objects.all().order_by('type', 'acronym'),
+        queryset=LearningComponentYear.objects.all().order_by(
+            'type', 'acronym'
+        ).annotate(count_real_classes=Count('learningclassyear')),
         to_attr='learning_components'
     )
 
@@ -162,12 +165,12 @@ def volume_from_initial_learning_component_year(learning_component_year, reparti
         VOLUME_Q1: Decimal(learning_component_year['hourly_volume_partial_q1'] or 0),
         VOLUME_Q2: Decimal(learning_component_year['hourly_volume_partial_q2'] or 0),
         PLANNED_CLASSES: learning_component_year.get('planned_classes'),
-        VOLUME_REQUIREMENT_ENTITY: Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0)),
+        VOLUME_REQUIREMENT_ENTITY: Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0) or 0),
         VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                                                0)),
+                                                                                0) or 0),
         VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2,
-                                                                                0)),
-        VOLUME_GLOBAL: sum([Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0)),
-                            Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0)),
-                            Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0))])
+                                                                                0) or 0),
+        VOLUME_GLOBAL: sum([Decimal(repartition_volumes.get(VOLUME_REQUIREMENT_ENTITY, 0) or 0),
+                            Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or 0),
+                            Decimal(repartition_volumes.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or 0)])
     }

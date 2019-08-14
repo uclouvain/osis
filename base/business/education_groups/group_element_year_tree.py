@@ -21,11 +21,14 @@
 #  at the root of the source code of this program.  If not,                              #
 #  see http://www.gnu.org/licenses/.                                                     #
 # ########################################################################################
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.conf import settings
 from django.db.models import OuterRef, Exists
+from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 
+from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
@@ -43,16 +46,22 @@ class EducationGroupHierarchy:
     _cache_hierarchy = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None):
+                 cache_hierarchy: dict = None, tab_to_show: str = None):
 
         self.children = []
+        self.included_group_element_years = []
         self.root = root
         self.group_element_year = link_attributes
         self.reference = self.group_element_year.link_type == LinkTypes.REFERENCE.name \
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
+        self.tab_to_show = tab_to_show
         self.generate_children()
+
+        self.modification_perm = ModificationPermission(self.root, self.group_element_year)
+        self.attach_perm = AttachPermission(self.root, self.group_element_year)
+        self.detach_perm = DetachPermission(self.root, self.group_element_year)
 
     @property
     def cache_hierarchy(self):
@@ -66,15 +75,18 @@ class EducationGroupHierarchy:
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
-
+                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
+                                               tab_to_show=self.tab_to_show)
+                self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
-                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy)
+                node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
+                                      tab_to_show=self.tab_to_show)
 
             else:
                 continue
 
             self.children.append(node)
+            self.included_group_element_years.append(group_element_year)
 
     def get_queryset(self):
         has_prerequisite = PrerequisiteItem.objects.filter(
@@ -116,6 +128,15 @@ class EducationGroupHierarchy:
                 'modify_url': reverse('group_element_year_update', args=[
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
+                'attach_disabled': not self.attach_perm.is_permitted(),
+                'attach_msg': escape(self.attach_perm.errors[0]) if self.attach_perm.errors else "",
+                'detach_disabled': not self.detach_perm.is_permitted(),
+                'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
+                'modification_disabled': not self.modification_perm.is_permitted(),
+                'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
+                'search_url': reverse('quick_search_education_group')+'?academic_year={}'.format(
+                    self.education_group_year.academic_year.pk
+                ),
             },
         }
 
@@ -150,8 +171,35 @@ class EducationGroupHierarchy:
         return "?group_to_parent=" + str(self.group_element_year.pk if self.group_element_year else 0)
 
     def get_url(self):
-        url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
-        return url + self.url_group_to_parent()
+        default_url = reverse('education_group_read', args=[self.root.pk, self.education_group_year.pk])
+        add_to_url = ""
+        urls = {
+            'show_identification': self.__get_base_url('education_group_read'),
+            'show_diploma': self.__get_base_url('education_group_diplomas'),
+            'show_administrative': self.__get_base_url('education_group_administrative'),
+            'show_content': self.__get_base_url('education_group_content'),
+            'show_utilization': self.__get_base_url('education_group_utilization'),
+            'show_general_information': self.__get_base_url('education_group_general_informations'),
+            'show_skills_and_achievements': self.__get_base_url('education_group_skills_achievements'),
+            'show_admission_conditions': self.__get_base_url('education_group_year_admission_condition_edit'),
+            None: default_url
+        }
+
+        return self._construct_url(add_to_url, urls)
+
+    def _construct_url(self, add_to_url, urls):
+        try:
+            url = urls[self.tab_to_show]
+        except KeyError:
+            self.tab_to_show = None
+            url = urls[self.tab_to_show]
+        finally:
+            if self.tab_to_show:
+                add_to_url = "&tab_to_show=" + self.tab_to_show
+            return url + self.url_group_to_parent() + add_to_url
+
+    def __get_base_url(self, view_name):
+        return reverse(view_name, args=[self.root.pk, self.education_group_year.pk])
 
     def get_option_list(self):
         def pruning_function(node):
@@ -199,6 +247,12 @@ class NodeLeafJsTree(EducationGroupHierarchy):
                 'modify_url': reverse('group_element_year_update', args=[
                     self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',
+                'attach_disabled': not self.attach_perm.is_permitted(),
+                'attach_msg': escape(self.attach_perm.errors[0]) if self.attach_perm.errors else "",
+                'detach_disabled': not self.detach_perm.is_permitted(),
+                'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
+                'modification_disabled': not self.modification_perm.is_permitted(),
+                'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
                 'class': self._get_class()
             },
         }
@@ -246,9 +300,96 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         return class_by_proposal_type[proposal.type] if proposal else ""
 
     def get_url(self):
-        url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
-        return url + self.url_group_to_parent()
+        default_url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
+        add_to_url = ''
+        urls = {
+            'show_utilization': default_url,
+            'show_prerequisite': reverse('learning_unit_prerequisite', args=[self.root.pk, self.learning_unit_year.pk]),
+            None: default_url
+        }
+
+        return self._construct_url(add_to_url, urls)
 
     def generate_children(self):
         """ The leaf does not have children """
         return
+
+
+class LinkActionPermission:
+    def __init__(self, root: EducationGroupYear, link: GroupElementYear):
+        self.root = root
+        self.link = link
+        self.errors = []
+
+    def is_permitted(self):
+        return len(self.errors) == 0
+
+
+class AttachPermission(LinkActionPermission):
+    def is_permitted(self):
+        self._check_year_is_editable()
+        self._check_if_leaf()
+        return super().is_permitted()
+
+    def _check_year_is_editable(self):
+        if not education_group_perms._is_year_editable(self.root, False):
+            self.errors.append(
+                str(_("Cannot perform action on a education group before %(limit_year)s") % {
+                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+                })
+            )
+
+    def _check_if_leaf(self):
+        if self.link and self.link.child_leaf:
+            self.errors.append(
+                str(_("Cannot attach element to learning unit"))
+            )
+
+
+class DetachPermission(LinkActionPermission):
+    def is_permitted(self):
+        self._check_year_is_editable()
+        self._check_if_root()
+        self._check_if_prerequisites()
+        return super().is_permitted()
+
+    def _check_year_is_editable(self):
+        if not education_group_perms._is_year_editable(self.root, False):
+            self.errors.append(
+                str(_("Cannot perform action on a education group before %(limit_year)s") % {
+                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+                })
+            )
+
+    def _check_if_root(self):
+        if self.link is None:
+            self.errors.append(
+                str(_("Cannot perform detach action on root."))
+            )
+
+    def _check_if_prerequisites(self):
+        if self.link and (self.link.has_prerequisite or self.link.is_prerequisite):
+            self.errors.append(
+                str(_("Cannot detach due to prerequisites."))
+            )
+
+
+class ModificationPermission(LinkActionPermission):
+    def is_permitted(self):
+        self._check_year_is_editable()
+        self._check_if_root()
+        return super().is_permitted()
+
+    def _check_year_is_editable(self):
+        if not education_group_perms._is_year_editable(self.root, False):
+            self.errors.append(
+                str(_("Cannot perform action on a education group before %(limit_year)s") % {
+                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+                })
+            )
+
+    def _check_if_root(self):
+        if self.link is None:
+            self.errors.append(
+                str(_("Cannot perform modification action on root."))
+            )

@@ -26,7 +26,8 @@
 import re
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import JsonResponse
+from django.db.models import Prefetch
+from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 
 from base import models as mdl
@@ -53,7 +54,10 @@ def show_success_learning_unit_year_creation_message(request, learning_unit_year
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def check_acronym(request, subtype):
     acronym = request.GET['acronym']
-    academic_yr = mdl.academic_year.find_academic_year_by_id(request.GET['year_id'])
+    academic_yr_id = request.GET.get('year_id', None)
+    if not academic_yr_id:
+        raise HttpResponseNotFound
+    academic_yr = mdl.academic_year.find_academic_year_by_id(int(academic_yr_id))
     existed_acronym = False
     existing_acronym = False
     first_using = ""
@@ -111,11 +115,19 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
 
 
 def get_common_context_learning_unit_year(learning_unit_year_id, person):
-    query_set = LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year')
+    query_set = LearningUnitYear.objects.all().select_related(
+        'learning_unit',
+        'learning_container_year'
+    ).prefetch_related(
+        Prefetch(
+            'learning_unit__learningunityear_set',
+            queryset=LearningUnitYear.objects.select_related('academic_year')
+        )
+    )
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     return {
         'learning_unit_year': learning_unit_year,
-        'current_academic_year': mdl.academic_year.current_academic_year(),
+        'current_academic_year': mdl.academic_year.starting_academic_year(),
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
     }
 

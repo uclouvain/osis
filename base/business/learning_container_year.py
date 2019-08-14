@@ -25,17 +25,22 @@
 ##############################################################################
 from decimal import Decimal
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business import learning_unit_year_with_context
 from base.models import entity_version
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 
 
-def _check_entity_version_exists(learning_container_year):
+def _check_entity_version_exists(learning_container_year) -> list:
     warnings = []
     for link_type, entity in learning_container_year.get_map_entity_by_type().items():
+        # Optional entities do not need warnings when they are empty.
+        if not entity and link_type in [ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2]:
+            continue
+
         link_type_translated = EntityContainerYearLinkTypes.get_value(link_type)
         if not entity_version.get_by_entity_and_date(entity, learning_container_year.academic_year.start_date):
             warnings.append(
@@ -45,20 +50,27 @@ def _check_entity_version_exists(learning_container_year):
     return warnings
 
 
-def get_learning_container_year_warnings(learning_container_year):
+def get_learning_container_year_warnings(learning_container_year, partim_id=None):
     _warnings = []
     learning_unit_years_with_context = \
         learning_unit_year_with_context.get_with_context(learning_container_year_id=learning_container_year.id)
 
     luy_full = next(luy for luy in learning_unit_years_with_context
                     if luy.subtype == learning_unit_year_subtypes.FULL)
-    luy_partims = [luy for luy in learning_unit_years_with_context
-                   if luy.subtype == learning_unit_year_subtypes.PARTIM]
+    if partim_id:
+        msg_part_2 = _('a partim volume value is greater than corresponding volume of parent')
+
+        luy_partims = [luy for luy in learning_unit_years_with_context
+                       if luy.subtype == learning_unit_year_subtypes.PARTIM and luy.id == partim_id]
+    else:
+        msg_part_2 = _('At least a partim volume value is greater than corresponding volume of parent')
+        luy_partims = [luy for luy in learning_unit_years_with_context
+                       if luy.subtype == learning_unit_year_subtypes.PARTIM]
 
     if any(volumes_are_inconsistent_between_partim_and_full(partim, luy_full) for partim in luy_partims):
         _warnings.append("{} ({})".format(
             _('Volumes are inconsistent'),
-            _('At least a partim volume value is greater than corresponding volume of parent')
+            msg_part_2
         ))
 
     _warnings += _check_entity_version_exists(learning_container_year)

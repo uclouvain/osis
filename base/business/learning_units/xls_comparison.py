@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from _pydecimal import Decimal
+
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.utils import get_column_letter
 
@@ -36,7 +38,10 @@ from base.business.proposal_xls import BLANK_VALUE, XLS_DESCRIPTION_COMPARISON, 
     COMPARISON_PROPOSAL_TITLES, COMPARISON_WORKSHEET_TITLE, basic_titles, components_titles
 from base.business.utils.convert import volume_format
 from base.business.xls import get_name_or_username
-from base.models.academic_year import current_academic_year
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
+from base.models.academic_year import starting_academic_year
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
@@ -51,9 +56,6 @@ from base.models.learning_unit_year import LearningUnitYear, get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
-    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
-    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 EMPTY_VALUE = ''
 DATE_FORMAT = '%d-%m-%Y'
@@ -274,7 +276,7 @@ def get_academic_year_of_reference(objects):
     criteria : academic_year = 'ALL' """
     if objects:
         return _get_academic_year(objects[0])
-    return current_academic_year()
+    return starting_academic_year()
 
 
 def _get_academic_year(obj):
@@ -388,7 +390,6 @@ def _get_data_from_initial_data(initial_data):
     lu_initial = initial_data.get('learning_unit', None)
     luy_initial = initial_data.get('learning_unit_year', None)
     lcy_initial = initial_data.get('learning_container_year', None)
-
     data = [
         str(_('Initial data')),
         luy_initial['acronym'],
@@ -398,7 +399,7 @@ def _get_data_from_initial_data(initial_data):
         translate_status(luy_initial['status']),
         learning_unit_yr.get_subtype_display(),
         get_translation(luy_initial['internship_subtype']),
-        volume_format(luy_initial['credits']),
+        volume_format(Decimal(luy_initial['credits'])),
         language.name if language else EMPTY_VALUE,
         dict(PERIODICITY_TYPES)[luy_initial['periodicity']] if luy_initial['periodicity'] else BLANK_VALUE,
         get_translation(luy_initial['quadrimester']),

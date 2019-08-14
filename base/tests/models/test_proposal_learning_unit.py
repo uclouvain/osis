@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
@@ -102,3 +103,11 @@ class TestSearchCases(TestCase):
 
     def check_search_result(self, results):
         self.assertCountEqual(results, [self.a_proposal_learning_unit.learning_unit_year])
+
+
+class TestEnsureFolderIdValidator(TestCase):
+    def test_ensure_folder_id_is_not_to_big(self):
+        bad_proposal = ProposalLearningUnitFactory(folder_id=100000000, initial_data={'acronym': 'LDROI1200'})
+        with self.assertRaises(ValidationError) as cm:
+            bad_proposal.full_clean()
+        self.assertTrue('folder_id' in cm.exception.message_dict.keys())

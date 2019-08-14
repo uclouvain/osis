@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -94,6 +94,26 @@ class TestBuildTree(TestCase):
                 args=[self.parent.pk, self.group_element_year_2_1.child_leaf.pk]
             ) + "?group_to_parent={}".format(self.group_element_year_2_1.pk)
         )
+
+    def test_tree_get_url(self):
+        test_cases = [
+            {'name': 'with tab',
+             'node': EducationGroupHierarchy(self.parent, tab_to_show='show_identification'),
+             'correct_url': reverse('education_group_read', args=[self.parent.pk, self.parent.pk]) +
+             "?group_to_parent=0&tab_to_show=show_identification"},
+            {'name': 'without tab',
+             'node': EducationGroupHierarchy(self.parent),
+             'correct_url': reverse('education_group_read',
+                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
+            {'name': 'with wrong tab',
+             'node': EducationGroupHierarchy(self.parent, tab_to_show='not_existing'),
+             'correct_url': reverse('education_group_read',
+                                    args=[self.parent.pk, self.parent.pk]) + "?group_to_parent=0"},
+        ]
+
+        for case in test_cases:
+            with self.subTest(type=case['name']):
+                self.assertEqual(case['correct_url'], case['node'].get_url())
 
     def test_tree_luy_has_prerequisite(self):
         # self.learning_unit_year_1 has prerequisite

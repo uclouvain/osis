@@ -40,12 +40,24 @@ from base.business.education_groups.learning_units.prerequisite import \
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.group_element_year import find_learning_unit_formations
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages
+
+NO_PREREQUISITES = [
+    TrainingType.MASTER_MA_120.name,
+    TrainingType.MASTER_MD_120.name,
+    TrainingType.MASTER_MS_120.name,
+    TrainingType.MASTER_MA_180_240.name,
+    TrainingType.MASTER_MD_180_240.name,
+    TrainingType.MASTER_MS_180_240.name,
+    MiniTrainingType.OPTION.name,
+    MiniTrainingType.MOBILITY_PARTNERSHIP.name,
+] + GroupType.get_names()
 
 
 @method_decorator(login_required, name='dispatch')
@@ -67,14 +79,20 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
 
         root = self.get_root()
+        self.hierarchy = EducationGroupHierarchy(root, tab_to_show=self.request.GET.get("tab_to_show"))
+
         # TODO remove parent in context
         context['person'] = self.get_person()
         context['root'] = root
         context['root_id'] = root.pk
         context['parent'] = root
-        context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
+        context['tree'] = json.dumps(self.hierarchy.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['show_prerequisites'] = self.show_prerequisites(root)
         return context
+
+    def show_prerequisites(self, education_group_year):
+        return education_group_year.education_group_type.name not in NO_PREREQUISITES
 
 
 class LearningUnitUtilization(LearningUnitGenericDetailView):
@@ -116,10 +134,16 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             context["root"]
         )
 
+        context["learning_unit_years_parent"] = {}
+        for grp in self.hierarchy.included_group_element_years:
+            if not grp.child_leaf:
+                continue
+            context["learning_unit_years_parent"].setdefault(grp.child_leaf.id, grp)
+
         context['is_prerequisites_list'] = Prerequisite.objects.filter(
             prerequisiteitem__learning_unit=luy.learning_unit,
             education_group_year=root
-        )
+        ).select_related('learning_unit_year')
         return context
 
     def render_to_response(self, context, **response_kwargs):

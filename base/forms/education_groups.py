@@ -23,20 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 
 
-class SelectWithData(forms.Select):
+class SelectMultipleWithData(forms.SelectMultiple):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         label = _(label)
         option_dict = super().create_option(name, value, label, selected, index,
@@ -65,12 +66,14 @@ class EducationGroupFilter(FilterSet):
         field_name='education_group_type__category',
         empty_label=pgettext_lazy("plural", "All")
     )
-    education_group_type = filters.ModelChoiceFilter(
+    education_group_type = filters.ModelMultipleChoiceFilter(
         queryset=EducationGroupType.objects.none(),
         required=False,
-        empty_label=pgettext_lazy("plural", "All"),
         label=_('Type'),
-        widget=SelectWithData
+        widget=autocomplete.ModelSelect2Multiple(
+            url='education_group_type_autocomplete',
+            forward=['category'],
+        ),
     )
     management_entity = filters.CharFilter(
         method='filter_with_entity_subordinated',
@@ -130,7 +133,7 @@ class EducationGroupFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
-        self.form.fields['academic_year'].initial = current_academic_year()
+        self.form.fields['academic_year'].initial = starting_academic_year()
         self.form.fields['category'].initial = education_group_categories.TRAINING
         self.form.fields["with_entity_subordinated"].initial = kwargs.pop('with_entity_subordinated', True)
 

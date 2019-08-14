@@ -42,7 +42,7 @@ class ProgramManagerAdmin(VersionAdmin, OsisModelAdmin):
 class ProgramManager(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    person = models.ForeignKey('Person', on_delete=models.CASCADE, verbose_name=gettext_lazy("person"))
+    person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
     offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
     education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
@@ -70,7 +70,9 @@ class ProgramManager(models.Model):
 
 
 def find_by_person(a_person):
-    return ProgramManager.objects.select_related("offer_year").filter(person=a_person)
+    return ProgramManager.objects.filter(person=a_person).select_related(
+        'education_group', 'person', 'offer_year'
+    )
 
 
 def is_program_manager(user, offer_year=None, learning_unit_year=None, education_group=None):

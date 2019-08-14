@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import waffle
 from django import template
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
@@ -57,8 +58,8 @@ def li_with_update_perm(context, url, message, url_id="link_update"):
     person = context['person']
     year = context['education_group_year'].academic_year.year
     is_general_faculty_manager = person.is_faculty_manager and not person.is_faculty_manager_for_ue
-    is_education_group_in_past = year < context['current_academic_year'].year
-    if is_education_group_in_past and is_general_faculty_manager:
+    is_education_group_in_past = year <= context['current_academic_year'].year
+    if is_education_group_in_past and is_general_faculty_manager and year >= settings.YEAR_LIMIT_EDG_MODIFICATION:
         return li_with_permission(context, _is_eligible_certificate_aims, url, message, url_id, True)
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 
@@ -216,13 +217,22 @@ def link_detach_education_group(context, url):
 @register.inclusion_tag('blocks/button/li_template.html')
 def link_pdf_content_education_group(url):
     action = _("Generate pdf")
+    if waffle.switch_is_active('education_group_year_generate_pdf'):
+        disabled = ''
+        title = action
+        load_modal = True
+    else:
+        disabled = 'disabled'
+        title = _('Generate PDF not available. Please use EPC.')
+        load_modal = False
+        url = '#'
 
     return {
-        "class_li": "",
-        "load_modal": True,
+        "class_li": disabled,
+        "load_modal": load_modal,
         "url": url,
         "id_li": "btn_operation_pdf_content",
-        "title": action,
+        "title": title,
         "text": action,
     }
 

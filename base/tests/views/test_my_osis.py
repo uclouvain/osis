@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -38,7 +38,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import SuperUserFactory
-from base.views import my_osis
 from osis_common.models import message_history
 
 LANGUAGE_CODE_FR = 'fr-be'
@@ -155,5 +154,5 @@ class MyOsisViewTestCase(TestCase):
         self.assertCountEqual(context['addresses'], [])
         self.assertEqual(context['tutor'], self.tutor)
         self.assertCountEqual(context['attributions'], [self.attribution])
-        self.assertCountEqual(context['programs_managers'], [])
+        self.assertCountEqual(context['programs'], [])
         self.assertTrue(context['summary_submission_opened'])

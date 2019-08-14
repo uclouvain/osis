@@ -26,6 +26,7 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -53,8 +54,9 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
     'django.contrib.sites',
-    'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
-    'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
+    'dal',
+    'dal_select2',
+    'dal_legacy_static',  # TODO : Useless in Django 2.0
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -92,7 +94,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -108,6 +109,12 @@ TESTING = 'test' in sys.argv
 if TESTING:
     # add test packages that have specific models for tests
     INSTALLED_APPS += ('osis_common.tests', )
+    # Speed up test because default hasher is slow by design
+    # https://docs.djangoproject.com/en/1.11/topics/testing/overview/#password-hashing
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+
 APPS_TO_TEST = (
     'osis_common',
     'reference',
@@ -134,6 +141,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'base.views.common.common_context_processor',
                 'base.context_processors.user_manual.user_manual_url',
+                'base.context_processors.settings.virtual_desktop',
                 'django.template.context_processors.i18n',
             ],
         },
@@ -173,6 +181,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
+
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
@@ -250,7 +259,7 @@ CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
         "removePlugins": "stylesheetparser",
-        'extraPlugins': ','.join(['pastefromword', 'cdn'] if CDN_URL else ['pastefromword']),
+        'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
@@ -260,11 +269,9 @@ CKEDITOR_CONFIGS = {
             ['Link', 'Unlink'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
-            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': CDN_URL},
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -292,18 +299,16 @@ CKEDITOR_CONFIGS = {
     },
     'minimal': {
         'toolbar': 'Custom',
-        'extraPlugins': ','.join(['cdn']) if CDN_URL else '',
+        'extraPlugins': '',
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
-            {'name': 'cdn_integration', 'items': ['CDN']},
         ],
         'autoParagraph': False,
         'allowedContent': True,
-        'customValues': {'cdn_url': CDN_URL},
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
@@ -318,6 +323,11 @@ CKEDITOR_CONFIGS = {
         'autoParagraph': False
     },
 }
+if CDN_URL:
+    for config_name in ['reddot', 'minimal']:
+        CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
+        CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
+        CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
 
 LOGGING = {
     'version': 1,
@@ -412,24 +422,29 @@ BOOTSTRAP3 = {
 AJAX_SELECT_BOOTSTRAP = False
 
 
-CACHE_ENABLED = os.environ.get("CACHE_ENABLED", "False").lower() == 'true'
-if CACHE_ENABLED:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        },
-        "redis": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                "SOCKET_CONNECT_TIMEOUT": 2,
-                "SOCKET_TIMEOUT": 2,
-                "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
-            },
-            "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
-        }
+BACKEND_CACHE = os.environ.get("BACKEND_CACHE", "locmem").lower()
+if BACKEND_CACHE == 'locmem':
+    CACHE_CONFIG = {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
     }
+elif BACKEND_CACHE == 'redis':
+    CACHE_CONFIG = {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 2,
+            "SOCKET_TIMEOUT": 2,
+            "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
+        },
+        "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
+    }
+else:
+    raise ImproperlyConfigured("Cache configuration error: invalid BACKEND_CACHE")
+
+
+CACHES = {"default": CACHE_CONFIG}
+
 
 WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'
 
@@ -450,3 +465,4 @@ YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 0))  # By default, no restriction
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
+VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')

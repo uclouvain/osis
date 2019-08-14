@@ -33,8 +33,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base.business import learning_unit_proposal as proposal_business
-from base.business.learning_unit import create_xls
-from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP
+from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP, \
+    create_xls_attributions, create_xls
 from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference, \
     create_xls_proposal_comparison
 from base.business.proposal_xls import create_xls as create_xls_proposal
@@ -105,6 +105,9 @@ def learning_units_search(request, search_type):
             }
         )
 
+    if request.POST.get('xls_status') == "xls_attributions":
+        return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
+
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
 
     context = {
@@ -151,10 +154,11 @@ def learning_units_borrowed_course(request):
 @cache_filter()
 def learning_units_proposal_search(request):
     user_person = get_object_or_404(Person, user=request.user)
+    starting_ac_year = starting_academic_year()
     search_form = LearningUnitProposalForm(
         request.GET or None,
         person=user_person,
-        initial={'academic_year_id': current_academic_year(), 'with_entity_subordinated': True},
+        initial={'academic_year_id': starting_ac_year, 'with_entity_subordinated': True},
     )
     found_learning_units = LearningUnitYear.objects.none()
 
@@ -189,7 +193,7 @@ def learning_units_proposal_search(request):
         'form': search_form,
         'form_proposal_state': ProposalStateModelForm(),
         'academic_years': get_last_academic_years(),
-        'current_academic_year': current_academic_year(),
+        'current_academic_year': starting_ac_year,
         'search_type': PROPOSAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
@@ -235,9 +239,10 @@ def _get_search_type_label(search_type):
 @permission_required('base.can_access_externallearningunityear', raise_exception=True)
 @cache_filter()
 def learning_units_external_search(request):
+    starting_ac_year = starting_academic_year()
     search_form = ExternalLearningUnitYearForm(
         request.GET or None,
-        initial={'academic_year_id': current_academic_year(), 'with_entity_subordinated': True}
+        initial={'academic_year_id': starting_ac_year, 'with_entity_subordinated': True}
     )
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
@@ -249,7 +254,7 @@ def learning_units_external_search(request):
     context = {
         'form': search_form,
         'academic_years': get_last_academic_years(),
-        'current_academic_year': current_academic_year(),
+        'current_academic_year': starting_ac_year,
         'search_type': EXTERNAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,

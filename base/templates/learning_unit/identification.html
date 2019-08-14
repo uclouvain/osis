@@ -1,6 +1,8 @@
 {% extends "learning_unit/layout_detail.html" %}
 {% load i18n %}
 {% load learning_unit %}
+{% load feature_flag %}
+{% load waffle_tags %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -33,6 +35,17 @@
 
 
 {% block content_tab %}
+    {% flag "learning_unit_proposal_delete" %}
+        {% if can_consolidate_proposal %}
+            {% include "learning_unit/blocks/modal/modal_confirm_consolidate.html" %}
+        {% endif %}
+    {% endflag %}
+    {% flag "learning_unit_delete" %}
+        {% if can_delete %}
+            {% include "learning_unit/blocks/modal/modal_confirm_delete.html" %}
+        {% endif %}
+    {% endflag %}
+    {% include "learning_unit/blocks/modal/modal_confirm_cancel.html" %}
     <div role="tabpanel" class="tab-pane active" id="identification">
         <br/>
         <div class="row">
@@ -77,6 +90,12 @@
                         {% with  old_acronym=learning_unit_year|get_previous_acronym %}
                             {% if old_acronym %}
                                 <div>({% trans 'Formerly' %} : {{ old_acronym }})</div>
+                                <br>
+                            {% endif %}
+                        {% endwith %}
+                        {% with new_acronym=learning_unit_year|get_next_acronym %}
+                            {% if new_acronym %}
+                                <div>({% trans 'Newly' %} : {{ new_acronym }})</div>
                                 <br>
                             {% endif %}
                         {% endwith %}
@@ -198,7 +217,7 @@
                 {% endblock panel_external %}
             </div>
             <div class="col-md-4">
-                {% if object.is_external %}
+                {% if object.is_external and not object.is_external_mobility %}
                     <div class="panel panel-default">
                         <div class="panel-body">
                             {% with organization=learning_unit_year.campus.organization campus=learning_unit_year.campus %}

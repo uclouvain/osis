@@ -42,6 +42,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group import FacultyManagerGroupFactory, CentralManagerGroupFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -126,6 +127,8 @@ class TestSave(TestCase):
             'component-0-planned_classes': 1,
             'component-1-planned_classes': 1,
         }
+        FacultyManagerGroupFactory()
+        CentralManagerGroupFactory()
 
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):
         self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
@@ -311,7 +314,7 @@ def build_initial_data(learning_unit_year, entity):
             "specific_title": learning_unit_year.specific_title,
             "internship_subtype": learning_unit_year.internship_subtype,
             "language": learning_unit_year.language.pk,
-            "credits": Decimal(5),
+            "credits": '5',
             "campus": learning_unit_year.campus.id,
             "periodicity": learning_unit_year.periodicity,
             "status": learning_unit_year.status,

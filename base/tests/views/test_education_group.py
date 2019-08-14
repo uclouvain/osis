@@ -35,7 +35,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
 from waffle.testutils import override_flag
@@ -511,8 +511,10 @@ class EducationGroupAdministrativedata(TestCase):
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        expected_url = reverse("education_group_read",
+                               args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_with_education_group_year_of_type_group(self):
         group_education_group_year = EducationGroupYearFactory()
@@ -523,8 +525,10 @@ class EducationGroupAdministrativedata(TestCase):
                       args=[group_education_group_year.id, group_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        expected_url = reverse("education_group_read",
+                               args=[group_education_group_year.id, group_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_user_can_edit_administrative_data(self):
         response = self.client.get(self.url)

@@ -178,6 +178,7 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
 
         self.fields['academic_year'].queryset = \
             self.fields['academic_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].empty_label = None
 
     def _preselect_entity_version_from_entity_value(self):
         if getattr(self.instance, 'management_entity', None):
@@ -297,11 +298,11 @@ class CommonBaseForm:
         education_group_year = self.education_group_year_form.save()
         self._save_group_element_year(self.education_group_year_form.parent, education_group_year)
 
+        create.create_initial_group_element_year_structure([education_group_year])
+
         if hasattr(self, '_post_save'):
             post_save = self._post_save()
             self.education_group_year_deleted = post_save.get('object_list_deleted', [])
-
-        create.create_initial_group_element_year_structure([education_group_year])
 
         return education_group_year
 

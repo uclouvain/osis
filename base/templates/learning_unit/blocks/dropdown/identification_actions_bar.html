@@ -33,8 +33,6 @@
     {% features_or "learning_unit_create" "learning_unit_update" "learning_unit_delete" "learning_unit_external_create" "learning_unit_proposal_create" "learning_unit_proposal_update" "learning_unit_proposal_delete" as show_button %}
 
     {% if show_button %}
-        <div class="row">
-            <div class="col-md-2 pull-right">
                 <div class="dropdown {{ dropdirection }}">
                     <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -47,7 +45,7 @@
                             {% if "base.can_create_learningunit" in perms and can_create_partim %}
                                 <li {% if not is_person_linked_to_entity %}class="disabled"{% endif %}>
                                     <a id="new_partim" {% if is_person_linked_to_entity %}
-                                        href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
+                                       href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}>
                                         {% trans 'New partim' %}
                                     </a>
                                 </li>
@@ -58,7 +56,8 @@
                         {# This feature is used for managing tree in education group context #}
                         {% flag "education_group_select" %}
                             <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
-                                <a {% if "base.can_edit_learningunit" in perms %} href="#" onclick="javascript:select()" {% endif %}>
+                                <a {% if "base.can_edit_learningunit" in perms %} href="#"
+                                                                                  onclick="javascript:select()" {% endif %}>
                                     {% trans 'Select' %}
                                 </a>
                             </li>
@@ -66,109 +65,66 @@
                         {% endflag %}
 
                         {% flag "learning_unit_update" %}
-                            {%  url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
-                                {% li_edit_lu edit_learning_unit_url _('Modify') %}
+                            {% url "edit_learning_unit" learning_unit_year_id=learning_unit_year.id as edit_learning_unit_url %}
+                            {% li_edit_lu edit_learning_unit_url _('Modify') %}
 
 
-                            {%  url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url %}
-                                {% li_edit_date_lu learning_unit_edition_url _('Modify end date') 'link_edit_date_learning_unit' %}
-                                <li class="divider"></li>
-                            {%  endflag %}
+                            {% url "learning_unit_edition" learning_unit_year_id=learning_unit_year.id as learning_unit_edition_url %}
+                            {% li_edit_date_lu learning_unit_edition_url _('Modify end date') 'link_edit_date_learning_unit' %}
+                            <li class="divider"></li>
+                        {% endflag %}
                         {% url "learning_unit_comparison" learning_unit_year_id=learning_unit_year.id as url_lus_comparison %}
                         <li id="link_lus_comparison" {% if proposal.type == 'CREATION' %} class="disabled"{% endif %}>
                             <a href="{% if proposal.type == 'CREATION' %}#{% else %}{{ url_lus_comparison }}{% endif %}"
                                data-toggle="tooltip"
-                               {% if proposal.type == 'CREATION' %} disabled title="{% trans 'Proposal of creation, so nothing to compare to'%}"{% endif %}>
+                                    {% if proposal.type == 'CREATION' %} disabled
+                               title="{% trans 'Proposal of creation, so nothing to compare to' %}"{% endif %}>
                                 {% trans 'Learning units comparison' %}
                             </a>
                         </li>
                         {% if proposal and proposal.learning_unit_year.academic_year == learning_unit_year.academic_year %}
                             {% url "learning_unit_proposal_comparison" learning_unit_year_id=learning_unit_year.id as url_proposal_comparison %}
-                            <li id="link_proposal_comparison" {% if proposal.type == 'CREATION' or proposal.type == 'SUPPRESSION' %} class="disabled" {% endif %}>
-                                <a href="{% if proposal.type != 'CREATION' and proposal.type != 'SUPPRESSION' %}{{ url_proposal_comparison }}{% else %}#{% endif %}"
+                            <li id="link_proposal_comparison"
+                                    {% if proposal.type == 'CREATION' or proposal.type == 'SUPPRESSION' %}
+                                class="disabled" {% endif %}>
+                                <a href="
+                                        {% if proposal.type != 'CREATION' and proposal.type != 'SUPPRESSION' %}{{ url_proposal_comparison }}{% else %}#{% endif %}"
                                    data-toggle="tooltip"
-                                {% if proposal.type == 'CREATION' or proposal.type == 'SUPPRESSION' %} disabled title="{% trans 'Proposal of creation or suppression, so nothing to compare to'%}"{% endif %}>
+                                        {% if proposal.type == 'CREATION' or proposal.type == 'SUPPRESSION' %} disabled
+                                   title="{% trans 'Proposal of creation or suppression, so nothing to compare to' %}"{% endif %}>
                                     {% trans 'Learning units proposal comparison' %}</a>
                             </li>
                         {% endif %}
-                        </a>
                         <li class="divider"></li>
-                        </a>
+                        {% flag "learning_unit_proposal_create" %}
 
-                            {% flag "learning_unit_proposal_create" %}
+                            {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url %}
+                            {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal in modification') 'link_proposal_modification' %}
 
-                                {% url "learning_unit_modification_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_modification_proposal_url %}
-                                {% li_modification_proposal learning_unit_modification_proposal_url _('Put in proposal in modification') 'link_proposal_modification' %}
+                            {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_suppression_proposal_url %}
+                            {% li_suppression_proposal learning_unit_suppression_proposal_url _('Put in proposal for ending date') 'link_proposal_suppression' %}
 
-                                {% url "learning_unit_suppression_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_suppression_proposal_url %}
-                                {% li_suppression_proposal learning_unit_suppression_proposal_url _('Put in proposal for ending date') 'link_proposal_suppression' %}
+                            <li class="divider"></li>
 
-                                <li class="divider"></li>
+                        {% endflag %}
 
-                            {% endflag %}
+                        {% flag "learning_unit_proposal_update" %}
+                            {% li_edit_proposal url_edit_proposal _('Edit the proposal') 'link_proposal_edit' %}
+                        {% endflag %}
 
-                            {% flag "learning_unit_proposal_update" %}
-                                {% li_edit_proposal url_edit_proposal _('Edit the proposal') 'link_proposal_edit' %}
-                            {% endflag %}
-
-                            {% flag "learning_unit_proposal_delete" %}
-
-                                {% url "learning_unit_cancel_proposal" learning_unit_year_id=learning_unit_year.id as learning_unit_cancel_proposal_url %}
-                                {% li_cancel_proposal learning_unit_cancel_proposal_url _('Cancel the proposal') 'link_cancel_proposal' %}
-
-                                {% li_consolidate_proposal '#' _('Consolidate the proposal') 'link_consolidate_proposal' 'document.getElementById(\'form_consolidate\').submit();' %}
-                                <li class="divider"></li>
-                            {% endflag %}
+                        {% flag "learning_unit_proposal_delete" %}
+                            {% li_cancel_proposal '#' _('Cancel the proposal') '#modalConfirmToCancel' 'link_cancel_proposal' %}
+                            {% li_consolidate_proposal '#' _('Consolidate the proposal') '#modalConsolidateLuy' 'link_consolidate_proposal' %}
+                            <li class="divider"></li>
+                        {% endflag %}
 
 
                         {% flag "learning_unit_delete" %}
-                            {%  li_delete_all_lu "#" _('Delete learning unit year definitively') '#modalDeleteLuy' 'link_delete_lus' %}
-
+                            {% li_delete_all_lu "#" _('Delete learning unit year definitively') '#modalDeleteLuy' 'link_delete_lus' %}
                         {% endflag %}
                     </ul>
                 </div>
-            </div>
-
-            </ul>
-        </div>
-        {% flag "learning_unit_proposal_delete" %}
-            {% if can_cancel_proposal %}
-                <!-- Modal to cancel proposal-->
-                <div class="modal fade" id="modalCancelProposal" tabindex="-1" role="dialog"
-                     aria-labelledby="myModalLabel">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                {% trans "Are you certain that you want to cancel the learning unit proposal ?" %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default"
-                                        data-dismiss="modal">{% trans "Close" %}</button>
-                                <a href="{% url "learning_unit_cancel_proposal" learning_unit_year_id=learning_unit_year.id %}"
-                                   role="button" class="btn btn-danger">{% trans "confirm" %}</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
-
-            {% if can_consolidate_proposal %}
-                <form id="form_consolidate" action="{% url "learning_unit_consolidate_proposal" %}" method="post">
-                    {% csrf_token %}
-                    <input id="learning_unit_year_id" type="hidden" name="learning_unit_year_id"
-                           value="{{ learning_unit_year.id }}">
-                </form>
-            {% endif %}
-        {% endflag %}
-
-        {% flag "learning_unit_delete" %}
-            {% if can_delete %}
-                {% include "learning_unit/blocks/modal/modal_confirm_delete.html" %}
-            {% endif %}
-        {% endflag %}
-
     {% endif %}
-
 {% endif %}
 
 {% block script %}

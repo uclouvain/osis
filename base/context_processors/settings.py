@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,13 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-from django.contrib.auth.models import Group, Permission
+from django.conf import settings
 
 
-class TestGroups(TestCase):
-    def test_executive_group_exists(self):
-        executive_group = Group.objects.get(name="executive")
-        self.assertTrue(executive_group)
-        can_access_learning_unit_perm = Permission.objects.get(codename="can_access_learningunit")
-        self.assertIn(can_access_learning_unit_perm, executive_group.permissions.all())
+def virtual_desktop(request):
+    url = ''
+    if request.user.is_authenticated:
+        url = _get_virtual_desktop_url_if_program_manager(request, url)
+    return {"virtual_desktop_url": url}
+
+
+def _get_virtual_desktop_url_if_program_manager(request, url):
+    if hasattr(request.user, 'person') and request.user.person.is_program_manager:
+        url = settings.VIRTUAL_DESKTOP_URL
+    return url

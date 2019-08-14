@@ -27,7 +27,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase, RequestFactory
 from requests.exceptions import RequestException
 

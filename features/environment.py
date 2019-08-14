@@ -44,6 +44,9 @@ def before_all(context):
     executable_path = settings.SELENIUM_SETTINGS["GECKO_DRIVER"]
     context.browser = webdriver.Firefox(options=options, executable_path=executable_path)
 
+    screen_size = (settings.SELENIUM_SETTINGS['SCREEN_WIDTH'], settings.SELENIUM_SETTINGS['SCREEN_HIGH'])
+    context.browser.set_window_size(*screen_size)
+
 
 def before_scenario(context, scenario):
     pass
