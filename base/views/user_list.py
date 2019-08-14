@@ -95,11 +95,11 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             )
 
         if 'partnership' in settings.INSTALLED_APPS:
-            from partnership.models import Partnership
+            from partnership.models import PartnershipEntityManager
             qs = qs.prefetch_related(
                 Prefetch(
                     'partnershipentitymanager_set',
-                    queryset=Partnership.objects.annotate(
+                    queryset=PartnershipEntityManager.objects.annotate(
                         entity_recent_acronym=most_recent_acronym_subquery
                     ).order_by('entity_recent_acronym')
                 )
