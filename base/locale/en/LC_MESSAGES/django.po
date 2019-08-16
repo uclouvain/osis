@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-13 09:40+0200\n"
+"POT-Creation-Date: 2019-08-16 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -187,11 +187,11 @@ msgid ""
 "%(year)s"
 msgstr ""
 
-#: business/learning_unit_xls.py:337 business/learning_unit_xls.py:341
+#: business/learning_unit_xls.py:338 business/learning_unit_xls.py:342
 msgid "1st quadri"
 msgstr ""
 
-#: business/learning_unit_xls.py:338 business/learning_unit_xls.py:342
+#: business/learning_unit_xls.py:339 business/learning_unit_xls.py:343
 msgid "2nd quadri"
 msgstr ""
 
@@ -275,8 +275,8 @@ msgstr ""
 msgid "Absent"
 msgstr ""
 
-#: business/education_group.py:48 business/learning_unit_xls.py:79
-#: business/learning_unit_xls.py:353 business/proposal_xls.py:52
+#: business/education_group.py:48 business/learning_unit_xls.py:80
+#: business/learning_unit_xls.py:354 business/proposal_xls.py:52
 #: forms/education_groups.py:60 forms/learning_unit/search_form.py:69
 #: templates/education_group/search.html:145
 #: templates/learning_unit/by_activity.html:84
@@ -394,7 +394,8 @@ msgstr ""
 #: templates/education_group/learning_unit/tab_prerequisite_training.html:68
 #: templates/entities.html:66 templates/entity/identification.html:51
 #: templates/entity/identification.html:115 templates/entity/versions.html:43
-#: templates/offers.html:57 templates/offers.html:58 templates/offers.html:78
+#: templates/my_osis/profile.html:168 templates/offers.html:57
+#: templates/offers.html:58 templates/offers.html:78
 #: templates/organization/organizations.html:61
 #: tests/business/learning_units/test_edition.py:113
 msgid "Acronym"
@@ -440,7 +441,7 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: business/learning_unit_proposal.py:63 business/learning_unit_xls.py:335
+#: business/learning_unit_proposal.py:63 business/learning_unit_xls.py:336
 #: business/learning_units/comparison.py:65
 #: business/learning_units/xls_comparison.py:180 business/proposal_xls.py:54
 #: models/enums/active_status.py:34 models/learning_unit_year.py:153
@@ -617,7 +618,7 @@ msgstr ""
 msgid "All the scores are encoded."
 msgstr ""
 
-#: business/learning_unit_xls.py:87 business/learning_unit_xls.py:361
+#: business/learning_unit_xls.py:88 business/learning_unit_xls.py:362
 #: business/proposal_xls.py:41 business/proposal_xls.py:67
 #: forms/learning_unit/search_form.py:91 forms/learning_unit/search_form.py:203
 #: templates/learning_unit/by_activity.html:90
@@ -638,7 +639,7 @@ msgstr ""
 msgid "And"
 msgstr ""
 
-#: business/learning_unit_xls.py:336 business/learning_unit_xls.py:340
+#: business/learning_unit_xls.py:337 business/learning_unit_xls.py:341
 #: models/enums/learning_unit_year_periodicity.py:33
 msgid "Annual"
 msgstr ""
@@ -731,13 +732,13 @@ msgstr ""
 msgid "Attached to"
 msgstr ""
 
-#: business/learning_unit_xls.py:236 business/learning_unit_xls.py:401
+#: business/learning_unit_xls.py:237 business/learning_unit_xls.py:402
 #: tests/business/test_learning_unit_xls.py:247
 #: tests/business/test_learning_unit_xls.py:510
 msgid "Attrib. vol1"
 msgstr ""
 
-#: business/learning_unit_xls.py:238 business/learning_unit_xls.py:402
+#: business/learning_unit_xls.py:239 business/learning_unit_xls.py:403
 #: tests/business/test_learning_unit_xls.py:248
 #: tests/business/test_learning_unit_xls.py:512
 msgid "Attrib. vol2"
@@ -748,7 +749,7 @@ msgstr ""
 msgid "Attribution added for %(tutor)s (%(function)s)"
 msgstr ""
 
-#: business/learning_unit_xls.py:234 business/learning_unit_xls.py:400
+#: business/learning_unit_xls.py:235 business/learning_unit_xls.py:401
 #: tests/business/test_learning_unit_xls.py:246
 #: tests/business/test_learning_unit_xls.py:508
 msgid "Attribution duration"
@@ -795,7 +796,7 @@ msgstr ""
 msgid "Base"
 msgstr ""
 
-#: business/learning_unit_xls.py:232 business/learning_unit_xls.py:399
+#: business/learning_unit_xls.py:233 business/learning_unit_xls.py:400
 #: tests/business/test_learning_unit_xls.py:245
 #: tests/business/test_learning_unit_xls.py:506
 msgid "Beg. of attribution"
@@ -1032,8 +1033,8 @@ msgstr ""
 msgid "Co-holder"
 msgstr ""
 
-#: business/education_group.py:49 business/learning_unit_xls.py:78
-#: business/learning_unit_xls.py:352 business/proposal_xls.py:38
+#: business/education_group.py:49 business/learning_unit_xls.py:79
+#: business/learning_unit_xls.py:353 business/proposal_xls.py:38
 #: business/proposal_xls.py:51 forms/education_groups.py:106
 #: forms/learning_unit/search_form.py:81 forms/utils/acronym_field.py:83
 #: forms/utils/acronym_field.py:129 forms/utils/acronym_field.py:175
@@ -1051,6 +1052,7 @@ msgstr ""
 #: templates/learning_unit/formations.html:43
 #: templates/learning_unit/identification.html:60
 #: templates/learning_unit/summary_list.html:77
+#: templates/my_osis/profile.html:169
 #: templates/student/learning_units_enrollments.html:45
 #: templates/student/offers_enrollments.html:46
 #: tests/business/test_learning_unit_xls.py:386
@@ -1223,7 +1225,7 @@ msgstr ""
 msgid "Cred. rel./abs."
 msgstr ""
 
-#: business/learning_unit_xls.py:86 business/learning_unit_xls.py:360
+#: business/learning_unit_xls.py:87 business/learning_unit_xls.py:361
 #: business/proposal_xls.py:40 business/proposal_xls.py:57
 #: models/learning_unit_year.py:147 templates/learning_unit/by_activity.html:91
 #: templates/learning_unit/by_external.html:49
@@ -1903,7 +1905,7 @@ msgstr ""
 msgid "Full name"
 msgstr ""
 
-#: business/learning_unit_xls.py:228 business/learning_unit_xls.py:397
+#: business/learning_unit_xls.py:229 business/learning_unit_xls.py:398
 #: templates/learning_unit/add_charge_repartition_inner.html:37
 #: templates/learning_unit/attributions.html:35
 #: templates/learning_unit/select_attribution.html:38
@@ -2251,7 +2253,7 @@ msgstr ""
 msgid "Label"
 msgstr ""
 
-#: business/learning_unit_xls.py:346 business/learning_units/edition.py:378
+#: business/learning_unit_xls.py:347 business/learning_units/edition.py:378
 #: business/proposal_xls.py:58 models/abstracts/abstract_achievement.py:48
 #: models/learning_unit_year.py:172
 #: templates/learning_unit/blocks/panel/educational_informations.html:55
@@ -2372,7 +2374,7 @@ msgstr ""
 msgid "Learning units list"
 msgstr ""
 
-#: business/learning_unit_xls.py:408
+#: business/learning_unit_xls.py:409
 msgid "Learning units list with attributions"
 msgstr ""
 
@@ -2399,16 +2401,16 @@ msgstr ""
 msgid "Lecturing incomplete"
 msgstr ""
 
-#: business/learning_unit_xls.py:339
+#: business/learning_unit_xls.py:340
 msgid "Lecturing planned classes"
 msgstr ""
 
-#: business/learning_unit_xls.py:336 business/learning_unit_xls.py:337
-#: business/learning_unit_xls.py:338
+#: business/learning_unit_xls.py:337 business/learning_unit_xls.py:338
+#: business/learning_unit_xls.py:339
 msgid "Lecturing vol."
 msgstr ""
 
-#: business/learning_unit_xls.py:191 business/learning_unit_xls.py:199
+#: business/learning_unit_xls.py:192 business/learning_unit_xls.py:200
 #: templates/education_group/pdf_content.html:105
 #: tests/business/test_learning_unit_xls.py:260
 #: tests/business/test_learning_unit_xls.py:268
@@ -2528,7 +2530,7 @@ msgstr ""
 msgid "Manage volumes"
 msgstr ""
 
-#: templates/my_osis/profile.html:163
+#: templates/my_osis/profile.html:161
 msgid "Managed programs"
 msgstr ""
 
@@ -2869,7 +2871,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: views/my_osis.py:57
+#: views/my_osis.py:58
 msgid "No Messages"
 msgstr ""
 
@@ -3219,7 +3221,7 @@ msgstr ""
 msgid "Periodic courses taught during"
 msgstr ""
 
-#: business/learning_unit_xls.py:334 business/proposal_xls.py:40
+#: business/learning_unit_xls.py:335 business/proposal_xls.py:40
 #: business/proposal_xls.py:59 models/learning_unit_year.py:175
 #: tests/business/test_proposal_xls.py:112
 #: tests/views/test_learning_unit.py:1517
@@ -3314,12 +3316,12 @@ msgstr ""
 msgid "Practical exercises incomplete"
 msgstr ""
 
-#: business/learning_unit_xls.py:343
+#: business/learning_unit_xls.py:344
 msgid "Practical planned classes"
 msgstr ""
 
-#: business/learning_unit_xls.py:340 business/learning_unit_xls.py:341
-#: business/learning_unit_xls.py:342
+#: business/learning_unit_xls.py:341 business/learning_unit_xls.py:342
+#: business/learning_unit_xls.py:343
 msgid "Practical vol."
 msgstr ""
 
@@ -3478,7 +3480,7 @@ msgstr ""
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully consolidated."
 msgstr ""
 
-#: business/learning_unit_xls.py:194
+#: business/learning_unit_xls.py:195
 #: tests/business/test_learning_unit_xls.py:263
 msgid "Proposal for modification"
 msgstr ""
@@ -3508,7 +3510,7 @@ msgstr ""
 msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
-#: business/learning_unit_xls.py:193
+#: business/learning_unit_xls.py:194
 #: templates/blocks/button/learning_units_action_button.html:53
 #: templates/learning_unit/proposal/creation.html:4
 #: templates/learning_unit/simple/creation.html:40
@@ -3524,14 +3526,14 @@ msgstr ""
 msgid "Proposal of creation, so nothing to compare to"
 msgstr ""
 
-#: business/learning_unit_xls.py:85 business/learning_unit_xls.py:359
+#: business/learning_unit_xls.py:86 business/learning_unit_xls.py:360
 #: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:63
 #: templates/learning_unit/by_proposal.html:88
 #: tests/business/test_learning_unit_xls.py:393 utils/send_mail.py:248
 msgid "Proposal status"
 msgstr ""
 
-#: business/learning_unit_xls.py:84 business/learning_unit_xls.py:358
+#: business/learning_unit_xls.py:85 business/learning_unit_xls.py:359
 #: business/proposal_xls.py:39 forms/proposal/learning_unit_proposal.py:57
 #: templates/learning_unit/by_proposal.html:87
 #: tests/business/test_learning_unit_xls.py:392
@@ -3595,7 +3597,7 @@ msgstr ""
 msgid "Quadri"
 msgstr ""
 
-#: business/learning_unit_xls.py:344 business/learning_units/edition.py:376
+#: business/learning_unit_xls.py:345 business/learning_units/edition.py:376
 #: business/proposal_xls.py:60 models/enums/duration_unit.py:37
 #: models/learning_unit_year.py:157
 #: templates/learning_unit/blocks/form/volumes_management_form.html:39
@@ -3700,7 +3702,7 @@ msgstr ""
 msgid "Req. Entities"
 msgstr ""
 
-#: business/learning_unit_xls.py:83 business/learning_unit_xls.py:357
+#: business/learning_unit_xls.py:84 business/learning_unit_xls.py:358
 #: business/learning_units/xls_generator.py:52 business/proposal_xls.py:38
 #: forms/learning_unit/search_form.py:76
 #: templates/learning_unit/by_activity.html:89
@@ -3898,7 +3900,7 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
-#: business/learning_unit_xls.py:345 business/learning_units/edition.py:375
+#: business/learning_unit_xls.py:346 business/learning_units/edition.py:375
 #: business/proposal_xls.py:61 models/learning_unit_year.py:156
 #: tests/business/test_proposal_xls.py:114
 msgid "Session derogation"
@@ -4038,7 +4040,7 @@ msgstr ""
 msgid "Subscribed"
 msgstr ""
 
-#: business/learning_unit_xls.py:230 business/learning_unit_xls.py:398
+#: business/learning_unit_xls.py:231 business/learning_unit_xls.py:399
 #: templates/learning_unit/add_charge_repartition_inner.html:46
 #: templates/learning_unit/attributions.html:42
 #: templates/learning_unit/select_attribution.html:45
@@ -4047,7 +4049,7 @@ msgstr ""
 msgid "Substitute"
 msgstr ""
 
-#: business/learning_unit_xls.py:82 business/learning_unit_xls.py:356
+#: business/learning_unit_xls.py:83 business/learning_unit_xls.py:357
 #: business/learning_units/edition.py:371 business/proposal_xls.py:55
 #: forms/learning_unit/search_form.py:187
 #: templates/learning_unit/by_activity.html:88
@@ -4069,7 +4071,7 @@ msgstr ""
 msgid "Suppression"
 msgstr ""
 
-#: business/learning_unit_xls.py:195
+#: business/learning_unit_xls.py:196
 #: tests/business/test_learning_unit_xls.py:264
 msgid "Suppression proposal"
 msgstr ""
@@ -4727,8 +4729,8 @@ msgstr ""
 msgid "This training has no content to postpone."
 msgstr ""
 
-#: business/education_group.py:49 business/learning_unit_xls.py:80
-#: business/learning_unit_xls.py:354
+#: business/education_group.py:49 business/learning_unit_xls.py:81
+#: business/learning_unit_xls.py:355
 #: business/learning_units/xls_generator.py:51 business/proposal_xls.py:38
 #: forms/education_groups.py:99 forms/entity.py:38
 #: forms/learning_unit/search_form.py:198 models/teaching_material.py:44
@@ -4745,13 +4747,14 @@ msgstr ""
 #: templates/learning_unit/by_external.html:47
 #: templates/learning_unit/by_proposal.html:84
 #: templates/learning_unit/formations.html:44
-#: templates/learning_unit/summary_list.html:78 templates/offers.html:79
+#: templates/learning_unit/summary_list.html:78
+#: templates/my_osis/profile.html:170 templates/offers.html:79
 #: tests/business/test_learning_unit_xls.py:388
 #: tests/views/test_learning_unit_pedagogy.py:193 utils/send_mail.py:247
 msgid "Title"
 msgstr ""
 
-#: business/learning_unit_xls.py:88 business/learning_unit_xls.py:362
+#: business/learning_unit_xls.py:89 business/learning_unit_xls.py:363
 #: models/education_group_year.py:182
 #: templates/education_group/blocks/informations.html:53
 #: tests/business/test_learning_unit_xls.py:396
@@ -4809,12 +4812,12 @@ msgstr ""
 msgid "Transformation and modification"
 msgstr ""
 
-#: business/learning_unit_xls.py:196
+#: business/learning_unit_xls.py:197
 #: tests/business/test_learning_unit_xls.py:265
 msgid "Transformation proposal"
 msgstr ""
 
-#: business/learning_unit_xls.py:197
+#: business/learning_unit_xls.py:198
 #: tests/business/test_learning_unit_xls.py:266
 msgid "Transformation/modification proposal"
 msgstr ""
@@ -4823,7 +4826,7 @@ msgstr ""
 msgid "Trimester"
 msgstr ""
 
-#: business/learning_unit_xls.py:396
+#: business/learning_unit_xls.py:397
 #: forms/learning_unit/attribution_charge_repartition.py:78
 #: forms/learning_unit/search_form.py:86
 #: templates/learning_unit/add_charge_repartition_inner.html:33
@@ -4847,7 +4850,7 @@ msgid "Tutors"
 msgstr ""
 
 #: business/education_group.py:49 business/education_group.py:61
-#: business/learning_unit_xls.py:81 business/learning_unit_xls.py:355
+#: business/learning_unit_xls.py:82 business/learning_unit_xls.py:356
 #: business/proposal_xls.py:38 business/proposal_xls.py:53
 #: forms/education_groups.py:72 forms/learning_unit/search_form.py:181
 #: models/entity_version.py:172 models/learning_container_year.py:55
@@ -4968,7 +4971,7 @@ msgstr ""
 msgid "User %(person)s do not have rights on this proposal."
 msgstr ""
 
-#: templates/my_osis/profile.html:187
+#: templates/my_osis/profile.html:202
 msgid "User interface language"
 msgstr ""
 
@@ -5638,7 +5641,7 @@ msgstr ""
 "Number Code with 4 digit\n"
 "Subdivision with one character"
 
-#: business/learning_unit_xls.py:83
+#: business/learning_unit_xls.py:84
 #: tests/business/test_learning_unit_xls.py:391
 msgid "fac. level"
 msgstr ""
@@ -5859,7 +5862,7 @@ msgstr ""
 #: templates/learning_unit/attribution_inner.html:69
 #: templates/learning_unit/class_edit.html:53
 #: templates/learning_unit/component_edit.html:53
-#: templates/my_osis/profile.html:195 templates/my_osis/profile.html:196
+#: templates/my_osis/profile.html:210 templates/my_osis/profile.html:211
 #: templates/organization/organization_address_form.html:56
 #: templates/organization/organization_address_form.html:57
 #: templates/organization/organization_form.html:49
