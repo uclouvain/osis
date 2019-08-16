@@ -294,7 +294,8 @@ msgid "Academic"
 msgstr ""
 
 #: templates/academic_actors.html:31 templates/academic_actors.html:35
-#: templates/blocks/navbar_top.html:130 templates/institution.html:59
+#: templates/base/person_list.html:31 templates/blocks/navbar_top.html:130
+#: templates/institution.html:59
 msgid "Academic actors"
 msgstr ""
 
@@ -1665,6 +1666,11 @@ msgstr ""
 msgid "Entities"
 msgstr ""
 
+#: templates/base/person_list.html:48
+msgid "Entities for DAFs + designation of note holders and program managers"
+msgstr ""
+
+#: business/education_group.py:49 forms/education_groups.py:80
 #: business/education_group.py:49 forms/education_groups.py:80
 #: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:149 templates/offers.html:51
@@ -1674,6 +1680,10 @@ msgstr ""
 
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
 msgid "Entity charges"
+msgstr ""
+
+#: templates/base/person_list.html:48
+msgid "Entity managers"
 msgstr ""
 
 #: templates/blocks/navbar_top.html:81 templates/studies.html:50
@@ -1793,6 +1803,7 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
+#: templates/base/person_list.html:45
 #: templates/education_group/pdf_content.html:81
 #: templates/my_osis/profile.html:72 templates/search/search.html:45
 msgid "Firstname"
@@ -1970,6 +1981,10 @@ msgstr ""
 msgid "Get back to initial data"
 msgstr ""
 
+#: templates/base/person_list.html:46
+msgid "Global ID"
+msgstr ""
+
 #: templates/academic_calendar/academic_calendar.html:73 templates/home.html:50
 msgid "Go"
 msgstr ""
@@ -1980,6 +1995,10 @@ msgstr ""
 
 #: models/enums/education_group_categories.py:38
 msgid "Group"
+msgstr ""
+
+#: templates/base/person_list.html:47
+msgid "Groups"
 msgstr ""
 
 #: templates/blocks/navbar_top.html:251 templates/blocks/navbar_top.html:253
@@ -2093,7 +2112,7 @@ msgstr ""
 #: templates/academic_calendar/academic_calendar.html:31
 #: templates/academic_calendar/academic_calendar_form.html:34
 #: templates/academic_calendar/academic_calendars.html:37
-#: templates/blocks/navbar_top.html:106
+#: templates/base/person_list.html:30 templates/blocks/navbar_top.html:106
 #: templates/education_group/blocks/coorganization.html:34
 #: templates/education_group/blocks/coorganization_edit.html:39
 #: templates/entities.html:30 templates/entity/breadcrumb.html:28
@@ -2276,7 +2295,8 @@ msgstr ""
 msgid "Last modifications"
 msgstr ""
 
-#: templates/my_osis/profile.html:79 templates/search/search.html:44
+#: templates/base/person_list.html:44 templates/my_osis/profile.html:79
+#: templates/search/search.html:44
 msgid "Lastname"
 msgstr ""
 
@@ -2453,6 +2473,10 @@ msgstr ""
 
 #: business/education_group.py:56 templates/education_group/search.html:130
 msgid "List of trainings with administrative data"
+msgstr ""
+
+#: templates/academic_actors.html:67 templates/base/person_list.html:32
+msgid "List of users"
 msgstr ""
 
 #: business/proposal_xls.py:36
@@ -2983,6 +3007,10 @@ msgstr ""
 msgid "Not required"
 msgstr ""
 
+#: templates/base/person_list.html:53
+msgid "Note encoding"
+msgstr ""
+
 #: templates/blocks/notifications.html:10
 #, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
@@ -3201,6 +3229,10 @@ msgstr ""
 msgid "Partners"
 msgstr ""
 
+#: templates/base/person_list.html:51
+msgid "Partnership entities"
+msgstr ""
+
 #: templates/blocks/navbar_top.html:151
 msgid "Partnerships"
 msgstr ""
@@ -3226,6 +3258,10 @@ msgstr ""
 #: tests/business/test_proposal_xls.py:112
 #: tests/views/test_learning_unit.py:1517
 msgid "Periodicity"
+msgstr ""
+
+#: templates/base/person_list.html:49
+msgid "Person entities"
 msgstr ""
 
 #: business/learning_units/perms.py:67
@@ -3428,6 +3464,7 @@ msgstr ""
 msgid "Program manager"
 msgstr ""
 
+#: templates/base/person_list.html:53
 #: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
 msgstr ""
@@ -4804,6 +4841,10 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
+#: templates/base/person_list.html:49
+msgid "Trainings and learning units"
+msgstr ""
+
 #: models/enums/proposal_type.py:35
 msgid "Transformation"
 msgstr ""
@@ -4975,6 +5016,10 @@ msgstr ""
 msgid "User interface language"
 msgstr ""
 
+#: templates/base/person_list.html:37
+msgid "Users"
+msgstr ""
+
 #: templates/education_group/learning_unit/tabs.html:35
 #: templates/education_group/tabs.html:71
 #: templates/learning_unit/blocks/tabs.html:76
@@ -5002,6 +5047,10 @@ msgstr ""
 
 #: templates/entity/tabs.html:41
 msgid "Versions"
+msgstr ""
+
+#: templates/academic_actors.html:68
+msgid "View list of users with groups and person entities"
 msgstr ""
 
 #: templates/blocks/navbar_top.html:73 templates/studies.html:69

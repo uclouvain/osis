@@ -330,7 +330,8 @@ msgid "Academic"
 msgstr "Académique"
 
 #: templates/academic_actors.html:31 templates/academic_actors.html:35
-#: templates/blocks/navbar_top.html:130 templates/institution.html:59
+#: templates/base/person_list.html:31 templates/blocks/navbar_top.html:130
+#: templates/institution.html:59
 msgid "Academic actors"
 msgstr "Acteurs académiques"
 
@@ -1722,6 +1723,12 @@ msgstr "Entrez le texte à rechercher"
 msgid "Entities"
 msgstr "Entités"
 
+#: templates/base/person_list.html:48
+msgid "Entities for DAFs + designation of note holders and program managers"
+msgstr ""
+"Entités pour DAFs + désignation responsables de notes et gestionnaires de "
+"programme"
+
 #: business/education_group.py:49 forms/education_groups.py:80
 #: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:149 templates/offers.html:51
@@ -1732,6 +1739,10 @@ msgstr "Entité"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
 msgid "Entity charges"
 msgstr "Entités de charges"
+
+#: templates/base/person_list.html:48
+msgid "Entity managers"
+msgstr "Gestionnaires d'entités"
 
 #: templates/blocks/navbar_top.html:81 templates/studies.html:50
 msgid "Evaluations"
@@ -1854,6 +1865,7 @@ msgstr "Liste au choix de Finalités (120)"
 msgid "Finality 180 list choice"
 msgstr "Liste au choix de Finalités (180)"
 
+#: templates/base/person_list.html:45
 #: templates/education_group/pdf_content.html:81
 #: templates/my_osis/profile.html:72 templates/search/search.html:45
 msgid "Firstname"
@@ -2031,6 +2043,10 @@ msgstr "Générer le pdf"
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
 
+#: templates/base/person_list.html:46
+msgid "Global ID"
+msgstr "Matricule FGS"
+
 #: templates/academic_calendar/academic_calendar.html:73 templates/home.html:50
 msgid "Go"
 msgstr "Continuer"
@@ -2042,6 +2058,10 @@ msgstr "Diplômés"
 #: models/enums/education_group_categories.py:38
 msgid "Group"
 msgstr "Groupe"
+
+#: templates/base/person_list.html:47
+msgid "Groups"
+msgstr "Groupes"
 
 #: templates/blocks/navbar_top.html:251 templates/blocks/navbar_top.html:253
 msgid "Help"
@@ -2346,7 +2366,8 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
-#: templates/my_osis/profile.html:79 templates/search/search.html:44
+#: templates/base/person_list.html:44 templates/my_osis/profile.html:79
+#: templates/search/search.html:44
 msgid "Lastname"
 msgstr "Nom"
 
@@ -2530,6 +2551,10 @@ msgstr "Liste des formations"
 #: business/education_group.py:56 templates/education_group/search.html:130
 msgid "List of trainings with administrative data"
 msgstr "Liste des formations avec données administratives"
+
+#: templates/academic_actors.html:67 templates/base/person_list.html:32
+msgid "List of users"
+msgstr "Liste des utilisateurs"
 
 #: business/proposal_xls.py:36
 msgid "List proposals"
@@ -3072,6 +3097,10 @@ msgstr ""
 msgid "Not required"
 msgstr "Non requis"
 
+#: templates/base/person_list.html:53
+msgid "Note encoding"
+msgstr "Encodage des notes"
+
 #: templates/blocks/notifications.html:10
 #, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
@@ -3300,6 +3329,10 @@ msgstr "Partims"
 msgid "Partners"
 msgstr "Partenaires"
 
+#: templates/base/person_list.html:51
+msgid "Partnership entities"
+msgstr "Partenariats"
+
 #: templates/blocks/navbar_top.html:151
 msgid "Partnerships"
 msgstr "Partenariats"
@@ -3326,6 +3359,10 @@ msgstr "Activité cyclique dispensée en"
 #: tests/views/test_learning_unit.py:1517
 msgid "Periodicity"
 msgstr "Périodicité"
+
+#: templates/base/person_list.html:49
+msgid "Person entities"
+msgstr "Entités attachées"
 
 #: business/learning_units/perms.py:67
 msgid "Person not in accordance with proposal state"
@@ -3534,6 +3571,7 @@ msgstr "Commission du programme"
 msgid "Program manager"
 msgstr "Gestionnaire de parcours étudiant"
 
+#: templates/base/person_list.html:53
 #: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
 msgstr "Gestionnaires de parcours étudiant"
@@ -4978,6 +5016,10 @@ msgstr "Type d'OF"
 msgid "Trainings"
 msgstr "Formations"
 
+#: templates/base/person_list.html:49
+msgid "Trainings and learning units"
+msgstr "Formations et unités d&apos;enseignement"
+
 #: models/enums/proposal_type.py:35
 msgid "Transformation"
 msgstr "Transformation"
@@ -5149,6 +5191,10 @@ msgstr "L'utilisateur %(person)s n'a pas de droits sur cette proposition."
 msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
+#: templates/base/person_list.html:37
+msgid "Users"
+msgstr "Utilisateurs"
+
 #: templates/education_group/learning_unit/tabs.html:35
 #: templates/education_group/tabs.html:71
 #: templates/learning_unit/blocks/tabs.html:76
@@ -5177,6 +5223,12 @@ msgstr "Valeur avant proposition"
 #: templates/entity/tabs.html:41
 msgid "Versions"
 msgstr "Versions"
+
+#: templates/academic_actors.html:68
+msgid "View list of users with groups and person entities"
+msgstr ""
+"Permet de consulter la liste des utilisateurs pour voir les groupes auxquels ils appartiennent, ainsi qu'une liste des"
+" entités auxquelles ils sont rattachés"
 
 #: templates/blocks/navbar_top.html:73 templates/studies.html:69
 msgid "Virtual Desktop"
