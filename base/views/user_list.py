@@ -25,10 +25,10 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.http import Http404
-from django.views.generic import ListView
 from django.db.models import Prefetch
 from django.db.models import Subquery, OuterRef
+from django.http import Http404
+from django.views.generic import ListView
 
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
@@ -37,7 +37,6 @@ from base.models.entity_version import EntityVersion
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
 from base.models.program_manager import ProgramManager
-from base.models.student import Student
 
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):

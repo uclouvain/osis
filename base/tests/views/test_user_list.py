@@ -25,8 +25,8 @@
 ##############################################################################
 from django.contrib.auth.models import Permission
 from django.http import HttpResponse
-from rest_framework.reverse import reverse
 from django.test import TestCase
+from rest_framework.reverse import reverse
 
 from base.tests.factories.person import PersonFactory
 
