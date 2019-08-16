@@ -91,10 +91,10 @@ urlpatterns = [
         name='campus-autocomplete'),
     url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
         name='employee_autocomplete'),
+    url(r'^list-of-users/$', user_list.UserListView.as_view(), name='academic_actors_list'),
 
     url(r'^academic_actors/', include([
         url(r'^$', institution.academic_actors, name='academic_actors'),
-        url(r'^list/$', user_list.UserListView.as_view(), name='academic_actors_list'),
     ])),
 
     url(r'^academic_calendars/', include([
