@@ -31,5 +31,5 @@ register = template.Library()
 @register.filter
 def has_permission_can_read_persons_roles(the_user):
     if the_user:
-        return the_user.has_perm("can_read_persons_roles")
+        return the_user.has_perm("base.can_read_persons_roles")
     return False
