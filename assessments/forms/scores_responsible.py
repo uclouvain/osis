@@ -24,12 +24,13 @@
 #
 ##############################################################################
 import django_filters
-from django.db.models import Q, Prefetch, Count, Value, CharField
+from django.db.models import Q, Prefetch, Count, Value, CharField, OuterRef, Subquery
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
 from attribution.models.attribution import Attribution
+from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear
 
 
@@ -85,8 +86,14 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
             self.request.user.person,
         )
         queryset = super().filter_queryset(queryset)
-        return queryset.select_related('learning_container_year__requirement_entity') \
-            .prefetch_related(
+
+        entity_requirement = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        return queryset.select_related('learning_container_year').prefetch_related(
             Prefetch(
                 'attribution_set',
                 queryset=Attribution.objects.all().select_related('tutor__person').order_by(
@@ -95,4 +102,6 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
                     'tutor__person__first_name'
                 )
             )
+        ).annotate(
+            requirement_entity=Subquery(entity_requirement)
         )
