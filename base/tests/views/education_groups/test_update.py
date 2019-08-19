@@ -69,6 +69,9 @@ from reference.tests.factories.language import LanguageFactory
 @override_flag('education_group_update', active=True)
 class TestUpdate(TestCase):
     def setUp(self):
+        self.start_academic_year = AcademicYearFactory(year=1968)
+        self.academic_year_2010 = AcademicYearFactory(year=2010)
+        self.academic_year_2018 = AcademicYearFactory(year=2018)
         self.current_academic_year = create_current_academic_year()
         self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
         self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
@@ -114,7 +117,7 @@ class TestUpdate(TestCase):
         self.previous_training_education_group_year = TrainingFactory(
             academic_year=self.previous_academic_year,
             education_group_type=self.an_training_education_group_type,
-            education_group__start_year=1968
+            education_group__start_year=self.start_academic_year
         )
 
         EntityVersionFactory(entity=self.previous_training_education_group_year.management_entity,
@@ -126,7 +129,7 @@ class TestUpdate(TestCase):
         self.training_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year,
             education_group_type=self.an_training_education_group_type,
-            education_group__start_year=1968
+            education_group__start_year=self.start_academic_year
         )
 
         self.training_education_group_year_1 = TrainingFactory(
@@ -305,7 +308,7 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
+            "start_year": self.academic_year_2010,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
         }
@@ -349,7 +352,7 @@ class TestUpdate(TestCase):
             'active': ACTIVE,
             'schedule_type': DAILY,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
+            "start_year": self.academic_year_2010,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
         }
@@ -383,8 +386,8 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
-            "end_year": 2018,
+            "start_year": self.academic_year_2010,
+            "end_year": self.academic_year_2018,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
         }
@@ -448,21 +451,24 @@ class TestSelectAttach(TestCase):
     def setUpTestData(self):
         self.person = PersonFactory()
         self.academic_year = create_current_academic_year()
+        self.previous_academic_year = AcademicYearFactory(year=self.academic_year.year - 1)
+        self.next_academic_year_1 = AcademicYearFactory(year=self.academic_year.year + 1)
+        self.next_academic_year_2 = AcademicYearFactory(year=self.academic_year.year + 2)
         self.child_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group__end_year=self.academic_year.year + 1
+            education_group__end_year=self.next_academic_year_1
         )
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.new_parent_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year + 2
+            education_group__end_year=self.next_academic_year_2
         )
         self.bad_parent = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year - 1
+            education_group__end_year=self.previous_academic_year
         )
 
         self.initial_group_element_year = GroupElementYearFactory(

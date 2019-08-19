@@ -70,7 +70,7 @@ def get_protected_messages_by_education_group_year(education_group_year):
             ) % {"count_enrollment": count_enrollment}
         )
 
-    # Check if content is not empty
+    # Check if content is not empty.year
     if _have_contents_which_are_not_mandatory(education_group_year):
         protected_message.append(_("The content of the education group is not empty."))
 
@@ -83,7 +83,7 @@ def get_protected_messages_by_education_group_year(education_group_year):
 def get_education_group_years_to_delete(education_group, end_year=None):
     qs = EducationGroupYear.objects.filter(education_group=education_group)
     if end_year is not None:
-        qs = qs.filter(academic_year__year__gt=end_year)
+        qs = qs.filter(academic_year__year__gt=end_year.year)
     return qs.order_by('academic_year__year')
 
 

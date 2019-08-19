@@ -105,7 +105,7 @@ class EducationGroup(SerializableModel):
     def clean(self):
         # Check end_year should be greater of equals to start_year
         if self.start_year and self.end_year:
-            if self.start_year > self.end_year:
+            if self.start_year.year > self.end_year.year:
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
                         "max": _("Last year of organization").title(),
