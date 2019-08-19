@@ -28,18 +28,13 @@ import logging
 from functools import wraps
 
 from django.conf import settings
-from django.core.cache import caches, InvalidCacheBackendError
+from django.core.cache import cache
 from django.http import QueryDict
 
 CACHE_FILTER_TIMEOUT = None
 PREFIX_CACHE_KEY = 'cache_filter'
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
-try:
-    cache = caches["redis"]
-except InvalidCacheBackendError:
-    logger.warning("Rolled back to default cache")
-    cache = caches["default"]
 
 
 def cache_filter(exclude_params=None, **default_values):
@@ -103,15 +98,18 @@ class RequestCache(OsisCache):
 
     def save_get_parameters(self, request, parameters_to_exclude=None):
         parameters_to_exclude = parameters_to_exclude or []
-        param_to_cache = {key: value for key, value in request.GET.items() if key not in parameters_to_exclude}
+        param_to_cache = {key: value for key, value in request.GET.lists() if key not in parameters_to_exclude}
         self.set_cached_data(param_to_cache)
 
     def restore_get_request(self, request, **default_values):
         cached_value = self.cached_data or default_values
-
         new_get_request = QueryDict(mutable=True)
-        new_get_request.update({**request.GET.dict(), **cached_value})
-
+        new_get_request.update({**request.GET.dict()})
+        for key, value in cached_value.items():
+            if type(value) == list:
+                new_get_request.setlist(key, value)
+            else:
+                new_get_request[key] = value
         return new_get_request
 
 

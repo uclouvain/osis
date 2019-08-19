@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 
 from base.forms.common import set_trans_txt
-from cms.models import translated_text
 from cms.enums import entity_name
-from ckeditor.widgets import CKEditorWidget
+from cms.models import translated_text
 
 
 class LearningUnitSpecificationsForm(forms.Form):
@@ -51,25 +51,39 @@ class LearningUnitSpecificationsForm(forms.Form):
 
 
 class LearningUnitSpecificationsEditForm(forms.Form):
-    trans_text = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
-    cms_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    trans_text_fr = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
+    trans_text_en = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
+    cms_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    cms_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     def __init__(self, *args, **kwargs):
         self.learning_unit_year = kwargs.pop('learning_unit_year', None)
-        self.language_iso = kwargs.pop('language', None)
         self.text_label = kwargs.pop('text_label', None)
         super(LearningUnitSpecificationsEditForm, self).__init__(*args, **kwargs)
 
     def load_initial(self):
-        value = translated_text.get_or_create(entity=entity_name.LEARNING_UNIT_YEAR,
-                                              reference=self.learning_unit_year.id,
-                                              language=self.language_iso,
-                                              text_label=self.text_label)
-        self.fields['cms_id'].initial = value.id
-        self.fields['trans_text'].initial = value.text
+        value_fr = translated_text.get_or_create(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=self.learning_unit_year.id,
+            language='fr-be',
+            text_label=self.text_label
+        )
+        value_en = translated_text.get_or_create(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=self.learning_unit_year.id,
+            language='en',
+            text_label=self.text_label
+        )
+        self.fields['cms_fr_id'].initial = value_fr.id
+        self.fields['trans_text_fr'].initial = value_fr.text
+        self.fields['cms_en_id'].initial = value_en.id
+        self.fields['trans_text_en'].initial = value_en.text
 
     def save(self):
-        cleaned_data = self.cleaned_data
-        trans_text = translated_text.find_by_id(cleaned_data['cms_id'])
-        trans_text.text = cleaned_data.get('trans_text')
+        self._save_text_language('fr')
+        self._save_text_language('en')
+
+    def _save_text_language(self, language):
+        trans_text = translated_text.find_by_id(self.cleaned_data['cms_' + language + '_id'])
+        trans_text.text = self.cleaned_data.get('trans_text_' + language)
         trans_text.save()

@@ -39,6 +39,8 @@ from base.models.person import get_user_interface_language, \
     change_language
 from base.tests.factories import user
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
+from base.tests.factories.group import CentralManagerGroupFactory, FacultyManagerGroupFactory, \
+    ProgramManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
@@ -76,6 +78,9 @@ class PersonTest(PersonTestCase):
         self.person_with_user = PersonFactory(user=self.user_for_person, language="fr-be", first_name="John",
                                               last_name="Doe")
         self.person_without_user = PersonWithoutUserFactory()
+        CentralManagerGroupFactory()
+        FacultyManagerGroupFactory()
+        ProgramManagerGroupFactory()
 
     def test_find_by_id(self):
         tmp_person = PersonFactory()
@@ -227,6 +232,11 @@ class PersonTest(PersonTestCase):
 
     def test_get_user_interface_language_with_user_without_person(self):
         self.assertEqual(get_user_interface_language(self.an_user), "fr-be")
+
+    def test_get_user_interface_language_with_person_without_language(self):
+        user_1 = user.UserFactory()
+        PersonFactory(user=user_1, language=None)
+        self.assertEqual(get_user_interface_language(user_1), "fr-be")
 
     def test_str_function_with_data(self):
         self.person_with_user.middle_name = "Junior"
