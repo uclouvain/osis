@@ -159,6 +159,34 @@ class ScoresResponsibleSearchTestCase(TestCase):
         self.assertEqual(qs_result.count(), 1)
         self.assertEqual(qs_result.first(), self.learning_unit_year)
 
+    def test_case_ajax_return_json_response(self):
+        data = {
+            'acronym': self.learning_unit_year.acronym,
+            'learning_unit_title': '',
+            'tutor': '',
+            'scores_responsible': self.tutor.person.last_name
+        }
+        response = self.client.get(self.url, data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        expected_response = [
+            {
+                'pk': self.learning_unit_year.pk,
+                'acronym': self.learning_unit_year.acronym,
+                'requirement_entity': 'CHILD_1_V',
+                'learning_unit_title': " - ".join([self.learning_unit_year.learning_container_year.common_title,
+                                                   self.learning_unit_year.specific_title]),
+                'attributions': [
+                    {'tutor': str(self.attribution.tutor), 'score_responsible': self.attribution.score_responsible}
+                ]
+            }
+        ]
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'object_list': expected_response}
+        )
+
 
 class ScoresResponsibleManagementTestCase(TestCase):
     @classmethod

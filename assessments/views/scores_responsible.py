@@ -25,11 +25,12 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django_filters.views import FilterView
 
+from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
 from assessments.forms.scores_responsible import ScoresResponsibleFilter
 from attribution import models as mdl_attr
 from attribution.business.score_responsible import get_attributions_data
@@ -51,6 +52,12 @@ class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, Cache
             **super().get_filterset_kwargs(filterset_class),
             'academic_year': mdl_base.academic_year.current_academic_year()
         }
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            serializer = ScoresResponsibleListSerializer(context['object_list'], many=True)
+            return JsonResponse({'object_list': serializer.data})
+        return super().render_to_response(context, **response_kwargs)
 
 
 @login_required

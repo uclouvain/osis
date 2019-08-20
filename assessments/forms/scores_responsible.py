@@ -24,7 +24,8 @@
 #
 ##############################################################################
 import django_filters
-from django.db.models import Q, Prefetch, Count, Value, CharField, OuterRef, Subquery
+from django import forms
+from django.db.models import Q, Prefetch, Value, CharField, OuterRef, Subquery, When, Case
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _
 
@@ -53,6 +54,15 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         method='filter_score_responsible',
         label=_('Scores responsible title'),
     )
+    order_by_field = 'ordering'
+    ordering = django_filters.OrderingFilter(
+        fields=(
+            ('requirement_entity', 'requirement_entity'),
+            ('acronym', 'acronym'),
+            ('full_title', 'learning_unit_title'),
+        ),
+        widget=forms.HiddenInput
+    )
 
     def filter_tutor(self, queryset, name, value):
         return queryset.filter(Q(attribution__tutor__person__first_name__icontains=value)
@@ -75,10 +85,18 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         queryset = queryset.filter(
             academic_year=self.academic_year
         ).annotate(
-            attributions_count=Count('attribution'),
-            full_title=Concat(
-                'learning_container_year__common_title', Value(' - '), 'specific_title',
-                output_field=CharField()
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
             )
         )
         queryset = business_scores_responsible.filter_learning_unit_year_according_person(
