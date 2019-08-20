@@ -18,7 +18,7 @@
 #  GNU General Public License for more details.                                          #
 #                                                                                        #
 #  A copy of this license - GNU General Public License - is available                    #
-#  at the root of the source code of this program.  If not,                              #
+#  at the root of the source code of this program.  If not ,                             #
 #  see http://www.gnu.org/licenses/.                                                     #
 # ########################################################################################
 from django.conf import settings
