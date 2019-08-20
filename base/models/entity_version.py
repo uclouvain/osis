@@ -27,6 +27,7 @@ import collections
 import datetime
 from collections import OrderedDict
 
+from django.core.cache import cache
 from django.db import models, connection
 from django.db.models import Q
 from django.utils import timezone
@@ -474,6 +475,26 @@ def build_current_entity_version_structure_in_memory(date=None):
             'entity_version': entity_version
         }
     return entity_versions
+
+
+def get_structure_of_entity_version(root=None, date=None):
+    entity_versions = cache.get_or_set('entity_versions', build_current_entity_version_structure_in_memory(date=date))
+    if not root:
+        return entity_versions
+    for ev in entity_versions:
+        if entity_versions[ev]['entity_version'].acronym == root.upper():
+            return entity_versions[ev]
+
+
+def get_entity_version_from_type(entity, entity_type, date=None):
+    entities_version = get_structure_of_entity_version(root=entity, date=date)
+    if not entities_version['entity_version_parent']:
+        return None
+    if entities_version['entity_version'].entity_type == entity_type:
+        return entities_version['entity_version']
+    if entities_version['entity_version_parent'].entity_type == entity_type:
+        return entities_version['entity_version_parent']
+    return get_entity_version_from_type(entities_version['entity_version_parent'].acronym, entity_type)
 
 
 def _build_entity_version_by_entity_id(versions):

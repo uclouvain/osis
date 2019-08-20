@@ -28,7 +28,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, OuterRef, Subquery
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -39,6 +39,7 @@ from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
 from base.models.entity import Entity
+from base.models.entity_version import get_entity_version_from_type, EntityVersion
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -114,7 +115,14 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
-        return super().get_queryset().filter(learning_container_year__isnull=False)
+        return super().get_queryset().select_related('learning_container_year')\
+            .filter(learning_container_year__isnull=False).annotate(
+            requirement_entity=Subquery(EntityVersion.objects.filter(
+                                            entity=OuterRef('learning_container_year__requirement_entity'),
+                                        ).current(
+                                            OuterRef('academic_year__start_date')
+                                        ).values('acronym')[:1])
+        )
 
 
 class ExtraManagerLearningUnitYear(models.Model):
@@ -211,9 +219,14 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def allocation_entity(self):
         return self.get_entity(entity_container_year_link_type.ALLOCATION_ENTITY)
 
+    # @cached_property
+    # def requirement_entity(self):
+    #     return self.get_entity(entity_container_year_link_type.REQUIREMENT_ENTITY)
+
     @cached_property
-    def requirement_entity(self):
-        return self.get_entity(entity_container_year_link_type.REQUIREMENT_ENTITY)
+    def is_service(self):
+        return get_entity_version_from_type(entity=self.requirement_entity.most_recent_acronym, entity_type='FACULTY') \
+               != get_entity_version_from_type(entity=self.allocation_entity.most_recent_acronym, entity_type='FACULTY')
 
     @property
     def complete_title(self):

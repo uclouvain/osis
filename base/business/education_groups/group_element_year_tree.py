@@ -280,9 +280,16 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         """
             When the LU year is different than its education group, we have to display the year in the title.
         """
+        acronym = ''
+        if self.learning_unit_year.is_service:
+            acronym += '|S'
         if self.learning_unit_year.academic_year != self.root.academic_year:
-            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
-        return self.learning_unit_year.acronym
+            acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
+        if acronym != '':
+            acronym += '| {}'.format(self.learning_unit_year.acronym)
+        else:
+            acronym = self.learning_unit_year.acronym
+        return acronym
 
     def _get_class(self):
         try:
