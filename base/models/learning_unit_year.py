@@ -28,12 +28,13 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
@@ -127,7 +128,7 @@ class ExtraManagerLearningUnitYear(models.Model):
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
-                                      validators=[academic_year_validator], on_delete=models.CASCADE)
+                                      validators=[academic_year_validator], on_delete=models.PROTECT)
     learning_unit = models.ForeignKey('LearningUnit', on_delete=models.CASCADE)
 
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True, on_delete=models.CASCADE)
@@ -166,9 +167,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.CASCADE)
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.CASCADE)
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.PROTECT)
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
@@ -176,7 +177,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
-        ordering = 'acronym',
+        ordering = ('academic_year', 'acronym')
         verbose_name = _("Learning unit year")
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),
@@ -419,12 +420,16 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         all_components = components_queryset.order_by('acronym') \
             .select_related('learning_unit_year')
         for learning_component_year in all_components:
-            _warnings.extend(learning_component_year.warnings)
+            if not self.is_partim() or learning_component_year.learning_unit_year == self:
+                _warnings.extend(learning_component_year.warnings)
 
         return _warnings
 
     def _check_learning_container_year_warnings(self):
-        return self.learning_container_year.warnings
+        if not self.is_partim():
+            return self.learning_container_year.warnings
+        else:
+            return get_learning_container_year_warnings(self.learning_container_year, self.id)
 
     def is_external(self):
         return hasattr(self, "externallearningunityear")
@@ -524,6 +529,10 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
     elif country:
         queryset = queryset.filter(campus__organization__organizationaddress__country=country)
 
+    quadrimester = kwargs.get('quadrimester')
+    if quadrimester:
+        queryset = queryset.filter(quadrimester=quadrimester)
+
     return queryset.select_related('learning_container_year', 'academic_year')
 
 
@@ -588,6 +597,14 @@ def find_lt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
                                            academic_year__year__lt=a_learning_unit_yr.academic_year.year,
                                            proposallearningunit__isnull=True) \
         .order_by('-academic_year') \
+        .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
+
+
+def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
+    return LearningUnitYear.objects.filter(learning_unit__id=a_learning_unit_yr.learning_unit.id,
+                                           academic_year__year__gt=a_learning_unit_yr.academic_year.year,
+                                           proposallearningunit__isnull=True) \
+        .order_by('academic_year') \
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
 
 

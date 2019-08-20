@@ -26,7 +26,7 @@
 
 from unittest import mock
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import IntegrityError
 from django.test import TestCase, RequestFactory
 
@@ -300,6 +300,7 @@ class TestAddSaveProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
+        ProgramManagerGroupFactory()
         cls.offer_year_without_equivalent_education_group_year = OfferYearFactory(
             corresponding_education_group_year=None
         )

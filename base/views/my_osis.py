@@ -26,11 +26,11 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
@@ -41,6 +41,7 @@ from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
 from osis_common.models import message_history as message_history_mdl
+from operator import itemgetter
 
 
 @login_required
@@ -142,11 +143,12 @@ def _get_data(request):
             ).select_related('academic_year'),
             to_attr='current_egy'
         )
-    )
+    ).order_by('education_group__educationgroupyear__acronym').distinct()
+
     return {'person': person,
             'addresses': mdl.person_address.find_by_person(person),
             'tutor': tutor,
-            'attributions': mdl_attr.attribution.search(tutor=tutor),
+            'attributions': mdl_attr.attribution.search(tutor=tutor) if tutor else None,
             'programs': programs,
             'supported_languages': settings.LANGUAGES,
             'default_language': settings.LANGUAGE_CODE,

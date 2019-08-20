@@ -1,4 +1,4 @@
-##############################################################################
+#############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-from django.contrib.auth.models import Group, Permission
+from django import template
+
+register = template.Library()
 
 
-class TestGroups(TestCase):
-    def test_executive_group_exists(self):
-        executive_group = Group.objects.get(name="executive")
-        self.assertTrue(executive_group)
-        can_access_learning_unit_perm = Permission.objects.get(codename="can_access_learningunit")
-        self.assertIn(can_access_learning_unit_perm, executive_group.permissions.all())
+@register.filter
+def has_permission_can_read_persons_roles(the_user):
+    if the_user:
+        return the_user.has_perm("base.can_read_persons_roles")
+    return False

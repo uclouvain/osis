@@ -26,6 +26,7 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -53,8 +54,9 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
     'django.contrib.sites',
-    'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
-    'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
+    'dal',
+    'dal_select2',
+    'dal_legacy_static',  # TODO : Useless in Django 2.0
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -92,7 +94,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -180,6 +181,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
+
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
@@ -420,24 +422,29 @@ BOOTSTRAP3 = {
 AJAX_SELECT_BOOTSTRAP = False
 
 
-CACHE_ENABLED = os.environ.get("CACHE_ENABLED", "False").lower() == 'true'
-if CACHE_ENABLED:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        },
-        "redis": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                "SOCKET_CONNECT_TIMEOUT": 2,
-                "SOCKET_TIMEOUT": 2,
-                "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
-            },
-            "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
-        }
+BACKEND_CACHE = os.environ.get("BACKEND_CACHE", "locmem").lower()
+if BACKEND_CACHE == 'locmem':
+    CACHE_CONFIG = {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
     }
+elif BACKEND_CACHE == 'redis':
+    CACHE_CONFIG = {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 2,
+            "SOCKET_TIMEOUT": 2,
+            "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
+        },
+        "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
+    }
+else:
+    raise ImproperlyConfigured("Cache configuration error: invalid BACKEND_CACHE")
+
+
+CACHES = {"default": CACHE_CONFIG}
+
 
 WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'
 

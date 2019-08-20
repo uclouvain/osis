@@ -25,6 +25,7 @@
 ##############################################################################
 from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -48,7 +49,7 @@ class ProposalLearningUnitAdmin(VersionAdmin, OsisModelAdmin):
 class ProposalLearningUnit(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    author = models.ForeignKey('Person', null=True, on_delete=models.CASCADE)
+    author = models.ForeignKey('Person', null=True, on_delete=models.PROTECT)
     date = models.DateTimeField(auto_now=True)
     learning_unit_year = models.OneToOneField('LearningUnitYear', on_delete=models.CASCADE)
     type = models.CharField(
@@ -67,7 +68,7 @@ class ProposalLearningUnit(models.Model):
 
     initial_data = JSONField(default={}, encoder=DjangoJSONEncoder)
     entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
-    folder_id = models.PositiveIntegerField()
+    folder_id = models.PositiveIntegerField(validators=[MaxValueValidator(9999999)])
 
     class Meta:
         permissions = (
