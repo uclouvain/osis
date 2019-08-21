@@ -39,6 +39,8 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
     requirement_entity = serializers.CharField()
     attributions = serializers.SerializerMethodField()
 
+    # FIXME Have to filter attribution to not have same person twice for a luy
+    #  (due to a conception problem in the model)
     def get_attributions(self, obj):
         visited = set()
         attributions_list = [
