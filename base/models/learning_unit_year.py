@@ -38,7 +38,7 @@ from base.business.learning_container_year import get_learning_container_year_wa
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
-from base.models.entity_version import get_entity_version_from_type
+from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -218,12 +218,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def is_service(self, entities_version, *args, **kwargs):
         if self.requirement_entity and self.allocation_entity:
-            return get_entity_version_from_type(entities_version,
-                                                entity=self.requirement_entity.most_recent_acronym,
-                                                entity_type='FACULTY') \
-                != get_entity_version_from_type(entities_version,
-                                                entity=self.allocation_entity.most_recent_acronym,
-                                                entity_type='FACULTY')
+            return get_entity_version_parent_or_itself_from_type(entities_version,
+                                                                 entity=self.requirement_entity.most_recent_acronym,
+                                                                 entity_type='FACULTY') \
+                   != get_entity_version_parent_or_itself_from_type(entities_version,
+                                                                    entity=self.allocation_entity.most_recent_acronym,
+                                                                    entity_type='FACULTY')
         else:
             return False
 

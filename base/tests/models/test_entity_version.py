@@ -33,7 +33,8 @@ from django.utils import timezone
 from base.business.learning_units.perms import find_last_requirement_entity_version
 from base.models import entity_version
 from base.models.entity_version import build_current_entity_version_structure_in_memory, \
-    find_parent_of_type_into_entity_structure
+    find_parent_of_type_into_entity_structure, get_structure_of_entity_version, \
+    get_entity_version_parent_or_itself_from_type
 from base.models.enums import organization_type
 from base.models.enums.entity_type import FACULTY, SCHOOL
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -525,12 +526,13 @@ class EntityVersionLoadInMemoryTest(TestCase):
         sc_direct_children = [self.MATH, self.PHYS]
         self.assertEqual(set(result[self.SC.id]), set(sc_direct_children))
 
-        self.assertNotIn(self.MATH.id, result) # No children for MATH
+        self.assertNotIn(self.MATH.id, result)  # No children for MATH
 
     def test_build_all_children_by_entity_version_id(self):
         all_current_entites_versions = entity_version.find_all_current_entities_version()
         entity_version_by_entity_id = entity_version._build_entity_version_by_entity_id(all_current_entites_versions)
-        direct_children_by_entity_version_id = entity_version._build_direct_children_by_entity_version_id(entity_version_by_entity_id)
+        direct_children_by_entity_version_id = entity_version\
+            ._build_direct_children_by_entity_version_id(entity_version_by_entity_id)
         result = entity_version._build_all_children_by_entity_version_id(direct_children_by_entity_version_id)
 
         count_entities_version_with_children = 4
@@ -569,6 +571,46 @@ class EntityVersionLoadInMemoryTest(TestCase):
         # assert entities without children are present in the result
         self.assertEqual(len(result.keys()), len(all_current_entities_version))
         self.assertEqual(result[self.MATH.entity.id]['all_children'], [])
+
+    def test_get_structure_of_entity_version(self):
+        result = entity_version.build_current_entity_version_structure_in_memory()
+        self.assertEqual(
+            get_structure_of_entity_version(entity_version.build_current_entity_version_structure_in_memory()),
+            result)
+
+        expected_result = None
+        for r in result:
+            if result[r]['entity_version'].acronym == self.root.acronym.upper():
+                expected_result = result[r]
+        self.assertEqual(
+            get_structure_of_entity_version(entity_version.build_current_entity_version_structure_in_memory(),
+                                            self.root.acronym),
+            expected_result)
+
+    def test_get_entity_version_from_type(self):
+        structure = entity_version.build_current_entity_version_structure_in_memory()
+        to_test_sector = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
+                                                                       entity=self.MATH.entity.most_recent_acronym,
+                                                                       entity_type='SECTOR')
+        to_test_faculty = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
+                                                                        entity=self.MATH.entity.most_recent_acronym,
+                                                                        entity_type='FACULTY')
+        to_test_itself = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
+                                                                       entity=self.MATH.entity.most_recent_acronym,
+                                                                       entity_type='SCHOOL')
+        self.assertEqual(self.root, to_test_sector)
+        self.assertEqual(self.SC, to_test_faculty)
+        self.assertEqual(self.MATH, to_test_itself)
+
+        to_test_lt_itself = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
+                                                                          entity=self.root.entity.most_recent_acronym,
+                                                                          entity_type='SCHOOL')
+        to_test_itself_without_parent = \
+            get_entity_version_parent_or_itself_from_type(entity_versions=structure,
+                                                          entity=self.root.entity.most_recent_acronym,
+                                                          entity_type='SECTOR')
+        self.assertIsNone(to_test_lt_itself)
+        self.assertEqual(self.root, to_test_itself_without_parent)
 
 
 class TestFindLastEntityVersionByLearningUnitYearId(TestCase):

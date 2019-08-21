@@ -476,7 +476,7 @@ def build_current_entity_version_structure_in_memory(date=None):
     return entity_versions
 
 
-def get_structure_of_entity_version(entity_versions, root=None):
+def get_structure_of_entity_version(entity_versions: dict, root: str = None) -> dict:
     if not root:
         return entity_versions
     for ev in entity_versions:
@@ -484,15 +484,18 @@ def get_structure_of_entity_version(entity_versions, root=None):
             return entity_versions[ev]
 
 
-def get_entity_version_from_type(entity_versions, entity, entity_type):
+def get_entity_version_parent_or_itself_from_type(entity_versions: dict, entity: str, entity_type: str)\
+        -> EntityVersion:
     entities_version = get_structure_of_entity_version(entity_versions, root=entity)
-    if not entities_version['entity_version_parent']:
-        return None
     if entities_version['entity_version'].entity_type == entity_type:
         return entities_version['entity_version']
+    if not entities_version['entity_version_parent']:
+        return None
     if entities_version['entity_version_parent'].entity_type == entity_type:
         return entities_version['entity_version_parent']
-    return get_entity_version_from_type(entities_version['entity_version_parent'].acronym, entity_type)
+    return get_entity_version_parent_or_itself_from_type(entity_versions=entity_versions,
+                                                         entity=entities_version['entity_version_parent'].acronym,
+                                                         entity_type=entity_type)
 
 
 def _build_entity_version_by_entity_id(versions):
