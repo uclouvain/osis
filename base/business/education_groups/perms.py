@@ -29,7 +29,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.business.group_element_years import management, postponement
-# from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
