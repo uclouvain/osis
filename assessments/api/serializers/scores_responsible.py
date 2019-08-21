@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from rest_framework import serializers
 
 
@@ -36,4 +37,12 @@ class ScoresResponsibleListSerializer(serializers.Serializer):
     acronym = serializers.CharField()
     learning_unit_title = serializers.CharField(source='full_title')
     requirement_entity = serializers.CharField()
-    attributions = AttributionSerializer(source='attribution_set', many=True)
+    attributions = serializers.SerializerMethodField()
+
+    def get_attributions(self, obj):
+        visited = set()
+        attributions_list = [
+            e for e in obj.attribution_set.all()
+            if e.tutor.person_id not in visited and not visited.add(e.tutor.person_id)
+        ]
+        return AttributionSerializer(attributions_list, many=True).data
