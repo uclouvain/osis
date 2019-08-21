@@ -129,14 +129,13 @@ class TestSearchForm(TestCase):
         self.assertEqual(form.get_queryset().count(), 1)
 
     def test_search_too_many_results(self):
-        cpt = 0
-        max_limit_of_results = LearningUnitYearForm.MAX_RECORDS
-        while cpt < max_limit_of_results + 1:
-            LearningUnitYearFactory(
-                acronym="L{}".format(cpt),
-            )
-            cpt += 1
-        form = LearningUnitYearForm({'acronym': 'L', 'service_course_search': False})
+        random_luy = LearningUnitYearFactory()
+
+        form = LearningUnitYearForm(data={
+            'acronym': random_luy.acronym,
+            'academic_year_id': random_luy.academic_year.pk
+        })
+        form.MAX_RECORDS = 0
         self.assertTrue(form.is_valid())
 
         with self.assertRaises(TooManyResultsException):
@@ -144,6 +143,18 @@ class TestSearchForm(TestCase):
 
         with self.assertRaises(TooManyResultsException):
             form.get_learning_units_and_summary_status()
+
+    def test_search_too_many_results_is_not_raised_when_borrowed_course_search(self):
+        random_luy = LearningUnitYearFactory(academic_year=self.academic_years[0])
+
+        form = LearningUnitYearForm(data={
+            'acronym': random_luy.acronym,
+            'academic_year_id': random_luy.academic_year.pk
+        }, borrowed_course_search=True)
+        form.MAX_RECORDS = 0
+
+        self.assertTrue(form.is_valid())
+        form.get_learning_units()
 
     def test_dropdown_init(self):
 
