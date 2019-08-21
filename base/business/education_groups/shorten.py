@@ -34,7 +34,7 @@ def start(education_group, until_year):
     """
     This function will delete all education group year
     """
-    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=until_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=until_year.year)
     egy_deleted = []
     for education_group_year in education_group_years_to_delete:
         egy_deleted.append(education_group_year)

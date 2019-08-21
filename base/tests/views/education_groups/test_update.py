@@ -77,24 +77,21 @@ from reference.tests.factories.language import LanguageFactory
 class TestUpdate(TestCase):
     def setUp(self):
         self.start_academic_year = AcademicYearFactory(year=1968)
-        self.academic_year_2010 = AcademicYearFactory(year=2010)
-        self.academic_year_2018 = AcademicYearFactory(year=2018)
+        self.academic_year_2010 = AcademicYearFactory(year=2012)
+        self.academic_year_2019 = AcademicYearFactory(year=2018)
         self.current_academic_year = create_current_academic_year()
         FacultyManagerGroupFactory()
         self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
         self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
         self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
-        academic_year_1 = AcademicYearFactory.build(start_date=self.start_date_ay_1,
-                                                    end_date=self.end_date_ay_1,
-                                                    year=self.current_academic_year.year + 1)
-        academic_year_1.save()
-
+        self.academic_year_1 = AcademicYearFactory(start_date=self.start_date_ay_1,
+                                                   end_date=self.end_date_ay_1,
+                                                   year=self.current_academic_year.year + 1)
         self.start_date_ay_2 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 2)
         self.end_date_ay_2 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 3)
-        academic_year_2 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
-                                                    end_date=self.end_date_ay_2,
-                                                    year=self.current_academic_year.year + 2)
-        academic_year_2.save()
+        academic_year_2 = AcademicYearFactory(start_date=self.start_date_ay_2,
+                                              end_date=self.end_date_ay_2,
+                                              year=self.current_academic_year.year + 2)
 
         self.education_group_year = GroupFactory()
 
@@ -141,7 +138,7 @@ class TestUpdate(TestCase):
         )
 
         self.training_education_group_year_1 = TrainingFactory(
-            academic_year=academic_year_1,
+            academic_year=self.academic_year_1,
             education_group_type=self.an_training_education_group_type,
             education_group=self.training_education_group_year.education_group
         )
@@ -485,8 +482,8 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": self.academic_year_2010,
-            "end_year": self.academic_year_2018,
+            "start_year": self.academic_year_2010.pk,
+            "end_year": self.current_academic_year.pk,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,

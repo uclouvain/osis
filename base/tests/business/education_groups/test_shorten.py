@@ -33,7 +33,7 @@ from base.business.education_groups.shorten import _get_formated_error_msg, chec
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
@@ -193,9 +193,10 @@ class TestCheckEducationGroupEndDate(EducationGroupShortenContext):
         )
         # Protected data [Offer enrollment]
         OfferEnrollmentFactory(education_group_year=edy)
+        previous_academic_year = AcademicYearFactory(year=self.ac_year_in_future.year-1)
 
         with self.assertRaises(ValidationError):
             check_education_group_end_date(
                 education_group=self.education_group_year.education_group,
-                end_year=self.ac_year_in_future.year-1
+                end_year=previous_academic_year
             )
