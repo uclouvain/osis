@@ -46,7 +46,7 @@ import reference.models.language
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
-from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
+from base.business.learning_unit_xls import learning_unit_titles_part2, learning_unit_titles_part_1, create_xls
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
@@ -86,7 +86,8 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
+    UEFacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -120,8 +121,6 @@ class LearningUnitViewCreateFullTestCase(TestCase):
     def test_create_full_form_when_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
-        from django.utils.encoding import uri_to_iri
-        self.assertEqual(uri_to_iri(uri_to_iri(response.url)), '/login/?next={}'.format(self.url))
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_create_full_form_when_user_doesnt_have_perms(self):
@@ -672,15 +671,17 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
-        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
-        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
+        ue_manager = UEFacultyManagerFactory(
+            'can_edit_learningunit',
+            'can_access_learningunit',
+            'can_edit_learningunit_date'
+        )
         managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            FacultyManagerFactory('can_edit_learningunit', 'can_access_learningunit', 'can_edit_learningunit_date'),
             ue_manager
         ]
 
         for manager in managers:
-            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             PersonEntityFactory(
                 entity=learning_container_year.requirement_entity,
                 person=manager
@@ -714,6 +715,7 @@ class LearningUnitViewTestCase(TestCase):
         ]
         for manager in managers:
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
             PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
@@ -734,8 +736,7 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
         managers = [
-            FacultyManagerFactory(),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_access_learningunit')
+            FacultyManagerFactory('can_access_learningunit'),
         ]
         for manager in managers:
             PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
@@ -1062,7 +1063,7 @@ class LearningUnitViewTestCase(TestCase):
                          '{}, {}'.format(last_name, first_name))
 
     def test_prepare_xls_content_no_data(self):
-        self.assertEqual(base.business.learning_unit.prepare_xls_content([]), [])
+        self.assertEqual(base.business.learning_unit_xls.prepare_ue_xls_content([]), [])
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ])
     def test_find_inexisting_language_in_settings(self):
@@ -1143,7 +1144,7 @@ class TestCreateXls(TestCase):
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        learning_unit_business.create_xls(self.user, [], None)
+        create_xls(self.user, [], None)
         expected_argument = _generate_xls_build_parameter([], self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)
 
@@ -1152,7 +1153,7 @@ class TestCreateXls(TestCase):
         a_form = LearningUnitYearForm({"acronym": self.learning_unit_year.acronym}, service_course_search=False)
         self.assertTrue(a_form.is_valid())
         found_learning_units = a_form.get_activity_learning_units()
-        learning_unit_business.create_xls(self.user, found_learning_units, None)
+        create_xls(self.user, found_learning_units, None)
         xls_data = [[self.learning_unit_year.academic_year.name, self.learning_unit_year.acronym,
                      self.learning_unit_year.complete_title,
                      xls_build.translate(self.learning_unit_year.learning_container_year.container_type),
@@ -1163,16 +1164,16 @@ class TestCreateXls(TestCase):
 
 
 def _generate_xls_build_parameter(xls_data, user):
-    titles = learning_unit_titles_part1()
+    titles = learning_unit_titles_part_1()
     titles.extend(learning_unit_titles_part2())
     return {
-        xls_build.LIST_DESCRIPTION_KEY: _(learning_unit_business.XLS_DESCRIPTION),
-        xls_build.FILENAME_KEY: _(learning_unit_business.XLS_FILENAME),
+        xls_build.LIST_DESCRIPTION_KEY: _(base.business.learning_unit_xls.XLS_DESCRIPTION),
+        xls_build.FILENAME_KEY: _(base.business.learning_unit_xls.XLS_FILENAME),
         xls_build.USER_KEY: user.username,
         xls_build.WORKSHEETS_DATA: [{
             xls_build.CONTENT_KEY: xls_data,
             xls_build.HEADER_TITLES_KEY: titles,
-            xls_build.WORKSHEET_TITLE_KEY: _(learning_unit_business.WORKSHEET_TITLE),
+            xls_build.WORKSHEET_TITLE_KEY: _(base.business.learning_unit_xls.WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
         }]
