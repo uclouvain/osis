@@ -37,7 +37,6 @@ from base.business.learning_units.quadrimester_strategy import LearningComponent
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
 from base.models import learning_unit_year
-from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, quadrimesters
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -51,11 +50,11 @@ from base.tests.factories.education_group_type import GroupEducationGroupTypeFac
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory, LecturingLearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year, \
-    LearningUnitYearPartimFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -254,6 +253,16 @@ class LearningUnitYearTest(TestCase):
         self.assertFalse(check_if_acronym_regex_is_valid('*TEST'))
         self.assertFalse(check_if_acronym_regex_is_valid('?TEST'))
         self.assertFalse(check_if_acronym_regex_is_valid(self.learning_unit_year))
+
+    # def test_is_service(self):
+    #     structure = build_current_entity_version_structure_in_memory()
+    #     print(structure)
+    #     self.learning_unit_year.learning_container_year.allocation_entity = None
+    #     self.assertFalse(self.learning_unit_year.is_service(structure))
+    #     self.learning_unit_year.learning_container_year.allocation_entity = \
+    #         self.learning_unit_year.learning_container_year.requirement_entity
+    #     self.assertFalse(self.learning_unit_year.is_service(structure))
+    #     # self.learning_unit_year.learning_container_year.allocation_entity = LearningComponentYearFactory(entity__=)
 
 
 class LearningUnitYearGetEntityTest(TestCase):

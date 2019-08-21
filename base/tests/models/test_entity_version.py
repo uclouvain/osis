@@ -438,7 +438,7 @@ class EntityVersionLoadInMemoryTest(TestCase):
 
     def _build_current_entity_version_structure(self, end_date, start_date):
         """Build the following entity version structure :
-                             SSH
+                             SST
                         SC        LOCI
                     MATH PHYS  URBA  BARC
         """
