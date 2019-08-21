@@ -217,12 +217,15 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return self.get_entity(entity_container_year_link_type.REQUIREMENT_ENTITY)
 
     def is_service(self, entities_version, *args, **kwargs):
-        return get_entity_version_from_type(entities_version,
-                                            entity=self.requirement_entity.most_recent_acronym,
-                                            entity_type='FACULTY') \
-            != get_entity_version_from_type(entities_version,
-                                            entity=self.allocation_entity.most_recent_acronym,
-                                            entity_type='FACULTY')
+        if self.requirement_entity and self.allocation_entity:
+            return get_entity_version_from_type(entities_version,
+                                                entity=self.requirement_entity.most_recent_acronym,
+                                                entity_type='FACULTY') \
+                != get_entity_version_from_type(entities_version,
+                                                entity=self.allocation_entity.most_recent_acronym,
+                                                entity_type='FACULTY')
+        else:
+            return False
 
     @property
     def complete_title(self):
