@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, ValidationError
@@ -214,6 +215,14 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
+        widgets = {
+            'start_year': autocomplete.ModelSelect2(
+                url='academic_year-autocomplete',
+            ),
+            'end_year': autocomplete.ModelSelect2(
+                url='academic_year-autocomplete',
+            ),
+        }
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
