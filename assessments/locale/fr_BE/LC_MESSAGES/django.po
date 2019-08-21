@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-26 10:30+0200\n"
+"POT-Creation-Date: 2019-08-21 08:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,6 +61,7 @@ msgid "Absent"
 msgstr "Absent"
 
 #: templates/admin/pgm_manager.html:30 templates/scores_responsible.html:31
+#: templates/scores_responsible/list.html:30
 #: templates/scores_responsible_edit.html:30
 msgid "Academic actors"
 msgstr "Acteurs académique"
@@ -87,12 +88,13 @@ msgstr "Année académique"
 msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
-#: templates/scores_encoding.html:101 templates/scores_encoding.html:153
-#: templates/scores_encoding.html:196
+#: forms/scores_responsible.py:42 templates/scores_encoding.html:101
+#: templates/scores_encoding.html:153 templates/scores_encoding.html:196
 #: templates/scores_encoding_by_learning_unit.html:86
-#: templates/scores_encoding_by_learning_unit.html:151
-#: templates/scores_encoding_by_learning_unit.html:226
-#: templates/scores_encoding_by_learning_unit.html:313
+#: templates/scores_encoding_by_learning_unit.html:150
+#: templates/scores_encoding_by_learning_unit.html:225
+#: templates/scores_encoding_by_learning_unit.html:312
+#: templates/scores_responsible/list.html:61
 msgid "Acronym"
 msgstr "Acronyme"
 
@@ -100,7 +102,7 @@ msgstr "Acronyme"
 msgid "Add"
 msgstr "Ajouter"
 
-#: templates/admin/programmanager_list.html:66
+#: templates/admin/programmanager_list.html:72
 msgid "Add manager"
 msgstr "Ajouter un gestionnaire"
 
@@ -191,9 +193,9 @@ msgstr "Code"
 msgid "Compare"
 msgstr "Comparer"
 
-#: templates/scores_encoding_by_learning_unit.html:150
-#: templates/scores_encoding_by_learning_unit.html:225
-#: templates/scores_encoding_by_learning_unit.html:312
+#: templates/scores_encoding_by_learning_unit.html:149
+#: templates/scores_encoding_by_learning_unit.html:224
+#: templates/scores_encoding_by_learning_unit.html:311
 msgid "Complete"
 msgstr "Compléter"
 
@@ -210,10 +212,12 @@ msgid "Customized"
 msgstr "Personnalisé"
 
 #: templates/scores_responsible.html:155
+#: templates/scores_responsible/list.html:146
 msgid "Datatable sort ascending"
 msgstr "Tri ascendant de la table de données"
 
 #: templates/scores_responsible.html:156
+#: templates/scores_responsible/list.html:147
 msgid "Datatable sort descending"
 msgstr "Tri descendant de la table de données"
 
@@ -252,8 +256,8 @@ msgstr "Soumission définitive (Soumettre à la faculté)"
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les tuteurs pour cette unité d'enseignement"
 
-#: templates/scores_encoding_by_learning_unit.html:245
-#: templates/scores_encoding_by_learning_unit.html:332
+#: templates/scores_encoding_by_learning_unit.html:244
+#: templates/scores_encoding_by_learning_unit.html:331
 msgid "Display scores for this learning unit"
 msgstr "Afficher les notes pour cette unité d'enseignement"
 
@@ -267,7 +271,7 @@ msgid "Double encoding"
 msgstr "Double encodage"
 
 #: templates/online_encoding.html:142 templates/scores_encoding.html:227
-#: templates/scores_encoding_by_learning_unit.html:284
+#: templates/scores_encoding_by_learning_unit.html:283
 msgid "Download the Excel file"
 msgstr "Télécharger le fichier Excel"
 
@@ -276,12 +280,12 @@ msgid "Email"
 msgstr "Courriel"
 
 #: templates/online_encoding.html:119 templates/scores_encoding.html:136
-#: templates/scores_encoding_by_learning_unit.html:213
+#: templates/scores_encoding_by_learning_unit.html:212
 msgid "Encode"
 msgstr "Encoder"
 
 #: templates/online_encoding.html:118 templates/scores_encoding.html:134
-#: templates/scores_encoding_by_learning_unit.html:212
+#: templates/scores_encoding_by_learning_unit.html:211
 msgid "Encode scores"
 msgstr "Encoder les notes"
 
@@ -300,6 +304,7 @@ msgstr "Entrer une adresse de messagerie valide."
 
 #: templates/admin/pgm_manager.html:45 templates/admin/pgm_manager.html:122
 #: templates/scores_responsible.html:86
+#: templates/scores_responsible/list.html:60
 msgid "Entity"
 msgstr "Entité"
 
@@ -317,14 +322,18 @@ msgstr "Evaluations"
 msgid "Fax"
 msgstr "Fax"
 
-#: views/upload_xls_utils.py:210
+#: tests/views/test_score_encoding.py:533 views/upload_xls_utils.py:210
 msgid ""
 "File error : Different values in the column Session. No scores injected."
-msgstr "Erreur dans le fichier : Valeurs différentes dans la colonne Session. Aucune note injectée."
+msgstr ""
+"Erreur dans le fichier : Valeurs différentes dans la colonne Session. Aucune "
+"note injectée."
 
-#: views/upload_xls_utils.py:215
+#: tests/views/test_score_encoding.py:544 views/upload_xls_utils.py:215
 msgid "File error : No value in the column Session. No scores injected."
-msgstr "Erreur dans le fichier : Aucune valeur dans la colonne Session. Aucune note injectée."
+msgstr ""
+"Erreur dans le fichier : Aucune valeur dans la colonne Session. Aucune note "
+"injectée."
 
 #: templates/online_double_encoding_validation.html:110
 msgid "Final"
@@ -340,7 +349,7 @@ msgid "Firstname"
 msgstr "Prénom"
 
 #: templates/online_encoding.html:142 templates/scores_encoding.html:229
-#: templates/scores_encoding_by_learning_unit.html:285
+#: templates/scores_encoding_by_learning_unit.html:284
 #: views/upload_xls_utils.py:82
 msgid "Get Excel file"
 msgstr "Récupérer le fichier Excel"
@@ -365,6 +374,7 @@ msgid "Inject XLS file"
 msgstr "Injecter le fichier XLS"
 
 #: templates/admin/pgm_manager.html:28 templates/scores_responsible.html:30
+#: templates/scores_responsible/list.html:29
 #: templates/scores_responsible_edit.html:29
 msgid "Institution"
 msgstr "Institution"
@@ -414,14 +424,16 @@ msgstr "Nom"
 #: templates/scores_encoding.html:102 templates/scores_encoding.html:154
 #: templates/scores_encoding.html:197
 #: templates/scores_encoding_by_learning_unit.html:85
-#: templates/scores_encoding_by_learning_unit.html:152
-#: templates/scores_encoding_by_learning_unit.html:227
-#: templates/scores_encoding_by_learning_unit.html:314
+#: templates/scores_encoding_by_learning_unit.html:151
+#: templates/scores_encoding_by_learning_unit.html:226
+#: templates/scores_encoding_by_learning_unit.html:313
 #: templates/scores_encoding_by_specific_criteria.html:104
 msgid "Learning unit"
 msgstr "Unité d'apprentissage"
 
-#: templates/scores_responsible.html:59 templates/scores_responsible.html:88
+#: forms/scores_responsible.py:47 templates/scores_responsible.html:59
+#: templates/scores_responsible.html:88
+#: templates/scores_responsible/list.html:62
 msgid "Learning unit title"
 msgstr "Titre de l'unité d'apprentissage"
 
@@ -531,7 +543,7 @@ msgid "Offer"
 msgstr "Offre"
 
 #: templates/scores_encoding.html:91
-#: templates/scores_encoding_by_learning_unit.html:133
+#: templates/scores_encoding_by_learning_unit.html:132
 msgid "Online"
 msgstr "En ligne"
 
@@ -591,17 +603,17 @@ msgid "Postal code"
 msgstr "Code postal"
 
 #: templates/online_encoding.html:135 templates/scores_encoding.html:185
-#: templates/scores_encoding_by_learning_unit.html:372
+#: templates/scores_encoding_by_learning_unit.html:371
 msgid "Print"
 msgstr "Imprimer"
 
 #: templates/scores_encoding.html:148
-#: templates/scores_encoding_by_learning_unit.html:307
+#: templates/scores_encoding_by_learning_unit.html:306
 msgid "Print all courses"
 msgstr "Imprimer tous les cours"
 
 #: templates/online_encoding.html:134 templates/scores_encoding.html:184
-#: templates/scores_encoding_by_learning_unit.html:370
+#: templates/scores_encoding_by_learning_unit.html:369
 msgid "Print the scores"
 msgstr "Imprimer toutes les notes"
 
@@ -616,9 +628,9 @@ msgstr "Gestionnaires de parcours étudiant"
 
 #: templates/online_encoding.html:99 templates/scores_encoding.html:103
 #: templates/scores_encoding.html:155 templates/scores_encoding.html:198
-#: templates/scores_encoding_by_learning_unit.html:154
-#: templates/scores_encoding_by_learning_unit.html:229
-#: templates/scores_encoding_by_learning_unit.html:316
+#: templates/scores_encoding_by_learning_unit.html:153
+#: templates/scores_encoding_by_learning_unit.html:228
+#: templates/scores_encoding_by_learning_unit.html:315
 msgid "Progress"
 msgstr "Progression"
 
@@ -651,10 +663,10 @@ msgstr "Noma"
 msgid "Remove"
 msgstr "Retirer"
 
-#: templates/scores_encoding_by_learning_unit.html:194
-#: templates/scores_encoding_by_learning_unit.html:265
-#: templates/scores_encoding_by_learning_unit.html:352
-#: templates/scores_encoding_by_learning_unit.html:371
+#: templates/scores_encoding_by_learning_unit.html:193
+#: templates/scores_encoding_by_learning_unit.html:264
+#: templates/scores_encoding_by_learning_unit.html:351
+#: templates/scores_encoding_by_learning_unit.html:370
 msgid ""
 "Represents the quantity of scores submitted to the administration. The "
 "number surrounded by parenthesis is the number of scores encoded by the "
@@ -756,23 +768,26 @@ msgstr "Les notes doivent être comprises entre 0 et 20"
 #: templates/online_double_encoding_form.html:51
 #: templates/online_double_encoding_validation.html:51
 #: templates/online_encoding.html:51 templates/online_encoding_form.html:50
-#: templates/scores_encoding_by_learning_unit.html:153
-#: templates/scores_encoding_by_learning_unit.html:228
-#: templates/scores_encoding_by_learning_unit.html:315
+#: templates/scores_encoding_by_learning_unit.html:152
+#: templates/scores_encoding_by_learning_unit.html:227
+#: templates/scores_encoding_by_learning_unit.html:314
 #: templates/scores_responsible_edit.html:47
 msgid "Scores responsible"
 msgstr "Responsable de notes"
 
-#: templates/scores_responsible.html:69
+#: forms/scores_responsible.py:55 templates/scores_responsible.html:69
 msgid "Scores responsible title"
 msgstr "Titre du responsable de notes"
 
 #: templates/scores_responsible.html:32 templates/scores_responsible.html:36
+#: templates/scores_responsible/list.html:31
+#: templates/scores_responsible/list.html:36
 #: templates/scores_responsible_edit.html:31
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
 #: templates/scores_responsible.html:75
+#: templates/scores_responsible/list.html:49
 msgid "Search"
 msgstr "Chercher"
 
@@ -781,7 +796,7 @@ msgid "Search of annual programs"
 msgstr "Chercher les programmes annuels"
 
 #: templates/scores_encoding.html:88
-#: templates/scores_encoding_by_learning_unit.html:116
+#: templates/scores_encoding_by_learning_unit.html:115
 msgid "Select an encoding type"
 msgstr "Sélectionnez un type d'encodage"
 
@@ -869,7 +884,7 @@ msgstr "Le fichier dois être un fichier excel valide"
 msgid "The manager will keep the following programs : "
 msgstr "Le gestionnaire devra conserver les programmes suivant : "
 
-#: tests/views/test_score_encoding.py:404 views/score_encoding.py:83
+#: tests/views/test_score_encoding.py:406 views/score_encoding.py:83
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s is closed since "
@@ -879,14 +894,14 @@ msgstr ""
 "%(str_date)s"
 
 #: tests/functionals/test_score_encoding.py:235
-#: tests/views/test_score_encoding.py:409 views/score_encoding.py:90
+#: tests/views/test_score_encoding.py:411 views/score_encoding.py:90
 #, python-format
 msgid ""
 "The period of scores' encoding %(session_number)s will be open %(str_date)s"
 msgstr ""
 "La période d'encodage de notes %(session_number)s va ouvrir %(str_date)s"
 
-#: tests/views/test_score_encoding.py:377 views/score_encoding.py:94
+#: tests/views/test_score_encoding.py:379 views/score_encoding.py:94
 msgid "The period of scores' encoding is not opened"
 msgstr "La période d'encodage de notes n'est pas ouverte"
 
@@ -904,9 +919,10 @@ msgstr ""
 "Cette procédure aide le tuteur durant l'encodage de notes pour les sessions "
 "d'examens."
 
-#: templates/scores_encoding.html:45
+#: forms/scores_responsible.py:51 templates/scores_encoding.html:45
 #: templates/scores_encoding_by_learning_unit.html:71
 #: templates/scores_responsible.html:64 templates/scores_responsible.html:89
+#: templates/scores_responsible/list.html:63
 #: templates/scores_responsible_edit.html:45
 msgid "Tutor"
 msgstr "Tuteur"
@@ -939,12 +955,12 @@ msgid "Unsubscribed lately"
 msgstr "Désinscrit tardivement"
 
 #: templates/scores_encoding.html:93
-#: templates/scores_encoding_by_learning_unit.html:137
+#: templates/scores_encoding_by_learning_unit.html:136
 msgid "Via excel"
 msgstr "Via excel"
 
 #: templates/scores_encoding.html:92
-#: templates/scores_encoding_by_learning_unit.html:141
+#: templates/scores_encoding_by_learning_unit.html:140
 msgid "Via paper"
 msgstr "Via papier"
 
@@ -992,7 +1008,7 @@ msgid "You have to select a file to upload."
 msgstr "Vous avez sélectionné un fichier à téléversé"
 
 #: templates/scores_encoding.html:242
-#: templates/scores_encoding_by_learning_unit.html:387
+#: templates/scores_encoding_by_learning_unit.html:386
 msgid "You haven't any score to encode."
 msgstr "Vous n'avez pas de note à encoder."
 
@@ -1009,11 +1025,11 @@ msgstr ""
 #: business/score_encoding_sheet.py:105
 #: tests/business/test_score_encoding_export.py:133
 #: tests/business/test_score_encoding_sheet.py:190
-#: tests/views/test_score_encoding.py:380 views/score_encoding.py:75
+#: tests/views/test_score_encoding.py:382 views/score_encoding.py:75
 msgid "date_format"
 msgstr "%d%m%Y"
 
-#: templates/scores_encoding_by_learning_unit.html:121
+#: templates/scores_encoding_by_learning_unit.html:120
 msgid "learning units in"
 msgstr "unités d'enseignement dans"
 
@@ -1021,11 +1037,10 @@ msgstr "unités d'enseignement dans"
 msgid "of"
 msgstr "sur"
 
-#: templates/scores_encoding_by_learning_unit.html:123
+#: templates/scores_encoding_by_learning_unit.html:122
 msgid "program(s)"
 msgstr "programme(s)"
 
 #: views/score_encoding.py:327
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
