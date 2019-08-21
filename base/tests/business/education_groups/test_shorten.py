@@ -70,7 +70,7 @@ class TestStartShortenEducationGroupYear(EducationGroupShortenContext):
             academic_year__year__gt=self.current_academic_year.year
         ).delete()
 
-        result = shorten.start(self.education_group_year.education_group, self.current_academic_year.year)
+        result = shorten.start(self.education_group_year.education_group, self.current_academic_year)
         self.assertIsInstance(result, list)
         self.assertFalse(result)
 
@@ -84,7 +84,7 @@ class TestStartShortenEducationGroupYear(EducationGroupShortenContext):
                 academic_year=ac_year,
             )
 
-        result = shorten.start(self.education_group_year.education_group, self.current_academic_year.year)
+        result = shorten.start(self.education_group_year.education_group, self.current_academic_year)
 
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 10)
