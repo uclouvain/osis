@@ -34,7 +34,7 @@ def start(education_group, until_year):
     """
     This function will delete all education group year
     """
-    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=until_year.year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=until_year)
     egy_deleted = []
     for education_group_year in education_group_years_to_delete:
         egy_deleted.append(education_group_year)
@@ -44,7 +44,7 @@ def start(education_group, until_year):
 
 def check_education_group_end_date(education_group, end_year):
     education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group,
-                                                                                 end_year=end_year.year)
+                                                                                 end_year=end_year)
     protected_messages = _get_protected_messages(education_group_years_to_delete)
     if protected_messages:
         error_msg = _get_formated_error_msg(end_year, protected_messages)
