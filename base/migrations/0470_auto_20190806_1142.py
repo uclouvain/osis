@@ -24,7 +24,7 @@ def start_years(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0467_auto_20190806_1141'),
+        ('base', '0469_auto_20190806_1141'),
     ]
 
     operations = [
