@@ -174,6 +174,7 @@ class Person(SerializableModel):
             ("can_edit_education_group_administrative_data", "Can edit education group administrative data"),
             ("can_manage_charge_repartition", "Can manage charge repartition"),
             ("can_manage_attribution", "Can manage attribution"),
+            ('can_read_persons_roles', 'Can read persons roles'),
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
