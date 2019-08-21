@@ -250,7 +250,9 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         learning_units = self.get_queryset()
 
-        if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
+        # FIXME: use one queryset for service cource search and borrowed course search instead of filtering in python
+        if not service_course_search and not self.borrowed_course_search \
+                and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
             raise TooManyResultsException
 
         if self.borrowed_course_search:
