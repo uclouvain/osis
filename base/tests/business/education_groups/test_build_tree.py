@@ -351,6 +351,7 @@ class TestBuildTree(TestCase):
                                                learning_container_year__requirement_entity=self.MATH.entity,
                                                learning_container_year__allocation_entity=self.URBA.entity)
         )
+
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
         str_expected_service = '|S| {}'.format(acronym)
         str_expected_not_service = '|S| LTEST0021'
