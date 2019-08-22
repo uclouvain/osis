@@ -254,16 +254,6 @@ class LearningUnitYearTest(TestCase):
         self.assertFalse(check_if_acronym_regex_is_valid('?TEST'))
         self.assertFalse(check_if_acronym_regex_is_valid(self.learning_unit_year))
 
-    # def test_is_service(self):
-    #     structure = build_current_entity_version_structure_in_memory()
-    #     print(structure)
-    #     self.learning_unit_year.learning_container_year.allocation_entity = None
-    #     self.assertFalse(self.learning_unit_year.is_service(structure))
-    #     self.learning_unit_year.learning_container_year.allocation_entity = \
-    #         self.learning_unit_year.learning_container_year.requirement_entity
-    #     self.assertFalse(self.learning_unit_year.is_service(structure))
-    #     # self.learning_unit_year.learning_container_year.allocation_entity = LearningComponentYearFactory(entity__=)
-
 
 class LearningUnitYearGetEntityTest(TestCase):
     def setUp(self):
