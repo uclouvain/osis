@@ -25,12 +25,13 @@
 ##############################################################################
 import itertools
 
+from django.db.models import QuerySet
 from openpyxl import Workbook
 
 from base.models.education_group_year import EducationGroupYear
 
 
-def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: iter):
+def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     workbook = Workbook(encoding='utf-8')
 
     sheet = workbook.active

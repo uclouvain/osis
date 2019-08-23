@@ -24,16 +24,46 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
+from base.business.education_groups.reporting import generate_prerequisites_workbook
+from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
 @login_required
 def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
-    workbook = Workbook(encoding='utf-8')
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
+    prerequisites_qs = Prerequisite.objects.filter(
+            education_group_year=education_group_year
+        ).prefetch_related(
+            Prefetch(
+                "prerequisiteitem_set",
+                queryset=PrerequisiteItem.objects.order_by(
+                    'group_number',
+                    'position'
+                ).select_related(
+                    "learning_unit"
+                ).prefetch_related(
+                    Prefetch(
+                        "learning_unit__learningunityear_set",
+                        queryset=LearningUnitYear.objects.filter(academic_year=education_group_year.academic_year),
+                        to_attr="luys"
+                    )
+                ),
+                to_attr="items"
+            )
+        ).select_related(
+            "learning_unit_year"
+        )
+    workbook = generate_prerequisites_workbook(education_group_year, prerequisites_qs)
     response = HttpResponse(
         save_virtual_workbook(workbook),
         content_type=CONTENT_TYPE_XLS)

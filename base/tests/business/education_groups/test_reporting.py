@@ -62,7 +62,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         )
 
         cls.prerequisites = Prerequisite.objects.filter(
-            pk__in=[prerequisite_1.pk, prerequisite_2.pk]
+            education_group_year=cls.education_group_year
         ).prefetch_related(
             Prefetch(
                 "prerequisiteitem_set",
@@ -82,6 +82,8 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
             )
         ).select_related(
             "learning_unit_year"
+        ).order_by(
+            "learning_unit_year__id"
         )
 
         cls.workbook = generate_prerequisites_workbook(cls.education_group_year, cls.prerequisites)

@@ -112,6 +112,12 @@
                         <span>{% trans 'Search' %}</span>
                     </a>
                 </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="{% url "prerequisites_reporting" education_group_year_pk=education_group_year.pk %}">
+                        <span>{% trans 'Excel cours ayant prérequis' %}</span>
+                    </a>
+                </li>
 
             </ul>
         </div>
