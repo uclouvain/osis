@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
@@ -55,6 +56,9 @@ class GroupYearModelForm(EducationGroupYearModelForm):
             "credits": forms.TextInput(),
             "min_constraint": forms.TextInput(),
             "max_constraint": forms.TextInput(),
+            'academic_year': autocomplete.ModelSelect2(
+                url='academic_year-autocomplete',
+            ),
         }
 
 

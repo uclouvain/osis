@@ -220,7 +220,7 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
                 url='academic_year-autocomplete',
             ),
             'end_year': autocomplete.ModelSelect2(
-                url='academic_year-autocomplete',
+                url='academic_year_limited-autocomplete',
             ),
         }
 

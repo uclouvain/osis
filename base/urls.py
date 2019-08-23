@@ -42,7 +42,7 @@ from base.views import learning_achievement, search, education_groups, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
-from base.views.academic_year import AcademicYearAutocomplete
+from base.views.academic_year import AcademicYearAutocomplete, AcademicYearAutocompleteLimited
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
@@ -86,6 +86,8 @@ urlpatterns = [
     ),
     url(r'^academic_year-autocomplete/$', AcademicYearAutocomplete.as_view(),
         name='academic_year-autocomplete'),
+    url(r'^academic_year_limited-autocomplete/$', AcademicYearAutocompleteLimited.as_view(),
+        name='academic_year_limited-autocomplete'),
     url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),
         name='organization_autocomplete'),
     url(r'^country-autocomplete/$', CountryAutocomplete.as_view(),

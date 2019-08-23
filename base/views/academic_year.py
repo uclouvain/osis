@@ -27,7 +27,8 @@
 from dal import autocomplete
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from base.models.academic_year import AcademicYear
+from base.models import academic_year
+from base.models.academic_year import AcademicYear, MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL
 
 
 class AcademicYearAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
@@ -38,3 +39,14 @@ class AcademicYearAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetV
             qs = qs.filter(year__icontains=self.q)
 
         return qs.distinct().order_by('year')
+
+
+class AcademicYearAutocompleteLimited(AcademicYearAutocomplete):
+    def get_queryset(self):
+        starting_academic_year = academic_year.starting_academic_year()
+        end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.request.user.person.is_faculty_manager \
+            else MAX_ACADEMIC_YEAR_CENTRAL
+        qs = super(AcademicYearAutocompleteLimited, self).get_queryset().min_max_years(
+            starting_academic_year.year, starting_academic_year.year + end_year_range
+        )
+        return qs
