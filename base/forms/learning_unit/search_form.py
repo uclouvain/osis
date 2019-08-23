@@ -226,6 +226,11 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise ValidationError(_('LU_ERRORS_INVALID_REGEX_SYNTAX'))
         return acronym
 
+    def clean_faculty_borrowing_acronym(self):
+        data_cleaned = self.cleaned_data.get('faculty_borrowing_acronym')
+        if data_cleaned:
+            return data_cleaned.upper()
+
     def clean(self):
         return get_clean_data(self.cleaned_data)
 
@@ -250,7 +255,9 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         learning_units = self.get_queryset()
 
-        if not service_course_search and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
+        # FIXME: use one queryset for service cource search and borrowed course search instead of filtering in python
+        if not service_course_search and not self.borrowed_course_search \
+                and self.cleaned_data and learning_units.count() > self.MAX_RECORDS:
             raise TooManyResultsException
 
         if self.borrowed_course_search:
