@@ -473,6 +473,11 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                     cache_structure,
                     entity_version_parent.acronym,
                     FACULTY)
+                if not root:
+                    root = get_entity_version_parent_or_itself_from_type(
+                        cache_structure,
+                        entity_version_parent.acronym,
+                        SECTOR)
             else:
                 root = entity_version_parent
             return root != get_entity_version_parent_or_itself_from_type(
