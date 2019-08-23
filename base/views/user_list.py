@@ -41,7 +41,7 @@ from base.models.program_manager import ProgramManager
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Person
-    paginate_by = "20"
+    paginate_by = "4    "
     ordering = 'last_name', 'first_name', 'global_id'
     permission_required = 'base.can_read_persons_roles'
     raise_exception = True
