@@ -1,0 +1,100 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from django.db.models import Prefetch
+from django.test import TestCase
+
+from base.business.education_groups.reporting import generate_prerequisites_workbook
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import PrerequisiteItem
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
+from base.tests.factories.prerequisite import PrerequisiteFactory
+
+
+class TestGeneratePrerequisitesWorkbook(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.child_leaves = GroupElementYearChildLeafFactory.create_batch(
+            6,
+            parent=cls.education_group_year
+        )
+        cls.luy_children = [child.child_leaf for child in cls.child_leaves]
+
+        cls.prerequisite = PrerequisiteFactory(
+            learning_unit_year=cls.luy_children[0],
+            education_group_year=cls.education_group_year,
+            items__groups=[[cls.luy_children[1]]]
+        )
+
+        cls.prerequisites = Prerequisite.objects.filter(
+            pk=cls.prerequisite.pk
+        ).prefetch_related(
+            Prefetch(
+                "prerequisiteitem_set",
+                queryset=PrerequisiteItem.objects.order_by(
+                    'group_number',
+                    'position'
+                ).select_related(
+                    "learning_unit"
+                ).prefetch_related(
+                    Prefetch(
+                        "learning_unit__learningunityear_set",
+                        queryset=LearningUnitYear.objects.filter(academic_year=cls.education_group_year.academic_year),
+                        to_attr="luys"
+                    )
+                ),
+                to_attr="items"
+            )
+        ).select_related(
+            "learning_unit_year"
+        )
+
+        cls.workbook = generate_prerequisites_workbook(cls.education_group_year, cls.prerequisites)
+        cls.sheet = cls.workbook.worksheets[0]
+
+    def test_header_lines(self):
+        expected_headers = [
+            [self.education_group_year.acronym, self.education_group_year.title],
+            ["Officiel", None]
+        ]
+
+        headers = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A1:B2")]
+        self.assertListEqual(headers, expected_headers)
+
+    def test_content_lines(self):
+        expected_content = [
+            [self.luy_children[0].acronym, self.luy_children[0].complete_title],
+            ["a comme prérequis :", "{} {}".format(self.luy_children[1].acronym, self.luy_children[1].complete_title)]
+        ]
+
+        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:B4")]
+        self.assertListEqual(expected_content, content)
+
+
+def row_to_value(sheet_row):
+    return [cell.value for cell in sheet_row]

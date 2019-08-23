@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,22 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
-
-import factory.fuzzy
-
-from base.tests.factories.learning_unit import LearningUnitFakerFactory
-
-
-class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.PrerequisiteItem"
-        django_get_or_create = ('learning_unit', 'prerequisite')
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    learning_unit = factory.SubFactory(LearningUnitFakerFactory)
-    prerequisite = factory.SubFactory("base.tests.factories.prerequisite.PrerequisiteFactory")
-    group_number = factory.Sequence(lambda n: n)
-    position = factory.Sequence(lambda n: n)
+from openpyxl import Workbook
+"""
+    Module to help generate excel files based on queryset.
+"""

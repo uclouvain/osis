@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,22 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from django.test import TestCase
+from django.urls import reverse
 
-import factory.fuzzy
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.person import PersonFactory
+from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
-from base.tests.factories.learning_unit import LearningUnitFakerFactory
 
+class TestGetLearningUnitPrerequisitesExcel(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.education_group_year = EducationGroupYearFactory()
 
-class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.PrerequisiteItem"
-        django_get_or_create = ('learning_unit', 'prerequisite')
+        cls.url = reverse("prerequisites_reporting", args=[cls.education_group_year.pk])
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    learning_unit = factory.SubFactory(LearningUnitFakerFactory)
-    prerequisite = factory.SubFactory("base.tests.factories.prerequisite.PrerequisiteFactory")
-    group_number = factory.Sequence(lambda n: n)
-    position = factory.Sequence(lambda n: n)
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_return_excel_file(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)

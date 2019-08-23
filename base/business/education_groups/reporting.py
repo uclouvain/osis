@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,22 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from openpyxl import Workbook
 
-import factory.fuzzy
-
-from base.tests.factories.learning_unit import LearningUnitFakerFactory
+from base.models.education_group_year import EducationGroupYear
 
 
-class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.PrerequisiteItem"
-        django_get_or_create = ('learning_unit', 'prerequisite')
+def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: iter):
+    workbook = Workbook(encoding='utf-8')
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    learning_unit = factory.SubFactory(LearningUnitFakerFactory)
-    prerequisite = factory.SubFactory("base.tests.factories.prerequisite.PrerequisiteFactory")
-    group_number = factory.Sequence(lambda n: n)
-    position = factory.Sequence(lambda n: n)
+    sheet = workbook.active
+
+    # Header
+    sheet.append(
+        (egy.acronym, egy.title)
+    )
+    sheet.append(
+        ("Officiel",)
+    )
+
+    # Content
+    for prerequisite in prerequisites_qs:
+        sheet.append(
+            (prerequisite.learning_unit_year.acronym, prerequisite.learning_unit_year.complete_title)
+        )
+        for prerequisite_item in prerequisite.items:
+            text = "{acronym} {title}".format(
+                acronym=prerequisite_item.learning_unit.luys[0].acronym,
+                title=prerequisite_item.learning_unit.luys[0].complete_title
+            )
+            sheet.append(
+                ["a comme prérequis :", text]
+            )
+
+    return workbook
