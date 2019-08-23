@@ -38,10 +38,11 @@ from base.business.learning_container_year import get_learning_container_year_wa
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
-from base.models.entity_version import get_entity_version_parent_or_itself_from_type
+from base.models.entity_version import get_entity_version_parent_or_itself_from_type, EntityVersion
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
+from base.models.enums.entity_type import SECTOR, FACULTY
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
@@ -464,6 +465,22 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
+
+    def is_borrowed(self, entity_version_parent: EntityVersion, cache_structure: dict) -> bool:
+        try:
+            if entity_version_parent.entity_type not in [SECTOR, FACULTY]:
+                root = get_entity_version_parent_or_itself_from_type(
+                    cache_structure,
+                    entity_version_parent.acronym,
+                    FACULTY)
+            else:
+                root = entity_version_parent
+            return root != get_entity_version_parent_or_itself_from_type(
+                cache_structure,
+                self.requirement_entity.most_recent_acronym,
+                root.entity_type)
+        except Exception:
+            return False
 
 
 def get_by_id(learning_unit_year_id):

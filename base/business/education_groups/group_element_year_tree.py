@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import build_current_entity_version_structure_in_memory
+from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
@@ -46,9 +46,11 @@ class EducationGroupHierarchy:
 
     _cache_hierarchy = None
     _cache_structure = None
+    _cache_entity_parent_root = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None, tab_to_show: str = None, cache_structure=None):
+                 cache_hierarchy: dict = None, tab_to_show: str = None, cache_structure=None,
+                 cache_entity_parent_root: str = None):
 
         self.children = []
         self.included_group_element_years = []
@@ -59,6 +61,7 @@ class EducationGroupHierarchy:
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
         self._cache_structure = cache_structure
+        self._cache_entity_parent_root = cache_entity_parent_root
         self.tab_to_show = tab_to_show
         self.generate_children()
 
@@ -78,6 +81,12 @@ class EducationGroupHierarchy:
             self._cache_structure = build_current_entity_version_structure_in_memory()
         return self._cache_structure
 
+    @property
+    def cache_entity_parent_root(self) -> EntityVersion:
+        if self._cache_entity_parent_root is None:
+            self._cache_entity_parent_root = self.root.administration_entity.get_latest_entity_version()
+        return self._cache_entity_parent_root
+
     def _init_cache(self):
         return fetch_all_group_elements_in_tree(self.education_group_year, self.get_queryset()) or {}
 
@@ -85,11 +94,13 @@ class EducationGroupHierarchy:
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
                 node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                               tab_to_show=self.tab_to_show, cache_structure=self.cache_structure)
+                                               tab_to_show=self.tab_to_show, cache_structure=self.cache_structure,
+                                               cache_entity_parent_root=self.cache_entity_parent_root)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                      tab_to_show=self.tab_to_show, cache_structure=self.cache_structure)
+                                      tab_to_show=self.tab_to_show, cache_structure=self.cache_structure,
+                                      cache_entity_parent_root=self.cache_entity_parent_root)
 
             else:
                 continue
@@ -297,6 +308,9 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         acronym = ''
         if self.learning_unit_year.academic_year != self.root.academic_year:
             acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
+        if self.learning_unit_year.is_borrowed(self.cache_entity_parent_root,
+                                               self.cache_structure):
+            acronym += '|E'
         if self.learning_unit_year.is_service(self.cache_structure):
             acronym += '|S'
         if acronym != '':
