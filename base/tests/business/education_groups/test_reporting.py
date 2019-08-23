@@ -100,21 +100,21 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
 
     def test_when_learning_unit_year_has_one_prerequisite(self):
         expected_content = [
-            [self.luy_children[0].acronym, self.luy_children[0].complete_title],
-            ["a comme prérequis :", "{} {}".format(self.luy_children[1].acronym, self.luy_children[1].complete_title)]
+            [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None],
+            ["a comme prérequis :", None, self.luy_children[1].acronym, self.luy_children[1].complete_title]
         ]
 
-        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:B4")]
+        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:D4")]
         self.assertListEqual(expected_content, content)
 
     def test_when_learning_unit_year_has_multiple_prerequisites(self):
         expected_content = [
-            [self.luy_children[2].acronym, self.luy_children[2].complete_title],
-            ["a comme prérequis :", "{} {}".format(self.luy_children[3].acronym, self.luy_children[3].complete_title)],
-            [None, "AND ({} {}".format(self.luy_children[4].acronym, self.luy_children[4].complete_title)],
-            [None, "OR {} {})".format(self.luy_children[5].acronym, self.luy_children[5].complete_title)]
+            [self.luy_children[2].acronym, self.luy_children[2].complete_title, None, None],
+            ["a comme prérequis :", None, self.luy_children[3].acronym, self.luy_children[3].complete_title],
+            [None, "AND", "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title],
+            [None, "OR", self.luy_children[5].acronym + ")", self.luy_children[5].complete_title]
         ]
-        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:B8")]
+        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:D8")]
         self.assertListEqual(expected_content, content)
 
 
