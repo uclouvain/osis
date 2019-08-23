@@ -18,7 +18,7 @@
 #  GNU General Public License for more details.                                          #
 #                                                                                        #
 #  A copy of this license - GNU General Public License - is available                    #
-#  at the root of the source code of this program.  If not ,                             #
+#  at the root of the source code of this program.  If not,                             #
 #  see http://www.gnu.org/licenses/.                                                     #
 # ########################################################################################
 from django.conf import settings
@@ -59,7 +59,9 @@ class EducationGroupHierarchy:
         self.tab_to_show = tab_to_show
         self.pdf_content = pdf_content
 
-        if not self.pdf_content or (not (self.group_element_year and self.group_element_year.child.type == GroupType.MINOR_LIST_CHOICE.name)):
+        if not self.pdf_content or \
+                (not (self.group_element_year and
+                      self.group_element_year.child.type == GroupType.MINOR_LIST_CHOICE.name)):
             self.generate_children()
 
         self.modification_perm = ModificationPermission(self.root, self.group_element_year)
