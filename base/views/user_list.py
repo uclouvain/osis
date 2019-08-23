@@ -88,9 +88,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 prefetch_managed_entity,
                 prefetch_personentity
             ).filter(
-                user__is_active=True,
-                student__isnull=True,
-                tutor__isnull=True,
+                user__is_active=True
             )
 
         if 'partnership' in settings.INSTALLED_APPS:
