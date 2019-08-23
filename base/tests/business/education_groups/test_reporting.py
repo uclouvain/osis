@@ -45,14 +45,24 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         )
         cls.luy_children = [child.child_leaf for child in cls.child_leaves]
 
-        cls.prerequisite = PrerequisiteFactory(
+        prerequisite_1 = PrerequisiteFactory(
             learning_unit_year=cls.luy_children[0],
             education_group_year=cls.education_group_year,
-            items__groups=[[cls.luy_children[1]]]
+            items__groups=(
+                (cls.luy_children[1],),
+            )
+        )
+        prerequisite_2 = PrerequisiteFactory(
+            learning_unit_year=cls.luy_children[2],
+            education_group_year=cls.education_group_year,
+            items__groups=(
+                (cls.luy_children[3],),
+                (cls.luy_children[4], cls.luy_children[5])
+            )
         )
 
         cls.prerequisites = Prerequisite.objects.filter(
-            pk=cls.prerequisite.pk
+            pk__in=[prerequisite_1.pk, prerequisite_2.pk]
         ).prefetch_related(
             Prefetch(
                 "prerequisiteitem_set",
@@ -86,13 +96,23 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         headers = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A1:B2")]
         self.assertListEqual(headers, expected_headers)
 
-    def test_content_lines(self):
+    def test_when_learning_unit_year_has_one_prerequisite(self):
         expected_content = [
             [self.luy_children[0].acronym, self.luy_children[0].complete_title],
             ["a comme prérequis :", "{} {}".format(self.luy_children[1].acronym, self.luy_children[1].complete_title)]
         ]
 
         content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:B4")]
+        self.assertListEqual(expected_content, content)
+
+    def test_when_learning_unit_year_has_multiple_prerequisites(self):
+        expected_content = [
+            [self.luy_children[2].acronym, self.luy_children[2].complete_title],
+            ["a comme prérequis :", "{} {}".format(self.luy_children[3].acronym, self.luy_children[3].complete_title)],
+            [None, "AND ({} {}".format(self.luy_children[4].acronym, self.luy_children[4].complete_title)],
+            [None, "OR {} {})".format(self.luy_children[5].acronym, self.luy_children[5].complete_title)]
+        ]
+        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:B8")]
         self.assertListEqual(expected_content, content)
 
 

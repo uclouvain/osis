@@ -50,17 +50,17 @@ class PrerequisiteFactory(factory.django.DjangoModelFactory):
     def items(obj, create, extracted, groups=None, **kwargs):
         """
         Generate PrerequisiteItems for to this Prerequisite based on the argument groups.
-        :param groups: A list of lists of LearningUnitYear. Ex: [[LSINF1101], [LOSIS1254, LOSIS2569]]
-                       Each list contained corresponds to a different group.
+        :param groups: A tuple of tuples of LearningUnitYear. Ex: ((LSINF1101,), (LOSIS1254, LOSIS2569))
+                       Each tuple contained corresponds to a different group.
         """
         if groups is None:
-            groups = []
+            groups = tuple()
 
         for index, group in enumerate(groups):
             for group_index, luy in enumerate(group):
                 PrerequisiteItemFactory(
                     learning_unit=luy.learning_unit,
                     prerequisite=obj,
-                    group_number=index,
-                    position=group_index
+                    group_number=index+1,
+                    position=group_index+1
                 )
