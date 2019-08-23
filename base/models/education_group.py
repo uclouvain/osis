@@ -79,11 +79,22 @@ class EducationGroup(SerializableModel):
     objects = EducationGroupManager()
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-
-    start_year = models.ForeignKey('AcademicYear', blank=True, null=True, verbose_name=_('Start'),
-                                   related_name='start_years', on_delete=models.PROTECT)
-    end_year = models.ForeignKey('AcademicYear', blank=True, null=True, verbose_name=_('Last year of organization'),
-                                 related_name='end_years', on_delete=models.PROTECT)
+    start_year = models.ForeignKey(
+        'AcademicYear',
+        blank=True,
+        null=True,
+        verbose_name=_('Start'),
+        related_name='start_years',
+        on_delete=models.PROTECT
+    )
+    end_year = models.ForeignKey(
+        'AcademicYear',
+        blank=True,
+        null=True,
+        verbose_name=_('Last year of organization'),
+        related_name='end_years',
+        on_delete=models.PROTECT
+    )
 
     @property
     def most_recent_acronym(self):

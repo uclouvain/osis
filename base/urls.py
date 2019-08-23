@@ -84,8 +84,8 @@ urlpatterns = [
         base.views.learning_units.update.EntityRequirementAutocomplete.as_view(),
         name='entity_requirement_autocomplete'
     ),
-    url(r'^academic_year-autocomplete/$', AcademicYearAutocomplete.as_view(),
-        name='academic_year-autocomplete'),
+    url(r'^academic_year_autocomplete/$', AcademicYearAutocomplete.as_view(),
+        name='academic_year_autocomplete'),
     url(r'^academic_year_limited-autocomplete/$', AcademicYearAutocompleteLimited.as_view(),
         name='academic_year_limited-autocomplete'),
     url(r'^organization-autocomplete/$', OrganizationAutocomplete.as_view(),

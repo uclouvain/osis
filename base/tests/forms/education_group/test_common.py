@@ -386,6 +386,7 @@ def _get_valid_post_data(category):
         'title_english': str(fake_education_group_year.title_english),
         'partial_acronym': str(fake_education_group_year.partial_acronym),
         'start_year': str(fake_education_group_year.education_group.start_year),
+        'end_year': fake_education_group_year.education_group.end_year,
         'title': str(fake_education_group_year.title),
         'credits': str(fake_education_group_year.credits),
         'academic_year': str(fake_education_group_year.academic_year.id),

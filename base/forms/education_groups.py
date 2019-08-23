@@ -59,7 +59,7 @@ class EducationGroupFilter(FilterSet):
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
         label=_('Ac yr.'),
-        widget=autocomplete.ModelSelect2(url='academic_year-autocomplete')
+        widget=autocomplete.ModelSelect2(url='academic_year_autocomplete')
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),

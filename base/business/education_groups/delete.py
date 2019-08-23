@@ -70,7 +70,7 @@ def get_protected_messages_by_education_group_year(education_group_year):
             ) % {"count_enrollment": count_enrollment}
         )
 
-    # Check if content is not empty.year
+    # Check if content is not empty
     if _have_contents_which_are_not_mandatory(education_group_year):
         protected_message.append(_("The content of the education group is not empty."))
 
