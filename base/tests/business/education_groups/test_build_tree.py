@@ -63,24 +63,28 @@ class TestBuildTree(TestCase):
 
         self.parent = EducationGroupYearFactory(acronym='LTEST0000',
                                                 academic_year=self.academic_year,
-                                                management_entity=self.SC.entity)
+                                                management_entity=self.SC.entity,
+                                                administration_entity=self.SC.entity)
         self.group_element_year_1 = GroupElementYearFactory(
             parent=self.parent,
             child_branch=EducationGroupYearFactory(acronym='LTEST0010',
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.SC.entity)
+                                                   management_entity=self.SC.entity,
+                                                   administration_entity=self.SC.entity)
         )
         self.group_element_year_1_1 = GroupElementYearFactory(
             parent=self.group_element_year_1.child_branch,
             child_branch=EducationGroupYearFactory(acronym='LTEST0011',
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.SC.entity)
+                                                   management_entity=self.SC.entity,
+                                                   administration_entity=self.SC.entity)
         )
         self.group_element_year_2 = GroupElementYearFactory(
             parent=self.parent,
             child_branch=EducationGroupYearFactory(acronym='LTEST0020',
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.MATH.entity)
+                                                   management_entity=self.MATH.entity,
+                                                   administration_entity=self.MATH.entity)
         )
         self.learning_unit_year_1 = LearningUnitYearFactory(
             acronym='LTEST0021',
@@ -157,6 +161,15 @@ class TestBuildTree(TestCase):
             title="BARC",
             entity_type=entity_version.entity_type.SCHOOL,
             parent=self.LOCI.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.EDDY = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="EDDY",
+            title="EDDY",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.URBA.entity,
             start_date=start_date,
             end_date=end_date
         )
@@ -357,6 +370,63 @@ class TestBuildTree(TestCase):
         str_expected_not_service = '|S| LTEST0021'
         self.assertTrue(str_expected_service in node)
         self.assertTrue(str_expected_not_service not in node)
+
+    def test_contains_luy_borrowed(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.BARC.entity)
+        )
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.BARC.entity,
+                                               learning_container_year__allocation_entity=self.MATH.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(acronym)
+        str_expected_borrowed2 = '|E|S| {}'.format(acronym)
+        str_expected_not_borrowed = '|E| LTEST0021'
+        self.assertTrue(str_expected_borrowed in node)
+        self.assertTrue(str_expected_borrowed2 in node)
+        self.assertTrue(str_expected_not_borrowed not in node)
+
+    def test_contains_luy_borrowed_without_entity(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_not_borrowed = '|E| LTEST0022'
+        self.assertTrue(acronym in node)
+        self.assertTrue(str_expected_not_borrowed not in node)
+
+    def test_contains_luy_borrowed_school(self):
+        acronym = 'LTEST0022'
+        group_element_year_2 = GroupElementYearFactory(
+            parent=self.parent,
+            child_branch=EducationGroupYearFactory(acronym='LTEST0020',
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.EDDY.entity,
+                                                   administration_entity=self.EDDY.entity)
+        )
+        GroupElementYearFactory(
+            parent=group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.BARC.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| LTEST0022'
+        self.assertTrue(str_expected_borrowed in node)
 
 
 class TestGetOptionList(TestCase):
