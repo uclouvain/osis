@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import build_current_entity_version_structure_in_memory
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
@@ -44,9 +45,11 @@ class EducationGroupHierarchy:
     element_type = EDUCATION_GROUP_YEAR
 
     _cache_hierarchy = None
+    _cache_structure = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None, tab_to_show: str = None, pdf_content: bool = False):
+                 cache_hierarchy: dict = None, tab_to_show: str = None, pdf_content: bool = False,
+                 cache_structure=None):
 
         self.children = []
         self.included_group_element_years = []
@@ -56,6 +59,7 @@ class EducationGroupHierarchy:
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
+        self._cache_structure = cache_structure
         self.tab_to_show = tab_to_show
         self.pdf_content = pdf_content
 
@@ -74,6 +78,12 @@ class EducationGroupHierarchy:
             self._cache_hierarchy = self._init_cache()
         return self._cache_hierarchy
 
+    @property
+    def cache_structure(self):
+        if self._cache_structure is None:
+            self._cache_structure = build_current_entity_version_structure_in_memory()
+        return self._cache_structure
+
     def _init_cache(self):
         return fetch_all_group_elements_in_tree(self.education_group_year, self.get_queryset()) or {}
 
@@ -83,11 +93,12 @@ class EducationGroupHierarchy:
                 node = EducationGroupHierarchy(self.root, group_element_year,
                                                cache_hierarchy=self.cache_hierarchy,
                                                tab_to_show=self.tab_to_show,
-                                               pdf_content=self.pdf_content)
+                                               pdf_content=self.pdf_content,
+                                               cache_structure=self.cache_structure)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                      tab_to_show=self.tab_to_show)
+                                      tab_to_show=self.tab_to_show, cache_structure=self.cache_structure)
 
             else:
                 continue
@@ -113,8 +124,13 @@ class EducationGroupHierarchy:
                             'child_branch__education_group_type',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
+                            'child_leaf__learning_container_year__requirement_entity',
+                            'child_leaf__learning_container_year__allocation_entity',
                             'child_leaf__proposallearningunit',
-                            'parent').order_by("order", "parent__partial_acronym")
+                            'parent')\
+            .prefetch_related('child_leaf__learning_container_year__requirement_entity__entityversion_set',
+                              'child_leaf__learning_container_year__allocation_entity__entityversion_set')\
+            .order_by("order", "parent__partial_acronym")
 
     def to_json(self):
         return {
@@ -287,9 +303,16 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         """
             When the LU year is different than its education group, we have to display the year in the title.
         """
+        acronym = ''
         if self.learning_unit_year.academic_year != self.root.academic_year:
-            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
-        return self.learning_unit_year.acronym
+            acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
+        if self.learning_unit_year.is_service(self.cache_structure):
+            acronym += '|S'
+        if acronym != '':
+            acronym += '| {}'.format(self.learning_unit_year.acronym)
+        else:
+            acronym = self.learning_unit_year.acronym
+        return acronym
 
     def _get_class(self):
         try:
