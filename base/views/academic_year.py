@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,25 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import string
 
-import factory
-import factory.fuzzy
-from django.utils import timezone
-from factory.django import DjangoModelFactory
-from faker import Faker
+from dal import autocomplete
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from osis_common.utils.datetime import get_tzinfo
-
-fake = Faker()
+from base.models import academic_year
+from base.models.academic_year import AcademicYear, MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL
 
 
-class EducationGroupFactory(DjangoModelFactory):
-    class Meta:
-        model = "base.EducationGroup"
+class AcademicYearAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = AcademicYear.objects.all()
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
-    end_year = None
+        if self.q:
+            qs = qs.filter(year__icontains=self.q)
+
+        return qs.distinct().order_by('year')
+
+
+class AcademicYearAutocompleteLimited(AcademicYearAutocomplete):
+    def get_queryset(self):
+        starting_academic_year = academic_year.starting_academic_year()
+        end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.request.user.person.is_faculty_manager \
+            else MAX_ACADEMIC_YEAR_CENTRAL
+        qs = super(AcademicYearAutocompleteLimited, self).get_queryset().min_max_years(
+            starting_academic_year.year, starting_academic_year.year + end_year_range
+        )
+        return qs

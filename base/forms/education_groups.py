@@ -25,6 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
@@ -57,7 +58,8 @@ class EducationGroupFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
-        label=_('Ac yr.')
+        label=_('Ac yr.'),
+        widget=autocomplete.ModelSelect2(url='academic_year_autocomplete')
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),

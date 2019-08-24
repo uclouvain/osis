@@ -29,7 +29,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import duplicate_education_group_year
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from base.business.group_element_years import attach
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.authorized_relationship import AuthorizedRelationship
@@ -190,7 +190,7 @@ class PostponeContent:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         end_year = self.instance.education_group.end_year
-        if end_year and end_year < self.next_academic_year.year:
+        if end_year and end_year.year < self.next_academic_year.year:
             raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
         if not self.instance.groupelementyear_set.exists():
@@ -337,7 +337,7 @@ class PostponeContent:
 
     def _duplication_education_group_year(self, old_gr: GroupElementYear, old_egy: EducationGroupYear):
         if old_egy.education_group_type.category != Categories.GROUP.name:
-            if old_egy.education_group.end_year and old_egy.education_group.end_year < self.next_academic_year.year:
+            if old_egy.education_group.end_year and old_egy.education_group.end_year.year < self.next_academic_year.year:
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
                 return None
 
@@ -377,7 +377,7 @@ class PostponeContent:
     def _check_options(self):
         missing_options = {}
         for finality in self.postponed_finalities:
-            missing_options[finality] = list(itertools.chain.from_iterable(AttachEducationGroupYearStrategy(
+            missing_options[finality] = list(itertools.chain.from_iterable(attach.AttachEducationGroupYearStrategy(
                 finality.parent, finality.child_branch
             )._get_missing_options().values()))
 
