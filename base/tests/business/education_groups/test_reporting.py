@@ -94,7 +94,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_header_lines(self):
         expected_headers = [
             [self.education_group_year.acronym, self.education_group_year.title],
-            [_("Official"), None]
+            [_("Official"), '']
         ]
 
         headers = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A1:B2")]
@@ -103,7 +103,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_when_learning_unit_year_has_one_prerequisite(self):
         expected_content = [
             [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None],
-            [_("has as prerequisite") + " :", None, self.luy_children[1].acronym, self.luy_children[1].complete_title]
+            [_("has as prerequisite") + " :", '', self.luy_children[1].acronym, self.luy_children[1].complete_title]
         ]
 
         content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:D4")]
@@ -112,9 +112,9 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_when_learning_unit_year_has_multiple_prerequisites(self):
         expected_content = [
             [self.luy_children[2].acronym, self.luy_children[2].complete_title, None, None],
-            [_("has as prerequisite") + " :", None, self.luy_children[3].acronym, self.luy_children[3].complete_title],
-            [None, _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title],
-            [None, _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title]
+            [_("has as prerequisite") + " :", '', self.luy_children[3].acronym, self.luy_children[3].complete_title],
+            ['', _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title],
+            ['', _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title]
         ]
         content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:D8")]
         self.assertListEqual(expected_content, content)
