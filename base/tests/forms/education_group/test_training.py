@@ -44,11 +44,13 @@ from base.tests.factories.academic_year import create_current_academic_year, get
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.hops import HopsFactory
+from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
@@ -97,7 +99,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
         cert = [CertificateAimFactory(code=code, section=2) for code in range(100, 102)]
         for i in range(0, len(cert)):
             with self.subTest(i=i):
-                cert_for_form = [str(cert[j].pk) for j in range(0, i+1)]
+                cert_for_form = [str(cert[j].pk) for j in range(0, i + 1)]
 
                 form = self.form_class(
                     data={
@@ -274,16 +276,24 @@ class TestPostponementEducationGroupYear(TestCase):
         # Update egys
         self.education_group_year.refresh_from_db()
 
+        self.assertEqual(self.education_group_year.educationgrouporganization_set.all().count(), 0)
+        EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=self.education_group_year
+        )
+        self.assertEqual(self.education_group_year.educationgrouporganization_set.all().count(), 1)
+
         self.data["title"] = "Defence Against the Dark Arts"
         form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
-        self.assertEqual(
-            EducationGroupYear.objects.filter(
-                education_group=self.education_group_year.education_group
-            ).count(), 7
+        all_egys = EducationGroupYear.objects.filter(
+            education_group=self.education_group_year.education_group
         )
+        self.assertEqual(all_egys.count(), 7)
+        for egy in all_egys:
+            self.assertEqual(egy.educationgrouporganization_set.all().count(), 1)
         self.assertEqual(len(form.warnings), 0, form.warnings)
 
     def test_save_with_postponement_error(self):
