@@ -25,8 +25,10 @@
 ##############################################################################
 from django.db.models import Prefetch
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.reporting import generate_prerequisites_workbook
+from base.models.enums.prerequisite_operator import AND, OR
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -92,7 +94,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_header_lines(self):
         expected_headers = [
             [self.education_group_year.acronym, self.education_group_year.title],
-            ["Officiel", None]
+            [_("Official"), None]
         ]
 
         headers = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A1:B2")]
@@ -101,7 +103,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_when_learning_unit_year_has_one_prerequisite(self):
         expected_content = [
             [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None],
-            ["a comme prérequis :", None, self.luy_children[1].acronym, self.luy_children[1].complete_title]
+            [_("has as prerequisite") + " :", None, self.luy_children[1].acronym, self.luy_children[1].complete_title]
         ]
 
         content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:D4")]
@@ -110,9 +112,9 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_when_learning_unit_year_has_multiple_prerequisites(self):
         expected_content = [
             [self.luy_children[2].acronym, self.luy_children[2].complete_title, None, None],
-            ["a comme prérequis :", None, self.luy_children[3].acronym, self.luy_children[3].complete_title],
-            [None, "AND", "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title],
-            [None, "OR", self.luy_children[5].acronym + ")", self.luy_children[5].complete_title]
+            [_("has as prerequisite") + " :", None, self.luy_children[3].acronym, self.luy_children[3].complete_title],
+            [None, _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title],
+            [None, _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title]
         ]
         content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:D8")]
         self.assertListEqual(expected_content, content)

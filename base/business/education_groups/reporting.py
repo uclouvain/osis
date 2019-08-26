@@ -26,6 +26,7 @@
 import itertools
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext as _
 from openpyxl import Workbook
 
 from base.models.education_group_year import EducationGroupYear
@@ -41,7 +42,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
         (egy.acronym, egy.title)
     )
     sheet.append(
-        ("Officiel",)
+        (_("Official"),)
     )
 
     # Content
@@ -56,8 +57,8 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
                 prerequisite_item = group[0]
                 sheet.append(
                     [
-                        "a comme prérequis :" if prerequisite_item.group_number == 1 else None,
-                        prerequisite.main_operator if prerequisite_item.group_number != 1 else None,
+                        (_("has as prerequisite") + " :") if prerequisite_item.group_number == 1 else None,
+                        _(prerequisite.main_operator) if prerequisite_item.group_number != 1 else None,
                         prerequisite_item.learning_unit.luys[0].acronym,
                         prerequisite_item.learning_unit.luys[0].complete_title
                     ]
@@ -66,8 +67,8 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
                 first_item = group[0]
                 sheet.append(
                     [
-                        "a comme prérequis :" if first_item.group_number == 1 else None,
-                        prerequisite.main_operator if first_item.group_number != 1 else None,
+                        (_("has as prerequisite") + ":") if first_item.group_number == 1 else None,
+                        _(prerequisite.main_operator) if first_item.group_number != 1 else None,
                         "(" + first_item.learning_unit.luys[0].acronym,
                         first_item.learning_unit.luys[0].complete_title
                     ]
@@ -77,7 +78,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
                     sheet.append(
                         [
                             None,
-                            prerequisite.secondary_operator,
+                            _(prerequisite.secondary_operator),
                             item.learning_unit.luys[0].acronym,
                             item.learning_unit.luys[0].complete_title
                         ]
@@ -87,7 +88,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
                 sheet.append(
                     [
                         None,
-                        prerequisite.secondary_operator,
+                        _(prerequisite.secondary_operator),
                         last_item.learning_unit.luys[0].acronym + ")",
                         last_item.learning_unit.luys[0].complete_title
                     ]
