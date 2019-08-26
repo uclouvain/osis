@@ -47,14 +47,14 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         )
         cls.luy_children = [child.child_leaf for child in cls.child_leaves]
 
-        prerequisite_1 = PrerequisiteFactory(
+        PrerequisiteFactory(
             learning_unit_year=cls.luy_children[0],
             education_group_year=cls.education_group_year,
             items__groups=(
                 (cls.luy_children[1],),
             )
         )
-        prerequisite_2 = PrerequisiteFactory(
+        PrerequisiteFactory(
             learning_unit_year=cls.luy_children[2],
             education_group_year=cls.education_group_year,
             items__groups=(

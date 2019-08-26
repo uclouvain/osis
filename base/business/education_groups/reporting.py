@@ -37,6 +37,17 @@ from base.models.enums.prerequisite_operator import AND, OR
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
 
+STYLE_BORDER_BOTTOM = Style(
+    border=Border(
+        bottom=Side(
+            border_style=BORDER_THICK, color=Color('FF000000')
+        )
+    )
+)
+STYLE_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('D1D1D1')))
+STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1E1E1')))
+STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
+
 
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     workbook = Workbook(encoding='utf-8')
@@ -66,64 +77,61 @@ def _build_content(prerequisites_qs: QuerySet):
         content.append(
             (prerequisite.learning_unit_year.acronym, prerequisite.learning_unit_year.complete_title)
         )
-        groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
-        for key, group_gen in groups_generator:
-            group = list(group_gen)
-            if len(group) == 1:
-                prerequisite_item = group[0]
-                content.append(
-                    [
-                        (_("has as prerequisite") + " :") if prerequisite_item.group_number == 1 else None,
-                        _(prerequisite.main_operator) if prerequisite_item.group_number != 1 else None,
-                        prerequisite_item.learning_unit.luys[0].acronym,
-                        prerequisite_item.learning_unit.luys[0].complete_title
-                    ]
-                )
-            else:
-                first_item = group[0]
-                content.append(
-                    [
-                        (_("has as prerequisite") + ":") if first_item.group_number == 1 else None,
-                        _(prerequisite.main_operator) if first_item.group_number != 1 else None,
-                        "(" + first_item.learning_unit.luys[0].acronym,
-                        first_item.learning_unit.luys[0].complete_title
-                    ]
-                )
+        content.extend(
+            _build_item_rows(prerequisite)
+        )
+    return content
 
-                for item in group[1:-1]:
-                    content.append(
-                        [
-                            None,
-                            _(prerequisite.secondary_operator),
-                            item.learning_unit.luys[0].acronym,
-                            item.learning_unit.luys[0].complete_title
-                        ]
-                    )
 
-                last_item = group[-1]
+def _build_item_rows(prerequisite):
+    content = []
+    groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
+    for key, group_gen in groups_generator:
+        group = list(group_gen)
+        if len(group) == 1:
+            prerequisite_item = group[0]
+            content.append(
+                [
+                    (_("has as prerequisite") + " :") if prerequisite_item.group_number == 1 else None,
+                    _(prerequisite.main_operator) if prerequisite_item.group_number != 1 else None,
+                    prerequisite_item.learning_unit.luys[0].acronym,
+                    prerequisite_item.learning_unit.luys[0].complete_title
+                ]
+            )
+        else:
+            first_item = group[0]
+            content.append(
+                [
+                    (_("has as prerequisite") + ":") if first_item.group_number == 1 else None,
+                    _(prerequisite.main_operator) if first_item.group_number != 1 else None,
+                    "(" + first_item.learning_unit.luys[0].acronym,
+                    first_item.learning_unit.luys[0].complete_title
+                ]
+            )
+
+            for item in group[1:-1]:
                 content.append(
                     [
                         None,
                         _(prerequisite.secondary_operator),
-                        last_item.learning_unit.luys[0].acronym + ")",
-                        last_item.learning_unit.luys[0].complete_title
+                        item.learning_unit.luys[0].acronym,
+                        item.learning_unit.luys[0].complete_title
                     ]
                 )
+
+            last_item = group[-1]
+            content.append(
+                [
+                    None,
+                    _(prerequisite.secondary_operator),
+                    last_item.learning_unit.luys[0].acronym + ")",
+                    last_item.learning_unit.luys[0].complete_title
+                ]
+            )
     return content
 
 
 def _style_cells(prerequisites_qs: QuerySet):
-    STYLE_BORDER_BOTTOM = Style(
-        border=Border(
-            bottom=Side(
-                border_style=BORDER_THICK, color=Color('FF000000')
-            )
-        )
-    )
-    STYLE_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('D1D1D1')))
-    STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1E1E1')))
-    STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
-
     luy_acronym_cells = []
     row_index = 3
     for prerequisite in prerequisites_qs:
@@ -172,7 +180,6 @@ def _merge_cells(prerequisites_qs, workbook):
 
 def _post_style_cell(workbook: Workbook):
     worksheet = workbook.worksheets[0]
-    last_operator = None
 
     main_operator = None
     for row_index in range(3, worksheet.max_row + 1):

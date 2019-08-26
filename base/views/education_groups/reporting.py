@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-from openpyxl import Workbook
+from django.utils.translation import gettext_lazy as _
 from openpyxl.writer.excel import save_virtual_workbook
 
 from base.business.education_groups.reporting import generate_prerequisites_workbook
@@ -67,5 +67,6 @@ def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
     response = HttpResponse(
         save_virtual_workbook(workbook),
         content_type=CONTENT_TYPE_XLS)
-    response['Content-Disposition'] = "%s%s" % ("attachment; filename=", "temp.xlsx")
+    filename = "{workbook_name}.xlsx".format(workbook_name=str(_("Formation prerequisites")).replace(" ", "_"))
+    response['Content-Disposition'] = "%s%s" % ("attachment; filename=", filename)
     return response
