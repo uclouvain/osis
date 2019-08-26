@@ -382,6 +382,7 @@ class TestBuildTree(TestCase):
 
     def test_contains_luy_borrowed(self):
         acronym = 'LTEST0022'
+        acronym2 = 'LTEST0022'
         GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
@@ -391,14 +392,14 @@ class TestBuildTree(TestCase):
         GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
-            child_leaf=LearningUnitYearFactory(acronym=acronym,
+            child_leaf=LearningUnitYearFactory(acronym=acronym2,
                                                learning_container_year__requirement_entity=self.BARC.entity,
                                                learning_container_year__allocation_entity=self.MATH.entity)
         )
 
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
         str_expected_borrowed = '|E| {}'.format(acronym)
-        str_expected_borrowed2 = '|E|S| {}'.format(acronym)
+        str_expected_borrowed2 = '|E|S| {}'.format(acronym2)
         str_expected_not_borrowed = '|E| LTEST0021'
         self.assertTrue(str_expected_borrowed in node)
         self.assertTrue(str_expected_borrowed2 in node)
@@ -431,7 +432,6 @@ class TestBuildTree(TestCase):
         )
 
         node = json.dumps(EducationGroupHierarchy(my_parent).to_json())
-        print(node)
         str_expected_borrowed = '|E| LTEST0022'
         self.assertTrue(str_expected_borrowed in node)
 
@@ -449,9 +449,21 @@ class TestBuildTree(TestCase):
         )
 
         node = json.dumps(EducationGroupHierarchy(my_parent).to_json())
-        print(node)
         str_expected_borrowed = '|E| LTEST0022'
         self.assertFalse(str_expected_borrowed in node)
+
+    def test_contains_luy_borrowed_when_child_higher_entity_type_than_parent(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.root.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(acronym)
+        self.assertTrue(str_expected_borrowed not in node)
 
 
 class TestGetOptionList(TestCase):
