@@ -28,6 +28,7 @@ from django.utils.translation import ugettext as _
 from base.business.education_groups import create
 from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
 from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.hops import Hops
 
@@ -114,8 +115,22 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
         update_object(postponed_egy, dict_new_value)
         # Postpone the m2m [languages / secondary_domains]
         _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
-
+    duplicate_coorganizations_set(old_education_group_year, postponed_egy)
     return postponed_egy
+
+
+def duplicate_coorganizations_set(old_egy, education_group_year):
+    coorganizations = old_egy.educationgrouporganization_set.all()
+    EXCLUDED_FIELDS = ['id', 'external_id', 'education_group_year']
+    for coorganization in coorganizations:
+        dict_new_value = model_to_dict_fk(coorganization, exclude=EXCLUDED_FIELDS)
+        defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
+        postponed_coorganization, created = EducationGroupOrganization.objects.get_or_create(
+            education_group_year=education_group_year,
+            defaults=defaults_values
+        )
+        if not created:
+            update_object(postponed_coorganization, dict_new_value)
 
 
 def _postpone_hops(hops_values, postponed_egy):
