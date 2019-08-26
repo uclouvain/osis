@@ -94,7 +94,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
     def test_header_lines(self):
         expected_headers = [
             [self.education_group_year.acronym, self.education_group_year.title],
-            [_("Official"), '']
+            [_("Official"), None]
         ]
 
         headers = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A1:B2")]

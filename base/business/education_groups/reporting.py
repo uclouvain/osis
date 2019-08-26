@@ -36,8 +36,22 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     workbook = Workbook(encoding='utf-8')
 
-    header = (egy.acronym, egy.title)
+    worksheet_data = {
+        WORKSHEET_TITLE_KEY: _("Formation prerequisites"),
+        HEADER_TITLES_KEY: _build_header(egy),
+        CONTENT_KEY: _build_content(prerequisites_qs),
+    }
 
+    _build_worksheet(worksheet_data, workbook, 0)
+
+    return workbook
+
+
+def _build_header(egy: EducationGroupYear):
+    return (egy.acronym, egy.title)
+
+
+def _build_content(prerequisites_qs: QuerySet):
     content = [(_("Official"),)]
     for prerequisite in prerequisites_qs:
         content.append(
@@ -86,13 +100,4 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
                         last_item.learning_unit.luys[0].complete_title
                     ]
                 )
-
-    worksheet_data = {
-        WORKSHEET_TITLE_KEY: _("Formation prerequisites"),
-        HEADER_TITLES_KEY: header,
-        CONTENT_KEY: content,
-
-    }
-
-    _build_worksheet(worksheet_data, workbook, 0)
-    return workbook
+    return content
