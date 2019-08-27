@@ -31,8 +31,10 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion
+from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion, \
+    get_entity_version_parent_or_itself_from_type, get_structure_of_entity_version
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from base.models.enums.entity_type import SECTOR, FACULTY
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
@@ -84,7 +86,7 @@ class EducationGroupHierarchy:
     @property
     def cache_entity_parent_root(self) -> EntityVersion:
         if self._cache_entity_parent_root is None:
-            self._cache_entity_parent_root = self.root.administration_entity.get_latest_entity_version()
+            self._cache_entity_parent_root = self.root.management_entity.most_recent_entity_version
         return self._cache_entity_parent_root
 
     def _init_cache(self):
@@ -124,19 +126,23 @@ class EducationGroupHierarchy:
             .annotate(is_prerequisite=Exists(is_prerequisite)) \
             .select_related('child_branch__academic_year',
                             'child_branch__education_group_type',
+                            'child_branch__administration_entity',
+                            'child_branch__management_entity',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
                             'child_leaf__learning_container_year__requirement_entity',
                             'child_leaf__learning_container_year__allocation_entity',
                             'child_leaf__proposallearningunit',
                             'parent')\
-            .prefetch_related('child_leaf__learning_container_year__requirement_entity__entityversion_set',
+            .prefetch_related('child_branch__administration_entity__entityversion_set',
+                              'child_branch__management_entity__entityversion_set',
+                              'child_leaf__learning_container_year__requirement_entity__entityversion_set',
                               'child_leaf__learning_container_year__allocation_entity__entityversion_set')\
             .order_by("order", "parent__partial_acronym")
 
     def to_json(self):
         return {
-            'text': self.education_group_year.verbose,
+            'text': self._get_acronym(),
             'icon': self.icon,
             'children': [child.to_json() for child in self.children],
             'a_attr': {
@@ -164,6 +170,16 @@ class EducationGroupHierarchy:
                 ),
             },
         }
+
+    def _get_acronym(self):
+        acronym = ''
+        if self.is_borrowed():
+            acronym += '|E'
+        if acronym != '':
+            acronym += '| {}'.format(self.education_group_year.verbose)
+        else:
+            acronym = self.education_group_year.verbose
+        return acronym
 
     def to_list(self, flat=False, pruning_function=None):
         """ Generate list of group_element_year without reference link
@@ -240,6 +256,37 @@ class EducationGroupHierarchy:
     def get_learning_unit_year_list(self):
         return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
 
+    def is_borrowed(self) -> bool:
+        try:
+            if self.cache_entity_parent_root.entity_type not in [SECTOR, FACULTY]:
+                root = get_entity_version_parent_or_itself_from_type(
+                    self.cache_structure,
+                    self.cache_entity_parent_root.acronym,
+                    FACULTY)
+                if not root:
+                    root = get_entity_version_parent_or_itself_from_type(
+                        self.cache_structure,
+                        self.cache_entity_parent_root.acronym,
+                        SECTOR)
+            else:
+                root = self.cache_entity_parent_root
+            root_entities = get_structure_of_entity_version(self.cache_structure, root.acronym)
+            list_entities_from_root = [e for e in root_entities['all_children']]
+            list_entities_from_root.append(root_entities['entity_version'])
+            if self.education_group_year:
+                # to_compare = self.education_group_year.administration_entity.most_recent_acronym
+                to_compare = self.education_group_year.management_entity.most_recent_acronym
+            else:
+                to_compare = self.learning_unit_year.requirement_entity.most_recent_acronym
+            entities = get_structure_of_entity_version(self.cache_structure, to_compare)
+            list_entities_children_from_self = [e for e in entities['all_children']]
+            list_entities_children_from_self.append(entities['entity_version'])
+            if entities['entity_version'].entity_type != root.entity_type:
+                list_entities_children_from_self.append(entities['entity_version_parent'])
+            return set(list_entities_from_root) & set(list_entities_children_from_self) == set()
+        except AttributeError:
+            return False
+
 
 class NodeLeafJsTree(EducationGroupHierarchy):
     element_type = LEARNING_UNIT_YEAR
@@ -308,8 +355,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         acronym = ''
         if self.learning_unit_year.academic_year != self.root.academic_year:
             acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
-        if self.learning_unit_year.is_borrowed(self.cache_entity_parent_root,
-                                               self.cache_structure):
+        if self.is_borrowed():
             acronym += '|E'
         if self.learning_unit_year.is_service(self.cache_structure):
             acronym += '|S'

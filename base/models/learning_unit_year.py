@@ -38,12 +38,10 @@ from base.business.learning_container_year import get_learning_container_year_wa
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
-from base.models.entity_version import get_entity_version_parent_or_itself_from_type, EntityVersion, \
-    get_structure_of_entity_version
+from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
-from base.models.enums.entity_type import SECTOR, FACULTY
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
@@ -466,32 +464,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
-
-    def is_borrowed(self, entity_version_parent: EntityVersion, cache_structure: dict) -> bool:
-        try:
-            if entity_version_parent.entity_type not in [SECTOR, FACULTY]:
-                root = get_entity_version_parent_or_itself_from_type(
-                    cache_structure,
-                    entity_version_parent.acronym,
-                    FACULTY)
-                if not root:
-                    root = get_entity_version_parent_or_itself_from_type(
-                        cache_structure,
-                        entity_version_parent.acronym,
-                        SECTOR)
-            else:
-                root = entity_version_parent
-            root_entities = get_structure_of_entity_version(cache_structure, root.acronym)
-            list_entities_from_root = [e for e in root_entities['all_children']]
-            list_entities_from_root.append(root_entities['entity_version'])
-            entities = get_structure_of_entity_version(cache_structure, self.requirement_entity.most_recent_acronym)
-            list_entities_children_from_self = [e for e in entities['all_children']]
-            list_entities_children_from_self.append(entities['entity_version'])
-            if entities['entity_version'].entity_type != root.entity_type:
-                list_entities_children_from_self.append(entities['entity_version_parent'])
-            return set(list_entities_from_root) & set(list_entities_children_from_self) == set()
-        except Exception:
-            return False
 
 
 def get_by_id(learning_unit_year_id):
