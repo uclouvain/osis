@@ -128,6 +128,7 @@ class EducationGroupHierarchy:
                             'child_leaf__learning_container_year__requirement_entity',
                             'child_leaf__learning_container_year__allocation_entity',
                             'child_leaf__proposallearningunit',
+                            'child_leaf__externallearningunityear',
                             'parent')\
             .prefetch_related('child_leaf__learning_container_year__requirement_entity__entityversion_set',
                               'child_leaf__learning_container_year__allocation_entity__entityversion_set')\

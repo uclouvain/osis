@@ -37,10 +37,12 @@ from base.models import entity_version
 from base.models.enums import organization_type
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -357,6 +359,30 @@ class TestBuildTree(TestCase):
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
         str_expected_service = '|S| {}'.format(acronym)
         str_expected_not_service = '|S| LTEST0021'
+        self.assertTrue(str_expected_service in node)
+        self.assertTrue(str_expected_not_service not in node)
+
+    @override_switch('luy_show_service_classes', active=True)
+    def test_contains_luy_service_mobility(self):
+        acronym = 'XTEST0022'
+        eluy = ExternalLearningUnitYearFactory(learning_unit_year__acronym=acronym,
+                                               learning_unit_year__academic_year=self.academic_year,
+                                               mobility=True,
+                                               co_graduation=False,
+                                               learning_unit_year__learning_container_year__requirement_entity=
+                                               self.MATH.entity,
+                                               learning_unit_year__learning_container_year__allocation_entity=
+                                               self.URBA.entity)
+        luy = LearningUnitYear.objects.get(externallearningunityear=eluy)
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=luy
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_service = '{}'.format(acronym)
+        str_expected_not_service = '|S| {}'.format(acronym)
         self.assertTrue(str_expected_service in node)
         self.assertTrue(str_expected_not_service not in node)
 
