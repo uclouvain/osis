@@ -32,6 +32,7 @@ from base.business.xls import get_name_or_username, convert_boolean
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
+from base.models.enums.education_group_types import TrainingType
 from base.models.mandate import Mandate
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.person import Person
@@ -403,3 +404,11 @@ def names(representatives):
 def qualification(signatories):
     return ', '.join(sorted(signatory.mandate.qualification for signatory in signatories
                             if signatory.mandate.qualification))
+
+
+def show_coorganization(education_group_year):
+    return education_group_year.education_group_type.category == "TRAINING" and \
+           education_group_year.education_group_type.name not in [
+               TrainingType.PGRM_MASTER_120.name,
+               TrainingType.PGRM_MASTER_180_240.name
+           ]
