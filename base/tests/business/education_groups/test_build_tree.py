@@ -30,6 +30,7 @@ from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from waffle.testutils import override_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models import entity_version
@@ -380,6 +381,7 @@ class TestBuildTree(TestCase):
         self.assertTrue(str_expected_service in node)
         self.assertTrue(str_expected_not_service not in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
     def test_contains_luy_borrowed(self):
         acronym = 'LTEST0022'
         acronym2 = 'LTEST0022'
@@ -405,6 +407,7 @@ class TestBuildTree(TestCase):
         self.assertTrue(str_expected_borrowed2 in node)
         self.assertTrue(str_expected_not_borrowed not in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
     def test_contains_luy_borrowed_without_entity(self):
         acronym = 'LTEST0022'
         GroupElementYearFactory(
@@ -418,6 +421,7 @@ class TestBuildTree(TestCase):
         self.assertTrue(acronym in node)
         self.assertTrue(str_expected_not_borrowed not in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
     def test_contains_luy_borrowed_school(self):
         acronym = 'LTEST0022'
         my_parent = EducationGroupYearFactory(acronym='LTEST0020',
@@ -435,6 +439,7 @@ class TestBuildTree(TestCase):
         str_expected_borrowed = '|E| LTEST0022'
         self.assertTrue(str_expected_borrowed in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
     def test_contains_luy_borrowed_school_without_fac(self):
         acronym = 'LTEST0022'
         my_parent = EducationGroupYearFactory(acronym='LTEST0020',
@@ -452,6 +457,7 @@ class TestBuildTree(TestCase):
         str_expected_borrowed = '|E| LTEST0022'
         self.assertFalse(str_expected_borrowed in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
     def test_contains_luy_borrowed_when_child_higher_entity_type_than_parent(self):
         acronym = 'LTEST0022'
         GroupElementYearFactory(
