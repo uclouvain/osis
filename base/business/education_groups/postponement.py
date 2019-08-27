@@ -134,6 +134,7 @@ def duplicate_set(old_egy, education_group_year, initial_dicts=None):
 def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, egy_set_name):
     ids = []
     egy_set = getattr(old_egy, egy_set_name).all()
+    initial_sets = initial_dicts.get(egy_set_name, {})
     for item_set in egy_set:
         dict_new_values = model_to_dict_fk(item_set, exclude=FIELD_TO_EXCLUDE_IN_SET)
         defaults_values = {x: v for x, v in dict_new_values.items() if not isinstance(v, list)}
@@ -145,7 +146,7 @@ def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_
         ids.append(postponed_item.id)
 
         if not created:
-            initial_set = initial_dicts.get(egy_set_name, None)
+            initial_set = initial_sets.get(egy_set_name, {})
             _check_differences_and_update(dict_new_values, initial_set, postponed_item)
 
     EducationGroupOrganization.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()
