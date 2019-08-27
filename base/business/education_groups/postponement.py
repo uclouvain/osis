@@ -39,9 +39,9 @@ FIELD_TO_EXCLUDE_IN_SET = ['id', 'external_id', 'education_group_year']
 
 
 class ConsistencyError(Error):
-    def __init__(self, last_instance_updated, differences, model, *args, **kwargs):
-        self.model = model
-        self.last_instance_updated = last_instance_updated
+    def __init__(self, data, differences, *args, **kwargs):
+        self.model = data['model']
+        self.last_instance_updated = data['last_instance_updated']
         self.differences = differences
         super().__init__(*args, **kwargs)
 
@@ -88,7 +88,7 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
 
 
 def duplicate_education_group_year(
-        old_education_group_year, new_academic_year, dict_initial_egy=None, hops_values=None, initial_sets_dict=None):
+        old_education_group_year, new_academic_year, initial_dicts=None, hops_values=None):
     dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
@@ -108,16 +108,19 @@ def duplicate_education_group_year(
     # During the update, we need to check if the postponed object has been modify
     else:
         dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=FIELD_TO_EXCLUDE)
-        differences = compare_objects(dict_initial_egy, dict_postponed_egy) \
-            if dict_initial_egy and dict_postponed_egy else {}
+        differences = compare_objects(initial_dicts['dict_initial_egy'], dict_postponed_egy) \
+            if initial_dicts['dict_initial_egy'] and dict_postponed_egy else {}
 
         if differences:
-            raise ConsistencyError(postponed_egy, differences, EducationGroupYear)
+            raise ConsistencyError(
+                {'model': EducationGroupYear, 'last_instance_updated': postponed_egy},
+                differences
+            )
 
         update_object(postponed_egy, dict_new_value)
         # Postpone the m2m [languages / secondary_domains]
         _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
-    duplicate_set(old_education_group_year, postponed_egy, initial_sets_dict)
+    duplicate_set(old_education_group_year, postponed_egy, initial_dicts['initial_sets_dict'])
     return postponed_egy
 
 
@@ -142,17 +145,22 @@ def _update_and_check_consistency_of_set(education_group_year, egy_set, initial_
         ids.append(postponed_item.id)
 
         if not created:
-            dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
-            initial_item = initial_set.get(dict_postponed_item['organization_id'], None)
-            differences = compare_objects(initial_item, dict_postponed_item) \
-                if initial_item and dict_postponed_item else {}
-
-            if differences:
-                raise ConsistencyError(postponed_item, differences, EducationGroupOrganization)
-
-            update_object(postponed_item, dict_new_values)
+            _check_differences_and_update(dict_new_values, initial_set, postponed_item)
 
     EducationGroupOrganization.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()
+
+
+def _check_differences_and_update(dict_new_values, initial_set, postponed_item):
+    dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
+    initial_item = initial_set.get(dict_postponed_item['organization_id'], None)
+    differences = compare_objects(initial_item, dict_postponed_item) \
+        if initial_item and dict_postponed_item else {}
+    if differences:
+        raise ConsistencyError(
+            {'model': EducationGroupOrganization, 'last_instance_updated': postponed_item},
+            differences
+        )
+    update_object(postponed_item, dict_new_values)
 
 
 def _postpone_hops(hops_values, postponed_egy):
@@ -210,15 +218,14 @@ class PostponementEducationGroupYearMixin:
                     postponed_egy = duplicate_education_group_year(
                         education_group_year,
                         academic_year,
-                        self.dict_initial_egy,
+                        {'dict_initial_egy': self.dict_initial_egy},
                     )
                 else:
                     postponed_egy = duplicate_education_group_year(
                         education_group_year,
                         academic_year,
-                        self.dict_initial_egy,
+                        {'dict_initial_egy': self.dict_initial_egy, 'initial_sets_dict': self.initial_dicts},
                         self.hops_form.data,
-                        self.initial_dicts,
                     )
                 self.education_group_year_postponed.append(postponed_egy)
 
