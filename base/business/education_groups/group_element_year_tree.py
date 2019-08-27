@@ -52,7 +52,8 @@ class EducationGroupHierarchy:
     _cache_entity_parent_root = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None, tab_to_show: str = None, cache_structure=None,
+                 cache_hierarchy: dict = None, tab_to_show: str = None, pdf_content: bool = False,
+                 cache_structure=None,
                  cache_entity_parent_root: str = None):
 
         self.children = []
@@ -66,7 +67,12 @@ class EducationGroupHierarchy:
         self._cache_structure = cache_structure
         self._cache_entity_parent_root = cache_entity_parent_root
         self.tab_to_show = tab_to_show
-        self.generate_children()
+        self.pdf_content = pdf_content
+
+        if not self.pdf_content or \
+                (not (self.group_element_year and
+                      self.group_element_year.child.type == GroupType.MINOR_LIST_CHOICE.name)):
+            self.generate_children()
 
         self.modification_perm = ModificationPermission(self.root, self.group_element_year)
         self.attach_perm = AttachPermission(self.root, self.group_element_year)
@@ -96,8 +102,11 @@ class EducationGroupHierarchy:
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                               tab_to_show=self.tab_to_show, cache_structure=self.cache_structure,
+                node = EducationGroupHierarchy(self.root, group_element_year,
+                                               cache_hierarchy=self.cache_hierarchy,
+                                               tab_to_show=self.tab_to_show,
+                                               pdf_content=self.pdf_content,
+                                               cache_structure=self.cache_structure,
                                                cache_entity_parent_root=self.cache_entity_parent_root)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
@@ -357,7 +366,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
             acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
         if switch_is_active('luy_show_borrowed_classes') and self.is_borrowed():
             acronym += '|E'
-        if self.learning_unit_year.is_service(self.cache_structure):
+        if switch_is_active('luy_show_service_classes') and self.learning_unit_year.is_service(self.cache_structure):
             acronym += '|S'
         if acronym != '':
             acronym += '| {}'.format(self.learning_unit_year.acronym)
