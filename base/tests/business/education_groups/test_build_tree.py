@@ -30,6 +30,7 @@ from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from waffle.testutils import override_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models import entity_version
@@ -342,6 +343,7 @@ class TestBuildTree(TestCase):
 
         self.assertCountEqual(list_children, [self.group_element_year_2])
 
+    @override_switch('luy_show_service_classes', active=True)
     def test_contains_luy_service(self):
         acronym = 'LTEST0022'
         GroupElementYearFactory(
