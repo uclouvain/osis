@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 from abc import ABC, abstractmethod
+from collections import namedtuple
 
 from django.db.models import QuerySet, Prefetch
 from django.utils.translation import gettext as _
@@ -42,7 +43,6 @@ from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
 
-
 XLS_FILENAME = "Formation prerequisites"
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
@@ -54,6 +54,11 @@ STYLE_BORDER_BOTTOM = Style(
 STYLE_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('D1D1D1')))
 STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1E1E1')))
 STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
+
+HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
+OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
+LearningUnitYearLine = namedtuple('LearningUnitYearLine', ['luy_acronym', 'luy_title'])
+PrerequisiteLine = namedtuple('PrerequisiteLine', ['text', 'operator', 'luy_acronym', 'luy_title'])
 
 
 class QuerysetToExcel(ABC):
@@ -104,10 +109,13 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel(QuerysetToExcel):
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     workbook = Workbook(encoding='utf-8')
 
+    excel_lines = _build_excel_lines(egy, prerequisites_qs)
+    header, *content = [tuple(line) for line in excel_lines]
+
     worksheet_data = {
         WORKSHEET_TITLE_KEY: _(XLS_FILENAME),
-        HEADER_TITLES_KEY: _build_header(egy),
-        CONTENT_KEY: _build_content(prerequisites_qs),
+        HEADER_TITLES_KEY: header,
+        CONTENT_KEY: content,
         STYLED_CELLS: _style_cells(prerequisites_qs)
     }
 
@@ -119,68 +127,54 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     return workbook
 
 
-def _build_header(egy: EducationGroupYear):
-    return (egy.acronym, egy.title)
-
-
-def _build_content(prerequisites_qs: QuerySet):
-    content = [(_("Official"),)]
-    for prerequisite in prerequisites_qs:
-        content.append(
-            (prerequisite.learning_unit_year.acronym, prerequisite.learning_unit_year.complete_title)
-        )
-        content.extend(
-            _build_item_rows(prerequisite)
-        )
-    return content
-
-
-def _build_item_rows(prerequisite):
+def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
     content = []
-    groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
-    for key, group_gen in groups_generator:
-        group = list(group_gen)
-        if len(group) == 1:
-            prerequisite_item = group[0]
-            content.append(
-                [
-                    (_("has as prerequisite") + " :") if prerequisite_item.group_number == 1 else None,
-                    _(prerequisite.main_operator) if prerequisite_item.group_number != 1 else None,
-                    prerequisite_item.learning_unit.luys[0].acronym,
-                    prerequisite_item.learning_unit.luys[0].complete_title
-                ]
-            )
-        else:
-            first_item = group[0]
-            content.append(
-                [
-                    (_("has as prerequisite") + ":") if first_item.group_number == 1 else None,
-                    _(prerequisite.main_operator) if first_item.group_number != 1 else None,
-                    "(" + first_item.learning_unit.luys[0].acronym,
-                    first_item.learning_unit.luys[0].complete_title
-                ]
-            )
+    content.append(
+        HeaderLine(egy_acronym=egy.acronym, egy_title=egy.title)
+    )
+    content.append(
+        OfficialTextLine(text=_("Official"))
+    )
 
-            for item in group[1:-1]:
+    for prerequisite in prerequisite_qs:
+        luy = prerequisite.learning_unit_year
+        content.append(
+            LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title)
+        )
+
+        groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
+        for key, group_gen in groups_generator:
+            group = list(group_gen)
+            for item in group:
+                text = (_("has as prerequisite") + " :") if item.group_number == 1 and item.position == 1 else None
+                operator = _get_operator(prerequisite, item)
+                luy_acronym = _get_item_acronym(item, group)
                 content.append(
-                    [
-                        None,
-                        _(prerequisite.secondary_operator),
-                        item.learning_unit.luys[0].acronym,
-                        item.learning_unit.luys[0].complete_title
-                    ]
+                    PrerequisiteLine(
+                        text=text,
+                        operator=operator,
+                        luy_acronym=luy_acronym,
+                        luy_title=item.learning_unit.luys[0].complete_title
+                    )
                 )
-
-            last_item = group[-1]
-            content.append(
-                [
-                    None,
-                    _(prerequisite.secondary_operator),
-                    last_item.learning_unit.luys[0].acronym + ")",
-                    last_item.learning_unit.luys[0].complete_title
-                ]
-            )
     return content
+
+
+def _get_operator(prerequisite: Prerequisite, prerequisite_item: PrerequisiteItem):
+    if prerequisite_item.group_number == 1 and prerequisite_item.position == 1:
+        return None
+    elif prerequisite_item.position == 1:
+        return _(prerequisite.main_operator)
+    return _(prerequisite.secondary_operator)
+
+
+def _get_item_acronym(prerequisite_item: PrerequisiteItem, group: list):
+    acronym_format = "{acronym}"
+    if prerequisite_item.position == 1 and len(group) > 1:
+        acronym_format = "({acronym}"
+    elif prerequisite_item.position == len(group) and len(group) > 1:
+        acronym_format = "{acronym})"
+    return acronym_format.format(acronym=prerequisite_item.learning_unit.luys[0].acronym)
 
 
 def _style_cells(prerequisites_qs: QuerySet):
