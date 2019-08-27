@@ -25,6 +25,7 @@ from django import forms
 from django.db import Error
 from django.utils.translation import ugettext as _
 
+from base.business import education_group
 from base.business.education_groups import create
 from base.business.utils.model import model_to_dict_fk, compare_objects, update_object
 from base.models.academic_year import AcademicYear, starting_academic_year
@@ -87,8 +88,7 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
         _postpone_hops(hops_values, postponed_egy)
 
 
-def duplicate_education_group_year(
-        old_education_group_year, new_academic_year, initial_dicts=None, hops_values=None):
+def duplicate_education_group_year(old_education_group_year, new_academic_year, initial_dicts=None, hops_values=None):
     dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
@@ -120,20 +120,20 @@ def duplicate_education_group_year(
         update_object(postponed_egy, dict_new_value)
         # Postpone the m2m [languages / secondary_domains]
         _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
-    duplicate_set(old_education_group_year, postponed_egy, initial_dicts.get('initial_sets_dict', {}))
+    if education_group.show_coorganization(old_education_group_year):
+        duplicate_set(old_education_group_year, postponed_egy, initial_dicts)
     return postponed_egy
 
 
-def duplicate_set(old_egy, education_group_year, initial_sets_dict=None):
+def duplicate_set(old_egy, education_group_year, initial_dicts=None):
     sets_to_duplicate = ['educationgrouporganization_set']
-    for set in sets_to_duplicate:
-        egy_set = getattr(old_egy, set).all()
-        initial_set = initial_sets_dict.get(set, None)
-        _update_and_check_consistency_of_set(education_group_year, egy_set, initial_set)
+    for egy_set_name in sets_to_duplicate:
+        _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, egy_set_name)
 
 
-def _update_and_check_consistency_of_set(education_group_year, egy_set, initial_set):
+def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, egy_set_name):
     ids = []
+    egy_set = getattr(old_egy, egy_set_name).all()
     for item_set in egy_set:
         dict_new_values = model_to_dict_fk(item_set, exclude=FIELD_TO_EXCLUDE_IN_SET)
         defaults_values = {x: v for x, v in dict_new_values.items() if not isinstance(v, list)}
@@ -145,6 +145,7 @@ def _update_and_check_consistency_of_set(education_group_year, egy_set, initial_
         ids.append(postponed_item.id)
 
         if not created:
+            initial_set = initial_dicts.get(egy_set_name, None)
             _check_differences_and_update(dict_new_values, initial_set, postponed_item)
 
     EducationGroupOrganization.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()
