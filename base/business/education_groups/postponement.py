@@ -140,9 +140,9 @@ def _update_and_check_consistency_of_set(education_group_year, egy_set, initial_
             defaults=defaults_values
         )
         ids.append(postponed_item.id)
-        dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
 
         if not created:
+            dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
             initial_item = initial_set.get(dict_postponed_item['organization_id'], None)
             differences = compare_objects(initial_item, dict_postponed_item) \
                 if initial_item and dict_postponed_item else {}
@@ -187,7 +187,7 @@ class PostponementEducationGroupYearMixin:
             self.dict_initial_egy = model_to_dict_fk(
                 self.forms[forms.ModelForm].instance, exclude=self.field_to_exclude
             )
-            self.initial_dicts['coorganizations'] = {
+            self.initial_dicts['educationgrouporganization_set'] = {
                 coorganization.organization.id: model_to_dict_fk(coorganization, exclude=FIELD_TO_EXCLUDE_IN_SET)
                 for coorganization in self.forms[forms.ModelForm].instance.coorganizations
             }
