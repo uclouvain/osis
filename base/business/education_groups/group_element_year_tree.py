@@ -27,6 +27,7 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
+from waffle import switch_is_active
 
 from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
@@ -297,7 +298,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         acronym = ''
         if self.learning_unit_year.academic_year != self.root.academic_year:
             acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
-        if self.learning_unit_year.is_service(self.cache_structure):
+        if switch_is_active('luy_show_service_classes') and self.learning_unit_year.is_service(self.cache_structure):
             acronym += '|S'
         if acronym != '':
             acronym += '| {}'.format(self.learning_unit_year.acronym)
