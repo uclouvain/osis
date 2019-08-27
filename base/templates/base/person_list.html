@@ -72,22 +72,21 @@
                             </td>
                             <td>
                                 <div id="div_personentity_set_{{ object.id }}"
-                                     class="show_collapse row">
+                                     class="show_collapse">
                                     <div class="collapse"
                                          id="personentity_set_{{ object.id }}"
                                          aria-expanded="false">
-                                        <div class="col-md-1">
-                                            {% if object.personentity_set.all and object.personentity_set.all|length > 1 %}
-                                                <a role="button"
-                                                   class="collapsed a_show_collapse"
-                                                   data-toggle="collapse"
-                                                   href="#personentity_set_{{ object.id }}"
-                                                   aria-expanded="false"
-                                                   aria-controls="personentity_set_{{ object.id }}">
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                        <ul class="col-md-6">
+
+                                        {% if object.personentity_set.all and object.personentity_set.all|length > 1 %}
+                                            <a role="button"
+                                               class="collapsed "
+                                               data-toggle="collapse"
+                                               href="#personentity_set_{{ object.id }}"
+                                               aria-expanded="false"
+                                               aria-controls="personentity_set_{{ object.id }}">
+                                            </a>
+                                        {% endif %}
+                                        <ul>
                                             {% for entity in object.personentity_set.all %}
                                                 <li>{{ entity.entity_recent_acronym }}</li>
                                             {% endfor %}
@@ -106,22 +105,21 @@
                             {% endif %}
                             <td>
                                 <div id="div_programmanager_set_{{ object.id }}"
-                                     class="show_collapse row">
+                                     class="show_collapse ">
                                     <div class="collapse"
                                          id="programmanager_set_{{ object.id }}"
                                          aria-expanded="false">
-                                        <div class="col-md-1">
-                                            {% if object.programmanager_set.all and object.programmanager_set.all|length > 1 %}
-                                                <a role="button"
-                                                   class="collapsed a_show_collapse"
-                                                   data-toggle="collapse"
-                                                   href="#programmanager_set_{{ object.id }}"
-                                                   aria-expanded="false"
-                                                   aria-controls="programmanager_set_{{ object.id }}">
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                        <ul class="col-md-11">
+
+                                        {% if object.programmanager_set.all and object.programmanager_set.all|length > 1 %}
+                                            <a role="button"
+                                               class="collapsed"
+                                               data-toggle="collapse"
+                                               href="#programmanager_set_{{ object.id }}"
+                                               aria-expanded="false"
+                                               aria-controls="programmanager_set_{{ object.id }}">
+                                            </a>
+                                        {% endif %}
+                                        <ul>
                                             {% for ed in object.programmanager_set.all %}
                                                 <li>{{ ed.most_recent_acronym }}</li>
                                             {% endfor %}
