@@ -29,7 +29,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import duplicate_education_group_year
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from base.business.group_element_years import attach
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.authorized_relationship import AuthorizedRelationship
@@ -377,7 +377,7 @@ class PostponeContent:
     def _check_options(self):
         missing_options = {}
         for finality in self.postponed_finalities:
-            missing_options[finality] = list(itertools.chain.from_iterable(AttachEducationGroupYearStrategy(
+            missing_options[finality] = list(itertools.chain.from_iterable(attach.AttachEducationGroupYearStrategy(
                 finality.parent, finality.child_branch
             )._get_missing_options().values()))
 
