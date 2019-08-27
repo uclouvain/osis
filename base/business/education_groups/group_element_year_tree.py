@@ -275,7 +275,6 @@ class EducationGroupHierarchy:
             list_entities_from_root = [e for e in root_entities['all_children']]
             list_entities_from_root.append(root_entities['entity_version'])
             if self.education_group_year:
-                # to_compare = self.education_group_year.administration_entity.most_recent_acronym
                 to_compare = self.education_group_year.management_entity.most_recent_acronym
             else:
                 to_compare = self.learning_unit_year.requirement_entity.most_recent_acronym
