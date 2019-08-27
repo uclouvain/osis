@@ -36,10 +36,11 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _get_col_letter, _add_training_data, \
+    _get_colored_rows, _get_attribution_line, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
+from base.business.xls import _get_col_letter
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type

@@ -30,7 +30,6 @@ from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
-from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
@@ -288,7 +287,7 @@ def _get_data_part2(learning_unit_yr, with_attributions):
                  for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
                     learning_unit_yr
                 ).values()
-                 ]
+                ]
             )
         )
 
