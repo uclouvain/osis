@@ -24,19 +24,26 @@
 #
 ##############################################################################
 import itertools
+from abc import ABC, abstractmethod
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Prefetch
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
 from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED
+from openpyxl.writer.excel import save_virtual_workbook
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import AND, OR
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.prerequisite import Prerequisite
+from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
 
+
+XLS_FILENAME = "Formation prerequisites"
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
         bottom=Side(
@@ -49,11 +56,56 @@ STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1
 STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
 
 
+class QuerysetToExcel(ABC):
+    @abstractmethod
+    def get_queryset(self):
+        pass
+
+    @abstractmethod
+    def to_excel(self):
+        pass
+
+
+class EducationGroupYearLearningUnitsPrerequisitesToExcel(QuerysetToExcel):
+    def __init__(self, egy: EducationGroupYear):
+        self.egy = egy
+
+    def get_queryset(self):
+        return Prerequisite.objects.filter(
+            education_group_year=self.egy
+        ).prefetch_related(
+            Prefetch(
+                "prerequisiteitem_set",
+                queryset=PrerequisiteItem.objects.order_by(
+                    'group_number',
+                    'position'
+                ).select_related(
+                    "learning_unit"
+                ).prefetch_related(
+                    Prefetch(
+                        "learning_unit__learningunityear_set",
+                        queryset=LearningUnitYear.objects.filter(academic_year=self.egy.academic_year),
+                        to_attr="luys"
+                    )
+                ),
+                to_attr="items"
+            )
+        ).select_related(
+            "learning_unit_year"
+        )
+
+    def _to_workbook(self):
+        return generate_prerequisites_workbook(self.egy, self.get_queryset())
+
+    def to_excel(self):
+        return save_virtual_workbook(self._to_workbook())
+
+
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     workbook = Workbook(encoding='utf-8')
 
     worksheet_data = {
-        WORKSHEET_TITLE_KEY: _("Formation prerequisites"),
+        WORKSHEET_TITLE_KEY: _(XLS_FILENAME),
         HEADER_TITLES_KEY: _build_header(egy),
         CONTENT_KEY: _build_content(prerequisites_qs),
         STYLED_CELLS: _style_cells(prerequisites_qs)
