@@ -1476,7 +1476,7 @@ msgid "Last modifications"
 msgstr "Dernières modifications"
 
 msgid "Last year of organization"
-msgstr "Dernière année d'organisations"
+msgstr "Dernière année d'organisation"
 
 msgid "Lastname"
 msgstr "Nom"
