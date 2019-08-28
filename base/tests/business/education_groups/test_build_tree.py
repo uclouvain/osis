@@ -409,25 +409,29 @@ class TestBuildTree(TestCase):
         self.assertTrue(str_expected_service in node)
         self.assertTrue(str_expected_not_service not in node)
 
+    @override_switch('luy_show_service_classes', active=True)
     @override_switch('luy_show_borrowed_classes', active=True)
     def test_contains_luy_borrowed(self):
         acronym = 'LTEST0022'
-        acronym2 = 'LTEST0022'
+        acronym2 = 'LTEST0023'
         GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
             child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               academic_year=self.academic_year,
                                                learning_container_year__requirement_entity=self.BARC.entity)
         )
         GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
             child_leaf=LearningUnitYearFactory(acronym=acronym2,
+                                               academic_year=self.academic_year,
                                                learning_container_year__requirement_entity=self.BARC.entity,
                                                learning_container_year__allocation_entity=self.MATH.entity)
         )
 
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        print(node)
         str_expected_borrowed = '|E| {}'.format(acronym)
         str_expected_borrowed2 = '|E|S| {}'.format(acronym2)
         str_expected_not_borrowed = '|E| LTEST0021'
