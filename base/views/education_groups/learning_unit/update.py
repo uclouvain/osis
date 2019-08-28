@@ -25,6 +25,7 @@
 ##############################################################################
 import json
 
+from django.contrib.admin.utils import flatten
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
@@ -41,8 +42,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.prerequisite import Prerequisite
-from base.views.mixins import RulesRequiredMixin
 from base.views.education_groups import perms
+from base.views.mixins import RulesRequiredMixin
 
 
 @method_decorator(login_required, name='dispatch')
@@ -98,13 +99,24 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        education_group_year_root_id = context["root_id"]
+        education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
 
-        formations_id = group_element_year.find_learning_unit_formations([learning_unit_year]).\
-            get(learning_unit_year.id, [])
+        formations = group_element_year.find_learning_unit_formations(
+            [learning_unit_year],
+            parents_as_instances=True,
+            with_parents_of_parents=True
+        )
 
-        if int(education_group_year_root_id) not in formations_id:
-            raise PermissionDenied("The learning unit has to be part of the training or mini-training.")
+        formations_set = set(flatten([parents for child_id, parents in formations.items()]))
+
+        if education_group_year_root not in formations_set:
+            raise PermissionDenied(
+                _("You must be in the context of a training to modify the prerequisites to a learning unit "
+                    "(current context: %(partial_acronym)s - %(acronym)s)") % {
+                        'acronym': education_group_year_root.acronym,
+                        'partial_acronym': education_group_year_root.partial_acronym
+                    }
+            )
 
         return context
 
