@@ -27,7 +27,7 @@ from django.db.models import Prefetch
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.reporting import generate_prerequisites_workbook
+from base.business.education_groups.excel import generate_prerequisites_workbook
 from base.models.enums.prerequisite_operator import AND, OR
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite

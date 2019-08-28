@@ -35,7 +35,6 @@ from openpyxl.styles.colors import RED
 from openpyxl.writer.excel import save_virtual_workbook
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.prerequisite_operator import AND, OR
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -101,8 +100,8 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     workbook = Workbook(encoding='utf-8')
 
     excel_lines = _build_excel_lines(egy, prerequisites_qs)
-    header, *content = [tuple(line) for line in excel_lines]
 
+    header, *content = [tuple(line) for line in excel_lines]
     style = _get_style_to_apply(excel_lines)
 
     worksheet_data = {
@@ -111,7 +110,6 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
         CONTENT_KEY: content,
         STYLED_CELLS: style
     }
-
     _build_worksheet(worksheet_data, workbook, 0)
 
     _merge_cells(excel_lines, workbook)
@@ -203,7 +201,7 @@ def _get_style_to_apply(excel_lines: list):
     return style_to_apply_dict
 
 
-def _merge_cells(excel_lines, workbook):
+def _merge_cells(excel_lines, workbook: Workbook):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, LearningUnitYearLine):

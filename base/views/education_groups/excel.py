@@ -23,27 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory
+from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, XLS_FILENAME
+from base.models.education_group_year import EducationGroupYear
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
-class TestGetLearningUnitPrerequisitesExcel(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.person = PersonFactory()
-        cls.education_group_year = EducationGroupYearFactory()
-
-        cls.url = reverse("prerequisites_reporting", args=[cls.education_group_year.pk])
-
-    def setUp(self):
-        self.client.force_login(self.person.user)
-
-    def test_return_excel_file(self):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)
+@login_required
+def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
+    excel = EducationGroupYearLearningUnitsPrerequisitesToExcel(education_group_year).to_excel()
+    response = HttpResponse(excel, content_type=CONTENT_TYPE_XLS)
+    filename = "{workbook_name}.xlsx".format(workbook_name=str(_(XLS_FILENAME)).replace(" ", "_"))
+    response['Content-Disposition'] = "%s%s" % ("attachment; filename=", filename)
+    return response
