@@ -431,7 +431,6 @@ class TestBuildTree(TestCase):
         )
 
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
-        print(node)
         str_expected_borrowed = '|E| {}'.format(acronym)
         str_expected_borrowed2 = '|E|S| {}'.format(acronym2)
         str_expected_not_borrowed = '|E| LTEST0021'
