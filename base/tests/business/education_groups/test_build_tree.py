@@ -66,27 +66,32 @@ class TestBuildTree(TestCase):
 
         self.parent = EducationGroupYearFactory(acronym='LTEST0000',
                                                 academic_year=self.academic_year,
-                                                management_entity=self.SC.entity)
+                                                management_entity=self.SC.entity,
+                                                administration_entity=self.SC.entity)
         self.group_element_year_1 = GroupElementYearFactory(
             parent=self.parent,
             child_branch=EducationGroupYearFactory(acronym='LTEST0010',
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.SC.entity)
+                                                   management_entity=self.SC.entity,
+                                                   administration_entity=self.SC.entity)
         )
         self.group_element_year_1_1 = GroupElementYearFactory(
             parent=self.group_element_year_1.child_branch,
             child_branch=EducationGroupYearFactory(acronym='LTEST0011',
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.SC.entity)
+                                                   management_entity=self.SC.entity,
+                                                   administration_entity=self.SC.entity)
         )
         self.group_element_year_2 = GroupElementYearFactory(
             parent=self.parent,
             child_branch=EducationGroupYearFactory(acronym='LTEST0020',
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.MATH.entity)
+                                                   management_entity=self.MATH.entity,
+                                                   administration_entity=self.MATH.entity)
         )
         self.learning_unit_year_1 = LearningUnitYearFactory(
             acronym='LTEST0021',
+            academic_year=self.academic_year,
             learning_container_year__requirement_entity=self.MATH.entity)
         self.group_element_year_2_1 = GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
@@ -163,6 +168,24 @@ class TestBuildTree(TestCase):
             start_date=start_date,
             end_date=end_date
         )
+        self.EDDY = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="EDDY",
+            title="EDDY",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.URBA.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.E2DY = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="E2DY",
+            title="E2DY",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.root.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
 
     def test_init_tree(self):
         node = EducationGroupHierarchy(self.parent)
@@ -201,7 +224,7 @@ class TestBuildTree(TestCase):
             {'name': 'with tab',
              'node': EducationGroupHierarchy(self.parent, tab_to_show='show_identification'),
              'correct_url': reverse('education_group_read', args=[self.parent.pk, self.parent.pk]) +
-             "?group_to_parent=0&tab_to_show=show_identification"},
+                "?group_to_parent=0&tab_to_show=show_identification"},
             {'name': 'without tab',
              'node': EducationGroupHierarchy(self.parent),
              'correct_url': reverse('education_group_read',
@@ -385,6 +408,183 @@ class TestBuildTree(TestCase):
         str_expected_not_service = '|S| {}'.format(acronym)
         self.assertTrue(str_expected_service in node)
         self.assertTrue(str_expected_not_service not in node)
+
+    @override_switch('luy_show_service_classes', active=True)
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed(self):
+        acronym = 'LTEST0022'
+        acronym2 = 'LTEST0023'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               academic_year=self.academic_year,
+                                               learning_container_year__requirement_entity=self.BARC.entity)
+        )
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym2,
+                                               academic_year=self.academic_year,
+                                               learning_container_year__requirement_entity=self.BARC.entity,
+                                               learning_container_year__allocation_entity=self.MATH.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(acronym)
+        str_expected_borrowed2 = '|E|S| {}'.format(acronym2)
+        str_expected_not_borrowed = '|E| LTEST0021'
+        self.assertTrue(str_expected_borrowed in node)
+        self.assertTrue(str_expected_borrowed2 in node)
+        self.assertTrue(str_expected_not_borrowed not in node)
+
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed_without_entity(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_not_borrowed = '|E| LTEST0022'
+        self.assertTrue(acronym in node)
+        self.assertTrue(str_expected_not_borrowed not in node)
+
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed_school(self):
+        acronym = 'LTEST0022'
+        my_parent = EducationGroupYearFactory(acronym='LTEST0020',
+                                              academic_year=self.academic_year,
+                                              management_entity=self.EDDY.entity,
+                                              administration_entity=self.EDDY.entity)
+        GroupElementYearFactory(
+            parent=my_parent,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.MATH.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(my_parent).to_json())
+        str_expected_borrowed = '|E| LTEST0022'
+        self.assertTrue(str_expected_borrowed in node)
+
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed_school_without_fac(self):
+        acronym = 'LTEST0022'
+        my_parent = EducationGroupYearFactory(acronym='LTEST0020',
+                                              academic_year=self.academic_year,
+                                              management_entity=self.E2DY.entity,
+                                              administration_entity=self.E2DY.entity)
+        GroupElementYearFactory(
+            parent=my_parent,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.MATH.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(my_parent).to_json())
+        str_expected_borrowed = '|E| LTEST0022'
+        self.assertFalse(str_expected_borrowed in node)
+
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed_when_child_higher_entity_type_than_parent(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.root.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(acronym)
+        self.assertTrue(str_expected_borrowed not in node)
+
+    @override_switch('egy_show_borrowed_classes', active=True)
+    def test_contains_egy_borrowed(self):
+        acronym = 'LTEST0022'
+        group = GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=EducationGroupYearFactory(acronym=acronym,
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.URBA.entity, ),
+            child_leaf=None
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(group.child_branch.verbose)
+        self.assertTrue(str_expected_borrowed in node)
+
+    @override_switch('egy_show_borrowed_classes', active=True)
+    def test_contains_egy_borrowed_without_entity(self):
+        acronym = 'LTEST0022'
+        group = GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=EducationGroupYearFactory(acronym=acronym,
+                                                   academic_year=self.academic_year,
+                                                   management_entity=None),
+            child_leaf=None
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_not_borrowed = '|E| {}'.format(group.child_branch.verbose)
+        self.assertTrue(group.child_branch.verbose in node)
+        self.assertTrue(str_expected_not_borrowed not in node)
+
+    @override_switch('egy_show_borrowed_classes', active=True)
+    def test_contains_egy_borrowed_school(self):
+        acronym = 'LTEST0022'
+        my_parent = EducationGroupYearFactory(acronym='LTEST0020',
+                                              academic_year=self.academic_year,
+                                              management_entity=self.EDDY.entity,
+                                              administration_entity=self.EDDY.entity)
+        group = GroupElementYearFactory(
+            parent=my_parent,
+            child_branch=EducationGroupYearFactory(acronym=acronym,
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.PHYS.entity, ),
+            child_leaf=None
+        )
+
+        node = json.dumps(EducationGroupHierarchy(my_parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(group.child_branch.verbose)
+        self.assertTrue(str_expected_borrowed in node)
+
+    @override_switch('egy_show_borrowed_classes', active=True)
+    def test_contains_egy_borrowed_school_without_fac(self):
+        acronym = 'LTEST0022'
+        my_parent = EducationGroupYearFactory(acronym='LTEST0020',
+                                              academic_year=self.academic_year,
+                                              management_entity=self.E2DY.entity,
+                                              administration_entity=self.E2DY.entity)
+        group = GroupElementYearFactory(
+            parent=my_parent,
+            child_branch=EducationGroupYearFactory(acronym=acronym,
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.URBA.entity, ),
+            child_leaf=None
+        )
+
+        node = json.dumps(EducationGroupHierarchy(my_parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(group.child_branch.verbose)
+        self.assertFalse(str_expected_borrowed in node)
+
+    @override_switch('egy_show_borrowed_classes', active=True)
+    def test_contains_egy_borrowed_when_child_higher_entity_type_than_parent(self):
+        acronym = 'LTEST0022'
+        group = GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=EducationGroupYearFactory(acronym=acronym,
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.root.entity, ),
+            child_leaf=None
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_borrowed = '|E| {}'.format(group.child_branch.verbose)
+        self.assertTrue(str_expected_borrowed not in node)
 
 
 class TestGetOptionList(TestCase):
