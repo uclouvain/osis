@@ -383,6 +383,7 @@ class TestUpdate(TestCase):
     def test_post_training_removing_coorganization(self):
         new_entity_version = MainEntityVersionFactory()
         egy = TrainingFactory(
+            education_group_type__name=TrainingType.AGGREGATION.name,
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
