@@ -347,7 +347,7 @@ class TestUpdate(TestCase):
         organization = OrganizationFactory()
         address = OrganizationAddressFactory(organization=organization, is_main=True)
         diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
-
+        self.assertEqual(egy.coorganizations.count(), 0)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -381,19 +381,22 @@ class TestUpdate(TestCase):
 
     def test_post_training_removing_coorganization(self):
         new_entity_version = MainEntityVersionFactory()
-        egy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+        egy = TrainingFactory(
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
         PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
-        address = OrganizationAddressFactory(organization=OrganizationFactory(), is_main=True)
-        egy_organization = EducationGroupOrganizationFactory(
-            organization=OrganizationFactory(),
-            education_group_year=egy
-        )
-        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+        orga = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=orga, is_main=True)
 
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+        egy_organization = EducationGroupOrganizationFactory(
+            organization=orga,
+            education_group_year=egy,
+            diploma=diploma_choice
+        )
+
+        self.assertEqual(egy.coorganizations.count(), 1)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -411,7 +414,7 @@ class TestUpdate(TestCase):
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
             'form-0-country': address.country.pk,
-            'form-0-organization': egy_organization.organization.pk,
+            'form-0-organization': orga.pk,
             'form-0-diploma': diploma_choice,
             'form-0-DELETE': 'on',
             'form-0-id': egy_organization.pk
