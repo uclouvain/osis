@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from collections import namedtuple
+
 from django import forms
 from django.db import Error
 from django.utils.translation import ugettext as _
@@ -37,6 +39,7 @@ EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc', 'publication_contact_entity']
 HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
 FIELD_TO_EXCLUDE_IN_SET = ['id', 'external_id', 'education_group_year']
+SetTuple = namedtuple('SetTuple', ['set_name', 'model', 'filter_field'])
 
 
 class ConsistencyError(Error):
@@ -126,27 +129,29 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
 
 
 def duplicate_set(old_egy, education_group_year, initial_dicts=None):
-    sets_to_duplicate = ['educationgrouporganization_set']
-    for egy_set_name in sets_to_duplicate:
-        _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, egy_set_name)
+    sets_to_duplicate = [
+        SetTuple('educationgrouporganization_set', EducationGroupOrganization, 'organization_id')
+    ]
+    for set_tuple in sets_to_duplicate:
+        _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, set_tuple)
 
 
-def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, egy_set_name):
+def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, set_tuple):
     ids = []
-    egy_set = getattr(old_egy, egy_set_name).all()
-    initial_sets = initial_dicts.get(egy_set_name, {})
+    egy_set = getattr(old_egy, set_tuple.set_name).all()
+    initial_sets = initial_dicts.get(set_tuple.set_name, {})
     for item_set in egy_set:
         dict_new_values = model_to_dict_fk(item_set, exclude=FIELD_TO_EXCLUDE_IN_SET)
         defaults_values = {x: v for x, v in dict_new_values.items() if not isinstance(v, list)}
-        postponed_item, created = EducationGroupOrganization.objects.get_or_create(
+        postponed_item, created = set_tuple.model.objects.get_or_create(
             education_group_year=education_group_year,
-            organization_id=dict_new_values['organization_id'],
-            defaults=defaults_values
+            defaults=defaults_values,
+            **{set_tuple.filter_field: dict_new_values[set_tuple.filter_field]}
         )
         ids.append(postponed_item.id)
 
         if not created:
-            initial_set = initial_sets.get(egy_set_name, {})
+            initial_set = initial_sets.get(set_tuple.set_name, {})
             _check_differences_and_update(dict_new_values, initial_set, postponed_item)
 
     EducationGroupOrganization.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()

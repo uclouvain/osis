@@ -27,7 +27,7 @@ from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
-from base.business.education_groups.perms import check_permission
+from base.business.education_groups import perms
 from base.business.xls import get_name_or_username, convert_boolean
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
@@ -122,7 +122,7 @@ def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exc
     else:
         person = Person.objects.get(user=a_user)
 
-    if not check_permission(person, "base.can_edit_education_group_administrative_data", raise_exception):
+    if not perms.check_permission(person, "base.can_edit_education_group_administrative_data", raise_exception):
         return False
 
     if person.is_central_manager and _is_management_entity_linked_to_user(person, an_education_group_year):
