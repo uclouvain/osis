@@ -373,7 +373,7 @@ class TestUpdate(TestCase):
         self.assertEqual(response.status_code, 302)
 
         egy.refresh_from_db()
-        coorganizations = egy.coorganizations
+        coorganizations = egy.educationgrouporganization_set.all()
         self.assertEqual(coorganizations.count(), 1)
         self.assertEqual(coorganizations.first().organization, organization)
         self.assertEqual(coorganizations.first().diploma, diploma_choice)
