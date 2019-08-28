@@ -23,44 +23,145 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+import json
 
 from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from waffle.testutils import override_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models import entity_version
+from base.models.enums import organization_type
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from osis_common.utils.datetime import get_tzinfo
+from reference.tests.factories.country import CountryFactory
 
 
 class TestBuildTree(TestCase):
     def setUp(self):
         self.academic_year = AcademicYearFactory()
-        self.parent = EducationGroupYearFactory(academic_year=self.academic_year)
+        self.country = CountryFactory()
+        self.organization = OrganizationFactory(
+            type=organization_type.MAIN
+        )
+        self.now = datetime.datetime.now(get_tzinfo())
+        start_date = self.now - datetime.timedelta(days=10)
+        end_date = None
+        self._build_current_entity_version_structure(end_date, start_date)
+
+        self.parent = EducationGroupYearFactory(acronym='LTEST0000',
+                                                academic_year=self.academic_year,
+                                                management_entity=self.SC.entity)
         self.group_element_year_1 = GroupElementYearFactory(
             parent=self.parent,
-            child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
+            child_branch=EducationGroupYearFactory(acronym='LTEST0010',
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.SC.entity)
         )
         self.group_element_year_1_1 = GroupElementYearFactory(
             parent=self.group_element_year_1.child_branch,
-            child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
+            child_branch=EducationGroupYearFactory(acronym='LTEST0011',
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.SC.entity)
         )
         self.group_element_year_2 = GroupElementYearFactory(
             parent=self.parent,
-            child_branch=EducationGroupYearFactory(academic_year=self.academic_year)
+            child_branch=EducationGroupYearFactory(acronym='LTEST0020',
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.MATH.entity)
         )
-        self.learning_unit_year_1 = LearningUnitYearFactory()
+        self.learning_unit_year_1 = LearningUnitYearFactory(
+            acronym='LTEST0021',
+            learning_container_year__requirement_entity=self.MATH.entity)
         self.group_element_year_2_1 = GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
             child_leaf=self.learning_unit_year_1
+        )
+
+    def _build_current_entity_version_structure(self, end_date, start_date):
+        """Build the following entity version structure :
+                             SST
+                        SC        LOCI
+                    MATH PHYS  URBA  BARC
+        """
+        self.root = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="SST",
+            title="SST",
+            entity_type=entity_version.entity_type.SECTOR,
+            parent=None,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.SC = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="SC",
+            title="SC",
+            entity_type=entity_version.entity_type.FACULTY,
+            parent=self.root.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.MATH = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="MATH",
+            title="MATH",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.SC.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.PHYS = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="PHYS",
+            title="PHYS",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.SC.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.LOCI = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="LOCI",
+            title="LOCI",
+            entity_type=entity_version.entity_type.FACULTY,
+            parent=self.root.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.URBA = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="URBA",
+            title="URBA",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.LOCI.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.BARC = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="BARC",
+            title="BARC",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.LOCI.entity,
+            start_date=start_date,
+            end_date=end_date
         )
 
     def test_init_tree(self):
@@ -243,6 +344,47 @@ class TestBuildTree(TestCase):
         )
 
         self.assertCountEqual(list_children, [self.group_element_year_2])
+
+    @override_switch('luy_show_service_classes', active=True)
+    def test_contains_luy_service(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               learning_container_year__requirement_entity=self.MATH.entity,
+                                               learning_container_year__allocation_entity=self.URBA.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_service = '|S| {}'.format(acronym)
+        str_expected_not_service = '|S| LTEST0021'
+        self.assertTrue(str_expected_service in node)
+        self.assertTrue(str_expected_not_service not in node)
+
+    @override_switch('luy_show_service_classes', active=True)
+    def test_contains_luy_service_mobility(self):
+        acronym = 'XTEST0022'
+        eluy = ExternalLearningUnitYearFactory(learning_unit_year__acronym=acronym,
+                                               learning_unit_year__academic_year=self.academic_year,
+                                               mobility=True,
+                                               co_graduation=False,
+                                               learning_unit_year__learning_container_year__requirement_entity=
+                                               self.MATH.entity,
+                                               learning_unit_year__learning_container_year__allocation_entity=
+                                               self.URBA.entity)
+        luy = LearningUnitYear.objects.get(externallearningunityear=eluy)
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=luy
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_service = '{}'.format(acronym)
+        str_expected_not_service = '|S| {}'.format(acronym)
+        self.assertTrue(str_expected_service in node)
+        self.assertTrue(str_expected_not_service not in node)
 
 
 class TestGetOptionList(TestCase):

@@ -46,8 +46,8 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
         structure
     )
 
-    learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_programs(
-        person.programmanager_set.all().select_related('education_group'),
+    learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_program_managers(
+        person.programmanager_set.all(),
         structure
     )
 
