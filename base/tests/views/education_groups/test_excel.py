@@ -27,14 +27,14 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
 class TestGetLearningUnitPrerequisitesExcel(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
         cls.education_group_year = EducationGroupYearFactory()
 
         cls.url = reverse("education_group_learning_units_prerequisites", args=[cls.education_group_year.pk])
