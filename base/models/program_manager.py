@@ -154,14 +154,14 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
            entity_structure,
            FACULTY
         )
-        if administration_fac_level:
-            allowed_entities_scopes.add(administration_fac_level.pk)
-            allowed_entities_scopes = allowed_entities_scopes.union({
-                entity_version.entity_id for entity_version in
-                entity_structure[administration_fac_level.pk].get('all_children', [])
-            })
-        else:
-            allowed_entities_scopes.add(education_group_year.administration_entity_id)
+        if not administration_fac_level:
+            administration_fac_level = education_group_year.administration_entity
+
+        allowed_entities_scopes.add(administration_fac_level.pk)
+        allowed_entities_scopes = allowed_entities_scopes.union({
+            entity_version.entity_id for entity_version in
+            entity_structure[administration_fac_level.pk].get('all_children', [])
+        })
 
     return LearningUnitYear.objects.filter(learning_container_year__requirement_entity__in=allowed_entities_scopes)\
                                    .values_list('id', flat=True)
