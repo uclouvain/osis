@@ -142,7 +142,6 @@ def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_
     set_name, set_model, set_filter_field = set_tuple
 
     egy_set = getattr(old_egy, set_name).all()
-    initial_sets = initial_dicts.get(set_name, {})
     for item_set in egy_set:
         dict_new_values = model_to_dict_fk(item_set, exclude=FIELD_TO_EXCLUDE_IN_SET)
         defaults_values = {x: v for x, v in dict_new_values.items() if not isinstance(v, list)}
@@ -154,14 +153,14 @@ def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_
         ids.append(postponed_item.id)
 
         if not created:
-            initial_set = initial_sets.get(set_tuple.set_name, {})
-            _check_differences_and_update(dict_new_values, initial_set, postponed_item, set_tuple)
+            _check_differences_and_update(dict_new_values, initial_dicts, postponed_item, set_tuple)
 
     set_model.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()
 
 
-def _check_differences_and_update(dict_new_values, initial_set, postponed_item, set_tuple):
-    _, set_model, set_filter_field = set_tuple
+def _check_differences_and_update(dict_new_values, initial_dicts, postponed_item, set_tuple):
+    set_name, set_model, set_filter_field = set_tuple
+    initial_set = initial_dicts.get('initial_sets_dict', {}).get(set_name, {})
     dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
     initial_item = initial_set.get(dict_postponed_item[set_filter_field], None)
     differences = compare_objects(initial_item, dict_postponed_item) \
