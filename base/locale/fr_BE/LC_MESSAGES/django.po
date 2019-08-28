@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-26 14:57+0200\n"
+"POT-Creation-Date: 2019-08-28 10:24+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1106,8 +1106,9 @@ msgstr "Inscription aux examens"
 msgid "Exams Enrollments"
 msgstr "Inscription aux examens"
 
-msgid "Excel cours ayant prérequis"
-msgstr ""
+
+msgid "Excel prerequisites learning units"
+msgstr "Excel prérequis unités d'enseignement"
 
 msgid "Exceptional procedure"
 msgstr "Procédure exceptionnelle"
@@ -1215,9 +1216,6 @@ msgstr "Formation doctorale"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
-
-msgid "Formation prerequisites"
-msgstr "Prérequis offre"
 
 msgid "Formations"
 msgstr ""
@@ -3987,3 +3985,6 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+msgid "Formation prerequisites"
+msgstr "Prérequis offre"

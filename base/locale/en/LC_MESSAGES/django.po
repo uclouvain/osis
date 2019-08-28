@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-26 14:57+0200\n"
+"POT-Creation-Date: 2019-08-28 10:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1047,7 +1047,7 @@ msgstr ""
 msgid "Exams Enrollments"
 msgstr ""
 
-msgid "Excel cours ayant prérequis"
+msgid "Excel prerequisites learning units"
 msgstr ""
 
 msgid "Exceptional procedure"
@@ -1151,9 +1151,6 @@ msgid "Formation PhD"
 msgstr ""
 
 msgid "Formation catalogue"
-msgstr ""
-
-msgid "Formation prerequisites"
 msgstr ""
 
 msgid "Formations"
