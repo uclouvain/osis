@@ -155,19 +155,20 @@ def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_
 
         if not created:
             initial_set = initial_sets.get(set_tuple.set_name, {})
-            _check_differences_and_update(dict_new_values, initial_set, postponed_item)
+            _check_differences_and_update(dict_new_values, initial_set, postponed_item, set_tuple)
 
-    EducationGroupOrganization.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()
+    set_model.objects.filter(education_group_year=education_group_year).exclude(id__in=ids).delete()
 
 
-def _check_differences_and_update(dict_new_values, initial_set, postponed_item):
+def _check_differences_and_update(dict_new_values, initial_set, postponed_item, set_tuple):
+    _, set_model, set_filter_field = set_tuple
     dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
-    initial_item = initial_set.get(dict_postponed_item['organization_id'], None)
+    initial_item = initial_set.get(dict_postponed_item[set_filter_field], None)
     differences = compare_objects(initial_item, dict_postponed_item) \
         if initial_item and dict_postponed_item else {}
     if differences:
         raise ConsistencyError(
-            {'model': EducationGroupOrganization, 'last_instance_updated': postponed_item},
+            {'model': set_model, 'last_instance_updated': postponed_item},
             differences
         )
     update_object(postponed_item, dict_new_values)
