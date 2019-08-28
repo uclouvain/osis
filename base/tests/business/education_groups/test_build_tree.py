@@ -224,7 +224,7 @@ class TestBuildTree(TestCase):
             {'name': 'with tab',
              'node': EducationGroupHierarchy(self.parent, tab_to_show='show_identification'),
              'correct_url': reverse('education_group_read', args=[self.parent.pk, self.parent.pk]) +
-             "?group_to_parent=0&tab_to_show=show_identification"},
+                "?group_to_parent=0&tab_to_show=show_identification"},
             {'name': 'without tab',
              'node': EducationGroupHierarchy(self.parent),
              'correct_url': reverse('education_group_read',
@@ -510,7 +510,7 @@ class TestBuildTree(TestCase):
             parent=self.group_element_year_2.child_branch,
             child_branch=EducationGroupYearFactory(acronym=acronym,
                                                    academic_year=self.academic_year,
-                                                   management_entity=self.URBA.entity,),
+                                                   management_entity=self.URBA.entity, ),
             child_leaf=None
         )
 
@@ -525,7 +525,7 @@ class TestBuildTree(TestCase):
             parent=self.group_element_year_2.child_branch,
             child_branch=EducationGroupYearFactory(acronym=acronym,
                                                    academic_year=self.academic_year,
-                                                   management_entity=None ),
+                                                   management_entity=None),
             child_leaf=None
         )
 
