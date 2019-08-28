@@ -129,7 +129,7 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
     for prerequisite in prerequisite_qs:
         luy = prerequisite.learning_unit_year
         content.append(
-            LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title)
+            LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title_i18n)
         )
 
         groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
@@ -146,7 +146,7 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
                         text=text,
                         operator=operator,
                         luy_acronym=luy_acronym,
-                        luy_title=item.learning_unit.luys[0].complete_title
+                        luy_title=item.learning_unit.luys[0].complete_title_i18n
                     )
                 )
     return content
