@@ -38,6 +38,7 @@ from base.models.hops import Hops
 EDUCATION_GROUP_MAX_POSTPONE_YEARS = 6
 FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_epc', 'publication_contact_entity']
 HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
+
 FIELD_TO_EXCLUDE_IN_SET = ['id', 'external_id', 'education_group_year']
 SetTuple = namedtuple('SetTuple', ['set_name', 'model', 'filter_field'])
 
@@ -138,15 +139,17 @@ def duplicate_set(old_egy, education_group_year, initial_dicts=None):
 
 def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_dicts, set_tuple):
     ids = []
-    egy_set = getattr(old_egy, set_tuple.set_name).all()
-    initial_sets = initial_dicts.get(set_tuple.set_name, {})
+    set_name, set_model, set_filter_field = set_tuple
+
+    egy_set = getattr(old_egy, set_name).all()
+    initial_sets = initial_dicts.get(set_name, {})
     for item_set in egy_set:
         dict_new_values = model_to_dict_fk(item_set, exclude=FIELD_TO_EXCLUDE_IN_SET)
         defaults_values = {x: v for x, v in dict_new_values.items() if not isinstance(v, list)}
-        postponed_item, created = set_tuple.model.objects.get_or_create(
+        postponed_item, created = set_model.objects.get_or_create(
             education_group_year=education_group_year,
             defaults=defaults_values,
-            **{set_tuple.filter_field: dict_new_values[set_tuple.filter_field]}
+            **{set_filter_field: dict_new_values[set_filter_field]}
         )
         ids.append(postponed_item.id)
 
