@@ -136,7 +136,8 @@ class TestPerms(TestCase):
 
     def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):
         administrative_manager = AdministrativeManagerFactory()
-        luy = LearningUnitYearFactory(learning_unit=self.learning_unit, learning_container_year=self.lcy)
+        luy = LearningUnitYearFactory(learning_unit=self.learning_unit, learning_container_year=self.lcy,
+                                      academic_year=self.lcy.academic_year)
         self.assertFalse(is_eligible_for_modification(luy, administrative_manager))
 
     @mock.patch('waffle.models.Flag.is_active_for_user', return_value=True)
