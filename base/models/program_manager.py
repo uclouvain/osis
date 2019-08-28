@@ -24,11 +24,16 @@
 #
 ##############################################################################
 from django.db import models, IntegrityError
+from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy
 from reversion.admin import VersionAdmin
 
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
+from base.models.education_group_year import EducationGroupYear
+from base.models.entity import Entity
+from base.models.entity_version import find_parent_of_type_into_entity_structure
+from base.models.enums.entity_type import FACULTY
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from .learning_unit_enrollment import LearningUnitEnrollment
@@ -129,19 +134,35 @@ def find_by_management_entity(administration_entity, academic_yr):
     return None
 
 
-def get_learning_unit_years_attached_to_programs(programs_manager, entities_by_id):
-    from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
-
+def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, entity_structure):
     current_ac = current_academic_year()
-    luys = LearningUnitYear.objects.none()
-    for program in programs_manager:
-        egy = program.education_group.educationgroupyear_set.select_related('administration_entity').get(
-            academic_year=current_ac
+    allowed_entities_scopes = set()
+
+    education_group_years = EducationGroupYear.objects.filter(
+        academic_year=current_ac,
+        education_group__in=programs_manager_qs.values_list('education_group', flat=True)
+    ).prefetch_related(
+        Prefetch(
+            'administration_entity',
+            queryset=Entity.objects.all().prefetch_related('entityversion_set')
         )
-        entities = [egy.administration_entity] + [
-            ent_version.entity for ent_version in entities_by_id[egy.administration_entity_id].get('all_children')
-        ]
-        luys = luys | EducationGroupHierarchy(root=egy).get_learning_unit_years().filter(
-            learning_container_year__requirement_entity__in=entities
+    )
+
+    for education_group_year in education_group_years:
+        administration_fac_level = find_parent_of_type_into_entity_structure(
+           education_group_year.administration_entity_version,
+           entity_structure,
+           FACULTY
         )
-    return luys.values_list('id', flat=True)
+        if administration_fac_level:
+            allowed_entities_scopes.add(administration_fac_level.pk)
+            allowed_entities_scopes = allowed_entities_scopes.union({
+                entity_version.entity_id for entity_version in
+                entity_structure[administration_fac_level.pk].get('all_children', [])
+            })
+        else:
+            allowed_entities_scopes.add(education_group_year.administration_entity_id)
+
+    return LearningUnitYear.objects.filter(learning_container_year__requirement_entity__in=allowed_entities_scopes)\
+                                   .values_list('id', flat=True)
+
