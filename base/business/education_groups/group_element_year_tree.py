@@ -268,6 +268,9 @@ class EducationGroupHierarchy:
         return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
 
     def is_borrowed(self) -> bool:
+        if isinstance(self, NodeLeafJsTree) and getattr(self.learning_unit_year, 'externallearningunityear', None):
+            if self.learning_unit_year.externallearningunityear.mobility:
+                return False
         try:
             if self.cache_entity_parent_root.entity_type not in [SECTOR, FACULTY]:
                 root = get_entity_version_parent_or_itself_from_type(

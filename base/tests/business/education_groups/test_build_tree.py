@@ -502,6 +502,30 @@ class TestBuildTree(TestCase):
         str_expected_borrowed = '|E| {}'.format(acronym)
         self.assertTrue(str_expected_borrowed not in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed_mobility(self):
+        acronym = 'XTEST0022'
+        eluy = ExternalLearningUnitYearFactory(learning_unit_year__acronym=acronym,
+                                               learning_unit_year__academic_year=self.academic_year,
+                                               mobility=True,
+                                               co_graduation=False,
+                                               learning_unit_year__learning_container_year__requirement_entity=
+                                               self.BARC.entity,
+                                               learning_unit_year__learning_container_year__allocation_entity=
+                                               self.BARC.entity)
+        luy = LearningUnitYear.objects.get(externallearningunityear=eluy)
+        GroupElementYearFactory(
+            parent=self.group_element_year_2.child_branch,
+            child_branch=None,
+            child_leaf=luy
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
+        str_expected_service = '{}'.format(acronym)
+        str_expected_not_service = '|E| {}'.format(acronym)
+        self.assertTrue(str_expected_service in node)
+        self.assertTrue(str_expected_not_service not in node)
+
     @override_switch('egy_show_borrowed_classes', active=True)
     def test_contains_egy_borrowed(self):
         acronym = 'LTEST0022'
