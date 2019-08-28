@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
@@ -34,6 +34,7 @@ from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
 @login_required
+@permission_required('base.can_access_education_group', raise_exception=True)
 def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
     excel = EducationGroupYearLearningUnitsPrerequisitesToExcel(education_group_year).to_excel()
