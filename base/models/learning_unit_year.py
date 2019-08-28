@@ -217,6 +217,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return self.get_entity(entity_container_year_link_type.REQUIREMENT_ENTITY)
 
     def is_service(self, entities_version, *args, **kwargs):
+        if getattr(self, 'externallearningunityear', None):
+            if self.externallearningunityear.mobility:
+                return False
         if self.requirement_entity and self.allocation_entity:
             return get_entity_version_parent_or_itself_from_type(entities_version,
                                                                  entity=self.requirement_entity.most_recent_acronym,

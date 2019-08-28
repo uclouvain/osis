@@ -44,7 +44,6 @@ from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
-from base.models.enums.education_group_types import TrainingType
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -339,8 +338,7 @@ class TestUpdate(TestCase):
 
     def test_post_training_with_a_coorganization(self):
         new_entity_version = MainEntityVersionFactory()
-        egy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+        egy = TrainingFactory(
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
