@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-28 10:24+0200\n"
+"POT-Creation-Date: 2019-08-29 09:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1047,9 +1047,6 @@ msgstr ""
 msgid "Exams Enrollments"
 msgstr ""
 
-msgid "Excel prerequisites learning units"
-msgstr ""
-
 msgid "Exceptional procedure"
 msgstr ""
 
@@ -1211,6 +1208,9 @@ msgid "Generate PDF not available. Please use EPC."
 msgstr ""
 
 msgid "Generate pdf"
+msgstr ""
+
+msgid "Generate xls of learnning units that have prerequisites"
 msgstr ""
 
 msgid "Get back to initial data"
