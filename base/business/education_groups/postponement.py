@@ -41,7 +41,7 @@ FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_e
 HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
 
 FIELD_TO_EXCLUDE_IN_SET = ['id', 'external_id', 'education_group_year']
-ReversePostponementConfig = namedtuple('SetTuple', ['set_name', 'model', 'filter_field'])
+ReversePostponementConfig = namedtuple('ReversePostponementConfig', ['set_name', 'model', 'filter_field'])
 
 
 class ConsistencyError(Error):
