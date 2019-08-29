@@ -99,12 +99,36 @@ class TestBuildTree(TestCase):
             child_leaf=self.learning_unit_year_1
         )
 
+        self.parent_ILV = EducationGroupYearFactory(acronym='TURC LV',
+                                                    academic_year=self.academic_year,
+                                                    management_entity=self.ILV.entity,)
+
     def _build_current_entity_version_structure(self, end_date, start_date):
         """Build the following entity version structure :
-                             SST
-                        SC        LOCI
+                             SST                  ADEF
+                        SC        LOCI       ILV
                     MATH PHYS  URBA  BARC
         """
+        self.ADEF = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="ADEF",
+            title="ADEF",
+            entity_type=entity_version.entity_type.LOGISTICS_ENTITY,
+            parent=None,
+            start_date=start_date,
+            end_date=end_date
+        )
+
+        self.ILV = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="ILV",
+            title="ILV",
+            entity_type=entity_version.entity_type.LOGISTICS_ENTITY,
+            parent=self.ADEF.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+
         self.root = EntityVersionFactory(
             entity=EntityFactory(country=self.country, organization=self.organization),
             acronym="SST",
@@ -526,6 +550,21 @@ class TestBuildTree(TestCase):
         self.assertTrue(str_expected_service in node)
         self.assertTrue(str_expected_not_service not in node)
 
+    @override_switch('luy_show_borrowed_classes', active=True)
+    def test_contains_luy_borrowed_from_non_academic_entities(self):
+        acronym = 'LTEST0022'
+        GroupElementYearFactory(
+            parent=self.parent_ILV,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(acronym=acronym,
+                                               academic_year=self.academic_year,
+                                               learning_container_year__requirement_entity=self.BARC.entity)
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent_ILV).to_json())
+        str_expected_borrowed = '|E| {}'.format(acronym)
+        self.assertTrue(str_expected_borrowed in node)
+
     @override_switch('egy_show_borrowed_classes', active=True)
     def test_contains_egy_borrowed(self):
         acronym = 'LTEST0022'
@@ -609,6 +648,21 @@ class TestBuildTree(TestCase):
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
         str_expected_borrowed = '|E| {}'.format(group.child_branch.verbose)
         self.assertTrue(str_expected_borrowed not in node)
+
+    @override_switch('egy_show_borrowed_classes', active=True)
+    def test_contains_egy_borrowed_from_non_academic_entities(self):
+        acronym = 'LTEST0022'
+        group = GroupElementYearFactory(
+            parent=self.parent_ILV,
+            child_branch=EducationGroupYearFactory(acronym=acronym,
+                                                   academic_year=self.academic_year,
+                                                   management_entity=self.BARC.entity, ),
+            child_leaf=None
+        )
+
+        node = json.dumps(EducationGroupHierarchy(self.parent_ILV).to_json())
+        str_expected_borrowed = '|E| {}'.format(group.child_branch.verbose)
+        self.assertTrue(str_expected_borrowed in node)
 
 
 class TestGetOptionList(TestCase):
