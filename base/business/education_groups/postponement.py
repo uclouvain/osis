@@ -41,7 +41,7 @@ FIELD_TO_EXCLUDE = ['id', 'uuid', 'external_id', 'academic_year', 'linked_with_e
 HOPS_FIELDS = ('ares_study', 'ares_graca', 'ares_ability')
 
 FIELD_TO_EXCLUDE_IN_SET = ['id', 'external_id', 'education_group_year']
-SetTuple = namedtuple('SetTuple', ['set_name', 'model', 'filter_field'])
+ReversePostponementConfig = namedtuple('SetTuple', ['set_name', 'model', 'filter_field'])
 
 
 class ConsistencyError(Error):
@@ -130,7 +130,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
         _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
 
     if education_group.show_coorganization(old_education_group_year):
-        duplicate_set(old_education_group_year, postponed_egy, initial_dicts.get('initial_sets_dict', None))
+        duplicate_set(old_education_group_year, postponed_egy, initial_dicts.get('initial_sets_dict'))
     return postponed_egy
 
 
@@ -139,7 +139,7 @@ def duplicate_set(old_egy, education_group_year, initial_sets=None):
         initial_sets = {}
 
     sets_to_duplicate = [
-        SetTuple('educationgrouporganization_set', EducationGroupOrganization, 'organization_id')
+        ReversePostponementConfig('educationgrouporganization_set', EducationGroupOrganization, 'organization_id')
     ]
     for set_tuple in sets_to_duplicate:
         _update_and_check_consistency_of_set(education_group_year, old_egy, initial_sets, set_tuple)
@@ -178,10 +178,11 @@ def _update_and_check_consistency_of_set(education_group_year, old_egy, initial_
 def _check_consistency_of_all_set(education_group_year, initial_set, set_tuple):
     set_name, _, set_filter_field = set_tuple
     postpone_set = getattr(education_group_year, set_name).all()
-    initial_set = sorted(list(initial_set.keys()))
+    initial_set = set(initial_set.keys())
+    diff_orga = set(postpone_set.values_list(set_filter_field, flat=True)) - initial_set
 
     have_same_number = postpone_set.count() == len(initial_set)
-    have_same_coorg = initial_set == sorted(list(postpone_set.values_list(set_filter_field, flat=True)))
+    have_same_coorg = len(diff_orga) == 0
 
     return have_same_number and have_same_coorg
 
@@ -190,7 +191,7 @@ def _check_differences_and_update(dict_new_values, initial_set, postponed_item, 
     set_name, set_model, set_filter_field = set_tuple
 
     dict_postponed_item = model_to_dict_fk(postponed_item, exclude=FIELD_TO_EXCLUDE_IN_SET)
-    initial_item = initial_set.get(dict_postponed_item[set_filter_field], None)
+    initial_item = initial_set.get(dict_postponed_item[set_filter_field])
 
     differences = compare_objects(initial_item, dict_postponed_item) \
         if initial_item and dict_postponed_item else {}
