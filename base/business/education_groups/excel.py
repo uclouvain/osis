@@ -35,6 +35,7 @@ from openpyxl.styles.colors import RED
 from openpyxl.writer.excel import save_virtual_workbook
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.prerequisite_operator import OR
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -171,7 +172,6 @@ def _get_item_acronym(prerequisite_item: PrerequisiteItem, group: list):
 
 def _get_style_to_apply(excel_lines: list):
     style_to_apply_dict = defaultdict(list)
-    main_operator = None
     last_luy_line_index = None
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, HeaderLine):
@@ -187,11 +187,7 @@ def _get_style_to_apply(excel_lines: list):
             last_luy_line_index = index
 
         elif isinstance(row, PrerequisiteLine):
-            if row.operator is None:
-                main_operator = None
-            elif main_operator is None:
-                main_operator = row.operator
-            elif main_operator != row.operator:
+            if row.operator == _(OR):
                 style_to_apply_dict[STYLE_FONT_RED].append("B{index}".format(index=index))
 
             if (last_luy_line_index - index) % 2 == 1:
