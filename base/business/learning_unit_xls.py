@@ -39,6 +39,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
+from openpyxl.utils import get_column_letter
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')

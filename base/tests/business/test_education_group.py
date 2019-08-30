@@ -382,6 +382,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 
@@ -397,6 +398,7 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE_ADMINISTRATIVE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 

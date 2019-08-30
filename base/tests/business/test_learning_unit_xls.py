@@ -40,14 +40,12 @@ from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPO
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
-from base.business.xls import _get_col_letter
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
 from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -64,6 +62,7 @@ from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
 from attribution.models.enums.function import COORDINATOR
+from base.business.learning_unit_xls import _get_col_letter
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
