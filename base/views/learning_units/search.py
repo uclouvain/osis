@@ -64,6 +64,8 @@ ACTION_BACK_TO_INITIAL = "back_to_initial"
 ACTION_CONSOLIDATE = "consolidate"
 ACTION_FORCE_STATE = "force_state"
 
+ITEMS_PER_PAGES = 2000
+
 
 def learning_units_search(request, search_type):
     service_course_search = search_type == SERVICE_COURSES_SEARCH
@@ -122,7 +124,7 @@ def learning_units_search(request, search_type):
         'search_type': search_type,
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=2000),
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
 
     return render(request, "learning_units.html", context)
@@ -198,7 +200,7 @@ def learning_units_proposal_search(request):
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=2000),
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
     return render(request, "learning_units.html", context)
 
@@ -259,6 +261,6 @@ def learning_units_external_search(request):
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=2000),
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
     return render(request, "learning_units.html", context)
