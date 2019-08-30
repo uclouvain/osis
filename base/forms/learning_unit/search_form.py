@@ -70,7 +70,6 @@ class LearningUnitSearchForm(BaseSearchForm):
         label=_('Ac yr.'),
         queryset=AcademicYear.objects.all(),
         empty_label=pgettext_lazy("plural", "All"),
-        widget=autocomplete.ModelSelect2(url='academic_year_autocomplete')
     )
 
     requirement_entity_acronym = forms.CharField(

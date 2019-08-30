@@ -57,8 +57,7 @@ class EducationGroupFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        widget=autocomplete.ModelSelect2(url='academic_year_autocomplete',
-                                         attrs={'data-placeholder': pgettext_lazy("plural", "All")}, )
+        empty_label=pgettext_lazy("plural", "All"),
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),

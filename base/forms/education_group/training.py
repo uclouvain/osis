@@ -193,9 +193,6 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             "duration": forms.TextInput(),
             "min_constraint": forms.TextInput(),
             "max_constraint": forms.TextInput(),
-            'academic_year': autocomplete.ModelSelect2(
-                url='academic_year_autocomplete',
-            ),
         }
 
     def __init__(self, *args, **kwargs):

@@ -215,14 +215,6 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
-        widgets = {
-            'start_year': autocomplete.ModelSelect2(
-                url='academic_year_autocomplete',
-            ),
-            'end_year': autocomplete.ModelSelect2(
-                url='academic_year_limited_autocomplete',
-            ),
-        }
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
