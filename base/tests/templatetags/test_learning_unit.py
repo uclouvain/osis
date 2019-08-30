@@ -128,18 +128,15 @@ class LearningUnitTagTest(TestCase):
 
     def test_next_acronym_with_acronym(self):
         learning_unit = LearningUnitFactory()
-        dict_learning_unit_year = create_learning_units_year(2013, 2013, learning_unit)
+        dict_learning_unit_year = create_learning_units_year(2013, 2014, learning_unit)
 
-        l_unit = dict_learning_unit_year.get(2013)
-        initial_acronym = l_unit.acronym
+        l_unit = dict_learning_unit_year.get(2014)
         new_acronym = "{}9".format(l_unit.acronym)
         l_unit.acronym = new_acronym
         l_unit.save()
+        other_l_unit = dict_learning_unit_year.get(2013)
 
-        ProposalLearningUnitFactory(learning_unit_year=l_unit,
-                                    initial_data={'learning_unit_year': {'acronym': initial_acronym}})
-
-        self.assertEqual(get_next_acronym(l_unit), initial_acronym)
+        self.assertEqual(get_next_acronym(other_l_unit), new_acronym)
 
     def test_value_label_equal_values(self):
         data = self.get_dict_data()
