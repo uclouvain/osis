@@ -42,8 +42,12 @@
                     {{ attribution.tutor.person }}
                 </div>
             {% else %}
-                {% bootstrap_field attribution_form.person form_group_class="col-md-6" %}
+                <div class="col-md-6">
+                <label>{% trans 'Tutor' %}</label><br>
+                {% bootstrap_field attribution_form.person %}
+                </div>
             {% endif %}
+
             {% bootstrap_field attribution_form.function form_group_class="col-md-6" %}
         </div>
         <br>
@@ -65,7 +69,7 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-    <input type="submit" value="{% trans "save" %}" class="btn btn-primary"
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+    <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
            onclick="$('#form_change_attribution').submit();"/>
 </div>
