@@ -57,8 +57,9 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from reference.tests.factories.language import LanguageFactory
 
-INDEX_FIRST_CMS_COLUMN = 3
-INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 18
+INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
+INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
+INDEX_FIRST_CMS_LABEL_SPECIFICATIONS_COLUMN = 16
 
 ENTITY_ACRONYM = 'ESPO'
 ACRONYM_ALLOCATION = 'INFO'
@@ -146,10 +147,6 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             str(_('Code')),
             str(_('Title')),
             str(_('Req. Entity')),
-            str('cms_themes_discussed - FR-BE'),
-            str('cms_themes_discussed - EN'),
-            str('cms_prerequisite - FR-BE'),
-            str('cms_prerequisite - EN'),
             str('cms_resume - FR-BE'),
             str('cms_resume - EN'),
             str("cms_teaching_methods - FR-BE"),
@@ -163,6 +160,10 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             str(_('Teaching material')),
             str("cms_bibliography - FR-BE"),
             str("cms_mobility - FR-BE"),
+            str('cms_themes_discussed - FR-BE'),
+            str('cms_themes_discussed - EN'),
+            str('cms_prerequisite - FR-BE'),
+            str('cms_prerequisite - EN'),
             str("{} - {}".format(str('Learning achievements'), FR_BE.upper())),
             str("{} - {}".format(str(_('Learning achievements')), EN.upper()))
         ]
@@ -194,19 +195,25 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
         self.assertEqual(working_sheet_data[0][1], self.l_unit_yr_1.complete_title)
         self.assertEqual(working_sheet_data[0][2], ENTITY_ACRONYM)
 
-        idx = INDEX_FIRST_CMS_COLUMN
-        for cms_label in CMS_LABEL_SPECIFICATIONS + CMS_LABEL_PEDAGOGY_FR_AND_EN:
+        idx = INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN
+        for cms_label in CMS_LABEL_PEDAGOGY_FR_AND_EN:
             self.assertEqual(working_sheet_data[0][idx], "{}{} - FR".format(PREFIX_FAKE_TEXT_LABEL, cms_label))
             self.assertEqual(working_sheet_data[0][idx+1], "{}{} - EN".format(PREFIX_FAKE_TEXT_LABEL, cms_label))
             idx += 2
 
         # teaching material
-        self.assertEqual(working_sheet_data[0][17], self.teaching_material.title)
+        self.assertEqual(working_sheet_data[0][13], self.teaching_material.title)
         #
         idx = INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN
         for cms_label in CMS_LABEL_PEDAGOGY_FR_ONLY:
             self.assertEqual(working_sheet_data[0][idx], "{}{} - FR".format(PREFIX_FAKE_TEXT_LABEL, cms_label))
             idx += 1
+        # specifications
+        idx = INDEX_FIRST_CMS_LABEL_SPECIFICATIONS_COLUMN
+        for cms_label in CMS_LABEL_SPECIFICATIONS:
+            self.assertEqual(working_sheet_data[0][idx], "{}{} - FR".format(PREFIX_FAKE_TEXT_LABEL, cms_label))
+            self.assertEqual(working_sheet_data[0][idx+1], "{}{} - EN".format(PREFIX_FAKE_TEXT_LABEL, cms_label))
+            idx += 2
 
         # achievements
         self.assertEqual(working_sheet_data[0][idx], self.learning_unit_achievement_fr.text)

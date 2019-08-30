@@ -84,10 +84,10 @@ def _get_titles():
         str(_('Title')),
         str(_('Req. Entity')),
     ]
-    titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_AND_EN, True)
     titles = titles + [str(_('Teaching material'))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
+    titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
     titles = titles + [str("{} - {}".format('Learning achievements', FR_BE.upper())),
                        str("{} - {}".format(_('Learning achievements'), EN.upper()))]
     return titles
@@ -122,8 +122,6 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
             learning_unit_yr.entity_requirement,
         ]
 
-        _add_specifications(learning_unit_yr, line, request)
-
         for label_key in CMS_LABEL_PEDAGOGY_FR_AND_EN:
             translated_label = translated_labels_with_text.filter(text_label__label=label_key).first()
             if translated_label:
@@ -153,7 +151,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
                 line.append(translated_label.text_label.text_fr[0].text if translated_label.text_label.text_fr else '')
             else:
                 line.append('')
-
+        _add_specifications(learning_unit_yr, line, request)
         line.extend(_add_achievements(learning_unit_yr))
 
         result.append(line)
