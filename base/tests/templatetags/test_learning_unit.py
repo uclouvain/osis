@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.utils.safestring import mark_safe
 
 from base.enums.component_detail import VOLUME_Q1
+from base.models.enums.proposal_type import ProposalType
 from base.templatetags.learning_unit import get_difference_css, has_proposal, get_previous_acronym, value_label, \
     DIFFERENCE_CSS, normalize_fraction, get_component_volume_css, dl_component_tooltip, changed_label, get_next_acronym
 from base.templatetags.learning_unit import th_tooltip, CSS_PROPOSAL_VALUE, LABEL_VALUE_BEFORE_PROPOSAL
@@ -101,8 +102,11 @@ class LearningUnitTagTest(TestCase):
         l_unit.acronym = new_acronym
         l_unit.save()
 
-        ProposalLearningUnitFactory(learning_unit_year=l_unit,
-                                    initial_data={'learning_unit_year': {'acronym': initial_acronym}})
+        ProposalLearningUnitFactory(
+            learning_unit_year=l_unit,
+            initial_data={'learning_unit_year': {'acronym': initial_acronym}},
+            type=ProposalType.TRANSFORMATION.name
+        )
 
         self.assertEqual(get_previous_acronym(l_unit), initial_acronym)
 
