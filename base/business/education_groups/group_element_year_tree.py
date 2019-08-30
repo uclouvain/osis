@@ -268,29 +268,30 @@ class EducationGroupHierarchy:
         return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
 
     def is_borrowed(self) -> bool:
-        if isinstance(self, NodeLeafJsTree) and getattr(self.learning_unit_year, 'externallearningunityear', None):
-            if self.learning_unit_year.externallearningunityear.mobility:
-                return False
         try:
-            if self.cache_entity_parent_root.entity_type in [SCHOOL, DOCTORAL_COMMISSION]:
+            if isinstance(self, NodeLeafJsTree):
+                if getattr(self.learning_unit_year, 'externallearningunityear', None) and \
+                        self.learning_unit_year.externallearningunityear.mobility:
+                    return False
+                to_compare = self.learning_unit_year.requirement_entity.most_recent_acronym
+            else:
+                to_compare = self.education_group_year.management_entity.most_recent_acronym
+            case = {SCHOOL: FACULTY, DOCTORAL_COMMISSION: FACULTY}
+            entity = case.get(self.cache_entity_parent_root.entity_type, self.cache_entity_parent_root.entity_type)
+            root = get_entity_version_parent_or_itself_from_type(
+                self.cache_structure,
+                self.cache_entity_parent_root.acronym,
+                entity)
+            if not root:
                 root = get_entity_version_parent_or_itself_from_type(
                     self.cache_structure,
                     self.cache_entity_parent_root.acronym,
-                    FACULTY)
-                if not root:
-                    root = get_entity_version_parent_or_itself_from_type(
-                        self.cache_structure,
-                        self.cache_entity_parent_root.acronym,
-                        SECTOR)
+                    SECTOR)
             else:
                 root = self.cache_entity_parent_root
             root_entities = get_structure_of_entity_version(self.cache_structure, root.acronym)
             list_entities_from_root = [e for e in root_entities['all_children']]
             list_entities_from_root.append(root_entities['entity_version'])
-            if self.education_group_year:
-                to_compare = self.education_group_year.management_entity.most_recent_acronym
-            else:
-                to_compare = self.learning_unit_year.requirement_entity.most_recent_acronym
             entities = get_structure_of_entity_version(self.cache_structure, to_compare)
             list_entities_children_from_self = [e for e in entities['all_children']]
             list_entities_children_from_self.append(entities['entity_version'])
