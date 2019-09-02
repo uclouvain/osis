@@ -34,7 +34,10 @@ from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED
 from openpyxl.writer.excel import save_virtual_workbook
 
+from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.prerequisite_operator import OR
+from base.models.group_element_year import fetch_row_sql, GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -58,7 +61,10 @@ STYLE_FONT_RED = Style(font=Font(color=RED))
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
 LearningUnitYearLine = namedtuple('LearningUnitYearLine', ['luy_acronym', 'luy_title'])
-PrerequisiteLine = namedtuple('PrerequisiteLine', ['text', 'operator', 'luy_acronym', 'luy_title'])
+PrerequisiteItemLine = namedtuple(
+    'PrerequisiteItemLine',
+    ['text', 'operator', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
+)
 
 
 class EducationGroupYearLearningUnitsPrerequisitesToExcel:
@@ -66,6 +72,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
         self.egy = egy
 
     def get_queryset(self):
+        group_element_years_of_education_group_year = [element["id"] for element in fetch_row_sql([self.egy.id])]
         return Prerequisite.objects.filter(
             education_group_year=self.egy
         ).prefetch_related(
@@ -79,7 +86,18 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
                 ).prefetch_related(
                     Prefetch(
                         "learning_unit__learningunityear_set",
-                        queryset=LearningUnitYear.objects.filter(academic_year=self.egy.academic_year),
+                        queryset=LearningUnitYear.objects.filter(
+                            academic_year=self.egy.academic_year
+                        ).prefetch_related(
+                            Prefetch(
+                                "child_leaf",
+                                queryset=GroupElementYear.objects.filter(
+                                    child_leaf__isnull=False,
+                                    id__in=group_element_years_of_education_group_year
+                                ),
+                                to_attr="links"
+                            )
+                        ),
                         to_attr="luys"
                     )
                 ),
@@ -87,6 +105,8 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
             )
         ).select_related(
             "learning_unit_year"
+        ).order_by(
+            "learning_unit_year__acronym"
         )
 
     def _to_workbook(self):
@@ -113,7 +133,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     _build_worksheet(worksheet_data, workbook, 0)
 
     _merge_cells(excel_lines, workbook)
-
+    _add_hyperlink(excel_lines, workbook, str(egy.academic_year.year))
     return workbook
 
 
@@ -129,27 +149,38 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
     for prerequisite in prerequisite_qs:
         luy = prerequisite.learning_unit_year
         content.append(
-            LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title)
+            LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title_i18n)
         )
-
         groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
         for key, group_gen in groups_generator:
 
             group = list(group_gen)
             for item in group:
-                text = (_("has as prerequisite") + " :") if item.group_number == 1 and item.position == 1 else None
-                operator = _get_operator(prerequisite, item)
-                luy_acronym = _get_item_acronym(item, group)
+                prerequisite_line = _build_prerequisite_line(prerequisite, item, group)
+                content.append(prerequisite_line)
 
-                content.append(
-                    PrerequisiteLine(
-                        text=text,
-                        operator=operator,
-                        luy_acronym=luy_acronym,
-                        luy_title=item.learning_unit.luys[0].complete_title
-                    )
-                )
     return content
+
+
+def _build_prerequisite_line(prerequisite: Prerequisite, prerequisite_item: PrerequisiteItem, group: list):
+    luy_item = prerequisite_item.learning_unit.luys[0]
+
+    text = (_("has as prerequisite") + " :") \
+        if prerequisite_item.group_number == 1 and prerequisite_item.position == 1 else None
+    operator = _get_operator(prerequisite, prerequisite_item)
+    luy_acronym = _get_item_acronym(prerequisite_item, group)
+    credits = _get_item_credits(prerequisite_item)
+    block = _get_item_blocks(prerequisite_item)
+    mandatory = luy_item.links[0].is_mandatory if luy_item.links else None
+    return PrerequisiteItemLine(
+        text=text,
+        operator=operator,
+        luy_acronym=luy_acronym,
+        luy_title=prerequisite_item.learning_unit.luys[0].complete_title_i18n,
+        credits=credits,
+        block=block,
+        mandatory=_("Yes") if mandatory else _("No")
+    )
 
 
 def _get_operator(prerequisite: Prerequisite, prerequisite_item: PrerequisiteItem):
@@ -169,9 +200,22 @@ def _get_item_acronym(prerequisite_item: PrerequisiteItem, group: list):
     return acronym_format.format(acronym=prerequisite_item.learning_unit.luys[0].acronym)
 
 
+def _get_item_credits(prerequisite_item: PrerequisiteItem):
+    luy_item = prerequisite_item.learning_unit.luys[0]
+    return " ; ".join(
+        set(["{} / {:f}".format(grp.relative_credits, luy_item.credits.normalize()) for grp in luy_item.links])
+    )
+
+
+def _get_item_blocks(prerequisite_item: PrerequisiteItem):
+    luy_item = prerequisite_item.learning_unit.luys[0]
+    return " ; ".join(
+        [str(grp.block) for grp in luy_item.links if grp.block]
+    )
+
+
 def _get_style_to_apply(excel_lines: list):
     style_to_apply_dict = defaultdict(list)
-    main_operator = None
     last_luy_line_index = None
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, HeaderLine):
@@ -186,17 +230,16 @@ def _get_style_to_apply(excel_lines: list):
             style_to_apply_dict[STYLE_LIGHT_GRAY].append("B{index}".format(index=index))
             last_luy_line_index = index
 
-        elif isinstance(row, PrerequisiteLine):
-            if row.operator is None:
-                main_operator = None
-            elif main_operator is None:
-                main_operator = row.operator
-            elif main_operator != row.operator:
+        elif isinstance(row, PrerequisiteItemLine):
+            if row.operator == _(OR):
                 style_to_apply_dict[STYLE_FONT_RED].append("B{index}".format(index=index))
 
             if (last_luy_line_index - index) % 2 == 1:
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("C{index}".format(index=index))
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("D{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("E{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("F{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("G{index}".format(index=index))
 
     return style_to_apply_dict
 
@@ -205,4 +248,16 @@ def _merge_cells(excel_lines, workbook: Workbook):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, LearningUnitYearLine):
-            worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=4)
+            worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=7)
+
+
+def _add_hyperlink(excel_lines, workbook: Workbook, year):
+    worksheet = workbook.worksheets[0]
+    for index, row in enumerate(excel_lines, 1):
+        if isinstance(row, LearningUnitYearLine):
+            cell = worksheet.cell(row=index, column=1)
+            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym)
+
+        if isinstance(row, PrerequisiteItemLine):
+            cell = worksheet.cell(row=index, column=3)
+            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym.strip("()"))
