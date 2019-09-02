@@ -125,5 +125,7 @@ def is_learning_unit_in_proposal(lu: LearningUnit):
 
 
 def is_in_proposal_of_transformation(luy):
-    proposal = ProposalLearningUnit.objects.get(learning_unit_year=luy)
-    return proposal.type in [ProposalType.TRANSFORMATION.name, ProposalType.TRANSFORMATION_AND_MODIFICATION.name]
+    return ProposalLearningUnit.objects.filter(
+        learning_unit_year=luy,
+        type__in=[ProposalType.TRANSFORMATION.name, ProposalType.TRANSFORMATION_AND_MODIFICATION.name]
+    ).exists()
