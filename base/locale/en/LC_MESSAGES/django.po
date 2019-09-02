@@ -166,8 +166,6 @@ msgstr ""
 msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr ""
 
-#: forms/prerequisite.py:112
-#: tests/views/education_groups/learning_unit/test_update.py:245
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
@@ -214,9 +212,6 @@ msgstr ""
 msgid "Academic"
 msgstr ""
 
-#: templates/academic_actors.html:31 templates/academic_actors.html:35
-#: templates/base/person_list.html:31 templates/blocks/navbar_top.html:130
-#: templates/institution.html:59
 msgid "Academic actors"
 msgstr ""
 
@@ -358,8 +353,6 @@ msgstr ""
 msgid "Addresses"
 msgstr ""
 
-#: templates/admin/data.html:29 templates/admin/data_maintenance.html:29
-#: templates/admin/storage.html:30 templates/blocks/navbar_top.html:234
 msgid "Administration"
 msgstr ""
 
@@ -539,7 +532,6 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
-#: templates/learning_units.html:72 views/learning_units/search.py:234
 msgid "Borrowed courses"
 msgstr ""
 
@@ -629,8 +621,6 @@ msgstr ""
 msgid "Choose academic years"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:414 models/organization_address.py:47
-#: templates/organization/organization_address.html:58
 msgid "City"
 msgstr ""
 
@@ -741,14 +731,6 @@ msgstr ""
 msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr ""
 
-#: forms/education_group/coorganization.py:41
-#: forms/learning_unit/external_learning_unit.py:68
-#: forms/learning_unit/learning_unit_create.py:202
-#: forms/learning_unit/search_form.py:410 models/organization_address.py:48
-#: templates/education_group/blocks/coorganization_edit.html:38
-#: templates/learning_unit/external/read.html:58
-#: templates/learning_unit/identification.html:225
-#: templates/organization/organization_address.html:62
 msgid "Country"
 msgstr ""
 
@@ -1035,22 +1017,15 @@ msgstr ""
 msgid "Entities"
 msgstr ""
 
-#: templates/base/person_list.html:48
 msgid "Entities for DAFs + designation of note holders and program managers"
 msgstr ""
 
-#: business/education_group.py:49 forms/education_groups.py:80
-#: business/education_group.py:49 forms/education_groups.py:80
-#: templates/education_group/blocks/contacts_general_informations.html:30
-#: templates/education_group/search.html:149 templates/offers.html:51
-#: templates/offers.html:52 templates/offers.html:80
 msgid "Entity"
 msgstr ""
 
 msgid "Entity charges"
 msgstr ""
 
-#: templates/base/person_list.html:48
 msgid "Entity managers"
 msgstr ""
 
@@ -1136,9 +1111,6 @@ msgstr ""
 msgid "Finality 180 list choice"
 msgstr ""
 
-#: templates/base/person_list.html:45
-#: templates/education_group/pdf_content.html:81
-#: templates/my_osis/profile.html:72 templates/search/search.html:45
 msgid "Firstname"
 msgstr ""
 
@@ -1223,7 +1195,6 @@ msgstr ""
 msgid "General Conditions"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:170
 msgid "General configuration"
 msgstr ""
 
@@ -1242,7 +1213,6 @@ msgstr ""
 msgid "Get back to initial data"
 msgstr ""
 
-#: templates/base/person_list.html:46
 msgid "Global ID"
 msgstr ""
 
@@ -1255,11 +1225,9 @@ msgstr ""
 msgid "Group"
 msgstr ""
 
-#: templates/base/person_list.html:47
 msgid "Groups"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:251 templates/blocks/navbar_top.html:253
 msgid "Help"
 msgstr ""
 
@@ -1325,27 +1293,6 @@ msgstr ""
 msgid "Institute"
 msgstr ""
 
-#: business/proposal_xls.py:71 forms/education_group/coorganization.py:47
-#: forms/learning_unit/search_form.py:412 templates/academic_actors.html:30
-#: templates/academic_calendar/academic_calendar.html:31
-#: templates/academic_calendar/academic_calendar_form.html:34
-#: templates/academic_calendar/academic_calendars.html:37
-#: templates/base/person_list.html:30 templates/blocks/navbar_top.html:106
-#: templates/education_group/blocks/coorganization.html:34
-#: templates/education_group/blocks/coorganization_edit.html:39
-#: templates/entities.html:30 templates/entity/breadcrumb.html:28
-#: templates/home.html:91 templates/institution.html:29
-#: templates/institution.html:33
-#: templates/learning_unit/blocks/institution.html:11
-#: templates/learning_unit/by_external.html:48
-#: templates/learning_unit/external/read.html:60
-#: templates/learning_unit/identification.html:238 templates/mandates.html:29
-#: templates/organization/organization.html:29
-#: templates/organization/organization_address.html:30
-#: templates/organization/organization_address_form.html:29
-#: templates/organization/organization_form.html:31
-#: templates/organization/organizations.html:30
-#: tests/business/test_proposal_xls.py:124
 msgid "Institution"
 msgstr ""
 
@@ -1459,8 +1406,6 @@ msgstr ""
 msgid "Last modifications"
 msgstr ""
 
-#: templates/base/person_list.html:44 templates/my_osis/profile.html:79
-#: templates/search/search.html:44
 msgid "Lastname"
 msgstr ""
 
@@ -1503,20 +1448,6 @@ msgstr ""
 msgid "Learning unit year"
 msgstr ""
 
-#: templates/base/quick_search_inner.html:31
-#: templates/blocks/navbar_top.html:45 templates/catalog.html:51
-#: templates/learning_unit/blocks/modal/modal_mail_summary_reminder.html:42
-#: templates/learning_unit/breadcrumb.html:29
-#: templates/learning_unit/by_external.html:39
-#: templates/learning_unit/comparison.html:28
-#: templates/learning_unit/external/create.html:29
-#: templates/learning_unit/learning_unit_layout.html:11
-#: templates/learning_unit/proposal_comparison.html:28
-#: templates/learning_unit/simple/creation.html:30
-#: templates/learning_unit/summary_list.html:70
-#: templates/learning_unit/volumes_management.html:31
-#: templates/learning_units.html:32 templates/learning_units.html:49
-#: views/learning_units/search.py:235
 msgid "Learning units"
 msgstr ""
 
@@ -1583,7 +1514,6 @@ msgstr ""
 msgid "List of trainings with administrative data"
 msgstr ""
 
-#: templates/academic_actors.html:67 templates/base/person_list.html:32
 msgid "List of users"
 msgstr ""
 
@@ -1602,7 +1532,6 @@ msgstr ""
 msgid "Lock"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:260 templates/registration/login.html:29
 msgid "Login"
 msgstr ""
 
@@ -1612,7 +1541,6 @@ msgstr ""
 msgid "Logistics entity"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:242 templates/logged_out.html:31
 msgid "Logout"
 msgstr ""
 
@@ -1650,12 +1578,6 @@ msgstr ""
 msgid "Managed programs"
 msgstr ""
 
-#: business/education_group.py:59 models/education_group_year.py:468
-#: models/enums/offer_year_entity_type.py:33
-#: templates/blocks/navbar_top.html:157
-#: templates/education_group/identification_group_details.html:37
-#: templates/education_group/identification_mini_training_details.html:37
-#: templates/education_group/identification_training_details.html:96
 msgid "Management entity"
 msgstr ""
 
@@ -1814,10 +1736,6 @@ msgstr ""
 msgid "My Messages"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:227 templates/home.html:98
-#: templates/my_osis/home.html:30 templates/my_osis/home.html:34
-#: templates/my_osis/my_message.html:30 templates/my_osis/my_messages.html:30
-#: templates/my_osis/profile.html:30
 msgid "My OSIS"
 msgstr ""
 
@@ -1881,9 +1799,6 @@ msgstr ""
 msgid "No enrollment for this learning unit"
 msgstr ""
 
-#: forms/prerequisite.py:120
-#: tests/views/education_groups/learning_unit/test_update.py:223
-#: tests/views/education_groups/learning_unit/test_update.py:227
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
@@ -1891,16 +1806,9 @@ msgstr ""
 msgid "No print"
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:406
-#: views/learning_units/search.py:208
 msgid "No proposals was selected."
 msgstr ""
 
-#: templates/academic_calendar/academic_calendars.html:106
-#: templates/entities.html:59 templates/learning_unit/summary_list.html:121
-#: templates/offers.html:71 templates/organization/organizations.html:81
-#: tests/views/education_groups/test_search.py:196 views/common.py:229
-#: views/education_groups/search.py:61
 msgid "No result!"
 msgstr ""
 
@@ -1941,7 +1849,6 @@ msgstr ""
 msgid "Not required"
 msgstr ""
 
-#: templates/base/person_list.html:53
 msgid "Note encoding"
 msgstr ""
 
@@ -2088,15 +1995,12 @@ msgstr ""
 msgid "Partims"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:161
 msgid "Partners"
 msgstr ""
 
-#: templates/base/person_list.html:51
 msgid "Partnership entities"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:151
 msgid "Partnerships"
 msgstr ""
 
@@ -2115,7 +2019,6 @@ msgstr ""
 msgid "Periodicity"
 msgstr ""
 
-#: templates/base/person_list.html:49
 msgid "Person entities"
 msgstr ""
 
@@ -2148,11 +2051,9 @@ msgid ""
 "12, 23, 46"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:413
 msgid "Please select a country and a city first"
 msgstr ""
 
-#: forms/learning_unit/search_form.py:415
 msgid "Please select a country first"
 msgstr ""
 
@@ -2195,7 +2096,6 @@ msgstr[1] ""
 msgid "Prerequisites are invalid"
 msgstr ""
 
-#: views/education_groups/learning_unit/update.py:112
 msgid "Prerequisites saved."
 msgstr ""
 
@@ -2256,8 +2156,6 @@ msgstr ""
 msgid "Program manager"
 msgstr ""
 
-#: templates/base/person_list.html:53
-#: templates/education_group/tab_administrative_data.html:186
 msgid "Program managers"
 msgstr ""
 
@@ -2329,8 +2227,6 @@ msgstr ""
 msgid "Proposal type"
 msgstr ""
 
-#: business/proposal_xls.py:34 business/proposal_xls.py:35
-#: templates/learning_units.html:77 views/learning_units/search.py:232
 msgid "Proposals"
 msgstr ""
 
@@ -2501,10 +2397,6 @@ msgstr ""
 msgid "Scores responsibles"
 msgstr ""
 
-#: templates/base/quick_search_inner.html:5
-#: templates/blocks/navbar_top.html:194 templates/blocks/navbar_top.html:196
-#: templates/education_group/blocks/dropdown/identification_actions_bar.html:111
-#: templates/education_group/blocks/dropdown/identification_actions_bar.html:112
 msgid "Search"
 msgstr ""
 
@@ -2517,7 +2409,6 @@ msgstr ""
 msgid "Search of annual programs"
 msgstr ""
 
-#: views/learning_units/search.py:226
 msgid "Search type"
 msgstr ""
 
@@ -2551,7 +2442,6 @@ msgstr ""
 msgid "Separate"
 msgstr ""
 
-#: templates/learning_units.html:67 views/learning_units/search.py:233
 msgid "Service courses"
 msgstr ""
 
@@ -3117,7 +3007,6 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
-#: views/learning_units/search.py:85
 msgid "Too many results"
 msgstr ""
 
@@ -3130,7 +3019,6 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
-#: templates/base/person_list.html:49
 msgid "Trainings and learning units"
 msgstr ""
 
@@ -3234,7 +3122,6 @@ msgstr ""
 msgid "User interface language"
 msgstr ""
 
-#: templates/base/person_list.html:37
 msgid "Users"
 msgstr ""
 
@@ -3256,11 +3143,9 @@ msgstr ""
 msgid "Versions"
 msgstr ""
 
-#: templates/academic_actors.html:68
 msgid "View list of users with groups and person entities"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:73 templates/studies.html:69
 msgid "Virtual Desktop"
 msgstr ""
 
@@ -3524,7 +3409,6 @@ msgstr ""
 msgid "additional informations"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:166
 msgid "agreements"
 msgstr ""
 
@@ -3713,11 +3597,9 @@ msgstr ""
 msgid "parameters"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:163
 msgid "partnerships"
 msgstr ""
 
-#: templates/blocks/navbar_top.html:177
 msgid "partnerships_financing_configuration"
 msgstr ""
 
