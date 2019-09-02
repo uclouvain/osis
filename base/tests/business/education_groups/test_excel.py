@@ -83,7 +83,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
             [_("has as prerequisite") + " :", '', self.luy_children[1].acronym,
              self.luy_children[1].complete_title_i18n,
              "{} / {}".format(self.child_leaves[1].relative_credits, self.luy_children[1].credits),
-             str(self.child_leaves[1].block),
+             str(self.child_leaves[1].block) if self.child_leaves[1].block else '',
              _("Yes") if self.child_leaves[1].is_mandatory else _("No")]
         ]
 
@@ -97,18 +97,18 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
             [_("has as prerequisite") + " :", '', self.luy_children[3].acronym,
              self.luy_children[3].complete_title_i18n,
              "{} / {}".format(self.child_leaves[3].relative_credits, self.luy_children[3].credits),
-             str(self.child_leaves[3].block),
+             str(self.child_leaves[3].block) if self.child_leaves[3].block else '',
              _("Yes") if self.child_leaves[3].is_mandatory else _("No")],
 
             ['', _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title_i18n,
              "{} / {}".format(self.child_leaves[4].relative_credits, self.luy_children[4].credits),
-             str(self.child_leaves[4].block),
+             str(self.child_leaves[4].block) if self.child_leaves[4].block else '',
              _("Yes") if self.child_leaves[4].is_mandatory else _("No")
              ],
 
             ['', _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title_i18n,
              "{} / {}".format(self.child_leaves[5].relative_credits, self.luy_children[5].credits),
-             str(self.child_leaves[5].block),
+             str(self.child_leaves[5].block) if self.child_leaves[5].block else '',
              _("Yes") if self.child_leaves[5].is_mandatory else _("No")
              ]
         ]

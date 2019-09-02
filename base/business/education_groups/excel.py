@@ -155,30 +155,31 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
 
             group = list(group_gen)
             for item in group:
-                luy = item.learning_unit.luys[0]
+                prerequisite_line = _build_prerequisite_line(prerequisite, item, group)
+                content.append(prerequisite_line)
 
-                text = (_("has as prerequisite") + " :") if item.group_number == 1 and item.position == 1 else None
-                operator = _get_operator(prerequisite, item)
-                luy_acronym = _get_item_acronym(item, group)
-                credits = " ; ".join(
-                    ["{} / {:f}".format(grp.relative_credits, luy.credits.normalize()) for grp in luy.links]
-                )
-                block = " ; ".join(
-                    [str(grp.block) for grp in luy.links]
-                )
-                mandatory = luy.links[0].is_mandatory
-                content.append(
-                    PrerequisiteLine(
-                        text=text,
-                        operator=operator,
-                        luy_acronym=luy_acronym,
-                        luy_title=item.learning_unit.luys[0].complete_title_i18n,
-                        credits=credits,
-                        block=block,
-                        mandatory=_("Yes") if mandatory else _("No")
-                    )
-                )
     return content
+
+
+def _build_prerequisite_line(prerequisite: Prerequisite, prerequisite_item: PrerequisiteItem, group: list):
+    luy_item = prerequisite_item.learning_unit.luys[0]
+
+    text = (_("has as prerequisite") + " :") \
+        if prerequisite_item.group_number == 1 and prerequisite_item.position == 1 else None
+    operator = _get_operator(prerequisite, prerequisite_item)
+    luy_acronym = _get_item_acronym(prerequisite_item, group)
+    credits = _get_item_credits(prerequisite_item)
+    block = _get_item_blocks(prerequisite_item)
+    mandatory = luy_item.links[0].is_mandatory if luy_item.links else None
+    return PrerequisiteLine(
+        text=text,
+        operator=operator,
+        luy_acronym=luy_acronym,
+        luy_title=prerequisite_item.learning_unit.luys[0].complete_title_i18n,
+        credits=credits,
+        block=block,
+        mandatory=_("Yes") if mandatory else _("No")
+    )
 
 
 def _get_operator(prerequisite: Prerequisite, prerequisite_item: PrerequisiteItem):
@@ -196,6 +197,20 @@ def _get_item_acronym(prerequisite_item: PrerequisiteItem, group: list):
     elif prerequisite_item.position == len(group) and len(group) > 1:
         acronym_format = "{acronym})"
     return acronym_format.format(acronym=prerequisite_item.learning_unit.luys[0].acronym)
+
+
+def _get_item_credits(prerequisite_item: PrerequisiteItem):
+    luy_item = prerequisite_item.learning_unit.luys[0]
+    return " ; ".join(
+        set(["{} / {:f}".format(grp.relative_credits, luy_item.credits.normalize()) for grp in luy_item.links])
+    )
+
+
+def _get_item_blocks(prerequisite_item: PrerequisiteItem):
+    luy_item = prerequisite_item.learning_unit.luys[0]
+    return " ; ".join(
+        [str(grp.block) for grp in luy_item.links if grp.block]
+    )
 
 
 def _get_style_to_apply(excel_lines: list):
