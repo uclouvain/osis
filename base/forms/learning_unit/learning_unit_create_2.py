@@ -350,7 +350,7 @@ class FullForm(LearningUnitBaseForm):
         )
 
         container_year = self.learning_container_year_form.save(
-            academic_year=self.forms[LearningUnitYearModelForm].cleaned_data['academic_year'],
+            academic_year=self.academic_year,
             learning_container=learning_container,
             acronym=self.learning_unit_year_form.instance.acronym,
             commit=commit
