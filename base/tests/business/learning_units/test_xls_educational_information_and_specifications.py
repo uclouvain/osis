@@ -36,7 +36,7 @@ from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.person import PersonFactory
 from base.business.learning_units.xls_educational_information_and_specifications import _get_titles, \
-    _add_cms_title_fr_en, FR_BE, EN, prepare_xls_educational_information_and_specifications
+    _add_cms_title_fr_en, prepare_xls_educational_information_and_specifications
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
@@ -56,6 +56,7 @@ from base.tests.factories.user import UserFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from reference.tests.factories.language import LanguageFactory
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
@@ -99,18 +100,18 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
         for idx, cms_label in enumerate(cms_labels):
             tl = TextLabelFactory(label=cms_label, entity=LEARNING_UNIT_YEAR)
             TranslatedTextLabelFactory(text_label=tl,
-                                       language=FR_BE,
+                                       language=LANGUAGE_CODE_FR,
                                        label="{}{}".format(PREFIX_FAKE_LABEL, cms_label))
             TranslatedTextLabelFactory(text_label=tl,
-                                       language=EN,
+                                       language=LANGUAGE_CODE_EN,
                                        label="{}{}".format(PREFIX_FAKE_LABEL, cms_label))
-            TranslatedTextFactory(language=FR_BE,
+            TranslatedTextFactory(language=LANGUAGE_CODE_FR,
                                   text="{}{} - FR".format(PREFIX_FAKE_TEXT_LABEL, cms_label),
                                   text_label=tl,
                                   reference=cls.l_unit_yr_1.id,
                                   entity=LEARNING_UNIT_YEAR)
             if with_en:
-                TranslatedTextFactory(language=EN,
+                TranslatedTextFactory(language=LANGUAGE_CODE_EN,
                                       text="{}{} - EN".format(PREFIX_FAKE_TEXT_LABEL, cms_label),
                                       text_label=tl,
                                       reference=cls.l_unit_yr_1.id,
@@ -164,8 +165,8 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             str('cms_themes_discussed - EN'),
             str('cms_prerequisite - FR-BE'),
             str('cms_prerequisite - EN'),
-            str("{} - {}".format(str('Learning achievements'), FR_BE.upper())),
-            str("{} - {}".format(str(_('Learning achievements')), EN.upper()))
+            str("{} - {}".format(str(_('Learning achievements')), LANGUAGE_CODE_FR.upper())),
+            str("{} - {}".format(str('Learning achievements'), LANGUAGE_CODE_EN.upper()))
         ]
 
         for idx, title in enumerate(titles):
@@ -223,11 +224,11 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
         titles = _add_cms_title_fr_en([CMS_LABEL_PEDAGOGY_FR_AND_EN[0]], False)
         self.assertCountEqual(titles, ["{}{} - {}".format(PREFIX_FAKE_LABEL,
                                                           CMS_LABEL_PEDAGOGY_FR_AND_EN[0],
-                                                          FR_BE.upper())])
+                                                          LANGUAGE_CODE_FR.upper())])
 
         titles = _add_cms_title_fr_en([CMS_LABEL_PEDAGOGY_FR_AND_EN[0]], True)
         self.assertCountEqual(
             titles,
-            ["{}{} - {}".format(PREFIX_FAKE_LABEL, CMS_LABEL_PEDAGOGY_FR_AND_EN[0], FR_BE.upper()),
-             "{}{} - {}".format(PREFIX_FAKE_LABEL, CMS_LABEL_PEDAGOGY_FR_AND_EN[0], EN.upper())]
+            ["{}{} - {}".format(PREFIX_FAKE_LABEL, CMS_LABEL_PEDAGOGY_FR_AND_EN[0], LANGUAGE_CODE_FR.upper()),
+             "{}{} - {}".format(PREFIX_FAKE_LABEL, CMS_LABEL_PEDAGOGY_FR_AND_EN[0], LANGUAGE_CODE_EN.upper())]
         )

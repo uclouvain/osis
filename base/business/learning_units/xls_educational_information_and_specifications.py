@@ -42,9 +42,7 @@ from base.business.learning_unit_xls import annotate_qs
 from base.business.xls import get_name_or_username
 from osis_common.document import xls_build
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
-
-EN = 'en'
-FR_BE = 'fr-be'
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
@@ -88,8 +86,8 @@ def _get_titles():
     titles = titles + [str(_('Teaching material'))]
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_PEDAGOGY_FR_ONLY, False)
     titles = titles + _add_cms_title_fr_en(CMS_LABEL_SPECIFICATIONS, True)
-    titles = titles + [str("{} - {}".format('Learning achievements', FR_BE.upper())),
-                       str("{} - {}".format(_('Learning achievements'), EN.upper()))]
+    titles = titles + [str("{} - {}".format(_('Learning achievements'), LANGUAGE_CODE_FR.upper())),
+                       str("{} - {}".format('Learning achievements', LANGUAGE_CODE_EN.upper()))]
     return titles
 
 
@@ -97,9 +95,9 @@ def _add_cms_title_fr_en(cms_labels, with_en=True):
     titles = []
     for label_key in cms_labels:
         a_text_label = TextLabel.objects.filter(label=label_key).first()
-        titles.append(_add_text_label(a_text_label, FR_BE))
+        titles.append(_add_text_label(a_text_label, LANGUAGE_CODE_FR))
         if with_en:
-            titles.append(_add_text_label(a_text_label, EN))
+            titles.append(_add_text_label(a_text_label, LANGUAGE_CODE_EN))
     return titles
 
 
@@ -132,15 +130,7 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
                 line.append('')
 
         if teaching_materials:
-            teaching_material_detail = None
-            for teaching_material in teaching_materials:
-                if teaching_material_detail is None:
-                    teaching_material_detail = ''
-                else:
-                    teaching_material_detail += "\n"
-
-                teaching_material_detail += teaching_material.title
-            line.append(teaching_material_detail)
+            line.append("\n".join([teaching_material.title for teaching_material in teaching_materials]))
         else:
             line.append('')
 
@@ -166,8 +156,11 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
 
 def _add_achievements(learning_unit_yr):
     achievements = get_achievements_group_by_language(learning_unit_yr)
-    return [_add_achievement(achievements.get('achievements_FR', None)),
-            _add_achievement(achievements.get('achievements_EN', None))]
+    achievements_fr = (achievements.get('achievements_FR', None))
+    achievements_en = (achievements.get('achievements_EN', None))
+    return ["\n".join([achievement.text for achievement in achievements_fr]) if achievements_fr else '',
+            "\n".join([achievement.text for achievement in achievements_en]) if achievements_en else ''
+            ]
 
 
 def _add_specifications(learning_unit_yr, line, request):
@@ -175,8 +168,8 @@ def _add_specifications(learning_unit_yr, line, request):
     obj_fr = specifications.get('form_french')
     obj_en = specifications.get('form_english')
     for label_key in CMS_LABEL_SPECIFICATIONS:
-        _add_specification_by_lang(label_key, obj_fr, line)
-        _add_specification_by_lang(label_key, obj_en, line)
+        line.append(getattr(obj_fr, label_key, None))
+        line.append(getattr(obj_en, label_key, None))
 
 
 def _get_translated_labels_with_text(learning_unit_year_id, user_language):
@@ -214,32 +207,6 @@ def _get_translated_labels_with_text(learning_unit_year_id, user_language):
         "label_ordering"
     )
     return translated_labels_with_text
-
-
-def _add_achievement(achievements):
-    achievement_detail = None
-    if achievements:
-        for achievement in achievements:
-            if achievement_detail is None:
-                achievement_detail = ''
-            else:
-                achievement_detail += '\n'
-            achievement_detail += achievement.text
-
-        return achievement_detail
-    else:
-        return ''
-
-
-def _add_specification_by_lang(label_key, obj_fr, part_fr):
-    try:
-        french_value = obj_fr.__getattribute__(label_key)
-    except AttributeError:
-        french_value = None
-    if french_value:
-        part_fr.append(french_value)
-    else:
-        part_fr.append('')
 
 
 def _get_wrapped_cells_educational_information_and_specifications(learning_units, nb_col):
