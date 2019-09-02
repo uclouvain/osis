@@ -91,6 +91,13 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class EducationGroupYearQueryset(SerializableQuerySet):
+    def get_queryset(self):
+        return self.get_queryset().select_related('administration_entity',
+                                                  'management_entity',
+                                                  'management_entity_version')\
+            .prefetch_related('administration_entity.entityversion_set',
+                              'management_entity.entityversion_set')
+
     def get_nearest_years(self, year):
         return self.aggregate(
             futur=Min(
