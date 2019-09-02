@@ -3985,8 +3985,3 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
-#~ msgid "Excel prerequisites learning units"
-#~ msgstr "Excel prérequis unités d'enseignement"
-
-#~ msgid "Formation prerequisites"
-#~ msgstr "Prérequis offre"
