@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:42+0200\n"
+"POT-Creation-Date: 2019-08-16 14:32+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1594,6 +1594,9 @@ msgstr "Liste des formations avec données administratives"
 
 msgid "List of users"
 msgstr "Liste des utilisateurs"
+
+msgid "List of users with their groups and linked entities"
+msgstr "Liste des utilisateurs avec leurs groupes et entités liés."
 
 msgid "List proposals"
 msgstr "Liste des propositions"
@@ -3553,6 +3556,15 @@ msgstr "Vous n'avez pas le droit de consolider"
 
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"
+
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
+msgstr ""
+"Vous devez être dans le contexte d'une formation pour modifier les prérequis "
+"d'une unité d'enseignement(contexte actuel: %(partial_acronym)s - "
+"%(acronym)s)"
 
 msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis"

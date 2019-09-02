@@ -41,8 +41,7 @@ from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory, \
     GroupEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory, \
-    GroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -352,7 +351,6 @@ class TestEducationGroupTypeAutoComplete(TestCase):
 
         expected_response = {
             'id': str(education_group_type.pk),
-            'selected_text': education_group_type.get_name_display(),
             'text': education_group_type.get_name_display()
         }
         self.assertEqual(len(json_response["results"]), 1)
