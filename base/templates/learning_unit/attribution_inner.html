@@ -37,14 +37,12 @@
         {% endif %}
         <div class="row">
             <div class="col-md-6">
-                <label>{% trans 'Tutor' %} *</label><br>
-                <div id="div_test" data-width='100%'>
+                <label class="control-label" for="id_attribution_form-person">{% trans 'Tutor' %} *</label><br>
                 {% if attribution %}
                     {{ attribution.tutor.person }}
                 {% else %}
-                    {% bootstrap_field attribution_form.person class="col-md-6"%}
+                    {% bootstrap_field attribution_form.person %}
                 {% endif %}
-                </div>
             </div>
             {% bootstrap_field attribution_form.function form_group_class="col-md-6" %}
         </div>
