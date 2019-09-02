@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-28 14:28+0200\n"
+"POT-Creation-Date: 2019-08-29 09:42+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -252,7 +252,7 @@ msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr "<b>Prolonger</b> l’unité d’enseignement du même acronyme"
 
 #: forms/prerequisite.py:112
-#: tests/views/education_groups/learning_unit/test_update.py:245
+#: tests/views/education_groups/learning_unit/test_update.py:256
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
@@ -2174,7 +2174,7 @@ msgstr "Valeur initiale"
 msgid "Institute"
 msgstr "Institut"
 
-#: business/proposal_xls.py:71 forms/education_group/coorganization.py:48
+#: business/proposal_xls.py:71 forms/education_group/coorganization.py:47
 #: forms/learning_unit/search_form.py:419 templates/academic_actors.html:30
 #: templates/academic_calendar/academic_calendar.html:31
 #: templates/academic_calendar/academic_calendar_form.html:34
@@ -3022,8 +3022,8 @@ msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
 
 #: forms/prerequisite.py:120
-#: tests/views/education_groups/learning_unit/test_update.py:223
-#: tests/views/education_groups/learning_unit/test_update.py:227
+#: tests/views/education_groups/learning_unit/test_update.py:234
+#: tests/views/education_groups/learning_unit/test_update.py:238
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
@@ -3484,7 +3484,7 @@ msgstr[1] "Prérequis"
 msgid "Prerequisites are invalid"
 msgstr "<p>Prérequis invalides</p>"
 
-#: views/education_groups/learning_unit/update.py:112
+#: views/education_groups/learning_unit/update.py:124
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
@@ -5612,6 +5612,16 @@ msgstr "Vous n'avez pas le droit de consolider"
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"
 
+#: views/education_groups/learning_unit/update.py:114
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
+msgstr ""
+"Vous devez être dans le contexte d'une formation pour modifier les prérequis "
+"d'une unité d'enseignement(contexte actuel: %(partial_acronym)s - "
+"%(acronym)s)"
+
 #: forms/learning_unit/learning_unit_create.py:377
 #: forms/learning_unit/learning_unit_create_2.py:209
 #: tests/views/learning_units/proposals/test_creation.py:200
@@ -6331,10 +6341,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:182
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid ""
-#~ "Consistency error in %(academic_year)s with organization "
-#~ "%(organization)s: %(error)s"
-#~ msgstr ""
-#~ "Erreur de consistance en %(academic_year)s avec l'organisation "
-#~ "%(organization)s: %(error)s"
