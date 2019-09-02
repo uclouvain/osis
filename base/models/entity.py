@@ -62,6 +62,14 @@ class Entity(SerializableModel):
         except IndexError:
             return None
 
+    @property
+    def most_recent_entity_version(self):
+        try:
+            most_recent_entity_version = sorted(self.entityversion_set.all(), key=lambda x: x.start_date)
+            return most_recent_entity_version[-1]
+        except IndexError:
+            return None
+
     class Meta:
         verbose_name_plural = "entities"
 
