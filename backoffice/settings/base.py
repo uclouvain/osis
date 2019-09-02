@@ -56,7 +56,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'dal',
     'dal_select2',
-    'dal_legacy_static',  # TODO : Useless in Django 2.0
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
