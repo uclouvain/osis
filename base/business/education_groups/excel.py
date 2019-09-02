@@ -60,8 +60,8 @@ STYLE_FONT_RED = Style(font=Font(color=RED))
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
 LearningUnitYearLine = namedtuple('LearningUnitYearLine', ['luy_acronym', 'luy_title'])
-PrerequisiteLine = namedtuple(
-    'PrerequisiteLine',
+PrerequisiteItemLine = namedtuple(
+    'PrerequisiteItemLine',
     ['text', 'operator', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
 )
 
@@ -171,7 +171,7 @@ def _build_prerequisite_line(prerequisite: Prerequisite, prerequisite_item: Prer
     credits = _get_item_credits(prerequisite_item)
     block = _get_item_blocks(prerequisite_item)
     mandatory = luy_item.links[0].is_mandatory if luy_item.links else None
-    return PrerequisiteLine(
+    return PrerequisiteItemLine(
         text=text,
         operator=operator,
         luy_acronym=luy_acronym,
@@ -229,13 +229,16 @@ def _get_style_to_apply(excel_lines: list):
             style_to_apply_dict[STYLE_LIGHT_GRAY].append("B{index}".format(index=index))
             last_luy_line_index = index
 
-        elif isinstance(row, PrerequisiteLine):
+        elif isinstance(row, PrerequisiteItemLine):
             if row.operator == _(OR):
                 style_to_apply_dict[STYLE_FONT_RED].append("B{index}".format(index=index))
 
             if (last_luy_line_index - index) % 2 == 1:
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("C{index}".format(index=index))
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("D{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("E{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("F{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("G{index}".format(index=index))
 
     return style_to_apply_dict
 
@@ -244,4 +247,4 @@ def _merge_cells(excel_lines, workbook: Workbook):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, LearningUnitYearLine):
-            worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=4)
+            worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=7)
