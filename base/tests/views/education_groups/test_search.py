@@ -351,7 +351,6 @@ class TestEducationGroupTypeAutoComplete(TestCase):
 
         expected_response = {
             'id': str(education_group_type.pk),
-            'selected_text': education_group_type.get_name_display(),
             'text': education_group_type.get_name_display()
         }
         self.assertEqual(len(json_response["results"]), 1)
