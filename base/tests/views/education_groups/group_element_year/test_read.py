@@ -30,21 +30,19 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.enums import education_group_categories
+from base.models.enums import education_group_types
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import GroupFactory
+from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
-from base.tests.factories.education_group_year import MiniTrainingFactory
-from base.models.enums.education_group_types import MiniTrainingType
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.models.enums import education_group_categories
-from base.models.enums import education_group_types
-from base.models.group_element_year import GroupElementYear
-from base.tests.factories.education_group_year import GroupFactory
 
 
 class TestRead(TestCase):

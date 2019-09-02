@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-30 11:38+0200\n"
+"POT-Creation-Date: 2019-08-23 09:30+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1597,6 +1597,9 @@ msgstr "Liste des formations avec données administratives"
 
 msgid "List of users"
 msgstr "Liste des utilisateurs"
+
+msgid "List of users with their groups and linked entities"
+msgstr "Liste des utilisateurs avec leurs groupes et entités liés."
 
 msgid "List proposals"
 msgstr "Liste des propositions"
