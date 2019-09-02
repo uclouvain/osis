@@ -34,6 +34,11 @@ from base.tests.factories.utils.fuzzy import FuzzyBoolean
 
 
 def _generate_block_value():
+    """Generate a random string composed of digit between 1 and 6 included.
+    Each digit can be represented at most once in the string and they are sorted from smallest to greatest.
+
+    Ex: "", "156", "2", "456" and so on
+    """
     rand = factory.fuzzy._random
 
     population = list(range(1, 7))
