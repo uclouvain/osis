@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Prefetch
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.excel import generate_prerequisites_workbook
+from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel
 from base.models.enums.prerequisite_operator import AND, OR
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.prerequisite import Prerequisite
-from base.models.prerequisite_item import PrerequisiteItem
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -45,6 +41,11 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
             6,
             parent=cls.education_group_year
         )
+        luy_acronyms = ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]
+        for node, acronym in zip(cls.child_leaves, luy_acronyms):
+            node.child_leaf.acronym = acronym
+            node.child_leaf.save()
+
         cls.luy_children = [child.child_leaf for child in cls.child_leaves]
 
         PrerequisiteFactory(
@@ -63,32 +64,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
             )
         )
 
-        cls.prerequisites = Prerequisite.objects.filter(
-            education_group_year=cls.education_group_year
-        ).prefetch_related(
-            Prefetch(
-                "prerequisiteitem_set",
-                queryset=PrerequisiteItem.objects.order_by(
-                    'group_number',
-                    'position'
-                ).select_related(
-                    "learning_unit"
-                ).prefetch_related(
-                    Prefetch(
-                        "learning_unit__learningunityear_set",
-                        queryset=LearningUnitYear.objects.filter(academic_year=cls.education_group_year.academic_year),
-                        to_attr="luys"
-                    )
-                ),
-                to_attr="items"
-            )
-        ).select_related(
-            "learning_unit_year"
-        ).order_by(
-            "learning_unit_year__id"
-        )
-
-        cls.workbook = generate_prerequisites_workbook(cls.education_group_year, cls.prerequisites)
+        cls.workbook = EducationGroupYearLearningUnitsPrerequisitesToExcel(cls.education_group_year)._to_workbook()
         cls.sheet = cls.workbook.worksheets[0]
 
     def test_header_lines(self):
@@ -102,24 +78,57 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
 
     def test_when_learning_unit_year_has_one_prerequisite(self):
         expected_content = [
-            [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None],
+            [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None, None, None, None],
+
             [_("has as prerequisite") + " :", '', self.luy_children[1].acronym,
-             self.luy_children[1].complete_title_i18n]
+             self.luy_children[1].complete_title_i18n,
+             "{} / {}".format(self.child_leaves[1].relative_credits, self.luy_children[1].credits),
+             str(self.child_leaves[1].block),
+             _("Yes") if self.child_leaves[1].is_mandatory else _("No")]
         ]
 
-        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:D4")]
+        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:G4")]
         self.assertListEqual(expected_content, content)
 
     def test_when_learning_unit_year_has_multiple_prerequisites(self):
         expected_content = [
-            [self.luy_children[2].acronym, self.luy_children[2].complete_title, None, None],
+            [self.luy_children[2].acronym, self.luy_children[2].complete_title, None, None, None, None, None],
+
             [_("has as prerequisite") + " :", '', self.luy_children[3].acronym,
-             self.luy_children[3].complete_title_i18n],
-            ['', _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title_i18n],
-            ['', _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title_i18n]
+             self.luy_children[3].complete_title_i18n,
+             "{} / {}".format(self.child_leaves[3].relative_credits, self.luy_children[3].credits),
+             str(self.child_leaves[3].block),
+             _("Yes") if self.child_leaves[3].is_mandatory else _("No")],
+
+            ['', _(AND), "(" + self.luy_children[4].acronym, self.luy_children[4].complete_title_i18n,
+             "{} / {}".format(self.child_leaves[4].relative_credits, self.luy_children[4].credits),
+             str(self.child_leaves[4].block),
+             _("Yes") if self.child_leaves[4].is_mandatory else _("No")
+             ],
+
+            ['', _(OR), self.luy_children[5].acronym + ")", self.luy_children[5].complete_title_i18n,
+             "{} / {}".format(self.child_leaves[5].relative_credits, self.luy_children[5].credits),
+             str(self.child_leaves[5].block),
+             _("Yes") if self.child_leaves[5].is_mandatory else _("No")
+             ]
         ]
-        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:D8")]
+        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:G8")]
         self.assertListEqual(expected_content, content)
+
+    @staticmethod
+    def get_luy_line(luy):
+        return [luy.acronym, luy.complete_title, None, None, None, None, None]
+
+    @staticmethod
+    def get_item_line(luy, grp, operator, first_item=False):
+        return [
+            (_("has as prerequisite") + " :") if first_item else None,
+            operator,
+            luy.acronym,
+            luy.complete_title_i18n,
+            "{} / {}".format(grp.relative_credits, luy.credits),
+            str(grp.block),
+            _("Yes") if grp.is_mandatory else _("No")]
 
 
 def row_to_value(sheet_row):

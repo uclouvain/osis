@@ -36,6 +36,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR
+from base.models.group_element_year import fetch_row_sql, GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
@@ -59,7 +60,10 @@ STYLE_FONT_RED = Style(font=Font(color=RED))
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
 LearningUnitYearLine = namedtuple('LearningUnitYearLine', ['luy_acronym', 'luy_title'])
-PrerequisiteLine = namedtuple('PrerequisiteLine', ['text', 'operator', 'luy_acronym', 'luy_title'])
+PrerequisiteLine = namedtuple(
+    'PrerequisiteLine',
+    ['text', 'operator', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
+)
 
 
 class EducationGroupYearLearningUnitsPrerequisitesToExcel:
@@ -67,6 +71,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
         self.egy = egy
 
     def get_queryset(self):
+        group_element_years_of_education_group_year = [element["id"] for element in fetch_row_sql([self.egy.id])]
         return Prerequisite.objects.filter(
             education_group_year=self.egy
         ).prefetch_related(
@@ -80,7 +85,18 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
                 ).prefetch_related(
                     Prefetch(
                         "learning_unit__learningunityear_set",
-                        queryset=LearningUnitYear.objects.filter(academic_year=self.egy.academic_year),
+                        queryset=LearningUnitYear.objects.filter(
+                            academic_year=self.egy.academic_year
+                        ).prefetch_related(
+                            Prefetch(
+                                "child_leaf",
+                                queryset=GroupElementYear.objects.filter(
+                                    child_leaf__isnull=False,
+                                    id__in=group_element_years_of_education_group_year
+                                ),
+                                to_attr="links"
+                            )
+                        ),
                         to_attr="luys"
                     )
                 ),
@@ -88,6 +104,8 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
             )
         ).select_related(
             "learning_unit_year"
+        ).order_by(
+            "learning_unit_year__acronym"
         )
 
     def _to_workbook(self):
@@ -132,22 +150,32 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
         content.append(
             LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title_i18n)
         )
-
         groups_generator = itertools.groupby(prerequisite.items, key=lambda item: item.group_number)
         for key, group_gen in groups_generator:
 
             group = list(group_gen)
             for item in group:
+                luy = item.learning_unit.luys[0]
+
                 text = (_("has as prerequisite") + " :") if item.group_number == 1 and item.position == 1 else None
                 operator = _get_operator(prerequisite, item)
                 luy_acronym = _get_item_acronym(item, group)
-
+                credits = " ; ".join(
+                    ["{} / {:f}".format(grp.relative_credits, luy.credits.normalize()) for grp in luy.links]
+                )
+                block = " ; ".join(
+                    [str(grp.block) for grp in luy.links]
+                )
+                mandatory = luy.links[0].is_mandatory
                 content.append(
                     PrerequisiteLine(
                         text=text,
                         operator=operator,
                         luy_acronym=luy_acronym,
-                        luy_title=item.learning_unit.luys[0].complete_title_i18n
+                        luy_title=item.learning_unit.luys[0].complete_title_i18n,
+                        credits=credits,
+                        block=block,
+                        mandatory=_("Yes") if mandatory else _("No")
                     )
                 )
     return content
