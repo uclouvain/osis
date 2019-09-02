@@ -96,9 +96,9 @@
     {% include 'learning_unit/by_external.html' %}
 {% else %}
     {% include 'learning_unit/by_activity.html' %}
+    {% include "learning_unit/blocks/modal/modal_comparison.html" %}
+    {% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endif %}
-{% include "learning_unit/blocks/modal/modal_comparison.html" %}
-{% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endblock %}
 
 {% block script %}
