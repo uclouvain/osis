@@ -72,7 +72,6 @@ class AttributionCreationForm(AttributionForm):
             attrs={
                 'data-theme': 'bootstrap',
                 'data-placeholder': _('Indicate the name or the FGS'),
-                'data-style': ' max-width: 100%; min-width: 100%; width: 100% !important;',
             }
         ),
         label='',
