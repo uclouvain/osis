@@ -36,18 +36,16 @@
             {% bootstrap_form_errors practical_charge_form %}
         {% endif %}
         <div class="row">
-            {% if attribution %}
-                <div class="col-md-6">
-                    <label>{% trans 'Tutor' %}</label><br>
+            <div class="col-md-6">
+                <label>{% trans 'Tutor' %} *</label><br>
+                <div id="div_test" data-width='100%'>
+                {% if attribution %}
                     {{ attribution.tutor.person }}
+                {% else %}
+                    {% bootstrap_field attribution_form.person class="col-md-6"%}
+                {% endif %}
                 </div>
-            {% else %}
-                <div class="col-md-6">
-                <label>{% trans 'Tutor' %}</label><br>
-                {% bootstrap_field attribution_form.person %}
-                </div>
-            {% endif %}
-
+            </div>
             {% bootstrap_field attribution_form.function form_group_class="col-md-6" %}
         </div>
         <br>
@@ -73,3 +71,4 @@
     <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
            onclick="$('#form_change_attribution').submit();"/>
 </div>
+

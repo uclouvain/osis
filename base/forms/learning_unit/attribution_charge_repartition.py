@@ -71,7 +71,8 @@ class AttributionCreationForm(AttributionForm):
             url='employee_autocomplete',
             attrs={
                 'data-theme': 'bootstrap',
-                'data-placeholder': _('Indicate the name or the FGS')
+                'data-placeholder': _('Indicate the name or the FGS'),
+                'data-style': ' max-width: 100%; min-width: 100%; width: 100% !important;',
             }
         ),
         label='',
