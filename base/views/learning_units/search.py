@@ -51,6 +51,8 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages
+from base.business.learning_units.xls_educational_information_and_specifications import \
+    create_xls_educational_information_and_specifications
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -106,6 +108,9 @@ def learning_units_search(request, search_type):
 
     if request.POST.get('xls_status') == "xls_attributions":
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
+
+    if request.POST.get('xls_status') == "xls_educational_specifications":
+        return create_xls_educational_information_and_specifications(request.user, found_learning_units, request)
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
 
