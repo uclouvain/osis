@@ -34,6 +34,7 @@ from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED
 from openpyxl.writer.excel import save_virtual_workbook
 
+from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR
 from base.models.group_element_year import fetch_row_sql, GroupElementYear
@@ -132,7 +133,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     _build_worksheet(worksheet_data, workbook, 0)
 
     _merge_cells(excel_lines, workbook)
-
+    _add_hyperlink(excel_lines, workbook, str(egy.academic_year.year))
     return workbook
 
 
@@ -248,3 +249,15 @@ def _merge_cells(excel_lines, workbook: Workbook):
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, LearningUnitYearLine):
             worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=7)
+
+
+def _add_hyperlink(excel_lines, workbook: Workbook, year):
+    worksheet = workbook.worksheets[0]
+    for index, row in enumerate(excel_lines, 1):
+        if isinstance(row, LearningUnitYearLine):
+            cell = worksheet.cell(row=index, column=1)
+            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym)
+
+        if isinstance(row, PrerequisiteItemLine):
+            cell = worksheet.cell(row=index, column=3)
+            cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym.strip("()"))

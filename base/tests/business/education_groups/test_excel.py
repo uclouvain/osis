@@ -80,7 +80,8 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         expected_content = [
             [self.luy_children[0].acronym, self.luy_children[0].complete_title, None, None, None, None, None],
 
-            [_("has as prerequisite") + " :", '', self.luy_children[1].acronym,
+            [_("has as prerequisite") + " :", '',
+             self.luy_children[1].acronym,
              self.luy_children[1].complete_title_i18n,
              "{} / {}".format(self.child_leaves[1].relative_credits, self.luy_children[1].credits),
              str(self.child_leaves[1].block) if self.child_leaves[1].block else '',
