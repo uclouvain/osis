@@ -46,7 +46,7 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)    
+    tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)
     context = {
         'root': education_group_year,
         'tree': tree_object.to_list(),
