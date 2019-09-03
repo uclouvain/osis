@@ -190,7 +190,7 @@ def learning_units_proposal_search(request):
 
     context = {
         'form': search_form,
-        'form_proposal_state': ProposalStateModelForm(),
+        'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
         'academic_years': get_last_academic_years(),
         'current_academic_year': starting_ac_year,
         'search_type': PROPOSAL_SEARCH,
