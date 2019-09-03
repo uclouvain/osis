@@ -28,7 +28,7 @@ from django.db.models import Q, Exists, OuterRef
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
-from base.business.education_groups.postponement import duplicate_education_group_year
+from base.business.education_groups import postponement
 from base.business.group_element_years import attach
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year, AcademicYear
@@ -342,7 +342,7 @@ class PostponeContent:
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
                 return None
 
-        new_egy = duplicate_education_group_year(old_egy, self.next_academic_year)
+        new_egy = postponement.duplicate_education_group_year(old_egy, self.next_academic_year)
 
         if old_gr.link_type != LinkTypes.REFERENCE.name:
             # Copy its children

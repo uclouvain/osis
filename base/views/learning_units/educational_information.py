@@ -40,15 +40,12 @@ from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.educational_information.mail_reminder import MailReminderRow, MailReminderFormset
 from base.forms.learning_unit.search_form import LearningUnitYearForm
-from base.models import academic_calendar
 from base.models.academic_year import starting_academic_year
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import cache_filter
 from base.utils.send_mail import send_mail_for_educational_information_update
-from base.views.common import check_if_display_message, display_warning_messages, paginate_queryset, \
-    display_error_messages
+from base.views.common import check_if_display_message, display_warning_messages, display_error_messages
 from base.views.learning_units.search import SUMMARY_LIST
 
 SUCCESS_MESSAGE = _('Reminding mails sent')
@@ -80,8 +77,6 @@ def learning_units_summary_list(request):
     found_learning_units = LearningUnitYear.objects.none()
 
     initial_academic_year = starting_academic_year()
-    if academic_calendar.is_academic_calendar_has_started(initial_academic_year, SUMMARY_COURSE_SUBMISSION):
-        initial_academic_year = initial_academic_year.next()
 
     search_form = LearningUnitYearForm(request.GET or None, initial={'academic_year_id': initial_academic_year,
                                                                      'with_entity_subordinated': True})
@@ -114,7 +109,7 @@ def learning_units_summary_list(request):
         'search_type': SUMMARY_LIST,
         'is_faculty_manager': a_user_person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': paginate_queryset(found_learning_units, request.GET),
+        'page_obj': found_learning_units,
     }
 
     return render(request, "learning_units.html", context)

@@ -28,6 +28,7 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -40,7 +41,6 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from django.utils.translation import ugettext_lazy as _
 
 
 class TestFindBuildParentListByEducationGroupYearId(TestCase):

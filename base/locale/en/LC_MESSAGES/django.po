@@ -703,6 +703,10 @@ msgstr ""
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
 
+#, python-format
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr ""
+
 msgid "Consolidate"
 msgstr ""
 
@@ -1515,6 +1519,9 @@ msgid "List of trainings with administrative data"
 msgstr ""
 
 msgid "List of users"
+msgstr ""
+
+msgid "List of users with their groups and linked entities"
 msgstr ""
 
 msgid "List proposals"
@@ -3140,6 +3147,9 @@ msgstr ""
 msgid "Versions"
 msgstr ""
 
+msgid "View list of users with groups and person entities"
+msgstr ""
+
 msgid "Virtual Desktop"
 msgstr ""
 
@@ -3341,6 +3351,12 @@ msgid "You don't have the rights to consolidate"
 msgstr ""
 
 msgid "You have the choice between"
+msgstr ""
+
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
 msgstr ""
 
 msgid "You must either set the common title or the specific title"
