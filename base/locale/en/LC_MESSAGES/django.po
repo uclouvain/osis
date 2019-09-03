@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-23 09:30+0200\n"
+"POT-Creation-Date: 2019-08-16 14:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3143,6 +3143,9 @@ msgstr ""
 msgid "Versions"
 msgstr ""
 
+msgid "View list of users with groups and person entities"
+msgstr ""
+
 msgid "Virtual Desktop"
 msgstr ""
 
@@ -3344,6 +3347,12 @@ msgid "You don't have the rights to consolidate"
 msgstr ""
 
 msgid "You have the choice between"
+msgstr ""
+
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
 msgstr ""
 
 msgid "You must either set the common title or the specific title"

@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.utils.safestring import mark_safe
 
 from base.enums.component_detail import VOLUME_Q1
+from base.models.enums.proposal_type import ProposalType
 from base.templatetags.learning_unit import get_difference_css, has_proposal, get_previous_acronym, value_label, \
     DIFFERENCE_CSS, normalize_fraction, get_component_volume_css, dl_component_tooltip, changed_label, get_next_acronym
 from base.templatetags.learning_unit import th_tooltip, CSS_PROPOSAL_VALUE, LABEL_VALUE_BEFORE_PROPOSAL
@@ -101,8 +102,11 @@ class LearningUnitTagTest(TestCase):
         l_unit.acronym = new_acronym
         l_unit.save()
 
-        ProposalLearningUnitFactory(learning_unit_year=l_unit,
-                                    initial_data={'learning_unit_year': {'acronym': initial_acronym}})
+        ProposalLearningUnitFactory(
+            learning_unit_year=l_unit,
+            initial_data={'learning_unit_year': {'acronym': initial_acronym}},
+            type=ProposalType.TRANSFORMATION.name
+        )
 
         self.assertEqual(get_previous_acronym(l_unit), initial_acronym)
 
@@ -128,18 +132,15 @@ class LearningUnitTagTest(TestCase):
 
     def test_next_acronym_with_acronym(self):
         learning_unit = LearningUnitFactory()
-        dict_learning_unit_year = create_learning_units_year(2013, 2013, learning_unit)
+        dict_learning_unit_year = create_learning_units_year(2013, 2014, learning_unit)
 
-        l_unit = dict_learning_unit_year.get(2013)
-        initial_acronym = l_unit.acronym
+        l_unit = dict_learning_unit_year.get(2014)
         new_acronym = "{}9".format(l_unit.acronym)
         l_unit.acronym = new_acronym
         l_unit.save()
+        other_l_unit = dict_learning_unit_year.get(2013)
 
-        ProposalLearningUnitFactory(learning_unit_year=l_unit,
-                                    initial_data={'learning_unit_year': {'acronym': initial_acronym}})
-
-        self.assertEqual(get_next_acronym(l_unit), initial_acronym)
+        self.assertEqual(get_next_acronym(other_l_unit), new_acronym)
 
     def test_value_label_equal_values(self):
         data = self.get_dict_data()
