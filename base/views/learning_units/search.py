@@ -195,7 +195,7 @@ def learning_units_proposal_search(request):
         'current_academic_year': starting_ac_year,
         'search_type': PROPOSAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
-        'is_faculty_manager': user_person.is_faculty_manager,
+        'can_change_proposal_state': user_person.is_faculty_manager or user_person.is_central_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
         'page_obj': found_learning_units,
     }
