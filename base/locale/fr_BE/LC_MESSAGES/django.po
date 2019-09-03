@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-29 09:42+0200\n"
+"POT-Creation-Date: 2019-09-03 13:37+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3662,9 +3662,6 @@ msgstr "bisannuelle impaire"
 msgid "blocked update for tutor"
 msgstr "mise-à-jour bloquée pour l'enseignant"
 
-msgid "cancel"
-msgstr "annuler"
-
 msgid "cannot be canceled"
 msgstr "ne peut pas être annulé"
 
@@ -3854,6 +3851,10 @@ msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
 
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr "prérequis-%(year)s-%(acronym)s"
+
 msgid "professional integration"
 msgstr "intégration professionnelle"
 
@@ -3886,9 +3887,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "save"
-msgstr "enregistrer"
 
 msgid "score(s) saved"
 msgstr "note(s) enregistrée(s)"
@@ -3996,4 +3994,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-

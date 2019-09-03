@@ -44,7 +44,6 @@ from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
 
-XLS_FILENAME = "Formation prerequisites"
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
         bottom=Side(
@@ -57,6 +56,7 @@ STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1
 STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
 
 STYLE_FONT_RED = Style(font=Font(color=RED))
+FONT_HYPERLINK = Font(underline='single', color='0563C1')
 
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
@@ -117,6 +117,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
 
 
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
+    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": egy.academic_year.year, "acronym": egy.acronym}
     workbook = Workbook(encoding='utf-8')
 
     excel_lines = _build_excel_lines(egy, prerequisites_qs)
@@ -125,7 +126,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     style = _get_style_to_apply(excel_lines)
 
     worksheet_data = {
-        WORKSHEET_TITLE_KEY: _(XLS_FILENAME),
+        WORKSHEET_TITLE_KEY: worksheet_title,
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
         STYLED_CELLS: style
@@ -257,7 +258,9 @@ def _add_hyperlink(excel_lines, workbook: Workbook, year):
         if isinstance(row, LearningUnitYearLine):
             cell = worksheet.cell(row=index, column=1)
             cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym)
+            cell.font = FONT_HYPERLINK
 
         if isinstance(row, PrerequisiteItemLine):
             cell = worksheet.cell(row=index, column=3)
             cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym.strip("()"))
+            cell.font = FONT_HYPERLINK
