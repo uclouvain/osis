@@ -235,8 +235,9 @@ def display_messages_by_level(request, messages_by_level):
         display_messages(request, msgs, level, extra_tags='safe')
 
 
-def paginate_queryset(qs, request_get):
-    paginator = Paginator(qs, ITEMS_PER_PAGE)
+def paginate_queryset(qs, request_get, items_per_page=None):
+    items_per_page = items_per_page or ITEMS_PER_PAGE
+    paginator = Paginator(qs, items_per_page)
 
     page = request_get.get('page')
     try:

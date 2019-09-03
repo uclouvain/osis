@@ -45,8 +45,9 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import cache_filter
 from base.utils.send_mail import send_mail_for_educational_information_update
-from base.views.common import check_if_display_message, display_warning_messages, display_error_messages
-from base.views.learning_units.search import SUMMARY_LIST
+from base.views.common import check_if_display_message, display_warning_messages, paginate_queryset, \
+    display_error_messages
+from base.views.learning_units.search import SUMMARY_LIST, ITEMS_PER_PAGES
 
 SUCCESS_MESSAGE = _('Reminding mails sent')
 
@@ -109,7 +110,7 @@ def learning_units_summary_list(request):
         'search_type': SUMMARY_LIST,
         'is_faculty_manager': a_user_person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
 
     return render(request, "learning_units.html", context)

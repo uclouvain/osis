@@ -50,7 +50,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
-from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages
+from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages, \
+    paginate_queryset
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -62,6 +63,8 @@ EXTERNAL_SEARCH = 6
 ACTION_BACK_TO_INITIAL = "back_to_initial"
 ACTION_CONSOLIDATE = "consolidate"
 ACTION_FORCE_STATE = "force_state"
+
+ITEMS_PER_PAGES = 2000
 
 
 def learning_units_search(request, search_type):
@@ -122,7 +125,7 @@ def learning_units_search(request, search_type):
         'search_type': search_type,
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
 
     return render(request, "learning_units.html", context)
@@ -198,7 +201,7 @@ def learning_units_proposal_search(request):
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
     return render(request, "learning_units.html", context)
 
@@ -259,6 +262,6 @@ def learning_units_external_search(request):
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
     return render(request, "learning_units.html", context)
