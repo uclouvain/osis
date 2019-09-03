@@ -32,6 +32,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
 from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED
+from openpyxl.worksheet.hyperlink import Hyperlink
 from openpyxl.writer.excel import save_virtual_workbook
 
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
@@ -56,6 +57,7 @@ STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1
 STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
 
 STYLE_FONT_RED = Style(font=Font(color=RED))
+FONT_HYPERLINK = Font(underline='single', color='0563C1')
 
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
@@ -257,7 +259,9 @@ def _add_hyperlink(excel_lines, workbook: Workbook, year):
         if isinstance(row, LearningUnitYearLine):
             cell = worksheet.cell(row=index, column=1)
             cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym)
+            cell.font = FONT_HYPERLINK
 
         if isinstance(row, PrerequisiteItemLine):
             cell = worksheet.cell(row=index, column=3)
             cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym.strip("()"))
+            cell.font = FONT_HYPERLINK
