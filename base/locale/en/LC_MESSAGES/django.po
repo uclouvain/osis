@@ -703,6 +703,10 @@ msgstr ""
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
 
+#, python-format
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr ""
+
 msgid "Consolidate"
 msgstr ""
 
