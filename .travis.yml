@@ -10,7 +10,8 @@ install:
   - "pip install -r requirements.txt"
 
 before_script:
-  - "psql -c 'create extension unaccent;' -U postgres"
+  - "psql -U postgres -c 'create database test;'"
+  - "psql -U postgres test -c 'create extension unaccent;'"
   - "curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter"
   - "chmod +x ./cc-test-reporter"
   - "./cc-test-reporter before-build"
