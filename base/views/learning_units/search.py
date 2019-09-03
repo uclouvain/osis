@@ -43,7 +43,7 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
+from base.models.academic_year import get_last_academic_years, starting_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
@@ -108,7 +108,7 @@ def learning_units_search(request, search_type):
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
-
+    starting_ac = starting_academic_year()
     context = {
         'form': form,
         'academic_years': get_last_academic_years(),
@@ -117,7 +117,8 @@ def learning_units_search(request, search_type):
         'learning_units_count': len(found_learning_units)
         if isinstance(found_learning_units, list) else
         found_learning_units.count(),
-        'current_academic_year': starting_academic_year(),
+        'current_academic_year': starting_ac,
+        'proposal_academic_year': starting_ac.next(),
         'search_type': search_type,
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
