@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import formset_factory
 from django.http import JsonResponse, HttpResponseRedirect
@@ -139,10 +139,11 @@ def _get_formset(request, responsible_and_learning_unit_yr_list):
     return None
 
 
-class LearningUnitDescriptionFicheSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
     model = LearningUnitYear
     paginate_by = 1000
     template_name = "learning_units.html"
+    raise_exception = True
 
     filterset_class = LearningUnitDescriptionFicheFilter
     permission_required = 'base.can_access_learningunit'

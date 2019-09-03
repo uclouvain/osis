@@ -46,7 +46,6 @@ from base.forms.search.search_form import BaseSearchForm
 from base.forms.utils.choice_field import add_blank
 from base.forms.utils.dynamic_field import DynamicChoiceField
 from base.models import learning_unit_year, group_element_year, entity_calendar, academic_calendar
-from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
