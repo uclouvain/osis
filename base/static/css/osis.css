@@ -239,3 +239,8 @@ div:target{
 .show_collapse a.a_show_collapse:not(.collapsed):after {
     content: "\f077";
 }
+
+.select2-container {
+    width: 100% !important;
+    padding: 0;
+}
