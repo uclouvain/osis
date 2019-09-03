@@ -32,7 +32,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
 from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED
-from openpyxl.worksheet.hyperlink import Hyperlink
 from openpyxl.writer.excel import save_virtual_workbook
 
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
