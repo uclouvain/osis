@@ -751,6 +751,10 @@ msgstr "Confirmer votre action."
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr "Erreur de consistance en %(academic_year)s : %(error)s"
 
+#, python-format
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr "Erreur de consistance en %(academic_year)s avec %(model)s : %(error)s"
+
 msgid "Consolidate"
 msgstr "Consolider"
 
