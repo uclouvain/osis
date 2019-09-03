@@ -34,16 +34,7 @@
         <div style="margin-top:10px;">
             {% if form.is_bound and learning_units_count %}
                 <div class="row">
-                    <div class="col-md-4">
-                        {% flag "educational_information_mailing" %}
-                            <button type="button" class="btn btn-default" style="margin-left:10px;"
-                                    id="btn_modal_mail_educational_information_update_reminder"
-                                    data-toggle="modal" data-target="#modal_mail_summary_reminder"
-                                    {% if not formset %}disabled title='{% trans 'Need no reminder' %}'{% endif %}>
-                                {% trans 'Mail to remind educational information update' %}
-                            </button>
-                        {% endflag %}
-                    </div>
+                    <div class="col-md-4"></div>
                     <div class="col-md-8">
                         <div class="dropdown {{ dropdirection }} text-right">
                             <button id="dLabel" class="btn btn-default" type="button"
@@ -120,33 +111,12 @@
             {% elif form.is_bound %}
                 <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
             {% endif %}
-            <form method="post" action="{% url 'email_educational_information_update' %}">
-                {% csrf_token %}
-                {% include "learning_unit/blocks/modal/modal_mail_summary_reminder.html" %}
-            </form>
         </div>
     </div>
 {% endblock %}
 
 {% block script %}
     <script>
-        $("#btn_modal_mail_summary_reminder").click(function (e) {
-            console.log('btn_modal_mail_summary_reminder');
-
-            var form = $(this).closest("form");
-            $.ajax({
-                data: form.serialize(),
-                type: 'post',
-                url: '../email_educational_information_update/',
-                success: function (data) {
-                    $('#message_info_container').css("visibility", "visible");
-                    $('#message_info_container').css("display", "block");
-                    $('#message_info_container').append(data.as_messages_info);
-                    $('#btn_modal_mail_summary_reminder_cancel').trigger("click");
-                }
-            });
-        });
-
         $("#btn_teaching_material_xls").click(function (e) {
             e.preventDefault();
             var status = $("#xls_status");
@@ -156,7 +126,5 @@
 
             status.val('');
         });
-
-
     </script>
 {% endblock %}

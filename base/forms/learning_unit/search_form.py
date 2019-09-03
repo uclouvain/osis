@@ -28,24 +28,23 @@ from distutils.util import strtobool
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import OuterRef, Subquery, Exists, Prefetch, Case, When, Q, Value, CharField, F
-from django.db.models.fields import BLANK_CHOICE_DASH, BooleanField, IntegerField
+from django.db.models import OuterRef, Subquery, Exists, Case, When, Q, Value, CharField
+from django.db.models.fields import BLANK_CHOICE_DASH, BooleanField
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters
 
-from attribution.models.attribution import Attribution
 from base import models as mdl
 from base.business.education_groups.general_information_sections import MOBILITY
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, _set_summary_status_on_luy
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none, TooManyResultsException
 from base.forms.search.search_form import BaseSearchForm
 from base.forms.utils.choice_field import add_blank
 from base.forms.utils.dynamic_field import DynamicChoiceField
-from base.models import learning_unit_year, group_element_year, entity_calendar, academic_calendar
+from base.models import learning_unit_year, group_element_year, entity_calendar
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
@@ -53,7 +52,7 @@ from base.models.enums import entity_container_year_link_type, learning_unit_yea
     entity_type, learning_container_year_types, quadrimesters
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -276,42 +275,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             append_latest_entities(learning_unit, service_course_search)
 
         return learning_units
-
-    def get_learning_units_and_summary_status(self, requirement_entities=None, luy_status=None):
-        self.cleaned_data['status'] = self._set_status(luy_status)
-
-        if requirement_entities:
-            self.cleaned_data['requirement_entities'] = requirement_entities
-
-        queryset = self.get_queryset()
-        if self.cleaned_data and queryset.count() > self.MAX_RECORDS:
-            raise TooManyResultsException
-
-        queryset = queryset.prefetch_related(
-            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
-            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
-            Prefetch(
-                'attribution_set',
-                queryset=Attribution.objects.filter(summary_responsible=True),
-                to_attr='summary_responsibles'
-            )
-        )
-
-        cms_list = TranslatedText.objects.filter(
-            entity=LEARNING_UNIT_YEAR,
-            text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__isnull=False,
-            reference__in=queryset.values_list('pk', flat=True)
-        ).select_related('text_label')
-
-        for learning_unit_yr in queryset:
-            append_latest_entities(learning_unit_yr)
-            _set_summary_status_on_luy(cms_list, learning_unit_yr)
-
-        return queryset
-
-    def _set_status(self, luy_status):
-        return convert_status_bool(luy_status) if luy_status else self.cleaned_data['status']
 
     def _filter_borrowed_learning_units(self, qs_learning_units):
         faculty_borrowing_id = None

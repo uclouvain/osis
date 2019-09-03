@@ -28,14 +28,12 @@ from io import BytesIO
 from unittest.mock import patch
 
 from django.contrib.messages import get_messages
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 from openpyxl import load_workbook
-from waffle.testutils import override_flag
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.models.enums import academic_calendar_type, entity_type
@@ -50,7 +48,6 @@ from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_units.educational_information import send_email_educational_information_needs_update
 from base.views.learning_units.search import SUMMARY_LIST
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
@@ -303,16 +300,6 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("the list to generate is empty.").capitalize())
-
-    @override_flag('educational_information_mailing', active=True)
-    def test_send_email_educational_information_needs_update_no_access(self):
-        request_factory = RequestFactory()
-        a_user = UserFactory()
-        request = request_factory.get(self.url)
-        request.user = a_user
-        self.client.force_login(a_user)
-        with self.assertRaises(PermissionDenied):
-            send_email_educational_information_needs_update(request)
 
 
 class LearningUnitPedagogyEditTestCase(TestCase):
