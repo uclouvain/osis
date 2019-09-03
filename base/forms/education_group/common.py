@@ -218,9 +218,6 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['start_year'].queryset = \
-            self.fields['start_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        self.fields['start_year'].empty_label = None
         self.fields['end_year'].queryset = \
             self.fields['end_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
