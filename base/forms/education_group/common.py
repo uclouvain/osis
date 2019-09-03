@@ -223,7 +223,6 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
         self.fields['start_year'].empty_label = None
         self.fields['end_year'].queryset = \
             self.fields['end_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        self.fields['end_year'].empty_label = None
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
