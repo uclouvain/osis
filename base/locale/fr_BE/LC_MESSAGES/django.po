@@ -30,7 +30,7 @@ msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
 msgid "%(access_value)s is not an accepted value"
 msgstr "%(access_value)s n'est pas une valeur acceptée"
 
-#: business/education_groups/postponement.py:187
+#: business/education_groups/postponement.py:283
 #, python-format
 msgid "%(col_name)s has been already modified."
 msgstr "%(col_name)s a déjà été modifié."
@@ -72,7 +72,7 @@ msgstr[0] "%(count)d unité d'enseignement a été reportée avec succès"
 msgstr[1] "%(count)d unités d'enseignement ont été reportées avec succès"
 
 #: tests/views/group_element_years/test_postpone.py:107
-#: views/education_groups/update.py:284
+#: views/education_groups/update.py:275
 #, python-format
 msgid ""
 "%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed "
@@ -96,8 +96,8 @@ msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
 #: business/group_element_years/postponement.py:114
-#: tests/business/education_groups/test_postponement.py:610
-#: tests/business/education_groups/test_postponement.py:633
+#: tests/business/education_groups/test_postponement.py:586
+#: tests/business/education_groups/test_postponement.py:609
 #, python-format
 msgid ""
 "%(education_group_year)s (reference link) has not been copied. Its content "
@@ -107,7 +107,7 @@ msgstr ""
 "contenu est encore vide."
 
 #: business/group_element_years/postponement.py:102
-#: tests/business/education_groups/test_postponement.py:360
+#: tests/business/education_groups/test_postponement.py:336
 #, python-format
 msgid ""
 "%(education_group_year)s has already been copied in %(academic_year)s in "
@@ -117,7 +117,7 @@ msgstr ""
 "autre programme. Il pourrait donc avoir déjà été modifié."
 
 #: business/group_element_years/postponement.py:125
-#: tests/business/education_groups/test_postponement.py:583
+#: tests/business/education_groups/test_postponement.py:559
 #, python-format
 msgid ""
 "%(education_group_year)s is closed in %(end_year)s. This element will not be "
@@ -127,7 +127,7 @@ msgstr ""
 "recopié en %(academic_year)s."
 
 #: business/group_element_years/postponement.py:88
-#: tests/business/education_groups/test_postponement.py:472
+#: tests/business/education_groups/test_postponement.py:448
 #, python-format
 msgid ""
 "%(learning_unit_year)s is not anymore contained in "
@@ -169,7 +169,7 @@ msgid "%(number_notifications)s unread notification(s)"
 msgstr "%(number_notifications)s notification(s) non lu(s)"
 
 #: business/group_element_years/postponement.py:72
-#: tests/business/education_groups/test_postponement.py:509
+#: tests/business/education_groups/test_postponement.py:485
 #, python-format
 msgid ""
 "%(prerequisite_item)s is not anymore contained in "
@@ -311,7 +311,7 @@ msgstr "Absence injustifiée"
 msgid "Absent"
 msgstr "Absent"
 
-#: business/education_group.py:48 business/learning_unit_xls.py:80
+#: business/education_group.py:49 business/learning_unit_xls.py:80
 #: business/learning_unit_xls.py:354 business/proposal_xls.py:52
 #: forms/education_groups.py:60 forms/learning_unit/search_form.py:69
 #: templates/education_group/search.html:145
@@ -458,7 +458,7 @@ msgstr "Sigle/Intitulé abrégé non valide"
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
-#: business/education_group.py:48
+#: business/education_group.py:49
 #: templates/education_group/blocks/content_default_table.html:30
 #: templates/education_group/blocks/content_minor_major_option_table.html:30
 #: templates/education_group/blocks/table_utilizations.html:31
@@ -725,7 +725,7 @@ msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir détacher %(acronym)s ?"
 
 #: tests/views/group_element_years/test_postpone.py:92
-#: views/education_groups/update.py:275
+#: views/education_groups/update.py:266
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
@@ -842,11 +842,11 @@ msgstr "Base"
 msgid "Beg. of attribution"
 msgstr "Déb. attribution"
 
-#: business/education_group.py:63
+#: business/education_group.py:64
 msgid "Begining of course registration"
 msgstr "Début inscription aux cours"
 
-#: business/education_group.py:65
+#: business/education_group.py:66
 msgid "Begining of exam registration"
 msgstr "Début inscription aux examens"
 
@@ -1018,7 +1018,7 @@ msgstr "Attestation de participation"
 msgid "Certificate of success"
 msgstr "Attestation de réussite"
 
-#: business/education_group.py:73
+#: business/education_group.py:74
 msgid "Chair of the exam board"
 msgstr "Président de jury"
 
@@ -1081,7 +1081,7 @@ msgstr "Coefficient total de co-diplômation"
 msgid "Co-holder"
 msgstr "Co-titulaire"
 
-#: business/education_group.py:49 business/learning_unit_xls.py:79
+#: business/education_group.py:50 business/learning_unit_xls.py:79
 #: business/learning_unit_xls.py:353 business/proposal_xls.py:38
 #: business/proposal_xls.py:51 forms/education_groups.py:106
 #: forms/learning_unit/search_form.py:81 forms/utils/acronym_field.py:83
@@ -1179,11 +1179,15 @@ msgstr "Confirmer"
 msgid "Confirm your action."
 msgstr "Confirmer votre action."
 
-#: business/education_groups/postponement.py:192
+#: business/education_groups/postponement.py:291
 #: forms/learning_unit/learning_unit_postponement.py:328
 #, python-format
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr "Erreur de consistance en %(academic_year)s : %(error)s"
+
+#: business/education_groups/postponement.py:298
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr "Erreur de consistance en %(academic_year)s avec %(model)s : %(error)s"
 
 #: templates/learning_unit/by_proposal.html:48
 msgid "Consolidate"
@@ -1222,7 +1226,7 @@ msgstr "Copier les données Reddot de l’année précédente."
 msgid "Copy the content from %(previous_anac)s to %(current_anac)s"
 msgstr "Recopier le contenu de %(previous_anac)s à %(current_anac)s"
 
-#: forms/education_group/coorganization.py:41
+#: forms/education_group/coorganization.py:42
 #: forms/learning_unit/external_learning_unit.py:68
 #: forms/learning_unit/learning_unit_create.py:202
 #: forms/learning_unit/search_form.py:417 models/organization_address.py:48
@@ -1330,7 +1334,7 @@ msgstr "Catégorie décret"
 msgid "Deepening"
 msgstr "Approfondissement"
 
-#: business/education_group.py:72 models/education_group_year.py:487
+#: business/education_group.py:73 models/education_group_year.py:487
 #: templates/education_group/tab_administrative_data.html:155
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
@@ -1354,7 +1358,7 @@ msgstr "Supprimer le message"
 msgid "Delete selected messages"
 msgstr "Supprimer les messages sélectionnés"
 
-#: business/education_group.py:69
+#: business/education_group.py:70
 #: forms/education_groups_administrative_data.py:103
 #: models/enums/academic_calendar_type.py:50
 #: templates/education_group/tab_administrative_data.html:93
@@ -1441,7 +1445,7 @@ msgstr "Mémoire"
 msgid "Dissertation Managers"
 msgstr "Gestionnaire de programme pour Dissertation"
 
-#: business/education_group.py:68
+#: business/education_group.py:69
 msgid "Dissertation presentation"
 msgstr "Remise du mémoire"
 
@@ -1517,7 +1521,7 @@ msgstr "Documentation"
 msgid "Down"
 msgstr "Descendre"
 
-#: tests/views/education_groups/test_update.py:848
+#: tests/views/education_groups/test_update.py:845
 msgid "Dummy message"
 msgstr ""
 
@@ -1572,8 +1576,8 @@ msgstr "Edition d'organisation de formations"
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
 
-#: tests/views/education_groups/test_update.py:496
-#: tests/views/education_groups/test_update.py:502
+#: tests/views/education_groups/test_update.py:493
+#: tests/views/education_groups/test_update.py:499
 #: views/education_groups/update.py:147
 #, python-format
 msgid ""
@@ -1600,7 +1604,7 @@ msgstr ""
 "Organisation de formations <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> mis à jour avec succès."
 
-#: business/education_group.py:45 business/education_group.py:46
+#: business/education_group.py:46 business/education_group.py:47
 msgid "Education_groups"
 msgstr "Formations"
 
@@ -1640,11 +1644,11 @@ msgstr "Fin de cycle"
 msgid "End year"
 msgstr "Année de fin"
 
-#: business/education_group.py:64
+#: business/education_group.py:65
 msgid "Ending of course registration"
 msgstr "Fin inscription aux cours"
 
-#: business/education_group.py:66
+#: business/education_group.py:67
 msgid "Ending of exam registration"
 msgstr "Fin inscription aux examens"
 
@@ -1728,7 +1732,7 @@ msgstr ""
 "Entités pour DAFs + désignation responsables de notes et gestionnaires de "
 "programme"
 
-#: business/education_group.py:49 forms/education_groups.py:80
+#: business/education_group.py:50 forms/education_groups.py:80
 #: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:149 templates/offers.html:51
 #: templates/offers.html:52 templates/offers.html:80
@@ -1751,11 +1755,11 @@ msgstr "Évaluations"
 msgid "Event"
 msgstr "Événement"
 
-#: business/education_group.py:74
+#: business/education_group.py:75
 msgid "Exam board secretary"
 msgstr "Secrétaire de jury"
 
-#: business/education_group.py:75
+#: business/education_group.py:76
 msgid "Exam board signatory"
 msgstr "Signataire du jury"
 
@@ -2256,7 +2260,7 @@ msgid "It is forbidden to attach an element to itself."
 msgstr "Il est interdit d’attacher un élément à lui-même."
 
 #: models/group_element_year.py:261
-#: tests/views/education_groups/test_update.py:750
+#: tests/views/education_groups/test_update.py:747
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 "Il est interdit d'attacher un élement à un autre élement y étant inclus."
@@ -2418,7 +2422,7 @@ msgid "Learning unit %(acronym)s successfully updated."
 msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
 #: business/group_element_years/postponement.py:57
-#: tests/business/education_groups/test_postponement.py:416
+#: tests/business/education_groups/test_postponement.py:392
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -2523,7 +2527,7 @@ msgstr "Type de lien"
 msgid "Linked with EPC"
 msgstr "Liens existants dans l'application EPC."
 
-#: business/education_group.py:47
+#: business/education_group.py:48
 msgid "List education groups"
 msgstr "Liste des formations"
 
@@ -2547,7 +2551,7 @@ msgstr "Liste des enseignants"
 msgid "List of trainings"
 msgstr "Liste des formations"
 
-#: business/education_group.py:56 templates/education_group/search.html:130
+#: business/education_group.py:57 templates/education_group/search.html:130
 msgid "List of trainings with administrative data"
 msgstr "Liste des formations avec données administratives"
 
@@ -2634,7 +2638,7 @@ msgstr "Gérer les volumes"
 msgid "Managed programs"
 msgstr "Programmes gérés"
 
-#: business/education_group.py:59 models/education_group_year.py:468
+#: business/education_group.py:60 models/education_group_year.py:468
 #: models/enums/offer_year_entity_type.py:33
 #: templates/blocks/navbar_top.html:165
 #: templates/education_group/identification_group_details.html:37
@@ -2710,7 +2714,7 @@ msgstr "Obligatoire"
 msgid "Mark selected messages as read"
 msgstr "Marquer les messages sélectionnés comme lus"
 
-#: business/education_group.py:67
+#: business/education_group.py:68
 #: forms/education_groups_administrative_data.py:94
 #: templates/education_group/tab_administrative_data.html:81
 msgid "Marks presentation"
@@ -3043,7 +3047,7 @@ msgstr "Aucune proposition n'a été sélectionnée."
 msgid "No result!"
 msgstr "Aucun résultat!"
 
-#: business/education_groups/perms.py:215
+#: business/education_groups/perms.py:214
 #, python-format
 msgctxt "female"
 msgid ""
@@ -3426,7 +3430,7 @@ msgstr ""
 "Impossible de créer une UE dont l'année académique est supérieure à "
 "%(academic_year_max)d."
 
-#: tests/views/education_groups/test_update.py:834
+#: tests/views/education_groups/test_update.py:831
 #: views/education_groups/group_element_year/create.py:56
 #: views/education_groups/group_element_year/create.py:83
 msgid "Please select an item before attach it"
@@ -3942,7 +3946,7 @@ msgstr "Type horaire"
 msgid "School"
 msgstr "École"
 
-#: business/education_group.py:70
+#: business/education_group.py:71
 #: forms/education_groups_administrative_data.py:106
 #: templates/education_group/tab_administrative_data.html:117
 msgid "Scores diffusion"
@@ -4063,7 +4067,7 @@ msgstr "Lire le message"
 msgid "Signatory"
 msgstr "Signataire"
 
-#: business/education_group.py:76
+#: business/education_group.py:77
 #: templates/education_group/tab_administrative_data.html:175
 msgid "Signatory qualification"
 msgstr "Qualification du signataire"
@@ -4329,9 +4333,9 @@ msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"
 
 #: business/group_element_years/postponement.py:208
-#: tests/business/education_groups/test_postponement.py:200
-#: tests/business/education_groups/test_postponement.py:214
-#: tests/business/education_groups/test_postponement.py:223
+#: tests/business/education_groups/test_postponement.py:176
+#: tests/business/education_groups/test_postponement.py:190
+#: tests/business/education_groups/test_postponement.py:199
 msgid "The content has already been postponed."
 msgstr "Le contenu a déjà été reporté."
 
@@ -4357,7 +4361,7 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
-#: business/education_groups/perms.py:138
+#: business/education_groups/perms.py:137
 #: tests/templatetags/test_education_group.py:49
 msgid "The education group edition period is not open."
 msgstr ""
@@ -4379,7 +4383,7 @@ msgid "The end date must be less or equals to the root %(acronym)s"
 msgstr "La date de fin doit être plus petite ou égale à la racine %(acronym)s"
 
 #: business/group_element_years/postponement.py:194
-#: tests/business/education_groups/test_postponement.py:232
+#: tests/business/education_groups/test_postponement.py:208
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
 msgstr "La date de fin de la formation est plus petite que l'année de report."
@@ -4405,16 +4409,16 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
-#: business/education_groups/perms.py:339
+#: business/education_groups/perms.py:338
 msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:307
+#: business/education_groups/perms.py:306
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:341
+#: business/education_groups/perms.py:340
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -4426,7 +4430,7 @@ msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir d'autre valeur."
 
 #: forms/education_group/training.py:100
-#: tests/forms/education_group/test_training.py:171
+#: tests/forms/education_group/test_training.py:173
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
 "Les champs concernant les données de l'ARES doivent être soit être tous "
@@ -4600,7 +4604,7 @@ msgstr ""
 "atteint la limite maximum."
 
 #: business/group_element_years/postponement.py:142
-#: tests/business/education_groups/test_postponement.py:700
+#: tests/business/education_groups/test_postponement.py:676
 #, python-format
 msgid ""
 "The option %(education_group_year_option)s is not anymore accessible in "
@@ -4660,7 +4664,7 @@ msgstr ""
 "l'organisation de formation annualisé %(acronym)s seront supprimés: "
 "%(learning_units)s"
 
-#: views/education_groups/detail.py:403
+#: views/education_groups/detail.py:398
 #, python-format
 msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
@@ -4684,7 +4688,7 @@ msgstr ""
 "à la place de %(current_value)s)"
 
 #: business/group_element_years/postponement.py:205
-#: tests/business/education_groups/test_postponement.py:192
+#: tests/business/education_groups/test_postponement.py:168
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
 
@@ -4719,21 +4723,21 @@ msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
 
-#: business/education_groups/perms.py:270
+#: business/education_groups/perms.py:269
 msgid "The user cannot modify data which are greater than N+1"
 msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
 
-#: business/education_groups/perms.py:319
+#: business/education_groups/perms.py:318
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour la condition d’admission"
 
-#: business/education_groups/perms.py:287
+#: business/education_groups/perms.py:286
 msgid "The user doesn't have right to update general information"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour les informations générales"
 
-#: business/education_groups/perms.py:43 templatetags/education_group.py:194
+#: business/education_groups/perms.py:42 templatetags/education_group.py:194
 #: tests/templatetags/test_education_group.py:227
 #: tests/templatetags/test_education_group.py:251
 msgid "The user has not permission to change education groups."
@@ -4745,22 +4749,22 @@ msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 
-#: business/education_groups/perms.py:166
+#: business/education_groups/perms.py:165
 #, python-format
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
-#: business/education_groups/perms.py:42
+#: business/education_groups/perms.py:41
 msgid "The user has not permission to create education groups."
 msgstr "L'utilisateur n'a pas la permission de créer des formations."
 
-#: business/education_groups/perms.py:44
+#: business/education_groups/perms.py:43
 msgid "The user has not permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
-#: business/education_groups/perms.py:183
-#: business/education_groups/perms.py:272
+#: business/education_groups/perms.py:182
+#: business/education_groups/perms.py:271
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 
@@ -4831,8 +4835,8 @@ msgstr ""
 "%(subtype)s %(acronym)s fait l’objet de %(count)d inscription(s) l’année "
 "%(year)s"
 
-#: forms/education_group/coorganization.py:91
-#: tests/forms/education_group/test_coorganization.py:159
+#: forms/education_group/coorganization.py:92
+#: tests/forms/education_group/test_coorganization.py:161
 msgid "There is already a coorganization with this organization"
 msgstr "Il y a déjà une co-organisation avec cette institution"
 
@@ -4862,7 +4866,7 @@ msgstr "Thèse"
 msgid "This code already exists for this learning unit"
 msgstr "Ce code existe déja pour cette unité d'enseignement"
 
-#: business/education_groups/perms.py:140
+#: business/education_groups/perms.py:139
 msgid "This education group is not editable during this period."
 msgstr ""
 "La période de modification d'organisation de formation n'est pas ouverte "
@@ -4880,7 +4884,7 @@ msgstr "Ce champ ne peut pas être défini"
 #: models/education_group_publication_contact.py:99
 #: models/education_group_year.py:804 models/education_group_year.py:825
 #: models/education_group_year.py:827
-#: tests/forms/education_group/test_coorganization.py:130
+#: tests/forms/education_group/test_coorganization.py:132
 #: tests/views/learning_units/proposals/test_creation.py:190
 #: tests/views/learning_units/proposals/test_creation.py:191
 #: tests/views/learning_units/proposals/test_creation.py:192
@@ -4901,7 +4905,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
-#: views/education_groups/detail.py:356
+#: views/education_groups/detail.py:351
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
@@ -4940,7 +4944,7 @@ msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 msgid "This training has no content to postpone."
 msgstr "La formation n'a pas de contenu à reporter."
 
-#: business/education_group.py:49 business/learning_unit_xls.py:81
+#: business/education_group.py:50 business/learning_unit_xls.py:81
 #: business/learning_unit_xls.py:355
 #: business/learning_units/xls_generator.py:51 business/proposal_xls.py:38
 #: forms/education_groups.py:99 forms/entity.py:38
@@ -4992,7 +4996,7 @@ msgstr "A compléter"
 msgid "Too many results"
 msgstr "Trop de résultats"
 
-#: business/education_group.py:60 models/enums/education_group_categories.py:36
+#: business/education_group.py:61 models/enums/education_group_categories.py:36
 #: templates/learning_unit/formations.html:116
 msgid "Training"
 msgstr "Formation"
@@ -5001,7 +5005,7 @@ msgstr "Formation"
 msgid "Training type"
 msgstr "Type d'OF"
 
-#: business/education_group.py:54 templates/base/quick_search_inner.html:37
+#: business/education_group.py:55 templates/base/quick_search_inner.html:37
 #: templates/blocks/navbar_top.html:37 templates/catalog.html:43
 #: templates/education_group/layout.html:7
 #: templates/education_group/learning_unit/layout_detail.html:6
@@ -5064,7 +5068,7 @@ msgstr "Enseignant·e UE parent"
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
-#: business/education_group.py:49 business/education_group.py:61
+#: business/education_group.py:50 business/education_group.py:62
 #: business/learning_unit_xls.py:82 business/learning_unit_xls.py:356
 #: business/proposal_xls.py:38 business/proposal_xls.py:53
 #: forms/education_groups.py:72 forms/learning_unit/search_form.py:181
@@ -5210,7 +5214,7 @@ msgstr "Vacant"
 msgid "Vacant not publish"
 msgstr "Vacant pas publier"
 
-#: business/education_group.py:62 templates/learning_unit/by_proposal.html:83
+#: business/education_group.py:63 templates/learning_unit/by_proposal.html:83
 msgid "Validity"
 msgstr "Validité"
 
@@ -5351,7 +5355,7 @@ msgstr "Site internet"
 msgid "Week"
 msgstr "Semaine"
 
-#: business/education_group.py:71 models/education_group_year.py:483
+#: business/education_group.py:72 models/education_group_year.py:483
 #: templates/education_group/tab_administrative_data.html:151
 msgid "Weighting"
 msgstr "Pondération par crédit"
@@ -5564,7 +5568,7 @@ msgstr ""
 "Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type "
 "\"%(parent_type)s\")"
 
-#: business/education_groups/perms.py:82
+#: business/education_groups/perms.py:81
 #, python-format
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
@@ -6239,7 +6243,7 @@ msgstr "à"
 msgid "training"
 msgstr "formation"
 
-#: business/education_group.py:55
+#: business/education_group.py:56
 msgid "training_administrative_data"
 msgstr "formations_avec_donnees_administratives"
 
