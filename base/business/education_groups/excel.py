@@ -44,7 +44,6 @@ from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
 
-XLS_FILENAME = "Formation prerequisites"
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
         bottom=Side(
@@ -117,6 +116,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
 
 
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
+    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": egy.academic_year.year, "acronym": egy.acronym}
     workbook = Workbook(encoding='utf-8')
 
     excel_lines = _build_excel_lines(egy, prerequisites_qs)
@@ -125,7 +125,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     style = _get_style_to_apply(excel_lines)
 
     worksheet_data = {
-        WORKSHEET_TITLE_KEY: _(XLS_FILENAME),
+        WORKSHEET_TITLE_KEY: worksheet_title,
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
         STYLED_CELLS: style

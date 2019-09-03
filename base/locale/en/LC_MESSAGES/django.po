@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-29 09:42+0200\n"
+"POT-Creation-Date: 2019-09-03 13:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3149,9 +3149,6 @@ msgstr ""
 msgid "Versions"
 msgstr ""
 
-msgid "View list of users with groups and person entities"
-msgstr ""
-
 msgid "Virtual Desktop"
 msgstr ""
 
@@ -3442,9 +3439,6 @@ msgstr ""
 msgid "blocked update for tutor"
 msgstr ""
 
-msgid "cancel"
-msgstr ""
-
 msgid "cannot be canceled"
 msgstr ""
 
@@ -3626,6 +3620,10 @@ msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
 
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr ""
+
 msgid "professional integration"
 msgstr ""
 
@@ -3657,9 +3655,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "save"
 msgstr ""
 
 msgid "score(s) saved"
