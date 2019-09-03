@@ -31,9 +31,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from base.business.education_groups.postponement import FIELD_TO_EXCLUDE_IN_SET
 from base.business.utils.model import model_to_dict_fk
 from base.forms.education_group.training import TrainingForm, TrainingEducationGroupYearForm, \
     HopsEducationGroupYearModelForm
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, internship_presence
@@ -44,11 +46,13 @@ from base.tests.factories.academic_year import create_current_academic_year, get
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.hops import HopsFactory
+from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
@@ -97,7 +101,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
         cert = [CertificateAimFactory(code=code, section=2) for code in range(100, 102)]
         for i in range(0, len(cert)):
             with self.subTest(i=i):
-                cert_for_form = [str(cert[j].pk) for j in range(0, i+1)]
+                cert_for_form = [str(cert[j].pk) for j in range(0, i + 1)]
 
                 form = self.form_class(
                     data={
@@ -241,8 +245,13 @@ class TestPostponementEducationGroupYear(TestCase):
         # In case of creation
         form = TrainingForm({}, user=self.user, education_group_type=self.education_group_type)
         self.assertFalse(form.dict_initial_egy)
+        self.assertEqual(form.initial_dicts, {'educationgrouporganization_set': {}})
 
         # In case of update
+        coorg = EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=self.education_group_year
+        )
         form = TrainingForm(
             {},
             user=self.user,
@@ -253,38 +262,30 @@ class TestPostponementEducationGroupYear(TestCase):
         )
 
         self.assertEqual(str(form.dict_initial_egy), str(dict_initial_egy))
+        initial_dict_coorg = model_to_dict_fk(
+            self.education_group_year.coorganizations.first(), exclude=FIELD_TO_EXCLUDE_IN_SET
+        )
+        self.assertEqual(
+            form.initial_dicts,
+            {'educationgrouporganization_set': {coorg.organization.id: initial_dict_coorg}}
+        )
 
     def test_save_with_postponement(self):
         # Create postponed egy
-        form = TrainingForm(
-            self.data,
-            instance=self.education_group_year,
-            user=self.user
-        )
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-
-        self.assertEqual(len(form.education_group_year_postponed), 6)
-
-        self.assertEqual(
-            EducationGroupYear.objects.filter(education_group=self.education_group_year.education_group).count(), 7
-        )
-        self.assertEqual(len(form.warnings), 0)
+        self._create_postponed_egys()
 
         # Update egys
         self.education_group_year.refresh_from_db()
 
-        self.data["title"] = "Defence Against the Dark Arts"
-        form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-
-        self.assertEqual(
-            EducationGroupYear.objects.filter(
-                education_group=self.education_group_year.education_group
-            ).count(), 7
+        self.assertEqual(self.education_group_year.educationgrouporganization_set.all().count(), 0)
+        EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=self.education_group_year
         )
-        self.assertEqual(len(form.warnings), 0, form.warnings)
+        self.assertEqual(self.education_group_year.educationgrouporganization_set.all().count(), 1)
+
+        self.data["title"] = "Defence Against the Dark Arts"
+        self._postpone_coorganization_and_check()
 
     def test_save_with_postponement_error(self):
         EducationGroupYearFactory(
@@ -308,13 +309,98 @@ class TestPostponementEducationGroupYear(TestCase):
         self.assertEqual(egs.count(), 7)
         self.assertGreater(len(form.warnings), 0)
 
-    def test_save_with_postponement_m2m(self):
-        domains = [DomainFactory(name="Alchemy"), DomainFactory(name="Muggle Studies")]
-        self.data["secondary_domains"] = '|'.join([str(domain.pk) for domain in domains])
+    def test_save_with_postponement_sets_inconsistents(self):
+        # create postponed egy's
+        self._create_postponed_egys()
 
-        certificate_aims = [CertificateAimFactory(code=100, section=1), CertificateAimFactory(code=101, section=2)]
-        self.data["certificate_aims"] = [str(aim.pk) for aim in certificate_aims]
+        # update with inconsistant EducationGroupOrganization (organization present in the future not in present)
+        self.education_group_year.refresh_from_db()
+        unconsistent_egy = EducationGroupYear.objects.get(
+            education_group=self.education_group_year.education_group,
+            academic_year=self.list_acs[4]
+        )
+        EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=unconsistent_egy
+        )
+        EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=self.education_group_year
+        )
 
+        form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+
+        self.assertGreater(len(form.warnings), 0)
+        self.assertEqual(
+            form.warnings,
+            [
+                _("Consistency error in %(academic_year)s : %(error)s") % {
+                    'academic_year': unconsistent_egy.academic_year,
+                    'error': EducationGroupOrganization._meta.verbose_name.title()
+                }
+            ]
+        )
+
+    def test_save_with_postponement_coorganization_inconsistant(self):
+        # create postponed egy's
+        self._create_postponed_egys()
+
+        # update with a coorganization to postpone
+        self.education_group_year.refresh_from_db()
+
+        good_organization = EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=self.education_group_year
+        )
+        self._postpone_coorganization_and_check()
+
+        # update with unconsistant EducationGroupOrganization (field different from a year to another one)
+        self.education_group_year.refresh_from_db()
+        unconsistent_egy = EducationGroupYear.objects.get(
+            education_group=self.education_group_year.education_group,
+            academic_year=self.list_acs[4]
+        )
+        unconsistent_orga = EducationGroupOrganization.objects.get(
+            education_group_year=unconsistent_egy
+        )
+        unconsistent_orga.all_students = not good_organization.all_students
+        unconsistent_orga.save()
+        # have to invalidate cache
+        del self.education_group_year.coorganizations
+        form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
+
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertEqual(len(form.warnings), 1)
+        error_msg = _("%(col_name)s has been already modified.") % {
+                    "col_name": _(EducationGroupOrganization._meta.get_field('all_students').verbose_name).title(),
+                }
+        self.assertEqual(
+            form.warnings,
+            [
+                _("Consistency error in %(academic_year)s with %(model)s: %(error)s") % {
+                    'academic_year': unconsistent_egy.academic_year,
+                    'model': EducationGroupOrganization._meta.verbose_name.title(),
+                    'error': error_msg
+                }
+            ]
+        )
+
+    def _postpone_coorganization_and_check(self):
+        form = TrainingForm(self.data, instance=self.education_group_year, user=self.user)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertEqual(len(form.warnings), 0, form.warnings)
+        all_egys = EducationGroupYear.objects.filter(
+            education_group=self.education_group_year.education_group
+        )
+        self.assertEqual(all_egys.count(), 7)
+        for egy in all_egys:
+            self.assertEqual(egy.educationgrouporganization_set.all().count(), 1)
+
+    def _create_postponed_egys(self):
         form = TrainingForm(
             self.data,
             instance=self.education_group_year,
@@ -322,12 +408,21 @@ class TestPostponementEducationGroupYear(TestCase):
         )
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
-
         self.assertEqual(len(form.education_group_year_postponed), 6)
-
+        self.assertEqual(len(form.warnings), 0)
         self.assertEqual(
             EducationGroupYear.objects.filter(education_group=self.education_group_year.education_group).count(), 7
         )
+
+    def test_save_with_postponement_m2m(self):
+        domains = [DomainFactory(name="Alchemy"), DomainFactory(name="Muggle Studies")]
+        self.data["secondary_domains"] = '|'.join([str(domain.pk) for domain in domains])
+
+        certificate_aims = [CertificateAimFactory(code=100, section=1), CertificateAimFactory(code=101, section=2)]
+        self.data["certificate_aims"] = [str(aim.pk) for aim in certificate_aims]
+
+        self._create_postponed_egys()
+
         last = EducationGroupYear.objects.filter(education_group=self.education_group_year.education_group
                                                  ).order_by('academic_year').last()
 
@@ -335,7 +430,6 @@ class TestPostponementEducationGroupYear(TestCase):
         self.assertEqual(self.education_group_year.secondary_domains.count(), 2)
         self.assertEqual(last.secondary_domains.count(), 2)
         self.assertEqual(last.certificate_aims.count(), len(certificate_aims))
-        self.assertEqual(len(form.warnings), 0)
 
         # update with a conflict
         dom3 = DomainFactory(name="Divination")

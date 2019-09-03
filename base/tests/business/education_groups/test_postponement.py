@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
@@ -82,29 +81,6 @@ class EducationGroupPostponementTestCase(TestCase):
         # Create two secondary domains
         EducationGroupYearDomainFactory(education_group_year=self.education_group_year)
         EducationGroupYearDomainFactory(education_group_year=self.education_group_year)
-
-    def assertPostponementEquals(self, education_group_year, education_group_year_postponed):
-        # Check all attribute without m2m / unreleveant fields
-        fields_to_exclude = ['id', 'external_id', 'academic_year', 'languages', 'secondary_domains']
-        egy_dict = model_to_dict(
-            education_group_year,
-            exclude=fields_to_exclude
-        )
-        egy_postponed_dict = model_to_dict(
-            education_group_year_postponed,
-            exclude=fields_to_exclude
-        )
-        self.assertDictEqual(egy_dict, egy_postponed_dict)
-
-        # Check if m2m is the same
-        self.assertEqual(
-            self.education_group_year.secondary_domains.all().count(),
-            education_group_year_postponed.secondary_domains.all().count()
-        )
-        self.assertEqual(
-            self.education_group_year.languages.all().count(),
-            education_group_year_postponed.languages.all().count()
-        )
 
 
 class TestComputeEndPostponement(EducationGroupPostponementTestCase):
