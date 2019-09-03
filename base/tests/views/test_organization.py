@@ -92,7 +92,7 @@ class TestOrganizationAutocomplete(TestCase):
         self.client.force_login(user=self.super_user)
         response = self.client.get(self.url, data={'q': 'univ'})
 
-        expected_results = [{'text': self.organization.name, 'selected_text': self.organization.name,
+        expected_results = [{'text': self.organization.name,
                              'id': str(self.organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
@@ -113,7 +113,7 @@ class TestOrganizationAutocomplete(TestCase):
             self.url,
             data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
         )
-        expected_results = [{'text': self.organization.name, 'selected_text': self.organization.name,
+        expected_results = [{'text': self.organization.name,
                              'id': str(self.organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
@@ -162,7 +162,7 @@ class TestCountryAutocomplete(TestCase):
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)
 
-        expected_results = [{'text': self.country.name, 'selected_text': self.country.name,'id': str(self.country.pk)}]
+        expected_results = [{'text': self.country.name, 'id': str(self.country.pk)}]
 
         self.assertListEqual(results, expected_results)
 
@@ -185,7 +185,6 @@ class TestCampusAutocomplete(TestCase):
         response = self.client.get(self.url, data={'q': 'univ'})
 
         expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
                              'id': str(self.campus.pk)}]
 
         self.assertEqual(response.status_code, 200)
@@ -207,7 +206,6 @@ class TestCampusAutocomplete(TestCase):
             data={'forward': '{"country_external_institution": "%s"}' % self.organization_address.country.pk}
         )
         expected_results = [{'text': "{} ({})".format(self.organization.name, self.campus.name),
-                             'selected_text': "{} ({})".format(self.organization.name, self.campus.name),
                              'id': str(self.campus.pk)}]
         self.assertEqual(response.status_code, 200)
         results = _get_results_from_autocomplete_response(response)

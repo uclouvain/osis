@@ -114,8 +114,6 @@
                         </tr>
                     {% endfor %}
                 </table>
-            {% else %}
-                <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
             {% endif %}
             <form method="post" action="{% url 'email_educational_information_update' %}">
                 {% csrf_token %}

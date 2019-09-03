@@ -20,6 +20,16 @@
 
 {% endblock %}
 
+{% block search_form_buttons %}
+    <br>
+    <div class="col-md-1">
+        <div class="btn-toolbar pull-right">
+            {% bootstrap_button "" value=_('Learning unit search') button_type="submit" button_class="btn-primary" icon="search" %}
+            {% include 'blocks/button/button_filter_refresh.html' %}
+        </div>
+    </div>
+{% endblock %}
+
 {% block extras %}
     <input type="hidden" id="xls_status" name="xls_status">
 {% endblock %}
