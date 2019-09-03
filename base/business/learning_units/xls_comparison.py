@@ -399,7 +399,7 @@ def _get_data_from_initial_data(initial_data):
         translate_status(luy_initial['status']),
         learning_unit_yr.get_subtype_display(),
         get_translation(luy_initial['internship_subtype']),
-        volume_format(Decimal(luy_initial['credits'])),
+        volume_format(Decimal(luy_initial['credits'])) if luy_initial['credits'] else '',
         language.name if language else EMPTY_VALUE,
         dict(PERIODICITY_TYPES)[luy_initial['periodicity']] if luy_initial['periodicity'] else BLANK_VALUE,
         get_translation(luy_initial['quadrimester']),

@@ -26,7 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import ModelChoiceField, modelformset_factory
+from django.forms import ModelChoiceField, modelformset_factory, BaseModelFormSet
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
@@ -47,7 +47,7 @@ class CoorganizationEditForm(forms.ModelForm):
         label=_("Institution"),
         widget=autocomplete.ModelSelect2(
             url='organization_autocomplete',
-            attrs={'data-theme': 'bootstrap', 'data-placeholder': BLANK_CHOICE_DISPLAY},
+            attrs={'data-theme': 'bootstrap', 'data-placeholder': BLANK_CHOICE_DISPLAY, 'required': 'required'},
             forward=['country']
         ),
     )
@@ -97,9 +97,18 @@ class CoorganizationEditForm(forms.ModelForm):
                self.check_unique_constraint_between_education_group_year_organization()
 
 
+class CoorganizationFormset(BaseModelFormSet):
+    def __init__(self, queryset=None, *args, **kwargs):
+        super().__init__(queryset=queryset, *args, **kwargs)
+        # Have to set empty_permitted to False (by default, it is True for modelformset_factory (not with inlineformset)
+        for form in self.forms:
+            form.empty_permitted = False
+
+
 OrganizationFormset = modelformset_factory(
     model=EducationGroupOrganization,
     form=CoorganizationEditForm,
+    formset=CoorganizationFormset,
     extra=0,
     can_delete=True
 )
