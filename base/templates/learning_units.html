@@ -39,7 +39,7 @@
     {% url 'learning_unit_create_external' academic_year=request.GET.academic_year_id as create_external_url%}
 {% else %}
     {% url 'learning_unit_create' academic_year_id=current_academic_year.id as create_learning_unit_url%}
-    {% url 'proposal_learning_unit_creation_form' academic_year=current_academic_year.id as create_proposal_url%}
+    {% url 'proposal_learning_unit_creation_form' academic_year=proposal_academic_year.id as create_proposal_url%}
     {% url 'learning_unit_create_external' academic_year=current_academic_year.id as create_external_url%}
 {% endif %}
 
