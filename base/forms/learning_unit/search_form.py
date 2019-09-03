@@ -556,11 +556,7 @@ class LearningUnitDescriptionFicheFilter(FilterSet):
             request=request,
             prefix=prefix,
         )
-
-        initial_academic_year = starting_academic_year()
-        if academic_calendar.is_academic_calendar_has_started(initial_academic_year, SUMMARY_COURSE_SUBMISSION):
-            initial_academic_year = initial_academic_year.next()
-        self.form.fields['academic_year'].initial = initial_academic_year
+        self.form.fields['academic_year'].initial = starting_academic_year()
         self.form.fields['with_entity_subordinated'].initial = True
 
     def filter_tutor(self, queryset, name, value):
