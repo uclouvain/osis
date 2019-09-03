@@ -103,7 +103,7 @@ class TestCoorganizationForm(TestCase):
             'form-0-organization': organization.pk
         }
         form = OrganizationFormset(
-            data,
+            data=data,
             form_kwargs={'education_group_year': EducationGroupYearFactory()},
         )
         self.assertTrue(form.is_valid())
@@ -120,7 +120,7 @@ class TestCoorganizationForm(TestCase):
             'form-0-organization': organization.pk
         }
         form = OrganizationFormset(
-            data,
+            data=data,
             form_kwargs={'education_group_year': EducationGroupYearFactory()},
         )
         self.assertFalse(form.is_valid(), form.errors)
@@ -149,7 +149,7 @@ class TestCoorganizationForm(TestCase):
             'form-0-organization': egy_organization.organization.pk
         }
         form = OrganizationFormset(
-            data,
+            data=data,
             form_kwargs={'education_group_year': egy},
         )
         self.assertFalse(form.is_valid(), form.errors)
