@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-16 14:32+0200\n"
+"POT-Creation-Date: 2019-09-04 13:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,6 +384,9 @@ msgid "Alert"
 msgstr ""
 
 msgid "Alert Message"
+msgstr ""
+
+msgid "All"
 msgstr ""
 
 msgctxt "plural"
@@ -889,10 +892,6 @@ msgid "Do you want to get back to initial data?"
 msgstr ""
 
 msgid "Do you want to report the modifications done to the next years ?"
-msgstr ""
-
-msgid ""
-"Do you want to sent email to remind to update the educational informations?"
 msgstr ""
 
 msgid "Doctoral commission"
@@ -1554,9 +1553,6 @@ msgstr ""
 msgid "Made in"
 msgstr ""
 
-msgid "Mail to remind educational information update"
-msgstr ""
-
 msgid "Main"
 msgstr ""
 
@@ -1747,9 +1743,6 @@ msgid "Name"
 msgstr ""
 
 msgid "Name of the teacher responsible"
-msgstr ""
-
-msgid "Need no reminder"
 msgstr ""
 
 msgid "New Education Group"
@@ -2324,9 +2317,6 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-msgid "Reminding mails sent"
-msgstr ""
-
 #, python-format
 msgid "Repartition added for %(tutor)s (%(function)s)"
 msgstr ""
@@ -2368,10 +2358,10 @@ msgstr ""
 msgid "Reserved for interns"
 msgstr ""
 
-msgid "Responsible"
+msgid "Result"
 msgstr ""
 
-msgid "Result"
+msgid "Return to search result"
 msgstr ""
 
 msgid "SQL command"
@@ -2438,9 +2428,6 @@ msgid "Select all the messages"
 msgstr ""
 
 msgid "Selected element"
-msgstr ""
-
-msgid "Sent email to remind to update description fiche"
 msgstr ""
 
 msgid "Separate"
@@ -3147,9 +3134,6 @@ msgstr ""
 msgid "Versions"
 msgstr ""
 
-msgid "View list of users with groups and person entities"
-msgstr ""
-
 msgid "Virtual Desktop"
 msgstr ""
 
@@ -3163,12 +3147,6 @@ msgid "Vol. annual"
 msgstr ""
 
 msgid "Vol. global"
-msgstr ""
-
-msgid "Volume 1"
-msgstr ""
-
-msgid "Volume 2"
 msgstr ""
 
 msgid "Volume Q1"
@@ -3440,9 +3418,6 @@ msgstr ""
 msgid "blocked update for tutor"
 msgstr ""
 
-msgid "cancel"
-msgstr ""
-
 msgid "cannot be canceled"
 msgstr ""
 
@@ -3652,9 +3627,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "save"
 msgstr ""
 
 msgid "score(s) saved"

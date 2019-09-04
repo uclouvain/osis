@@ -68,6 +68,8 @@ ITEMS_PER_PAGES = 2000
 
 
 def learning_units_search(request, search_type):
+    if 'search_url' in request.session:
+        del request.session['search_url']
     service_course_search = search_type == SERVICE_COURSES_SEARCH
     borrowed_course_search = search_type == BORROWED_COURSE
 

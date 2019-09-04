@@ -68,6 +68,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        if 'search_url' not in request.session:
+            request.session['search_url'] = self.request.META.get('HTTP_REFERER')
         # Get does not need to fetch self.object again
         context = self.get_context_data(object=self.object)
 
@@ -129,6 +131,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()
         context["has_partim"] = self.object.get_partims_related().exists()
+        context["search_url"] = self.request.session.get('search_url')
+
         return context
 
     def get_context_permission(self, proposal):
