@@ -136,7 +136,7 @@ class LecturingAttributionChargeForm(AttributionChargeForm):
 
     class Meta(AttributionChargeForm.Meta):
         labels = {
-            'allocation_charge': _get_formatted_label('Lecturing', 'P.M.'),
+            'allocation_charge': _get_formatted_label('Lecturing', 'PM'),
         }
 
 
@@ -145,5 +145,5 @@ class PracticalAttributionChargeForm(AttributionChargeForm):
 
     class Meta(AttributionChargeForm.Meta):
         labels = {
-            'allocation_charge': _get_formatted_label('Practical exercises', 'P.P.')
+            'allocation_charge': _get_formatted_label('Practical exercises', 'PP')
         }
