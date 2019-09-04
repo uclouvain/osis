@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-04 13:20+0200\n"
+"POT-Creation-Date: 2019-09-04 13:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -959,9 +959,6 @@ msgstr ""
 msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
-msgid "End"
-msgstr ""
-
 msgid "End date"
 msgstr ""
 
@@ -1407,6 +1404,9 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
+msgstr ""
+
+msgid "Last year of organization"
 msgstr ""
 
 msgid "Lastname"
@@ -3473,9 +3473,6 @@ msgid "duration unit"
 msgstr ""
 
 msgid "email"
-msgstr ""
-
-msgid "end"
 msgstr ""
 
 msgid "english comment"
