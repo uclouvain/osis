@@ -45,6 +45,8 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages, add_to_session
 
+SEARCH_URL_PART = 'learning_units/by_'
+
 
 class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     permission_required = 'base.can_access_learningunit'
@@ -68,7 +70,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        add_to_session(request, 'search_url', self.request.META.get('HTTP_REFERER'))
+        if SEARCH_URL_PART in self.request.META.get('HTTP_REFERER'):
+            add_to_session(request, 'search_url', self.request.META.get('HTTP_REFERER'))
 
         # Get does not need to fetch self.object again
         context = self.get_context_data(object=self.object)
@@ -131,7 +134,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()
         context["has_partim"] = self.object.get_partims_related().exists()
-        context["search_url"] = self.request.session.get('search_url')
+        context["search_url"] = self.request.session.get('search_url', None)
 
         return context
 
