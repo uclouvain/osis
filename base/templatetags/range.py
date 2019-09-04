@@ -23,11 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 
-CENTRAL_MANAGER_GROUP = "central_managers"
-FACULTY_MANAGER_GROUP = "faculty_managers"
-UE_FACULTY_MANAGER_GROUP = "faculty_managers_for_ue"
-ADMINISTRATIVE_MANAGER_GROUP = "administrative_manager"
-PROGRAM_MANAGER_GROUP = "program_managers"
-SIC_GROUP = "sic"
-TUTOR_GROUP = "tutors"
+from django import template
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
+
+from base.models import learning_unit_year
+
+register = template.Library()
+
+
+@register.filter(name="range_for")
+def range_for(start, end):
+    return range(start, end+1)
