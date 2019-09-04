@@ -32,12 +32,11 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models.prerequisite import Prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
 class TestUpdateLearningUnitPrerequisite(TestCase):
@@ -78,6 +77,18 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_permission_denied_when_context_not_a_formation(self):
+        group_parent = GroupFactory(academic_year=self.academic_year)
+        PersonEntityFactory(person=self.person, entity=group_parent.management_entity)
+        url = reverse("learning_unit_prerequisite_update",
+                      args=[group_parent.id, self.learning_unit_year_child.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertIn(
+            "{} - {}".format(group_parent.partial_acronym, group_parent.acronym),
+            str(response.context['exception'])
+        )
 
     def test_template_used(self):
         response = self.client.get(self.url)

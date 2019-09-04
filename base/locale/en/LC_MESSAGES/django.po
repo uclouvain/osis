@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:42+0200\n"
+"POT-Creation-Date: 2019-08-26 09:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -703,6 +703,10 @@ msgstr ""
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
 
+#, python-format
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr ""
+
 msgid "Consolidate"
 msgstr ""
 
@@ -954,9 +958,6 @@ msgid "Educational information opening"
 msgstr ""
 
 msgid "Elaboration and management of the formation catalogue."
-msgstr ""
-
-msgid "End"
 msgstr ""
 
 msgid "End date"
@@ -1406,6 +1407,9 @@ msgstr ""
 msgid "Last modifications"
 msgstr ""
 
+msgid "Last year of organization"
+msgstr ""
+
 msgid "Lastname"
 msgstr ""
 
@@ -1515,6 +1519,9 @@ msgid "List of trainings with administrative data"
 msgstr ""
 
 msgid "List of users"
+msgstr ""
+
+msgid "List of users with their groups and linked entities"
 msgstr ""
 
 msgid "List proposals"
@@ -3140,6 +3147,9 @@ msgstr ""
 msgid "Versions"
 msgstr ""
 
+msgid "View list of users with groups and person entities"
+msgstr ""
+
 msgid "Virtual Desktop"
 msgstr ""
 
@@ -3343,6 +3353,12 @@ msgstr ""
 msgid "You have the choice between"
 msgstr ""
 
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
+msgstr ""
+
 msgid "You must either set the common title or the specific title"
 msgstr ""
 
@@ -3482,9 +3498,6 @@ msgid "duration unit"
 msgstr ""
 
 msgid "email"
-msgstr ""
-
-msgid "end"
 msgstr ""
 
 msgid "english comment"
