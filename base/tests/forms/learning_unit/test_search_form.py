@@ -141,9 +141,6 @@ class TestSearchForm(TestCase):
         with self.assertRaises(TooManyResultsException):
             form.get_learning_units()
 
-        with self.assertRaises(TooManyResultsException):
-            form.get_learning_units_and_summary_status()
-
     def test_search_too_many_results_is_not_raised_when_borrowed_course_search(self):
         random_luy = LearningUnitYearFactory(academic_year=self.academic_years[0])
 
