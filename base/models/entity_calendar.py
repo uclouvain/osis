@@ -88,7 +88,10 @@ def build_calendar_by_entities(ac_year, reference):
         }
         entities_id.remove(entity_calendar.entity_id)
 
-    default_dates = {'start_date': ac_calendar.start_date, 'end_date': ac_calendar.end_date}
+    default_dates = {
+        'start_date': getattr(ac_calendar, 'start_date', None),
+        'end_date': getattr(ac_calendar, 'end_date', None)
+    }
     entity_calendar_computed.update({
         entity_id: _get_start_end_date_of_parent(entity_id, entity_structure, entity_calendar_computed, default_dates)
         for entity_id in entities_id
