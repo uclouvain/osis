@@ -4313,7 +4313,7 @@
         "pk": 268,
         "fields": {
             "field_name": "web_re_registration",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgroupyear"
@@ -4330,7 +4330,7 @@
         "pk": 269,
         "fields": {
             "field_name": "co_graduation",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgroupyear"
@@ -4347,7 +4347,7 @@
         "pk": 270,
         "fields": {
             "field_name": "co_graduation_coefficient",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgroupyear"
@@ -4364,7 +4364,7 @@
         "pk": 271,
         "fields": {
             "field_name": "country",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4381,7 +4381,7 @@
         "pk": 272,
         "fields": {
             "field_name": "organization",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4398,7 +4398,7 @@
         "pk": 273,
         "fields": {
             "field_name": "all_students",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4415,7 +4415,7 @@
         "pk": 274,
         "fields": {
             "field_name": "enrollment_place",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4432,7 +4432,7 @@
         "pk": 275,
         "fields": {
             "field_name": "diploma",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4449,7 +4449,7 @@
         "pk": 276,
         "fields": {
             "field_name": "is_producing_cerfificate",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4466,7 +4466,7 @@
         "pk": 277,
         "fields": {
             "field_name": "is_producing_annexe",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "educationgrouporganization"
@@ -4483,7 +4483,7 @@
         "pk": 278,
         "fields": {
             "field_name": "ares_graca",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "hops"
@@ -4500,7 +4500,7 @@
         "pk": 279,
         "fields": {
             "field_name": "ares_study",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "hops"
@@ -4517,7 +4517,7 @@
         "pk": 280,
         "fields": {
             "field_name": "ares_ability",
-            "context": "TRAINING_DAILY_MANAGEMENT",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
                 "hops"
