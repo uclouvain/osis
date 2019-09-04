@@ -276,6 +276,8 @@ class EntityVersion(SerializableModel):
         elif self.entity_type == entity_type.SECTOR:
             return None
         else:
+            if self.acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS:
+                return self
             parent_entity_version = self._find_latest_version_by_parent(academic_yr.start_date)
             if parent_entity_version:
                 return parent_entity_version.find_faculty_version(academic_yr)

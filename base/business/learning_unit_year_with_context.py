@@ -35,7 +35,6 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLAN
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 from base.models import learning_unit_year
 from base.models.entity import Entity
-from base.models.entity_version import PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.learning_component_year import LearningComponentYear
 
@@ -141,7 +140,7 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
             or requirement_entity_version == allocation_entity_version:
         return False
 
-    requirement_parent_faculty = _get_faculty_parent_or_pedagogical_entity(academic_year, requirement_entity_version)
+    requirement_parent_faculty = requirement_entity_version.find_faculty_version(academic_year)
 
     if not requirement_parent_faculty:
         return False
@@ -150,13 +149,6 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
     if not allocation_parent_faculty:
         return False
     return requirement_parent_faculty != allocation_parent_faculty
-
-
-def _get_faculty_parent_or_pedagogical_entity(academic_year, requirement_entity_version):
-    if requirement_entity_version.acronym not in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS:
-        return requirement_entity_version.find_faculty_version(academic_year)
-    else:
-        return requirement_entity_version
 
 
 def get_learning_component_prefetch():
