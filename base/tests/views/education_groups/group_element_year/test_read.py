@@ -30,21 +30,19 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_switch
 
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.models.enums import education_group_categories
+from base.models.enums import education_group_types
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import GroupFactory
+from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
-from base.tests.factories.education_group_year import MiniTrainingFactory
-from base.models.enums.education_group_types import MiniTrainingType
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.models.enums import education_group_categories
-from base.models.enums import education_group_types
-from base.models.group_element_year import GroupElementYear
-from base.tests.factories.education_group_year import GroupFactory
 
 
 class TestRead(TestCase):
@@ -54,9 +52,10 @@ class TestRead(TestCase):
         cls.person = PersonFactory()
         cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year,
+                                                               acronym='ed3')
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
-        cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
+        cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="", acronym="luy2")
         cls.learning_component_year_1 = LearningComponentYearFactory(
             learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
@@ -66,21 +65,25 @@ class TestRead(TestCase):
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_2,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=1)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_2,
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_1,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=6)
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_3,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=1)
         cls.group_element_year_4 = GroupElementYearFactory(parent=cls.education_group_year_3,
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_2,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=123)
         cls.a_superuser = SuperUserFactory()
 
     @override_switch('education_group_year_generate_pdf', active=True)
@@ -117,6 +120,13 @@ class TestRead(TestCase):
             _("credits"),
         )
         self.assertEqual(self.group_element_year_2.verbose, verbose_leaf)
+
+    def test_max_block(self):
+        result = EducationGroupHierarchy(self.education_group_year_1)
+        self.assertEqual(result.max_block, 6)
+
+        result = EducationGroupHierarchy(self.education_group_year_3)
+        self.assertEqual(result.max_block, 3)
 
 
 class TestReadTree(TestCase):

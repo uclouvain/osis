@@ -36,6 +36,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
+from base.business.education_group import show_coorganization
 from base.business.education_groups import perms
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.forms.education_group.common import EducationGroupModelForm
@@ -47,7 +48,6 @@ from base.models.academic_year import starting_academic_year
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups.detail import EducationGroupGenericDetailView
@@ -111,7 +111,7 @@ def _common_success_redirect(request, form, root):
 
     success_msgs = []
     if not education_group_year.education_group.end_year or \
-            education_group_year.education_group.end_year >= education_group_year.academic_year.year:
+            education_group_year.education_group.end_year.year >= education_group_year.academic_year.year:
         success_msgs = [_get_success_message_for_update_education_group_year(root.pk, education_group_year)]
 
     if hasattr(form, 'education_group_year_postponed'):
@@ -183,9 +183,11 @@ def _update_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
-    if request.method == 'POST':
+    coorganization_formset = None
+
+    if show_coorganization(education_group_year):
         coorganization_formset = OrganizationFormset(
-            data=request.POST,
+            data=request.POST or None,
             form_kwargs={'education_group_year': education_group_year},
             queryset=education_group_year.coorganizations
         )
@@ -193,11 +195,8 @@ def _update_training(request, education_group_year, root):
             coorganization_formset.save()
             return _common_success_redirect(request, form_education_group_year, root)
     else:
-        coorganization_formset = OrganizationFormset(
-            request.GET or None,
-            form_kwargs={'education_group_year': education_group_year},
-            queryset=education_group_year.coorganizations
-        )
+        if form_education_group_year.is_valid():
+            return _common_success_redirect(request, form_education_group_year, root)
 
     return render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
@@ -205,20 +204,12 @@ def _update_training(request, education_group_year, root):
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         "form_coorganization": coorganization_formset,
         "form_hops": form_education_group_year.hops_form,
-        "show_coorganization": _show_coorganization(education_group_year),
+        "show_coorganization": show_coorganization(education_group_year),
         'can_change_coorganization': perms.is_eligible_to_change_coorganization(
             person=request.user.person,
             education_group=education_group_year,
         )
     })
-
-
-def _show_coorganization(education_group_year):
-    return education_group_year.education_group_type.category == "TRAINING" and \
-           education_group_year.education_group_type.name not in [
-               TrainingType.PGRM_MASTER_120.name,
-               TrainingType.PGRM_MASTER_180_240.name
-           ]
 
 
 class CertificateAimAutocomplete(autocomplete.Select2QuerySetView):

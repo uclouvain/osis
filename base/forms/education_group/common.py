@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, ValidationError
@@ -214,10 +215,11 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
-        widgets = {
-            "start_year": forms.TextInput(),
-            "end_year": forms.TextInput(),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['end_year'].queryset = \
+            self.fields['end_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
@@ -279,7 +281,7 @@ class CommonBaseForm:
 
         if self._is_creation() and not educ_group_form.instance.start_year:
             # Specific case, because start_date is hidden when creation, we should test start_date [validite] > end_date
-            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year']
             try:
                 educ_group_form.instance.clean()
             except ValidationError as error:
@@ -291,7 +293,7 @@ class CommonBaseForm:
     def save(self):
         start_year = None
         if self._is_creation() and not self.education_group_form.instance.start_year:
-            start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            start_year = self.education_group_year_form.cleaned_data['academic_year']
 
         education_group = self.education_group_form.save(start_year=start_year)
         self.education_group_year_form.instance.education_group = education_group
