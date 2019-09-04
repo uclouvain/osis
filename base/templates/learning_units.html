@@ -91,14 +91,14 @@
 {% if search_type == 3 %}
     {% include 'learning_unit/by_proposal.html' %}
 {% elif search_type == 4 %}
-        {% include 'learning_unit/summary_list.html' %}
+    {% include 'learning_unit/summary_list.html' %}
 {% elif search_type == 6 %}
     {% include 'learning_unit/by_external.html' %}
 {% else %}
     {% include 'learning_unit/by_activity.html' %}
+    {% include "learning_unit/blocks/modal/modal_comparison.html" %}
+    {% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endif %}
-{% include "learning_unit/blocks/modal/modal_comparison.html" %}
-{% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endblock %}
 
 {% block script %}
