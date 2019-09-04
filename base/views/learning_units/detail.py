@@ -43,7 +43,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, add_to_session
 
 
 class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
@@ -68,8 +68,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if 'search_url' not in request.session:
-            request.session['search_url'] = self.request.META.get('HTTP_REFERER')
+        add_to_session(request, 'search_url', self.request.META.get('HTTP_REFERER'))
+
         # Get does not need to fetch self.object again
         context = self.get_context_data(object=self.object)
 

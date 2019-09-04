@@ -247,3 +247,13 @@ def paginate_queryset(qs, request_get, items_per_page=None):
     except EmptyPage:
         paginated_qs = paginator.page(paginator.num_pages)
     return paginated_qs
+
+
+def remove_from_session(request, session_key):
+    if session_key in request.session:
+        del request.session[session_key]
+
+
+def add_to_session(request, session_key, value):
+    if session_key not in request.session:
+        request.session[session_key] = value
