@@ -75,7 +75,7 @@ class HopsEducationGroupYearModelForm(PermissionFieldTrainingMixin, forms.ModelF
         return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('user', None)
+        self.user = kwargs.get('user')
         super().__init__(*args, **kwargs)
         self.fields["ares_study"].required = False
         self.fields["ares_graca"].required = False

@@ -119,7 +119,7 @@ class PermissionFieldEducationGroupMixin(PermissionFieldMixin):
 
 class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
     """
-    Permission Field for Hops(year)
+    Permission Field for Hops(year) and for Coorganization
 
     This mixin will get allowed field on reference_field model according to perm's
     """

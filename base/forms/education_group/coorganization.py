@@ -67,7 +67,7 @@ class CoorganizationEditForm(PermissionFieldTrainingMixin, forms.ModelForm):
         )
 
     def __init__(self, education_group_year=None, *args, **kwargs):
-        self.user = kwargs.get('user', None)
+        self.user = kwargs.get('user')
         if not education_group_year and not kwargs.get('instance'):
             raise ImproperlyConfigured("Provide an education_group_year or an instance")
 
