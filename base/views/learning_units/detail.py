@@ -70,7 +70,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        if SEARCH_URL_PART in self.request.META.get('HTTP_REFERER'):
+        if SEARCH_URL_PART in self.request.META.get('HTTP_REFERER', ''):
             add_to_session(request, 'search_url', self.request.META.get('HTTP_REFERER'))
 
         # Get does not need to fetch self.object again

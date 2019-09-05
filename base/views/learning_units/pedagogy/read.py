@@ -51,7 +51,7 @@ from cms.models.translated_text_label import TranslatedTextLabel
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_pedagogy(request, learning_unit_year_id):
-    if SEARCH_URL_PART in request.META.get('HTTP_REFERER'):
+    if SEARCH_URL_PART in request.META.get('HTTP_REFERER', ''):
         add_to_session(request, 'search_url', request.META.get('HTTP_REFERER'))
     return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html")
 
