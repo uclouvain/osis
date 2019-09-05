@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,25 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
-import string
 import datetime
+import string
 
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.offer_year import OfferYearFactory
+import factory.fuzzy
+
 from base.tests.factories.education_group import EducationGroupFactory
-from osis_common.utils.datetime import get_tzinfo
+from base.tests.factories.group import ProgramManagerGroupFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.person import PersonFactory
 
 
 class ProgramManagerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.ProgramManager"
         django_get_or_create = ('person', 'offer_year')
+        exclude = ('group', )
+
+    group = factory.SubFactory(ProgramManagerGroupFactory)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),datetime.datetime(2017, 3, 1))
+
     person = factory.SubFactory(PersonFactory)
     offer_year = factory.SubFactory(OfferYearFactory)
     education_group = factory.SubFactory(EducationGroupFactory)

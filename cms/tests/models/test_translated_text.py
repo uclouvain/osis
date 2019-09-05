@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class TranslatedTextTest(TestCase):
                                                      reference=REFERENCE)
 
 
-        self.assertEqual(list(translated_text.find_by_entity_reference(entity_name.OFFER_YEAR, REFERENCE)),
+        self.assertEqual(list(translated_text.find_labels_list_by_label_entity_and_reference(entity_name.OFFER_YEAR, REFERENCE)),
                          [text_label_oy_1.label, text_label_oy_2.label,text_label_oy_3.label])
 
 

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,26 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
-from django.db import models
 from django.conf import settings
+from django.db import models
+
+from osis_common.models import osis_model_admin
 from .text_label import TextLabel
 
 
-class TranslatedTextLabelAdmin(admin.ModelAdmin):
+class TranslatedTextLabelAdmin(osis_model_admin.OsisModelAdmin):
+    actions = None  # Remove ability to delete in Admin Interface
     list_display = ('label', 'language', 'text_label',)
-    fieldsets = ((None, {'fields': ('label', 'language', 'text_label')}),)
     search_fields = ['label', 'text_label__label']
     ordering = ('label',)
-    raw_id_fields = ('text_label',)
     list_filter = ('language',)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class TranslatedTextLabel(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
-    text_label = models.ForeignKey(TextLabel)
+    text_label = models.ForeignKey(TextLabel, on_delete=models.CASCADE)
     label = models.CharField(max_length=255)
 
     def __str__(self):
@@ -61,3 +64,12 @@ def search(text_entity, labels=None, language=None):
         queryset = queryset.filter(language=language)
 
     return queryset.select_related('text_label')
+
+
+def get_label_translation(text_entity, label, language):
+    translated_text_label = search(
+        text_entity=text_entity,
+        labels=[label],
+        language=language
+    )
+    return translated_text_label.get().label if translated_text_label else label

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -36,5 +36,5 @@ class MyMessageForm(forms.Form):
 
 
 class MyMessageActionForm(forms.Form):
-    ACTIONS = (('MARK_AS_READ', _('mark_selected_as_read')), ('DELETE', _('delete_selected')))
+    ACTIONS = (('MARK_AS_READ', _('Mark selected messages as read')), ('DELETE', _('Delete selected messages')))
     action = forms.ChoiceField(required=False, choices=ACTIONS, initial=None)

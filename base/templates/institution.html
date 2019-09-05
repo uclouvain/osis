@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,11 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li class="active">{% trans 'institution' %}</li>
+<li class="active">{% trans 'Institution' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'institution' %}</h2>
+    <h2>{% trans 'Institution' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -39,28 +39,35 @@
             <div class="col-md-1"><i class="fa fa-university" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
                 <h4 class="media-heading"><a href="{% url 'organizations' %}" id="lnk_organizations">
-                    {% trans 'organizations'%}</a></h4>
-                <p>{% trans 'desc_lnk_organizations' %}</p>
+                    {% trans 'Organizations'%}</a></h4>
+                <p>{% trans 'Management of organizations' %}</p>
             </div>
             {% endif %}
             {% if perms.base.can_access_structure  %}
             <div class="col-md-1"><i class="fa fa-sitemap" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'entities' %}" id="lnk_entities">{% trans 'entities'%}</a></h4>
-                <p>{% trans 'desc_lnk_entities' %}</p>
+                <h4 class="media-heading"><a href="{% url 'entities' %}" id="lnk_entities">{% trans 'Entities'%}</a></h4>
+                <p>{% trans 'Management of organizational structure.' %}</p>
             </div>
             {% endif %}
         </div>
-        {% if perms.base.is_entity_manager %}
-            <br>
-            <div class="row">
-                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'academic_actors' %}" id="lnk_academic_actors">{% trans 'academic_actors'%}</a></h4>
-                    <p>{% trans 'desc_lnk_academic_actors' %}</p>
-                </div>
+        <br/>
+        <div class="row">
+            {% if perms.base.is_entity_manager %}
+            <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-5">
+                <h4 class="media-heading"><a href="{% url 'academic_actors' %}" id="lnk_academic_actors">{% trans 'Academic actors'%}</a></h4>
+                <p>{% trans 'Academic actors management' %}</p>
             </div>
-        {% endif %}
+            {% endif %}
+            {%  if perms.base.can_access_academicyear and perms.base.can_access_academic_calendar %}
+            <div class="col-md-1"><i class="fa fa-calendar" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-5">
+                <h4 class="media-heading"><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'Academic calendar' %}</a></h4>
+                <p>{% trans 'Academic calendar management' %}</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

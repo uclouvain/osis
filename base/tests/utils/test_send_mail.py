@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest.mock import patch
+
 from django.test import TestCase
 
+from base.models.education_group import EducationGroup
+from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from osis_common.models import message_template
-from base.utils import send_mail
-from unittest.mock import patch
-from base.tests.models import test_person, test_academic_year, test_learning_unit_year, test_offer_year, \
+from base.tests.factories.person import PersonWithPermissionsFactory
+from base.tests.models import test_person, test_academic_year, test_offer_year, \
     test_exam_enrollment
-from django.core.mail.message import EmailMultiAlternatives
+from base.utils import send_mail
+from osis_common.models import message_template
+
+LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_ = "<p>{{ learning_unit_years }}/p>"
 
 
 class TestSendMessage(TestCase):
@@ -40,9 +47,13 @@ class TestSendMessage(TestCase):
         self.person_2 = test_person.create_person("person_2", last_name="test", email="person2@test.com")
         self.persons = [self.person_1, self.person_2]
 
+        self.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
+
         self.academic_year = test_academic_year.create_academic_year()
+        test_academic_year.create_academic_year(year=self.academic_year.year - 1)
+
         self.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
-                                                          title="Cours de test",
+                                                          specific_title="Cours de test",
                                                           academic_year=self.academic_year)
 
         self.offer_year = test_offer_year.create_offer_year("SINF2MA", "Master en Sciences Informatique",
@@ -56,54 +67,119 @@ class TestSendMessage(TestCase):
                                                                                           self.learning_unit_year)
 
         self.msg_list = [
-            'The partim TEST_A has been deleted for the year '+str(self.academic_year.year),
-            'The partim TEST_B has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_C has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_A_C1 has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_A_C2 has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_B_C1 has been deleted for the year '+str(self.academic_year.year),
-            'The class TEST_B_C2 has been deleted for the year '+str(self.academic_year.year),
+            'The partim TEST_A has been deleted for the year ' + str(self.academic_year.year),
+            'The partim TEST_B has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_C has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_A_C1 has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_A_C2 has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_B_C1 has been deleted for the year ' + str(self.academic_year.year),
+            'The class TEST_B_C2 has been deleted for the year ' + str(self.academic_year.year),
             'The learning unit TEST has been successfully deleted for all years'
         ]
+
+        self.egys_to_postpone = EducationGroupYear.objects.all()
+        self.egys_already_existing = EducationGroupYear.objects.all()
+        self.egys_ending_this_year = EducationGroupYear.objects.all()
+
+        self.luys_to_postpone = LearningUnitYear.objects.all()
+        self.luys_already_existing = LearningUnitYear.objects.all()
+        self.luys_ending_this_year = LearningUnitYear.objects.all()
+        self.ending_on_max_adjournment = LearningUnitYear.objects.all()
+
+        self.statistics_data = {
+            'max_academic_year_to_postpone': self.academic_year,
+            'to_duplicate': self.luys_to_postpone,
+            'already_duplicated': self.luys_already_existing,
+            'to_ignore': self.luys_ending_this_year,
+            'ending_on_max_academic_year': self.ending_on_max_adjournment
+        }
 
         add_message_template_html()
         add_message_template_txt()
 
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_send_mail_after_the_learning_unit_year_deletion(self, mock_send_messages):
+        send_mail.send_mail_after_the_learning_unit_year_deletion(
+            self.persons,
+            self.learning_unit_year.acronym,
+            self.academic_year,
+            self.msg_list
+        )
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
+        self.assertEqual(len(args.get('receivers')), 2)
+        self.assertIsNone(args.get('attachment'))
 
-    @patch("osis_common.messaging.send_message.EmailMultiAlternatives", autospec=True)
-    def test_send_mail_after_the_learning_unit_year_deletion(self, mock_class):
-        mock_class.send.return_value = None
-        self.assertIsInstance(mock_class, EmailMultiAlternatives)
-        send_mail.send_mail_after_the_learning_unit_year_deletion(self.persons,
-                                                                  self.learning_unit_year.acronym,
-                                                                  self.academic_year,
-                                                                  self.msg_list)
-        call_args = mock_class.call_args
-        subject = call_args[0][0]
-        recipients = call_args[0][3]
-        attachments = call_args[1]
-        self.assertIn(self.learning_unit_year.acronym, subject)
-        self.assertEqual(len(recipients), 2)
-        self.assertIsNone(attachments['attachments'])
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self, mock_send_messages):
+        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self.statistics_data)
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
+        self.assertEqual(len(args.get('receivers')), 1)
+        self.assertIsNone(args.get('attachment'))
 
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_send_mail_after_annual_procedure_of_automatic_postponement_of_luy(self, mock_send_messages):
+        send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
+            self.statistics_data,
+            LearningUnitYear.objects.all(),
+            LearningUnitYear.objects.none()
+        )
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
+        self.assertEqual(len(args.get('receivers')), 1)
+        self.assertIsNone(args.get('attachment'))
 
-    @patch("osis_common.messaging.send_message.EmailMultiAlternatives", autospec=True)
-    def test_with_one_enrollment(self, mock_class):
-        mock_class.send.return_value = None
-        self.assertIsInstance(mock_class, EmailMultiAlternatives)
-        send_mail.send_message_after_all_encoded_by_manager(self.persons, [self.exam_enrollment_1],
-                                                            self.learning_unit_year.acronym, self.offer_year.acronym)
-        call_args = mock_class.call_args
-        subject = call_args[0][0]
-        recipients = call_args[0][3]
-        attachments = call_args[1]
-        self.assert_subject_mail(subject, self.learning_unit_year.acronym, self.offer_year.acronym)
-        self.assertEqual(len(recipients), 2)
-        self.assertIsNotNone(attachments)
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
+        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self.statistics_data)
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('current_academic_year'))
+        self.assertEqual(len(args.get('receivers')), 1)
+        self.assertIsNone(args.get('attachment'))
 
-    def assert_subject_mail(self, subject, learning_unit_acronym, offer_year_acronym):
-        self.assertIn(learning_unit_acronym, subject)
-        self.assertIn(offer_year_acronym, subject)
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_send_mail_after_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
+        edgy_same_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        edgy_not_same_year = EducationGroupYearFactory(academic_year=self.academic_year.past())
+
+        send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
+            self.statistics_data,
+            [edgy_same_year, edgy_not_same_year],
+            []
+        )
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('current_academic_year'))
+        self.assertEqual(len(args.get('receivers')), 1)
+        self.assertIsNone(args.get('attachment'))
+
+        # Ensure that the mail contains only postponed of academic year
+        # (Doesn't contains previous which are technical problem)
+        self.assertEqual(args['template_base_data']['egys_postponed'], 1)
+        self.assertEqual(args['template_base_data']['egys_postponed_qs'][0], edgy_same_year)
+
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_with_one_enrollment(self, mock_send_messages):
+        send_mail.send_message_after_all_encoded_by_manager(
+            self.persons,
+            [self.exam_enrollment_1],
+            self.learning_unit_year.acronym,
+            self.offer_year.acronym
+        )
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
+        self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
+        self.assertEqual(len(args.get('receivers')), 2)
+        self.assertIsNotNone(args.get('attachment'))
+
+    @patch("osis_common.messaging.send_message.send_messages")
+    def test_send_mail_for_educational_information_update(self, mock_send_messages):
+        add_message_template_html_education_update()
+        add_message_template_txt_education_update()
+        send_mail.send_mail_for_educational_information_update([self.person_1], [self.learning_unit_year])
+        args = mock_send_messages.call_args[0][0]
+        self.assertEqual(len(args.get('receivers')), 1)
+        self.assertEqual([self.learning_unit_year], args.get('template_base_data').get('learning_unit_years'))
 
 
 def add_message_template_txt():
@@ -126,7 +202,7 @@ def add_message_template_txt():
                  "par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre.</em></p>\r\n\r\n<p>Nous vous informons"
                  " que l&#39;ensemble des notes<strong> </strong>de<strong> {{ learning_unit_acronym }}</strong> pour"
                  " l&#39;offre <strong>{{ offer_acronym }}</strong> ont &eacute;t&eacute; valid&eacute;es par le "
-                 "gestionnaire de programme.</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Osis UCLouvain."
+                 "gestionnaire de parcours étudiant.</p>\r\n\r\n<p>{{ enrollments }}</p>\r\n\r\n<p>Osis UCLouvain."
                  "</p>\r\n\r\n<p>&nbsp;</p>",
         format="PLAIN",
         language="fr-be"
@@ -142,8 +218,8 @@ def add_message_template_html():
                  "automatique g&eacute;n&eacute;r&eacute; par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre"
                  ".</em></p>\r\n\r\n<p>Nous vous informons que l&#39;ensemble des notes<strong> </strong>de<strong> "
                  "{{ learning_unit_acronym }}</strong> pour l&#39;offre <strong>{{ offer_acronym }}</strong> ont "
-                 "&eacute;t&eacute; valid&eacute;es par le gestionnaire de programme.</p>\r\n\r\n<p>{{ enrollments }}"
-                 "</p>\r\n\r\n<p>{{ signature }}</p>\r\n\r\n<p>{% endautoescape %}</p>",
+                 "&eacute;t&eacute; valid&eacute;es par le gestionnaire de parcours étudiant.</p>\r\n\r\n"
+                 "<p>{{ enrollments }}</p>\r\n\r\n<p>{{ signature }}</p>\r\n\r\n<p>{% endautoescape %}</p>",
         format="HTML",
         language="fr-be"
     )
@@ -162,3 +238,46 @@ def add_message_template_html():
     )
     msg_template.save()
 
+
+def add_message_template_txt_education_update():
+    msg_template = message_template.MessageTemplate(
+        reference=send_mail.EDUCATIONAL_INFORMATION_UPDATE_TXT,
+        subject="",
+        template=LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_,
+        format="PLAIN",
+        language="en"
+    )
+    msg_template.save()
+
+    msg_template = message_template.MessageTemplate(
+        reference=send_mail.EDUCATIONAL_INFORMATION_UPDATE_TXT,
+        subject="",
+        template=LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_,
+        format="PLAIN",
+        language="fr-be"
+    )
+    msg_template.save()
+
+
+def add_message_template_html_education_update():
+    msg_template = message_template.MessageTemplate(
+        reference=send_mail.EDUCATIONAL_INFORMATION_UPDATE_HTML,
+        subject="",
+        template="<p>{% autoescape off %}</p>"
+                 "<p>{{ learning_unit_years }}</p>\r\n\r\n"
+                 "<p>{% endautoescape %}</p>",
+        format="HTML",
+        language="fr-be"
+    )
+    msg_template.save()
+
+    msg_template = message_template.MessageTemplate(
+        reference=send_mail.EDUCATIONAL_INFORMATION_UPDATE_HTML,
+        subject="",
+        template="<p>{% autoescape off %}</p>"
+                 "<p>{{ learning_unit_years }}</p>\r\n\r\n"
+                 "<p>{% endautoescape %}</p>",
+        format="HTML",
+        language="en"
+    )
+    msg_template.save()

@@ -1,5 +1,6 @@
-{% extends "layout.html" %}
+{% extends "education_group/layout_detail.html" %}
 {% load i18n %}
+{% load staticfiles getattr education_group format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -7,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -24,90 +25,19 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "education_group/breadcrumb.html" %}
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
 {% endblock %}
-{% load getattr %}
-{% block content %}
 
-{% include "education_group/header.html" %}
 
-<div class="panel panel-default">
-    <div class="panel-body" id="tabs">
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="content">
-                <a class="button" onclick="showDiv()">
-                    <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
-                </a>
-                <div class="row">
-                    {% include "education_group/training_tree.html" %}
-                    <div id="panel-data" class="col-md-9">
-                        {% include "education_group/tabs.html" %}
-                        <br>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{% trans 'code_scs'%}</th>
-                                    <th>{% trans 'title_code_formation' %}</th>
-                                    <th>{% trans 'absolute_credits' %}</th>
-                                    <th>{% trans 'relative_target_credits' %}</th>
-                                    <th>{% trans 'min_credits' %}</th>
-                                    <th>{% trans 'max_credits' %}</th>
-                                    <th>{% trans 'mandatory' %}</th>
-                                    <th>{% trans 'block' %}</th>
-                                    <th>{% trans 'current_order' %}</th>
-                                    <th>{% trans 'sessions_derogation' %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for element in group_elements %}
-                                    <tr>
-                                        <td>{{ element.code_scs | default_if_none:''  }}</td>
-                                        <td>{{ element.title | default_if_none:'' }}</td>
-                                        <td>{{ element.group_element.absolute_credits | default_if_none:'-' }}</td>
-                                        <td>{{ element.group_element.relative_credits | default_if_none:'-' }}</td>
-                                        <td>{{ element.credits_min | default_if_none:'-' }}</td>
-                                        <td>{{ element.credits_max | default_if_none:'-' }}</td>
-                                        <td>{% if element.group_element.is_mandatory %}{% trans 'yes'%} {% else %}{% trans 'no' %}{% endif %}</td>
-                                        <td>{{ element.block | default_if_none:'-' }}</td>
-                                        <td>{{ element.group_element.current_order | default_if_none:'-' }}</td>
-                                        <td>{% if element.sessions_derogation %}{% trans element.sessions_derogation %}{% else %}-{% endif %}</td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="10" style="border-top: none;">
-                                            {% if element.group_element.own_comment %}
-                                                <label>{% trans 'own_comment' %}</label> :&nbsp;
-                                                {{ element.group_element.own_comment }}
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+{% block details %}
+    {% if show_minor_major_option_table %}
+        {% include "education_group/blocks/content_minor_major_option_table.html" %}
+    {% else %}
+        {% include "education_group/blocks/content_default_table.html" %}
+    {% endif %}
 {% endblock %}
+
 {% block script %}
-<script>
-    $(document).ready(function(){
-		$("#browser").treeview({
-			toggle: function() {
-				console.log("%s was toggled.", $(this).find(">span").text());
-			}
-		});
-
-		$("#add").click(function() {
-			var branches = $("<li><span class='folder'>New Sublist</span><ul>" +
-				"<li><span class='file'>Item1</span></li>" +
-				"<li><span class='file'>Item2</span></li></ul></li>").appendTo("#browser");
-			$("#browser").treeview({
-				add: branches
-			});
-		});
-	});
-</script>
+    <script type="text/javascript" src="{% static 'js/education_group/tab_content.js' %}"></script>
 {% endblock %}

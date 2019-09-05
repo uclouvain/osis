@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,23 +27,14 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import Group
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-
-from base.models import tutor
 from django.test import TestCase
 
+from base.models import tutor
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-
-
-def create_tutor(first_name="Tutor", last_name="tutor"):
-    return TutorFactory(
-        person=PersonFactory(first_name=first_name, last_name=last_name)
-    )
-
-
-def create_tutor_with_person(person):
-    return TutorFactory(person=person)
+from attribution.tests.models import test_attribution
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestTutor(TestCase):
@@ -53,6 +44,11 @@ class TestTutor(TestCase):
         self.tutor = TutorFactory(person=self.person)
         TutorFactory()  # Create fake Tutor
         TutorFactory()  # Create fake Tutor
+        self.learning_unit_year = LearningUnitYearFactory()
+        self.attribution = test_attribution.create_attribution(tutor=self.tutor,
+                                                               learning_unit_year=self.learning_unit_year,
+                                                               score_responsible=False,
+                                                               summary_responsible=True)
 
     def test_find_by_person(self):
         self.assertEqual(self.tutor, tutor.find_by_person(self.person))
@@ -74,18 +70,19 @@ class TestTutor(TestCase):
     def test_find_by_user(self):
         self.assertEqual(self.tutor, tutor.find_by_user(self.user))
 
-    def test_find_by_user_wrong_id(self):
-        self.assertIsNone(tutor.find_by_user(-1))
-
     def test_find_by_id(self):
         self.assertEqual(self.tutor, tutor.find_by_id(self.tutor.id))
 
     def test_find_by_id_wrong_id(self):
         self.assertIsNone(tutor.find_by_id(-1))
 
+    def test_find_all_summary_responsibles_by_learning_unit_year(self):
+        responsibles = tutor.find_all_summary_responsibles_by_learning_unit_year(self.learning_unit_year)
+        self.assertCountEqual(responsibles, [self.tutor])
+
 
 class MockRequest:
-    COOKIES={}
+    COOKIES = {}
 
 
 class MockSuperUser:
@@ -128,3 +125,27 @@ class TestTutorAdmin(TestCase):
         tutor_admin.add_to_group(request, queryset)
         msg = [m.message for m in get_messages(request)]
         self.assertIn("Group tutors doesn't exist.", msg)
+
+
+class TestSearch(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        TUTOR_NAMES = (
+            {"first_name": "Jean", "last_name": "Pierrer"},
+            {"first_name": "John", "last_name": "Doe"},
+            {"first_name": "Morgan", "last_name": "Wakaba"},
+            {"first_name": "Philip", "last_name": "Doe"}
+        )
+
+        cls.tutors = [TutorFactory(person=PersonFactory(**name)) for name in TUTOR_NAMES]
+
+    def test_with_no_criterias(self):
+        qs = tutor.search()
+        self.assertQuerysetEqual(qs, self.tutors, transform=lambda o: o, ordered=False)
+
+    def test_with_name_criteria(self):
+        for tutor_obj in self.tutors:
+            with self.subTest(tutor=tutor):
+                name =  " ".join([tutor_obj.person.first_name, tutor_obj.person.last_name])
+                qs = tutor.search(name=name)
+                self.assertQuerysetEqual(qs, [tutor_obj], transform=lambda o: o, ordered=False)

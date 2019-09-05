@@ -7,7 +7,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 {% if disabled_nav %}
     <h2 style="margin:40px 0 40px;">{{ header_title|default_if_none:'' }}</h2>
     {% else %}
-<div class="row page-header" style="margin-top:25px;">
+<div class="row" style="margin:0 -15px 5px; padding:0;">
     <div class="col-md-1">
         <ul class="pager">
             <li class="previous disabled" >
@@ -39,7 +39,8 @@
         </ul>
     </div>
     <div class="col-md-10">
-         <h2>{{ header_title|default_if_none:'' }}</h2>
+        <h2>{{ acronym|default_if_none:'' }} &mdash; {{ current_yr|default_if_none:'' }}</h2>
+        <h4 style="margin-top: 0;">{{ complete_title }}</h4>
     </div>
     <div class="col-md-1">
         <ul class="pager">

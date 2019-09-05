@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 import datetime
+import operator
+
 import factory
 import factory.fuzzy
 from django.conf import settings
+from django.contrib.auth.models import Group, Permission
+
 from base import models as mdl
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, UE_FACULTY_MANAGER_GROUP, \
+    ADMINISTRATIVE_MANAGER_GROUP
 from base.tests.factories.user import UserFactory
-from osis_common.utils.datetime import get_tzinfo
 
 
 def generate_person_email(person, domain=None):
@@ -42,13 +46,65 @@ def generate_person_email(person, domain=None):
 class PersonFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Person'
+        django_get_or_create = ('user',)  # One-to-one field
 
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()))
-    email = factory.LazyAttribute(generate_person_email)
+    first_name = factory.LazyAttribute(lambda person:
+                                       person.user.first_name if person.user else factory.Faker('first_name'))
+    last_name = factory.LazyAttribute(lambda person:
+                                      person.user.last_name if person.user else factory.Faker('last_name'))
+
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1))
+    email = factory.LazyAttribute(lambda person: person.user.email if person.user else None)
     phone = factory.Faker('phone_number')
     language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))
     gender = factory.Iterator(mdl.person.Person.GENDER_CHOICES, getter=operator.itemgetter(0))
     user = factory.SubFactory(UserFactory)
     global_id = None
+
+
+class PersonWithoutUserFactory(PersonFactory):
+    user = None
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
+    email = factory.LazyAttribute(generate_person_email)
+
+
+class PersonWithPermissionsFactory:
+    def __init__(self, *permissions, groups=None, **kwargs):
+        perms_obj = [Permission.objects.get_or_create(defaults={"name": p}, codename=p)[0] for p in permissions]
+        self.person = PersonFactory(**kwargs)
+        self.person.user.user_permissions.add(*perms_obj)
+
+        if groups:
+            groups_obj = [Group.objects.get_or_create(name=name)[0] for name in groups]
+            self.person.user.groups.add(*groups_obj)
+
+    def __new__(cls, *permissions, **kwargs):
+        obj = super().__new__(cls)
+        obj.__init__(*permissions, **kwargs)
+        return obj.person
+
+
+class FacultyManagerFactory(PersonWithPermissionsFactory):
+    def __init__(self, *permissions, **kwargs):
+        super().__init__(*permissions, groups=(FACULTY_MANAGER_GROUP, ), **kwargs)
+
+
+class UEFacultyManagerFactory(PersonWithPermissionsFactory):
+    def __init__(self, *permissions, **kwargs):
+        super().__init__(*permissions, groups=(UE_FACULTY_MANAGER_GROUP, ), **kwargs)
+
+
+class CentralManagerFactory(PersonWithPermissionsFactory):
+    def __init__(self, *permissions, **kwargs):
+        super().__init__(*permissions, groups=(CENTRAL_MANAGER_GROUP, ), **kwargs)
+
+
+class SICFactory(PersonWithPermissionsFactory):
+    def __init__(self, *permissions, **kwargs):
+        super().__init__(*permissions, groups=(SIC_GROUP, ), **kwargs)
+
+
+class AdministrativeManagerFactory(PersonWithPermissionsFactory):
+    def __init__(self, *permissions, **kwargs):
+        super().__init__(*permissions, groups=(ADMINISTRATIVE_MANAGER_GROUP, ), **kwargs)

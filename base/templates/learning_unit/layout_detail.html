@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% load i18n %}
+{% load learning_unit %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block title %}
+    <title>OSIS - {{ learning_unit_year.acronym }}</title>
+{% endblock %}
+
+{% block breadcrumb %}
+    {% include "learning_unit/breadcrumb.html" %}
+{% endblock %}
+
+{% block content %}
+
+    {% include "learning_unit/blocks/header.html" %}
+    {% if messages_deletion %}
+        {% include "learning_unit/deletion_msg.html" %}
+    {% endif %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <label style="margin-left: 15px;">
+                    <select class="form-control"
+                            onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                        {% for luy in learning_unit_year.learning_unit.learningunityear_set.all %}
+                            <option value="{% url request.resolver_match.url_name luy.pk %}"
+                                    {% if luy == learning_unit_year %} selected="selected" {% endif %}>
+                                {{ luy.academic_year }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <div class="pull-right" style="margin-right: 15px;">
+                    {% block action_top %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        <div class="panel-body" id="tabs">
+            {% block tabs %}
+                {% include "learning_unit/blocks/tabs.html" %}
+            {% endblock tabs %}
+
+            <div class="tab-content">
+                {% block content_tab %}{% endblock %}
+            </div>
+        </div>
+        <div class="panel-footer text-right">
+            {% block action_bottom %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}

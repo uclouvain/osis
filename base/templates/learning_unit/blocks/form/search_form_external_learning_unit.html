@@ -1,0 +1,50 @@
+{% extends "blocks/forms/search_form.html" %}
+{% load bootstrap3 %}
+
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+{% block search_form_row_1 %}
+    {% bootstrap_field form.academic_year_id form_group_class="col-md-2" %}
+    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
+    {% bootstrap_field form.title form_group_class="col-md-4" %}
+{% endblock %}
+
+{% block search_form_row_2 %}
+    {% bootstrap_field form.status form_group_class="col-md-1" %}
+    {% bootstrap_field form.country form_group_class="col-md-3" %}
+    {% bootstrap_field form.city form_group_class="col-md-3" %}
+    {% bootstrap_field form.campus form_group_class="col-md-3" %}
+{% endblock %}
+
+{% block search_form_buttons %}
+    <div class="col-md-2">
+        <br>
+        <div class="btn-toolbar">
+            {% bootstrap_button "" value=_('Learning unit search') button_type="submit" button_class="btn-primary" icon="search" %}
+            {% include 'blocks/button/button_filter_refresh.html' %}
+        </div>
+    </div>
+{% endblock %}

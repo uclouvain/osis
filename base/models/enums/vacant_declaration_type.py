@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 RESEVED_FOR_INTERNS = "RESEVED_FOR_INTERNS"
 OPEN_FOR_EXTERNS = "OPEN_FOR_EXTERNS"
 EXCEPTIONAL_PROCEDURE = "EXCEPTIONAL_PROCEDURE"
@@ -32,9 +34,17 @@ VACANT_NOT_PUBLISH = "VACANT_NOT_PUBLISH"
 DO_NOT_ASSIGN = "DO_NOT_ASSIGN"
 
 DECLARATION_TYPE = (
-    (RESEVED_FOR_INTERNS, _(RESEVED_FOR_INTERNS)),
-    (OPEN_FOR_EXTERNS, _(OPEN_FOR_EXTERNS)),
-    (EXCEPTIONAL_PROCEDURE, _(EXCEPTIONAL_PROCEDURE)),
-    (VACANT_NOT_PUBLISH, _(VACANT_NOT_PUBLISH)),
-    (DO_NOT_ASSIGN, _(DO_NOT_ASSIGN))
+    (RESEVED_FOR_INTERNS, _("Reserved for interns")),
+    (OPEN_FOR_EXTERNS, _("Open for externs")),
+    (EXCEPTIONAL_PROCEDURE, _("Exceptional procedure")),
+    (VACANT_NOT_PUBLISH, _("Vacant not publish")),
+    (DO_NOT_ASSIGN, _("Do not assign"))
 )
+
+
+class VacantDeclarationType(ChoiceEnum):
+    RESEVED_FOR_INTERNS = "RESEVED_FOR_INTERNS"
+    OPEN_FOR_EXTERNS = "OPEN_FOR_EXTERNS"
+    EXCEPTIONAL_PROCEDURE = "EXCEPTIONAL_PROCEDURE"
+    VACANT_NOT_PUBLISH = "VACANT_NOT_PUBLISH"
+    DO_NOT_ASSIGN = "DO_NOT_ASSIGN"

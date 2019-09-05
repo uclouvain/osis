@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,35 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 from django.db import models
+from django.utils.translation import gettext_lazy
+
 from assessments.models.enums import score_sheet_address_choices
 from django.core.exceptions import ObjectDoesNotExist
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class ScoreSheetAddressAdmin(admin.ModelAdmin):
+class ScoreSheetAddressAdmin(OsisModelAdmin):
     list_display = ('offer_year', 'entity_address_choice', 'location', 'postal_code', 'city', 'phone', 'fax', 'email')
-    fieldsets = ((None, {'fields': ('offer_year', 'entity_address_choice', 'location', 'postal_code', 'city', 'country', 'phone', 'fax', 'email')}),)
     search_fields = ['offer_year__acronym', 'location']
     list_filter = ('entity_address_choice',)
     raw_id_fields = ('offer_year',)
 
 
 class ScoreSheetAddress(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer_year = models.OneToOneField('base.OfferYear')
+    offer_year = models.OneToOneField('base.OfferYear', on_delete=models.CASCADE)
     # Info to find the address
-    entity_address_choice = models.CharField(max_length=50, blank=True, null=True, choices=score_sheet_address_choices.CHOICES)
+    entity_address_choice = models.CharField(max_length=50, blank=True, null=True,
+                                             choices=score_sheet_address_choices.CHOICES)
     # Address fields
     recipient = models.CharField(max_length=255, blank=True, null=True)
-    location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores cheets
+    location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores sheets
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
-    phone = models.CharField(max_length=30, blank=True, null=True)
-    fax = models.CharField(max_length=30, blank=True, null=True)
-    email = models.EmailField(null=True, blank=True)
+    country = models.ForeignKey(
+        'reference.Country',
+        blank=True, null=True,
+        on_delete=models.CASCADE
+    )
+    phone = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Phone"))
+    fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Fax"))
+    email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
 
     @property
     def customized(self):
@@ -61,7 +67,8 @@ class ScoreSheetAddress(models.Model):
         if self.customized or self.entity_address_choice:
             super(ScoreSheetAddress, self).save(*args, **kwargs)
         else:
-            raise Exception("Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
+            raise Exception(
+                "Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
 
     def __str__(self):
         return "{0} - {1}".format(self.offer_year, self.entity_address_choice)

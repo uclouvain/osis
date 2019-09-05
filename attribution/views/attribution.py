@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class RecomputePortalSerializer(serializers.Serializer):
 
 @api_view(['POST'])
 def recompute_portal(request):
-    serializer = RecomputePortalSerializer(data=request.POST)
+    serializer = RecomputePortalSerializer(data=request.data)
     if serializer.is_valid():
         global_ids = serializer.data['global_ids'] if serializer.data['global_ids'] else None
         result = attribution_json.publish_to_portal(global_ids)

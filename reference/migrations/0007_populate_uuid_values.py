@@ -3,19 +3,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
-import uuid
 
-
-def set_uuid_field(apps, schema_editor):
-    """
-    Set a random uuid value to all existing rows in all models in database.
-    """
-    reference = apps.get_app_config('reference')
-    for model_class in reference.get_models():
-        ids = model_class.objects.values_list('id', flat=True)
-        if ids:
-            for pk in ids:
-                model_class.objects.filter(pk=pk).update(uuid=uuid.uuid4())
+from reference.migrations.utils.uuid import set_uuid_field
 
 
 class Migration(migrations.Migration):

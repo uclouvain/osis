@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.test import TestCase
-from base.models.education_group_language import find_by_education_group_year
+
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -42,8 +42,10 @@ class EducationGroupLanguageTest(TestCase):
                                                                         language=self.language)
 
     def test_return_str_format(self):
-        self.assertEqual(self.education_group_language_1.__str__(), str(self.education_group_language_1.id))
+        self.assertEqual(
+            self.education_group_language_1.__str__(),
+            "{} - {}".format(
+                self.education_group_language_1.education_group_year, self.education_group_language_1.language
+            )
+        )
 
-    def test_find_by_education_group_year(self):
-        education_group_year = find_by_education_group_year(self.education_group_year.id)
-        self.assertEqual(education_group_year.count(), 2)

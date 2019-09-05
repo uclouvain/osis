@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
+
 from .text_label import TextLabelFactory
 
 
@@ -32,8 +32,16 @@ class TranslatedTextFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "cms.TranslatedText"
 
-    language = 1  # French default
+    language = 'fr-be'  # French default
     text_label = factory.SubFactory(TextLabelFactory)
-    entity = factory.fuzzy.FuzzyText(prefix="Entity ", length=20)
+    entity = factory.fuzzy.FuzzyText(prefix="Entity ", length=15)
     reference = factory.fuzzy.FuzzyInteger(1, 10)
     text = None
+
+
+class TranslatedTextRandomFactory(TranslatedTextFactory):
+    text = factory.Faker('paragraph', nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)
+
+
+class EnglishTranslatedTextRandomFactory(TranslatedTextRandomFactory):
+    language = 'en'

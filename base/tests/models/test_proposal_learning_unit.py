@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils import timezone
 
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.models import proposal_learning_unit
+from base.models.enums import proposal_state, proposal_type
 
 
 class TestSearch(TestCase):
@@ -39,18 +48,66 @@ class TestSearch(TestCase):
         )
         self.assertEqual(a_proposal_learning_unit, self.proposal_learning_unit)
 
-    def test_have_a_proposal(self):
-        a_learning_unit_year = self.proposal_learning_unit.learning_unit_year
-        self.assertTrue(proposal_learning_unit.have_a_proposal(a_learning_unit_year))
+    def test_find_by_learning_unit(self):
+        a_proposal_learning_unit = proposal_learning_unit.find_by_learning_unit(
+            self.proposal_learning_unit.learning_unit_year.learning_unit
+        )
+        self.assertEqual(a_proposal_learning_unit, self.proposal_learning_unit)
 
-        self.proposal_learning_unit.delete()
-        self.assertFalse(proposal_learning_unit.have_a_proposal(a_learning_unit_year))
+    def test_str(self):
+        expected_str = "{} - {}".format(self.proposal_learning_unit.folder_id,
+                                        self.proposal_learning_unit.learning_unit_year)
+        self.assertEqual(str(self.proposal_learning_unit), expected_str)
 
-    def test_find_by_folder(self):
-        folder = self.proposal_learning_unit.folder
-        self.assertTrue(proposal_learning_unit.find_by_folder(folder))
 
-        self.proposal_learning_unit.delete()
+class TestSearchCases(TestCase):
 
-        self.assertFalse(proposal_learning_unit.find_by_folder(folder))
+    def setUp(self):
+        yr = timezone.now().year
+        self.entity_1 = EntityFactory()
+        EntityVersionFactory(entity=self.entity_1)
+        self.an_academic_year = AcademicYearFactory(year=yr)
+        self.an_acronym = "LBIO1212"
 
+        self.learning_container_yr = LearningContainerYearFactory(
+            academic_year=self.an_academic_year,
+            requirement_entity=self.entity_1,
+        )
+        a_learning_unit_year = LearningUnitYearFactory(acronym=self.an_acronym,
+                                                       academic_year=self.an_academic_year,
+                                                       learning_container_year=self.learning_container_yr)
+        self.a_proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=a_learning_unit_year,
+                                                                    type=proposal_type.ProposalType.CREATION,
+                                                                    state=proposal_state.ProposalState.CENTRAL,
+                                                                    entity=self.entity_1)
+
+    def test_search_by_proposal_type(self):
+        qs = LearningUnitYear.objects.all()
+        results = proposal_learning_unit.filter_proposal_fields(qs, proposal_type=self.a_proposal_learning_unit.type)
+        self.check_search_result(results)
+
+    def test_search_by_proposal_state(self):
+        qs = LearningUnitYear.objects.all()
+        results = proposal_learning_unit.filter_proposal_fields(qs, proposal_state=self.a_proposal_learning_unit.state)
+        self.check_search_result(results)
+
+    def test_search_by_folder_id(self):
+        qs = LearningUnitYear.objects.all()
+        results = proposal_learning_unit.filter_proposal_fields(qs, folder_id=self.a_proposal_learning_unit.folder_id)
+        self.check_search_result(results)
+
+    def test_search_by_entity_folder(self):
+        qs = LearningUnitYear.objects.all()
+        results = proposal_learning_unit.filter_proposal_fields(qs, entity_folder_id=self.a_proposal_learning_unit.entity.id)
+        self.check_search_result(results)
+
+    def check_search_result(self, results):
+        self.assertCountEqual(results, [self.a_proposal_learning_unit.learning_unit_year])
+
+
+class TestEnsureFolderIdValidator(TestCase):
+    def test_ensure_folder_id_is_not_to_big(self):
+        bad_proposal = ProposalLearningUnitFactory(folder_id=100000000, initial_data={'acronym': 'LDROI1200'})
+        with self.assertRaises(ValidationError) as cm:
+            bad_proposal.full_clean()
+        self.assertTrue('folder_id' in cm.exception.message_dict.keys())

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,15 +25,13 @@
 ##############################################################################
 import datetime
 import operator
-import factory
+
 import factory.fuzzy
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_container import LearningContainerFactory
-from base.tests.factories.campus import CampusFactory
 from base.models.enums import learning_container_year_types
-from reference.tests.factories.language import LanguageFactory
-from osis_common.utils.datetime import get_tzinfo
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.learning_container import LearningContainerFactory
 
 
 class LearningContainerYearFactory(factory.django.DjangoModelFactory):
@@ -43,12 +41,21 @@ class LearningContainerYearFactory(factory.django.DjangoModelFactory):
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     academic_year = factory.SubFactory(AcademicYearFactory)
     learning_container = factory.SubFactory(LearningContainerFactory)
-    container_type = factory.Iterator(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES,
+    container_type = factory.Iterator(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL,
                                       getter=operator.itemgetter(0))
-    title = factory.Sequence(lambda n: 'Learning container year - %d' % n)
+    common_title = factory.Sequence(lambda n: 'Learning container year - %d' % n)
+    common_title_english = factory.Sequence(lambda n: 'Learning container year english - %d' % n)
     acronym = factory.Sequence(lambda n: 'LCY-%d' % n)
-    campus = factory.SubFactory(CampusFactory)
-    language = factory.SubFactory(LanguageFactory)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+
+    changed = factory.fuzzy.FuzzyNaiveDateTime(
+        datetime.datetime(2016, 1, 1),
+        datetime.datetime(2017, 3, 1)
+    )
+
     in_charge = False
+    type_declaration_vacant = None
+
+    requirement_entity = None
+    allocation_entity = None
+    additional_entity_1 = None
+    additional_entity_2 = None

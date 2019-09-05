@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,9 @@
 import copy
 from decimal import Decimal, Context, Inexact
 import unicodedata
+
+from django.db import transaction
+
 from base.models import academic_year, session_exam_calendar, exam_enrollment, program_manager, tutor, offer_year, \
                         learning_unit_year
 from base.models.enums import exam_enrollment_justification_type
@@ -39,9 +42,11 @@ def get_scores_encoding_list(user, **kwargs):
     offer_year_id = kwargs.get('offer_year_id')
     tutor_id = kwargs.get('tutor_id')
     enrollments_ids = kwargs.get('enrollments_ids')
+    justification = kwargs.get('justification')
+    only_enrolled = _need_to_filter_students_enrolled_to_exam(justification, kwargs)
 
     if is_program_manager:
-        professor = tutor.find_by_id(tutor_id) if tutor_id else None            #Filter by tutor
+        professor = tutor.find_by_id(tutor_id) if tutor_id else None
         offers_year = [offer_year.find_by_id(offer_year_id)] if offer_year_id else \
                        list(offer_year.find_by_user(user, academic_yr=current_academic_year))
 
@@ -54,7 +59,8 @@ def get_scores_encoding_list(user, **kwargs):
             registration_id=kwargs.get('registration_id'),
             student_last_name=kwargs.get('student_last_name'),
             student_first_name=kwargs.get('student_first_name'),
-            justification=kwargs.get('justification')
+            justification=justification,
+            only_enrolled=only_enrolled,
         )
     else:
         professor = tutor.find_by_user(user)
@@ -62,7 +68,9 @@ def get_scores_encoding_list(user, **kwargs):
             academic_year=current_academic_year,
             session_exam_number=current_number_session,
             learning_unit_year_id=learning_unit_year_id,
-            tutor=professor)
+            tutor=professor,
+            only_enrolled=only_enrolled
+        )
 
     # Want a subset of exam enrollment list
     if enrollments_ids:
@@ -145,33 +153,34 @@ def update_enrollment(enrollment, user, is_program_manager=None):
     if can_modify_exam_enrollment(enrollment, is_program_manager) and \
             is_enrollment_changed(enrollment, is_program_manager):
 
-        enrollment_updated = set_score_and_justification(enrollment, is_program_manager)
+        with transaction.atomic():
+            enrollment_updated = set_score_and_justification(enrollment, is_program_manager)
 
-        if is_program_manager:
-            exam_enrollment.create_exam_enrollment_historic(user, enrollment)
+            if is_program_manager:
+                exam_enrollment.create_exam_enrollment_historic(user, enrollment)
 
-        return enrollment_updated
+            return enrollment_updated
     return None
 
 
 def clean_score_and_justification(enrollment):
     is_decimal_scores_authorized = enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores
 
-    score_clean = None
+    cleaned_score = None
     if enrollment.score_encoded is not None and enrollment.score_encoded != "":
-        score_clean = _truncate_decimals(enrollment.score_encoded, is_decimal_scores_authorized)
+        cleaned_score = _convert_to_decimal(enrollment.score_encoded, is_decimal_scores_authorized)
 
-    justification_clean = None if not enrollment.justification_encoded else enrollment.justification_encoded
+    cleaned_justification = None if not enrollment.justification_encoded else enrollment.justification_encoded
     if enrollment.justification_encoded == exam_enrollment_justification_type.SCORE_MISSING:
-        justification_clean = score_clean = None
+        cleaned_justification = cleaned_score = None
 
     enrollment_cleaned = copy.deepcopy(enrollment)
-    enrollment_cleaned.score_encoded = score_clean
-    enrollment_cleaned.justification_encoded = justification_clean
+    enrollment_cleaned.score_encoded = cleaned_score
+    enrollment_cleaned.justification_encoded = cleaned_justification
     return enrollment_cleaned
 
 
-def _truncate_decimals(score, decimal_scores_authorized):
+def _convert_to_decimal(score, decimal_scores_authorized):
     decimal_score = _format_score_to_decimal(score)
 
     if decimal_scores_authorized:
@@ -192,12 +201,12 @@ def _format_score_to_decimal(score):
     if isinstance(score, str):
         score = score.strip().replace(',', '.')
         _check_str_score_is_digit(score)
-    return Decimal(score)
+    return Decimal(str(score))
 
 
 def _check_str_score_is_digit(score_str):
     if not score_str.replace('.', '').isdigit():  # Case not empty string but have alphabetic values
-        raise ValueError("scores_must_be_between_0_and_20")
+        raise ValueError("Scores must be between 0 and 20")
 
 
 def is_enrollment_changed(enrollment, is_program_manager):
@@ -300,3 +309,10 @@ def _normalize_string(string):
     """
     string = string.replace(" ", "")
     return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
+
+
+def _need_to_filter_students_enrolled_to_exam(justification, kwargs):
+    only_enrolled = kwargs.get('only_enrolled')
+    if justification and justification == exam_enrollment_justification_type.SCORE_MISSING:
+        only_enrolled = True
+    return only_enrolled

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,166 +23,145 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import messages
+from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.urlresolvers import reverse
-from django.db.utils import IntegrityError
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.db.models import Q, Prefetch
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
+from django.views.decorators.http import require_POST
+from django.views.generic import DetailView
+from django_filters.views import FilterView
 
-from base import models as mdl
-from base.forms.organization import OrganizationForm
-from base.models.enums import organization_type
-from . import layout
-from reference import models as mdlref
-from django.utils.translation import ugettext_lazy as _
-
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organizations(request):
-    return layout.render(request, "organizations.html", {'types': organization_type.ORGANIZATION_TYPE,
-                                                         "init": "0"})
+from base.forms.organization import OrganizationFilter
+from base.forms.organization_address import OrganizationAddressForm
+from base.models.campus import Campus
+from base.models.organization import Organization
+from base.models.organization_address import OrganizationAddress
+from reference.models.country import Country
 
 
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organizations_search(request):
-    organizations = mdl.organization.search(acronym=request.GET.get('acronym'),
-                                            name=request.GET.get('name'),
-                                            type=request.GET.get('type_choices'))
+class OrganizationSearch(PermissionRequiredMixin, FilterView):
+    model = Organization
+    paginate_by = 20
+    template_name = "organization/organizations.html"
 
-    return layout.render(request, "organizations.html", {'organizations': organizations,
-                                                         'types': organization_type.ORGANIZATION_TYPE,
-                                                         "init": "1"})
+    filterset_class = OrganizationFilter
+    permission_required = 'base.can_access_organization'
+    raise_exception = True
 
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_read(request, organization_id):
-    organization = mdl.organization.find_by_id(organization_id)
-    structures = mdl.structure.find_by_organization(organization)
-    organization_addresses = mdl.organization_address.find_by_organization(organization)
-    campus = mdl.campus.find_by_organization(organization)
-    return layout.render(request, "organization.html", locals())
+    def get_context_data(self, *, object_list=None, **kwargs):
+        # Display the list even if the filter is not bound
+        if not self.filterset.is_bound:
+            object_list = self.filterset.qs
+        return super().get_context_data(object_list=object_list, **kwargs)
 
 
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_new(request):
-    return organization_save(request, None)
+class DetailOrganization(PermissionRequiredMixin, DetailView):
+    model = Organization
+    template_name = "organization/organization.html"
+    permission_required = 'base.can_access_organization'
+    raise_exception = True
+    pk_url_kwarg = "organization_id"
 
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_save(request, organization_id):
-    form = OrganizationForm(data=request.POST)
-    if organization_id:
-        organization = mdl.organization.find_by_id(organization_id)
-    else:
-        organization = mdl.organization.Organization()
-
-    # get the screen modifications
-    organization.acronym = request.POST.get('acronym')
-    organization.name = request.POST.get('name')
-    organization.website = request.POST.get('website')
-    organization.reference = request.POST.get('reference')
-    organization.type = request.POST.get('type_choices')
-
-    if form.is_valid():
-        organization.save()
-        return HttpResponseRedirect(reverse('organization_read', kwargs={'organization_id': organization.id}))
-    else:
-        return layout.render(request, "organization_form.html", {'organization': organization,
-                                                                 'form': form})
-
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_edit(request, organization_id):
-    organization = mdl.organization.find_by_id(organization_id)
-    return layout.render(request, "organization_form.html", {'organization': organization,
-                                                             'types': organization_type.ORGANIZATION_TYPE})
-
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_create(request):
-    organization = mdl.organization.Organization()
-    return layout.render(request, "organization_form.html", {'organization': organization,
-                                                             'types': organization_type.ORGANIZATION_TYPE})
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related(
+            Prefetch(
+                "organizationaddress_set",
+                queryset=OrganizationAddress.objects.select_related("country")
+            ),
+            "campus_set",
+        )
 
 
 @login_required
 @permission_required('base.can_access_organization', raise_exception=True)
 def organization_address_read(request, organization_address_id):
-    organization_address = mdl.organization_address.find_by_id(organization_address_id)
-    organization_id = organization_address.organization.id
-    return layout.render(request, "organization_address.html", {'organization_address': organization_address,
-                                                                'organization_id': organization_id})
+    organization_address = get_object_or_404(
+        OrganizationAddress.objects.select_related('organization', 'country'),
+        id=organization_address_id
+    )
+    return render(request, "organization/organization_address.html", {
+            'organization_address': organization_address,
+        }
+    )
 
 
 @login_required
 @permission_required('base.can_access_organization', raise_exception=True)
 def organization_address_edit(request, organization_address_id):
-    organization_address = mdl.organization_address.find_by_id(organization_address_id)
-    organization_id = organization_address.organization.id
-    countries = mdlref.country.find_all()
-    return layout.render(request, "organization_address_form.html", {'organization_address': organization_address,
-                                                                     'organization_id': organization_id,
-                                                                     'countries': countries})
+    organization_address = get_object_or_404(
+        OrganizationAddress.objects.select_related('organization'),
+        id=organization_address_id
+    )
+    form = OrganizationAddressForm(request.POST or None, instance=organization_address)
+    if form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("organization_address_read", args=[organization_address.pk]))
+
+    return render(request, "organization/organization_address_form.html", {
+            'organization_address': organization_address,
+            'form': form
+        }
+    )
 
 
 @login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_save(request, organization_address_id):
-    if organization_address_id:
-        organization_address = mdl.organization_address.find_by_id(organization_address_id)
-    else:
-        organization_address = mdl.organization_address.OrganizationAddress()
-
-    organization_address.label = request.POST.get('organization_address_label')
-    organization_address.location = request.POST.get('organization_address_location')
-    organization_address.postal_code = request.POST.get('organization_address_postal_code')
-    organization_address.city = request.POST.get('organization_address_city')
-
-    country = request.POST.get('country')
-    if country is not None:
-        organization_address.country = mdlref.country.find_by_id(int(country))
-
-    organization_id = request.POST.get('organization_id')
-    if organization_id is not None:
-        organization_address.organization = mdl.organization.find_by_id(int(organization_id))
-
-    organization_address.save()
-
-    return organization_read(request, organization_address.organization.id)
-
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_new(request):
-    try:
-        return organization_address_save(request, None)
-    except IntegrityError:
-        messages.error(request, _("organization_address_save_error"))
-        return redirect('organizations')
-
-@login_required
-@permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_create(request, organization_address_id):
-    organization_address = mdl.organization_address.OrganizationAddress()
-    organization = mdl.organization.find_by_id(organization_address_id)
-    countries = mdlref.country.find_all()
-    return layout.render(request, "organization_address_form.html", {'organization_address': organization_address,
-                                                                     'organization_id': organization.id,
-                                                                     'countries': countries})
-
-
-@login_required
+@require_POST
 @permission_required('base.can_access_organization', raise_exception=True)
 def organization_address_delete(request, organization_address_id):
-    organization_address = mdl.organization_address.find_by_id(organization_address_id)
-    organization = organization_address.organization
+    organization_address = get_object_or_404(
+        OrganizationAddress.objects.select_related('organization'),
+        id=organization_address_id
+    )
     organization_address.delete()
-    return organization_read(request, organization.id)
+    return HttpResponseRedirect(reverse("organization_read", args=[organization_address.organization.pk]))
+
+
+class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Organization.objects.all()
+
+        country = self.forwarded.get('country', None)
+        if country:
+            qs = qs.filter(
+                organizationaddress__is_main=True,
+                organizationaddress__country=country,
+            )
+
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
+
+        return qs.distinct().order_by('name')
+
+    def get_result_label(self, result):
+        return result.name
+
+
+class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Country.objects.filter(organizationaddress__isnull=False).distinct()
+
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
+
+        return qs.distinct().order_by('name')
+
+
+class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Campus.objects.filter(organization__is_current_partner=True)
+
+        country = self.forwarded.get('country_external_institution', None)
+
+        if country:
+            qs = qs.filter(organization__organizationaddress__country=country)
+
+        if self.q:
+            qs = qs.filter(Q(organization__name__icontains=self.q) | Q(name__icontains=self.q))
+
+        return qs.select_related('organization').order_by('organization__name')
+
+    def get_result_label(self, result):
+        return "{} ({})".format(result.organization.name, result.name)

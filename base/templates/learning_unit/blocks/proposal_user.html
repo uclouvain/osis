@@ -1,0 +1,23 @@
+{% load i18n %}
+
+
+<div class="row">
+    <div class="col-md-3">
+        <b>{% trans 'By' %}</b>
+    </div>
+
+    <div class="col-md-9">
+        {# TODO check if we can remove default_if_none : person != request.user #}
+        {{ person|default_if_none:request.user }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <b>{% trans 'The' %}</b>
+    </div>
+
+    <div class="col-md-9">
+        {% now "d/m/Y" %}
+    </div>
+
+</div>

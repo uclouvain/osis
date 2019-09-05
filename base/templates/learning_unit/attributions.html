@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "learning_unit/layout_detail.html" %}
 {% load staticfiles %}
 {% load i18n %}
 {% comment "License" %}
@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -25,49 +25,83 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
-{% endblock %}
 
-{% block content %}
+{% block content_tab %}
+    <div role="tabpanel" class="tab-pane active" id="attributions">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>{% trans 'Tutors' %}</th>
+                <th>{% trans 'Function' %}</th>
+                {% if not learning_unit_year.is_for_faculty_or_partim %}
+                    <th>{% trans 'Start' %}</th>
+                    <th>{% trans 'Duration' %}</th>
+                {% endif %}
+                <th>{% trans "Volume 1" %}</th>
+                <th>{% trans "Volume 2" %}</th>
+                <th>{% trans 'Substitute' %}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for attribution in attributions %}
+                <tr>
+                    <td>{{ attribution.tutor.person }}</td>
+                    <td>{{ attribution.get_function_display }}</td>
+                    {% if not learning_unit_year.is_for_faculty_or_partim %}
+                        <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                        <td>{{ attribution.duration | default_if_none:'' }}</td>
+                    {% endif %}
+                    <td>{{ attribution.lecturing_charges.0.allocation_charge | floatformat:2 }}</td>
+                    <td>{{ attribution.practical_charges.0.allocation_charge| floatformat:2 }}</td>
+                    <td>{{ attribution.substitute | default_if_none:'' }}</td>
+                    <td>
+                        {% if can_manage_attribution %}
+                            <a class="trigger_modal"
+                               data-url="{% url "update_attribution" learning_unit_year.id attribution.pk %}"
+                               data-modal_class="modal-lg">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a class="trigger_modal"
+                               data-url="{% url "remove_attribution" learning_unit_year.id attribution.pk %}">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        {% endif %}
+                        {% if can_manage_charge_repartition %}
+                            <a class="trigger_modal"
+                               data-url="{% url "edit_charge_repartition" learning_unit_year.id attribution.pk %}"
+                               data-modal_class="modal-lg">
+                                            <span class="glyphicon glyphicon-edit">
 
-{% include "learning_unit/header.html" %}
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "learning_unit/tabs.html" %}
-
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="attributions">
-                <table class="table">
-                    <thead>
-                        <th>{% trans 'tutor' %}</th>
-                        <th>{% trans 'function' %}</th>
-                        <th></th>
-                        <th>{% trans 'start' %}</th>
-                        <th>{% trans 'duration' %}</th>
-                        <th>Volume 1</th>
-                        <th>Volume 2</th>
-                    </thead>
-                    <tbody>
-                        {% for attribution in attributions %}
-                            <tr>
-                                <td>{{ attribution.tutor.person.last_name}}, {{ attribution.tutor.person.first_name}}</td>
-                                <td>
-                                    {% if attribution.function %}
-                                        {% trans attribution.function %}
-                                    {% endif %}
-                                </td>
-                                <td></td>
-                                <td>{{ attribution.start_year | default_if_none:''}}</td>
-                                <td>{{ attribution.duration | default_if_none:''}}</td>
-                                <td>{{ attribution.volume_lecturing  | default_if_none:''}}</td>
-                                <td>{{ attribution.volume_practical  | default_if_none:''}}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                            </span> </a>
+                            <a class="trigger_modal"
+                               data-url="{% url "remove_attribution" learning_unit_year.id attribution.pk %}">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if learning_unit_year.is_full %}
+            <a class="btn btn-default trigger_modal {% if not can_manage_attribution %}disabled{% endif %}"
+               role="button" id="manage_repartition"
+               data-url="{% url "add_attribution" learning_unit_year.id %}"
+               data-modal_class="modal-lg">
+                {% if learning_unit_year.learning_container_year.is_type_for_faculty %}
+                    {% trans "Add current year attribution" %}
+                {% else %}
+                    {% trans "Add attribution" %}
+                {% endif %}
+            </a>
+        {% endif %}
+        {% if learning_unit_year.is_partim %}
+            <a href="{% url "select_attribution" learning_unit_year.id %}" id="manage_repartition"
+               class="btn btn-default {% if not can_manage_charge_repartition %}disabled{% endif %}"
+               role="button">
+                {% trans "Manage repartition" %}
+            </a>
+        {% endif %}
     </div>
-</div>
 {% endblock %}

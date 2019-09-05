@@ -1,0 +1,382 @@
+[
+{
+    "model": "waffle.flag",
+    "pk": 2,
+    "fields": {
+        "name": "learning_unit_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T08:51:05Z",
+        "modified": "2018-07-10T11:52:42.584Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 3,
+    "fields": {
+        "name": "learning_unit_delete",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:54:54Z",
+        "modified": "2018-07-10T13:55:27.412Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 4,
+    "fields": {
+        "name": "learning_unit_proposal_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:55:42Z",
+        "modified": "2018-07-10T13:55:48.045Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 5,
+    "fields": {
+        "name": "learning_unit_proposal_delete",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:56:00Z",
+        "modified": "2018-07-10T13:56:08.077Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 6,
+    "fields": {
+        "name": "education_group_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:56:20Z",
+        "modified": "2018-07-10T13:56:26.091Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 7,
+    "fields": {
+        "name": "education_group_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:57:05Z",
+        "modified": "2018-07-10T13:57:11.708Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 8,
+    "fields": {
+        "name": "education_group_delete",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:57:23Z",
+        "modified": "2018-07-10T13:57:29.911Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 9,
+    "fields": {
+        "name": "learning_unit_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:57:47Z",
+        "modified": "2018-07-10T13:57:54.139Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 10,
+    "fields": {
+        "name": "learning_unit_proposal_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:58:08Z",
+        "modified": "2018-07-10T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 11,
+    "fields": {
+        "name": "educational_information_block_action",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:58:08Z",
+        "modified": "2018-07-10T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 12,
+    "fields": {
+        "name": "educational_information_mailing",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:58:08Z",
+        "modified": "2018-07-10T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 13,
+    "fields": {
+        "name": "education_group_select",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-30T13:58:08Z",
+        "modified": "2018-07-30T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 14,
+    "fields": {
+        "name": "education_group_move",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-30T13:58:08Z",
+        "modified": "2018-07-30T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 15,
+    "fields": {
+        "name": "education_group_detach",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-30T13:58:08Z",
+        "modified": "2018-07-30T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 16,
+    "fields": {
+        "name": "education_group_attach",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-30T13:58:08Z",
+        "modified": "2018-07-30T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 17,
+    "fields": {
+        "name": "pdf_content",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-30T13:58:08Z",
+        "modified": "2018-07-30T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 18,
+    "fields": {
+        "name": "learning_unit_external_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-10-30T12:00:40",
+        "modified": "2018-10-30T12:00:53.975",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 19,
+    "fields": {
+        "name": "learning_achievement_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-11-23T16:28:45Z",
+        "modified": "2018-11-23T16:29:39.033Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 20,
+    "fields": {
+        "name": "education_group_administrative_data_update",
+        "everyone": false,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": false,
+        "authenticated": false,
+        "languages": "",
+        "rollout": false,
+        "note": "Used in \"/educationgroups/XXX/XXX/administrative/?group_to_parent=0\" -> \"base/views/education_group.py\" education_group_edit_administrative_data\r\n\r\nUsed in \"base/templates/education_group/blocks/dropdown/administrative_data_actions_bar.html\"",
+        "created": "2019-03-28T15:19:18",
+        "modified": "2019-03-28T15:40:16.786",
+        "groups": [],
+        "users": []
+    }
+}
+]

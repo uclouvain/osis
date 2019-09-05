@@ -1,6 +1,7 @@
-{% extends "layout.html" %}
+{% extends "learning_unit/layout_detail.html" %}
 {% load staticfiles %}
 {% load i18n %}
+{% load dictionnary %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -8,7 +9,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -25,21 +26,119 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
-{% endblock %}
-
-{% block content %}
-
-{% include "learning_unit/header.html" %}
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "learning_unit/tabs.html" %}
-
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="formations">
+{% block content_tab %}
+    <div class="panel-body" id="tabs">
+        <br>
+        {% if group_elements_years %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is included in the following education groups{% endblocktrans %}
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content" id="tab_content">
+                        <div role="tabpanel" class="tab-pane active" id="trainings">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                <th>{% trans 'Code' %}</th>
+                                <th>{% trans 'Title' %}</th>
+                                <th>{% trans "Training type" %}</th>
+                                <th>{% trans 'Block' %}</th>
+                                <th>{% trans 'Trainings' %}</th>
+                                <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for group_element_year in group_elements_years %}
+                                    {% url 'education_group_read' group_element_year.parent_id group_element_year.parent_id as url_education_group_year %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_education_group_year }}">
+                                                {{ group_element_year.parent.partial_acronym | default_if_none:'-' }}
+                                            </a>
+                                        </td>
+                                        <td>{{ group_element_year.parent.title | default_if_none:'-' }}</td>
+                                        <td>{{ group_element_year.parent.education_group_type | default_if_none:'-' }}</td>
+                                        <td>{{ group_element_year.block | default_if_none:'-' }}</td>
+                                        <td>
+                                            <ul>
+                                                {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_id %}
+                                                    {% url 'education_group_read' training.id training.id as url_education_group_yr %}
+                                                    <li>
+                                                        <a href="{{ url_education_group_yr }}">{{ training.acronym }} - {{ training.title }}</a>
+                                                        {% if formations_by_educ_group_year|get_item:training.id %}
+                                                            <ul><li>
+                                                                {% trans 'Included in' %} :
+                                                                {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
+                                                                    {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
+                                                                    <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
+                                                                    {% if not forloop.last %} - {% endif %}
+                                                                {% endfor %}
+                                                            </li></ul>
+                                                        {% endif %}
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td class="text-center">
+                                            {% if group_element_year.relative_credits == group_element_year.child_leaf.credits %}
+                                                -
+                                            {% else %}
+                                                {{ group_element_year.relative_credits | default_if_none:'-' }}
+                                            {% endif %}
+                                            / {{ group_element_year.child_leaf.credits | default_if_none:'-' }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        {% else %}
+            <span></span>
+            {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is not included in any education group{% endblocktrans %}
+            <br>
+        {% endif %}
+        <br>
+        {% if root_formations %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% trans 'Enrollments to learning unit' %}
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content" id="tab_content">
+                        <div role="tabpanel" class="tab-pane active" id="learning_unit_enrollments">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>{% trans 'Training' %}</th>
+                                    <th>{% trans 'Enrollments to training' %}</th>
+                                    <th>{% trans 'Enrolled to learning unit' %}</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for education_group_year in root_formations %}
+                                    {% url 'education_group_read' education_group_year.id education_group_year.id as url_education_group_year %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_education_group_year }}">
+                                                {{ education_group_year.acronym }}
+                                            </a>
+                                        </td>
+                                        <td>{{ education_group_year.count_formation_enrollments }}</td>
+                                        <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            {% trans 'No enrollment for this learning unit' %}
+        {% endif %}
     </div>
-</div>
 {% endblock %}

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ from factory import DjangoModelFactory
 class LanguageFactory(DjangoModelFactory):
     class Meta:
         model = 'reference.Language'
+        django_get_or_create = ('code',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     code = factory.Sequence(lambda n: str(n))

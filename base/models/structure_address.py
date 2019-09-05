@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,23 +24,22 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class StructureAddressAdmin(admin.ModelAdmin):
+class StructureAddressAdmin(OsisModelAdmin):
     list_display = ('structure', 'label', 'location', 'postal_code', 'city', 'country')
-    fieldsets = ((None, {'fields': ('structure', 'label', 'location', 'postal_code', 'city', 'country', 'phone', 'fax', 'email')}),)
     search_fields = ['structure__acronym']
 
 
 class StructureAddress(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
-    structure = models.ForeignKey('Structure')
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    structure = models.ForeignKey('Structure', on_delete=models.CASCADE)
     label = models.CharField(max_length=20)
     location = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=20)
     city = models.CharField(max_length=255)
-    country = models.ForeignKey('reference.Country')
+    country = models.ForeignKey('reference.Country', on_delete=models.CASCADE)
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(max_length=255, blank=True, null=True)

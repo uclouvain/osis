@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,26 +26,24 @@
 from itertools import chain
 
 from django.db import models
-from django.contrib import admin
-
-from base.models.academic_year import current_academic_years
 from base.models.enums import structure_type
+from base.models.utils.utils import get_object_or_none
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class StructureAdmin(admin.ModelAdmin):
+class StructureAdmin(OsisModelAdmin):
     list_display = ('acronym', 'title', 'part_of', 'organization', 'type')
-    fieldsets = ((None, {'fields': ('acronym', 'title', 'part_of', 'organization', 'type')}),)
     raw_id_fields = ('part_of',)
     search_fields = ['acronym']
 
 
 class Structure(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15)
     title = models.CharField(max_length=255)
-    organization = models.ForeignKey('Organization', null=True)
-    part_of = models.ForeignKey('self', null=True, blank=True)
+    organization = models.ForeignKey('Organization', null=True, on_delete=models.CASCADE)
+    part_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
     type = models.CharField(max_length=30, blank=True, null=True, choices=structure_type.TYPES)
 
     @property
@@ -81,10 +79,7 @@ def find_structures():
 
 
 def find_by_id(structure_id):
-    try:
-        return Structure.objects.get(pk=structure_id)
-    except:
-        return None
+    return get_object_or_none(Structure, pk=structure_id)
 
 
 def search(acronym=None, title=None, type=None):
@@ -100,10 +95,6 @@ def search(acronym=None, title=None, type=None):
         queryset = queryset.filter(type=type)
 
     return queryset
-
-
-def find_by_organization(organization):
-    return Structure.objects.filter(organization=organization, part_of__isnull=True)
 
 
 def find_by_type(type):

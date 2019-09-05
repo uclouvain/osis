@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ PROFESSIONAL_INTERNSHIP = "PROFESSIONAL_INTERNSHIP"
 RESEARCH_INTERNSHIP = "RESEARCH_INTERNSHIP"
 
 INTERNSHIP_SUBTYPES = (
-    (TEACHING_INTERNSHIP, _(TEACHING_INTERNSHIP)),
-    (CLINICAL_INTERNSHIP, _(CLINICAL_INTERNSHIP)),
-    (PROFESSIONAL_INTERNSHIP, _(PROFESSIONAL_INTERNSHIP)),
-    (RESEARCH_INTERNSHIP, _(RESEARCH_INTERNSHIP))
+    (TEACHING_INTERNSHIP, _("Teaching internship")),
+    (CLINICAL_INTERNSHIP, _("Clinical internship")),
+    (PROFESSIONAL_INTERNSHIP, _("Professional internship")),
+    (RESEARCH_INTERNSHIP, _("Research internship"))
 )

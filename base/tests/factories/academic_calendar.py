@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,41 +24,51 @@
 #
 ##############################################################################
 import datetime
-import factory
-import factory.fuzzy
+import operator
 import string
-from django.utils import timezone
+
+import factory.fuzzy
+
+from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EDUCATION_GROUP_EDITION, \
+    ACADEMIC_CALENDAR_TYPES, SCORES_EXAM_SUBMISSION
 from base.tests.factories.academic_year import AcademicYearFactory
-from osis_common.utils.datetime import get_tzinfo
-
-
-def generate_start_date(academic_calendar):
-    if academic_calendar.academic_year:
-        return academic_calendar.academic_year.start_date
-    else:
-        return datetime.date(timezone.now().year, 9, 30)
-
-
-def generate_end_date(academic_calendar):
-    if academic_calendar.academic_year:
-        return academic_calendar.academic_year.end_date
-    else:
-        return datetime.date(timezone.now().year+1, 9, 30)
 
 
 class AcademicCalendarFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.AcademicCalendar'
+        django_get_or_create = ('academic_year', 'title')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+
     academic_year = factory.SubFactory(AcademicYearFactory)
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
-    start_date = factory.LazyAttribute(generate_start_date)
-    end_date = factory.LazyAttribute(generate_end_date)
+    start_date = factory.SelfAttribute("academic_year.start_date")
+    end_date = factory.SelfAttribute("academic_year.end_date")
     highlight_title = factory.Sequence(lambda n: 'Highlight - %d' % n)
     highlight_description = factory.Sequence(lambda n: 'Description - %d' % n)
     highlight_shortcut = factory.Sequence(lambda n: 'Shortcut Highlight - %d' % n)
-    reference = None
+    reference = factory.Iterator(ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
 
+
+class OpenAcademicCalendarFactory(AcademicCalendarFactory):
+    start_date = factory.Faker('past_date')
+    end_date = factory.Faker('future_date')
+
+
+class CloseAcademicCalendarFactory(AcademicCalendarFactory):
+    start_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=3))
+    end_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=1))
+
+
+class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
+    reference = SCORES_EXAM_SUBMISSION
+
+
+class AcademicCalendarSummaryCourseSubmissionFactory(AcademicCalendarFactory):
+    reference = SUMMARY_COURSE_SUBMISSION
+
+
+class AcademicCalendarEducationGroupEditionFactory(AcademicCalendarFactory):
+    reference = EDUCATION_GROUP_EDITION

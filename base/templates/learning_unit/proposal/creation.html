@@ -1,0 +1,16 @@
+{% extends "learning_unit/simple/creation.html" %}
+{% load bootstrap3 i18n %}
+
+{% block h2_title %}{% trans 'Proposal of creation' %}{% endblock %}
+
+{% block create_proposal %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <label>{% trans 'Proposal management' %}</label>
+        </div>
+        <div class="panel-body">
+            {% bootstrap_form_errors form_proposal %}
+            {% include 'learning_unit/blocks/proposal_folder.html' with form=form_proposal %}
+        </div>
+    </div>
+{% endblock %}

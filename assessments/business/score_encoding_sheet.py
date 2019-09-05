@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,9 @@ from assessments.business.score_encoding_list import sort_encodings
 from assessments.models import score_sheet_address
 from assessments.models.enums.score_sheet_address_choices import *
 from base.business import entity_version as entity_version_business
+from base.models.enums.person_address_type import PersonAddressType
+from assessments.business.enrollment_state import get_line_color
+from base.models.enums import exam_enrollment_state as enrollment_states
 
 
 def get_score_sheet_address(off_year):
@@ -45,7 +48,7 @@ def get_score_sheet_address(off_year):
             entity_id = map_offer_year_entity_type_with_entity_id[address.entity_address_choice]
             ent_version = entity_version.get_last_version(entity_id)
             entity = entity_model.get_by_internal_id(entity_id)
-            if not entity: # Case no address found for this entity
+            if not entity:  # Case no address found for this entity
                 entity = entity_model.Entity()
             email = address.email
             address = entity
@@ -104,9 +107,11 @@ def scores_sheet_data(exam_enrollments, tutor=None):
     data = {'tutor_global_id': tutor.person.global_id if tutor else ''}
     now = timezone.now()
     data['publication_date'] = '%s/%s/%s' % (now.day, now.month, now.year)
-    data['institution'] = str(_('ucl_denom_location'))
-    data['link_to_regulation'] = str(_('link_to_RGEE'))
-    data['justification_legend'] = _('justification_legend') % justification_label_authorized()
+    data['institution'] = 'Université catholique de Louvain'
+    data['link_to_regulation'] = 'https://www.uclouvain.be/enseignement-reglements.html'
+    data['justification_legend'] = \
+        _('Justification legend: %(justification_label_authorized)s') % \
+        {'justification_label_authorized': justification_label_authorized()}
 
     # Will contain lists of examEnrollments splitted by learningUnitYear
     enrollments_by_learn_unit = _group_by_learning_unit_year_id(
@@ -124,7 +129,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
         person = None
         if scores_responsible:
             person = scores_responsible.person
-            scores_responsible_address = person_address.find_by_person_label(scores_responsible.person, 'PROFESSIONAL')
+            scores_responsible_address = person_address.get_by_label(scores_responsible.person,
+                                                                     PersonAddressType.PROFESSIONAL.value)
 
         learn_unit_year_dict['academic_year'] = str(learning_unit_yr.academic_year)
 
@@ -140,7 +146,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                                                                  if scores_responsible_address else ''}
         learn_unit_year_dict['session_number'] = exam_enrollments[0].session_exam.number_session
         learn_unit_year_dict['acronym'] = learning_unit_yr.acronym
-        learn_unit_year_dict['title'] = learning_unit_yr.title
+        learn_unit_year_dict['title'] = learning_unit_yr.complete_title
         learn_unit_year_dict['decimal_scores'] = learning_unit_yr.decimal_scores
 
         programs = []
@@ -162,7 +168,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             if deliberation_date:
                 deliberation_date = deliberation_date.strftime(date_format)
             else:
-                deliberation_date = _('not_passed')
+                deliberation_date = _('Not passed')
 
             program = {'acronym': exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
                        'deliberation_date': deliberation_date,
@@ -170,25 +176,16 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             enrollments = []
             for exam_enrol in list_enrollments:
                 student = exam_enrol.learning_unit_enrollment.student
-                score = ''
-                if exam_enrol.score_final is not None:
-                    if learning_unit_yr.decimal_scores:
-                        score = str(exam_enrol.score_final)
-                    else:
-                        score = str(int(exam_enrol.score_final))
-
-                # Compute deadline score encoding
-                deadline = get_deadline(exam_enrol)
-                if deadline:
-                    deadline = deadline.strftime(date_format)
 
                 enrollments.append({
                     "registration_id": student.registration_id,
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
-                    "score": score,
-                    "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else '',
-                    "deadline": deadline if deadline else ''
+                    "score": _format_score(exam_enrol, learning_unit_yr),
+                    "justification": _(exam_enrol.get_justification_final_display())
+                    if exam_enrol.justification_final else '',
+                    "deadline": _get_formatted_deadline(date_format, exam_enrol),
+                    "enrollment_state_color": get_line_color(exam_enrol),
                 })
             program['enrollments'] = enrollments
             programs.append(program)
@@ -220,3 +217,21 @@ def _group_by_learning_unit_year_id(exam_enrollments):
         else:
             enrollments_by_learn_unit[key].append(exam_enroll)
     return enrollments_by_learn_unit
+
+
+def _get_formatted_deadline(date_format, exam_enrol):
+    # Compute deadline score encoding
+    if exam_enrol.enrollment_state == enrollment_states.ENROLLED:
+        deadline = get_deadline(exam_enrol)
+        if deadline:
+            return deadline.strftime(date_format)
+    return ''
+
+
+def _format_score(exam_enrol, learning_unit_yr):
+    if exam_enrol.score_final is not None:
+        if learning_unit_yr.decimal_scores:
+            return str(exam_enrol.score_final)
+        else:
+            return str(int(exam_enrol.score_final))
+    return ''

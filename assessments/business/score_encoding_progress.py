@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ def get_scores_encoding_progress(user, offer_year_id, number_session, academic_y
                                                                                    offer_year_id=offer_year_id,
                                                                                    session_exam_number=number_session,
                                                                                    academic_year=academic_year,
-                                                                                   learning_unit_year_ids=learning_unit_year_ids)
+                                                                                   learning_unit_year_ids=learning_unit_year_ids,
+                                                                                   only_enrolled=True)
 
     return _sort_by_acronym([ScoreEncodingProgress(**row) for row in list(queryset)])
 
@@ -134,7 +135,13 @@ class ScoreEncodingProgress:
     def __init__(self, **kwargs):
         self.learning_unit_year_id = kwargs.get('learning_unit_enrollment__learning_unit_year')
         self.learning_unit_year_acronym = kwargs.get('learning_unit_enrollment__learning_unit_year__acronym')
-        self.learning_unit_year_title = kwargs.get('learning_unit_enrollment__learning_unit_year__title')
+        self.learning_unit_year_title = ' - '.join(
+            filter(None,
+                   [kwargs.get('learning_unit_enrollment__learning_unit_year__learning_container_year__common_title'),
+                    kwargs.get('learning_unit_enrollment__learning_unit_year__specific_title')]
+                   )
+        )
+
         self.offer_year_id = kwargs.get('learning_unit_enrollment__offer_enrollment__offer_year')
         self.exam_enrollments_encoded = kwargs.get('exam_enrollments_encoded')
         self.scores_not_yet_submitted = kwargs.get('scores_not_yet_submitted')

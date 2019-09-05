@@ -1,0 +1,20 @@
+{% spaceless %}
+    <div class="row">
+        <div class="col-sm-4" style="padding-right:0;">
+            {% with widget=widget.subwidgets.0 %}
+                {% include widget.template_name %}
+            {% endwith %}
+        </div>
+
+        <div class="col-sm-6" style="padding:0">
+            {% with widget=widget.subwidgets.1 %}
+                {% include widget.template_name %}
+            {% endwith %}
+        </div>
+        <div class="col-sm-2" style="padding:0">
+            {% with widget=widget.subwidgets.2 %}
+                {% include widget.template_name %}
+            {% endwith %}
+        </div>
+    </div>
+{% endspaceless %}

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,15 +24,16 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
+from django.utils.functional import cached_property
+from reversion.admin import VersionAdmin
 
-from base.models import entity
 from base.models import entity_version
+from base.models.entity_version import EntityVersion
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class PersonEntityAdmin(admin.ModelAdmin):
+class PersonEntityAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('person', 'entity', 'latest_entity_version_name', 'with_child')
-    fieldsets = ((None, {'fields': ('person', 'entity', 'with_child')}),)
     search_fields = ['person__first_name', 'person__last_name']
     raw_id_fields = ('person', 'entity',)
 
@@ -47,8 +48,8 @@ class PersonEntityAdmin(admin.ModelAdmin):
 
 
 class PersonEntity(models.Model):
-    person = models.ForeignKey('Person')
-    entity = models.ForeignKey('Entity')
+    person = models.ForeignKey('Person', on_delete=models.PROTECT)
+    entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     with_child = models.BooleanField(default=False)
 
     class Meta:
@@ -57,14 +58,10 @@ class PersonEntity(models.Model):
     def __str__(self):
         return u"%s" % self.person
 
+    @cached_property
+    def descendants(self):
+        if not self.with_child:
+            return {self.entity.id}
 
-def find_entities_by_person(person):
-    person_entities = PersonEntity.objects.filter(person=person).select_related('entity')
-
-    entities = set()
-    entities |= {pers_ent.entity for pers_ent in person_entities if not pers_ent.with_child }
-    entity_with_child = [pers_ent.entity for pers_ent in person_entities if pers_ent.with_child]
-    if entity_with_child:
-        entity_with_find_descendants = entity.find_descendants(entity_with_child, with_entities=True)
-        entities |= set(entity_with_find_descendants) if entity_with_find_descendants else set()
-    return list(entities)
+        # Create a set of all entity under the parent
+        return set(row['entity_id'] for row in EntityVersion.objects.get_tree(self.entity))

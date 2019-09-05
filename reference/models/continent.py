@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,11 +24,11 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
+from osis_common.models import osis_model_admin
 from django.core import serializers
 
 
-class ContinentAdmin(admin.ModelAdmin):
+class ContinentAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('name', 'code',)
     ordering = ('name',)
 

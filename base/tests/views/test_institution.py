@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,18 +26,32 @@
 import datetime
 import json
 from unittest import mock
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.user import UserFactory
+
+from django.http import HttpResponseForbidden
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
+
+from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.person import PersonFactory
 from base.views import institution
+from base.views.institution import entities_search
 from reference.tests.factories.country import CountryFactory
 
 
 class EntityViewTestCase(APITestCase):
     def setUp(self):
-        self.user = UserFactory()
+        self.user = PersonFactory().user
+        today = datetime.date.today()
+        self.current_academic_year = AcademicYearFactory(start_date=today,
+                                                         end_date=today.replace(year=today.year + 1),
+                                                         year=today.year)
+        self.academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
         self.entity = EntityFactory(country=CountryFactory())
         self.parent = EntityFactory()
         self.start_date = datetime.date(2015, 1, 1)
@@ -69,16 +83,27 @@ class EntityViewTestCase(APITestCase):
 
     def test_entities_search(self):
         self.client.force_login(self.user)
-        url = reverse('entities_search')
-        response = self.client.get(url+"?acronym=%s&title=%s&type_choices=%s" % ("ENTITY_CHILDREN", "", ""))
+        url = reverse(entities_search)
+        response = self.client.get(url, data={"acronym": "ENTITY_CHILDREN", "title": "", "entity_type": ""})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context[-1]['entities_version']), 1)
+        self.assertEqual(len(response.context['entities_version']), 1)
 
     def test_entity_read(self):
         self.client.force_login(self.user)
         url = reverse('entity_read', args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        context = response.context
+        self.assertIsInstance(context["form"], EntityCalendarEducationalInformationForm)
+
+    def test_entity_read_with_post_when_no_sufficient_right(self):
+        self.client.force_login(self.user)
+        url = reverse('entity_read', args=[self.entity_version.id])
+        response = self.client.post(url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
 
     def test_entity_diagram(self):
         self.client.force_login(self.user)

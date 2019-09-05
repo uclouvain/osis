@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,31 +24,20 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class MandataryAdmin(admin.ModelAdmin):
+class MandataryAdmin(OsisModelAdmin):
     list_display = ('mandate', 'person', 'start_date', 'end_date')
-    fieldsets = ((None, {'fields': ('mandate',
-                                    'person',
-                                    'start_date',
-                                    'end_date')}),)
-    
+
     raw_id_fields = ('mandate', 'person')
     search_fields = ['person__first_name', 'person__last_name']
 
 
 class Mandatary(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    mandate = models.ForeignKey('Mandate')
-    person = models.ForeignKey('Person')
+    mandate = models.ForeignKey('Mandate', on_delete=models.CASCADE)
+    person = models.ForeignKey('Person', on_delete=models.PROTECT)
     start_date = models.DateField(auto_now=False, auto_now_add=False)
     end_date = models.DateField(auto_now=False, auto_now_add=False)
-
-
-def find_by_education_group_year(an_education_group_year):
-    return Mandatary.objects.filter(mandate__education_group=an_education_group_year.education_group,
-                                    start_date__lte=an_education_group_year.academic_year.start_date,
-                                    end_date__gte=an_education_group_year.academic_year.end_date) \
-        .order_by('mandate__function', 'person__last_name', 'person__first_name')

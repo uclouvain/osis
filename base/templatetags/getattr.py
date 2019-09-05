@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from django import template
+
 register = template.Library()
 
+
 @register.filter
-def getattr (obj, args):
+def getattr(obj, args):
     """ Try to get an attribute from an object.
 
     Example: {% if block|getattr:"editable,True" %}
@@ -44,6 +46,6 @@ def getattr (obj, args):
     try:
         return obj.__getattribute__(attribute)
     except AttributeError:
-         return  obj.__dict__.get(attribute, default)
+        return obj.__dict__.get(attribute, default)
     except:
         return default

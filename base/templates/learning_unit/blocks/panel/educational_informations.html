@@ -1,0 +1,154 @@
+{% load staticfiles %}
+{% load statici18n i18n bootstrap3 %}
+{% load getattr %}
+
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% get_current_language as LANGUAGE_CODE %}
+
+<div role="tabpanel" class="tab-pane active" id="pedagogy">
+    <div class="row well" style="margin-left: 10px;margin-right: 10px">
+        <div class="col-md-6">
+            {% if attributions %}
+                <label>{% trans 'Tutors' %} : </label>
+                <br>
+                <table class="table" style="border-bottom: 1px solid #ddd">
+                    <tbody>
+                        {% for attribution in attributions %}
+                            <tr>
+                                <td>{{ attribution.tutor }}</td>
+                                <td>{{ attribution.get_function_display }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+        {% include "learning_unit/blocks/summary_locked.html" %}
+    </div>
+
+    <table class="table" style="border-bottom: 1px solid #ddd">
+        <thead>
+        <tr>
+            <th class="col-md-2" style="padding: 20px;">{% trans 'Language' %}</th>
+            <th class="col-md-5" style="padding: 20px;">{% trans 'French' %}</th>
+            <th class="col-md-5" style="padding: 20px;">{% trans 'English' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for translated_label in cms_labels_translated %}
+            {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
+                {% include 'learning_unit/blocks/panel/cms_informations.html' %}
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="panel" style="box-shadow: none;">
+        <div class="panel-heading"><label>{% trans 'Teaching material' %}</label></div>
+
+        <div class="panel-body" style="padding-top:0px;">
+            <ul class="list-group list-group-flush">
+                {% for teaching_material in teaching_materials %}
+                    <li class="list-group-item">
+                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
+                      style="color:green;margin-right:10px;
+                              {% if not teaching_material.mandatory %}visibility: hidden; {% endif %}"
+                      data-toggle="tooltip" title="{% trans 'Required' %}"></span>
+                        {{ teaching_material.title }}
+
+                        {% if can_edit_information %}
+                            <a class="trigger_modal pull-right" style="margin-left:10px;"
+                               data-url="{% url "teaching_material_delete" learning_unit_year_id=learning_unit_year.pk teaching_material_id=teaching_material.pk %}">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </a>
+                            <a class="trigger_modal pull-right"
+                               data-url="{% url "teaching_material_edit" learning_unit_year_id=learning_unit_year.pk teaching_material_id=teaching_material.pk %}">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if can_edit_information %}
+                <div class="pull-right">
+                    <a class="btn btn-primary trigger_modal"
+                       data-url="{% url "teaching_material_create" learning_unit_year_id=learning_unit_year.pk %}">
+                        {% trans 'Add' %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <table class="table" style="border-bottom: 1px solid #ddd">
+        <tbody>
+        {% for translated_label in cms_labels_translated %}
+            {% if translated_label.text_label.label == 'bibliography' %}
+                {% include 'learning_unit/blocks/panel/cms_informations.html' %}
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="panel">
+        <div class="panel-heading">
+            <label>{% trans "Mobility" %}</label>
+            {% if can_edit_information %}
+                <a class="trigger_modal pull-right"
+                   data-url="{{ post_url }}?language=fr-be&label=mobility"
+                   data-modal_class="modal-lg">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    {% for translated_label in  cms_labels_translated %}
+                        {% if translated_label.text_label.label == "mobility" %}
+                            {{ translated_label.text_label.text_fr.0.text|default_if_none:"" }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if perms.base.can_edit_learningunit_pedagogy %}
+    <script src="{% statici18n LANGUAGE_CODE %}"></script>
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script>
+        $('.link-formset').formset({
+            addText: gettext('Add another'),
+            deleteText: gettext('remove'),
+            addCssClass: 'btn btn-info btn-sm',
+            deleteCssClass: 'btn btn-warning btn-sm',
+            prefix: 'teachingmaterial_set'
+        });
+    </script>
+{% endif %}

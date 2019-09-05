@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,21 +30,20 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class OfferEnrollmentAdmin(SerializableModelAdmin):
-    list_display = ('offer_year', 'student', 'date_enrollment', 'enrollment_state', 'changed')
-    fieldsets = ((None, {'fields': ('offer_year', 'student', 'date_enrollment', 'enrollment_state')}),)
+    list_display = ('offer_year', 'education_group_year', 'student', 'date_enrollment', 'enrollment_state', 'changed')
     list_filter = ('offer_year__academic_year', 'enrollment_state')
-    raw_id_fields = ('offer_year', 'student')
-    search_fields = ['offer_year__acronym', 'student__person__first_name', 'student__person__last_name',
-                     'student__registration_id', 'enrollment_state']
+    search_fields = ['offer_year__acronym', 'education_group_year__acronym', 'student__person__first_name',
+                     'student__person__last_name', 'student__registration_id', 'enrollment_state']
 
 
 class OfferEnrollment(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
-    offer_year = models.ForeignKey('OfferYear')
-    student = models.ForeignKey('Student')
+    offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
+    student = models.ForeignKey('Student', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=15, choices=offer_enrollment_state.STATES, blank=True, null=True)
+    education_group_year = models.ForeignKey('EducationGroupYear', null=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return u"%s - %s" % (self.student, self.offer_year)
@@ -54,13 +53,3 @@ class OfferEnrollment(SerializableModel):
             ("can_access_student_path", "Can access student path"),
             ("can_access_evaluation", "Can access evaluation"),
         )
-
-
-def find_by_student(a_student):
-    enrollments = OfferEnrollment.objects.filter(student=a_student).order_by('-offer_year__academic_year__year',
-                                                                             'offer_year__acronym')
-    return enrollments
-
-
-def find_by_student_offer(a_student, offer_year):
-    return OfferEnrollment.objects.filter(student=a_student, offer_year=offer_year)

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
+# TYPES_CATEGORIES
+ACADEMIC_CATEGORY = "ACADEMIC"
+PROJECT_CATEGORY = "PROJECT"
+AD_HOC_CATEGORY = "AD_HOC"
+
+# ACADEMIC_CALENDAR_TYPES
 DELIBERATION = "DELIBERATION"
 DISSERTATION_SUBMISSION = "DISSERTATION_SUBMISSION"
 EXAM_ENROLLMENTS = "EXAM_ENROLLMENTS"
@@ -30,17 +38,37 @@ SCORES_EXAM_DIFFUSION = "SCORES_EXAM_DIFFUSION"
 SCORES_EXAM_SUBMISSION = "SCORES_EXAM_SUBMISSION"
 TEACHING_CHARGE_APPLICATION = "TEACHING_CHARGE_APPLICATION"
 COURSE_ENROLLMENT = "COURSE_ENROLLMENT"
+SUMMARY_COURSE_SUBMISSION = "SUMMARY_COURSE_SUBMISSION"
+EDUCATION_GROUP_EDITION = "EDUCATION_GROUP_EDITION"
+
+# PROJECT_CALENDAR_TYPES
+TESTING = "TESTING"
+RELEASE = "RELEASE"
+
 
 ACADEMIC_CALENDAR_TYPES = (
-    (DELIBERATION, DELIBERATION),
-    (DISSERTATION_SUBMISSION, DISSERTATION_SUBMISSION),
-    (EXAM_ENROLLMENTS, EXAM_ENROLLMENTS),
-    (SCORES_EXAM_DIFFUSION, SCORES_EXAM_DIFFUSION),
-    (SCORES_EXAM_SUBMISSION, SCORES_EXAM_SUBMISSION),
-    (TEACHING_CHARGE_APPLICATION, TEACHING_CHARGE_APPLICATION),
-    (COURSE_ENROLLMENT, COURSE_ENROLLMENT))
+    (DELIBERATION, _("Deliberation")),
+    (DISSERTATION_SUBMISSION, _("Dissertation submission")),
+    (EXAM_ENROLLMENTS, _("Exam enrollments")),
+    (SCORES_EXAM_DIFFUSION, _("Scores exam diffusion")),
+    (SCORES_EXAM_SUBMISSION, _("Scores exam submission")),
+    (TEACHING_CHARGE_APPLICATION, _("Teaching charge application")),
+    (COURSE_ENROLLMENT, _("Course enrollment")),
+    (SUMMARY_COURSE_SUBMISSION, _("Summary course submission")),
+    (EDUCATION_GROUP_EDITION, _("Education group edition")),
+)
 
-ACADEMIC_CALENDAR_TYPES_COLORS = {
+PROJECT_CALENDAR_TYPES = (
+    (TESTING, _("Testing")),
+)
+
+AD_HOC_CALENDAR_TYPES = (
+    (RELEASE, _("Release")),
+)
+
+CALENDAR_TYPES = ACADEMIC_CALENDAR_TYPES + PROJECT_CALENDAR_TYPES + AD_HOC_CALENDAR_TYPES
+
+CALENDAR_TYPES_COLORS = {
     DELIBERATION: '#d9534f',
     DISSERTATION_SUBMISSION: '#5bc0de',
     EXAM_ENROLLMENTS: '#5bc0de',

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="100px" height="30px" viewBox="0 0 1000 300">
+
+  <text x="500" y="210"
+        alignment-baseline="central"
+        text-anchor="middle"
+        font-family="Verdana"
+        font-size="180"
+        font-weight="bold"
+        fill="#9eb94f"
+        opacity="0.1"
+        transform="rotate(-15 500,150)"
+  >
+    QA
+  </text>
+</svg>

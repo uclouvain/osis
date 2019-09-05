@@ -1,0 +1,17 @@
+{% load bootstrap3 %}
+{% load i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {% trans 'Proposal management' %}
+    </div>
+    <div class="panel-body">
+        {% include 'learning_unit/blocks/proposal_folder.html' %}
+        <br>
+        <div class="row">
+            {% bootstrap_field form.type layout='horizontal' %}
+        </div>
+        <br>
+        {% include 'learning_unit/blocks/proposal_user.html' %}
+    </div>
+</div>

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import *
 from django.contrib import admin
 
+from base.models import *
+from base.models import validation_rule, education_group_achievement, education_group_detailed_achievement
 
 admin.site.register(academic_calendar.AcademicCalendar,
                     academic_calendar.AcademicCalendarAdmin)
@@ -33,11 +34,23 @@ admin.site.register(academic_calendar.AcademicCalendar,
 admin.site.register(academic_year.AcademicYear,
                     academic_year.AcademicYearAdmin)
 
+admin.site.register(admission_condition.AdmissionCondition,
+                    admission_condition.AdmissionConditionAdmin)
+
+admin.site.register(admission_condition.AdmissionConditionLine,
+                    admission_condition.AdmissionConditionLineAdmin)
+
 admin.site.register(campus.Campus,
                     campus.CampusAdmin)
 
+admin.site.register(certificate_aim.CertificateAim,
+                    certificate_aim.CertificateAimAdmin)
+
 admin.site.register(education_group.EducationGroup,
                     education_group.EducationGroupAdmin)
+
+admin.site.register(education_group_certificate_aim.EducationGroupCertificateAim,
+                    education_group_certificate_aim.EducationGroupCertificateAimAdmin)
 
 admin.site.register(education_group_language.EducationGroupLanguage,
                     education_group_language.EducationGroupLanguageAdmin)
@@ -51,14 +64,14 @@ admin.site.register(education_group_type.EducationGroupType,
 admin.site.register(education_group_year.EducationGroupYear,
                     education_group_year.EducationGroupYearAdmin)
 
+admin.site.register(education_group_year_domain.EducationGroupYearDomain,
+                    education_group_year_domain.EducationGroupYearDomainAdmin)
+
 admin.site.register(entity.Entity,
                     entity.EntityAdmin)
 
-admin.site.register(entity_component_year.EntityComponentYear,
-                    entity_component_year.EntityComponentYearAdmin)
-
-admin.site.register(entity_container_year.EntityContainerYear,
-                    entity_container_year.EntityContainerYearAdmin)
+admin.site.register(entity_calendar.EntityCalendar,
+                    entity_calendar.EntityCalendarAdmin)
 
 admin.site.register(entity_manager.EntityManager,
                     entity_manager.EntityManagerAdmin)
@@ -72,11 +85,20 @@ admin.site.register(exam_enrollment.ExamEnrollment,
 admin.site.register(exam_enrollment.ExamEnrollmentHistory,
                     exam_enrollment.ExamEnrollmentHistoryAdmin)
 
+admin.site.register(external_learning_unit_year.ExternalLearningUnitYear,
+                    external_learning_unit_year.ExternalLearningUnitYearAdmin)
+
 admin.site.register(external_offer.ExternalOffer,
                     external_offer.ExternalOfferAdmin)
 
+admin.site.register(hops.Hops,
+                    hops.HopsAdmin)
+
 admin.site.register(group_element_year.GroupElementYear,
                     group_element_year.GroupElementYearAdmin)
+
+admin.site.register(learning_achievement.LearningAchievement,
+                    learning_achievement.LearningAchievementAdmin)
 
 admin.site.register(learning_class_year.LearningClassYear,
                     learning_class_year.LearningClassYearAdmin)
@@ -92,12 +114,6 @@ admin.site.register(learning_container_year.LearningContainerYear,
 
 admin.site.register(learning_unit.LearningUnit,
                     learning_unit.LearningUnitAdmin)
-
-admin.site.register(learning_unit_component_class.LearningUnitComponentClass,
-                    learning_unit_component_class.LearningUnitComponentClassAdmin)
-
-admin.site.register(learning_unit_component.LearningUnitComponent,
-                    learning_unit_component.LearningUnitComponentAdmin)
 
 admin.site.register(learning_unit_enrollment.LearningUnitEnrollment,
                     learning_unit_enrollment.LearningUnitEnrollmentAdmin)
@@ -147,11 +163,14 @@ admin.site.register(person_address.PersonAddress,
 admin.site.register(person_entity.PersonEntity,
                     person_entity.PersonEntityAdmin)
 
+admin.site.register(prerequisite.Prerequisite,
+                    prerequisite.PrerequisiteAdmin)
+
+admin.site.register(prerequisite_item.PrerequisiteItem,
+                    prerequisite_item.PrerequisiteItemAdmin)
+
 admin.site.register(program_manager.ProgramManager,
                     program_manager.ProgramManagerAdmin)
-
-admin.site.register(proposal_folder.ProposalFolder,
-                    proposal_folder.ProposalFolderAdmin)
 
 admin.site.register(proposal_learning_unit.ProposalLearningUnit,
                     proposal_learning_unit.ProposalLearningUnitAdmin)
@@ -177,5 +196,23 @@ admin.site.register(student.Student,
 admin.site.register(synchronization.Synchronization,
                     synchronization.SynchronizationAdmin)
 
+admin.site.register(teaching_material.TeachingMaterial,
+                    teaching_material.TeachingMaterialAdmin)
+
 admin.site.register(tutor.Tutor,
                     tutor.TutorAdmin)
+
+admin.site.register(authorized_relationship.AuthorizedRelationship,
+                    authorized_relationship.AuthorizedRelationshipAdmin)
+
+admin.site.register(validation_rule.ValidationRule,
+                    validation_rule.ValidationRuleAdmin)
+
+admin.site.register(education_group_achievement.EducationGroupAchievement,
+                    education_group_achievement.EducationGroupAchievementAdmin)
+
+admin.site.register(education_group_detailed_achievement.EducationGroupDetailedAchievement,
+                    education_group_detailed_achievement.EducationGroupDetailedAchievementAdmin)
+
+admin.site.register(education_group_publication_contact.EducationGroupPublicationContact,
+                    education_group_publication_contact.EducationGroupPublicationContactAdmin)

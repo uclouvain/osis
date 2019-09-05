@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import string
 import datetime
-import factory
+import string
+
 import factory.fuzzy
 from faker import Faker
+
+from attribution.models.enums.function import Functions
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.tutor import TutorFactory
 from osis_common.utils.datetime import get_tzinfo
-from attribution.models.enums import function
 
 fake = Faker()
 
@@ -42,10 +43,10 @@ class TutorApplicationFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    function = factory.Iterator(function.FUNCTIONS, getter=lambda c: c[0])
+    function = factory.Iterator(Functions.choices(), getter=lambda c: c[0])
     tutor = factory.SubFactory(TutorFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     volume_lecturing = factory.fuzzy.FuzzyDecimal(99)
     volume_pratical_exercice = factory.fuzzy.FuzzyDecimal(99)
-    last_changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                               datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    last_changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
+                                               datetime.datetime(2017, 3, 1))

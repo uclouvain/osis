@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,20 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-from django.utils import timezone
+import datetime
+
 import factory
 import factory.fuzzy
-import datetime
+from django.test import TestCase
+from django.utils import timezone
+
+from base.business.learning_units.perms import find_last_requirement_entity_version
 from base.models import entity_version
+from base.models.entity_version import build_current_entity_version_structure_in_memory, \
+    find_parent_of_type_into_entity_structure
 from base.models.enums import organization_type
+from base.models.enums.entity_type import FACULTY, SCHOOL
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from osis_common.utils.datetime import get_tzinfo
 from reference.tests.factories.country import CountryFactory
-from base.tests.factories.academic_year import AcademicYearFactory
 
 now = datetime.datetime.now()
 
@@ -44,8 +52,7 @@ now = datetime.datetime.now()
 class EntityVersionTest(TestCase):
     def setUp(self):
         self.country = CountryFactory()
-        self.organization = OrganizationFactory(name="Université catholique de Louvain", acronym="UCL",
-                                                type=organization_type.MAIN)
+        self.organization = OrganizationFactory(type=organization_type.MAIN)
         self.entities = [EntityFactory(country=self.country, organization=self.organization) for x in range(3)]
         self.parent = EntityFactory(country=self.country, organization=self.organization)
         self.start_date = datetime.date(2015, 1, 1)
@@ -217,8 +224,7 @@ class EntityVersionTest(TestCase):
         self.assertEqual(self.parent_entity_version.count_direct_children(date=self.date_in_2015), 3)
 
     def test_version_direct_children_out_dates(self):
-        self.assertCountEqual(self.parent_entity_version.find_direct_children(date=self.date_in_2017),
-                              [])
+        self.assertFalse(self.parent_entity_version.find_direct_children(date=self.date_in_2017).exists())
         self.assertEqual(self.parent_entity_version.count_direct_children(date=self.date_in_2017), 0)
 
     def test_version_direct_children_with_null_end(self):
@@ -241,6 +247,35 @@ class EntityVersionTest(TestCase):
         for child in self.entity_versions:
             self.assertEqual(child.get_parent_version(date=self.date_in_2015), self.parent_entity_version)
             self.assertEqual(child.get_parent_version(date=self.date_in_2017), None)
+
+    def test_find_parent_of_type_itself(self):
+        entity_v = EntityVersionFactory(entity_type=FACULTY)
+        result = find_parent_of_type_into_entity_structure(
+            entity_v,
+            build_current_entity_version_structure_in_memory(timezone.now().date()),
+            FACULTY
+        )
+        self.assertEqual(entity_v.entity, result)
+
+    def test_find_parent_of_type_first_parent(self):
+        entity = EntityFactory()
+        EntityVersionFactory(entity=entity, entity_type=FACULTY)
+        entity_v = EntityVersionFactory(parent=entity)
+        result = find_parent_of_type_into_entity_structure(
+            entity_v,
+            build_current_entity_version_structure_in_memory(timezone.now().date()),
+            FACULTY
+        )
+        self.assertEqual(entity_v.parent, result)
+
+    def test_find_parent_of_type_without_parent(self):
+        entity_v = EntityVersionFactory(parent=None, entity_type=SCHOOL)
+        result = find_parent_of_type_into_entity_structure(
+            entity_v,
+            build_current_entity_version_structure_in_memory(timezone.now().date()),
+            FACULTY
+        )
+        self.assertEqual(None, result)
 
     def test_find_parent_faculty_version(self):
         ac_yr = AcademicYearFactory()
@@ -275,7 +310,7 @@ class EntityVersionTest(TestCase):
             end_date=end_date
         )
 
-        self.assertEqual(entity_school_version_level2.find_parent_faculty_version(ac_yr),
+        self.assertEqual(entity_school_version_level2.find_faculty_version(ac_yr),
                          entity_faculty_version)
 
     def test_find_parent_faculty_version_no_parent(self):
@@ -296,7 +331,7 @@ class EntityVersionTest(TestCase):
             end_date=end_date
         )
 
-        self.assertIsNone(entity_school_version_no_parent.find_parent_faculty_version(ac_yr))
+        self.assertIsNone(entity_school_version_no_parent.find_faculty_version(ac_yr))
 
     def test_find_parent_faculty_version_no_faculty_parent(self):
 
@@ -325,7 +360,7 @@ class EntityVersionTest(TestCase):
             start_date=start_date,
             end_date=end_date
         )
-        self.assertIsNone(entity_school_version_level1.find_parent_faculty_version(ac_yr))
+        self.assertIsNone(entity_school_version_level1.find_faculty_version(ac_yr))
 
     def test_find_main_entities_version_filtered_by_person(self):
         person = PersonFactory()
@@ -336,7 +371,223 @@ class EntityVersionTest(TestCase):
         entity_not_attached = EntityFactory(organization=self.organization)
         EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR", parent=None, end_date=None)
         PersonEntityFactory(person=person, entity=entity_attached)
-        entity_list = list(entity_version.find_main_entities_version_filtered_by_person(person))
+        entity_list = list(person.find_main_entities_version)
         self.assertTrue(entity_list)
         self.assertEqual(len(entity_list), 1)
         self.assertEqual(entity_list[0], entity_version_attached)
+
+    def test_find_attached_faculty_entities_version_filtered_by_person(self):
+        person = PersonFactory()
+        entity_attached = EntityFactory(organization=self.organization)
+        entity_version_attached = EntityVersionFactory(entity=entity_attached, entity_type="FACULTY")
+        
+        entity_not_attached = EntityFactory(organization=self.organization)
+        EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR")
+        
+        entity_ilv = EntityFactory(organization=self.organization)
+        entity_version_ilv = EntityVersionFactory(entity=entity_ilv, acronym="ILV")
+        
+        entity_parent = EntityFactory(organization=self.organization)
+        entity_version_parent = EntityVersionFactory(entity=entity_parent, entity_type='FACULTY')
+        EntityVersionFactory(parent=entity_parent)
+
+        PersonEntityFactory(person=person, entity=entity_attached)
+        PersonEntityFactory(person=person, entity=entity_ilv)
+        PersonEntityFactory(person=person, entity=entity_parent)
+
+        entity_list = list(person.find_attached_faculty_entities_version(acronym_exceptions=['ILV']))
+        self.assertTrue(entity_list)
+        self.assertEqual(len(entity_list), 3)
+        self.assertIn(entity_version_attached, entity_list)
+        self.assertIn(entity_version_ilv, entity_list)
+        self.assertIn(entity_version_parent, entity_list)
+
+    def test_find_attached_faculty_entities_version_filtered_by_person_but_faculty_below_attached_entities(self):
+        person = PersonFactory()
+
+        entity_attached = EntityFactory(organization=self.organization)
+        EntityVersionFactory(entity=entity_attached, entity_type="SECTOR")
+
+        entity_fac = EntityFactory(organization=self.organization)
+        entity_version_fac = EntityVersionFactory(
+            entity=entity_fac,
+            acronym="FAC",
+            entity_type="FACULTY",
+            parent=entity_attached
+        )
+
+        PersonEntityFactory(person=person, entity=entity_attached)
+
+        entity_list = list(person.find_attached_faculty_entities_version())
+        self.assertTrue(entity_list)
+        self.assertEqual(len(entity_list), 1)
+        self.assertIn(entity_version_fac, entity_list)
+
+
+class EntityVersionLoadInMemoryTest(TestCase):
+    def setUp(self):
+        self.country = CountryFactory()
+        self.organization = OrganizationFactory(
+            type=organization_type.MAIN
+        )
+        self.now = datetime.datetime.now(get_tzinfo())
+        start_date = self.now - datetime.timedelta(days=10)
+        end_date = None
+        self._build_current_entity_version_structure(end_date, start_date)
+
+    def _build_current_entity_version_structure(self, end_date, start_date):
+        """Build the following entity version structure :
+                             SSH
+                        SC        LOCI
+                    MATH PHYS  URBA  BARC
+        """
+        self.root = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="SST",
+            title="SST",
+            entity_type=entity_version.entity_type.SECTOR,
+            parent=None,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.SC = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="SC",
+            title="SC",
+            entity_type=entity_version.entity_type.FACULTY,
+            parent=self.root.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.MATH = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="MATH",
+            title="MATH",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.SC.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.PHYS = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="PHYS",
+            title="PHYS",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.SC.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.LOCI = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="LOCI",
+            title="LOCI",
+            entity_type=entity_version.entity_type.FACULTY,
+            parent=self.root.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.URBA = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="URBA",
+            title="URBA",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.LOCI.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+        self.BARC = EntityVersionFactory(
+            entity=EntityFactory(country=self.country, organization=self.organization),
+            acronym="BARC",
+            title="BARC",
+            entity_type=entity_version.entity_type.SCHOOL,
+            parent=self.LOCI.entity,
+            start_date=start_date,
+            end_date=end_date
+        )
+
+    def test_build_entity_version_by_entity_id_parent(self):
+        all_current_entities_version = entity_version.find_all_current_entities_version()
+        result = entity_version._build_entity_version_by_entity_id(all_current_entities_version)
+        expected_keys = [v.entity_id for v in all_current_entities_version]
+        self.assertListEqual(list(sorted(result.keys())), sorted(expected_keys))
+
+    def test_build_direct_children_by_entity_version_id(self):
+        entity_version_by_entity_id = entity_version._build_entity_version_by_entity_id(
+            entity_version.find_all_current_entities_version())
+        result = entity_version._build_direct_children_by_entity_version_id(entity_version_by_entity_id)
+
+        count_entities_version_with_children = 4
+        self.assertEqual(len(result.keys()), count_entities_version_with_children)
+
+        root_direct_children = [self.SC, self.LOCI]
+        self.assertEqual(set(result[self.root.id]), set(root_direct_children))
+
+        sc_direct_children = [self.MATH, self.PHYS]
+        self.assertEqual(set(result[self.SC.id]), set(sc_direct_children))
+
+        self.assertNotIn(self.MATH.id, result) # No children for MATH
+
+    def test_build_all_children_by_entity_version_id(self):
+        all_current_entites_versions = entity_version.find_all_current_entities_version()
+        entity_version_by_entity_id = entity_version._build_entity_version_by_entity_id(all_current_entites_versions)
+        direct_children_by_entity_version_id = entity_version._build_direct_children_by_entity_version_id(entity_version_by_entity_id)
+        result = entity_version._build_all_children_by_entity_version_id(direct_children_by_entity_version_id)
+
+        count_entities_version_with_children = 4
+        self.assertEqual(len(result.keys()), count_entities_version_with_children)
+
+        root_all_children = [self.SC, self.LOCI, self.MATH, self.PHYS, self.URBA, self.BARC]
+        self.assertEqual(set(result[self.root.id]), set(root_all_children))
+
+        sc_all_children = [self.MATH, self.PHYS]
+        self.assertEqual(set(result[self.SC.id]), set(sc_all_children))
+
+        self.assertNotIn(self.MATH.id, result.keys())
+
+    def test_build_entity_version_structure_in_memory(self):
+        partial_expected_result = {
+            self.root.entity.id: {
+                'entity_version_parent': None,
+                'direct_children': [self.SC, self.LOCI],
+                'all_children': [self.SC, self.LOCI, self.MATH, self.PHYS, self.URBA, self.BARC],
+            },
+            self.SC.entity.id: {
+                'entity_version_parent': self.root,
+                'direct_children': [self.MATH, self.PHYS],
+                'all_children': [self.MATH, self.PHYS],
+            },
+            self.MATH.entity.id: {
+                'entity_version_parent': self.SC,
+                'direct_children': [],
+                'all_children': [],
+            },
+            # ...
+        }
+        result = entity_version.build_current_entity_version_structure_in_memory()
+        all_current_entities_version = entity_version.find_all_current_entities_version()
+
+        # assert entities without children are present in the result
+        self.assertEqual(len(result.keys()), len(all_current_entities_version))
+        self.assertEqual(result[self.MATH.entity.id]['all_children'], [])
+
+
+class TestFindLastEntityVersionByLearningUnitYearId(TestCase):
+    def test_when_entity_version(self):
+        learning_unit_year = LearningUnitYearFactory()
+
+        actual_entity_version = find_last_requirement_entity_version(
+            learning_unit_year_id=learning_unit_year.id,
+        )
+
+        self.assertIsNone(actual_entity_version)
+
+    def test_find_last_entity_version_by_learning_unit_year_id(self):
+        an_entity_version = EntityVersionFactory()
+        learning_unit_year = LearningUnitYearFactory(
+            learning_container_year__requirement_entity=an_entity_version.entity
+        )
+
+        actual_entity_version = find_last_requirement_entity_version(
+            learning_unit_year_id=learning_unit_year.id,
+        )
+        self.assertEqual(an_entity_version, actual_entity_version)

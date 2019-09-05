@@ -1,0 +1,100 @@
+{% extends 'blocks/modal/generic_modal.html' %}
+{% load statici18n i18n bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% block modal_id %}modal_force_state{% endblock %}
+
+{% block modal_header %}
+    <h3>{% trans 'Do you want to change the status of this proposals?' %}</h3>
+    <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
+{% endblock %}
+
+{% block modal_body %}
+    {% bootstrap_field form_proposal_state.state %}
+    <input type="hidden" id="action" name="action" class="action"/>
+{% endblock %}
+
+{% block modal_footer %}
+    <button type="button" class="btn btn-primary" onclick="submit_form();">{% trans 'yes' %}</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
+
+<script src="{% statici18n LANGUAGE_CODE %}"></script>
+<script>
+    const REFUSED = gettext('REFUSED');
+    const ACCEPTED = gettext('ACCEPTED');
+    const CENTRAL = gettext('CENTRAL');
+    const FACULTY = gettext('FACULTY');
+
+    // trigger events
+    $('#modal_force_state').on('shown.bs.modal', function () {
+        showWarningIfInconsistentState();
+    });
+
+    $("#id_state").change(function(){
+        showWarningIfInconsistentState();
+    });
+
+    function submit_form(){
+        $(".action").val('force_state');
+        $('#proposals_form').submit();
+    }
+
+    function showWarningIfInconsistentState () {
+        var alert_node = $('#alert_warning');
+        remove_alert_msg(alert_node);
+        var new_state = $("#id_state" ).children("select option:selected").text();
+        $('.row-proposal').each(function(){
+            if($(this).find("input").is(":checked")){
+                var old_state = $(this).find(".col-proposal_state").text().trim();
+                var acronym = $(this).find(".col-acronym").text().trim();
+                if ((old_state === REFUSED && new_state === ACCEPTED) ||
+                    (old_state === CENTRAL && new_state === FACULTY)){
+                    add_warning(alert_node, acronym, old_state, new_state)
+                }
+            }
+        });
+    }
+
+    function remove_alert_msg(alert_node) {
+        alert_node.hide();
+        alert_node.children().remove();
+    }
+
+    function add_warning(alert_node, proposal, old_state, new_state) {
+        alert_node.show();
+        var text = interpolate(
+            gettext("You will pass the proposal %(proposal)s from state %(old_state)s to %(new_state)s"),
+            {
+                'proposal': proposal,
+                'old_state': old_state,
+                'new_state': new_state
+            }, true);
+        alert_node.append("<p>"+text+"</p>");
+    }
+
+</script>
+{% endblock %}
+

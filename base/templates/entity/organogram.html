@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@
         var sub_nodes = $("<ul></ul>");
         var json_data = JSON.parse(entities_version_as_json);
         show_nodes(sub_nodes, json_data);
-        var escaped_structure = "{{ entity_version.acronym }} - {{ entity_version.title }}".replace(/&#39;/g, "'").replace(/&quot;/g, "''");;
+        var escaped_structure = "{{ entity_version.acronym }} - {{ entity_version.title }}".replace(/&#39;/g, "'").replace(/&quot;/g, "''");
         $('#organogram').append($("<ul class='root'></ul>")
                                   .append($("<li class='root'></li>")
                                   .append($("<a></a>").attr("href","{% url 'entity_read' entity_version.id %}")
@@ -94,14 +94,14 @@
         var width = $('#organogram li.root').width();
         $('#organogram').width(width + 30);
 
-        var secondLevelLiWidth = computeSecondLevelWidth()
+        var secondLevelLiWidth = computeSecondLevelWidth();
         $('#organogram li.root > ul > li').each(function() {
             $(this).css({'width' : secondLevelLiWidth + '%'})
         });
     }
 
     function computeSecondLevelWidth()  {
-        var numberLi = $('#organogram li.root > ul > li').length
+        var numberLi = $('#organogram li.root > ul > li').length;
         if (numberLi) {
             return (100/numberLi);
         }

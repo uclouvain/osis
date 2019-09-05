@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% load staticfiles %}
-{% load i18n %}
+{% load i18n academic_actors %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -9,7 +9,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -27,30 +27,40 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li id="lnk_institution">{% trans 'institution' %}</li>
-<li class="active" id="lnk_studies">{% trans 'academic_actors' %}</li>
+    <li id="lnk_institution">{% trans 'Institution' %}</li>
+    <li class="active" id="lnk_studies">{% trans 'Academic actors' %}</li>
 {% endblock %}
 {% block content %}
-<div class="page-header">
-    <h2>{% trans 'academic_actors' %}</h2>
-</div>
+    <div class="page-header">
+        <h2>{% trans 'Academic actors' %}</h2>
+    </div>
 
-<div class="panel panel-default">
-    <div class="panel-body">
-
-        <div class="row">
-            <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers" >{% trans 'pgm_managers' %}</a></h4>
-                <p>{% trans 'desc_lnk_pgm_managers' %}</p>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading">
+                        <a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers">{% trans 'Program Managers' %}</a>
+                    </h4>
+                    <p>{% trans 'Management of the program managers' %}</p>
+                </div>
+                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{% url 'scores_responsible' %}"
+                                                 id="lnk_srm_managers">{% trans 'Scores responsibles' %}</a></h4>
+                    <p>{% trans 'Management of the scores responsibles managers' %}</p>
+                </div>
             </div>
-            <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'scores_responsible' %}" id="lnk_srm_managers" >{% trans 'scores_responsibles' %}</a></h4>
-                <p>{% trans 'desc_lnk_srm_managers' %}</p>
+            <br>
+            <div class="row">
+                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a
+                            href="{% url 'offer_propositions' %}">{% trans 'Dissertation Managers' %}</a></h4>
+                    <p>{% trans 'Management of the dissertation managers' %}</p>
+                </div>
             </div>
         </div>
-
     </div>
-</div>
 {% endblock %}

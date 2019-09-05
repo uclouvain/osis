@@ -9,7 +9,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0060_offeryeardomain'),
         ('reference', '0004_educationinstitution'),
     ]
 

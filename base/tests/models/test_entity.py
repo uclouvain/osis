@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import factory.fuzzy
 import datetime
 from django.utils import timezone
 from base.models import entity
+from base.models.entity import find_versions_from_entites
+from base.models.entity_version import EntityVersion
 from base.models.enums import entity_type
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -91,16 +93,12 @@ class EntityTest(TestCase):
         self.assertEqual(entity.get_by_internal_id(an_entity.id+1), None)
 
     def test_find_descendants_with_parent(self):
-        entities_with_descendants = entity.find_descendants([self.parent], date=self.date_in_2015)
+        entities_with_descendants = EntityVersion.objects.get_tree([self.parent], date=self.date_in_2015)
         self.assertEqual(len(entities_with_descendants), 5)
 
-    def test_find_descendants_without_parent(self):
-        entities_with_descendants = entity.find_descendants([self.parent], date=self.date_in_2015, with_entities=False)
-        self.assertEqual(len(entities_with_descendants), 4)
-
     def test_find_descendants_out_date(self):
-        entities_with_descendants = entity.find_descendants([self.parent], date=self.date_in_2017)
-        self.assertFalse(entities_with_descendants)
+        entities_with_descendants = EntityVersion.objects.get_tree([self.parent], date=self.date_in_2017)
+        self.assertEqual(len(entities_with_descendants), 1)
 
     def test_find_descendants_with_multiple_parent(self):
         parent_2 = EntityFactory(country=self.country)
@@ -114,23 +112,20 @@ class EntityTest(TestCase):
         child_2 = EntityFactory(country=self.country)
         EntityVersionFactory(entity=child_2, parent=child, acronym="CHILD_OF_CHILD", start_date=self.start_date,
                              end_date=self.end_date)
-        entities_with_descendants = entity.find_descendants([self.parent, parent_2], date=self.date_in_2015)
+        entities_with_descendants = EntityVersion.objects.get_tree([self.parent, parent_2], date=self.date_in_2015)
         self.assertEqual(len(entities_with_descendants), 8)# 5 for parent + 3 for parent_2
 
-    def test_find_descendants_with_multiple_parent_get_without_parents(self):
-        parent_2 = EntityFactory(country=self.country)
-        EntityVersionFactory(entity=parent_2, parent=None, acronym="ROOT_ENTITY_2", start_date=self.start_date,
-                             end_date=self.end_date)
-        ### Create one child entity
-        child = EntityFactory(country=self.country)
-        EntityVersionFactory(entity=child, parent=parent_2, acronym="CHILD_OF_ROOT_2", start_date=self.start_date,
-                             end_date=self.end_date)
-        ### Create one child entity with parent CHILD_OF_ROOT_2
-        child_2 = EntityFactory(country=self.country)
-        EntityVersionFactory(entity=child_2, parent=child, acronym="CHILD_OF_CHILD", start_date=self.start_date,
-                             end_date=self.end_date)
-        entities_with_descendants = entity.find_descendants([self.parent, parent_2], date=self.date_in_2015,
-                                                            with_entities=False)
-        self.assertEqual(len(entities_with_descendants), 6)  # 4 for parent + 2 for parent_2
+    def test_most_recent_acronym(self):
+        entity_instance = EntityFactory()
+        most_recent_year = 2018
+        for year in range(2016, most_recent_year + 1):
+            date = datetime.date(year=year, month=1, day=1)
+            EntityVersionFactory(entity_id=entity_instance.id, start_date=date)
+        most_recent_date = datetime.date(year=most_recent_year, month=1, day=1)
+        most_recent_entity_version = EntityVersion.objects.get(start_date=most_recent_date,
+                                                               entity=entity_instance)
+        self.assertEqual(entity_instance.most_recent_acronym, most_recent_entity_version.acronym)
 
-
+    def test_find_versions_from_entites_with_date(self):
+        entities_list = find_versions_from_entites([self.parent.id], self.start_date)
+        self.assertEqual(len(entities_list), 1)

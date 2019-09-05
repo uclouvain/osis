@@ -1,0 +1,76 @@
+{% extends "blocks/forms/search_form.html" %}
+{% load bootstrap3 staticfiles %}
+
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block search_form_row_1 %}
+    {% bootstrap_field form.academic_year_id form_group_class="col-md-2" %}
+    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
+    {% bootstrap_field form.title form_group_class="col-md-4" %}
+    {% bootstrap_field form.container_type form_group_class="col-md-2" %}
+    {% bootstrap_field form.subtype form_group_class="col-md-2" %}
+{% endblock %}
+
+{% block search_form_row_2 %}
+    {% with activity_search_type=1 service_search_type=2 borrowed_search_type=5 %}
+        {% bootstrap_field form.status form_group_class="col-md-1" %}
+        {% bootstrap_field form.quadrimester form_group_class="col-md-1" %}
+        {% bootstrap_field form.tutor form_group_class="col-md-2" %}
+        {% bootstrap_field form.requirement_entity_acronym form_group_class="col-md-2" %}
+
+        {% if search_type == service_search_type or search_type == activity_search_type or search_type == borrowed_search_type%}
+            {% bootstrap_field form.allocation_entity_acronym form_group_class="col-md-2" %}
+            {% bootstrap_field form.with_entity_subordinated form_group_class="col-md-2" %}
+        {% endif %}
+    {% endwith %}
+{% endblock %}
+
+{% block search_form_buttons %}
+    {% with borrowed_search_type=5 %}
+    {% if search_type == borrowed_search_type %}
+    {% else %}
+        {{ block.super }}
+        {% include 'blocks/button/button_filter_refresh.html' %}
+    {% endif %}
+    {% endwith %}
+{% endblock %}
+
+{% block extras %}
+    {% with borrowed_search_type=5 %}
+    {% if search_type == borrowed_search_type %}
+        <div class="row" style="margin-top:10px;">
+            {% bootstrap_field form.faculty_borrowing_acronym form_group_class="col-md-3" %}
+            <div class="col-md-2">
+                <br>
+                <div class="btn-toolbar">
+                    {% bootstrap_button "" value=_('Learning unit search') button_type="submit" button_class="btn-primary" icon="search" %}
+                    {% include 'blocks/button/button_filter_refresh.html' %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% endwith %}
+{% endblock %}
+

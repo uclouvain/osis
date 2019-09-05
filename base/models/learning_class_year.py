@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,19 +24,17 @@
 #
 ##############################################################################
 from django.db import models
-from osis_common.models.auditable_model import AuditableModel, AuditableModelAdmin
+from osis_common.models import osis_model_admin
 
 
-class LearningClassYearAdmin(AuditableModelAdmin):
+class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym')
-    fieldsets = ((None, {'fields': ('learning_component_year', 'acronym', 'description')}),)
     search_fields = ['acronym']
-    raw_id_fields = ('learning_component_year',)
 
 
-class LearningClassYear(AuditableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
-    learning_component_year = models.ForeignKey('LearningComponentYear')
+class LearningClassYear(models.Model):
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
     acronym = models.CharField(max_length=3)
     description = models.CharField(max_length=100, blank=True, null=True)
 

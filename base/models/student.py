@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,18 +32,15 @@ from base.models import person
 
 class StudentAdmin(SerializableModelAdmin):
     list_display = ('person', 'registration_id', 'changed',)
-    fieldsets = ((None, {'fields': ('registration_id', 'person')}),)
     list_filter = ('person__gender', 'person__language',)
-    raw_id_fields = ('person', )
     search_fields = ['person__first_name', 'person__last_name', 'registration_id']
 
 
 class Student(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     registration_id = models.CharField(max_length=10, unique=True, db_index=True)
-    person = models.ForeignKey('Person')
-
+    person = models.ForeignKey('Person', on_delete=models.PROTECT)
 
     def __str__(self):
         return u"%s (%s)" % (self.person, self.registration_id)
@@ -54,7 +51,9 @@ class Student(SerializableModel):
         )
 
 
-def find_by(registration_id=None, person_name=None, person_username=None, person_first_name=None, full_registration=None):
+def find_by(registration_id=None, person_name=None,
+            person_username=None, person_first_name=None,
+            full_registration=None):
     """
     Find students by optional arguments. At least one argument should be informed
     otherwise it returns empty.
@@ -107,11 +106,3 @@ def find_by_id(student_id):
         return Student.objects.get(pk=student_id)
     except ObjectDoesNotExist:
         return None
-
-
-def search(full_name):
-    if full_name:
-        persons = person.search(full_name)
-        if persons.exists():
-            return Student.objects.filter(person__in=persons).order_by('person__last_name', 'person__first_name')
-    return None

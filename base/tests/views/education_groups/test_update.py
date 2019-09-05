@@ -1,0 +1,897 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+import json
+import random
+from http import HTTPStatus
+from unittest import mock
+
+from django.contrib.auth.models import Permission, Group
+from django.contrib.messages import get_messages
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.test import TestCase, Client
+from django.urls import reverse
+from django.utils.translation import ugettext as _
+from waffle.testutils import override_flag
+
+from base.business.group_element_years import management
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from base.forms.education_group.group import GroupYearModelForm
+from base.models.enums import education_group_categories, internship_presence
+from base.models.enums.active_status import ACTIVE
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
+from base.models.enums.education_group_types import TrainingType
+from base.models.enums.schedule_type import DAILY
+from base.models.group_element_year import GroupElementYear
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.business.learning_units import GenerateAcademicYear
+from base.tests.factories.certificate_aim import CertificateAimFactory
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
+from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
+from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
+from base.tests.factories.group import FacultyManagerGroupFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.organization_address import OrganizationAddressFactory
+from base.tests.factories.person import PersonFactory, CentralManagerFactory
+from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.user import SuperUserFactory, UserFactory
+from base.utils.cache import ElementCache
+from base.views.education_groups.update import _get_success_redirect_url, \
+    update_education_group
+from reference.tests.factories.domain import DomainFactory
+from reference.tests.factories.domain_isced import DomainIscedFactory
+from reference.tests.factories.language import LanguageFactory
+
+
+@override_flag('education_group_update', active=True)
+class TestUpdate(TestCase):
+    def setUp(self):
+        self.current_academic_year = create_current_academic_year()
+        FacultyManagerGroupFactory()
+        self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
+        self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
+        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        academic_year_1 = AcademicYearFactory.build(start_date=self.start_date_ay_1,
+                                                    end_date=self.end_date_ay_1,
+                                                    year=self.current_academic_year.year + 1)
+        academic_year_1.save()
+
+        self.start_date_ay_2 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 2)
+        self.end_date_ay_2 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 3)
+        academic_year_2 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
+                                                    end_date=self.end_date_ay_2,
+                                                    year=self.current_academic_year.year + 2)
+        academic_year_2.save()
+
+        self.education_group_year = GroupFactory()
+
+        EntityVersionFactory(entity=self.education_group_year.management_entity,
+                             start_date=self.education_group_year.academic_year.start_date)
+
+        EntityVersionFactory(entity=self.education_group_year.administration_entity,
+                             start_date=self.education_group_year.academic_year.start_date)
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.education_group_year.education_group_type,
+            child_type=self.education_group_year.education_group_type
+        )
+
+        self.url = reverse(update_education_group, kwargs={"root_id": self.education_group_year.pk,
+                                                           "education_group_year_id": self.education_group_year.pk})
+        self.person = CentralManagerFactory()
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        self.client.force_login(self.person.user)
+        permission = Permission.objects.get(codename='change_educationgroup')
+        self.person.user.user_permissions.add(permission)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_certificate_aims",
+                                       return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+
+        self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+
+        self.previous_training_education_group_year = TrainingFactory(
+            academic_year=self.previous_academic_year,
+            education_group_type=self.an_training_education_group_type,
+            education_group__start_year=1968
+        )
+
+        EntityVersionFactory(entity=self.previous_training_education_group_year.management_entity,
+                             start_date=self.previous_training_education_group_year.academic_year.start_date)
+
+        EntityVersionFactory(entity=self.previous_training_education_group_year.administration_entity,
+                             start_date=self.previous_training_education_group_year.academic_year.start_date)
+
+        self.training_education_group_year = TrainingFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=self.an_training_education_group_type,
+            education_group__start_year=1968
+        )
+
+        self.training_education_group_year_1 = TrainingFactory(
+            academic_year=academic_year_1,
+            education_group_type=self.an_training_education_group_type,
+            education_group=self.training_education_group_year.education_group
+        )
+
+        self.training_education_group_year_2 = TrainingFactory(
+            academic_year=academic_year_2,
+            education_group_type=self.an_training_education_group_type,
+            education_group=self.training_education_group_year.education_group
+        )
+
+        AuthorizedRelationshipFactory(
+            parent_type=self.an_training_education_group_type,
+            child_type=self.an_training_education_group_type,
+        )
+
+        EntityVersionFactory(
+            entity=self.training_education_group_year.management_entity,
+            start_date=self.education_group_year.academic_year.start_date
+        )
+
+        EntityVersionFactory(
+            entity=self.training_education_group_year.administration_entity,
+            start_date=self.education_group_year.academic_year.start_date
+        )
+
+        self.training_url = reverse(
+            update_education_group,
+            args=[self.training_education_group_year.pk, self.training_education_group_year.pk]
+        )
+        PersonEntityFactory(person=self.person, entity=self.training_education_group_year.management_entity)
+
+        self.domains = [DomainFactory() for x in range(10)]
+
+        self.a_mini_training_education_group_type = EducationGroupTypeFactory(
+            category=education_group_categories.MINI_TRAINING)
+
+        self.mini_training_education_group_year = MiniTrainingFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=self.a_mini_training_education_group_type
+        )
+
+        self.mini_training_url = reverse(
+            update_education_group,
+            args=[self.mini_training_education_group_year.pk, self.mini_training_education_group_year.pk]
+        )
+        PersonEntityFactory(person=self.person, entity=self.mini_training_education_group_year.management_entity)
+
+        EntityVersionFactory(
+            entity=self.mini_training_education_group_year.management_entity,
+            start_date=self.education_group_year.academic_year.start_date
+        )
+
+    def tearDown(self):
+        self.perm_patcher.stop()
+
+    def test_login_required(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_template_used(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "education_group/update_groups.html")
+
+    def test_response_context(self):
+        response = self.client.get(self.url)
+
+        form_education_group_year = response.context["form_education_group_year"]
+
+        self.assertIsInstance(form_education_group_year, GroupYearModelForm)
+
+    def test_post(self):
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        self.education_group_year.management_entity = new_entity_version.entity
+        self.education_group_year.save()
+
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.education_group_year.education_group_type.id,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.education_group_year.academic_year.pk,
+            "constraint_type": "",
+        }
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+        self.education_group_year.refresh_from_db()
+        self.assertEqual(self.education_group_year.title, 'Cours au choix')
+        self.assertEqual(self.education_group_year.title_english, 'deaze')
+        self.assertEqual(self.education_group_year.credits, 42)
+        self.assertEqual(self.education_group_year.acronym, 'CRSCHOIXDVLD')
+        self.assertEqual(self.education_group_year.partial_acronym, 'LDVLD101R')
+        self.assertEqual(self.education_group_year.management_entity, new_entity_version.entity)
+
+    def test_template_used_for_training(self):
+        response = self.client.get(self.training_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "education_group/update_trainings.html")
+
+    def test_template_used_for_certificate_edition(self):
+        faculty_managers_group = Group.objects.get(name='faculty_managers')
+        self.faculty_user = UserFactory()
+        self.faculty_user.groups.add(faculty_managers_group)
+        self.faculty_person = PersonFactory(user=self.faculty_user)
+        self.client.force_login(self.faculty_user)
+        permission = Permission.objects.get(codename='change_educationgroup')
+        self.faculty_user.user_permissions.add(permission)
+        self._assert_redirects_to_modal_to_update_certificate_aims(self.previous_training_education_group_year)
+        self._assert_redirects_to_modal_to_update_certificate_aims(self.training_education_group_year)
+
+        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+        first_certificate_aim = certificate_aims[0].id
+
+        self._assert_post_to_modal_to_update_certificate_aims(
+            first_certificate_aim,
+            self.previous_training_education_group_year
+        )
+        self._assert_post_to_modal_to_update_certificate_aims(
+            first_certificate_aim,
+            self.training_education_group_year
+        )
+
+    def _assert_redirects_to_modal_to_update_certificate_aims(self, education_group_year):
+        response = self.client.get(reverse(
+            update_education_group,
+            args=[education_group_year.pk, education_group_year.pk]
+        ))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
+
+    def _assert_post_to_modal_to_update_certificate_aims(self, first_certificate_aim, education_group_year):
+        response = self.client.post(reverse(update_education_group,
+                                            args=[education_group_year.pk,
+                                                  education_group_year.pk]),
+                                    data={'certificate_aims': str(first_certificate_aim)})
+        self.assertEqual(response.status_code, 302)
+
+    def test_post_training(self):
+        old_domain = DomainFactory()
+        EducationGroupYearDomainFactory(
+            education_group_year=self.training_education_group_year,
+            domain=old_domain
+        )
+
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        list_domains = [domain.pk for domain in self.domains]
+        isced_domain = DomainIscedFactory()
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.an_training_education_group_type.pk,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.training_education_group_year.academic_year.pk,
+            'secondary_domains': ['|' + ('|'.join([str(domain.pk) for domain in self.domains])) + '|'],
+            'isced_domain': isced_domain.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 0,
+            'form-INITIAL_FORMS': 0,
+        }
+        response = self.client.post(self.training_url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        self.training_education_group_year.refresh_from_db()
+        self.assertEqual(self.training_education_group_year.title, 'Cours au choix')
+        self.assertEqual(self.training_education_group_year.title_english, 'deaze')
+        self.assertEqual(self.training_education_group_year.credits, 42)
+        self.assertEqual(self.training_education_group_year.acronym, 'CRSCHOIXDVLD')
+        self.assertEqual(self.training_education_group_year.partial_acronym, 'LDVLD101R')
+        self.assertEqual(self.training_education_group_year.management_entity, new_entity_version.entity)
+        self.assertEqual(self.training_education_group_year.administration_entity, new_entity_version.entity)
+        self.assertEqual(self.training_education_group_year.isced_domain, isced_domain)
+        self.assertCountEqual(
+            list(self.training_education_group_year.secondary_domains.values_list('id', flat=True)),
+            list_domains
+        )
+        self.assertNotIn(old_domain, self.education_group_year.secondary_domains.all())
+
+    def test_post_training_with_a_coorganization(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        organization = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=organization, is_main=True)
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+
+        data = {
+            'title': 'Cours au choix',
+            'education_group_type': egy.education_group_type.pk,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'academic_year': egy.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-country': address.country.pk,
+            'form-0-organization': organization.pk,
+            'form-0-diploma': diploma_choice
+        }
+
+        url = reverse(update_education_group, args=[egy.pk, egy.pk])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        egy.refresh_from_db()
+        coorganizations = egy.coorganizations
+        self.assertEqual(coorganizations.count(), 1)
+        self.assertEqual(coorganizations.first().organization, organization)
+        self.assertEqual(coorganizations.first().diploma, diploma_choice)
+
+    def test_post_training_removing_coorganization(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        address = OrganizationAddressFactory(organization=OrganizationFactory(), is_main=True)
+        egy_organization = EducationGroupOrganizationFactory(
+            organization=OrganizationFactory(),
+            education_group_year=egy
+        )
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+
+        data = {
+            'title': 'Cours au choix',
+            'education_group_type': egy.education_group_type.pk,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'academic_year': egy.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 1,
+            'form-0-country': address.country.pk,
+            'form-0-organization': egy_organization.organization.pk,
+            'form-0-diploma': diploma_choice,
+            'form-0-DELETE': 'on',
+            'form-0-id': egy_organization.pk
+        }
+
+        url = reverse(update_education_group, args=[egy.pk, egy.pk])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        egy.refresh_from_db()
+        coorganizations = egy.coorganizations
+        self.assertEqual(coorganizations.count(), 0)
+
+    def test_post_mini_training(self):
+        old_domain = DomainFactory()
+        EducationGroupYearDomainFactory(
+            education_group_year=self.mini_training_education_group_year,
+            domain=old_domain
+        )
+
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.a_mini_training_education_group_type.pk,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.mini_training_education_group_year.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+        }
+        response = self.client.post(self.mini_training_url, data=data)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+        self.mini_training_education_group_year.refresh_from_db()
+        self.assertEqual(self.mini_training_education_group_year.title, 'Cours au choix')
+        self.assertEqual(self.mini_training_education_group_year.title_english, 'deaze')
+        self.assertEqual(self.mini_training_education_group_year.credits, 42)
+        self.assertEqual(self.mini_training_education_group_year.acronym, 'CRSCHOIXDVLD')
+        self.assertEqual(self.mini_training_education_group_year.partial_acronym, 'LDVLD101R')
+        self.assertEqual(self.mini_training_education_group_year.management_entity, new_entity_version.entity)
+
+    def test_post_training_with_end_year(self):
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.an_training_education_group_type.pk,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.training_education_group_year.academic_year.pk,
+            'secondary_domains': ['|' + ('|'.join([str(domain.pk) for domain in self.domains])) + '|'],
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "end_year": 2018,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 0,
+            'form-INITIAL_FORMS': 0,
+        }
+        response = self.client.post(self.training_url, data=data)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+
+        self.assertEqual(
+            messages[1], _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
+                "acronym": self.training_education_group_year_1.acronym,
+                "academic_year": self.training_education_group_year_1.academic_year,
+            }
+        )
+        self.assertEqual(
+            messages[2], _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
+                "acronym": self.training_education_group_year_2.acronym,
+                "academic_year": self.training_education_group_year_2.academic_year,
+            }
+        )
+
+
+class TestGetSuccessRedirectUrl(TestCase):
+    def setUp(self):
+        self.current_academic_year = create_current_academic_year()
+        self.education_group_year = EducationGroupYearFactory(
+            academic_year=self.current_academic_year
+        )
+
+        self.ac_year_in_future = GenerateAcademicYear(
+            start_year=self.current_academic_year.year + 1,
+            end_year=self.current_academic_year.year + 5,
+        )
+
+        self.education_group_year_in_future = []
+        for ac_in_future in self.ac_year_in_future.academic_years:
+            self.education_group_year_in_future.append(EducationGroupYearFactory(
+                education_group=self.education_group_year.education_group,
+                academic_year=ac_in_future
+            ))
+
+    def test_get_redirect_success_url_when_exist(self):
+        expected_url = reverse("education_group_read", args=[self.education_group_year.pk,
+                                                             self.education_group_year.id])
+        result = _get_success_redirect_url(self.education_group_year, self.education_group_year)
+        self.assertEqual(result, expected_url)
+
+    def test_get_redirect_success_url_when_current_viewed_has_been_deleted(self):
+        current_viewed = self.education_group_year_in_future[-1]
+        current_viewed.delete()
+        # Expected URL is the latest existing [-2]
+        expected_url = reverse("education_group_read", args=[self.education_group_year_in_future[-2].pk,
+                                                             self.education_group_year_in_future[-2].pk])
+        result = _get_success_redirect_url(current_viewed, current_viewed)
+        self.assertEqual(result, expected_url)
+
+
+@override_flag('education_group_attach', active=True)
+@override_flag('education_group_select', active=True)
+@override_flag('education_group_update', active=True)
+class TestSelectAttach(TestCase):
+    @classmethod
+    def setUpTestData(self):
+        self.person = PersonFactory()
+        self.academic_year = create_current_academic_year()
+        self.child_education_group_year = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group__end_year=self.academic_year.year + 1
+        )
+        self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
+        self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        self.new_parent_education_group_year = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__learning_unit_child_allowed=True,
+            education_group__end_year=self.academic_year.year + 2
+        )
+        self.bad_parent = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__learning_unit_child_allowed=True,
+            education_group__end_year=self.academic_year.year - 1
+        )
+
+        self.initial_group_element_year = GroupElementYearFactory(
+            parent=self.initial_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        )
+
+        self.child_group_element_year = GroupElementYearFactory(
+            parent=self.initial_parent_education_group_year,
+            child_branch=None,
+            child_leaf=self.learning_unit_year
+        )
+
+        self.url_select_education_group = reverse(
+            "education_group_select",
+            args=[
+                self.initial_parent_education_group_year.id,
+                self.child_education_group_year.id,
+            ]
+        )
+        self.url_select_learning_unit = reverse(
+            "learning_unit_select",
+            args=[self.learning_unit_year.id]
+        )
+        group_above_new_parent = GroupElementYearFactory(
+            parent__academic_year=self.academic_year,
+            child_branch=self.new_parent_education_group_year
+        )
+
+        self.url_management = reverse("education_groups_management")
+        self.select_data = {
+            "root_id": group_above_new_parent.parent.id,
+            "element_id": self.child_education_group_year.id,
+            "group_element_year_id": self.initial_group_element_year.id,
+            "action": "select",
+        }
+        self.root = group_above_new_parent.parent
+        self.attach_data = {
+            "root_id": group_above_new_parent.parent.id,
+            "element_id": self.new_parent_education_group_year.id,
+            "group_element_year_id": group_above_new_parent.id,
+            "action": "attach",
+        }
+
+    def setUp(self):
+        self.client = Client()
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.is_eligible_to_change_education_group",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+        # Clean cache state
+        self.addCleanup(cache.clear)
+
+    def test_select_case_education_group(self):
+        response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        data_cached = ElementCache(self.person.user).cached_data
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertDictEqual(
+            data_cached,
+            {
+                'modelname': management.EDUCATION_GROUP_YEAR,
+                'id': self.child_education_group_year.id,
+                'source_link_id': self.initial_group_element_year.pk
+            }
+        )
+
+    def test_select_ajax_case_learning_unit_year(self):
+        response = self.client.post(
+            self.url_select_learning_unit,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        data_cached = ElementCache(self.person.user).cached_data
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertDictEqual(
+            data_cached,
+            {
+                'modelname': management.LEARNING_UNIT_YEAR,
+                'id': self.learning_unit_year.id
+            }
+        )
+
+    def test_select_redirects_if_not_ajax(self):
+        """In this test, we ensure that redirect is made if the request is not in AJAX """
+        response = self.client.post(self.url_select_learning_unit)
+
+        redirected_url = reverse('learning_unit', args=[self.learning_unit_year.id])
+        self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
+
+    def test_attach_case_child_education_group_year_with_larger_end_year(self):
+        AuthorizedRelationshipFactory(
+            parent_type=self.bad_parent.education_group_type,
+            child_type=self.child_education_group_year.education_group_type,
+        )
+
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.bad_parent,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        self._assert_link_with_inital_parent_present()
+
+        # Select :
+        self.client.post(self.url_management, data=self.select_data)
+
+        # Create a link :
+        self.client.post(
+            reverse("group_element_year_create",
+                    args=[self.attach_data["root_id"],
+                          self.attach_data["element_id"]]),
+        )
+
+        expected_group_element_year_existing = GroupElementYear.objects.filter(
+            parent=self.bad_parent,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_group_element_year_existing)
+
+        self._assert_link_with_inital_parent_present()
+
+    def test_attach_case_child_education_group_year(self):
+        AuthorizedRelationshipFactory(
+            parent_type=self.new_parent_education_group_year.education_group_type,
+            child_type=self.child_education_group_year.education_group_type,
+        )
+
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        self._assert_link_with_inital_parent_present()
+
+        # Select :
+        self.client.post(self.url_management, data=self.select_data)
+
+        # Create a link :
+        self.client.post(
+            reverse("group_element_year_create",
+                    args=[self.attach_data["root_id"],
+                          self.attach_data["element_id"]]),
+        )
+
+        expected_group_element_year_count = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        ).count()
+        self.assertEqual(expected_group_element_year_count, 1)
+
+        self._assert_link_with_inital_parent_present()
+
+    def test_attach_child_education_group_year_to_one_of_its_descendants_creating_loop(self):
+        # We attempt to create a loop : child --> initial_parent --> new_parent --> child
+        GroupElementYearFactory(
+            parent=self.new_parent_education_group_year,
+            child_branch=self.initial_parent_education_group_year
+        )
+        AuthorizedRelationshipFactory(
+            parent_type=self.child_education_group_year.education_group_type,
+            child_type=self.new_parent_education_group_year.education_group_type,
+        )
+
+        # Select :
+        self.client.post(
+            self.url_select_education_group,
+            data={'element_id': self.new_parent_education_group_year.id}
+        )
+
+        # Create a link :
+        response = self.client.post(
+            reverse("group_element_year_create", args=[
+                self.new_parent_education_group_year.id, self.child_education_group_year.id
+            ]),
+            data={}
+        )
+        self.assertFormError(
+            response, 'form', '__all__',
+            _("It is forbidden to attach an element to one of its included elements.")
+        )
+
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.child_education_group_year,
+            child_branch=self.new_parent_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+    def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
+        self.mocked_perm.return_value = False
+        AuthorizedRelationshipFactory(
+            parent_type=self.new_parent_education_group_year.education_group_type,
+            child_type=self.child_education_group_year.education_group_type,
+        )
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        self._assert_link_with_inital_parent_present()
+
+        # Select :
+        self.client.post(
+            self.url_management,
+            data=self.select_data
+        )
+
+        # Create link :
+        response = self.client.get(
+            reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk])
+        )
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        self._assert_link_with_inital_parent_present()
+
+    def test_attach_case_child_learning_unit_year(self):
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_leaf=self.learning_unit_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        data_cached = ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
+
+        response = self.client.post(
+            reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),
+            data={}
+        )
+        self.assertEqual(response.status_code, 302)
+
+        expected_group_element_year_count = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_leaf=self.learning_unit_year
+        ).count()
+        self.assertEqual(expected_group_element_year_count, 1)
+
+    def test_attach_without_selecting_gives_warning(self):
+        ElementCache(self.person.user).clear()
+        expected_absent_group_element_year = GroupElementYear.objects.filter(
+            parent=self.new_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        ).exists()
+        self.assertFalse(expected_absent_group_element_year)
+
+        response = self.client.get(
+            reverse("group_element_year_create",
+                    args=[self.root.pk,
+                          self.new_parent_education_group_year.pk]),
+        )
+        self.assertEqual(response.status_code, 200)
+
+        messages = list(get_messages(response.wsgi_request))
+
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), _("Please select an item before attach it"))
+
+    @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
+    def test_attach_a_not_valid_case(self, mock_attach_strategy):
+        ElementCache(self.person.user).save_element_selected(self.child_education_group_year)
+        response = self.client.get(
+            reverse("group_element_year_create",
+                    args=[self.root.pk,
+                          self.new_parent_education_group_year.pk]),
+        )
+        self.assertEqual(response.status_code, 200)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), _("Dummy message"))
+
+    def _assert_link_with_inital_parent_present(self):
+        expected_initial_group_element_year = GroupElementYear.objects.get(
+            parent=self.initial_parent_education_group_year,
+            child_branch=self.child_education_group_year
+        )
+        self.assertEqual(expected_initial_group_element_year, self.initial_group_element_year)
+
+
+class TestCertificateAimAutocomplete(TestCase):
+    def setUp(self):
+        self.super_user = SuperUserFactory()
+        self.url = reverse("certificate_aim_autocomplete")
+        self.certificate_aim = CertificateAimFactory(
+            code=1234,
+            section=5,
+            description="description",
+        )
+
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url, data={'q': '1234'})
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(results, [])
+
+    def test_when_param_is_digit_assert_searching_on_code(self):
+        # When searching on "code"
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': '1234'})
+        self._assert_result_is_correct(response)
+
+    def test_assert_searching_on_description(self):
+        # When searching on "description"
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'q': 'descr'})
+        self._assert_result_is_correct(response)
+
+    def test_with_filter_by_section(self):
+        self.client.force_login(user=self.super_user)
+        response = self.client.get(self.url, data={'forward': '{"section": "5"}'})
+        self._assert_result_is_correct(response)
+
+    def _assert_result_is_correct(self, response):
+        self.assertEqual(response.status_code, 200)
+        json_response = str(response.content, encoding='utf8')
+        results = json.loads(json_response)['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['id'], str(self.certificate_aim.id))

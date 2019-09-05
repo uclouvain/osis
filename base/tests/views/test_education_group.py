@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,42 +24,346 @@
 #
 ##############################################################################
 import datetime
+import json
+import urllib
+from http import HTTPStatus
+from itertools import product
 from unittest import mock
 
+import bs4
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
-from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse
+from django.contrib.messages import get_messages
+from django.urls import reverse
+from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
+from waffle.testutils import override_flag
 
-from base.forms.education_groups import EducationGroupFilter
-from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import education_group_categories, offer_year_entity_type
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING
-
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.business.education_groups.general_information import PublishException
+from base.forms.education_group_admission import UpdateTextForm
+from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
+from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
+from base.models.enums import education_group_categories, academic_calendar_type
+from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
+    TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.offer import OfferFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.offer_year_entity import OfferYearEntityFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.mandatary import MandataryFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.structure import StructureFactory
-from reference.tests.factories.country import CountryFactory
-
-from base.views.education_group import education_groups
-
-
-def save(self, *args, **kwargs):
-    return super(AcademicCalendar, self).save()
+from base.tests.factories.user import UserFactory, SuperUserFactory
+from base.views.education_groups.detail import get_appropriate_common_admission_condition
+from cms.enums import entity_name
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 
 
+class EducationGroupGeneralInformations(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        EducationGroupYearCommonFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name
+        )
+        cls.education_group_parent = TrainingFactory(
+            acronym="Parent",
+            academic_year=cls.current_academic_year
+        )
+        cls.education_group_child = TrainingFactory(
+            acronym="Child_1",
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.CERTIFICATE_OF_PARTICIPATION.name
+        )
+        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
+
+        cls.cms_label_for_child = TranslatedTextFactory(
+            text_label=TextLabelFactory(entity=entity_name.OFFER_YEAR),
+            reference=cls.education_group_child.id,
+        )
+
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+
+        cls.url = reverse(
+            "education_group_general_informations",
+            args=[cls.education_group_parent.pk, cls.education_group_child.pk]
+        )
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.GeneralInformationPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_user_without_permission(self):
+        an_other_user = UserFactory()
+        self.client.force_login(an_other_user)
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_with_non_existent_education_group_year(self):
+        non_existent_id = self.education_group_child.id + self.education_group_parent.id
+        url = reverse("education_group_diplomas", args=[self.education_group_parent.pk, non_existent_id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "page_not_found.html")
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+
+    def test_with_education_group_year_of_type_group(self):
+        group_education_group_year = EducationGroupYearFactory(
+            academic_year=self.current_academic_year
+        )
+        group_education_group_year.education_group_type.category = education_group_categories.GROUP
+        group_education_group_year.education_group_type.save()
+
+        url = reverse(
+            "education_group_general_informations",
+            args=[group_education_group_year.id, group_education_group_year.id]
+        )
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_case_didactic_offer_ensure_show_finalite_common(self):
+        education_group_year = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_MD_120.name,
+            academic_year=self.current_academic_year,
+        )
+        url = reverse("education_group_general_informations",
+                      args=[education_group_year.pk, education_group_year.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        context = response.context
+        self.assertEqual(context["parent"], education_group_year)
+        self.assertEqual(context["education_group_year"], education_group_year)
+        sections = context['sections_with_translated_labels']
+
+        self.assertEqual(sections[0].labels[0]['label'], 'intro')
+        self.assertEqual(sections[1].labels[0]['label'], 'finalites_didactiques-commun')
+
+    def test_case_common_do_not_have_double_field_prerequisite(self):
+        education_group_year = EducationGroupYearCommonFactory(
+            academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name
+        )
+        url = reverse("education_group_general_informations",
+                      args=[education_group_year.pk, education_group_year.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        context = response.context
+        self.assertEqual(context["parent"], education_group_year)
+        self.assertEqual(context["education_group_year"], education_group_year)
+        sections = context['sections_with_translated_labels']
+        prerequis = {
+            'label': 'prerequis',
+            'type': 'specific',
+            'translation':
+                'Ce label prerequis n’existe pas',
+            'fr-be': None,
+            'en': None
+        }
+        self.assertIn(prerequis, sections[0].labels)
+        self.assertEqual(sections[0].labels.count(prerequis), 1)
+
+    def test_case_user_has_link_to_edit_pedagogy(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertGreater(len(soup.select('a.pedagogy-edit-btn')), 0)
+
+    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
+    def test_user_has_not_link_to_edit_pedagogy(self, mock_is_eligible_to_edit_general_info):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('a.pedagogy-edit-btn')), 0)
+
+
+class EducationGroupPedagogyUpdateViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.training = TrainingFactory(academic_year=cls.current_academic_year)
+
+        cls.text_label = TextLabelFactory(label='dummy-label')
+        cls.translated_text_in_french = TranslatedTextRandomFactory(
+            reference=str(cls.training.pk),
+            entity=entity_name.OFFER_YEAR,
+            text_label=cls.text_label,
+            language=settings.LANGUAGE_CODE_FR,
+        )
+        cls.translated_text_in_english = TranslatedTextRandomFactory(
+            reference=str(cls.training.pk),
+            entity=entity_name.OFFER_YEAR,
+            text_label=cls.text_label,
+            language=settings.LANGUAGE_CODE_EN,
+        )
+        cls.person = PersonWithPermissionsFactory(
+            "can_access_education_group",
+            "change_pedagogyinformation",
+            "change_commonpedagogyinformation"
+        )
+        cls.url = reverse("education_group_pedagogy_edit", args=[cls.training.pk, cls.training.pk])
+
+    def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.GeneralInformationPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+        self.client.force_login(self.person.user)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
+    def test_get_pedagogy_info_case_user_without_permission(self, mock_edit_post, mock_edit_get, mock_perms):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+        self.assertFalse(mock_edit_post.called)
+        self.assertFalse(mock_edit_get.called)
+
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
+    def test_get_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertFalse(mock_edit_post.called)
+        self.assertTrue(mock_edit_get.called)
+
+    @mock.patch('base.views.education_group.render')
+    def test_get_pedagogy_info_ensure_context_data(self, mock_render):
+        request = RequestFactory().get(self.url, data={'label': self.text_label.label})
+        request.user = self.person.user
+
+        from base.views.education_group import education_group_year_pedagogy_edit_get
+        education_group_year_pedagogy_edit_get(request, self.training.pk)
+
+        request, template, context = mock_render.call_args[0]
+        self.assertEqual(context['education_group_year'], self.training)
+        self.assertEqual(context['label'], self.text_label.label)
+
+        form = context['form']
+        self.assertIsInstance(form, EducationGroupPedagogyEditForm)
+        self.assertEqual(form.initial['label'], self.text_label.label)
+        self.assertEqual(form.initial['text_french'], self.translated_text_in_french.text)
+        self.assertEqual(form.initial['text_english'], self.translated_text_in_english.text)
+
+    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
+    def test_post_pedagogy_info_case_user_without_permission(self, mock_edit_post, mock_edit_get, mock_perms):
+        response = self.client.post(self.url, data={})
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+        self.assertFalse(mock_edit_post.called)
+        self.assertFalse(mock_edit_get.called)
+
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
+    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    def test_post_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get):
+        response = self.client.post(self.url, data={})
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertTrue(mock_edit_post.called)
+        self.assertFalse(mock_edit_get.called)
+
+    def test_education_group_year_pedagogy_edit_post(self):
+        post_data = {'label': 'welcome_introduction', 'text_french': 'Salut', 'text_english': 'Hello'}
+        request = RequestFactory().post(self.url, data=post_data)
+
+        from base.views.education_group import education_group_year_pedagogy_edit_post
+        response = education_group_year_pedagogy_edit_post(request, self.training.pk, self.training.pk)
+
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        anchor_expected = '#section_welcome_introduction'
+        self.assertTrue(anchor_expected in response.url)
+
+
+class EducationGroupPublishViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+        cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
+        cls.person = PersonWithPermissionsFactory('can_access_education_group')
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_publish_case_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_public_case_methods_not_allowed(self):
+        methods_not_allowed = ['get', 'delete', 'put']
+        for method in methods_not_allowed:
+            request_to_call = getattr(self.client, method)
+            response = request_to_call(self.url)
+            self.assertEqual(response.status_code, 405)
+
+    @mock.patch("base.business.education_groups.general_information.publish", side_effect=lambda e: "portal-url")
+    def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
+        response = self.client.post(self.url)
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.SUCCESS, msg_level)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    @mock.patch("base.business.education_groups.general_information.publish", side_effect=PublishException('error'))
+    def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
+        response = self.client.post(self.url)
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.ERROR, msg_level)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+
+@override_flag('education_group_update', active=True)
 class EducationGroupViewTestCase(TestCase):
     def setUp(self):
         today = datetime.date.today()
@@ -71,301 +375,28 @@ class EducationGroupViewTestCase(TestCase):
         self.type_minitraining = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
         self.type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        request_factory = RequestFactory()
+    def test_education_administrative_data(self):
+        an_education_group = EducationGroupYearFactory(academic_year=self.academic_year)
+        self.initialize_session()
+        url = reverse("education_group_administrative", args=[an_education_group.id, an_education_group.id])
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertEqual(response.context['education_group_year'], an_education_group)
+        self.assertEqual(response.context['parent'], an_education_group)
 
-        EducationGroupYearFactory(acronym='EDPH2', academic_year=self.academic_year)
-        EducationGroupYearFactory(acronym='ARKE2A', academic_year=self.academic_year)
-        EducationGroupYearFactory(acronym='HIST2A', academic_year=self.academic_year)
-
-        request = request_factory.get(reverse(education_groups), data={
-            'acronym': 'EDPH2',
-            'academic_year': self.academic_year.id,
-        })
-        request.user = mock.Mock()
-        education_groups(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_groups.html')
-        self.assertEqual(len(context['object_list']), 1)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_by_code_scs(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        request_factory = RequestFactory()
-
-        EducationGroupYearFactory(acronym='EDPH2', partial_acronym='EDPH2_SCS', academic_year=self.academic_year)
-        EducationGroupYearFactory(acronym='ARKE2A', partial_acronym='ARKE2A_SCS', academic_year=self.academic_year)
-        EducationGroupYearFactory(acronym='HIST2A', partial_acronym='HIST2A_SCS', academic_year=self.academic_year)
-
-        request = request_factory.get(reverse(education_groups), data={
-            'partial_acronym': 'EDPH2_SCS',
-            'academic_year': self.academic_year.id,
-        })
-        request.user = mock.Mock()
-        education_groups(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_groups.html')
-        self.assertEqual(len(context['object_list']), 1)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_by_requirement_entity(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda  x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        request_factory = RequestFactory()
-
-        self._prepare_context_education_groups_search()
-
-        request = request_factory.get(reverse('education_groups'), data={
-                'academic_year': self.academic_year.id,
-                'requirement_entity_acronym': 'AGRO'
-            })
-        request.user = mock.Mock()
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-
-        education_groups(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_groups.html')
-        self.assertEqual(len(context['object_list']), 1)
-
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_by_requirement_entity_and_subord(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda  x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        request_factory = RequestFactory()
-
-        self._prepare_context_education_groups_search()
-
-        request = request_factory.get(reverse(education_groups), data={
-                'academic_year': self.academic_year.id,
-                'requirement_entity_acronym': 'AGRO',
-                'with_entity_subordinated': True
-            })
-        request.user = mock.Mock()
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-
-        education_groups(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_groups.html')
-        self.assertEqual(len(context['object_list']), 3)
-
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_by_type(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        request_factory = RequestFactory()
-
-        EducationGroupYearFactory(acronym='EDPH2', academic_year=self.academic_year)
-        EducationGroupYearFactory(acronym='ARKE2A', academic_year=self.academic_year)
-        result = EducationGroupYearFactory(acronym='HIST2A', academic_year=self.academic_year,
-                                  education_group_type=self.type_minitraining)
-
-        request = request_factory.get(reverse(education_groups), data={
-            'academic_year': self.academic_year.id,
-            'education_group_type': self.type_minitraining.id
-        })
-        request.user = mock.Mock()
-
-        education_groups(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_groups.html')
-        self.assertEqual(len(context['object_list']), 1)
-        self.assertIn(result, context['object_list'])
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_by_category(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        request_factory = RequestFactory()
-
-        EducationGroupYearFactory(acronym='EDPH2', academic_year=self.academic_year)
-        EducationGroupYearFactory(acronym='ARKE2A', academic_year=self.academic_year)
-        result = EducationGroupYearFactory(acronym='HIST2A', academic_year=self.academic_year,
-                                           education_group_type=self.type_minitraining)
-
-        request = request_factory.get(reverse(education_groups), data={
-            'academic_year': self.academic_year.id,
-            'category': MINI_TRAINING
-        })
-        request.user = mock.Mock()
-
-        education_groups(request)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'education_groups.html')
-        self.assertEqual(len(context['object_list']), 1)
-        self.assertIn(result, context['object_list'])
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_post(self, mock_render, mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        request_factory = RequestFactory()
-
-        request = request_factory.post(reverse(education_groups), data={})
-        request.user = mock.Mock()
-
-        education_groups(request)
-
-        self.assertTrue(mock_render.called)
-
-        request, template, context = mock_render.call_args[0]
-
-        self.assertEqual(template, 'education_groups.html')
-        self.assertIsInstance(context.get('form'), EducationGroupFilter)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_groups_search_empty_result(self, mock_render, mock_decorators):
-        from django.contrib.messages.storage.fallback import FallbackStorage
-
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        request_factory = RequestFactory()
-        from base.views.education_group import education_groups
-        request = request_factory.get(reverse(education_groups), data={
-            'academic_year': self.academic_year.id,
-            'type': ''  # Simulate all type
-        })
-        request.user = mock.Mock()
-        # Need session in order to store messages
-        setattr(request, 'session', {})
-        setattr(request, '_messages', FallbackStorage(request))
-
-        education_groups(request)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_groups.html')
-        self.assertFalse(context['object_list'])
-        # It should have one message ['no_result']
-        self.assertEqual(len(request._messages), 1)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.program_manager.is_program_manager', return_value=True)
-    @mock.patch('base.models.education_group_year.find_by_id')
-    def test_education_group_read(self,
-                                  mock_find_by_id,
-                                  mock_program_manager,
-                                  mock_render,
-                                  mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        organization = EducationGroupOrganizationFactory(education_group_year=education_group_year)
-        request = mock.Mock(method='GET')
-
-        from base.views.education_group import education_group_read
-
-        mock_find_by_id.return_value = education_group_year
-        education_group_read(request, education_group_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_identification.html')
-        self.assertEqual(context['education_group_year'].coorganizations.first(), organization)
-        self.assertEqual(context['education_group_year'].coorganizations.first().address, organization.address)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.program_manager.is_program_manager', return_value=True)
-    @mock.patch('base.models.education_group_year.find_by_id')
-    def test_education_group_parent_read(self,
-                                         mock_find_by_id,
-                                         mock_program_manager,
-                                         mock_render,
-                                         mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-
-        education_group_type = EducationGroupTypeFactory(category=TRAINING)
-
-        education_group_year_child = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                                education_group_type=education_group_type)
-        education_group_year_parent = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                                education_group_type=education_group_type)
-
-        GroupElementYearFactory(parent=education_group_year_parent, child_branch=education_group_year_child)
-        request = mock.Mock(method='GET')
-
-        from base.views.education_group import education_group_parent_read
-
-        mock_find_by_id.return_value = education_group_year_child
-        education_group_parent_read(request, education_group_year_child.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_identification.html')
-        self.assertEqual(context['education_group_year'].parent_by_training, education_group_year_parent)
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.person.get_user_interface_language', return_value=True)
-    @mock.patch('base.models.education_group_year.find_by_id')
-    def test_education_group_general_informations(self,
-                                                  mock_find_by_id,
-                                                  mock_get_user_interface_language,
-                                                  mock_render,
-                                                  mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        request = mock.Mock(method='GET')
-
-        from base.views.education_group import education_group_general_informations
-
-        mock_find_by_id.return_value = education_group_year
-        education_group_general_informations(request, education_group_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_general_informations.html')
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.education_group_year.find_by_id')
-    def test_education_administrative_data(self,
-                                           mock_find_by_id,
-                                           mock_render,
-                                           mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        request = mock.Mock(method='GET')
-
-        from base.views.education_group import education_group_administrative_data
-
-        mock_find_by_id.return_value = education_group_year
-        education_group_administrative_data(request, education_group_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_administrative_data.html')
-        self.assertEqual(context['education_group_year'], education_group_year)
+    def test_education_administrative_data_with_root_set(self):
+        a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
+                                                       child_branch__academic_year=self.academic_year)
+        self.initialize_session()
+        url = reverse("education_group_administrative",
+                      args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertEqual(response.context['education_group_year'], a_group_element_year.child_branch)
+        self.assertEqual(response.context['parent'], a_group_element_year.parent)
 
     def test_get_sessions_dates(self):
-        from base.views.education_group import get_sessions_dates
+        from base.views.education_groups.detail import get_sessions_dates
         from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
         from base.tests.factories.academic_calendar import AcademicCalendarFactory
         from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -373,147 +404,50 @@ class EducationGroupViewTestCase(TestCase):
 
         sessions_quantity = 3
         an_academic_year = AcademicYearFactory()
-        academic_calendar = AcademicCalendarFactory.build(academic_year=an_academic_year)
-        academic_calendar.save(functions=[])
+        academic_calendars = [
+            AcademicCalendarFactory(academic_year=an_academic_year,
+                                    reference=academic_calendar_type.DELIBERATION)
+            for _ in range(sessions_quantity)
+        ]
         education_group_year = EducationGroupYearFactory(academic_year=an_academic_year)
-        session_exam_calendars = [SessionExamCalendarFactory(number_session=session,
-                                                             academic_calendar=academic_calendar)
-                                  for session in range(1, sessions_quantity + 1)]
-        offer_year_calendar = OfferYearCalendarFactory(
+
+        for session, academic_calendar in enumerate(academic_calendars):
+            SessionExamCalendarFactory(number_session=session + 1, academic_calendar=academic_calendar)
+
+        offer_year_calendars = [OfferYearCalendarFactory(
             academic_calendar=academic_calendar,
-            education_group_year=education_group_year
-        )
-        self.assertEquals(
-            get_sessions_dates(academic_calendar.reference, education_group_year),
+            education_group_year=education_group_year)
+            for academic_calendar in academic_calendars]
+
+        self.assertEqual(
+            get_sessions_dates(education_group_year),
             {
-                'session{}'.format(s): offer_year_calendar for s in range(1, sessions_quantity + 1)
+                academic_calendar_type.DELIBERATION.lower(): {
+                    'session{}'.format(s + 1): offer_year_calendar
+                    for s, offer_year_calendar in enumerate(offer_year_calendars)
+                }
             }
         )
 
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    def test_education_edit_administrative_data(self,
-                                                mock_render,
-                                                mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        from base.views.education_group import education_group_edit_administrative_data
+    def test_education_content(self):
+        an_education_group = EducationGroupYearFactory()
+        self.initialize_session()
+        url = reverse("education_group_diplomas", args=[an_education_group.id, an_education_group.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertTemplateUsed(response, "education_group/tab_diplomas.html")
 
-        request_factory = RequestFactory()
-        request = request_factory.get(reverse(education_group_edit_administrative_data, kwargs={
-            'education_group_year_id': education_group_year.id
-        }))
-        request.user = mock.Mock()
-
-        education_group_edit_administrative_data(request, education_group_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_edit_administrative_data.html')
-        self.assertEqual(context['education_group_year'], education_group_year)
-        self.assertEqual(context['course_enrollment_validity'], False)
-        self.assertEqual(context['formset_session_validity'], False)
-
-
-    @mock.patch('django.contrib.auth.decorators')
-    @mock.patch('base.views.layout.render')
-    @mock.patch('base.models.education_group_year.find_by_id')
-    def test_education_content(self,
-                               mock_find_by_id,
-                               mock_render,
-                               mock_decorators):
-        mock_decorators.login_required = lambda x: x
-        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
-        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        request = mock.Mock(method='GET')
-
-        from base.views.education_group import education_group_content
-
-        mock_find_by_id.return_value = education_group_year
-        education_group_content(request, education_group_year.id)
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(template, 'education_group/tab_content.html')
-        self.assertEqual(context['education_group_year'], education_group_year)
-
-    def _prepare_context_education_groups_search(self):
-        # Create a structure [Entity / Entity version]
-        country = CountryFactory()
-        structure = StructureFactory()
-        ssh_entity = EntityFactory(country=country)
-        ssh_entity_v = EntityVersionFactory(acronym="SSH", end_date=None, entity=ssh_entity)
-
-        agro_entity = EntityFactory(country=country)
-        envi_entity = EntityFactory(country=country)
-        ages_entity = EntityFactory(country=country)
-        agro_entity_v = EntityVersionFactory(entity=agro_entity, parent=ssh_entity_v.entity, acronym="AGRO",
-                                             end_date=None)
-        envi_entity_v = EntityVersionFactory(entity=envi_entity, parent=agro_entity_v.entity, acronym="ENVI",
-                                             end_date=None)
-        ages_entity_v = EntityVersionFactory(entity=ages_entity, parent=agro_entity_v.entity, acronym="AGES",
-                                             end_date=None)
-
-        # Create EG and put entity charge [AGRO]
-        agro_education_group = EducationGroupFactory()
-        agro_education_group_type = EducationGroupTypeFactory(category=TRAINING)
-
-        agro_education_group_year = EducationGroupYearFactory(acronym='EDPH2',
-                                                              academic_year=self.academic_year,
-                                                              education_group=agro_education_group,
-                                                              education_group_type=agro_education_group_type)
-
-        agro_offer = OfferFactory()
-        agro_offer_year=OfferYearFactory(offer=agro_offer,
-                                    entity_management=structure,
-                                    entity_administration_fac=structure)
-
-        OfferYearEntityFactory(offer_year=agro_offer_year,
-                               entity=agro_entity,
-                               education_group_year=agro_education_group_year,
-                               type=offer_year_entity_type.ENTITY_MANAGEMENT)
-
-        # Create EG and put entity charge [ENVI]
-        envi_education_group = EducationGroupFactory()
-        envi_education_group_type = EducationGroupTypeFactory(category=TRAINING)
-
-        envi_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                         education_group=envi_education_group,
-                                                         education_group_type=envi_education_group_type)
-
-        envi_offer = OfferFactory()
-        envi_offer_year=OfferYearFactory(offer=envi_offer,
-                                         entity_management=structure,
-                                         entity_administration_fac=structure)
-
-        OfferYearEntityFactory(offer_year=envi_offer_year,
-                               entity=envi_entity,
-                               education_group_year=envi_education_group_year,
-                               type=offer_year_entity_type.ENTITY_MANAGEMENT)
-
-        # Create EG and put entity charge [AGES]
-        ages_education_group = EducationGroupFactory()
-        ages_education_group_type = EducationGroupTypeFactory(category=TRAINING)
-
-        ages_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                         education_group=ages_education_group,
-                                                         education_group_type=ages_education_group_type)
-
-        ages_offer = OfferFactory()
-        ages_offer_year=OfferYearFactory(offer=ages_offer,
-                                    entity_management=structure,
-                                    entity_administration_fac=structure)
-
-        OfferYearEntityFactory(offer_year=ages_offer_year,
-                               entity=ages_entity,
-                               education_group_year=ages_education_group_year,
-                               type=offer_year_entity_type.ENTITY_MANAGEMENT)
+    def initialize_session(self):
+        person = PersonFactory()
+        person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        self.client.force_login(person.user)
 
 
 class EducationGroupAdministrativedata(TestCase):
     def setUp(self):
         self.person = PersonFactory()
 
-        self.permission_access = Permission.objects.get(codename='can_access_offer')
+        self.permission_access = Permission.objects.get(codename='can_access_education_group')
         self.person.user.user_permissions.add(self.permission_access)
 
         self.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
@@ -523,8 +457,11 @@ class EducationGroupAdministrativedata(TestCase):
         self.program_manager = ProgramManagerFactory(person=self.person,
                                                      education_group=self.education_group_year.education_group)
 
-        self.url = reverse('education_group_administrative', args=[self.education_group_year.id])
+        self.url = reverse('education_group_administrative', args=[
+            self.education_group_year.id, self.education_group_year.id
+        ])
         self.client.force_login(self.person.user)
+        create_current_academic_year()
 
     def test_when_not_logged(self):
         self.client.logout()
@@ -558,6 +495,41 @@ class EducationGroupAdministrativedata(TestCase):
 
         self.assertFalse(response.context["can_edit_administrative_data"])
 
+    def test_education_group_non_existent(self):
+        self.education_group_year.delete()
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertTemplateUsed(response, "page_not_found.html")
+
+    def test_with_education_group_year_of_type_mini_training(self):
+        mini_training_education_group_year = EducationGroupYearFactory()
+        mini_training_education_group_year.education_group_type.category = education_group_categories.MINI_TRAINING
+        mini_training_education_group_year.education_group_type.save()
+
+        url = reverse("education_group_administrative",
+                      args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
+        response = self.client.get(url)
+
+        expected_url = reverse("education_group_read",
+                               args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    def test_with_education_group_year_of_type_group(self):
+        group_education_group_year = EducationGroupYearFactory()
+        group_education_group_year.education_group_type.category = education_group_categories.GROUP
+        group_education_group_year.education_group_type.save()
+
+        url = reverse("education_group_administrative",
+                      args=[group_education_group_year.id, group_education_group_year.id])
+        response = self.client.get(url)
+
+        expected_url = reverse("education_group_read",
+                               args=[group_education_group_year.id, group_education_group_year.id])
+        self.assertEqual(expected_url, response.url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
     def test_user_can_edit_administrative_data(self):
         response = self.client.get(self.url)
 
@@ -566,18 +538,67 @@ class EducationGroupAdministrativedata(TestCase):
 
         self.assertTrue(response.context["can_edit_administrative_data"])
 
+    def test_get_good_mandataries(self):
+        ed = EducationGroupFactory()
+        ac = AcademicYearFactory(current=True)
+        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
 
+        url = reverse('education_group_administrative', args=[
+            edy.id, edy.id
+        ])
+
+        combinations = list(product((0, 1, -1), repeat=2))
+        one_day = datetime.timedelta(days=1)
+        good_dates = [
+            (ac.start_date + combi[0]*one_day, ac.end_date + combi[1]*one_day)
+            for combi in combinations
+        ]
+        bad_dates = [
+            (ac.start_date - 2*one_day, ac.start_date - one_day),
+            (ac.end_date + one_day, ac.end_date + 2*one_day),
+        ]
+
+        good_mandataries = [
+            MandataryFactory(
+                mandate__education_group=ed,
+                start_date=date[0],
+                end_date=date[1]
+            )
+            for date in good_dates
+        ]
+        bad_mandataries = [
+            MandataryFactory(
+                mandate__education_group=ed,
+                start_date=date[0],
+                end_date=date[1]
+            )
+            for date in bad_dates
+        ]
+        response = self.client.get(url)
+        self.assertCountEqual(good_mandataries, response.context['mandataries'])
+        for bad in bad_mandataries:
+            self.assertFalse(bad in response.context['mandataries'])
+
+
+@override_flag('education_group_update', active=True)
+@override_flag('education_group_administrative_data_update', active=True)
 class EducationGroupEditAdministrativeData(TestCase):
     def setUp(self):
+        today = datetime.date.today()
         self.person = PersonFactory()
 
         self.permission = Permission.objects.get(codename='can_edit_education_group_administrative_data')
         self.person.user.user_permissions.add(self.permission)
 
+        self.academic_year = AcademicYearFactory(start_date=today,
+                                                 end_date=today.replace(year=today.year + 1),
+                                                 year=today.year)
+
         self.education_group_year = EducationGroupYearFactory()
         self.program_manager = ProgramManagerFactory(person=self.person,
                                                      education_group=self.education_group_year.education_group)
-        self.url = reverse('education_group_edit_administrative', args=[self.education_group_year.id])
+        self.url = reverse('education_group_edit_administrative',
+                           args=[self.education_group_year.id, self.education_group_year.id])
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -606,3 +627,555 @@ class EducationGroupEditAdministrativeData(TestCase):
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
+
+    def test_with_education_group_year_of_type_mini_training(self):
+        mini_training_education_group_year = EducationGroupYearFactory()
+        mini_training_education_group_year.education_group_type.category = education_group_categories.MINI_TRAINING
+        mini_training_education_group_year.education_group_type.save()
+
+        url = reverse("education_group_edit_administrative",
+                      args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_with_education_group_year_of_type_group(self):
+        group_education_group_year = EducationGroupYearFactory()
+        group_education_group_year.education_group_type.category = education_group_categories.GROUP
+        group_education_group_year.education_group_type.save()
+
+        url = reverse("education_group_edit_administrative",
+                      args=[group_education_group_year.id, group_education_group_year.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('base.business.education_group.can_user_edit_administrative_data')
+    def test_education_edit_administrative_data(self, mock_can_user_edit_administrative_data):
+        from base.views.education_group import education_group_edit_administrative_data
+        self.client.force_login(SuperUserFactory())
+
+        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        mock_can_user_edit_administrative_data.return_value = True
+
+        response = self.client.get(reverse(education_group_edit_administrative_data, kwargs={
+            'root_id': education_group_year.id,
+            'education_group_year_id': education_group_year.id
+        }))
+
+        self.assertTemplateUsed(response, 'education_group/tab_edit_administrative_data.html')
+        self.assertEqual(response.context['education_group_year'], education_group_year)
+        self.assertEqual(response.context['course_enrollment_validity'], False)
+        self.assertEqual(response.context['formset_session_validity'], False)
+        self.assertIn('additional_info_form', response.context)
+
+
+class AdmissionConditionEducationGroupYearTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+        AcademicYearFactory(current=True)
+        cls.education_group_parent = TrainingFactory(acronym="Parent", academic_year=cls.academic_year)
+        cls.education_group_child = TrainingFactory(acronym="Child_1", academic_year=cls.academic_year)
+
+        cls.agregation_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonAgregationFactory(academic_year=cls.academic_year)
+        )
+        cls.bachelor_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonBachelorFactory(academic_year=cls.academic_year)
+        )
+        cls.special_master_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonSpecializedMasterFactory(academic_year=cls.academic_year)
+        )
+        cls.master_adm_cond = AdmissionConditionFactory(
+            education_group_year=EducationGroupYearCommonMasterFactory(academic_year=cls.academic_year)
+        )
+        GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
+
+        cls.cms_label_for_child = TranslatedTextFactory(
+            text_label__entity=entity_name.OFFER_YEAR,
+            reference=cls.education_group_child.id
+        )
+
+        cls.person = PersonWithPermissionsFactory(
+            "can_access_education_group",
+            "change_admissioncondition",
+            "change_commonadmissioncondition",
+        )
+        cls.url = reverse(
+            "education_group_year_admission_condition_edit",
+            args=[cls.education_group_parent.pk, cls.education_group_child.pk]
+        )
+
+    def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_groups.perms.AdmissionConditionPerms.is_eligible",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+        self.client.force_login(self.person.user)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_user_without_permission(self):
+        an_other_user = UserFactory()
+        self.client.force_login(an_other_user)
+
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_user_has_link_to_edit_conditions(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertGreater(len(soup.select('button.btn-publish')), 0)
+
+    @mock.patch('base.business.education_groups.perms.AdmissionConditionPerms.is_eligible', return_value=False)
+    def test_user_has_not_link_to_edit_conditions(self, mock_perms):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('button.btn-publish')), 0)
+
+    def test_case_free_text_is_not_show_when_common(self):
+        AcademicYearFactory(current=True)
+        common_bachelor = EducationGroupYearCommonBachelorFactory()
+        url_edit_common = reverse(
+            "education_group_year_admission_condition_edit",
+            args=[common_bachelor.pk, common_bachelor.pk]
+        )
+
+        response = self.client.get(url_edit_common)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+
+        self.assertFalse(response.context['info']['show_free_text'])
+
+    def test_case_admission_condition_remove_line_not_found(self):
+        delete_url = reverse(
+            "education_group_year_admission_condition_remove_line",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.get(delete_url, data={'id': 0})
+
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+
+    def test_case_admission_condition_remove_line(self):
+        delete_url = reverse(
+            "education_group_year_admission_condition_remove_line",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
+        qs = AdmissionConditionLine.objects.filter(admission_condition=admission_condition)
+
+        self.assertEqual(qs.count(), 1)
+        response = self.client.get(delete_url, data={'id': admission_condition_line.pk})
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        self.assertEqual(qs.count(), 0)
+
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_line_get',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_line_post')
+    def test_case_admission_condition_update_line(self, mock_edit_post, mock_edit_get):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_line",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.get(update_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertFalse(mock_edit_post.called)
+        self.assertTrue(mock_edit_get.called)
+
+    @mock.patch('base.views.education_group.get_content_of_admission_condition_line')
+    @mock.patch('base.views.education_group.render')
+    def test_case_admission_condition_update_existing_line(self, mock_render, mock_get_content):
+        section = 'ucl_bachelors'
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition,
+                                                                         section=section)
+
+        mock_get_content.return_value = {
+            'message': 'read',
+            'section': section,
+            'id': admission_condition_line.id,
+            'diploma': 'Diploma',
+            'conditions': 'Conditions',
+            'access': CONDITION_ADMISSION_ACCESSES[2][0],
+            'remarks': 'Remarks'
+        }
+
+        info = {
+            'section': section,
+            'language': 'fr-be',
+            'id': admission_condition_line.id,
+        }
+        request = RequestFactory().get('/?{}'.format(urllib.parse.urlencode(info)))
+
+        from base.views.education_group import education_group_year_admission_condition_update_line_get
+        response = education_group_year_admission_condition_update_line_get(request)
+
+        mock_get_content.assert_called_once_with('read', admission_condition_line, '')
+
+    @mock.patch('base.views.education_group.get_content_of_admission_condition_line')
+    @mock.patch('base.views.education_group.render')
+    def test_education_group_year_admission_condition_update_line_get_no_admission_condition_line(self,
+                                                                                                  mock_render,
+                                                                                                  mock_get_content):
+        info = {
+            'section': 'ucl_bachelors',
+            'language': 'fr',
+        }
+        request = RequestFactory().get('/?section={section}&language={language}'.format(**info))
+
+        from base.views.education_group import education_group_year_admission_condition_update_line_get
+        response = education_group_year_admission_condition_update_line_get(request)
+
+        mock_get_content.not_called()
+
+    def test_save_form_to_admission_condition_line_creation_mode_true(self):
+        from base.views.education_group import save_form_to_admission_condition_line
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+        form = mock.Mock(cleaned_data={
+            'language': 'fr',
+            'section': 'ucl_bachelors',
+            'admission_condition_line': '',
+            'diploma': 'Diploma',
+            'conditions': 'Conditions',
+            'remarks': 'Remarks',
+            'access': CONDITION_ADMISSION_ACCESSES[2][0],
+        })
+
+        request = RequestFactory().get('/')
+
+        queryset = AdmissionConditionLine.objects.filter(admission_condition=admission_condition)
+        self.assertEqual(queryset.count(), 0)
+
+        save_form_to_admission_condition_line(self.education_group_child.id, creation_mode=True, form=form)
+
+        self.assertEqual(queryset.count(), 1)
+
+    def test_save_form_to_admission_condition_line_creation_mode_false(self):
+        from base.views.education_group import save_form_to_admission_condition_line
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
+        form = mock.Mock(cleaned_data={
+            'language': 'fr',
+            'section': 'ucl_bachelors',
+            'admission_condition_line': admission_condition_line.id,
+            'diploma': 'Diploma',
+            'conditions': 'Conditions',
+            'remarks': 'Remarks',
+            'access': CONDITION_ADMISSION_ACCESSES[2][0],
+        })
+
+        queryset = AdmissionConditionLine.objects.filter(admission_condition=admission_condition)
+        self.assertEqual(queryset.count(), 1)
+
+        save_form_to_admission_condition_line(self.education_group_child.id, creation_mode=False, form=form)
+
+        self.assertEqual(queryset.count(), 1)
+
+    @mock.patch('base.views.education_group.save_form_to_admission_condition_line')
+    def test_education_group_year_admission_condition_update_line_post_bad_form(self, mock_save_form):
+        from base.views.education_group import education_group_year_admission_condition_update_line_post
+        form = {
+            'admission_condition_line': '',
+        }
+        request = RequestFactory().post('/', form)
+        response = education_group_year_admission_condition_update_line_post(request,
+                                                                             self.education_group_parent.id,
+                                                                             self.education_group_child.id)
+        # the form is not called because this one is not valid
+        mock_save_form.not_called()
+        # we can not test the redirection because we don't have a client with the returned response.
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    @mock.patch('base.views.education_group.save_form_to_admission_condition_line')
+    def test_education_group_year_admission_condition_update_line_post_creation_mode(self, mock_save_form):
+        from base.views.education_group import education_group_year_admission_condition_update_line_post
+        form = {
+            'admission_condition_line': '',
+            'language': 'fr',
+            'section': 'ucl_bachelors',
+            'diploma': 'Diploma',
+            'conditions': 'Conditions',
+            'remarks': 'Remarks',
+            'access': CONDITION_ADMISSION_ACCESSES[2][0],
+        }
+        request = RequestFactory().post('/', form)
+        response = education_group_year_admission_condition_update_line_post(request,
+                                                                             self.education_group_parent.id,
+                                                                             self.education_group_child.id)
+
+        education_group_id, creation_mode, unused = mock_save_form.call_args[0]
+        self.assertEqual(education_group_id, self.education_group_child.id)
+        self.assertEqual(creation_mode, True)
+        # we can not test the redirection because we don't have a client with the returned response.
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    @mock.patch('base.views.education_group.save_form_to_admission_condition_line')
+    def test_education_group_year_admission_condition_update_line_post_creation_mode_off(self, mock_save_form):
+        from base.views.education_group import education_group_year_admission_condition_update_line_post
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
+        form = {
+            'admission_condition_line': admission_condition_line.id,
+            'language': 'fr',
+            'section': 'ucl_bachelors',
+            'diploma': 'Diploma',
+            'conditions': 'Conditions',
+            'remarks': 'Remarks',
+            'access': CONDITION_ADMISSION_ACCESSES[2][0]
+        }
+        request = RequestFactory().post('/', form)
+        result = education_group_year_admission_condition_update_line_post(request,
+                                                                           self.education_group_parent.id,
+                                                                           self.education_group_child.id)
+
+        education_group_id, creation_mode, unused = mock_save_form.call_args[0]
+        self.assertEqual(education_group_id, self.education_group_child.id)
+        self.assertEqual(creation_mode, False)
+
+    def test_get_content_of_admission_condition_line(self):
+        from base.views.education_group import get_content_of_admission_condition_line
+
+        admission_condition_line = mock.Mock(diploma='diploma',
+                                             conditions='conditions',
+                                             access=CONDITION_ADMISSION_ACCESSES[2][0],
+                                             remarks='remarks')
+
+        response = get_content_of_admission_condition_line('updated', admission_condition_line, '')
+        self.assertEqual(response['message'], 'updated')
+        self.assertEqual(response['diploma'], 'diploma')
+        self.assertEqual(response['access'], CONDITION_ADMISSION_ACCESSES[2][0])
+
+    @mock.patch('base.business.education_groups.perms.AdmissionConditionPerms.is_eligible', return_value=False)
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
+    def test_case_update_text_admission_condition_without_perms(self, mock_update_get, mock_update_post, mock_perms):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.get(update_url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+        self.assertFalse(mock_update_post.called)
+        self.assertFalse(mock_update_get.called)
+
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    def test_case_get_update_text_admission_condition(self, mock_update_get, mock_update_post):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.get(update_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertFalse(mock_update_post.called)
+        self.assertTrue(mock_update_get.called)
+
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post',
+                side_effect=lambda *args, **kwargs: HttpResponse())
+    @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
+    def test_case_post_update_text_admission_condition(self, mock_update_get, mock_update_post):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        response = self.client.post(update_url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        self.assertTrue(mock_update_post.called)
+        self.assertFalse(mock_update_get.called)
+
+    @mock.patch('base.views.education_group.render')
+    def test_get_update_text_admission_condition_ensure_context_data(self, mock_render):
+        AdmissionCondition.objects.create(
+            education_group_year=self.education_group_child,
+            text_free='texte en français',
+            text_free_en='text in english'
+        )
+
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        querystring_data = {'section': 'free', 'language': 'fr', 'title': 'Free Text'}
+        request = RequestFactory().get(update_url, data=querystring_data)
+        request.user = self.person.user
+
+        from base.views.education_group import education_group_year_admission_condition_update_text_get
+        education_group_year_admission_condition_update_text_get(request, self.education_group_child.id)
+
+        unused_request, template_name, context = mock_render.call_args[0]
+
+        self.assertEqual(template_name, 'education_group/condition_text_edit.html')
+        self.assertIn('form', context)
+
+        form = context['form']
+        self.assertIsInstance(form, UpdateTextForm)
+        self.assertEqual(form.initial['section'], querystring_data['section'])
+        self.assertEqual(form.initial['text_fr'], self.education_group_child.admissioncondition.text_free)
+        self.assertEqual(form.initial['text_en'], self.education_group_child.admissioncondition.text_free_en)
+
+    def test_education_group_year_admission_condition_update_text_post_form_is_valid(self):
+        AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        post_data = {'section': 'free', 'text_fr': 'Texte en Français', 'text_en': 'Text in English'}
+        request = RequestFactory().post(update_url, data=post_data)
+        request.user = self.person.user
+
+        from base.views.education_group import education_group_year_admission_condition_update_text_post
+        response = education_group_year_admission_condition_update_text_post(
+            request,
+            self.education_group_parent.id,
+            self.education_group_child.id,
+        )
+
+        self.education_group_child.admissioncondition.refresh_from_db()
+        self.assertEqual(self.education_group_child.admissioncondition.text_free, post_data['text_fr'])
+        self.assertEqual(self.education_group_child.admissioncondition.text_free_en, post_data['text_en'])
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    @mock.patch('base.forms.education_group_admission.UpdateTextForm.is_valid', return_value=False)
+    def test_education_group_year_admission_condition_update_text_post_form_is_not_valid(self, mock_is_valid):
+        update_url = reverse(
+            "education_group_year_admission_condition_update_text",
+            args=[self.education_group_parent.pk, self.education_group_child.pk]
+        )
+        request = RequestFactory().post(update_url, data={})
+
+        from base.views.education_group import education_group_year_admission_condition_update_text_post
+        response = education_group_year_admission_condition_update_text_post(
+            request,
+            self.education_group_parent.id,
+            self.education_group_child.id,
+        )
+
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    def test_webservice_education_group_year_admission_condition_line_order(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+        admission_condition = AdmissionCondition.objects.create(education_group_year=self.education_group_child)
+
+        admission_condition_line_1 = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
+        admission_condition_line_2 = AdmissionConditionLine.objects.create(admission_condition=admission_condition)
+
+        self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
+
+        url = reverse('education_group_year_admission_condition_line_order', kwargs={
+            'root_id': self.education_group_parent.id,
+            'education_group_year_id': self.education_group_child.id,
+        })
+
+        data = {
+            'action': 'down',
+            'record': admission_condition_line_1.id,
+        }
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        admission_condition_line_1.refresh_from_db()
+        admission_condition_line_2.refresh_from_db()
+
+        self.assertGreater(admission_condition_line_1.order, admission_condition_line_2.order)
+
+        data = {
+            'action': 'up',
+            'record': admission_condition_line_1.id,
+        }
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+        admission_condition_line_1.refresh_from_db()
+        admission_condition_line_2.refresh_from_db()
+
+        self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
+
+    def test_education_group_year_admission_condition_change_lang_tab(self):
+        url = reverse('tab_lang_edit', args=[self.education_group_parent.pk, self.education_group_child.pk, 'fr'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    def test_get_appropriate_common_offer_for_common(self):
+        edy = EducationGroupYearCommonFactory(
+            education_group_type__minitraining=True,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, None)
+
+    def test_get_appropriate_common_offer_for_bachelor(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.bachelor_adm_cond)
+
+    def test_get_appropriate_common_offer_for_agregation(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.agregation_adm_cond)
+
+    def test_get_appropriate_common_offer_for_master(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_M1.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_180_240.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
+    def test_get_appropriate_common_offer_for_special_master(self):
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.MASTER_MC.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.special_master_adm_cond)

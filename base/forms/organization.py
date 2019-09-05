@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.forms import ModelForm
-from base.models import organization
+import django_filters
+from django.utils.translation import ugettext_lazy as _
+
+from base.models.organization import Organization
 
 
-class OrganizationForm(ModelForm):
+class OrganizationFilter(django_filters.FilterSet):
+    acronym = django_filters.CharFilter(lookup_expr='icontains', label=_('Acronym'))
+    name = django_filters.CharFilter(lookup_expr='icontains', label=_('Name'))
+
     class Meta:
-        model = organization.Organization
-        fields = ['acronym', 'name', 'website', 'prefix']
+        model = Organization
+        fields = ['acronym', 'name', 'type']

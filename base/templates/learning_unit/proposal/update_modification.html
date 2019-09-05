@@ -1,0 +1,36 @@
+{% extends "learning_unit/learning_unit_layout.html" %}
+{% load bootstrap3 %}
+
+{% block proposal_management %}
+    {% include "learning_unit/blocks/form/update_proposal.html" with form=form_proposal %}
+
+<script>
+    function showWarningIfInconsistentState(){
+        var idSelect = '{{ form.state.auto_id }}';
+        var initialState='{{form.state.value}}';
+        var toState = $('#'+idSelect).val();
+
+        if (( initialState==='CENTRAL' && toState==='FACULTY' ) ||
+                ( initialState==='REFUSED' && toState==='ACCEPTED')) {
+            var modal = $('#modalWarningStateModification');
+            // Initial State
+            var initialStateStr = getTextFromSelect(idSelect, initialState);
+            modal.find('#initialState').html(initialStateStr);
+            // To State
+            var toStateStr = getTextFromSelect(idSelect, toState);
+            modal.find('#toState').html(toStateStr);
+            modal.modal("show");
+            return false; // Prevent form submission
+        }else{
+            $('form').submit();
+        }
+    }
+
+    function getTextFromSelect(idSelect, value) {
+        return $('#' + idSelect +' option[value=' +  value + ']').text()
+    }
+</script>
+{% endblock proposal_management%}
+
+
+

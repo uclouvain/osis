@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,14 +27,13 @@ import datetime
 import operator
 import string
 
-import factory
 import factory.fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from osis_common.utils.datetime import get_tzinfo
-from base.tests.factories.education_group import EducationGroupFactory
 from base.models.enums import mandate_type as mandate_types
+from base.tests.factories.education_group import EducationGroupFactory
+
 fake = Faker()
 
 
@@ -43,11 +42,9 @@ class MandateFactory(DjangoModelFactory):
         model = "base.Mandate"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
+                                          datetime.datetime(2017, 3, 1))
     education_group = factory.SubFactory(EducationGroupFactory)
-
-
     function = factory.Iterator(mandate_types.MANDATE_TYPES,
                             getter=operator.itemgetter(0))
     qualification = factory.Sequence(lambda n: 'qualification - %d' % n)

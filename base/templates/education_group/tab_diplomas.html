@@ -1,5 +1,6 @@
-{% extends "layout.html" %}
+{% extends "education_group/layout_detail.html" %}
 {% load i18n %}
+{% load staticfiles education_group format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -7,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -24,62 +25,30 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "education_group/breadcrumb.html" %}
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" tab_to_show='diplomas_certificates' %}
 {% endblock %}
 
-{% block content %}
+{% block details %}
+    <label>{% trans 'Leads to diploma/certificate' %}</label><br>
+    {{ education_group_year.joint_diploma|yesno|title }}
 
-{% include "education_group/header.html" %}
+    <br><br>
 
-<div class="panel panel-default">
-    <div class="panel-body" id="tabs">
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="diplomas">
-                <a class="button" onclick="showDiv()">
-                    <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
-                </a>
-                <div class="row">
-                    {% include "education_group/training_tree.html" %}
-                    <div id="panel-data" class="col-md-9">
-                        {% include "education_group/tabs.html" %}
-                        <br>
-                        <label>{% trans 'university_certificate_desc' %}</label><br>
-                        {% if education_group_year.university_certificate %}
-                            {% trans 'yes'%}
-                        {% else %}
-                            {% trans 'no'%}
-                        {% endif %}
-                        <br><br>
-                        <label>{% trans 'diploma_title'%}</label><br>
-                        {{education_group_year.diploma_printing_title | default_if_none:'-'}}
-                        <br><br>
-                        <label>{% trans 'professionnal_title'%}</label><br>
-                        {{education_group_year.professional_title | default_if_none:'-'}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-{% block script %}
-<script>
-    $(document).ready(function(){
-		$("#browser").treeview({
-			toggle: function() {
-				console.log("%s was toggled.", $(this).find(">span").text());
-			}
-		});
+    <label>{% trans 'Diploma title' %}</label><br>
+    {{ education_group_year.diploma_printing_title | default_if_none:'-' }}
 
-		$("#add").click(function() {
-			var branches = $("<li><span class='folder'>New Sublist</span><ul>" +
-				"<li><span class='file'>Item1</span></li>" +
-				"<li><span class='file'>Item2</span></li></ul></li>").appendTo("#browser");
-			$("#browser").treeview({
-				add: branches
-			});
-		});
-	});
-</script>
+    <br><br>
+
+    <label>{% trans 'Professionnal title' %}</label><br>
+    {{ education_group_year.professional_title | default_if_none:'-' }}
+
+    <br><br>
+
+    <label>{% trans 'certificate aims'|capfirst %}</label><br>
+    <ul>
+        {% for aim in education_group_year.certificate_aims.all %}
+            <li>{{ aim.section }} - {{ aim.code }} {{ aim.description }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

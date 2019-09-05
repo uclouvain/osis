@@ -5,11 +5,13 @@
     "fields": {
       "learning_container_year": 21,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": "20.00",
+      "hourly_volume_total_annual": "20.00",
+      "hourly_volume_partial_q1": "20.00",
+      "hourly_volume_partial_q2": "0.00",
       "deleted": false
     }
   },
@@ -19,11 +21,13 @@
     "fields": {
       "learning_container_year": 16,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -37,7 +41,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -51,7 +57,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -61,11 +69,13 @@
     "fields": {
       "learning_container_year": 14,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -75,11 +85,13 @@
     "fields": {
       "learning_container_year": 14,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": true
     }
   },
@@ -93,7 +105,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -103,11 +117,13 @@
     "fields": {
       "learning_container_year": 20,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": null,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": true
     }
   },
@@ -117,11 +133,13 @@
     "fields": {
       "learning_container_year": 20,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -131,11 +149,13 @@
     "fields": {
       "learning_container_year": 13,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -145,11 +165,13 @@
     "fields": {
       "learning_container_year": 13,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": true
     }
   },
@@ -159,11 +181,13 @@
     "fields": {
       "learning_container_year": 17,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -173,11 +197,13 @@
     "fields": {
       "learning_container_year": 17,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -191,7 +217,9 @@
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -205,7 +233,9 @@
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": true
     }
   },
@@ -219,7 +249,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -229,11 +261,13 @@
     "fields": {
       "learning_container_year": 15,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -243,11 +277,13 @@
     "fields": {
       "learning_container_year": 15,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -261,7 +297,9 @@
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -275,7 +313,9 @@
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -285,11 +325,13 @@
     "fields": {
       "learning_container_year": 12,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -299,11 +341,13 @@
     "fields": {
       "learning_container_year": 12,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -317,7 +361,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -331,7 +377,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -345,7 +393,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -355,11 +405,13 @@
     "fields": {
       "learning_container_year": 11,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -369,11 +421,13 @@
     "fields": {
       "learning_container_year": 11,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -387,7 +441,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -401,7 +457,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -415,7 +473,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -425,11 +485,13 @@
     "fields": {
       "learning_container_year": 18,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -439,11 +501,13 @@
     "fields": {
       "learning_container_year": 18,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -457,7 +521,9 @@
       "type": null,
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -467,11 +533,13 @@
     "fields": {
       "learning_container_year": 22,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": null,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -481,11 +549,13 @@
     "fields": {
       "learning_container_year": 22,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -500,7 +570,9 @@
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": true
     }
   },
@@ -515,7 +587,9 @@
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -530,7 +604,9 @@
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -545,7 +621,9 @@
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -560,7 +638,9 @@
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": null,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": true
     }
   },
@@ -575,7 +655,9 @@
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -586,11 +668,13 @@
       "external_id": "osis.learning_component_year_32082_32082_PRACTICAL_EXERCISES_2017",
       "learning_container_year": 23,
       "title": null,
-      "acronym": "TP",
+      "acronym": "PP",
       "type": "PRACTICAL_EXERCISES",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   },
@@ -601,11 +685,13 @@
       "external_id": "osis.learning_component_year_32082_32082_LECTURING_2017",
       "learning_container_year": 23,
       "title": null,
-      "acronym": "CM",
+      "acronym": "PM",
       "type": "LECTURING",
       "comment": null,
       "planned_classes": 1,
-      "hourly_volume_partial": null,
+      "hourly_volume_total_annual": null,
+      "hourly_volume_partial_q1": null,
+      "hourly_volume_partial_q2": null,
       "deleted": false
     }
   }

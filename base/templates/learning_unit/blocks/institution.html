@@ -1,0 +1,55 @@
+{% load bootstrap3 i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        {% if learning_unit_external_form %}
+            {% bootstrap_field learning_unit_year_form.country_external_institution %}
+            {% bootstrap_field learning_unit_year_form.campus %}
+        {% else %}
+            <div class="form-group">
+                {% if learning_unit_year.campus %}
+                    <label>{% trans 'Institution' %}</label><br>
+                    {{ learning_unit_year.campus.organization.name }}
+                {% endif %}
+            </div>
+            {% bootstrap_field learning_unit_year_form.campus %}
+        {% endif %}
+
+        <div class="row form-group">
+            {% bootstrap_field learning_container_year_form.requirement_entity form_group_class="col-md-12"%}
+        </div>
+
+        <div class="row form-group">
+            {% bootstrap_field learning_container_year_form.allocation_entity form_group_class="col-md-12"%}
+        </div>
+
+        <div class="row form-group">
+            {% bootstrap_field learning_container_year_form.additional_entity_1 form_group_class="col-md-9" %}
+            <br>
+            {% bootstrap_field learning_container_year_form.country_additional_entity_1 show_label=False form_group_class="col-md-3" %}
+        </div>
+
+        <div class="row form-group">
+            {% bootstrap_field learning_container_year_form.additional_entity_2 form_group_class="col-md-9" %}
+            <br>
+            {% bootstrap_field learning_container_year_form.country_additional_entity_2 show_label=False form_group_class="col-md-3" %}
+        </div>
+
+        {% bootstrap_field learning_unit_year_form.academic_year %}
+    </div>
+</div>
+
+{{ learning_container_year_form.media }}
+
+<style>
+    /* Overrided to get items in list */
+    .select2-container .select2-selection--multiple {
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-grid;
+        min-height: 32px;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+</style>
+

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from enum import Enum
 from django.utils.translation import ugettext_lazy as _
 
-
-class ProposalState(Enum):
-    FACULTY = "FACULTY"
-    CENTRAL = "CENTRAL"
-    SUSPENDED = "SUSPENDED"
-    ACCEPTED = "ACCEPTED"
-    REFUSED = "REFUSED"
+from base.models.utils.utils import ChoiceEnum
 
 
-CHOICES = tuple((name, _(name)) for name, member in ProposalState.__members__.items())
+class ProposalState(ChoiceEnum):
+    FACULTY = _("Faculty")
+    CENTRAL = _("Central")
+    SUSPENDED = _("Suspended")
+    ACCEPTED = _("Accepted")
+    REFUSED = _("Refused")

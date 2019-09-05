@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@ import datetime
 from django.utils import timezone
 from django.test import TestCase
 from base.models import academic_year
+from base.models.academic_year import AcademicYear
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from django.core.exceptions import ObjectDoesNotExist
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 now = datetime.datetime.now()
 
@@ -81,13 +81,6 @@ class SingleAcademicYearTest(TestCase):
 
 
 class PeriodAcademicYearTest(TestCase):
-    def test_future_academic_year(self):
-        academic_year = AcademicYearFactory.build(year=(now.year + 1),
-                                                  start_date=datetime.datetime(now.year + 1, now.month, 15),
-                                                  end_date=datetime.datetime(now.year + 2, now.month, 28))
-        with self.assertRaises(AttributeError):
-            academic_year.save()
-
     def test_start_date_year_same_of_year(self):
         academic_year = AcademicYearFactory.build(year=now.year,
                                                   start_date=datetime.datetime(now.year + 1, now.month, 15),
@@ -113,3 +106,29 @@ class PeriodAcademicYearTest(TestCase):
             academic_year.AcademicYear.objects.create(year=2017,
                                                       start_date=datetime.datetime(2017, 9, 14),
                                                       end_date=datetime.datetime(2017, 9, 30))
+
+
+class AcademicYearNextPropertyTest(TestCase):
+    def setUp(self):
+        self.current_ac = create_current_academic_year()
+        self.next_ac = AcademicYearFactory(year=self.current_ac.year + 1)
+
+    def test_next_property_case_have_next(self):
+        self.assertEqual(self.current_ac.next(), self.next_ac)
+
+    def test_next_property_case_doesnt_have_next(self):
+        with self.assertRaises(AcademicYear.DoesNotExist):
+            self.next_ac.next()
+
+
+class AcademicYearPastPropertyTest(TestCase):
+    def setUp(self):
+        self.current_ac = create_current_academic_year()
+        self.prev_ac = AcademicYearFactory(year=self.current_ac.year - 1)
+
+    def test_next_property_case_have_next(self):
+        self.assertEqual(self.current_ac.past(), self.prev_ac)
+
+    def test_next_property_case_doesnt_have_next(self):
+        with self.assertRaises(AcademicYear.DoesNotExist):
+            self.prev_ac.past()

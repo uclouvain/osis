@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,50 +24,35 @@
 #
 ##############################################################################
 from django.http import HttpResponse
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
-from openpyxl.styles import Color, Style, PatternFill, Font, colors
-from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from openpyxl import Workbook
+from openpyxl.styles import Color, Style, PatternFill, Font, colors
+from openpyxl.writer.excel import save_virtual_workbook
 
+from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
 
-HEADER = [str(_('academic_year')),
-          str(_('sessionn')),
-          str(_('learning_unit')),
-          str(_('program')),
-          str(_('registration_number')),
-          str(_('lastname')),
-          str(_('firstname')),
-          str(_('numbered_score')),
-          str(_('justification')),
-          str(_('end_date')),
-          str(_('ID'))]
+HEADER = ['Academic year', 'Session', 'Learning unit', 'Program', 'Registration number', 'Lastname',
+          'Firstname', 'Email', 'Numbered scores', 'Justification (A,T)', 'End date Prof']
 
 JUSTIFICATION_ALIASES = {
-    exam_enrollment_justification_type.ABSENCE_JUSTIFIED : "M",
-    exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED : "S",
-    exam_enrollment_justification_type.CHEATING : "T",
+    exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
+    exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED: "S",
+    exam_enrollment_justification_type.CHEATING: "T",
 }
+
+FIRST_COL_LEGEND_ENROLLMENT_STATUS = 7
+FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
 
 
 def export_xls(exam_enrollments):
     workbook = Workbook()
     worksheet = workbook.active
+    _add_header_and_legend_to_file(exam_enrollments, worksheet)
 
-    worksheet.append([str(exam_enrollments[0].learning_unit_enrollment.learning_unit_year)])
-    worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
-    worksheet.append([str('')])
-    __display_creation_date_with_message_about_state(worksheet, row_number=4)
-    __display_warning_about_students_deliberated(worksheet, row_number=5)
-    worksheet.append([str('')])
-    __display_legends(worksheet)
-    worksheet.append([str('')])
-    __columns_resizing(worksheet)
-    worksheet.append(HEADER)
-
-    row_number = 11
+    row_number = 12
     for exam_enroll in exam_enrollments:
         student = exam_enroll.learning_unit_enrollment.student
         offer = exam_enroll.learning_unit_enrollment.offer
@@ -90,13 +75,14 @@ def export_xls(exam_enrollments):
                           student.registration_id,
                           person.last_name,
                           person.first_name,
+                          person.email,
                           score,
                           str(justification),
-                          end_date,
-                          exam_enroll.id])
+                          end_date if exam_enroll.enrollment_state == 'ENROLLED' else ''])
 
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
+        _coloring_enrollment_state(worksheet, row_number, exam_enroll)
 
     lst_exam_enrollments = list(exam_enrollments)
     number_session = lst_exam_enrollments[0].session_exam.number_session
@@ -107,6 +93,23 @@ def export_xls(exam_enrollments):
     response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
+
+
+def _add_header_and_legend_to_file(exam_enrollments, worksheet):
+    ue = exam_enrollments[0].learning_unit_enrollment.learning_unit_year
+    worksheet.append([str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)])
+    worksheet.append([str('Session: %s' % exam_enrollments[0].session_exam.number_session)])
+    worksheet.append([str('')])
+    __display_creation_date_with_message_about_state(worksheet, row_number=4)
+    __display_warning_about_students_deliberated(worksheet, row_number=5)
+    worksheet.append([str('')])
+    show_decimal = ue.decimal_scores
+    __display_legends(worksheet, show_decimal)
+    _color_legend(worksheet)
+    worksheet.append([str('')])
+    __columns_resizing(worksheet)
+    header_translate_list = [str(_(elem)) for elem in HEADER]
+    worksheet.append(header_translate_list)
 
 
 def __columns_resizing(ws):
@@ -120,16 +123,17 @@ def __columns_resizing(ws):
     col_academic_year = ws.column_dimensions['E']
     col_academic_year.width = 18
     col_last_name = ws.column_dimensions['F']
-    col_last_name.width = 30
+    col_last_name.width = 25
     col_first_name = ws.column_dimensions['G']
-    col_first_name.width = 30
-    col_note = ws.column_dimensions['H']
-    col_note.width = 20
+    col_first_name.width = 25
+    col_email = ws.column_dimensions['H']
+    col_email.width = 30
     col_note = ws.column_dimensions['I']
-    col_note.width = 20
-    col_id_exam_enrollment = ws.column_dimensions['K']
-    # Hide the exam_enrollment_id column
-    col_id_exam_enrollment.hidden = True
+    col_note.width = 15
+    col_note = ws.column_dimensions['J']
+    col_note.width = 15
+    col_note = ws.column_dimensions['K']
+    col_note.width = 15
 
 
 def __coloring_non_editable(ws, row_number, score, justification):
@@ -140,12 +144,12 @@ def __coloring_non_editable(ws, row_number, score, justification):
     style_no_modification = Style(fill=pattern_fill_grey)
     column_number = 1
     while column_number < 12:
-        if column_number < 8 or column_number > 9:
+        if column_number < 9 or column_number > 10:
             ws.cell(row=row_number, column=column_number).style = style_no_modification
         else:
             if not(score is None and justification is None):
-                ws.cell(row=row_number, column=8).style = style_no_modification
                 ws.cell(row=row_number, column=9).style = style_no_modification
+                ws.cell(row=row_number, column=10).style = style_no_modification
 
         column_number += 1
 
@@ -155,33 +159,53 @@ def __display_creation_date_with_message_about_state(ws, row_number):
     printing_date = timezone.now()
     printing_date = printing_date.strftime(date_format)
 
-    ws.cell(row=row_number, column=1).value = str('%s' % (_('warn_user_data_can_change') % printing_date))
+    ws.cell(row=row_number, column=1).value = str(
+        '%s' % (_("The data presented on this document correspond to the state of the system dated %(printing_date)s "
+                  "and are likely to evolve") % {'printing_date': printing_date}))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
 def __display_warning_about_students_deliberated(ws, row_number):
-    ws.cell(row=row_number, column=1).value = str(_('students_deliberated_are_not_shown'))
+    ws.cell(row=row_number, column=1).value = str(_("Students deliberated are not shown"))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
-def __display_legends(ws):
+def __display_legends(ws, decimal):
     ws.append([
-        str(_('justification')),
-        str(_('justification_values_accepted') % mdl.exam_enrollment.justification_label_authorized())
+        str(_('Justification')),
+        str(_("Accepted value: %(justification_label_authorized)s ")
+            % {"justification_label_authorized": mdl.exam_enrollment.justification_label_authorized()}),
+        str(''),
+        str(''),
+        str(''),
+        str(''),
+        str(_('Enrolled lately')),
     ])
     ws.append([
         str(''),
-        str(_('justification_other_values') % justification_other_values())
+        str(_("Other values reserved to administration: %(justification_other_values)s ") % {
+            'justification_other_values': justification_other_values()}),
+        str(''),
+        str(''),
+        str(''),
+        str(''),
+        str(_('Unsubscribed lately')),
     ])
     ws.append([
-        str(_('numbered_score')),
-        str(_('score_legend') % "0 - 20")
+        str(_('Numbered scores')),
+        str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
+    ])
+    ws.append([
+            str(''),
+            str(_('Decimals authorized for this learning unit'))
+            if decimal else
+            str(_('Unauthorized decimal for this learning unit'))
     ])
 
 
 def justification_other_values():
-    return "%s, %s" % (_('unjustified_absence_export_legend'),
-                       _('justified_absence_export_legend'))
+    return "%s, %s" % (_('S=Unjustified Absence'),
+                       _('M=Justified Absence'))
 
 
 def __get_session_exam_deadline(exam_enroll):
@@ -194,3 +218,30 @@ def __get_session_exam_deadline(exam_enroll):
                    session_exam_deadline.deadline
 
     return deadline.strftime(date_format) if deadline else "-"
+
+
+def _coloring_enrollment_state(ws, row_number, exam_enroll):
+    """
+    Coloring of the non-editable columns
+    """
+    enrollment_state_color = get_line_color(exam_enroll)
+    if enrollment_state_color:
+        pattern_fill_enrollment_state = PatternFill(patternType='solid',
+                                                    fgColor=Color(enrollment_state_color.lstrip("#")))
+        style_enrollment_state = Style(fill=pattern_fill_enrollment_state)
+        column_number = 1
+        while column_number < 12:
+            ws.cell(row=row_number, column=column_number).style = style_enrollment_state
+            column_number += 1
+
+
+def _color_legend(ws):
+    __apply_style_to_cells(ws, ENROLLED_LATE_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS)
+    __apply_style_to_cells(ws, NOT_ENROLLED_COLOR, FIRST_ROW_LEGEND_ENROLLMENT_STATUS + 1)
+    ws.cell(row=10, column=2).font = Font(color=colors.RED)
+
+
+def __apply_style_to_cells(ws, color_style, row):
+    style_enrollment_state = Style(fill=PatternFill(patternType='solid',
+                                                    fgColor=Color(color_style.lstrip("#"))))
+    ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style = style_enrollment_state

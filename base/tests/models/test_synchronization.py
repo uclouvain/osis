@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -56,10 +56,10 @@ class MultipleSynchronizationTest(TestCase):
 
     def test_find_last_synchronization_date(self):
         sync = synchronization.Synchronization.objects.get(pk=self.latest_sync_id)
-        self.assertEquals(sync.date, synchronization.find_last_synchronization_date())
+        self.assertEqual(sync.date, synchronization.find_last_synchronization_date())
 
 
-class InexistingSynchronizationTest(TestCase):
+class NonExistingSynchronizationTest(TestCase):
 
-    def test_find_last_syncrhonization_date(self):
+    def test_find_last_synchronization_date(self):
         self.assertRaises(ObjectDoesNotExist, synchronization.find_last_synchronization_date())

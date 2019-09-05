@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
-import string
 import datetime
+import string
+
+import factory.fuzzy
 from django.utils import timezone
 from factory.django import DjangoModelFactory
-from faker import Faker
-from osis_common.utils.datetime import get_tzinfo
-fake = Faker()
+
+from base.models.academic_year import AcademicYear
+
+
+def create_current_academic_year():
+    return AcademicYearFactory(year=get_current_year())
+
+
+def get_current_year():
+    now = datetime.datetime.now()
+    ref_date = datetime.datetime(now.year, 9, 15)
+    if now < ref_date:
+        start_date = datetime.date(now.year - 1, 9, 15)
+    else:
+        start_date = datetime.date(now.year, 9, 15)
+    return start_date.year
 
 
 class AcademicYearFactory(DjangoModelFactory):
@@ -40,29 +53,30 @@ class AcademicYearFactory(DjangoModelFactory):
         django_get_or_create = ('year',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
+                                               datetime.datetime(2017, 3, 1))
     year = factory.fuzzy.FuzzyInteger(1950, timezone.now().year)
     start_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year, 9, 15))
-    end_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year+1, 9, 30))
+    end_date = factory.LazyAttribute(lambda obj: datetime.date(obj.year + 1, 9, 30))
+
+    class Params:
+        current = factory.Trait(
+            year=get_current_year()
+        )
 
     @staticmethod
     def produce_in_past(from_year=None, quantity=3):
-        if not from_year:
-            from_year = datetime.date.today().year
-        i = 0
-        while i < quantity:
-            AcademicYearFactory(year=from_year-i)
-            i += 1
+        from_year = from_year or get_current_year()
+        return [AcademicYearFactory(year=from_year-i) for i in range(quantity)]
 
+    @staticmethod
+    def produce_in_future(current_year=None, quantity=10):
+        current_year = current_year or get_current_year()
+        academic_years = [AcademicYearFactory.build(year=current_year + i) for i in range(quantity)]
+        return AcademicYear.objects.bulk_create(academic_years)
 
-class AcademicYearFakerFactory(DjangoModelFactory):
-    class Meta:
-        model = "base.AcademicYear"
-        django_get_or_create = ('year',)
-
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_date = fake.date_time_this_decade(before_now=True, after_now=False, tzinfo=get_tzinfo())
-    end_date = fake.date_time_this_decade(before_now=False, after_now=True, tzinfo=get_tzinfo())
-    year = factory.SelfAttribute('start_date.year')
+    @staticmethod
+    def produce(base_year=None, number_past=1, number_future=1):
+        current_year = base_year or get_current_year()
+        acys = [AcademicYearFactory.build(year=current_year+i) for i in range(-number_past, number_future+1)]
+        return AcademicYear.objects.bulk_create(acys)

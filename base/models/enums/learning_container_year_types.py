@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@
 #
 ##############################################################################
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
 
 COURSE = "COURSE"
 INTERNSHIP = "INTERNSHIP"
@@ -34,12 +36,35 @@ OTHER_INDIVIDUAL = "OTHER_INDIVIDUAL"
 MASTER_THESIS = "MASTER_THESIS"
 EXTERNAL = "EXTERNAL"
 
-LEARNING_CONTAINER_YEAR_TYPES = (
-    (COURSE, _(COURSE)),
-    (INTERNSHIP, _(INTERNSHIP)),
-    (DISSERTATION, _(DISSERTATION)),
-    (OTHER_COLLECTIVE, _(OTHER_COLLECTIVE)),
-    (OTHER_INDIVIDUAL, _(OTHER_INDIVIDUAL)),
-    (MASTER_THESIS, _(MASTER_THESIS)),
-    (EXTERNAL, _(EXTERNAL)),
+LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY = (
+    (OTHER_COLLECTIVE, _("Other collective")),
+    (OTHER_INDIVIDUAL, _("Other individual")),
+    (MASTER_THESIS, _("Thesis")),
+)
+
+
+class LearningContainerYearType(ChoiceEnum):
+    COURSE = _("Course")
+    INTERNSHIP = _("Internship")
+    DISSERTATION = _("Dissertation")
+    OTHER_COLLECTIVE = _("Other collective")
+    OTHER_INDIVIDUAL = _("Other individual")
+    MASTER_THESIS = _("Thesis")
+    EXTERNAL = _("External")
+
+    @classmethod
+    def for_faculty(cls) -> tuple:
+        return cls.OTHER_COLLECTIVE.name, cls.OTHER_INDIVIDUAL.name, cls.MASTER_THESIS.name, cls.INTERNSHIP.name
+
+
+LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY = [COURSE, INTERNSHIP, DISSERTATION]
+
+LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL = LearningContainerYearType.choices()[:-1]
+
+CONTAINER_TYPE_WITH_DEFAULT_COMPONENT = [COURSE, MASTER_THESIS, OTHER_COLLECTIVE, INTERNSHIP, EXTERNAL]
+
+CONTAINER_TYPES_CREATION_PROPOSAL = (
+    (COURSE, _("Course")),
+    (DISSERTATION, _("Dissertation")),
+    (INTERNSHIP, _("Internship"))
 )

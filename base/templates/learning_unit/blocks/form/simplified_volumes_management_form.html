@@ -1,0 +1,87 @@
+{% load staticfiles bootstrap3 %}
+{% load i18n %}
+{% load components_classes %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{{ simplified_volume_management_form.management_form }}
+{% for form in simplified_volume_management_form %}
+        {% bootstrap_field form.id %}
+{% endfor %}
+<div class="table-responsive">
+    <table class="table volumes_simplified">
+        <thead>
+        <tr>
+            <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
+            <th>[</th>
+            <th>(</th>
+            <th class="text-center" title="{% trans 'Volume Q1' %}">{% trans 'Vol. Q1' %}</th>
+            <th>+</th>
+            <th class="text-center" title="{% trans 'Volume Q2' %}">{% trans 'Vol. Q2' %}</th>
+            <th>)</th>
+            <th>=</th>
+            <th class="text-center" title="{% trans 'Volume annuel' %}">{% trans 'Vol. annual' %}</th>
+            <th>]</th>
+            <th>*</th>
+            <th class="text-center" title="{% trans 'Planned classes' %}">{% trans 'Planned classes' %}</th>
+            <th>=</th>
+            <th>[</th>
+            <th class="text-center" title="{% trans 'Requirement entity' %}">{% trans 'Entity charges' %}</th>
+            <th>+</th>
+            <th class="text-center" title="{% trans 'Additional requirement entity 1' %}">EC1</th>
+            <th>+</th>
+            <th class="text-center" title="{% trans 'Additional requirement entity 2' %}">EC2</th>
+            <th>]</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for form in simplified_volume_management_form %}
+            <tr>
+                <th>
+                    <label class="inline-group">{{ form.label }}</label>
+                </th>
+                <td></td>
+                <td></td>
+                <td>{% bootstrap_field form.hourly_volume_partial_q1 show_label=False %}</td>
+                <td></td>
+                <td>{% bootstrap_field form.hourly_volume_partial_q2 show_label=False %}</td>
+                <td></td>
+                <td></td>
+                <td>{% bootstrap_field form.hourly_volume_total_annual show_label=False %}</td>
+                <td></td><td></td>
+                <td>{% bootstrap_field form.planned_classes show_label=False %}</td>
+                <td></td><td></td>
+                <td>{% bootstrap_field form.repartition_volume_requirement_entity show_label=False %}</td>
+                <td></td>
+                <td>{% bootstrap_field form.repartition_volume_additional_entity_1 show_label=False %}</td>
+                <td></td>
+                <td>{% bootstrap_field form.repartition_volume_additional_entity_2 show_label=False %}</td>
+                <td></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/learning_unit/learning_unit_update.js' %}"></script>
+{% endblock script %}

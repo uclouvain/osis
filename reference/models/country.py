@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,17 +29,15 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class CountryAdmin(SerializableModelAdmin):
-    list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code', 'currency',
-                    'continent')
-    fieldsets = ((None, {'fields': ('iso_code', 'name', 'nationality', 'european_union', 'dialing_code', 'cref_code',
-                                    'currency', 'continent')}),)
+    list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code',
+                    'currency', 'continent')
     list_filter = ('european_union',)
     ordering = ('name',)
     search_fields = ['name']
 
 
 class Country(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     iso_code = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=80, unique=True)
     nationality = models.CharField(max_length=80, blank=True, null=True)
@@ -51,6 +49,9 @@ class Country(SerializableModel):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('name',)
 
 
 def find_all():

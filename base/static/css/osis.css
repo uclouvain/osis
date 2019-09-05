@@ -4,7 +4,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,38 @@
 * OSIS Custom layout
 */
 
+html {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding-bottom: 6rem;
+    min-height: 100%;
+}
+
+.nopadding {
+    padding: 0 !important;
+}
+
+.nomargin {
+    margin: 0 !important;
+}
 
 /* Indication Status QA - DEV */
 
-.qamode
-{
-    background-image:url("../img/qamode.png");
+.qamode {
+    background-image: url("../img/qamode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .qagreen {
@@ -49,11 +73,33 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.devmode
-{
-    background-image:url("../img/devmode.png");
+.testmode {
+    background-image: url("../img/testmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
+}
+
+
+.testblue {
+    background: #5079b9;
+    width: 50px;
+    height: 100%;
+    line-height: 25px;
+    text-align: center;
+    color: #fff;
+    font-size: 12px;
+    font-style: italic;
+    margin-right: 20px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    -webkit-clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+    clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+}
+
+.devmode {
+    background-image: url("../img/devmode.svg");
+    background-repeat: repeat;
+    background-position: center;
 }
 
 .devorange {
@@ -72,11 +118,10 @@
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
 }
 
-.localmode
-{
-    background-image:url("../img/localmode.png");
+.localmode {
+    background-image: url("../img/localmode.svg");
     background-repeat: repeat;
-    background-position:center;
+    background-position: center;
 }
 
 .localred {
@@ -94,4 +139,103 @@
     margin-bottom: 10px;
     -webkit-clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
     clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 0 50%, 0% 0%);
+}
+
+/* Prevent hidden element because of heigth fixed navbar when use anchor */
+div:target{
+    padding-top: 50px;  /* Size of navbar */
+    margin-top: -50px;
+}
+
+.proposal_value {
+    color: #5CB85C;
+    cursor: help;
+}
+
+.required_field .control-label:after {
+    content: " *";
+}
+
+.list-group-flush:first-child .list-group-item:first-child {
+    border-top: 0;
+}
+
+.list-group-flush .list-group-item {
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
+
+/* IE 6 doesn't support max-height
+ * we use height instead, but this forces the menu to always be this tall
+ */
+* html .ui-autocomplete {
+    height: 200px;
+}
+
+.footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #f5f5f5;
+}
+
+/*
+ * Css for education information cms to ensure a good rendering.
+ */
+#pedagogy pre {
+    white-space: normal;
+}
+
+.btn-as-atag {
+    border: 0;
+    background: transparent;
+    color: #337ab7;
+    padding:0;
+}
+
+.btn-as-atag:disabled{
+  color: #f5f5f5;
+}
+
+
+/*
+ * Overriding of bootstrap css
+ */
+.tooltip-inner {
+    max-width: 250px;
+    /* If max-width does not work, try using width instead */
+    width: 250px;
+    text-align: left;
+}
+
+.show_collapse .collapse[aria-expanded="false"] {
+    display: block;
+    height: 40px !important;
+    overflow: hidden;
+}
+
+.show_collapse .collapsing[aria-expanded="false"] {
+    height: 40px !important;
+}
+
+.show_collapse a {
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+}
+
+.show_collapse a.collapsed:after {
+    content: "\f078";
+}
+
+.show_collapse a.a_show_collapse:not(.collapsed):after {
+    content: "\f077";
 }

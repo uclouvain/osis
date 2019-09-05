@@ -1,6 +1,6 @@
-{% extends "layout.html" %}
-{% load staticfiles %}
-{% load i18n %}
+{% extends "learning_unit/layout_detail.html" %}
+{% load staticfiles getattr %}
+{% load i18n index %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -8,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -25,82 +25,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-{% include "learning_unit/breadcrumb.html" %}
+
+{% block content_tab %}
+    {% include 'learning_unit/specifications_all.html' %}
 {% endblock %}
-
-{% load getattr %}
-
-{% block content %}
-
-{% include "learning_unit/header.html" %}
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "learning_unit/tabs.html" %}
-
-        <div class="tab-content" id="tab_content">
-            <div role="tabpanel" class="tab-pane active" id="specifications">
-                <div class="row" style="margin-top:10px;">
-                    <div class="col-md-2">
-                        <label> {% trans 'language'%} </label>
-                    </div>
-                    <div class="col-md-5">
-                        <label> {{ form_french.language.1 }} </label>
-                    </div>
-                    <div class="col-md-5">
-                        <label> {{ form_english.language.1 }} </label>
-                    </div>
-                </div>
-                <hr/>
-                {% for label_key, label_translated in cms_labels_translated.items %}
-                    <div class="row" style="margin-top:10px;">
-                        <div class="col-md-2">
-                            <label> {{ label_translated }} </label>
-                        </div>
-                        <div class="col-md-5">
-                            {% if perms.base.can_edit_learningunit_specification %}
-                            <a class="specification-edit-btn pull-right" href="#"
-                               data-form="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{form_french.language.0}}&label={{label_key}}"
-                               title="{% trans 'edit' %}">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </a>
-                            {% endif %}
-
-                            {{ form_french|getattr:label_key }}
-                        </div>
-                        <div class="col-md-5">
-                            {% if perms.base.can_edit_learningunit_specification %}
-                            <a class="specification-edit-btn pull-right" href="#"
-                               data-form="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{form_english.language.0}}&label={{label_key}}"
-                               title="{% trans 'edit' %}">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </a>
-                            {% endif %}
-
-                            {{ form_english|getattr:label_key }}
-                        </div>
-                    </div>
-                    <hr/>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="specification_edit" role="dialog" data-backdrop="static"></div>
-{% endblock %}
-
-{% block script %}
-    <script>
-        $(".specification-edit-btn").click(function(ev) {
-            ev.preventDefault();
-            var url = $(this).data("form"); // get the contact form url
-            var specification_edit_modal = $("#specification_edit");
-            specification_edit_modal.load(url, function() { // load the url into the modal
-                $(this).modal('show');
-            });
-            return false;
-        });
-    </script>
-{% endblock %}
-

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
+
 from django.contrib.auth.models import User, Permission
+from django.urls import reverse
+from django.test import TestCase
+from django.test.utils import override_settings
+
+from base.tests.factories.user import UserFactory
+from base.views.common import home
+from osis_common.tests.factories.application_notice import ApplicationNoticeFactory
 
 
 class ErrorViewTestCase(TestCase):
@@ -42,3 +47,13 @@ class ErrorViewTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+class TestCheckNotice(TestCase):
+    def setUp(self):
+        self.url = reverse(home)
+        self.notice = ApplicationNoticeFactory()
+        self.client.force_login(UserFactory())
+
+    def test_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['subject'], self.notice.subject)
+        self.assertEqual(response.context['notice'], self.notice.notice)

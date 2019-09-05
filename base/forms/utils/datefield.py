@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,11 +27,8 @@ import datetime
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms.utils import to_current_timezone
-from django.utils import formats, timezone
+from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
-
-from osis_common.utils.datetime import get_tzinfo
 
 DATE_FORMAT = '%d/%m/%Y'
 TIME_FORMAT = '%H:%M'
@@ -78,8 +75,8 @@ class DateTimePickerInput(forms.MultiWidget):
             ),
             forms.TimeInput(
                 attrs={
-                    'class': 'timepicker',
-                    'data-format': TIME_FORMAT_JS
+                    'data-format': TIME_FORMAT_JS,
+                    'type': 'time'
                 },
                 format=TIME_FORMAT,
             ),
@@ -92,7 +89,6 @@ class DateTimePickerInput(forms.MultiWidget):
 
     def decompress(self, value):
         if value:
-            value = to_current_timezone(value)
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
 
@@ -130,7 +126,8 @@ class DateRangeField(forms.DateField):
 
     def __init__(self, base=forms.DateField(), input_formats=None, **kwargs):
         """
-        :param base: can be either DateField or DateTimeField, which will be used to do conversions for beginning and end of interval.
+        :param base: can be either DateField or DateTimeField, which will be used
+        to do conversions for beginning and end of interval.
         :param input_formats: is passed into base if present
         """
         super(DateRangeField, self).__init__(**kwargs)
@@ -138,7 +135,7 @@ class DateRangeField(forms.DateField):
         if input_formats is not None:
             self.base.input_formats = input_formats
         else:
-            self.base.input_formats = [DATE_FORMAT,]
+            self.base.input_formats = [DATE_FORMAT]
 
     def to_python(self, value):
         if self.required is False and not value:
@@ -149,4 +146,6 @@ class DateRangeField(forms.DateField):
             raise ValidationError(_('The format of the range date is not valid'))
         start_date = self.base.to_python(values[0])
         end_date = self.base.to_python(values[1])
+        if start_date > end_date:
+            raise ValidationError(_('The start date must be equals or lower than the end date'))
         return start_date, end_date

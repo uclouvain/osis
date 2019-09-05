@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,24 +24,23 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
 from base.models.enums import number_session
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class SessionExamAdmin(admin.ModelAdmin):
+class SessionExamAdmin(OsisModelAdmin):
     list_display = ('offer_year', 'learning_unit_year', 'number_session', 'changed')
     list_filter = ('learning_unit_year__academic_year', 'number_session', 'offer_year__academic_year')
     raw_id_fields = ('learning_unit_year', 'offer_year')
-    fieldsets = ((None, {'fields': ('learning_unit_year', 'number_session', 'offer_year')}),)
     search_fields = ['learning_unit_year__acronym', 'offer_year__acronym']
 
 
 class SessionExam(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
-    learning_unit_year = models.ForeignKey('LearningUnitYear')
-    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
+    learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True, on_delete=models.CASCADE)
     progress = None
 
     def __str__(self):

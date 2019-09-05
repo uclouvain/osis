@@ -1,5 +1,6 @@
-{% extends "layout.html" %}
+{% extends "education_group/layout_detail.html" %}
 {% load i18n %}
+{% load staticfiles education_group format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -7,7 +8,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -24,57 +25,9 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-    {% include "education_group/breadcrumb.html" %}
+{% block top_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
 {% endblock %}
-
-{% block content %}
-
-    {% include "education_group/header.html" %}
-
-    <div class="panel panel-default">
-        <div class="panel-body" id="tabs">
-            <div class="tab-content" id="tab_content">
-                <div role="tabpanel" class="tab-pane active" id="identification">
-                    <a class="button" onclick="showDiv()">
-                        <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
-                    </a>
-                    <div class="row">
-                        {% include "education_group/training_tree.html" %}
-                        <div id="panel-data" class="col-md-9">
-                            {% include "education_group/tabs.html" %}
-                            <br>
-                            {% if education_group_year.education_group_type.category == enums.TRAINING %}
-                                {% include "education_group/identification_training_details.html" %}
-                            {% elif education_group_year.education_group_type.category == enums.MINI_TRAINING %}
-                                {% include "education_group/identification_mini_training_details.html" %}
-                            {% elif education_group_year.education_group_type.category == enums.GROUP %}
-                                {% include "education_group/identification_group_details.html" %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
-{% block script %}
-<script>
-    $(document).ready(function(){
-		$("#browser").treeview({
-			toggle: function() {
-				console.log("%s was toggled.", $(this).find(">span").text());
-			}
-		});
-
-		$("#add").click(function() {
-			var branches = $("<li><span class='folder'>New Sublist</span><ul>" +
-				"<li><span class='file'>Item1</span></li>" +
-				"<li><span class='file'>Item2</span></li></ul></li>").appendTo("#browser");
-			$("#browser").treeview({
-				add: branches
-			});
-		});
-	});
-</script>
+{% block bottom_action_bar %}
+    {% include "education_group/blocks/dropdown/identification_actions_bar.html"  with dropdirection="dropup" %}
 {% endblock %}

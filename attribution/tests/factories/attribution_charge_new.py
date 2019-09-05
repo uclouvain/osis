@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import string
-import factory
+
 import factory.fuzzy
 
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -38,3 +38,4 @@ class AttributionChargeNewFactory(factory.django.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     attribution = factory.SubFactory(AttributionNewFactory)
     learning_component_year = factory.SubFactory(LearningComponentYearFactory)
+    allocation_charge=0

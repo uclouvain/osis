@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,11 +24,15 @@
 #
 ##############################################################################
 import datetime
-import factory
-import factory.fuzzy
+import operator
 import string
-from base.models.learning_unit_year import LearningUnitYear
-from osis_common.utils.datetime import get_tzinfo
+
+import factory.fuzzy
+import factory.fuzzy
+
+from base.models.enums import number_session as number_session_enum
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
 
 
 class SessionExamFactory(factory.DjangoModelFactory):
@@ -36,7 +40,8 @@ class SessionExamFactory(factory.DjangoModelFactory):
         model = 'base.SessionExam'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
-    number_session = factory.fuzzy.FuzzyInteger(1000)
-    learning_unit_year = factory.SubFactory(LearningUnitYear)
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+    number_session = factory.Iterator(number_session_enum.NUMBERS_SESSION, getter=operator.itemgetter(0))
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
+    offer_year = factory.SubFactory(OfferYearFactory,
+                                    academic_year=factory.SelfAttribute('..learning_unit_year.academic_year'))

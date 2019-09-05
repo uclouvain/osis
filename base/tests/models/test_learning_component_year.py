@@ -1,12 +1,12 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,61 +23,88 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+
 from django.test import TestCase
-from django.utils import timezone
-from base.models.learning_container import LearningContainer
-from base.models.learning_container_year import LearningContainerYear
-from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.learning_unit_component import LearningUnitComponent
-from base.models.learning_class_year import LearningClassYear
-from base.models.academic_year import AcademicYear
 
-now = timezone.now()
+from base.models.enums import entity_container_year_link_type as entity_types
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 
 
-class LearningComponentYearTest(TestCase):
-
-    current_academic_year = None
-
+class LearningUnitYearWithContextTestCase(TestCase):
     def setUp(self):
-        self.current_academic_year = AcademicYear(year=(now.year),
-                                     start_date=datetime.date(now.year, now.month, 15),
-                                     end_date=datetime.date(now.year + 1, now.month, 28))
-        self.current_academic_year.save()
+        self.component_with_repartition = LearningComponentYearFactory(
+            hourly_volume_total_annual=15.0,
+            planned_classes=3,
+            repartition_volume_requirement_entity=20.0,
+            repartition_volume_additional_entity_1=10.0,
+            repartition_volume_additional_entity_2=15.0,
+        )
+        self.component_without_repartition = LearningComponentYearFactory(
+            hourly_volume_total_annual=15.0,
+            planned_classes=3,
+            repartition_volume_requirement_entity=None,
+            repartition_volume_additional_entity_1=None,
+            repartition_volume_additional_entity_2=None,
+        )
 
-        self.current_academic_year_different = AcademicYear(year=(now.year)-1,
-                                     start_date=datetime.date(now.year-1, now.month, 15),
-                                     end_date=datetime.date(now.year + 2, now.month, 28))
-        self.current_academic_year_different.save()
+    def test_repartition_volumes_property(self):
+        container_year = self.component_with_repartition.learning_unit_year.learning_container_year
+        container_year.set_entities({
+            entity_types.REQUIREMENT_ENTITY: EntityFactory(),
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: EntityFactory(),
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: EntityFactory(),
+        })
+        container_year.save()
+        expected_result = {
+            "REQUIREMENT_ENTITY": 20.0,
+            "ADDITIONAL_REQUIREMENT_ENTITY_1": 10.0,
+            "ADDITIONAL_REQUIREMENT_ENTITY_2": 15.0,
+        }
 
-    def test_creation_learning_unit_component_class_with_different_year(self):
+        self.assertDictEqual(self.component_with_repartition.repartition_volumes, expected_result)
 
-        learning_container = LearningContainer()
+        expected_result = {
+            "REQUIREMENT_ENTITY": None,
+            "ADDITIONAL_REQUIREMENT_ENTITY_1": None,
+            "ADDITIONAL_REQUIREMENT_ENTITY_2": None,
+        }
+        self.assertDictEqual(self.component_without_repartition.repartition_volumes, expected_result)
 
-        learning_container_year = LearningContainerYear(title="Biology",
-                                                        acronym="LBIO1212",
-                                                        academic_year=self.current_academic_year,
-                                                        learning_container=learning_container)
-        #Composant annualisé est associé à son composant et à son conteneur annualisé
-        learning_component_year = LearningComponentYear(learning_container_year=learning_container_year,
-                                                        title="Cours magistral",
-                                                        acronym="/C",
-                                                        comment="TEST")
-        #Classe annualisée est associée à son composant et à son conteneur annualisé
-        learning_class_year = LearningClassYear(learning_component_year=learning_component_year,
-                                                acronym="/C1")
+    def test_vol_global(self):
+        self.assertIsInstance(self.component_with_repartition.vol_global, float)
+        self.assertEqual(self.component_with_repartition.vol_global, 45.0)
 
+    def test_vol_global_when_repartition_volumes_are_none(self):
+        self.assertIsInstance(self.component_without_repartition.vol_global, float)
+        self.assertEqual(self.component_without_repartition.vol_global, 45.0)
 
-        #UE associée à un conteneur d'une année différente du composant
-        learning_unit_year = LearningUnitYear(  title="Biology",
-                                                acronym="LBIO1212",
-                                                academic_year=self.current_academic_year_different,
-                                                learning_container_year=learning_container_year)
-        #Association du conteneur et de son composant dont les années académiques diffèrent l'une de l'autre
-        learning_unit_component = LearningUnitComponent(learning_component_year=learning_component_year,
-                                                        learning_unit_year=learning_unit_year)
+    def test_get_repartition_volume(self):
+        repartition_value = self.component_with_repartition.get_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1)
+        self.assertEqual(repartition_value, 10.0)
 
-        self.assertEqual(learning_unit_component.learning_component_year,
-                         learning_class_year.learning_component_year)
+    def test_set_repartition_volume(self):
+        new_repartition_value = 1.0
+
+        self.component_without_repartition.set_repartition_volume(entity_types.REQUIREMENT_ENTITY, new_repartition_value)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, new_repartition_value)
+
+        self.component_without_repartition.set_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, new_repartition_value)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, new_repartition_value)
+
+        self.component_without_repartition.set_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, new_repartition_value)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, new_repartition_value)
+
+        self.component_without_repartition.refresh_from_db()
+
+    def test_set_repartition_volumes(self):
+        new_repartition_volumes = {
+            entity_types.REQUIREMENT_ENTITY: 1.0,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: 2.0,
+            entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: 3.0,
+        }
+        self.component_without_repartition.set_repartition_volumes(new_repartition_volumes)
+        self.assertEqual(self.component_without_repartition.repartition_volume_requirement_entity, 1.0)
+        self.assertEqual(self.component_without_repartition.repartition_volume_additional_entity_1, 2.0)
+        self.assertEqual(self.component_without_repartition.repartition_volume_additional_entity_2, 3.0)
+        self.component_without_repartition.refresh_from_db()

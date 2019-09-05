@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.utils.translation import ugettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
 
 TRAINING = "TRAINING"
 MINI_TRAINING = "MINI_TRAINING"
 GROUP = "GROUP"
 
-CATEGORIES = (
-    (TRAINING, _(TRAINING)),
-    (MINI_TRAINING, _(MINI_TRAINING)),
-    (GROUP, _(GROUP)),
-)
 
+class Categories(ChoiceEnum):
+    TRAINING = _("Training")
+    MINI_TRAINING = _("Mini-Training")
+    GROUP = _("Group")
+
+    @classmethod
+    def training_categories(cls):
+        return cls.TRAINING.name, cls.MINI_TRAINING.name

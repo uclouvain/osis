@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,12 +24,12 @@
 #
 ##############################################################################
 import datetime
-import factory
-import factory.fuzzy
-import string
 import operator
+import string
+
+import factory.fuzzy
+
 from base.models.enums import structure_type
-from osis_common.utils.datetime import get_tzinfo
 
 
 class StructureFactory(factory.DjangoModelFactory):
@@ -38,8 +38,8 @@ class StructureFactory(factory.DjangoModelFactory):
         #abstract = False
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
+                                          datetime.datetime(2017, 3, 1))
 
     acronym = acronym = factory.Sequence(lambda n: 'ACR-%d' % n)
     title = factory.Sequence(lambda n: 'TITLE-%d' % n)

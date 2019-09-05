@@ -1,0 +1,60 @@
+{% load i18n learning_unit dictionnary %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% if current.components %}
+    {% for key, component in current.components.items %}
+        <tr class="table_header" style="border-top: groove">
+            <td class="table_header">{% trans 'Component' %} : {{ key }}</td>
+            {% if previous %}
+                <th>{{ previous.learning_unit_year.academic_year }}</th>
+            {% endif %}
+            <th>{{ current.learning_unit_year.academic_year }}</th>
+            {% if next %}
+                <th>{{ next.learning_unit_year.academic_year }}</th>
+            {% endif %}
+        </tr>
+        {% for title, values in component.items %}
+            {% if title != 'type' %}
+                <tr>
+                    <td class="table_header">
+                        <table>
+                            <tr>
+                                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                <td>{{ title }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    {% if previous.components %}
+                        {% changed_label previous.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
+                    {% endif %}
+                    {% changed_label values|default:'0' %}
+                    {% if next.components %}
+                        {% changed_label next.components|get_item:key|get_item:title|default:'0' other=values|default:'0' %}
+                    {% endif %}
+                </tr>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif %}

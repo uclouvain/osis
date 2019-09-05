@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,12 +27,9 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from base.views import common
-from django.views.i18n import javascript_catalog
+from django.views.i18n import JavaScriptCatalog
 
-js_info_dict = {
-    'domain': 'djangojs',
-    'packages': ('assessments',),
-}
+packages = ('assessments', 'base')
 
 urlpatterns = (
     url(r'^login/$', common.login, name='login'),
@@ -41,7 +38,7 @@ urlpatterns = (
 
     url(r'^' + settings.ADMIN_URL, admin.site.urls),
     url(r'', include('base.urls')),
-    url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
+    url(r'^hijack/', include('hijack.urls', namespace='hijack')),
 )
 
 if 'assistant' in settings.INSTALLED_APPS:
@@ -52,6 +49,18 @@ if 'dissertation' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^dissertation/', include('dissertation.urls')),)
 if 'assessments' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^assessments/', include('assessments.urls')),)
+if 'attribution' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^attribution/', include('attribution.urls')),)
+if 'webservices' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^api/', include('webservices.urls')),)
+if 'partnership' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^partnerships/', include('partnership.urls', namespace='partnerships')),
+        # API
+        url(r'^partnerships/v1/', include('partnership.api.url_v1', namespace='partnership_api_v1'))
+    )
+if 'continuing_education' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^continuing_education/', include('continuing_education.urls')),)
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'
@@ -66,4 +75,3 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
 
     urlpatterns += (url(r'^__debug__/', include(debug_toolbar.urls)),)
-

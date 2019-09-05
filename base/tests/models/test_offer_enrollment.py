@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@
 #
 ##############################################################################
 import datetime
-from base.models import offer_enrollment
+
+from base.models.offer_enrollment import OfferEnrollment
 
 
 def create_date_enrollment():
@@ -32,7 +33,7 @@ def create_date_enrollment():
 
 
 def create_offer_enrollment(student, offer_year):
-    an_offer_enrollment = offer_enrollment.OfferEnrollment(date_enrollment=create_date_enrollment(),
+    an_offer_enrollment = OfferEnrollment(date_enrollment=create_date_enrollment(),
                                                            student=student, offer_year=offer_year)
     an_offer_enrollment.save()
     return an_offer_enrollment

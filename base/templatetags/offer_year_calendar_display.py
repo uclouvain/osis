@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@
 from django import template
 from datetime import date
 
+
+CURRENT_EVENT_CSS_STYLE = "font-weight:bold;"
+NOT_CURRENT_EVENT_CSS_STYLE = ""
+
 register = template.Library()
 
 
@@ -33,5 +37,5 @@ register = template.Library()
 def offer_year_calendar_display(value_start, value_end):
     if value_start.date() and value_end.date():
         if value_start.date() <= date.today() <= value_end.date():
-            return "font-weight:bold;"
-    return ""
+            return CURRENT_EVENT_CSS_STYLE
+    return NOT_CURRENT_EVENT_CSS_STYLE

@@ -1,0 +1,44 @@
+{% extends "blocks/modal/generic_modal.html" %}
+{% load i18n %}
+
+{% block modal_id %}confirm-modal{% endblock %}
+
+{% block modal_header %}
+    {% blocktrans %}There are warnings in the form.{% endblocktrans %}
+{% endblock %}
+
+{% block modal_body %}
+    <ul id="ul_warnings">
+
+    </ul>
+    {% blocktrans %}Do you want to continue ?{% endblocktrans %}
+{% endblock %}
+
+{% block modal_footer %}
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "no" %}</button>
+    <button type="submit" class="btn btn-warning" name="confirmed" value="true">{% trans "yes" %}</button>
+
+    <script>
+        $(function () {
+                let warning_nodes = $(".form-control.has-warning");
+
+                if (warning_nodes.length > 0) {
+
+                    warning_nodes.each(
+                        function () {
+                            $(this).parent().removeClass("has-error").addClass("has-warning");
+                            $("#ul_warnings").append('<li>' + $(this).siblings("label").text() + '</li>');
+                            $(this).parent().children(".help-block").remove();
+                        }
+                    );
+
+                    // We do not need to display the modal if there is some errors
+                    if ($(".has-error").length === 0) {
+                        $('#confirm-modal').modal('toggle');
+                    }
+                }
+            }
+        )
+    </script>
+{% endblock %}
+

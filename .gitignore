@@ -5,10 +5,13 @@ sys
 *.iml
 .idea/
 *.csv
+!base/fixtures/*.csv
 venv/
 __pycache__/
+jsi18n/
 backoffice/server_settings.py
 /base/tests/sent_mails
+/base/tests/functional
 /reports
 .project
 .settings
@@ -16,6 +19,7 @@ backoffice/server_settings.py
 .pydevproject
 *.mo
 /uploads/
+/.my_config/
 .env
 .coverage
 *.sh
@@ -23,7 +27,10 @@ backoffice/server_settings.py
 htmlcov/
 dev.py
 ghostdriver.log
-dev-requirements.txt
 .DS_Store
-.coveragerc
-/dev_requirements.txt
+/geckodriver.log
+/features/logs/
+**/*.orig
+git_submodule_ref_update.py
+
+celerybeat-schedule

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,12 +29,11 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 class OfferAdmin(SerializableModelAdmin):
     list_display = ('id', 'title', 'changed')
-    fieldsets = ((None, {'fields': ['title']}),)
     search_fields = ['title']
 
 
 class Offer(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     title = models.CharField(max_length=255)
 

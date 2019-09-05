@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ from django import template
 register = template.Library()
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def full_width(context):
     """
     :return: True only if there is no offer_year.orientation_sibling OR
@@ -36,4 +36,4 @@ def full_width(context):
     """
     offer_year = context['offer_year']
     return not offer_year.orientation_sibling or (
-        not offer_year.offer_year_children and not offer_year.offer_year_sibling)
+            not offer_year.offer_year_children and not offer_year.offer_year_sibling)

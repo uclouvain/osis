@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,17 +24,22 @@
 #
 ##############################################################################
 import datetime
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection
+
 from django.test import TestCase
-from base.tests.factories import tutor, user, structure, entity_manager, academic_year, learning_unit_year
+
 from attribution.models import attribution
+from attribution.models.enums.function import CO_HOLDER, COORDINATOR
+from attribution.tests.factories.attribution import AttributionFactory
+from base.tests.factories import tutor, user, structure, entity_manager, academic_year, learning_unit_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.models.test_person import create_person_with_user
 
 
-def create_attribution(tutor, learning_unit_year, score_responsible=False):
-    an_attribution = attribution.Attribution(tutor=tutor, learning_unit_year=learning_unit_year,
-                                             score_responsible=score_responsible)
+def create_attribution(tutor, learning_unit_year, score_responsible=False, summary_responsible=False):
+    an_attribution = attribution.Attribution(tutor=tutor,
+                                             learning_unit_year=learning_unit_year,
+                                             score_responsible=score_responsible,
+                                             summary_responsible=summary_responsible)
     an_attribution.save()
     return an_attribution
 
@@ -61,7 +66,8 @@ class AttributionTest(TestCase):
                                                                                                  academic_year=self.academic_year)
         self.attribution = create_attribution(tutor=self.tutor,
                                               learning_unit_year=self.learning_unit_year,
-                                              score_responsible=True)
+                                              score_responsible=True,
+                                              summary_responsible=True)
         self.attribution_children = create_attribution(tutor=self.tutor,
                                                        learning_unit_year=self.learning_unit_year_children,
                                                        score_responsible=False)
@@ -89,19 +95,47 @@ class AttributionTest(TestCase):
     def test_is_score_responsible_without_attribution(self):
         self.assertFalse(attribution.is_score_responsible(self.user, self.learning_unit_year_without_attribution))
 
-    def test_attribution_deleted_field(self):
-        attribution_id = self.attribution.id
 
-        with connection.cursor() as cursor:
-            cursor.execute("update attribution_attribution set deleted=True where id=%s", [attribution_id])
+class TestFindAllResponsibleByLearningUnitYear(TestCase):
+    """Unit tests on find_all_responsible_by_learning_unit_year()"""
 
-        with self.assertRaises(ObjectDoesNotExist):
-            attribution.Attribution.objects.get(id=attribution_id)
+    def test_score_responsible_when_multiple_attribution_for_same_tutor(self):
+        luy = LearningUnitYearFactory()
+        attr1 = AttributionFactory(
+            function=COORDINATOR,
+            learning_unit_year=luy,
+            score_responsible=False,
+        )
+        AttributionFactory(
+            function=CO_HOLDER,
+            tutor=attr1.tutor,
+            learning_unit_year=luy,
+            score_responsible=True,
+        )  # Second attribution with different function
+        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-score_responsible')
+        self.assertEqual(result.count(), 1)
+        self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
+        self.assertTrue(result.get().score_responsible)
 
-        with connection.cursor() as cursor:
-            cursor.execute("select id, deleted from attribution_attribution where id=%s", [attribution_id])
-            row = cursor.fetchone()
-            db_attribution_id = row[0]
-            db_attribution_deleted = row[1]
-        self.assertEqual(db_attribution_id, attribution_id)
-        self.assertTrue(db_attribution_deleted)
+    def test_summary_responsible_when_multiple_attribution_for_same_tutor(self):
+        luy = LearningUnitYearFactory()
+        attr1 = AttributionFactory(
+            function=COORDINATOR,
+            learning_unit_year=luy,
+            summary_responsible=False,
+        )
+        AttributionFactory(
+            function=CO_HOLDER,
+            tutor=attr1.tutor,
+            learning_unit_year=luy,
+            summary_responsible=True,
+        )  # Second attribution with different function
+        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-summary_responsible')
+        self.assertEqual(result.count(), 1)
+        self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
+        self.assertTrue(result.get().summary_responsible)
+
+    def test_when_orderby_is_none(self):
+        order_by = None
+        with self.assertRaises(AttributeError):
+            attribution.find_all_responsible_by_learning_unit_year(LearningUnitYearFactory(), order_by)

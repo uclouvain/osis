@@ -1,0 +1,30 @@
+{% load bootstrap3 %}
+{% load i18n %}
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-8">
+        <div class="pull-right">
+            <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default"
+               style="margin-left: 10px;" role="button">
+                {% trans 'Cancel' %}
+            </a>
+
+            {# We do not need postponement for learning unit in the past #}
+            {% if learning_unit_year.is_past %}
+                <button onclick="submit()" class="btn btn-primary">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+                </button>
+            {% else %}
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReport">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function submit() {
+        $('form').submit()
+    }
+</script>

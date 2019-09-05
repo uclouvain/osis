@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,24 +26,27 @@
 import factory
 import factory.fuzzy
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer import OfferFactory
 from base.tests.factories.structure import StructureFactory
 from base.tests.factories.offer_type import OfferTypeFactory
 
 
-def generate_title(offer_year):
-    return '{obj.academic_year} {obj.acronym}'.format(obj=offer_year).lower()
-
-
 class OfferYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.OfferYear"
+        exclude = ("corresponding_education_group_year",)
 
     offer = factory.SubFactory(OfferFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
     acronym = factory.Sequence(lambda n: 'Offer %d' % n)
-    title = factory.LazyAttribute(generate_title)
+    title = factory.LazyAttribute(lambda obj: '{obj.academic_year} {obj.acronym}'.format(obj=obj).lower())
     entity_management = factory.SubFactory(StructureFactory)
-    entity_administration_fac= factory.SubFactory(StructureFactory)
+    entity_administration_fac = factory.SubFactory(StructureFactory)
     offer_type = factory.SubFactory(OfferTypeFactory)
 
+    corresponding_education_group_year = factory.SubFactory(
+        EducationGroupYearFactory,
+        academic_year=factory.SelfAttribute("..academic_year"),
+        acronym=factory.SelfAttribute("..acronym")
+    )

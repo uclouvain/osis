@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,13 +26,12 @@
 from enum import Enum
 from django.utils.translation import ugettext_lazy as _
 
-
-class ProposalType(Enum):
-    CREATION = "CREATION"
-    MODIFICATION = "MODIFICATION"
-    TRANSFORMATION = "TRANSFORMATION"
-    TRANSFORMATION_AND_MODIFICATION = "TRANSFORMATION_AND_MODIFICATION"
-    SUPPRESSION = "SUPPRESSION"
+from base.models.utils.utils import ChoiceEnum
 
 
-CHOICES = tuple((name, _(name)) for name, member in ProposalType.__members__.items())
+class ProposalType(ChoiceEnum):
+    CREATION = _("Creation")
+    MODIFICATION = _("Modification")
+    TRANSFORMATION = _("Transformation")
+    TRANSFORMATION_AND_MODIFICATION = _("Transformation and modification")
+    SUPPRESSION = _("Suppression")

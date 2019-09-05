@@ -1,0 +1,92 @@
+{% load staticfiles %}
+{% load i18n %}
+{% load components_classes %}
+{% load bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<form role="form" method="POST" action="" novalidate>
+    {% csrf_token %}
+    <table class="table volumes">
+        {% for learning_unit, formset in formsets.items %}
+            <tbody>
+                <tr>
+                    <th>
+                        <b>{{ learning_unit.acronym }}</b>
+                        <br>
+                        {% if learning_unit.quadrimester %}
+                        <abbr title="{% trans 'Quadrimester' %} : {% trans learning_unit.quadrimester|default:"" %}">
+                            ({% trans learning_unit.quadrimester %})
+                        </abbr>
+                        {% endif %}
+                    </th>
+                    <th></th>
+                    {% for field in formset.0 %}
+                        <th>
+                            {% if field.help_text %}
+                            <abbr title="{{ field.help_text }}">
+                                {{ field.label }}
+                            </abbr>
+                            {% else %}
+                                {{ field.label }}
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+                </tr>
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    <tr>{% bootstrap_formset_errors formset %}</tr>
+                    <tr>
+                        <td>
+                            <abbr title="{{ form.title_help }}">
+                                {# FIXME :: Temporary solution - waiting for business clarification about "components" concept (untyped, ...)#}
+                                {% if form.title == 'NT' %}PM{% else %}{{ form.title }}{% endif %}
+                            </abbr>
+                        </td>
+                        <td></td>{% bootstrap_form_errors form %}
+                        {% for field in form %}
+                            <td>
+                                {% bootstrap_field field show_label=False show_help=False%}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endfor %}
+    </table>
+    {% if not learning_unit_year.is_past %}
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReport">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+            </button>
+            <a class="btn btn-default"
+               href="{% url luy_url learning_unit_year_id=learning_unit_year.id %}">
+                {% trans 'Cancel' %}
+            </a>
+        </div>
+        {% include "learning_unit/blocks/modal/modal_modification_ask_to_report.html" %}
+    {% else %}
+        {% include "learning_unit/blocks/save_cancel_buttons.html" %}
+    {% endif %}
+</form>

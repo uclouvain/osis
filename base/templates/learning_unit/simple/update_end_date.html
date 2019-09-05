@@ -1,0 +1,19 @@
+{% extends "learning_unit/identification.html" %}
+{% load i18n learning_unit bootstrap3 %}
+
+{% block edit_academic_year %}
+    <label style="margin-top:10px;">{% trans 'Academic start year'%}</label><br>
+    {{ learning_unit_year.learning_unit.start_year|academic_year }}
+    <br>
+    <form method="post" style="display: inline;">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+
+        {% buttons %}
+        <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}" class="btn btn-default">
+            {% trans 'Cancel' %}
+        </a>
+        <button type="submit" class="btn btn-danger">{% trans 'Yes, I confirm.' %}</button>
+        {% endbuttons %}
+    </form>
+{% endblock %}

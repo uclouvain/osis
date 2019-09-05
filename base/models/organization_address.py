@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,29 +24,34 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class OrganizationAddressAdmin(admin.ModelAdmin):
+class OrganizationAddressAdmin(OsisModelAdmin):
     list_display = ('organization', 'label', 'location', 'postal_code', 'city', 'country')
-    fieldsets = ((None, {'fields': ('organization', 'label', 'location', 'postal_code', 'city', 'country')}),)
+    search_fields = ['organization__name', 'label', 'country__name']
 
 
 class OrganizationAddress(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    organization = models.ForeignKey('Organization')
-    label = models.CharField(max_length=20)
-    location = models.CharField(max_length=255)
-    postal_code = models.CharField(max_length=20, blank=True, null=True)
-    city = models.CharField(max_length=255)
-    country = models.ForeignKey('reference.Country')
+    organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
+    # TODO is_main and label are similar.
+    # TODO rename label to type
+    # FIXME Create a FK directly between Organization and Address for main address.
+    label = models.CharField(max_length=20, verbose_name=_("Label"))
+    location = models.CharField(max_length=255, verbose_name=_("Location"))
+    postal_code = models.CharField(max_length=20, blank=True, null=True, verbose_name=_("Postal code"))
+    city = models.CharField(max_length=255, verbose_name=_("City"))
+    country = models.ForeignKey('reference.Country', verbose_name=_("Country"), on_delete=models.CASCADE)
+    is_main = models.BooleanField(default=False)
 
 
 def find_by_organization(organization):
     return OrganizationAddress.objects.filter(organization=organization).order_by('label')
 
 
-def find_by_id(organization_address_id):
-    return OrganizationAddress.objects.get(pk=organization_address_id)
-
+def find_distinct_by_country(a_country):
+    return OrganizationAddress.objects.filter(country=a_country).distinct('city').order_by('city').values('city')

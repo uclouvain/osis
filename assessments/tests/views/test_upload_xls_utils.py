@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,28 +24,29 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
-from django.test import TestCase, Client
+from django.contrib.auth.models import Group
+from django.http import Http404
+from django.test import TestCase, Client, TransactionTestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.exam_enrollment import ExamEnrollment
-
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.models.test_academic_calendar import create_academic_calendar
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from attribution.tests.factories.attribution import AttributionFactory
 from base.tests.factories.session_examen import SessionExamFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-
 from base.models.enums import number_session, academic_calendar_type, exam_enrollment_justification_type
-from osis_common.utils.datetime import get_tzinfo
+from base.tests.mixin.academic_year import AcademicYearMockMixin
+from base.models.enums import exam_enrollment_state
+from assessments.views.upload_xls_utils import _get_score_list_filtered_by_enrolled_state
+from base.models.exam_enrollment import ExamEnrollment
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -53,66 +54,121 @@ LEARNING_UNIT_ACRONYM = "LOSIS1211"
 REGISTRATION_ID_1 = "00000001"
 REGISTRATION_ID_2 = "00000002"
 
+EMAIL_1 = "adam.smith@test.be"
+EMAIL_2 = "john.doe@test.be"
+
 
 def _get_list_tag_and_content(messages):
     return [(m.tags, m.message) for m in messages]
 
 
-class TestUploadXls(TestCase):
+def generate_exam_enrollments(year, with_different_offer=False):
+    number_enrollments = 2
+    academic_year = AcademicYearFactory(year=year)
+
+    an_academic_calendar = AcademicCalendarFactory(academic_year=academic_year,
+                                                   start_date=(
+                                                   datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+                                                   end_date=(
+                                                   datetime.datetime.today() + datetime.timedelta(days=20)).date(),
+                                                   reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+    session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
+                                                       academic_calendar=an_academic_calendar)
+
+    learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
+                                                      learning_container_year__academic_year=academic_year,
+                                                      acronym=LEARNING_UNIT_ACRONYM)
+    attribution = AttributionFactory(learning_unit_year=learning_unit_year)
+
+    if with_different_offer:
+        session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
+                                            offer_year__academic_year=academic_year)
+                         for _ in range(0, number_enrollments)]
+    else:
+        session_exams = [SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year,
+                                            offer_year__academic_year=academic_year)] * number_enrollments
+    offer_years = [session_exam.offer_year for session_exam in session_exams]
+
+    exam_enrollments = list()
+    for i in range(0, number_enrollments):
+        student = StudentFactory()
+        offer_enrollment = OfferEnrollmentFactory(offer_year=offer_years[i], student=student)
+        learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
+                                                                 offer_enrollment=offer_enrollment)
+        exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
+                                                      learning_unit_enrollment=learning_unit_enrollment,
+                                                      enrollment_state=exam_enrollment_state.ENROLLED,
+                                                      date_enrollment=an_academic_calendar.start_date))
+    return locals()
+
+
+class MixinTestUploadScoresFile(AcademicYearMockMixin):
     def setUp(self):
-        today = datetime.datetime.today()
-        twenty_days = datetime.timedelta(days=20)
+        Group.objects.get_or_create(name="tutors")
+        data = generate_exam_enrollments(2017)
+        self.academic_year = data["academic_year"]
+        self.exam_enrollments = data["exam_enrollments"]
+        self.attribution = data["attribution"]
+        self.learning_unit_year = data["learning_unit_year"]
+        self.offer_year = data["offer_years"][0]
+        self.students = [enrollment.learning_unit_enrollment.offer_enrollment.student for enrollment
+                         in self.exam_enrollments]
 
-        #Take same academic year as the one in the associated xls file
-        an_academic_year = AcademicYearFactory(year=2017)
+        self.offer_year.acronym = OFFER_ACRONYM
+        self.offer_year.save()
 
-        a_learning_unit_year = LearningUnitYearFakerFactory(academic_year=an_academic_year,
-                                                            acronym=LEARNING_UNIT_ACRONYM)
+        registration_ids = [REGISTRATION_ID_1, REGISTRATION_ID_2]
+        mails = [EMAIL_1, EMAIL_2]
+        data_to_modify_for_students = list(zip(registration_ids, mails))
+        for i in range(0, 2):
+            registration_id, email = data_to_modify_for_students[i]
+            student = self.students[i]
+            student.registration_id = registration_id
+            student.save()
+            student.person.email = email
+            student.person.save()
 
-        tutor = TutorFactory()
-
-        an_academic_calendar = create_academic_calendar(an_academic_year, start_date=today - twenty_days,
-                                                        end_date=today + twenty_days,
-                                                        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
-        SessionExamCalendarFactory(number_session=number_session.ONE,
-                                   academic_calendar=an_academic_calendar)
-        AttributionFactory(learning_unit_year=a_learning_unit_year,
-                           tutor=tutor)
-        a_session_exam = SessionExamFactory(number_session=number_session.ONE,
-                                            learning_unit_year=a_learning_unit_year)
-
-        student_1 = StudentFactory(registration_id=REGISTRATION_ID_1)
-        student_2 = StudentFactory(registration_id=REGISTRATION_ID_2)
-
-        an_offer_year = OfferYearFactory(academic_year=an_academic_year,
-                                         acronym=OFFER_ACRONYM)
-        offer_enrollment_1 = OfferEnrollmentFactory(offer_year=an_offer_year,
-                                                    student=student_1)
-        offer_enrollment_2 = OfferEnrollmentFactory(offer_year=an_offer_year,
-                                                    student=student_2)
-
-        learning_unit_enrollment_1 = LearningUnitEnrollmentFactory(learning_unit_year=a_learning_unit_year,
-                                                                   offer_enrollment=offer_enrollment_1)
-        learning_unit_enrollment_2 = LearningUnitEnrollmentFactory(learning_unit_year=a_learning_unit_year,
-                                                                   offer_enrollment=offer_enrollment_2)
-
-        ExamEnrollmentFactory(session_exam=a_session_exam,
-                              learning_unit_enrollment=learning_unit_enrollment_1)
-        ExamEnrollmentFactory(session_exam=a_session_exam,
-                              learning_unit_enrollment=learning_unit_enrollment_2)
-
-        user = tutor.person.user
         self.client = Client()
-        self.client.force_login(user=user)
-        self.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': a_learning_unit_year.id})
+        self.a_user = self.attribution.tutor.person.user
+        self.client.force_login(user=self.a_user)
+        self.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
 
+        # Mock academic_year in order to be decouple from system time
+        self.mock_academic_year(
+            current_academic_year=self.academic_year,
+            starting_academic_year=self.academic_year
+        )
+
+    def assert_enrollments_equal(self, exam_enrollments, attribute_value_list):
+        [enrollment.refresh_from_db() for enrollment in exam_enrollments]
+        data = zip(exam_enrollments, attribute_value_list)
+        for exam_enrollment, tuple_attribute_value in data:
+            attribute, value = tuple_attribute_value
+            self.assertEqual(getattr(exam_enrollment, attribute), value)
+
+
+class TestTransactionNonAtomicUploadXls(MixinTestUploadScoresFile, TransactionTestCase):
+    @mock.patch("assessments.views.upload_xls_utils._show_error_messages", side_effect=Http404)
+    def test_when_exception_occured_after_saving_scores(self, mock_method_that_raise_exception):
+        SCORE_1 = 16
+        SCORE_2 = exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED
+        with open("assessments/tests/resources/correct_score_sheet.xlsx", 'rb') as score_sheet:
+            response = self.client.post(self.url, {'file': score_sheet}, follow=True)
+            self.assertTrue(mock_method_that_raise_exception.called)
+            self.assert_enrollments_equal(
+                self.exam_enrollments,
+                [("score_draft", SCORE_1), ("justification_draft", SCORE_2)]
+            )
+
+
+class TestUploadXls(MixinTestUploadScoresFile, TestCase):
     def test_with_no_file_uploaded(self):
         response = self.client.post(self.url, {'file': ''}, follow=True)
         messages = list(response.context['messages'])
 
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, _('no_file_submitted'))
+        self.assertEqual(messages[0].message, _('You have to select a file to upload.'))
 
     def test_with_incorrect_format_file(self):
         with open("assessments/tests/resources/bad_format.txt", 'rb') as score_sheet:
@@ -121,7 +177,7 @@ class TestUploadXls(TestCase):
 
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].tags, 'error')
-            self.assertEqual(messages[0].message, _('file_must_be_xlsx'))
+            self.assertEqual(messages[0].message, _("The file must be a valid 'XLSX' excel file"))
 
     def test_with_no_scores_encoded(self):
         with open("assessments/tests/resources/empty_scores.xlsx", 'rb') as score_sheet:
@@ -130,7 +186,7 @@ class TestUploadXls(TestCase):
 
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].tags, 'error')
-            self.assertEqual(messages[0].message, _('no_score_injected'))
+            self.assertEqual(messages[0].message, _('No score injected'))
 
     def test_with_incorrect_justification(self):
         INCORRECT_LINES = '13'
@@ -139,7 +195,7 @@ class TestUploadXls(TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('justification_invalid_value'), _('Line'), INCORRECT_LINES)),
+            self.assertIn(('error', "%s : %s %s" % (_('Invalid justification value'), _('Row'), INCORRECT_LINES)),
                           messages_tag_and_content)
 
     def test_with_numbers_outside_scope(self):
@@ -149,7 +205,7 @@ class TestUploadXls(TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('scores_must_be_between_0_and_20'), _('Line'), INCORRECT_LINES)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINES)),
                           messages_tag_and_content)
 
     def test_with_correct_score_sheet(self):
@@ -161,56 +217,100 @@ class TestUploadXls(TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
-            exam_enrollment_1 = ExamEnrollment.objects.get(
-                learning_unit_enrollment__offer_enrollment__student__registration_id=REGISTRATION_ID_1
+            self.assert_enrollments_equal(
+                self.exam_enrollments,
+                [("score_draft", SCORE_1), ("justification_draft", SCORE_2)]
             )
-            self.assertEqual(exam_enrollment_1.score_draft, SCORE_1)
-
-            exam_enrollment_2 = ExamEnrollment.objects.get(
-                learning_unit_enrollment__offer_enrollment__student__registration_id=REGISTRATION_ID_2
-            )
-            self.assertEqual(exam_enrollment_2.justification_draft, SCORE_2)
 
     def test_with_formula(self):
         NUMBER_SCORES = "2"
-        SCORE_1 = 15
-        SCORE_2 = 17
         with open("assessments/tests/resources/score_sheet_with_formula.xlsx", 'rb') as score_sheet:
             response = self.client.post(self.url, {'file': score_sheet}, follow=True)
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
-            exam_enrollment_1 = ExamEnrollment.objects.get(
-                learning_unit_enrollment__offer_enrollment__student__registration_id=REGISTRATION_ID_1
+            self.assert_enrollments_equal(
+                self.exam_enrollments,
+                [("score_draft", 15), ("score_draft", 17)]
             )
-            self.assertEqual(exam_enrollment_1.score_draft, SCORE_1)
-
-            exam_enrollment_2 = ExamEnrollment.objects.get(
-                learning_unit_enrollment__offer_enrollment__student__registration_id=REGISTRATION_ID_2
-            )
-            self.assertEqual(exam_enrollment_2.score_draft, SCORE_2)
 
     def test_with_incorrect_formula(self):
         NUMBER_CORRECT_SCORES = "1"
         INCORRECT_LINE = "13"
-        SCORE_1 = 15
         with open("assessments/tests/resources/incorrect_formula.xlsx", 'rb') as score_sheet:
             response = self.client.post(self.url, {'file': score_sheet}, follow=True)
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('scores_must_be_between_0_and_20'), _('Line'), INCORRECT_LINE)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINE)),
                           messages_tag_and_content)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
-            exam_enrollment_1 = ExamEnrollment.objects.get(
-                learning_unit_enrollment__offer_enrollment__student__registration_id=REGISTRATION_ID_1
-            )
-            self.assertEqual(exam_enrollment_1.score_draft, SCORE_1)
 
+            self.assert_enrollments_equal(
+                self.exam_enrollments[:1],
+                [("score_draft", 15)]
+            )
+
+    def test_with_registration_id_not_matching_email(self):
+        INCORRECT_LINES = '12, 13'
+        with open("assessments/tests/resources/registration_id_not_matching_email.xlsx", 'rb') as score_sheet:
+            response = self.client.post(self.url, {'file': score_sheet}, follow=True)
+            messages = list(response.context['messages'])
+
+            messages_tag_and_content = _get_list_tag_and_content(messages)
+            self.assertIn(('error', "%s : %s %s" % (_('Registration ID does not match email'),
+                                                    _('Row'),
+                                                    INCORRECT_LINES)),
+                          messages_tag_and_content)
+
+    def test_with_correct_score_sheet_white_spaces_around_emails(self):
+        NUMBER_CORRECT_SCORES = "2"
+        with open("assessments/tests/resources/correct_score_sheet_spaces_around_emails.xlsx", 'rb') as score_sheet:
+            response = self.client.post(self.url, {'file': score_sheet}, follow=True)
+            messages = list(response.context['messages'])
+
+            messages_tag_and_content = _get_list_tag_and_content(messages)
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
+                          messages_tag_and_content)
+
+            self.assert_enrollments_equal(
+                self.exam_enrollments,
+                [("score_draft", 16), ("justification_draft", exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED)]
+            )
+
+    def test_with_correct_score_sheet_white_one_empty_email(self):
+        self.students[0].person.email = None
+        self.students[0].person.save()
+        NUMBER_CORRECT_SCORES = "2"
+        with open("assessments/tests/resources/correct_score_sheet_one_empty_email.xlsx", 'rb') as score_sheet:
+            response = self.client.post(self.url, {'file': score_sheet}, follow=True)
+            messages = list(response.context['messages'])
+
+            messages_tag_and_content = _get_list_tag_and_content(messages)
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
+                          messages_tag_and_content)
+
+            self.assert_enrollments_equal(
+                self.exam_enrollments,
+                [("score_draft", 16), ("justification_draft", exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED)]
+            )
+
+    def test_get_score_list_filtered_by_enrolled_state(self):
+        enrolled_exam_enrollment = ExamEnrollment.objects.all()
+        nb_enrolled_student = len(enrolled_exam_enrollment)
+        self._unsubscribe_one_student(enrolled_exam_enrollment[0])
+        exam_enrollments = _get_score_list_filtered_by_enrolled_state(
+            self.learning_unit_year.id,
+            self.a_user)
+        self.assertEqual(len(exam_enrollments.enrollments), nb_enrolled_student - 1)
+
+    def _unsubscribe_one_student(self, exam):
+        exam.enrollment_state = exam_enrollment_state.NOT_ENROLLED
+        exam.save()

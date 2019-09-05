@@ -1,0 +1,224 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load dictionnary %}
+{% load format %}
+{% get_current_language as LANGUAGE_CODE %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/toggle-switch.css' %}">
+{% endblock %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution'%}</a></li>
+  <li class="active">{% trans 'Academic calendars'%}</li>
+
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>{% trans 'Academic calendar' %}</h2>
+</div>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="row">
+      <form  method="get" action="{% url 'academic_calendars' %}" >
+        <div class="col-md-2">
+          <label for="slt_academic_year" >{% trans 'Academic year'%}</label>
+          <select class="form-control" id="slt_academic_year"  name="academic_year" value="{{ academic_year }}" onchange='this.form.submit();'>
+            {% for v in academic_years %}
+              <option value="{{ v.id }}" {% if v.id == academic_year %}selected {% endif %} >
+                  {{ v }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+            {% if request.user.is_superuser %}
+                <table>
+                    <tr>
+                        <td><label>{% trans "academic events" as academic_events %}{{ academic_events|title }}</label></td>
+                        <td style="padding-left: 0.5em; padding-top: 4px;">
+                            <label class="switch">
+                              <input type="checkbox" name="show_academic_events" title="{{ academic_events|title }}" onclick='this.form.submit();' {% if show_academic_events %}checked{% endif %} />
+                              <span class="slider round"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>{% trans "project events" as project_events %}{{ project_events|title }}</label><br></td>
+                        <td style="padding-left: 0.5em; padding-top: 4px;">
+                            <label class="switch">
+                              <input type="checkbox" name="show_project_events" title="{{ project_events|title }}" onclick='this.form.submit();' {% if show_project_events %}checked{% endif %} />
+                              <span class="slider round"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label>{% trans "ad hoc events" as ad_hoc_events %}{{ ad_hoc_events|title }}</label><br></td>
+                        <td style="padding-left: 0.5em; padding-top: 4px;">
+                            <label class="switch">
+                                <input type="checkbox" name="show_ad_hoc_events" title="{{ ad_hoc_events|title }}" onclick='this.form.submit();' {% if show_ad_hoc_events %}checked{% endif %} />
+                                <span class="slider round"></span>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            {% else %}
+                <input type="hidden" name="show_academic_events" title="{{ academic_events|title }}" value="on" />
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            {% if request.user.is_superuser %}
+                <a href="{% url 'academic_calendar_form' %}" id="lnk_academic_calendar_create" class="btn btn-default" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+            {% endif %}
+        </div>
+      </form>
+    </div>
+    <br>
+    <div id="gantt">
+      {% if show_gantt_diagram %}
+        <div id="gantt_div"></div>
+      {% else %}
+          <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
+      {% endif %}
+    </div>
+    {% if undated_calendars_list|length > 0 %}
+      <div id="undated_calendars">
+        <br>{% trans 'Unscheduled events' %} :
+        <ul>
+          {% for calendar in undated_calendars_list %}
+            <li>
+              <a href="{% url 'academic_calendar_read' academic_calendar_id=calendar.id %}" id="lnk_academic_calendar_edit_{{calendar.id}}">{{ calendar.title }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+{% block script %}
+    <script src="{% static 'dhtmlxGantt/dhtmlxgantt.js' %}"></script>
+    <script src="{% static 'dhtmlxGantt/ext/dhtmlxgantt_tooltip.js' %}"></script>
+    <script src="{% static 'dhtmlxGantt/ext/dhtmlxgantt_marker.js' %}"></script>
+    <link href="{% static 'dhtmlxGantt/dhtmlxgantt.css' %}" rel="stylesheet">
+    {% if LANGUAGE_CODE == 'fr-be' %}
+        <script src="{% static 'dhtmlxGantt/locale/locale_fr.js' %}" charset="utf-8"></script>
+    {% endif %}
+
+    <script type="text/javascript">
+        function formatDate(date){
+            month = date.getMonth() + 1;
+            return date.getDate() + "/" + month + "/" + date.getFullYear()
+        }
+
+        gantt.config.scale_unit = "year";
+        gantt.config.date_scale = "%Y";
+        gantt.config.subscales = [
+            {unit:"month", step:1, date:"%F" }
+        ];
+
+        gantt.config.readonly = true;
+        gantt.config.columns = [
+            {name:"text", label:" ", width:"*", align: "left"},
+        ];
+
+        gantt.templates.task_text=function(start,end,task){
+            return Math.round(task.progress * 100) + '%';
+        };
+
+        (function(){
+
+            gantt._show_tooltip = function(text, pos) {
+
+                var tip = this._create_tooltip();
+
+                tip.innerHTML = text;
+                gantt.$container.appendChild(tip);
+
+                pos.x += gantt.config.grid_width;
+                pos.y += document.documentElement.scrollTop;
+
+                tip.style.left = pos.x + "px";
+                tip.style.top  = pos.y + "px";
+            };
+
+        })();
+
+        gantt.config.tooltip_hide_timeout = 500;
+        gantt.templates.tooltip_text = function(start,end,task){
+            days = task.duration + 1; // include end_date in duration
+            if(days <= 1){
+                duration = days + " {% trans 'day'%}"
+            }
+            else{
+                duration = days + " {% trans 'days'%}"
+            }
+
+            return "<b>" + task.text + "</b><br>"
+            + formatDate(task.start_date) + " - " + formatDate(task.end_date)
+            + " (" + duration +  ") <br>"
+            + "<a href=\"{% url 'academic_calendars' %}" + task.id + "\">"
+            + "{% trans 'Details'%}</a>";
+        };
+
+        /* Update lines style for project events */
+        let setRowStyleFunction = function (start, end, task) {
+            if (task.category === 'PROJECT')
+                return "projectRow";
+        };
+        gantt.templates.grid_row_class = setRowStyleFunction; // update first cell style
+        gantt.templates.task_row_class = setRowStyleFunction; // update end of row style
+
+        gantt.addMarker({
+            start_date: new Date() // this is today
+        });
+
+        var data = {{ ad_hoc_list|safe }}['ad_hoc_events'];
+        for (var i=0;i<data.length;i++) {
+            var parts =data[i]['start_date'].split('-');
+            var mm = parts[1]-1;
+
+            gantt.addMarker({
+                start_date: new Date(parts[2],mm , parts[0]),
+                css: 'releaseCol',
+                text: get_release_title(parts[0], parts[1], parts[2], data[i]['id']),
+            });
+        }
+
+        gantt.config.autosize = "y";
+        gantt.init("gantt_div");
+        gantt.parse({{ academic_calendar_json|safe }},"json");
+
+        function get_release_title(d,m,y, id){
+            return "<b>" + gettext('Release') + " : " + d + "/" + m + "/" +  y + "</b>"
+                    + "<br>"
+                    + "<a href=\"{% url 'academic_calendars' %}" + id + "\">"
+                    + "{% trans 'Details'%}</a>";
+        }
+    </script>
+{% endblock %}

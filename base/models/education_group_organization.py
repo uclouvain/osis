@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,45 +24,38 @@
 #
 ##############################################################################
 from django.db import models
-from django.contrib import admin
+from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import organization_address
 from base.models.enums import diploma_coorganization
-from base.models.organization_address import OrganizationAddress
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class EducationGroupOrganizationAdmin(admin.ModelAdmin):
+class EducationGroupOrganizationAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('education_group_year', 'organization')
-    fieldsets = ((None, {'fields': ('education_group_year',
-                                    'organization',
-                                    'all_students',
-                                    'enrollment_place',
-                                    'diploma')}),)
     raw_id_fields = ('education_group_year', 'organization')
-    search_fields = ['education_group_year']
+    search_fields = ['education_group_year__acronym']
 
 
 class EducationGroupOrganization(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    education_group_year = models.ForeignKey('EducationGroupYear')
-    organization = models.ForeignKey('Organization')
-    all_students = models.BooleanField(default=False)
-    enrollment_place = models.BooleanField(default=False)
+    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
+    organization = models.ForeignKey('Organization', on_delete=models.PROTECT)
+    all_students = models.BooleanField(default=False, verbose_name=_('For all students'))
+    enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
-                               choices=diploma_coorganization.DiplomaCoorganizationTypes.choices(),
-                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value)
+                               choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,
+                               default=diploma_coorganization.DiplomaCoorganizationTypes.NOT_CONCERNED.value,
+                               verbose_name=_('UCL Diploma'))
+    is_producing_cerfificate = models.BooleanField(default=False, verbose_name=_('Producing certificat'))
+    is_producing_annexe = models.BooleanField(default=False, verbose_name=_('Producing annexe'))
 
-    _address = None
+    class Meta:
+        unique_together = ('education_group_year', 'organization', )
 
-    @property
+    @cached_property
     def address(self):
-        if not self._address:
-            self._address = organization_address.find_by_organization(self.organization).first()
-        return self._address
-
-
-def search(**kwargs):
-
-    if "education_group_year" in kwargs:
-        return EducationGroupOrganization.objects.filter(education_group_year=kwargs['education_group_year'])
+        return organization_address.find_by_organization(self.organization).first()

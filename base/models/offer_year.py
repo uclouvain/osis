@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,51 +31,54 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 class OfferYearAdmin(SerializableModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'offer', 'parent', 'offer_type', 'changed')
-    fieldsets = ((None, {'fields': ('offer', 'academic_year', 'entity_administration', 'entity_administration_fac',
-                                    'entity_management', 'entity_management_fac', 'acronym', 'title', 'parent',
-                                    'title_international', 'title_short', 'title_printable', 'grade', 'grade_type',
-                                    'recipient', 'location', 'postal_code', 'city', 'country', 'phone', 'fax', 'email',
-                                    'campus', 'offer_type')}),)
     list_filter = ('academic_year', 'grade', 'offer_type', 'campus')
-    raw_id_fields = ('offer', 'parent', 'offer_type', 'grade_type','campus','country','entity_administration',
-                     'entity_administration_fac', 'entity_management', 'entity_management_fac', 'academic_year')
     search_fields = ['acronym']
 
 
 GRADE_TYPES = (
     ('BACHELOR', _('bachelor')),
-    ('MASTER', _('master')),
-    ('DOCTORATE', _('ph_d')))
+    ('MASTER', _('Master')),
+    ('DOCTORATE', _('Ph.D')))
 
 
 class OfferYear(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    offer = models.ForeignKey('Offer')
-    academic_year = models.ForeignKey('AcademicYear')
+    offer = models.ForeignKey('Offer', on_delete=models.CASCADE)
+    academic_year = models.ForeignKey('AcademicYear', on_delete=models.CASCADE)
     acronym = models.CharField(max_length=15, db_index=True)
     title = models.CharField(max_length=255)
     title_international = models.CharField(max_length=255, blank=True, null=True)
     title_short = models.CharField(max_length=255, blank=True, null=True)
     title_printable = models.CharField(max_length=255, blank=True, null=True)
-    parent = models.ForeignKey('self', blank=True, null=True, related_name='children', db_index=True)
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='children', db_index=True,
+                               on_delete=models.CASCADE)
     grade = models.CharField(max_length=20, blank=True, null=True, choices=GRADE_TYPES)
-    entity_administration = models.ForeignKey('Structure', related_name='admministration', blank=True, null=True)
-    entity_administration_fac = models.ForeignKey('Structure', related_name='admministration_fac', blank=True, null=True)
-    entity_management = models.ForeignKey('Structure', related_name='management', blank=True, null=True)
-    entity_management_fac = models.ForeignKey('Structure', related_name='management_fac', blank=True, null=True)
+    entity_administration = models.ForeignKey('Structure', related_name='admministration', blank=True, null=True,
+                                              on_delete=models.CASCADE)
+    entity_administration_fac = models.ForeignKey(
+        'Structure',
+        related_name='admministration_fac',
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE
+    )
+    entity_management = models.ForeignKey('Structure', related_name='management', blank=True, null=True,
+                                          on_delete=models.CASCADE)
+    entity_management_fac = models.ForeignKey('Structure', related_name='management_fac', blank=True, null=True,
+                                              on_delete=models.CASCADE)
     recipient = models.CharField(max_length=255, blank=True, null=True)  # Recipient of scores cheets (Structure)
     location = models.CharField(max_length=255, blank=True, null=True)  # Address for scores cheets
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(null=True, blank=True)
-    campus = models.ForeignKey('Campus', blank=True, null=True)
-    grade_type = models.ForeignKey('reference.GradeType', blank=True, null=True)
+    campus = models.ForeignKey('Campus', blank=True, null=True, on_delete=models.CASCADE)
+    grade_type = models.ForeignKey('reference.GradeType', blank=True, null=True, on_delete=models.CASCADE)
     enrollment_enabled = models.BooleanField(default=False)
-    offer_type = models.ForeignKey('OfferType', blank=True, null=True)
+    offer_type = models.ForeignKey('OfferType', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s - %s" % (self.academic_year, self.acronym)
@@ -128,14 +131,6 @@ class OfferYear(SerializableModel):
         return None
 
 
-def find_by_academic_year(academic_yr):
-    return OfferYear.objects.filter(academic_year=academic_yr)
-
-
-def find_by_structure(struct):
-    return OfferYear.objects.filter(entity_management=struct).order_by('academic_year', 'acronym')
-
-
 def find_by_id(offer_year_id):
     try:
         return OfferYear.objects.get(pk=offer_year_id)
@@ -145,10 +140,6 @@ def find_by_id(offer_year_id):
 
 def find_by_ids(offer_year_ids):
     return OfferYear.objects.filter(pk__in=offer_year_ids)
-
-
-def find_by_acronym(acronym):
-    return OfferYear.objects.filter(acronym=acronym)
 
 
 def search(entity=None, academic_yr=None, acronym=None):
@@ -169,7 +160,7 @@ def search(entity=None, academic_yr=None, acronym=None):
 
     if entity or academic_yr or acronym:
         out = queryset.order_by('acronym')
-               
+
     return out
 
 
@@ -186,54 +177,8 @@ def find_by_user(user, academic_yr=None):
     return OfferYear.objects.filter(pk__in=offer_year_ids).order_by('acronym')
 
 
-def find_by_offer(offers):
-    return OfferYear.objects.filter(offer__in=offers)
-
-
-def find_by_id_list(ids):
-    if ids:
-        return OfferYear.objects.filter(id__in=ids)
-    return None
-
-
-def search_offers(entity_list=None, academic_yr=None, an_offer_type=None):
-    out = None
-    queryset = OfferYear.objects
-
-    queryset = entity_list_parameter(entity_list, queryset)
-
-    queryset = academic_year_parameter(academic_yr, queryset)
-
-    queryset = offer_type_parameter(an_offer_type, queryset)
-
-    if entity_list or academic_yr or an_offer_type:
-        out = queryset.order_by('acronym')
-
-    return out.select_related("entity_management", "offer_type")
-
-
-def offer_type_parameter(an_offer_type, queryset):
-    if an_offer_type:
-        queryset = queryset.filter(offer_type=an_offer_type)
-    else:
-        queryset = queryset.filter(offer_type__isnull=False)
-    return queryset
-
-
-def academic_year_parameter(academic_yr, queryset):
-    if academic_yr:
-        queryset = queryset.filter(academic_year=academic_yr)
-    return queryset
-
-
-def entity_list_parameter(entity_list, queryset):
-    if entity_list:
-        queryset = queryset.filter(entity_management__in=entity_list)
-    return queryset
-
-
 def get_last_offer_year_by_offer(an_offer):
-    last_offer_year = OfferYear.objects.filter(offer=an_offer).order_by('-academic_year__start_date').first()
+    last_offer_year = an_offer.offeryear_set.order_by('-academic_year__start_date').first()
     if last_offer_year:
         return last_offer_year
     return None

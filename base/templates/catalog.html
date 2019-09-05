@@ -9,7 +9,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -27,47 +27,33 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li class="active">{% trans 'formation_catalogue' %}</li>
+<li class="active">{% trans 'Formation catalogue' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'formation_catalogue' %}</h2>
+    <h2>{% trans 'Formation catalogue' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% if perms.base.can_access_offer %}
-            <div class="col-md-1"><i class="fa fa-map" style="font-size: 400%; color: #6699FF;"></i></div>
+            {%  if perms.base.can_access_education_group %}
+            <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'offers' %}" id="lnk_offers">{% trans 'offers' %}</a></h4>
-                <p>{% trans 'desc_lnk_offers' %}</p>
+                <h4 class="media-heading">
+                    <a href="{% url 'education_groups' %}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
+                </h4>
+                <p>{% trans 'Management of formations' %}</p>
             </div>
             {% endif %}
             {% if perms.base.can_access_learningunit %}
-            <div class="col-md-1"><i class="fa fa-book" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></h4>
-                <p> {% trans 'desc_lnk_learning_units' %}</p>
-            </div>
+                <div class="col-md-1"><i class="fa fa-file" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></h4>
+                    <p> {% trans 'Management of learning units.' %}</p>
+                </div>
             {% endif %}
         </div>
-        <br>
-        <div class="row">
-            {%  if perms.base.can_access_academicyear %}
-            <div class="col-md-1"><i class="fa fa-calendar" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year' %}</a></h4>
-                <p>{% trans 'desc_lnk_academic_year' %}</p>
-            </div>
-            {% endif %}
-            {%  if perms.base.can_access_education_group %}
-            <div class="col-md-1"><i class="fa fa-map" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'education_groups' %}" id="lnk_education_groups">{% trans 'formations_lnk' %}</a></h4>
-                <p>{% trans 'desc_lnk_formations' %}</p>
-            </div>
-            {% endif %}
-        </div>
+
     </div>
 </div>
 {% endblock %}

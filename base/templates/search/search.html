@@ -1,0 +1,78 @@
+{% extends "layout.html"%}
+{% load staticfiles %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block layout_navbar_top %}<!-- Remove top navbar-->{% endblock %}
+
+{% block breadcrumbarea %}<!-- Remove breadcrumb -->{% endblock %}
+
+
+{% block content %}
+    <div class="panel panel-default">
+
+        {% include "search/block_search_form.html" %}
+
+        <div style="margin-top:10px;">
+            <table id="table_search_results" class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>{% trans 'Lastname'%}</th>
+                    <th>{% trans 'Firstname'%}</th>
+                </tr>
+            </thead>
+                {% for tutor in tutors%}
+                <tr data-id="{{tutor.id}}" data-value="{{tutor.person}}">
+                    <td><a href="#" data-popup-value="{{ tutor.person.full_name }}" class>{{tutor.person.last_name}}</a></td>
+                    <td>{{tutor.person.first_name}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% bootstrap_pagination tutors extra=request.GET.urlencode %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function()
+    {
+	    $("a[data-popup-value]").click(function(event){
+	        event.preventDefault();
+	        var name = window.name;
+	        var value = $(this).data("popup-value");
+	        opener = window.opener;
+	        if(opener !== null && opener !== undefined){
+                opener.document.getElementById(name).value = value;
+            }
+            window.close();
+        });
+    });
+
+</script>
+{% endblock %}
