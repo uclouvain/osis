@@ -259,7 +259,7 @@ class GenerateContainer:
                 campus=self.campus,
                 language=self.language
             )
-            for year in range(self.start_year, self.end_year + 1)
+            for year in range(self.start_year.year, self.end_year.year + 1)
         ]
 
     def _setup_entities(self):
