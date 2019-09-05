@@ -139,7 +139,7 @@ def _manage_session_variables(request, search_type):
         request.session['ue_search_type'] = str(_('External learning units'))
     elif search_type == SIMPLE_SEARCH:
         request.session['ue_search_type'] = None
-    else :
+    else:
         request.session['ue_search_type'] = str(_get_search_type_label(search_type))
 
 
