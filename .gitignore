@@ -57,6 +57,7 @@ celerybeat-schedule
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/datasources.xml
 
 # Gradle
 .idea/**/gradle.xml
