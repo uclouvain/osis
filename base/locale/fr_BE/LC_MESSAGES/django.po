@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-04 13:43+0200\n"
+"POT-Creation-Date: 2019-09-05 10:56+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2470,9 +2470,6 @@ msgstr "Réservé aux internes"
 
 msgid "Result"
 msgstr "Résultat"
-
-msgid "Return to search result"
-msgstr "Revenir aux résultats de recherche"
 
 msgid "SQL command"
 msgstr "Commande SQL"
