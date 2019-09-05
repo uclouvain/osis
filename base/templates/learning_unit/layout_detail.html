@@ -57,6 +57,14 @@
                     {% block action_top %}
                     {% endblock %}
                 </div>
+                <div class="pull-right" style="margin-right: 15px;">
+                    {% if search_url %}
+                        <a type="button" class="btn btn-default" href="{{ search_url }}">
+                            <span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
+                            {% trans 'Return to search result' %}
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
         <div class="panel-body" id="tabs">

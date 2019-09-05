@@ -24,13 +24,6 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if search_url %}
-    <a type="button" class="btn btn-default" href="{{ search_url }}">
-        <span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
-        {% trans 'Return to search result' %}
-    </a>
-{% endif %}
-
 {% if disabled_nav %}
     <h2 style="margin:40px 0 40px;">{{ header_title|default_if_none:'' }}</h2>
 {% else %}
