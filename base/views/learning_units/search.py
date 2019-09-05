@@ -69,6 +69,9 @@ ITEMS_PER_PAGES = 2000
 
 def learning_units_search(request, search_type):
     remove_from_session(request, 'search_url')
+    request.session['ue_search_type'] = str(_get_search_type_label(search_type)) \
+        if search_type != SIMPLE_SEARCH else None
+
     service_course_search = search_type == SERVICE_COURSES_SEARCH
     borrowed_course_search = search_type == BORROWED_COURSE
 
@@ -136,7 +139,6 @@ def learning_units_search(request, search_type):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units(request):
-    request.session['ue_search_type'] = None
     return learning_units_search(request, SIMPLE_SEARCH)
 
 
@@ -144,7 +146,6 @@ def learning_units(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_service_course(request):
-    request.session['ue_search_type'] = str(_get_search_type_label(SERVICE_COURSES_SEARCH))
     return learning_units_search(request, SERVICE_COURSES_SEARCH)
 
 
@@ -152,7 +153,6 @@ def learning_units_service_course(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_borrowed_course(request):
-    request.session['ue_search_type'] = str(_get_search_type_label(BORROWED_COURSE))
     return learning_units_search(request, BORROWED_COURSE)
 
 
