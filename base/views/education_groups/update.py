@@ -188,7 +188,7 @@ def _update_training(request, education_group_year, root):
     if show_coorganization(education_group_year):
         coorganization_formset = OrganizationFormset(
             data=request.POST or None,
-            form_kwargs={'education_group_year': education_group_year},
+            form_kwargs={'education_group_year': education_group_year, 'user': request.user},
             queryset=education_group_year.coorganizations
         )
         if form_education_group_year.is_valid() and coorganization_formset.is_valid():
