@@ -96,6 +96,7 @@ from base.views.learning_unit import learning_unit_components, learning_unit_spe
     learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
+from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
@@ -572,10 +573,12 @@ class LearningUnitViewTestCase(TestCase):
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.FULL)
 
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
+        header = {'HTTP_REFERER': SEARCH_URL_PART}
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]), **header)
 
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
+        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
     def test_learning_unit_read_versions(self):
         learning_unit_year = LearningUnitYearFullFactory(
@@ -1079,10 +1082,11 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr,
                                                      subtype=learning_unit_year_subtypes.FULL)
-
-        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]))
+        header = {'HTTP_REFERER': SEARCH_URL_PART}
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]), **header)
 
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
+        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()

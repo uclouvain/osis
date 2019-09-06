@@ -102,18 +102,18 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
 
     def test_compute_end_postponement_case_specific_end_date_and_no_data_in_future(self):
         # Set end date of education group
-        self.education_group_year.education_group.end_year = self.current_academic_year.year + 2
+        self.education_group_year.education_group.end_year = self.generated_ac_years.academic_years[1]
         self.education_group_year.education_group.save()
         self.education_group_year.refresh_from_db()
         # Remove all data in future
         EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
 
         result = _compute_end_year(self.education_group_year.education_group)
-        self.assertEqual(result, self.education_group_year.education_group.end_year)
+        self.assertEqual(result, self.education_group_year.education_group.end_year.year)
 
     def test_compute_end_postponement_case_specific_end_date_and_data_in_future_gte(self):
         # Set end date of education group
-        self.education_group_year.education_group.end_year = self.current_academic_year.year + 2
+        self.education_group_year.education_group.end_year = self.generated_ac_years.academic_years[1]
         self.education_group_year.refresh_from_db()
 
         # Create data in future
@@ -134,10 +134,12 @@ class TestPostpone(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.previous_academic_year, cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce()
+        cls.current_academic_year = create_current_academic_year()
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
     def setUp(self):
-        self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
+        self.education_group = EducationGroupFactory(end_year=self.next_academic_year)
 
         self.current_education_group_year = TrainingFactory(
             education_group=self.education_group,
@@ -199,7 +201,7 @@ class TestPostpone(TestCase):
         self.assertEqual(str(cm.exception), _("The content has already been postponed."))
 
     def test_init_old_education_group(self):
-        self.education_group.end_year = 1200
+        self.education_group.end_year = AcademicYearFactory(year=2000)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -548,7 +550,7 @@ class TestPostpone(TestCase):
         sub_group = GroupElementYearFactory(
             parent=self.current_group_element_year.child_branch,
             child_branch__academic_year=self.current_academic_year,
-            child_branch__education_group__end_year=self.current_academic_year.year,
+            child_branch__education_group__end_year=self.current_academic_year,
         )
         self.postponer = PostponeContent(self.current_education_group_year)
 
