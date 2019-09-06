@@ -51,7 +51,7 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages, \
-    paginate_queryset
+    paginate_queryset, remove_from_session
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -68,6 +68,8 @@ ITEMS_PER_PAGES = 2000
 
 
 def learning_units_search(request, search_type):
+    _manage_session_variables(request, search_type)
+
     service_course_search = search_type == SERVICE_COURSES_SEARCH
     borrowed_course_search = search_type == BORROWED_COURSE
 
@@ -131,6 +133,16 @@ def learning_units_search(request, search_type):
     return render(request, "learning_units.html", context)
 
 
+def _manage_session_variables(request, search_type):
+    remove_from_session(request, 'search_url')
+    if search_type == 'EXTERNAL':
+        request.session['ue_search_type'] = str(_('External learning units'))
+    elif search_type == SIMPLE_SEARCH:
+        request.session['ue_search_type'] = None
+    else:
+        request.session['ue_search_type'] = str(_get_search_type_label(search_type))
+
+
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
@@ -156,6 +168,8 @@ def learning_units_borrowed_course(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @cache_filter()
 def learning_units_proposal_search(request):
+    _manage_session_variables(request, PROPOSAL_SEARCH)
+
     user_person = get_object_or_404(Person, user=request.user)
     starting_ac_year = starting_academic_year()
     search_form = LearningUnitProposalForm(
@@ -242,6 +256,8 @@ def _get_search_type_label(search_type):
 @permission_required('base.can_access_externallearningunityear', raise_exception=True)
 @cache_filter()
 def learning_units_external_search(request):
+    _manage_session_variables(request, 'EXTERNAL')
+
     starting_ac_year = starting_academic_year()
     search_form = ExternalLearningUnitYearForm(
         request.GET or None,
