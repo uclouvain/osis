@@ -26,7 +26,6 @@
 import itertools
 from distutils.util import strtobool
 
-from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import OuterRef, Subquery, Exists, Case, When, Q, Value, CharField
