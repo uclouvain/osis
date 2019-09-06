@@ -225,8 +225,8 @@ class TestPropositionComparisonXls(TestCase):
                                         line_number), ['C{}'.format(line_number)])
 
     def test_get_represen_string(self):
-        self.assertEqual(get_representing_string(None), "-")
-        self.assertEqual(get_representing_string(""), "-")
+        self.assertEqual(get_representing_string(None), "")
+        self.assertEqual(get_representing_string(""), "")
         self.assertEqual(get_representing_string("test"), "test")
 
 
