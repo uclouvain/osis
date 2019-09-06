@@ -51,6 +51,7 @@ from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import find_all_languages
+from rules_management.mixins import PermissionFieldMixin
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
@@ -86,14 +87,15 @@ class LearningContainerModelForm(forms.ModelForm):
         fields = ()
 
 
-class LearningUnitYearModelForm(forms.ModelForm):
+class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
 
     def __init__(self, data, person, subtype, *args, external=False, **kwargs):
+        self.person = person
+        self.user = self.person.user
         super().__init__(data, *args, **kwargs)
 
         self.external = external
         self.instance.subtype = subtype
-        self.person = person
 
         acronym = self.initial.get('acronym')
         if acronym:
@@ -213,7 +215,7 @@ class CountryEntityField(forms.ChoiceField):
         )
 
 
-class LearningContainerYearModelForm(forms.ModelForm):
+class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
     # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
     requirement_entity = EntitiesVersionChoiceField(
         widget=autocomplete.ModelSelect2(
@@ -311,6 +313,7 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.person = kwargs.pop('person')
+        self.user = self.person.user
         self.proposal = kwargs.pop('proposal', False)
         self.is_create_form = kwargs['instance'] is None
         super().__init__(*args, **kwargs)
