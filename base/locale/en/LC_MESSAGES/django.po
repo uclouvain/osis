@@ -703,6 +703,10 @@ msgstr ""
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
 
+#, python-format
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr ""
+
 msgid "Consolidate"
 msgstr ""
 
@@ -954,9 +958,6 @@ msgid "Educational information opening"
 msgstr ""
 
 msgid "Elaboration and management of the formation catalogue."
-msgstr ""
-
-msgid "End"
 msgstr ""
 
 msgid "End date"
@@ -1407,6 +1408,9 @@ msgid "Language classes"
 msgstr ""
 
 msgid "Last modifications"
+msgstr ""
+
+msgid "Last year of organization"
 msgstr ""
 
 msgid "Lastname"
@@ -3494,9 +3498,6 @@ msgid "duration unit"
 msgstr ""
 
 msgid "email"
-msgstr ""
-
-msgid "end"
 msgstr ""
 
 msgid "english comment"

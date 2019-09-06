@@ -1279,6 +1279,7 @@ class GetContactsTestCase(TestCase):
         self.assertTrue('content' in context)
         self.assertTrue('entity' in context['content'])
         self.assertEqual(context['content']['entity'], self.entity_version.acronym)
+        self.assertEqual(context['content']['management_entity'], self.education_group_year.management_entity_version)
         self.assertTrue('contacts' in context['content'])
         self.assertTrue('text' in context['content'])
 

@@ -28,7 +28,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.models import Group
 from django.db.models import Prefetch
 from django.db.models import Subquery, OuterRef
-from django.http import Http404
 from django.views.generic import ListView
 
 from base.models.academic_year import current_academic_year
