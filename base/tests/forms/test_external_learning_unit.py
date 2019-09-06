@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm, \
     LearningContainerYearExternalModelForm, CograduationExternalLearningUnitModelForm, \
@@ -120,6 +121,7 @@ class TestExternalLearningUnitForm(TestCase):
         self.academic_year = create_current_academic_year()
         self.language = LanguageFactory(code='FR')
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_external_learning_unit_form_init(self):
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year)
 
@@ -130,6 +132,7 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertIsInstance(context['learning_container_year_form'], LearningContainerYearExternalModelForm)
         self.assertIsInstance(context['learning_unit_external_form'], CograduationExternalLearningUnitModelForm)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_external_learning_unit_form_is_valid(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data)
