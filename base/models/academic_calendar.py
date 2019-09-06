@@ -38,10 +38,10 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('academic_year', 'title', 'start_date', 'end_date')
+    list_display = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
     list_display_links = None
-    readonly_fields = ('academic_year', 'title', 'start_date', 'end_date')
-    list_filter = ('academic_year', 'reference')
+    readonly_fields = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
+    list_filter = ('academic_year', 'reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
 
@@ -76,6 +76,9 @@ class AcademicCalendar(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
+    data_year = models.ForeignKey(
+        'AcademicYear', on_delete=models.PROTECT, related_name='related_academic_calendar_data', null=True
+    )
     title = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
