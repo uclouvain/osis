@@ -28,10 +28,10 @@ from django.http import HttpResponse
 from django.test import TestCase
 from rest_framework.reverse import reverse
 
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, TUTOR_GROUP
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.views.user_list import UserListView
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, TUTOR_GROUP
 
 
 class UserListViewTestCase(TestCase):

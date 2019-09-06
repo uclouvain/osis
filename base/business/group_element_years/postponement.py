@@ -28,7 +28,8 @@ from django.db.models import Q, Exists, OuterRef
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
-from base.business.education_groups.postponement import duplicate_education_group_year
+
+from base.business.education_groups import postponement
 from base.business.group_element_years import attach
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year, AcademicYear
@@ -190,7 +191,7 @@ class PostponeContent:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         end_year = self.instance.education_group.end_year
-        if end_year and end_year < self.next_academic_year.year:
+        if end_year and end_year.year < self.next_academic_year.year:
             raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
         if not self.instance.groupelementyear_set.exists():
@@ -337,11 +338,12 @@ class PostponeContent:
 
     def _duplication_education_group_year(self, old_gr: GroupElementYear, old_egy: EducationGroupYear):
         if old_egy.education_group_type.category != Categories.GROUP.name:
-            if old_egy.education_group.end_year and old_egy.education_group.end_year < self.next_academic_year.year:
+            if old_egy.education_group.end_year and \
+                    old_egy.education_group.end_year.year < self.next_academic_year.year:
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
                 return None
 
-        new_egy = duplicate_education_group_year(old_egy, self.next_academic_year)
+        new_egy = postponement.duplicate_education_group_year(old_egy, self.next_academic_year)
 
         if old_gr.link_type != LinkTypes.REFERENCE.name:
             # Copy its children

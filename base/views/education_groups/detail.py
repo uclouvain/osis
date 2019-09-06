@@ -44,7 +44,7 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base import models as mdl
-from base.business.education_group import can_user_edit_administrative_data
+from base.business.education_group import can_user_edit_administrative_data, show_coorganization
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
@@ -143,8 +143,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            context['tree'] = json.dumps(EducationGroupHierarchy(
-                self.root, tab_to_show=self.request.GET.get('tab_to_show')).to_json())
+            education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
+                                                                     tab_to_show=self.request.GET.get('tab_to_show'))
+            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,
@@ -220,7 +221,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
-        context["show_coorganization"] = self.show_coorganization()
+        context["show_coorganization"] = show_coorganization(self.object)
         return context
 
     def get_template_names(self):
@@ -254,11 +255,6 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             'main_teaching_campus', 'administration_entity', 'management_entity',
             'academic_year'
         )
-
-    def show_coorganization(self):
-        return self.object.education_group_type.category == "TRAINING" and \
-               self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                             TrainingType.PGRM_MASTER_180_240.name]
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
