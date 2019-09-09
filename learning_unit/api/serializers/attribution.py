@@ -56,13 +56,8 @@ class LearningUnitAttribution(SubstituteAttribution):
 
     class Meta:
         model = AttributionChargeNew
-        fields = (
-            'email',
+        fields = SubstituteAttribution.Meta.fields + (
             'function',
             'function_text',
-            'global_id',
-            'first_name',
-            'middle_name',
-            'last_name',
             'substitute'
         )
