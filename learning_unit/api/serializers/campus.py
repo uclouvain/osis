@@ -30,7 +30,7 @@ from base.models.campus import Campus
 
 
 class CampusSerializer(serializers.HyperlinkedModelSerializer):
-    organization = serializers.RelatedField(source='organization.name', read_only=True)
+    organization = serializers.ReadOnlyField(source='organization.name')
 
     class Meta:
         model = Campus

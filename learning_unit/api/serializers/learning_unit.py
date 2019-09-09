@@ -35,7 +35,10 @@ class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
         view_name='learning_unit_api_v1:learningunits_read',
         lookup_field='uuid'
     )
-    requirement_entity = serializers.CharField(source='requirement_entity_version.acronym', read_only=True)
+    requirement_entity = serializers.CharField(
+        source='learning_container_year.requirement_entity_version.acronym',
+        read_only=True
+    )
     language = serializers.CharField(source='language.code', read_only=True)
     team = serializers.BooleanField(source='learning_container_year.team', read_only=True)
     campus = CampusSerializer()

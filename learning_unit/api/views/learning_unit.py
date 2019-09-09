@@ -35,10 +35,9 @@ class LearningUnitYearDetail(generics.RetrieveAPIView):
     """
     name = 'learningunits_read'
     queryset = LearningUnitYear.objects.all().select_related(
-        'learning_container_year',
         'language',
     ).prefetch_related(
-        'requirement_entity__entityversion_set',
+        'learning_container_year__requirement_entity__entityversion_set',
     )
     serializer_class = LearningUnitYearSerializer
     lookup_field = 'uuid'
