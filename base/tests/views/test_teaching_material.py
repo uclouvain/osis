@@ -25,7 +25,6 @@
 ##############################################################################
 from unittest import mock
 
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
@@ -34,7 +33,7 @@ from django.urls import reverse
 
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -42,12 +41,11 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 
 class TeachingMaterialCreateTestCase(TestCase):
     def setUp(self):
-
-        self.academic_yr = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
+        self.current_academic_year = create_current_academic_year()
         self.learning_unit_year = LearningUnitYearFactory(
             subtype=FULL,
-            academic_year=self.academic_yr,
-            learning_container_year__academic_year=self.academic_yr
+            academic_year=self.current_academic_year,
+            learning_container_year__academic_year=self.current_academic_year
         )
         self.url = reverse('teaching_material_create', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
         self.person = _get_central_manager_person_with_permission()
