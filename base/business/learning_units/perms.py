@@ -553,10 +553,10 @@ class can_learning_unit_year_educational_information_be_udpated(BasePerm):
 
 
 def is_year_editable(learning_unit_year, raise_exception):
-    result = learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
+    result = learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
     msg = "{}.  {}".format(
         _("You can't modify learning unit under year : %(year)d") %
-        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+        {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
         _("Modifications should be made in EPC for year %(year)d") %
         {"year": learning_unit_year.academic_year.year},
     )
@@ -610,19 +610,6 @@ def _check_proposal_edition(learning_unit_year, raise_exception):
         raise_exception,
         result,
         MSG_CANNOT_EDIT_BECAUSE_OF_PROPOSAL,
-    )
-    return result
-
-
-def _is_container_type_course_dissertation_or_internship(learning_unit_year, _, raise_exception):
-    result = \
-        learning_unit_year.learning_container_year and \
-        learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
-
-    can_raise_exception(
-        raise_exception,
-        result,
-        MSG_NOT_ELIGIBLE_FOR_MODIFICATION_BECAUSE_OF_TYPE
     )
     return result
 

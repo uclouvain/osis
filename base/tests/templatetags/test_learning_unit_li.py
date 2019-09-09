@@ -39,6 +39,7 @@ from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG
     MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
     MSG_CAN_DELETE_ACCORDING_TO_TYPE, can_modify_end_year_by_proposal, can_modify_by_proposal, \
     MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
@@ -150,7 +151,7 @@ class LearningUnitTagLiEditTest(TestCase):
                     'id_li': ID_LINK_EDIT_LU,
                     'url': "#",
                     'title': "{}.  {}".format("You can't modify learning unit under year : %(year)d" %
-                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
                                               "Modifications should be made in EPC for year %(year)d" %
                                               {"year": self.previous_learning_unit_year.academic_year.year}),
                     'class_li': DISABLED,
@@ -238,9 +239,10 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
+        current_academic_yr = AcademicYear.objects.get(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
         lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=current_academic_yr,
             learning_unit=lu,
         )
         person_faculty_managers = [
