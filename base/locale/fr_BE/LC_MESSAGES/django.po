@@ -1585,7 +1585,7 @@ msgid "List of learning units with comparison"
 msgstr "Comparaison entre unités d'enseignement"
 
 msgid "List of learning units with educational information and specifications"
-msgstr "Liste des UEs avec les informationss pédagogiques et le cahier des charges"
+msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "List of learning units with with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
@@ -2237,7 +2237,7 @@ msgid ""
 "Produce a xls of learning units with educational information and "
 "specifications"
 msgstr ""
-"Produire une liste des UEs avec les informations pédagogiques et le cahier des charges"
+"Produire une liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "Produce a xls of learning units with one line per attribution"
 msgstr ""
