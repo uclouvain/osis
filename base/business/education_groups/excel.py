@@ -31,12 +31,12 @@ from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
 from openpyxl.styles.borders import BORDER_THICK
-from openpyxl.styles.colors import RED
+from openpyxl.styles.colors import RED, GREEN
 from openpyxl.writer.excel import save_virtual_workbook
 
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.prerequisite_operator import OR
+from base.models.enums.prerequisite_operator import OR, AND
 from base.models.group_element_year import fetch_row_sql, GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
@@ -56,6 +56,7 @@ STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1
 STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
 
 STYLE_FONT_RED = Style(font=Font(color=RED))
+STYLE_FONT_GREEN = Style(font=Font(color=GREEN))
 FONT_HYPERLINK = Font(underline='single', color='0563C1')
 
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
@@ -134,6 +135,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
     _build_worksheet(worksheet_data, workbook, 0)
 
     _merge_cells(excel_lines, workbook)
+    _readjust_worksheet_columns_width(workbook)
     _add_hyperlink(excel_lines, workbook, str(egy.academic_year.year))
     return workbook
 
@@ -234,6 +236,8 @@ def _get_style_to_apply(excel_lines: list):
         elif isinstance(row, PrerequisiteItemLine):
             if row.operator == _(OR):
                 style_to_apply_dict[STYLE_FONT_RED].append("B{index}".format(index=index))
+            elif row.operator == _(AND):
+                style_to_apply_dict[STYLE_FONT_GREEN].append("B{index}".format(index=index))
 
             if (last_luy_line_index - index) % 2 == 1:
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("C{index}".format(index=index))
@@ -248,8 +252,15 @@ def _get_style_to_apply(excel_lines: list):
 def _merge_cells(excel_lines, workbook: Workbook):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
+        if isinstance(row, HeaderLine):
+            worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=7)
         if isinstance(row, LearningUnitYearLine):
             worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=7)
+
+
+def _readjust_worksheet_columns_width(workbook: Workbook):
+    worksheet = workbook.worksheets[0]
+    worksheet.column_dimensions['B'].width = 6
 
 
 def _add_hyperlink(excel_lines, workbook: Workbook, year):
