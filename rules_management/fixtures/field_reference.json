@@ -4750,5 +4750,38 @@
             ]
         },
         "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 294,
+        "fields": {
+            "field_name": "attribution_procedure",
+            "content_type": [
+                "base",
+                "learningunityear"
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 295,
+        "fields": {
+            "field_name": "is_vacant",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 296,
+        "fields": {
+            "field_name": "type_declaration_vacant",
+            "content_type": [
+                "base",
+                "learningcontaineryear"
+            ]
+        },
+        "model": "rules_management.fieldreference"
     }
 ]
