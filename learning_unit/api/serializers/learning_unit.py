@@ -27,8 +27,8 @@
 from rest_framework import serializers
 
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.campus import CampusSerializer
-from learning_unit.api.serializers.component import LearningComponentYearSerializer
+from learning_unit.api.serializers.campus import LearningUnitCampus
+from learning_unit.api.serializers.component import LearningUnitComponent
 
 
 class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
@@ -48,8 +48,8 @@ class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
     language = serializers.CharField(source='language.code', read_only=True)
     team = serializers.BooleanField(source='learning_container_year.team', read_only=True)
 
-    campus = CampusSerializer(read_only=True)
-    components = LearningComponentYearSerializer(many=True, source='learningcomponentyear_set', read_only=True)
+    campus = LearningUnitCampus(read_only=True)
+    components = LearningUnitComponent(many=True, source='learningcomponentyear_set', read_only=True)
 
     parent = serializers.HyperlinkedRelatedField(
         view_name='learning_unit_api_v1:learningunits_read',
