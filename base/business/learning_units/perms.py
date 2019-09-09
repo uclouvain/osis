@@ -240,7 +240,8 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
     elif LearningUnitYear.objects.filter(learning_unit=learning_unit_year.learning_unit,
                                          academic_year__year__lt=settings.YEAR_LIMIT_LUE_MODIFICATION):
-        msg = MSG_LEARNING_UNIT_EXIST_IN_PAST
+        msg = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
+            "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
 
     result = False if msg else True
     can_raise_exception(
