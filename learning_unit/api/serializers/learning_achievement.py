@@ -30,4 +30,3 @@ class LearningAchievementListSerializer(serializers.Serializer):
     code_name = serializers.CharField()
     fr = serializers.CharField()
     en = serializers.CharField()
-

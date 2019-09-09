@@ -23,38 +23,47 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
-
-from django.db.models.functions import Lower
+from django.db.models import Case, When, CharField, F, Value
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from base.models.learning_achievement import LearningAchievement
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_achievement import LearningAchievementListSerializer
+from cms.models.translated_text import TranslatedText
+from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
 
 
-class LearningAchievementList(generics.GenericAPIView):
+class LearningUnitSummarySpecification(generics.GenericAPIView):
     """
-        Return all achievement in order according of the learning unit specified.
+        Return all summary and specification information of the learning unit specified
     """
-    name = 'learningunitachievements_read'
-    serializer_class = LearningAchievementListSerializer
+    name = 'learningunitsummaryspecification_read'
+    serializer_class = LearningUnitSummarySpecificationSerializer
     filter_backends = []
     paginator = None
 
     def get(self, request, *args, **kwargs):
         learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
-        qs = LearningAchievement.objects.filter(learning_unit_year=learning_unit_year)\
-                                .annotate(iso_code=Lower('language__code')).values('code_name', 'text', 'iso_code')
+        qs = TranslatedText.objects.filter(
+            reference=learning_unit_year.pk,
+            text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
+        ).annotate(
+            iso_code=Case(
+                When(language=LANGUAGE_CODE_FR, then=Value('fr')),
+                When(language=LANGUAGE_CODE_EN, then=Value('en')),
+                default=None,
+                output_field=CharField(),
+            ),
+            label=F('text_label__label')
+        ).exclude(iso_code__isnull=True).values('label', 'iso_code', 'text')
 
-        learning_achievements_grouped = OrderedDict()
-        for learning_achievement in qs:
-            code_name = learning_achievement['code_name']
-            learning_achievements_grouped.setdefault(code_name, {'fr': '', 'en': '', 'code_name': code_name})
-            learning_achievements_grouped[code_name][learning_achievement['iso_code']] = \
-                learning_achievement['text']
+        summary_specification_grouped = {}
+        for translated_text in qs:
+            key = translated_text['label']
+            summary_specification_grouped.setdefault(key, {'fr': '', 'en': ''})
+            summary_specification_grouped[key][translated_text['iso_code']] = translated_text['text']
 
-        serializer = self.get_serializer(learning_achievements_grouped.values(), many=True)
+        serializer = self.get_serializer(summary_specification_grouped)
         return Response(serializer.data)

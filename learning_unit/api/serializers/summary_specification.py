@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,27 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.conf.urls import url
+from rest_framework import serializers
 
-from learning_unit.api.views.learning_achievement import LearningAchievementList
-from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
+from backoffice.settings.rest_framework import common_serializers
 
-app_name = "learning_unit"
 
-urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/achievements', LearningAchievementList.as_view(),
-        name=LearningAchievementList.name),
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/summary_specification', LearningUnitSummarySpecification.as_view(),
-        name=LearningUnitSummarySpecification.name),
-]
-
-if 'education_group' in settings.INSTALLED_APPS:
-    from education_group.api.views.learning_unit import EducationGroupRootsList
-    urlpatterns += (
-      url(
-        r'^learning_units/(?P<uuid>[0-9a-f-]+)/education_group_roots$',
-        EducationGroupRootsList.as_view(),
-        name=EducationGroupRootsList.name
-      ),
-    )
+class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
+    bibliography = common_serializers.TranslatedSerializer()
+    resume = common_serializers.TranslatedSerializer()
+    evaluation_methods = common_serializers.TranslatedSerializer()
+    other_informations = common_serializers.TranslatedSerializer()
+    online_resources = common_serializers.TranslatedSerializer()
+    teaching_methods = common_serializers.TranslatedSerializer()
+    themes_discussed = common_serializers.TranslatedSerializer()
+    prerequisite = common_serializers.TranslatedSerializer()
+    mobility = common_serializers.TranslatedSerializer()

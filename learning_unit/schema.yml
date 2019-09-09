@@ -122,7 +122,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{uuid}/summary_specification_info:
+  /learning_units/{uuid}/summary_specification:
     get:
       description: Return all summary and specification information of the learning unit specified
       operationId: learningunitsummaryspecification_read
