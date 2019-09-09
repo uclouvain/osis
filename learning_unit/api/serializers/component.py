@@ -1,3 +1,4 @@
+
 ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
@@ -23,23 +24,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
 
-from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_unit import LearningUnitYearSerializer
+from rest_framework import serializers
+
+from base.models.learning_component_year import LearningComponentYear
 
 
-class LearningUnitYearDetail(generics.RetrieveAPIView):
-    """
-        Return the detail of the learning unit
-    """
-    name = 'learningunits_read'
-    queryset = LearningUnitYear.objects.all().select_related(
-        'language',
-        'campus'
-    ).prefetch_related(
-        'learning_container_year__requirement_entity__entityversion_set',
-        'learningcomponentyear_set'
-    )
-    serializer_class = LearningUnitYearSerializer
-    lookup_field = 'uuid'
+class LearningComponentYearSerializer(serializers.HyperlinkedModelSerializer):
+    type_text = serializers.CharField(source='get_type_display', read_only=True)
+    hourly_volume_total_annual_computed = serializers.SerializerMethodField('get_computed_volume', read_only=True)
+
+    class Meta:
+        model = LearningComponentYear
+        fields = (
+            'type',
+            'type_text',
+            'planned_classes',
+            'hourly_volume_total_annual',
+            'hourly_volume_total_annual_computed'
+        )
+
+    def get_computed_volume(self, obj):
+        return str(obj.vol_global)

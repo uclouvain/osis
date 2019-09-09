@@ -28,20 +28,41 @@ from rest_framework import serializers
 
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import CampusSerializer
+from learning_unit.api.serializers.component import LearningComponentYearSerializer
 
 
 class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid'
+        lookup_field='uuid',
+        read_only=True
     )
+
+    periodicity_text = serializers.CharField(source='get_periodicity_display', read_only=True)
+    quadrimester_text = serializers.CharField(source='get_quadrimester_display', read_only=True)
+
     requirement_entity = serializers.CharField(
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
     )
     language = serializers.CharField(source='language.code', read_only=True)
     team = serializers.BooleanField(source='learning_container_year.team', read_only=True)
-    campus = CampusSerializer()
+
+    campus = CampusSerializer(read_only=True)
+    components = LearningComponentYearSerializer(many=True, source='learningcomponentyear_set', read_only=True)
+
+    parent = serializers.HyperlinkedRelatedField(
+        view_name='learning_unit_api_v1:learningunits_read',
+        lookup_field='uuid',
+        read_only=True
+    )
+    partims = serializers.HyperlinkedRelatedField(
+        view_name='learning_unit_api_v1:learningunits_read',
+        lookup_field='uuid',
+        many=True,
+        source='get_partims_related',
+        read_only=True
+    )
 
     class Meta:
         model = LearningUnitYear
@@ -52,14 +73,13 @@ class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
             'requirement_entity',
             'status',
             'quadrimester',
+            'quadrimester_text',
             'periodicity',
+            'periodicity_text',
             'campus',
             'team',
-            'language'
+            'language',
+            'components',
+            'parent',
+            'partims'
         )
-
-    def get_campus(self, obj):
-        return {
-            'name': obj.campus.name,
-            'organization': obj.campus.organization.name
-        }

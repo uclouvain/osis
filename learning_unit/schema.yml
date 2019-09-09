@@ -192,8 +192,12 @@ components:
           type: boolean
         quadrimester:
           $ref: '#/components/schemas/QuadrimesterEnum'
+        quadrimester_text:
+          type: string
         periodicity:
           $ref: '#/components/schemas/PeriodicityEnum'
+        periodicity_text:
+          type: string
         campus:
           $ref: '#/components/schemas/LearningUnitCampus'
         components:
@@ -219,6 +223,8 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/ComponentTypeEnum'
+        type_text:
+            type: string
         planned_classes:
           type: integer
           format: int32
