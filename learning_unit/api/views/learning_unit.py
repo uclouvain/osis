@@ -23,12 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import generics
 
-from learning_unit.api.views.learning_unit import LearningUnitYearDetail
+from base.models.learning_unit_year import LearningUnitYear
+from learning_unit.api.serializers.learning_unit import LearningUnitYearSerializer
 
-app_name = "learning_unit"
 
-urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitYearDetail.as_view(), name=LearningUnitYearDetail.name),
-]
+class LearningUnitYearDetail(generics.RetrieveAPIView):
+    """
+        Return the detail of the learning unit
+    """
+    name = 'learningunits_read'
+    queryset = LearningUnitYear.objects.all().select_related(
+        'learning_container_year',
+        'language',
+    ).prefetch_related(
+        'requirement_entity__entityversion_set',
+    )
+    serializer_class = LearningUnitYearSerializer
+    lookup_field = 'uuid'

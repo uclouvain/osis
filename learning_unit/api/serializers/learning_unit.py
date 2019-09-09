@@ -1,3 +1,4 @@
+
 ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
@@ -23,12 +24,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from learning_unit.api.views.learning_unit import LearningUnitYearDetail
+from base.models.learning_unit_year import LearningUnitYear
+from learning_unit.api.serializers.campus import CampusSerializer
 
-app_name = "learning_unit"
 
-urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitYearDetail.as_view(), name=LearningUnitYearDetail.name),
-]
+class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='learning_unit_api_v1:learningunits_read',
+        lookup_field='uuid'
+    )
+    requirement_entity = serializers.CharField(source='requirement_entity_version.acronym', read_only=True)
+    language = serializers.CharField(source='language.code', read_only=True)
+    team = serializers.BooleanField(source='learning_container_year.team', read_only=True)
+    campus = CampusSerializer()
+
+    class Meta:
+        model = LearningUnitYear
+        fields = (
+            'url',
+            'acronym',
+            'credits',
+            'requirement_entity',
+            'status',
+            'quadrimester',
+            'periodicity',
+            'campus',
+            'team',
+            'language'
+        )
+
+    def get_campus(self, obj):
+        return {
+            'name': obj.campus.name,
+            'organization': obj.campus.organization.name
+        }

@@ -1,3 +1,4 @@
+
 ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
@@ -23,12 +24,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from learning_unit.api.views.learning_unit import LearningUnitYearDetail
+from base.models.campus import Campus
 
-app_name = "learning_unit"
 
-urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitYearDetail.as_view(), name=LearningUnitYearDetail.name),
-]
+class CampusSerializer(serializers.HyperlinkedModelSerializer):
+    organization = serializers.RelatedField(source='organization.name', read_only=True)
+
+    class Meta:
+        model = Campus
+        fields = (
+            'name',
+            'organization'
+        )
