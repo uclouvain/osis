@@ -36,7 +36,8 @@ from base.serializers import EntitySerializer
 @api_view(['POST'])
 def post_entities(request):
     existing_entity = entity.get_by_external_id(request.data.get('external_id'))
-
+    print(existing_entity)
+    print(request.data)
     if existing_entity is None:
         return create_full_entity(request)
     else:

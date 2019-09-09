@@ -148,7 +148,10 @@ def learning_unit_specifications(request, learning_unit_year_id):
 @require_http_methods(["GET", "POST"])
 def learning_unit_specifications_edit(request, learning_unit_year_id):
     if request.method == 'POST':
-        form = LearningUnitSpecificationsEditForm(request.POST)
+        form = LearningUnitSpecificationsEditForm(
+            request.POST,
+
+        )
         if form.is_valid():
             form.save()
         return HttpResponseRedirect(reverse("learning_unit_specifications",
@@ -200,8 +203,8 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         'campus': [
             learning_unit_year._meta.get_field('campus').verbose_name,
             initial_learning_unit_year.campus.name,
-            learning_unit_year.campus.name] \
-            if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else [],
+            learning_unit_year.campus.name]
+        if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else [],
         'entities_fields': get_all_entities_comparison_context(initial_data, learning_unit_year),
         'learning_unit_year_fields': learning_unit_year_fields,
         'components': components_list

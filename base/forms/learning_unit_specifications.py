@@ -25,10 +25,17 @@
 ##############################################################################
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.db.models import Max
 
+from base.business.utils.model import update_object, model_to_dict_fk
 from base.forms.common import set_trans_txt
+from base.models import academic_year
+from base.models.academic_year import AcademicYear
+from base.models.enums import learning_unit_year_subtypes
+from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
 from cms.models import translated_text
+from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitSpecificationsForm(forms.Form):
@@ -59,6 +66,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.learning_unit_year = kwargs.pop('learning_unit_year', None)
         self.text_label = kwargs.pop('text_label', None)
+
         super(LearningUnitSpecificationsEditForm, self).__init__(*args, **kwargs)
 
     def load_initial(self):
@@ -87,3 +95,46 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         trans_text = translated_text.find_by_id(self.cleaned_data['cms_' + language + '_id'])
         trans_text.text = self.cleaned_data.get('trans_text_' + language)
         trans_text.save()
+
+        luy = LearningUnitYear.objects.get(id=trans_text.reference)
+        max_postponement_year = self._get_end_postponent_year(luy)
+        ac_year_postponement_range = AcademicYear.objects.min_max_years(
+            luy.academic_year.year + 1,
+            max_postponement_year
+        )
+        print("LUY ID", luy.id)
+        for ac in ac_year_postponement_range:
+            next_luy = LearningUnitYear.objects.get(
+                academic_year=ac,
+                acronym=luy.acronym
+            )
+            print("dada")
+            print(next_luy.id)
+            new_text, created = TranslatedText.objects.get_or_create(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=next_luy.id,
+                language='fr-be' if language == 'fr' else language,
+                text_label=trans_text.text_label,
+                defaults={'text': trans_text.text}
+            )
+            # print(vars(new_text))
+            new_text_dict = model_to_dict_fk(trans_text, exclude=['external_id', 'reference'])
+            new_text_dict['reference'] = next_luy.id
+            print(created)
+            if not created:
+                print("update")
+                update_object(new_text, new_text_dict)
+            # print(vars(new_text))
+
+    def _get_end_postponent_year(self, luy):
+        end_postponement = academic_year.find_academic_year_by_year(luy.learning_unit.end_year)
+        if luy.subtype == learning_unit_year_subtypes.PARTIM:
+            max_postponement_year = luy.learning_unit.learningunityear_set.aggregate(
+                Max('academic_year__year')
+            )['academic_year__year__max']
+        else:
+            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
+        end_year = end_postponement.year if end_postponement else None
+        max_postponent_year = min(end_year, max_postponement_year) if end_year else max_postponement_year
+        return max_postponement_year
+
