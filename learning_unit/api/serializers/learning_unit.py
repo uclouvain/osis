@@ -31,7 +31,7 @@ from learning_unit.api.serializers.campus import LearningUnitCampus
 from learning_unit.api.serializers.component import LearningUnitComponent
 
 
-class LearningUnitYearSerializer(serializers.HyperlinkedModelSerializer):
+class LearningUnitDetailed(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='learning_unit_api_v1:learningunits_read',
         lookup_field='uuid',

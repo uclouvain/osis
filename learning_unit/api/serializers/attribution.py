@@ -24,25 +24,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from rest_framework import serializers
 
-from base.models.learning_component_year import LearningComponentYear
+from attribution.models.attribution_charge_new import AttributionChargeNew
+from base.models.person import Person
 
 
-class LearningUnitComponent(serializers.ModelSerializer):
-    type_text = serializers.CharField(source='get_type_display', read_only=True)
-    hourly_volume_total_annual_computed = serializers.SerializerMethodField('get_computed_volume', read_only=True)
+class SubstituteAttribution(serializers.ModelSerializer):
+    global_id = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(read_only=True)
+    middle_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    email = serializers.CharField(read_only=True)
 
     class Meta:
-        model = LearningComponentYear
+        model = Person
         fields = (
-            'type',
-            'type_text',
-            'planned_classes',
-            'hourly_volume_total_annual',
-            'hourly_volume_total_annual_computed'
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+            'global_id'
         )
 
-    def get_computed_volume(self, obj):
-        return str(obj.vol_global)
+
+class LearningUnitAttribution(SubstituteAttribution):
+    function = serializers.CharField(source='attribution.function', read_only=True)
+    function_text = serializers.CharField(source='attribution.get_function_display', read_only=True)
+
+    substitute = SubstituteAttribution(source='attribution.substitute')
+
+    class Meta:
+        model = AttributionChargeNew
+        fields = (
+            'email',
+            'function',
+            'function_text',
+            'global_id',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'substitute'
+        )

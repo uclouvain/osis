@@ -25,10 +25,16 @@
 ##############################################################################
 from django.conf.urls import url
 
+from learning_unit.api.views.attribution import Attribution
 from learning_unit.api.views.learning_unit import LearningUnitYearDetail
 
 app_name = "learning_unit"
 
 urlpatterns = [
     url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitYearDetail.as_view(), name=LearningUnitYearDetail.name),
+    url(
+        r'^learning_units/(?P<uuid>[0-9a-f-]+)/attributions/$',
+        Attribution.as_view(),
+        name=Attribution.name
+    ),
 ]

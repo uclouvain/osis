@@ -249,6 +249,8 @@ components:
           format: email
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
         global_id:
           type: string
         last_name:

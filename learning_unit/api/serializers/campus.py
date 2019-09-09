@@ -29,7 +29,7 @@ from rest_framework import serializers
 from base.models.campus import Campus
 
 
-class LearningUnitCampus(serializers.HyperlinkedModelSerializer):
+class LearningUnitCampus(serializers.ModelSerializer):
     organization = serializers.ReadOnlyField(source='organization.name')
 
     class Meta:
