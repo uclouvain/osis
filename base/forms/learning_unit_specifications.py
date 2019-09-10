@@ -70,63 +70,46 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         super(LearningUnitSpecificationsEditForm, self).__init__(*args, **kwargs)
 
     def load_initial(self):
-        value_fr = translated_text.get_or_create(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.learning_unit_year.id,
-            language='fr-be',
-            text_label=self.text_label
-        )
-        value_en = translated_text.get_or_create(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.learning_unit_year.id,
-            language='en',
-            text_label=self.text_label
-        )
+        value_fr = self._get_or_create_translated_text('fr')
+        value_en = self._get_or_create_translated_text('en')
         self.fields['cms_fr_id'].initial = value_fr.id
         self.fields['trans_text_fr'].initial = value_fr.text
         self.fields['cms_en_id'].initial = value_en.id
         self.fields['trans_text_en'].initial = value_en.text
 
+    def _get_or_create_translated_text(self, language):
+        return translated_text.get_or_create(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=self.learning_unit_year.id,
+            language='fr-be' if language == 'fr' else language,
+            text_label=self.text_label
+        )
+
     def save(self):
-        self._save_text_language('fr')
-        self._save_text_language('en')
+        text_label, last_academic_year = self._save_translated_text()
+        return text_label, last_academic_year
 
-    def _save_text_language(self, language):
-        trans_text = translated_text.find_by_id(self.cleaned_data['cms_' + language + '_id'])
-        trans_text.text = self.cleaned_data.get('trans_text_' + language)
-        trans_text.save()
+    def _save_translated_text(self):
+        for language in ['fr', 'en']:
+            trans_text = translated_text.find_by_id(self.cleaned_data['cms_' + language + '_id'])
+            trans_text.text = self.cleaned_data.get('trans_text_' + language)
+            trans_text.save()
 
-        luy = LearningUnitYear.objects.get(id=trans_text.reference)
-        max_postponement_year = self._get_end_postponent_year(luy)
+            luy = LearningUnitYear.objects.get(id=trans_text.reference)
+            ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
+
+            self._update_future_luy(ac_year_postponement_range, language, luy, trans_text)
+        return trans_text.text_label.label, ac_year_postponement_range.last()
+
+    def _get_ac_year_postponement_year(self, luy):
+        max_postponement_year = self._get_end_postponement_year(luy)
         ac_year_postponement_range = AcademicYear.objects.min_max_years(
             luy.academic_year.year + 1,
             max_postponement_year
         )
-        print("LUY ID", luy.id)
-        for ac in ac_year_postponement_range:
-            next_luy = LearningUnitYear.objects.get(
-                academic_year=ac,
-                acronym=luy.acronym
-            )
-            print("dada")
-            print(next_luy.id)
-            new_text, created = TranslatedText.objects.get_or_create(
-                entity=entity_name.LEARNING_UNIT_YEAR,
-                reference=next_luy.id,
-                language='fr-be' if language == 'fr' else language,
-                text_label=trans_text.text_label,
-                defaults={'text': trans_text.text}
-            )
-            # print(vars(new_text))
-            new_text_dict = model_to_dict_fk(trans_text, exclude=['external_id', 'reference'])
-            new_text_dict['reference'] = next_luy.id
-            print(created)
-            if not created:
-                print("update")
-                update_object(new_text, new_text_dict)
-            # print(vars(new_text))
+        return ac_year_postponement_range
 
-    def _get_end_postponent_year(self, luy):
+    def _get_end_postponement_year(self, luy):
         end_postponement = academic_year.find_academic_year_by_year(luy.learning_unit.end_year)
         if luy.subtype == learning_unit_year_subtypes.PARTIM:
             max_postponement_year = luy.learning_unit.learningunityear_set.aggregate(
@@ -135,6 +118,19 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         else:
             max_postponement_year = academic_year.compute_max_academic_year_adjournment()
         end_year = end_postponement.year if end_postponement else None
-        max_postponent_year = min(end_year, max_postponement_year) if end_year else max_postponement_year
+        max_postponement_year = min(end_year, max_postponement_year) if end_year else max_postponement_year
         return max_postponement_year
 
+    def _update_future_luy(self, ac_year_postponement_range, language, luy, trans_text):
+        for ac in ac_year_postponement_range:
+            next_luy = LearningUnitYear.objects.get(
+                academic_year=ac,
+                acronym=luy.acronym
+            )
+            TranslatedText.objects.update_or_create(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=next_luy.id,
+                language='fr-be' if language == 'fr' else language,
+                text_label=trans_text.text_label,
+                defaults={'text': trans_text.text}
+            )

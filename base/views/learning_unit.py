@@ -30,11 +30,10 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 from django.views.decorators.http import require_http_methods
 
 from attribution.business import attribution_charge_new
@@ -63,7 +62,7 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
 from reference.models.language import find_language_in_settings
@@ -148,29 +147,44 @@ def learning_unit_specifications(request, learning_unit_year_id):
 @require_http_methods(["GET", "POST"])
 def learning_unit_specifications_edit(request, learning_unit_year_id):
     if request.method == 'POST':
-        form = LearningUnitSpecificationsEditForm(
-            request.POST,
-
-        )
+        form = LearningUnitSpecificationsEditForm(request.POST)
         if form.is_valid():
-            form.save()
-        return HttpResponseRedirect(reverse("learning_unit_specifications",
-                                            kwargs={'learning_unit_year_id': learning_unit_year_id}))
+            field_label, last_academic_year = form.save()
+            translated_field_label = _get_translated_field_label(field_label)
 
-    context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
-    label_name = request.GET.get('label')
-    text_lb = text_label.get_by_name(label_name)
-    form = LearningUnitSpecificationsEditForm(**{
-        'learning_unit_year': context['learning_unit_year'],
-        'text_label': text_lb
+            display_success_messages(
+                request,
+                _build_edit_specification_success_message(last_academic_year, translated_field_label)
+            )
+        return HttpResponse()
+    else:
+        context = get_common_context_learning_unit_year(learning_unit_year_id,
+                                                        get_object_or_404(Person, user=request.user))
+        label_name = request.GET.get('label')
+        text_lb = text_label.get_by_name(label_name)
+        form = LearningUnitSpecificationsEditForm(**{
+            'learning_unit_year': context['learning_unit_year'],
+            'text_label': text_lb
+        })
+        form.load_initial()  # Load data from database
+        context['form'] = form
+
+        user_language = mdl.person.get_user_interface_language(request.user)
+        context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
+        return render(request, "learning_unit/specifications_edit.html", context)
+
+
+def _build_edit_specification_success_message(last_academic_year, translated_field_label):
+    default_msg = "The '%(field)s' field content has been successfully saved"
+    msg = default_msg + " and postponed until %(year)s" if last_academic_year else default_msg
+    return _(msg % {
+        'field': translated_field_label,
+        'year': last_academic_year
     })
-    form.load_initial()  # Load data from database
-    context['form'] = form
 
-    user_language = mdl.person.get_user_interface_language(request.user)
-    context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
-    return render(request, "learning_unit/specifications_edit.html", context)
+
+def _get_translated_field_label(field_label):
+    return list(get_cms_label_data([field_label], get_language()).values())[0]
 
 
 @login_required

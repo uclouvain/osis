@@ -112,14 +112,14 @@ def get_all_attributions(learning_unit_year):
 
 def get_cms_label_data(cms_label, user_language):
     cms_label_data = OrderedDict()
-    translated_labels = mdl_cms.translated_text_label.search(text_entity=entity_name.LEARNING_UNIT_YEAR,
-                                                             labels=cms_label,
-                                                             language=user_language)
-
+    translated_labels = mdl_cms.translated_text_label.search(
+        text_entity=entity_name.LEARNING_UNIT_YEAR,
+        labels=cms_label,
+        language=user_language
+    )
     for label in cms_label:
         translated_text = next((trans.label for trans in translated_labels if trans.text_label.label == label), None)
         cms_label_data[label] = translated_text
-
     return cms_label_data
 
 
