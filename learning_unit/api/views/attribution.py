@@ -48,7 +48,9 @@ class LearningUnitAttribution(generics.ListAPIView):
             'attribution__substitute'
         ).filter(
             learning_component_year__learning_unit_year=luy
-        ).distinct('attribution__tutor').annotate(
+        ).distinct(
+            'attribution__tutor'
+        ).annotate(
             first_name=F('attribution__tutor__person__first_name'),
             middle_name=F('attribution__tutor__person__middle_name'),
             last_name=F('attribution__tutor__person__last_name'),
