@@ -87,7 +87,7 @@ WITH RECURSIVE group_element_year_parent AS (
     WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
 )
 
-SELECT array_to_json(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent 
+SELECT to_jsonb(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent
 WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING') 
 """
 

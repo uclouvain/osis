@@ -422,9 +422,6 @@ msgstr "Alerte"
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
-#, fuzzy
-#| msgctxt "plural"
-#| msgid "All"
 msgid "All"
 msgstr "Tous"
 
