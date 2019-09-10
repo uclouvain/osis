@@ -82,7 +82,7 @@ class PermsTestCase(TestCase):
         super(AcademicYear, self.academic_year_6).save()
 
         self.lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
-        lu = LearningUnitFactory(end_year=self.academic_yr.year)
+        lu = LearningUnitFactory(end_year=self.academic_yr)
         self.luy = LearningUnitYearFactory(academic_year=self.academic_yr,
                                            learning_container_year=self.lunit_container_yr,
                                            subtype=FULL,
@@ -180,8 +180,8 @@ class PermsTestCase(TestCase):
     def test_can_central_manager_modify_end_date_full(self):
         a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
         a_person.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr,
+                                                end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
@@ -193,8 +193,8 @@ class PermsTestCase(TestCase):
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):
         a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr,
+                                                end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
@@ -210,8 +210,8 @@ class PermsTestCase(TestCase):
             create_person_with_permission_and_group(FACULTY_MANAGER_GROUP),
             create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP)
         ]
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr,
+                                                end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         luy = generated_container_first_year.learning_unit_year_full
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
@@ -223,8 +223,8 @@ class PermsTestCase(TestCase):
             self.assertFalse(perms.is_eligible_to_edit_proposal(a_proposal, manager))
 
     def test_access_edit_learning_unit_proposal_as_faculty_manager(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr_1.year,
-                                                end_year=self.academic_yr_1.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr_1,
+                                                end_year=self.academic_yr_1)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
@@ -284,8 +284,8 @@ class PermsTestCase(TestCase):
         self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
 
     def test_is_eligible_for_cancel_of_proposal_for_creation(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr,
+                                                end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
@@ -332,8 +332,8 @@ class PermsTestCase(TestCase):
             self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, manager))
 
     def test_is_eligible_for_cancel_of_proposal_wrong_state(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr,
+                                                end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 
@@ -359,8 +359,8 @@ class PermsTestCase(TestCase):
             self.assertFalse(perms.is_eligible_for_cancel_of_proposal(a_proposal, manager))
 
     def test_is_eligible_for_cancel_of_proposal_as_central_manager(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr,
+                                                end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 

@@ -298,7 +298,7 @@ class TestConsolidateProposal(TestCase):
 
         self.assertTrue(mock_edit_lu_end_date.called)
         lu_arg, academic_year_arg = mock_edit_lu_end_date.call_args[0]
-        self.assertEqual(lu_arg.end_year, creation_proposal.learning_unit_year.academic_year.year)
+        self.assertEqual(lu_arg.end_year, creation_proposal.learning_unit_year.academic_year)
         self.assertIsNone(academic_year_arg)
 
     @mock.patch("base.business.learning_unit_proposal.edit_learning_unit_end_date")
@@ -314,7 +314,7 @@ class TestConsolidateProposal(TestCase):
                 }
             })
         random_end_acad_year_index = fuzzy.FuzzyInteger(initial_end_year_index + 1, len(academic_years) - 1).fuzz()
-        suppression_proposal.learning_unit_year.learning_unit.end_year = academic_years[random_end_acad_year_index].year
+        suppression_proposal.learning_unit_year.learning_unit.end_year = academic_years[random_end_acad_year_index]
         suppression_proposal.learning_unit_year.learning_unit.save()
         consolidate_proposal(suppression_proposal)
 
@@ -323,13 +323,15 @@ class TestConsolidateProposal(TestCase):
         self.assertTrue(mock_edit_lu_end_date.called)
 
         lu_arg, academic_year_arg = mock_edit_lu_end_date.call_args[0]
-        self.assertEqual(lu_arg.end_year, suppression_proposal.initial_data["learning_unit"]["end_year"])
+        self.assertEqual(lu_arg.end_year.year, suppression_proposal.initial_data["learning_unit"]["end_year"])
         suppression_proposal.learning_unit_year.learning_unit.refresh_from_db()
-        self.assertEqual(academic_year_arg.year, suppression_proposal.learning_unit_year.learning_unit.end_year)
+        self.assertEqual(academic_year_arg, suppression_proposal.learning_unit_year.learning_unit.end_year)
 
     @mock.patch("base.business.learning_unit_proposal.update_learning_unit_year_with_report")
     def test_when_proposal_of_type_modification_and_accepted(self, mock_update_learning_unit_with_report):
-        generatorContainer = GenerateContainer(datetime.date.today().year - 2, datetime.date.today().year)
+        old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
+        current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(old_academic_year, current_academic_year)
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.MODIFICATION.name,

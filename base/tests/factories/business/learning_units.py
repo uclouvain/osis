@@ -134,8 +134,8 @@ class LearningUnitsMixin:
                                  periodicity):
         create = False
         result = None
-        end_year = learning_unit.end_year or compute_max_academic_year_adjournment()
-        if learning_unit.start_year <= academic_year.year <= end_year:
+        end_year = learning_unit.end_year or AcademicYearFactory(year=compute_max_academic_year_adjournment())
+        if learning_unit.start_year.year <= academic_year.year <= end_year.year:
             if periodicity == learning_unit_year_periodicity.BIENNIAL_ODD:
                 if not (academic_year.year % 2):
                     create = True

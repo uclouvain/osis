@@ -116,7 +116,7 @@ class LearningUnit(SerializableModel):
         return self.acronym
 
     def save(self, *args, **kwargs):
-        if self.end_year and self.end_year < self.start_year:
+        if self.end_year and self.end_year.year < self.start_year.year:
             raise AttributeError("Start date should be before the end date")
         super(LearningUnit, self).save(*args, **kwargs)
 
