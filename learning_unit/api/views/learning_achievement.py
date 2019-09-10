@@ -46,7 +46,7 @@ class LearningAchievementList(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
-        qs = LearningAchievement.objects.filter(learning_unit_year=learning_unit_year)\
+        qs = LearningAchievement.objects.filter(learning_unit_year=learning_unit_year).order_by('order')\
                                 .annotate(iso_code=Lower('language__code')).values('code_name', 'text', 'iso_code')
 
         learning_achievements_grouped = OrderedDict()
