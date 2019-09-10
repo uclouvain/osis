@@ -26,10 +26,10 @@
 from rest_framework import generics
 
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailed
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
-class LearningUnitYearDetail(generics.RetrieveAPIView):
+class LearningUnitDetailed(generics.RetrieveAPIView):
     """
         Return the detail of the learning unit
     """
@@ -41,5 +41,5 @@ class LearningUnitYearDetail(generics.RetrieveAPIView):
         'learning_container_year__requirement_entity__entityversion_set',
         'learningcomponentyear_set'
     )
-    serializer_class = LearningUnitDetailed
+    serializer_class = LearningUnitDetailedSerializer
     lookup_field = 'uuid'

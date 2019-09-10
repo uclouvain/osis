@@ -29,15 +29,15 @@ from rest_framework import generics
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.attribution import LearningUnitAttribution
+from learning_unit.api.serializers.attribution import LearningUnitAttributionSerializer
 
 
-class Attribution(generics.ListAPIView):
+class LearningUnitAttribution(generics.ListAPIView):
     """
         Return the attributions of the learning unit
     """
     name = 'learningunitattributions_read'
-    serializer_class = LearningUnitAttribution
+    serializer_class = LearningUnitAttributionSerializer
 
     def get_queryset(self):
         luy = get_object_or_404(LearningUnitYear, uuid=self.kwargs['uuid'])

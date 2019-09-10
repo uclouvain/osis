@@ -30,7 +30,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from base.models.person import Person
 
 
-class SubstituteAttribution(serializers.ModelSerializer):
+class PersonAttributionSerializer(serializers.ModelSerializer):
     global_id = serializers.CharField(read_only=True)
     first_name = serializers.CharField(read_only=True)
     middle_name = serializers.CharField(read_only=True)
@@ -48,15 +48,15 @@ class SubstituteAttribution(serializers.ModelSerializer):
         )
 
 
-class LearningUnitAttribution(SubstituteAttribution):
+class LearningUnitAttributionSerializer(PersonAttributionSerializer):
     function = serializers.CharField(source='attribution.function', read_only=True)
     function_text = serializers.CharField(source='attribution.get_function_display', read_only=True)
 
-    substitute = SubstituteAttribution(source='attribution.substitute')
+    substitute = PersonAttributionSerializer(source='attribution.substitute')
 
     class Meta:
         model = AttributionChargeNew
-        fields = SubstituteAttribution.Meta.fields + (
+        fields = PersonAttributionSerializer.Meta.fields + (
             'function',
             'function_text',
             'substitute'

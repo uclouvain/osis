@@ -25,16 +25,16 @@
 ##############################################################################
 from django.conf.urls import url
 
-from learning_unit.api.views.attribution import Attribution
-from learning_unit.api.views.learning_unit import LearningUnitYearDetail
+from learning_unit.api.views.attribution import LearningUnitAttribution
+from learning_unit.api.views.learning_unit import LearningUnitDetailed
 
 app_name = "learning_unit"
 
 urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitYearDetail.as_view(), name=LearningUnitYearDetail.name),
+    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitDetailed.as_view(), name=LearningUnitDetailed.name),
     url(
         r'^learning_units/(?P<uuid>[0-9a-f-]+)/attributions/$',
-        Attribution.as_view(),
-        name=Attribution.name
+        LearningUnitAttribution.as_view(),
+        name=LearningUnitAttribution.name
     ),
 ]
