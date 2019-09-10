@@ -48,7 +48,11 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 @login_required
 @permission_required('base.is_institution_administrator', raise_exception=True)
 def institution(request):
-    return render(request, "institution.html", {'section': 'institution'})
+    context = {
+        'section': 'institution',
+        'view_academicactors': view_academicactors(request.user)
+    }
+    return render(request, "institution.html", context)
 
 
 @login_required
