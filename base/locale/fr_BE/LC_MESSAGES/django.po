@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-05 10:56+0200\n"
+"POT-Creation-Date: 2019-09-10 10:26+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1273,6 +1273,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
+msgid "Generate xls of learning units that have prerequisites"
+msgstr "Générer xls des cours qui ont des prérequis"
+
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
 
@@ -1952,6 +1955,9 @@ msgstr "OU"
 
 msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
+
+msgid "Official"
+msgstr "Officiel"
 
 msgid "On the file: direct access or access with additional training"
 msgstr ""
@@ -3730,6 +3736,9 @@ msgstr "jj/mm/aaaa"
 msgid "french help text"
 msgstr "texte d'aide en français"
 
+msgid "has as prerequisite"
+msgstr "a comme prérequis"
+
 msgid "has the following prerequisites"
 msgstr "a des prérequis"
 
@@ -3819,6 +3828,10 @@ msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
+
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr "prérequis-%(year)s-%(acronym)s"
 
 msgid "professional integration"
 msgstr "intégration professionnelle"

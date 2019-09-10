@@ -23,22 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
-
 import factory.fuzzy
 
-from base.tests.factories.learning_unit import LearningUnitFakerFactory
 
-
-class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.PrerequisiteItem"
-        django_get_or_create = ('learning_unit', 'prerequisite')
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    learning_unit = factory.SubFactory(LearningUnitFakerFactory)
-    prerequisite = factory.SubFactory("base.tests.factories.prerequisite.PrerequisiteFactory")
-    group_number = factory.Sequence(lambda n: n)
-    position = factory.Sequence(lambda n: n)
+class FuzzyBoolean(factory.fuzzy.BaseFuzzyAttribute):
+    """Random boolean value"""
+    def fuzz(self):
+        return factory.fuzzy._random.choice([True, False])

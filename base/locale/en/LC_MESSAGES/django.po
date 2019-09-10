@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-05 10:56+0200\n"
+"POT-Creation-Date: 2019-09-10 10:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1210,6 +1210,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units that have prerequisites"
+msgstr ""
+
 msgid "Get back to initial data"
 msgstr ""
 
@@ -1860,6 +1863,9 @@ msgid "OR"
 msgstr ""
 
 msgid "Offers enrollments"
+msgstr ""
+
+msgid "Official"
 msgstr ""
 
 msgid "On the file: direct access or access with additional training"
@@ -3504,6 +3510,9 @@ msgstr "mm/dd/yyyy"
 msgid "french help text"
 msgstr ""
 
+msgid "has as prerequisite"
+msgstr ""
+
 msgid "has the following prerequisites"
 msgstr ""
 
@@ -3589,6 +3598,10 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
+
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr ""
 
 msgid "professional integration"
 msgstr ""
