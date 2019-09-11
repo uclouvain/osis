@@ -39,7 +39,7 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
 from education_group.api.views.learning_unit import EducationGroupRootsList
 
 
-class TrainingListSerializerTestCase(APITestCase):
+class TrainingListViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         """
@@ -76,7 +76,7 @@ class TrainingListSerializerTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_method_not_allowed(self):
-        methods_not_allowed = ['post', 'delete', 'put']
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
 
         for method in methods_not_allowed:
             response = getattr(self.client, method)(self.url)
