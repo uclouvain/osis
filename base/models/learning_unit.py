@@ -181,8 +181,8 @@ class LearningUnit(SerializableModel):
     @property
     def max_end_year(self):
         """ Compute the maximal possible end_year value when the end_year is None """
-        if self.new_end_year:
-            return self.new_end_year
+        if self.end_year:
+            return self.end_year
 
         return AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
 

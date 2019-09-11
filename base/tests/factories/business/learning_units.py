@@ -107,7 +107,7 @@ class LearningUnitsMixin:
     def create_list_of_academic_years(start_year, end_year):
         results = None
         if start_year and end_year:
-            results = [AcademicYearFactory(year=year) for year in range(start_year, end_year + 1)]
+            results = [AcademicYearFactory(year=year) for year in range(start_year.year, end_year.year + 1)]
         return results
 
     @staticmethod

@@ -305,8 +305,7 @@ class PermsTestCase(TestCase):
             self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, manager))
 
     def test_is_eligible_for_cancel_of_proposal(self):
-        generated_container = GenerateContainer(start_year=self.academic_yr.year,
-                                                end_year=self.academic_yr.year)
+        generated_container = GenerateContainer(start_year=self.academic_yr, end_year=self.academic_yr)
         generated_container_first_year = generated_container.generated_container_years[0]
         an_requirement_entity = generated_container_first_year.requirement_entity_container_year
 

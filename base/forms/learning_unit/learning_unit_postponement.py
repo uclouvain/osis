@@ -223,7 +223,7 @@ class LearningUnitPostponementForm:
                 data_to_postpone['component-1-id'] = learning_component_year.id
 
     def _instantiate_base_form_as_insert(self, ac_year, data):
-        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)
+        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement)
 
     @staticmethod
     def _get_data_to_postpone(lunit_year, data):

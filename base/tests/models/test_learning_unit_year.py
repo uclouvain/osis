@@ -320,8 +320,8 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
 class LearningUnitYearWarningsTest(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full

@@ -138,7 +138,7 @@ class TestExternalLearningUnitForm(TestCase):
     def test_external_learning_unit_form_save(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data,
-                                            start_year=self.academic_year.year)
+                                            start_year=self.academic_year)
         self.assertTrue(form.is_valid(), form.errors)
         luy = form.save()
 
@@ -146,7 +146,7 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertEqual(luy.learning_container_year.container_type, EXTERNAL)
         self.assertEqual(luy.acronym[0], 'E')
         self.assertEqual(luy.externallearningunityear.author, self.person)
-        self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
+        self.assertEqual(luy.learning_unit.start_year, self.academic_year)
 
 
 class TestExternalPartimForm(TestCase):
@@ -158,7 +158,7 @@ class TestExternalPartimForm(TestCase):
         campus = CampusFactory(organization=organization)
         language = LanguageFactory(code='FR')
         container_year = LearningContainerYearFactory(academic_year=self.academic_year, container_type=EXTERNAL)
-        self.learning_unit = LearningUnitFactory(start_year=self.academic_year.year)
+        self.learning_unit = LearningUnitFactory(start_year=self.academic_year)
         self.learning_unit_year = LearningUnitYearFactory(
             acronym='EOSIS1111',
             academic_year=self.academic_year,
@@ -199,7 +199,7 @@ class TestExternalPartimForm(TestCase):
         self.assertEqual(luy.learning_container_year.container_type, EXTERNAL)
         self.assertEqual(luy.acronym[0], 'E')
         self.assertEqual(luy.externallearningunityear.author, self.person)
-        self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
+        self.assertEqual(luy.learning_unit.start_year, self.academic_year)
 
 
 class TestLearningUnitYearForExternalModelForm(TestCase):
