@@ -164,3 +164,18 @@ def is_academic_calendar_has_started(academic_year, reference, date=None):
 
 def _list_types(calendar_types):
     return [calendar_type[0] for calendar_type in calendar_types]
+
+
+def get_academic_calendar_by_date_and_reference_and_data_year(data_year, reference, date=None):
+    if date is None:
+        date = timezone.now()
+
+    try:
+        return AcademicCalendar.objects.get(
+            data_year=data_year,
+            reference=reference,
+            start_date__lte=date,
+            end_date__gte=date,
+        )
+    except AcademicCalendar.DoesNotExist:
+        return None
