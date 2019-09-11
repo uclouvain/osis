@@ -30,10 +30,12 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
+from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
@@ -248,6 +250,13 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return complete_title_english
 
     @property
+    def complete_title_i18n(self):
+        complete_title = self.complete_title
+        if translation.get_language() == LANGUAGE_CODE_EN:
+            complete_title = self.complete_title_english or complete_title
+        return complete_title
+
+    @property
     def container_common_title(self):
         if self.learning_container_year:
             return self.learning_container_year.common_title
@@ -449,9 +458,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def is_external_with_co_graduation(self):
         return self.is_external() and self.externallearningunityear.co_graduation
-
-    def is_external_mobility(self):
-        return self.is_external() and self.externallearningunityear.mobility
 
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
