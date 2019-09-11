@@ -59,7 +59,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LearningUnitAttribution'
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitAttribution'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

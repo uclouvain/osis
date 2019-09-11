@@ -23,40 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.test import TestCase
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
-from base.models.person import Person
-
-
-class PersonAttributionSerializer(serializers.ModelSerializer):
-    global_id = serializers.CharField(read_only=True)
-    first_name = serializers.CharField(read_only=True)
-    middle_name = serializers.CharField(read_only=True)
-    last_name = serializers.CharField(read_only=True)
-    email = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = Person
-        fields = (
-            'first_name',
-            'middle_name',
-            'last_name',
-            'email',
-            'global_id'
-        )
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
 
-class LearningUnitAttributionSerializer(PersonAttributionSerializer):
-    function = serializers.CharField(source='attribution.function', read_only=True)
-    function_text = serializers.CharField(source='attribution.get_function_display', read_only=True)
+class LearningUnitComponentSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.component = LearningComponentYearFactory()
+        cls.serializer = LearningUnitComponentSerializer(cls.component)
 
-    substitute = PersonAttributionSerializer(source='attribution.substitute')
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'type',
+            'type_text',
+            'planned_classes',
+            'hourly_volume_total_annual',
+            'hourly_volume_total_annual_computed'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
-    class Meta:
-        model = AttributionChargeNew
-        fields = PersonAttributionSerializer.Meta.fields + (
-            'function',
-            'function_text',
-            'substitute'
+    def test_ensure_compute_correct_volume(self):
+        self.assertEqual(
+            self.serializer.data['hourly_volume_total_annual_computed'],
+            str(self.component.vol_global)
         )

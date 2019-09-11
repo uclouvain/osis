@@ -44,7 +44,6 @@ class LearningUnitAttribution(generics.ListAPIView):
         return AttributionChargeNew.objects.select_related(
             'learning_component_year__learning_unit_year',
             'attribution__tutor__person',
-            'attribution__learning_container_year',
             'attribution__substitute'
         ).filter(
             learning_component_year__learning_unit_year=luy
