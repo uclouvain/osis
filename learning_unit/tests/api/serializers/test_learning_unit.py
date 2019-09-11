@@ -55,6 +55,7 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
         expected_fields = [
             'url',
             'acronym',
+            'academic_year',
             'credits',
             'requirement_entity',
             'status',

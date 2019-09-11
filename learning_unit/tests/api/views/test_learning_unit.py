@@ -38,7 +38,7 @@ from base.tests.factories.person import PersonFactory
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
-class LearningUnitAttributionTestCase(APITestCase):
+class LearningUnitDetailedTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         anac = AcademicYearFactory()

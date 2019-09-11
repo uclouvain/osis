@@ -46,6 +46,7 @@ class LearningUnitDetailedSerializer(serializers.HyperlinkedModelSerializer):
     )
     language = serializers.CharField(source='language.code', read_only=True)
     team = serializers.BooleanField(source='learning_container_year.team', read_only=True)
+    academic_year = serializers.IntegerField(source='academic_year.year')
 
     campus = LearningUnitCampusSerializer(read_only=True)
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
@@ -68,6 +69,7 @@ class LearningUnitDetailedSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'url',
             'acronym',
+            'academic_year',
             'credits',
             'requirement_entity',
             'status',

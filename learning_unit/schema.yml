@@ -185,6 +185,9 @@ components:
         url:
           type: string
           format: uri
+        academic_year:
+          type: number
+          example: 2014
         acronym:
           type: string
         credit:
