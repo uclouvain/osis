@@ -24,15 +24,11 @@
 #
 ##############################################################################
 from django.db.models import F
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
+from django.test import TestCase
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.tutor import TutorFactory
 from learning_unit.api.serializers.attribution import PersonAttributionSerializer, LearningUnitAttributionSerializer
 
 
@@ -56,16 +52,7 @@ class PersonAttributionSerializerTestCase(TestCase):
 class LearningUnitAttributionSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        tutor = TutorFactory(person=PersonFactory())
-        attribution = AttributionNewFactory(
-            tutor=tutor,
-            substitute=PersonFactory()
-        )
-        cls.luy = LearningUnitYearFactory()
-        cls.attrib = AttributionChargeNewFactory(
-            attribution=attribution,
-            learning_component_year__learning_unit_year=cls.luy
-        )
+        cls.attrib = AttributionChargeNewFactory()
         cls.attribution = AttributionChargeNew.objects.annotate(
             first_name=F('attribution__tutor__person__first_name'),
             middle_name=F('attribution__tutor__person__middle_name'),
@@ -74,13 +61,18 @@ class LearningUnitAttributionSerializerTestCase(TestCase):
             global_id=F('attribution__tutor__person__global_id'),
         ).get(id=cls.attrib.id)
 
-        url = reverse('learning_unit_api_v1:learningunitattributions_read', kwargs={'uuid': cls.luy.uuid})
-        cls.serializer = LearningUnitAttributionSerializer(
-            cls.attribution,
-            context={'request': RequestFactory().get(url)}
-        )
+        cls.serializer = LearningUnitAttributionSerializer(cls.attribution)
 
     def test_contains_expected_fields(self):
+        attribution = AttributionChargeNew.objects.annotate(
+            first_name=F('attribution__tutor__person__first_name'),
+            middle_name=F('attribution__tutor__person__middle_name'),
+            last_name=F('attribution__tutor__person__last_name'),
+            email=F('attribution__tutor__person__email'),
+            global_id=F('attribution__tutor__person__global_id'),
+        ).get(id=self.attrib.id)
+
+        serializer = LearningUnitAttributionSerializer(attribution)
         expected_fields = [
             'first_name',
             'middle_name',
@@ -91,4 +83,4 @@ class LearningUnitAttributionSerializerTestCase(TestCase):
             'function_text',
             'substitute'
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertListEqual(list(serializer.data.keys()), expected_fields)
