@@ -38,6 +38,8 @@ class LearningUnitAttribution(generics.ListAPIView):
     """
     name = 'learningunitattributions_read'
     serializer_class = LearningUnitAttributionSerializer
+    filter_backends = []
+    paginator = None
 
     def get_queryset(self):
         luy = get_object_or_404(LearningUnitYear, uuid=self.kwargs['uuid'])
