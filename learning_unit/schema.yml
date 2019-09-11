@@ -59,7 +59,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LearningUnitAttribution'
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitAttribution'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -183,6 +185,9 @@ components:
         url:
           type: string
           format: uri
+        academic_year:
+          type: number
+          example: 2014
         acronym:
           type: string
         credit:
@@ -194,8 +199,12 @@ components:
           type: boolean
         quadrimester:
           $ref: '#/components/schemas/QuadrimesterEnum'
+        quadrimester_text:
+          type: string
         periodicity:
           $ref: '#/components/schemas/PeriodicityEnum'
+        periodicity_text:
+          type: string
         campus:
           $ref: '#/components/schemas/LearningUnitCampus'
         components:
@@ -221,6 +230,8 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/ComponentTypeEnum'
+        type_text:
+            type: string
         planned_classes:
           type: integer
           format: int32
@@ -245,6 +256,8 @@ components:
           format: email
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
         global_id:
           type: string
         last_name:

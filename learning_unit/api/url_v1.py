@@ -26,12 +26,20 @@
 from django.conf import settings
 from django.conf.urls import url
 
+from learning_unit.api.views.attribution import LearningUnitAttribution
 from learning_unit.api.views.learning_achievement import LearningAchievementList
+from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
 
 app_name = "learning_unit"
 
 urlpatterns = [
+    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitDetailed.as_view(), name=LearningUnitDetailed.name),
+    url(
+        r'^learning_units/(?P<uuid>[0-9a-f-]+)/attributions/$',
+        LearningUnitAttribution.as_view(),
+        name=LearningUnitAttribution.name
+    ),
     url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/achievements', LearningAchievementList.as_view(),
         name=LearningAchievementList.name),
     url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/summary_specification', LearningUnitSummarySpecification.as_view(),
