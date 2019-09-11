@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,27 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.conf.urls import url
+from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
-from learning_unit.api.views.learning_achievement import LearningAchievementList
-from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
+from base.models import group_element_year
+from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
+from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 
-app_name = "learning_unit"
 
-urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/achievements', LearningAchievementList.as_view(),
-        name=LearningAchievementList.name),
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/summary_specification', LearningUnitSummarySpecification.as_view(),
-        name=LearningUnitSummarySpecification.name),
-]
+class EducationGroupRootsList(generics.ListAPIView):
+    """
+       Return all education groups root which utilize the learning unit specified
+    """
+    name = 'learningunitutilization_read'
+    serializer_class = EducationGroupRootsListSerializer
+    filter_backends = []
+    paginator = None
 
-if 'education_group' in settings.INSTALLED_APPS:
-    from education_group.api.views.learning_unit import EducationGroupRootsList
-    urlpatterns += (
-      url(
-        r'^learning_units/(?P<uuid>[0-9a-f-]+)/education_group_roots$',
-        EducationGroupRootsList.as_view(),
-        name=EducationGroupRootsList.name
-      ),
-    )
+    def get_queryset(self):
+        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=self.kwargs['uuid'])
+        education_group_root_ids = group_element_year.find_learning_unit_formations([learning_unit_year]). \
+            get(learning_unit_year.id, [])
+        return EducationGroupYear.objects.filter(pk__in=education_group_root_ids)\
+            .select_related('education_group_type', 'academic_year')

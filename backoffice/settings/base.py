@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'rules_management',
     'base',
     'education_group',
+    'learning_unit',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',

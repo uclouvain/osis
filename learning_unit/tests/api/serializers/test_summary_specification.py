@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,27 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.conf.urls import url
+from django.test import TestCase
 
-from learning_unit.api.views.learning_achievement import LearningAchievementList
-from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
+from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
 
-app_name = "learning_unit"
 
-urlpatterns = [
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/achievements', LearningAchievementList.as_view(),
-        name=LearningAchievementList.name),
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/summary_specification', LearningUnitSummarySpecification.as_view(),
-        name=LearningUnitSummarySpecification.name),
-]
+class LearningAchievementListSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.serializer = LearningUnitSummarySpecificationSerializer({})
 
-if 'education_group' in settings.INSTALLED_APPS:
-    from education_group.api.views.learning_unit import EducationGroupRootsList
-    urlpatterns += (
-      url(
-        r'^learning_units/(?P<uuid>[0-9a-f-]+)/education_group_roots$',
-        EducationGroupRootsList.as_view(),
-        name=EducationGroupRootsList.name
-      ),
-    )
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'bibliography',
+            'resume',
+            'evaluation_methods',
+            'other_informations',
+            'online_resources',
+            'teaching_methods',
+            'themes_discussed',
+            'prerequisite',
+            'mobility',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
