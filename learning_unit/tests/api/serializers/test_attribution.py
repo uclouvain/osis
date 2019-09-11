@@ -64,15 +64,6 @@ class LearningUnitAttributionSerializerTestCase(TestCase):
         cls.serializer = LearningUnitAttributionSerializer(cls.attribution)
 
     def test_contains_expected_fields(self):
-        attribution = AttributionChargeNew.objects.annotate(
-            first_name=F('attribution__tutor__person__first_name'),
-            middle_name=F('attribution__tutor__person__middle_name'),
-            last_name=F('attribution__tutor__person__last_name'),
-            email=F('attribution__tutor__person__email'),
-            global_id=F('attribution__tutor__person__global_id'),
-        ).get(id=self.attrib.id)
-
-        serializer = LearningUnitAttributionSerializer(attribution)
         expected_fields = [
             'first_name',
             'middle_name',
@@ -83,4 +74,4 @@ class LearningUnitAttributionSerializerTestCase(TestCase):
             'function_text',
             'substitute'
         ]
-        self.assertListEqual(list(serializer.data.keys()), expected_fields)
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

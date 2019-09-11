@@ -52,13 +52,7 @@ class LearningUnitAttributionTestCase(APITestCase):
             attribution=attribution,
             learning_component_year__learning_unit_year=cls.luy
         )
-        cls.attribution = AttributionChargeNew.objects.annotate(
-            first_name=F('attribution__tutor__person__first_name'),
-            middle_name=F('attribution__tutor__person__middle_name'),
-            last_name=F('attribution__tutor__person__last_name'),
-            email=F('attribution__tutor__person__email'),
-            global_id=F('attribution__tutor__person__global_id'),
-        ).get(id=cls.attrib.id)
+
         cls.person = PersonFactory()
         cls.url = reverse('learning_unit_api_v1:learningunitattributions_read', kwargs={'uuid': cls.luy.uuid})
 
@@ -86,6 +80,13 @@ class LearningUnitAttributionTestCase(APITestCase):
     def test_get_results(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        attribution = AttributionChargeNew.objects.annotate(
+            first_name=F('attribution__tutor__person__first_name'),
+            middle_name=F('attribution__tutor__person__middle_name'),
+            last_name=F('attribution__tutor__person__last_name'),
+            email=F('attribution__tutor__person__email'),
+            global_id=F('attribution__tutor__person__global_id'),
+        ).get(id=self.attrib.id)
 
-        serializer = LearningUnitAttributionSerializer([self.attribution], many=True)
-        self.assertEqual(response.data['results'], serializer.data)
+        serializer = LearningUnitAttributionSerializer([attribution], many=True)
+        self.assertEqual(response.data, serializer.data)
