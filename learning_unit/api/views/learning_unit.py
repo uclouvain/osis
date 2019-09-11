@@ -43,5 +43,3 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
     )
     serializer_class = LearningUnitDetailedSerializer
     lookup_field = 'uuid'
-    filter_backends = []
-    paginator = None
