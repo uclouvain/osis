@@ -87,7 +87,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EducationGroupRoot'
+                type: array
+                items:
+                  $ref: '#/components/schemas/EducationGroupRoot'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -124,7 +126,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{uuid}/summary_specification_info:
+  /learning_units/{uuid}/summary_specification:
     get:
       description: Return all summary and specification information of the learning unit specified
       operationId: learningunitsummaryspecification_read
@@ -288,20 +290,27 @@ components:
           multipleOf: 0.01
         title:
           type: object
-          additionalProperties:
-            type: string
+          required:
+            - en
+            - fr
           example:
             en: Hello!
             fr: Bonjour!
         decree_category:
           $ref: '#/components/schemas/DecreeCategoryEnum'
+        decree_category_text:
+          type: string
         duration:
           type: integer
           minimum: 1
         duration_unit:
           $ref: '#/components/schemas/DurationUnitEnum'
-        type:
+        duration_unit_text:
+          type: string
+        education_group_type:
           $ref: '#/components/schemas/EducationGroupTypeEnum'
+        education_group_type_text:
+          type: string
         academic_year:
           type: number
           example: 2014

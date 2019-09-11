@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.conf.urls import url
 
 from learning_unit.api.views.attribution import LearningUnitAttribution
+from learning_unit.api.views.learning_achievement import LearningAchievementList
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
+from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
 
 app_name = "learning_unit"
 
@@ -37,4 +40,18 @@ urlpatterns = [
         LearningUnitAttribution.as_view(),
         name=LearningUnitAttribution.name
     ),
+    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/achievements', LearningAchievementList.as_view(),
+        name=LearningAchievementList.name),
+    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/summary_specification', LearningUnitSummarySpecification.as_view(),
+        name=LearningUnitSummarySpecification.name),
 ]
+
+if 'education_group' in settings.INSTALLED_APPS:
+    from education_group.api.views.learning_unit import EducationGroupRootsList
+    urlpatterns += (
+      url(
+        r'^learning_units/(?P<uuid>[0-9a-f-]+)/education_group_roots$',
+        EducationGroupRootsList.as_view(),
+        name=EducationGroupRootsList.name
+      ),
+    )

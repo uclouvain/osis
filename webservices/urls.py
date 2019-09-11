@@ -38,10 +38,10 @@ url_api_v1 = [url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name)]
 
 webservice_apps = [
     'education_group',
+    'learning_unit',
     'reference',
     'continuing_education',
     'base',
-    'learning_unit'
 ]
 
 for appname in webservice_apps:
