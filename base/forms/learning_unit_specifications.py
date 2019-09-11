@@ -27,10 +27,9 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.db.models import Max
 
-from base.business.utils.model import update_object, model_to_dict_fk
 from base.forms.common import set_trans_txt
 from base.models import academic_year
-from base.models.academic_year import AcademicYear
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
@@ -96,10 +95,14 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             trans_text.save()
 
             luy = LearningUnitYear.objects.get(id=trans_text.reference)
-            ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
 
-            self._update_future_luy(ac_year_postponement_range, language, luy, trans_text)
-        return trans_text.text_label.label, ac_year_postponement_range.last()
+            last_postponed_academic_year = None
+            if not luy.academic_year.is_past and not luy.academic_year == current_academic_year():
+                ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
+                last_postponed_academic_year = ac_year_postponement_range.last()
+                self._update_future_luy(ac_year_postponement_range, language, luy, trans_text)
+
+        return trans_text.text_label.label, last_postponed_academic_year
 
     def _get_ac_year_postponement_year(self, luy):
         max_postponement_year = self._get_end_postponement_year(luy)

@@ -151,7 +151,6 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         if form.is_valid():
             field_label, last_academic_year = form.save()
             translated_field_label = _get_translated_field_label(field_label)
-
             display_success_messages(
                 request,
                 _build_edit_specification_success_message(last_academic_year, translated_field_label)
@@ -175,12 +174,12 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
 
 
 def _build_edit_specification_success_message(last_academic_year, translated_field_label):
-    default_msg = "The '%(field)s' field content has been successfully saved"
-    msg = default_msg + " and postponed until %(year)s" if last_academic_year else default_msg
-    return _(msg % {
+    default_msg = _("The '%(field)s' field content has been successfully saved")
+    msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+    return msg % {
         'field': translated_field_label,
         'year': last_academic_year
-    })
+    }
 
 
 def _get_translated_field_label(field_label):
