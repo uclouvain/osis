@@ -63,6 +63,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
     cms_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     def __init__(self, *args, **kwargs):
+        self.postponement = bool(int(args[0]['postpone'])) if args else False
         self.learning_unit_year = kwargs.pop('learning_unit_year', None)
         self.text_label = kwargs.pop('text_label', None)
 
@@ -97,7 +98,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             luy = LearningUnitYear.objects.get(id=trans_text.reference)
 
             last_postponed_academic_year = None
-            if not luy.academic_year.is_past and not luy.academic_year == current_academic_year():
+            if not luy.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
                 last_postponed_academic_year = ac_year_postponement_range.last()
                 self._update_future_luy(ac_year_postponement_range, language, luy, trans_text)

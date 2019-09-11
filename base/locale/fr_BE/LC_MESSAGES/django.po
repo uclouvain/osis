@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-11 09:43+0200\n"
+"POT-Creation-Date: 2019-09-11 15:49+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -571,8 +571,8 @@ msgstr "Infos complémentaires"
 #: forms/learning_unit/learning_unit_create.py:283
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:51
-#: templates/learning_unit/identification.html:251 views/learning_unit.py:258
-#: views/learning_unit.py:378 views/learning_unit.py:396
+#: templates/learning_unit/identification.html:251 views/learning_unit.py:257
+#: views/learning_unit.py:377 views/learning_unit.py:395
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
 
@@ -581,8 +581,8 @@ msgstr "Entité resp. cahier des charges complémentaire 1"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:53
 #: templates/learning_unit/identification.html:252
 #: tests/forms/test_learning_unit_postponement.py:680
-#: views/learning_unit.py:261 views/learning_unit.py:379
-#: views/learning_unit.py:397
+#: views/learning_unit.py:260 views/learning_unit.py:378
+#: views/learning_unit.py:396
 msgid "Additional requirement entity 2"
 msgstr "Entité resp. cahier des charges complémentaire 2"
 
@@ -936,7 +936,7 @@ msgstr ""
 #: templates/learning_unit/proposal/create_suppression.html:20
 #: templates/learning_unit/proposal/update_suppression.html:20
 #: templates/learning_unit/simple/update_end_date.html:14
-#: templates/learning_unit/specifications_edit.html:53
+#: templates/learning_unit/specifications_edit.html:51
 #: templates/learning_unit/teaching_material/modal_edit.html:44
 msgid "Cancel"
 msgstr "Annuler"
@@ -3403,8 +3403,8 @@ msgstr ""
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:46
 #: tests/business/test_proposal_xls.py:151
 #: tests/business/test_proposal_xls.py:161
-#: tests/views/test_learning_unit.py:1540 views/learning_unit.py:249
-#: views/learning_unit.py:374 views/learning_unit.py:392
+#: tests/views/test_learning_unit.py:1540 views/learning_unit.py:248
+#: views/learning_unit.py:373 views/learning_unit.py:391
 msgid "Planned classes"
 msgstr "Classes prévues"
 
@@ -3884,8 +3884,8 @@ msgstr "Obligatoire"
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
 #: templates/learning_unit/identification.html:249
 #: tests/forms/test_learning_unit_postponement.py:599
-#: views/learning_unit.py:255 views/learning_unit.py:377
-#: views/learning_unit.py:395
+#: views/learning_unit.py:254 views/learning_unit.py:376
+#: views/learning_unit.py:394
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
@@ -3935,10 +3935,14 @@ msgstr "Commande SQL"
 #: templates/learning_unit/blocks/save_cancel_buttons.html:11
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:15
 #: templates/learning_unit/blocks/save_cancel_buttons_with_modal.html:19
-#: templates/learning_unit/specifications_edit.html:51
+#: templates/learning_unit/specifications_edit.html:52
 #: templates/learning_unit/teaching_material/modal_edit.html:43
 msgid "Save"
 msgstr "Enregistrer"
+
+#: templates/learning_unit/specifications_edit.html:54
+msgid "Save and postpone"
+msgstr "Enregistrer et reporter"
 
 #: models/education_group_year.py:293
 msgid "Schedule type"
@@ -4282,7 +4286,7 @@ msgstr "Le"
 msgid "The %(acronym)s has been moved"
 msgstr "%(acronym)s a été déplacé"
 
-#: views/learning_unit.py:178
+#: views/learning_unit.py:177
 #, python-format
 msgid "The '%(field)s' field content has been successfully saved"
 msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
@@ -4719,7 +4723,7 @@ msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
 
-#: tests/views/test_learning_unit.py:1338 views/learning_unit.py:510
+#: tests/views/test_learning_unit.py:1338 views/learning_unit.py:509
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -5279,8 +5283,8 @@ msgstr "Vol. global"
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:335
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:38
-#: tests/views/test_learning_unit.py:1541 views/learning_unit.py:251
-#: views/learning_unit.py:375 views/learning_unit.py:393
+#: tests/views/test_learning_unit.py:1541 views/learning_unit.py:250
+#: views/learning_unit.py:374 views/learning_unit.py:392
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
@@ -5288,8 +5292,8 @@ msgstr "Volume Q1"
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:339
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:40
-#: tests/views/test_learning_unit.py:1542 views/learning_unit.py:253
-#: views/learning_unit.py:376 views/learning_unit.py:394
+#: tests/views/test_learning_unit.py:1542 views/learning_unit.py:252
+#: views/learning_unit.py:375 views/learning_unit.py:393
 msgid "Volume Q2"
 msgstr "Volume Q2"
 
@@ -5299,8 +5303,8 @@ msgstr "Volume total annuel"
 
 #: forms/learning_unit/edition_volume.py:82
 #: forms/learning_unit/edition_volume.py:105
-#: tests/views/test_learning_unit.py:1539 views/learning_unit.py:247
-#: views/learning_unit.py:373 views/learning_unit.py:391
+#: tests/views/test_learning_unit.py:1539 views/learning_unit.py:246
+#: views/learning_unit.py:372 views/learning_unit.py:390
 msgid "Volume total annual"
 msgstr "Volume total annuel"
 
@@ -5721,7 +5725,7 @@ msgstr "accords"
 msgid "aim number"
 msgstr "numéro de l'attendu"
 
-#: views/learning_unit.py:179
+#: views/learning_unit.py:178
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr "et reporté jusque %(year)s"

@@ -48,11 +48,14 @@
     </form>
 </div>
 <div class="modal-footer">
-    <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
-           onclick="CKupdate(); $('#specification_edit_form').submit();"/>
     <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %} </button>
+    <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
+           onclick="CKupdate(); submitForm(0)"/>
+    {% if not form.learning_unit_year.is_past %}
+    <input type="submit" value="{% trans "Save and postpone" %}" class="btn btn-primary"
+           onclick="CKupdate(); submitForm(1)"/>
+    {% endif %}
 </div>
-
 
 {% block script %}
     <script>
@@ -60,5 +63,11 @@
             e.preventDefault();
             $(this).tab('show');
         });
+        function submitForm(withPostponement){
+            var input = $("<input>")
+               .attr("type", "hidden")
+               .attr("name", "postpone").val(withPostponement);
+            $('#specification_edit_form').append(input).submit();
+        }
     </script>
 {% endblock script %}
