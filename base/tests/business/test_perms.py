@@ -531,10 +531,10 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_acy = create_current_academic_year()
-        cls.academic_years = GenerateAcademicYear(
-            cls.current_acy.year - LEARNING_UNIT_CREATION_SPAN_YEARS,
-            cls.current_acy.year + LEARNING_UNIT_CREATION_SPAN_YEARS
-        ).academic_years
+        start_year = AcademicYearFactory(year=cls.current_acy.year - LEARNING_UNIT_CREATION_SPAN_YEARS)
+        end_year = AcademicYearFactory(year=cls.current_acy.year + LEARNING_UNIT_CREATION_SPAN_YEARS)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
+        cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.academic_years[LEARNING_UNIT_CREATION_SPAN_YEARS] = cls.current_acy
         cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
 

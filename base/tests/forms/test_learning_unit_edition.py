@@ -37,7 +37,7 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         super().setUp()
         self.setup_academic_years()
         self.learning_unit = self.setup_learning_unit(
-            start_year=self.starting_academic_year.year)
+            start_year=self.starting_academic_year)
         self.learning_container_year = self.setup_learning_container_year(
             academic_year=self.starting_academic_year,
             container_type=learning_container_year_types.COURSE
@@ -75,7 +75,7 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         self.assertEqual(form.fields['academic_year'].disabled, True)
 
     def test_edit_end_date(self):
-        self.learning_unit.end_year = self.last_academic_year.year
+        self.learning_unit.end_year = self.last_academic_year
         form_data = {"academic_year": self.starting_academic_year.pk}
         form = LearningUnitEndDateForm(form_data, learning_unit_year=self.learning_unit_year)
         self.assertTrue(form.is_valid())

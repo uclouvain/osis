@@ -137,7 +137,7 @@ class LearningUnit(SerializableModel):
         return super().delete(*args, **kwargs)
 
     def is_past(self):
-        return self.end_year and starting_academic_year().year > self.end_year
+        return self.end_year and starting_academic_year().year > self.end_year.year
 
     def most_recent_learning_unit_year(self):
         return self.learningunityear_set.latest('academic_year__year')

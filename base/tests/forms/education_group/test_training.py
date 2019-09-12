@@ -214,7 +214,9 @@ class TestPostponementEducationGroupYear(TestCase):
             category=education_group_categories.TRAINING
         )
 
-        self.list_acs = GenerateAcademicYear(get_current_year(), get_current_year() + 40).academic_years
+        start_year = AcademicYearFactory(year=get_current_year())
+        end_year = AcademicYearFactory(year=get_current_year() + 40)
+        self.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
 
         self.data = {
             'title': 'Métamorphose',

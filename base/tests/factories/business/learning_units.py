@@ -80,9 +80,8 @@ class LearningUnitsMixin:
 
     def setup_academic_years(self):
         self.this_year = datetime.datetime.now().year
-        self.start_year = self.this_year - LEARNING_UNIT_CREATION_SPAN_YEARS * 2
-        self.last_year = self.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2
-
+        self.start_year = AcademicYearFactory(year=self.this_year - LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
+        self.last_year = AcademicYearFactory(year=self.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
         self.list_of_academic_years = self.create_list_of_academic_years(self.start_year, self.last_year)
         self.starting_academic_year = mdl_academic_year.starting_academic_year()
         index_of_current_academic_year_in_list = self.list_of_academic_years.index(self.starting_academic_year)
