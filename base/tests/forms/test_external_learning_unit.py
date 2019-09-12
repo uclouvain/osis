@@ -33,7 +33,6 @@ from base.forms.learning_unit.external_learning_unit import ExternalLearningUnit
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
 from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
-from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
@@ -159,7 +158,7 @@ class TestExternalLearningUnitForm(TestCase):
     def test_creation(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
         form = LearningUnitYearForExternalModelForm(person=self.person, data=data, subtype=learning_unit_year_subtypes.FULL, initial={})
-        self.assertCountEqual(list(form.fields['academic_year'].queryset), self.academic_years[1:])
+        self.assertCountEqual(list(form.fields['academic_year'].queryset), self.academic_years)
 
 
 class TestExternalPartimForm(TestCase):
