@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
 
-import factory.fuzzy
-
-from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.group import ProgramManagerGroupFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonFactory
+from rest_framework import serializers
 
 
-class ProgramManagerFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.ProgramManager"
-        django_get_or_create = ('person', 'offer_year')
-        exclude = ('group', )
+class AttributionSerializer(serializers.Serializer):
+    tutor = serializers.CharField()
+    score_responsible = serializers.BooleanField()
 
-    group = factory.SubFactory(ProgramManagerGroupFactory)
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    person = factory.SubFactory(PersonFactory)
-    offer_year = factory.SubFactory(OfferYearFactory)
-    education_group = factory.SubFactory(EducationGroupFactory)
+
+class ScoresResponsibleListSerializer(serializers.Serializer):
+    pk = serializers.IntegerField()
+    acronym = serializers.CharField()
+    learning_unit_title = serializers.CharField(source='full_title')
+    requirement_entity = serializers.CharField()
+    attributions = serializers.SerializerMethodField()
+
+    # FIXME Have to filter attribution to not have same person twice for a luy
+    #  (due to a conception problem in the model)
+    def get_attributions(self, obj):
+        visited = set()
+        attributions_list = [
+            e for e in obj.attribution_set.all()
+            if e.tutor.person_id not in visited and not visited.add(e.tutor.person_id)
+        ]
+        return AttributionSerializer(attributions_list, many=True).data

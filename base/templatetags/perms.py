@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,26 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+from django import template
 
-import factory.fuzzy
+from base.business import perms
 
-from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.group import ProgramManagerGroupFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonFactory
+register = template.Library()
 
 
-class ProgramManagerFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.ProgramManager"
-        django_get_or_create = ('person', 'offer_year')
-        exclude = ('group', )
-
-    group = factory.SubFactory(ProgramManagerGroupFactory)
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    person = factory.SubFactory(PersonFactory)
-    offer_year = factory.SubFactory(OfferYearFactory)
-    education_group = factory.SubFactory(EducationGroupFactory)
+@register.simple_tag(takes_context=True)
+def view_academicactors(context):
+    user = context['request'].user
+    return perms.view_academicactors(user)
