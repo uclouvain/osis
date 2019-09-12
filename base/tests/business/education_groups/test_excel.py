@@ -122,21 +122,6 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         content = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A5:G8")]
         self.assertListEqual(expected_content, content)
 
-    # @staticmethod
-    # def get_luy_line(luy):
-    #     return [luy.acronym, luy.complete_title, None, None, None, None, None]
-    #
-    # @staticmethod
-    # def get_item_line(luy, grp, operator, first_item=False):
-    #     return [
-    #         (_("has as prerequisite") + " :") if first_item else None,
-    #         operator,
-    #         luy.acronym,
-    #         luy.complete_title_i18n,
-    #         "{} / {}".format(grp.relative_credits, luy.credits),
-    #         str(grp.block),
-    #         _("Yes") if grp.is_mandatory else _("No")]
-
 
 def row_to_value(sheet_row):
     return [cell.value for cell in sheet_row]
