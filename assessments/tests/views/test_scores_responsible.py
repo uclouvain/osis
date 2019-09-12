@@ -32,16 +32,12 @@ from django.urls import reverse
 
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
-from base.models.enums.education_group_types import TrainingType
 from base.tests.factories import structure
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.entities import create_entities_hierarchy
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import EntityManagerGroupFactory, ProgramManagerGroupFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -259,7 +255,7 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         group.permissions.add(Permission.objects.get(codename='view_scoresresponsible'))
         group.permissions.add(Permission.objects.get(codename='change_scoresresponsible'))
 
-        cls.academic_year = AcademicYearFactory(year=datetime.date.today().year, start_date=datetime.date.today())
+        cls.academic_year = create_current_academic_year()
 
         # FIXME: Old structure model [To remove]
         cls.structure = structure.StructureFactory()
