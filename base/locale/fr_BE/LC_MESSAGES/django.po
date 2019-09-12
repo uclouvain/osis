@@ -975,7 +975,7 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
 
 msgid "Education group edition"
-msgstr "Edition d'organisation de formations"
+msgstr "Édition des programmes"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
@@ -2496,7 +2496,7 @@ msgid "Scores exam diffusion"
 msgstr "Diffusion des feuilles de note"
 
 msgid "Scores exam submission"
-msgstr "Soumission des feuilles de note"
+msgstr "Soumission des notes d'examen"
 
 msgid "Scores must be between 0 and 20"
 msgstr "Les scores doivent être compris entre 0 et 20"
@@ -2649,7 +2649,7 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Résumé du cours"
+msgstr "Soumission des fiches descriptives"
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2664,7 +2664,7 @@ msgid "T=Cheating"
 msgstr "T=Tricherie"
 
 msgid "Teaching charge application"
-msgstr "Demande de frais d’enseignement"
+msgstr "Candidature en ligne"
 
 msgid "Teaching internship"
 msgstr "Stage d’enseignement"
