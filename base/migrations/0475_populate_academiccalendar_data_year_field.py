@@ -35,7 +35,7 @@ def reverse_migration(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0473_academiccalendar_data_year'),
+        ('base', '0474_academiccalendar_data_year'),
     ]
 
     operations = [
