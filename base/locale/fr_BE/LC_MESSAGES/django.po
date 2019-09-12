@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-11 15:49+0200\n"
+"POT-Creation-Date: 2019-09-12 16:04+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -921,7 +921,7 @@ msgstr ""
 #: templates/education_group/learning_unit/tab_prerequisite_update.html:45
 #: templates/education_group/organization_edit_inner.html:51
 #: templates/education_group/tab_edit_administrative_data.html:100
-#: templates/learning_unit/achievement_edit.html:70
+#: templates/learning_unit/achievement_edit.html:74
 #: templates/learning_unit/add_charge_repartition_inner.html:72
 #: templates/learning_unit/blocks/form/volumes_management_form.html:85
 #: templates/learning_unit/blocks/modal/modal_comparison.html:43
@@ -1663,10 +1663,10 @@ msgid "Ending of exam registration"
 msgstr "Fin inscription aux examens"
 
 #: forms/education_group/achievement.py:55
-#: forms/education_group/achievement.py:85 forms/learning_achievement.py:60
+#: forms/education_group/achievement.py:85
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:40
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:36
-#: templates/learning_unit/achievement_edit.html:54
+#: templates/learning_unit/achievement_edit.html:58
 #: templates/learning_unit/blocks/panel/educational_informations.html:57
 #: templates/learning_unit/specifications_edit.html:36
 msgid "English"
@@ -1955,10 +1955,10 @@ msgid "Formerly"
 msgstr "Anciennement"
 
 #: forms/education_group/achievement.py:49
-#: forms/education_group/achievement.py:79 forms/learning_achievement.py:55
+#: forms/education_group/achievement.py:79
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:39
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:35
-#: templates/learning_unit/achievement_edit.html:53
+#: templates/learning_unit/achievement_edit.html:57
 #: templates/learning_unit/blocks/panel/educational_informations.html:56
 #: templates/learning_unit/specifications_edit.html:35
 msgid "French"
@@ -2399,6 +2399,10 @@ msgid ""
 msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
+
+#: views/learning_achievement.py:144
+msgid "Learning achievement content has been successfully saved"
+msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
 #: templates/learning_unit/achievement_edit.html:30
 #: templates/learning_unit/specifications_all.html:106
@@ -3452,6 +3456,12 @@ msgstr "Pôle"
 msgid "Postal code"
 msgstr "Code postal"
 
+#: templates/learning_unit/achievement_edit.html:53
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
+msgstr "Le report ne sera pas possible car le code choisi existe déjà pour les années académiques futures"
+
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
 #: templates/learning_unit/add_charge_repartition_inner.html:48
@@ -3928,7 +3938,7 @@ msgstr "Commande SQL"
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/education_group/tab_edit_administrative_data.html:96
 #: templates/entity/blocks/educational_summary_calendar_widget.html:39
-#: templates/learning_unit/achievement_edit.html:71
+#: templates/learning_unit/achievement_edit.html:75
 #: templates/learning_unit/add_charge_repartition_inner.html:73
 #: templates/learning_unit/blocks/form/volumes_management_form.html:81
 #: templates/learning_unit/blocks/modal/modal_pedagogy_edit.html:45
@@ -3940,9 +3950,24 @@ msgstr "Commande SQL"
 msgid "Save"
 msgstr "Enregistrer"
 
-#: templates/learning_unit/specifications_edit.html:54
+#: templates/learning_unit/achievement_edit.html:75
+#: templates/learning_unit/specifications_edit.html:53
+#, fuzzy
+#| msgid "Save and postpone"
+msgid "Save and do not postpone changes"
+msgstr "Enregistrer et reporter"
+
+#: templates/learning_unit/achievement_edit.html:78
+#: templates/learning_unit/specifications_edit.html:56
 msgid "Save and postpone"
 msgstr "Enregistrer et reporter"
+
+#: templates/learning_unit/achievement_edit.html:79
+#: templates/learning_unit/specifications_edit.html:57
+#, fuzzy
+#| msgid "and postponed until %(year)s"
+msgid "Save and postpone changes on next years"
+msgstr "et reporté jusque %(year)s"
 
 #: models/education_group_year.py:293
 msgid "Schedule type"
@@ -4870,7 +4895,7 @@ msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
 msgid "Thesis"
 msgstr "Thèse"
 
-#: forms/learning_achievement.py:123
+#: forms/learning_achievement.py:125
 #: tests/forms/test_learning_achievement.py:66
 msgid "This code already exists for this learning unit"
 msgstr "Ce code existe déja pour cette unité d'enseignement"
@@ -5725,7 +5750,7 @@ msgstr "accords"
 msgid "aim number"
 msgstr "numéro de l'attendu"
 
-#: views/learning_unit.py:178
+#: views/learning_achievement.py:145 views/learning_unit.py:178
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr "et reporté jusque %(year)s"

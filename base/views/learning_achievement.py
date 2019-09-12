@@ -24,9 +24,10 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.achievement import get_anchor_reference, DELETE, DOWN, UP, \
@@ -34,9 +35,11 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications
 from base.views.learning_units import perms
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
+
 
 
 def operation(learning_achievement_id, operation_str):
@@ -89,7 +92,7 @@ def update(request, learning_unit_year_id, learning_achievement_id):
     )
 
     if form.is_valid():
-        return _save_and_redirect(form, learning_unit_year_id)
+        return _save_and_redirect(request, form, learning_unit_year_id)
 
     context = {'learning_unit_year': learning_unit_year,
                'learning_achievement': learning_achievement,
@@ -112,7 +115,7 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     )
 
     if form.is_valid():
-        return _save_and_redirect(form, learning_unit_year_id)
+        return _save_and_redirect(request, form, learning_unit_year_id)
 
     context = {'learning_unit_year': learning_unit_yr,
                'learning_achievement': learning_achievement_fr,
@@ -123,12 +126,26 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     return render(request, "learning_unit/achievement_edit.html", context)
 
 
-def _save_and_redirect(form, learning_unit_year_id):
-    achievement = form.save()
-    return HttpResponseRedirect(
-        reverse(learning_unit_specifications, kwargs={'learning_unit_year_id': learning_unit_year_id})
-        + "{}{}".format(HTML_ANCHOR, achievement.id)
+def _save_and_redirect(request, form, learning_unit_year_id):
+    achievement, last_academic_year = form.save()
+    display_success_messages(
+        request,
+        _build_edit_achievement_success_message(achievement, last_academic_year)
     )
+    return HttpResponse()
+
+    # return HttpResponseRedirect(
+    #     reverse(learning_unit_specifications, kwargs={'learning_unit_year_id': learning_unit_year_id})
+    #     + "{}{}".format(HTML_ANCHOR, achievement.id)
+    # )
+
+
+def _build_edit_achievement_success_message(achievement, last_academic_year):
+    default_msg = _("Learning achievement content has been successfully saved")
+    msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+    return msg % {
+        'year': last_academic_year
+    }
 
 
 @login_required
@@ -143,10 +160,27 @@ def create_first(request, learning_unit_year_id):
     )
 
     if form.is_valid():
-        return _save_and_redirect(form, learning_unit_year_id)
+        return _save_and_redirect(request, form, learning_unit_year_id)
 
     context = {'learning_unit_year': learning_unit_yr,
                'form': form,
                'language_code': FR_CODE_LANGUAGE}
 
     return render(request, "learning_unit/achievement_edit.html", context)
+
+
+@login_required
+@permission_required('base.can_access_learningunit', raise_exception=True)
+@require_http_methods(['GET'])
+@perms.can_update_learning_achievement
+def check_code(request, learning_unit_year_id, learning_achievement_id):
+    code = request.GET['code']
+    accept_postponement = True
+    next_luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
+    academic_year = next_luy.academic_year
+    while next_luy.get_learning_unit_next_year():
+        next_luy = next_luy.get_learning_unit_next_year()
+        if LearningAchievement.objects.filter(learning_unit_year=next_luy.pk, code_name=code).exists():
+            accept_postponement = False
+            academic_year = next_luy.academic_year
+    return JsonResponse(data={'accept_postponement': accept_postponement, 'academic_year': academic_year.name})
