@@ -25,6 +25,7 @@
 ##############################################################################
 import uuid
 
+from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -91,5 +92,9 @@ class TrainingListViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupRootsListSerializer([self.training], many=True)
+        serializer = EducationGroupRootsListSerializer(
+            [self.training],
+            many=True,
+            context={'request': RequestFactory().get(self.url)}
+        )
         self.assertEqual(response.data, serializer.data)
