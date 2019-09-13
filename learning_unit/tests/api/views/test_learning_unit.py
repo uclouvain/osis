@@ -30,12 +30,114 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.views.learning_unit import LearningUnitList
+
+
+class LearningUnitListTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = GenerateAcademicYear(start_year=2015, end_year=2020)
+
+        cls.requirement_entity_version = EntityVersionFactory(
+            start_date=cls.academic_years[0].start_date,
+            end_date=cls.academic_years[-1].end_date,
+        )
+
+        cls.learning_unit_years = []
+        for academic_year in cls.academic_years:
+            cls.learning_unit_years.append(
+                LearningUnitYearFactory(
+                    academic_year=academic_year,
+                    learning_container_year__academic_year=academic_year,
+                    learning_container_year__requirement_entity=cls.requirement_entity_version.entity
+                )
+            )
+
+        cls.person = PersonFactory()
+        cls.url = reverse('learning_unit_api_v1:' + LearningUnitList.name)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_all_training_ensure_response_have_next_previous_results_count(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertTrue('previous' in response.data)
+        self.assertTrue('next' in response.data)
+        self.assertTrue('results' in response.data)
+
+        self.assertTrue('count' in response.data)
+        expected_count = LearningUnitYear.objects.all().count()
+        self.assertEqual(response.data['count'], expected_count)
+
+    def test_get_results_without_filtering(self):
+        response = self.client.get(self.url, {})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        qs = LearningUnitYear.objects.all().annotate_full_title().order_by('-academic_year__year', 'acronym')
+        serializer = LearningUnitSerializer(
+            qs,
+            many=True,
+            context={'request': RequestFactory().get(self.url)}
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_results_filter_by_academic_year(self):
+        response = self.client.get(self.url, data={'year': self.academic_years[3].year})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        qs = LearningUnitYear.objects.filter(
+            pk=self.learning_unit_years[3].pk
+        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
+
+        serializer = LearningUnitSerializer(
+            qs,
+            many=True,
+            context={'request': RequestFactory().get(self.url)}
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_results_filter_by_acronym_exact_match(self):
+        expected_learning_unit_year = self.learning_unit_years[2]
+
+        response = self.client.get(self.url, data={'acronym': expected_learning_unit_year.acronym})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        qs = LearningUnitYear.objects.filter(
+            pk=expected_learning_unit_year.pk
+        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
+
+        serializer = LearningUnitSerializer(
+            qs,
+            many=True,
+            context={'request': RequestFactory().get(self.url)}
+        )
+        self.assertEqual(response.data['results'], serializer.data)
 
 
 class LearningUnitDetailedTestCase(APITestCase):
@@ -80,6 +182,9 @@ class LearningUnitDetailedTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = LearningUnitDetailedSerializer(self.luy, context={'request': RequestFactory().get(self.url)})
-
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
+        serializer = LearningUnitDetailedSerializer(
+            luy_with_full_title,
+            context={'request': RequestFactory().get(self.url)}
+        )
         self.assertEqual(response.data, serializer.data)

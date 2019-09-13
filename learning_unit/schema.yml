@@ -34,10 +34,12 @@ paths:
       - in: query
         name: acronym
         schema:
+          description: Filter acronym in exact match
           type: string
       - in: query
-        name: title
+        name: acronym_like
         schema:
+          description: Filter acronym in contains match case insensitive
           type: string
       - in: query
         name: year
