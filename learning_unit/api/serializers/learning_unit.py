@@ -30,23 +30,50 @@ from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
 
-class LearningUnitDetailedSerializer(serializers.HyperlinkedModelSerializer):
+class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='learning_unit_api_v1:learningunits_read',
         lookup_field='uuid',
         read_only=True
     )
-
-    periodicity_text = serializers.CharField(source='get_periodicity_display', read_only=True)
-    quadrimester_text = serializers.CharField(source='get_quadrimester_display', read_only=True)
-
     requirement_entity = serializers.CharField(
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
     )
+    title = serializers.SerializerMethodField(read_only=True)
+    academic_year = serializers.IntegerField(source='academic_year.year')
+
+    type = serializers.CharField(source='learning_container_year.container_type')
+    type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
+    subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
+
+    class Meta:
+        model = LearningUnitYear
+        fields = (
+            'url',
+            'acronym',
+            'academic_year',
+            'requirement_entity',
+            'title',
+            'type',
+            'type_text',
+            'subtype',
+            'subtype_text'
+        )
+
+    def get_title(self, learning_unit_year):
+        return {
+            'fr': getattr(learning_unit_year, 'full_title', None),
+            'en': getattr(learning_unit_year, 'full_title_en', None)
+        }
+
+
+class LearningUnitDetailedSerializer(LearningUnitSerializer):
+    periodicity_text = serializers.CharField(source='get_periodicity_display', read_only=True)
+    quadrimester_text = serializers.CharField(source='get_quadrimester_display', read_only=True)
+
     language = serializers.CharField(source='language.code', read_only=True)
     team = serializers.BooleanField(source='learning_container_year.team', read_only=True)
-    academic_year = serializers.IntegerField(source='academic_year.year')
 
     campus = LearningUnitCampusSerializer(read_only=True)
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
@@ -64,14 +91,10 @@ class LearningUnitDetailedSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True
     )
 
-    class Meta:
+    class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
-        fields = (
-            'url',
-            'acronym',
-            'academic_year',
+        fields = LearningUnitSerializer.Meta.fields + (
             'credits',
-            'requirement_entity',
             'status',
             'quadrimester',
             'quadrimester_text',

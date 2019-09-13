@@ -30,7 +30,45 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+
+
+class LearningUnitSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        academic_year = AcademicYearFactory()
+        requirement_entity_version = EntityVersionFactory(
+            start_date=AcademicYearFactory(year=academic_year.year - 1).start_date,
+            end_date=AcademicYearFactory(year=academic_year.year + 1).end_date,
+        )
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=academic_year,
+            learning_container_year__requirement_entity=requirement_entity_version.entity
+        )
+
+        url = reverse('learning_unit_api_v1:learningunits_list')
+        cls.serializer = LearningUnitSerializer(cls.learning_unit_year, context={'request': RequestFactory().get(url)})
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'acronym',
+            'academic_year',
+            'requirement_entity',
+            'title',
+            'type',
+            'type_text',
+            'subtype',
+            'subtype_text'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_title_is_dict_contains_iso_code_as_key(self):
+        title = self.serializer.data['title']
+
+        self.assertIsInstance(title, dict)
+        self.assertTrue('fr' in title)
+        self.assertTrue('en' in title)
 
 
 class LearningUnitDetailedSerializerTestCase(TestCase):
@@ -56,8 +94,13 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'url',
             'acronym',
             'academic_year',
-            'credits',
             'requirement_entity',
+            'title',
+            'type',
+            'type_text',
+            'subtype',
+            'subtype_text',
+            'credits',
             'status',
             'quadrimester',
             'quadrimester_text',
@@ -68,6 +111,6 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'language',
             'components',
             'parent',
-            'partims'
+            'partims',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

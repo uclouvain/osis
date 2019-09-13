@@ -24,9 +24,40 @@
 #
 ##############################################################################
 from rest_framework import generics
+from django_filters import rest_framework as filters
 
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+
+
+class LearningUnitFilter(filters.FilterSet):
+    acronym_like = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
+    year = filters.NumberFilter(field_name="academic_year__year")
+
+    class Meta:
+        model = LearningUnitYear
+        fields = ['acronym', 'acronym_like', 'year']
+
+
+class LearningUnitList(generics.ListAPIView):
+    """
+       Return a list of all the learning unit with optional filtering.
+    """
+    name = 'learningunits_list'
+    queryset = LearningUnitYear.objects.all().select_related(
+        'academic_year',
+        'learning_container_year'
+    ).prefetch_related(
+        'learning_container_year__requirement_entity__entityversion_set',
+    ).annotate_full_title()
+    serializer_class = LearningUnitSerializer
+    filter_class = LearningUnitFilter
+    search_fields = None
+    ordering_fields = None
+    ordering = (
+        '-academic_year__year',
+        'acronym',
+    )  # Default ordering
 
 
 class LearningUnitDetailed(generics.RetrieveAPIView):
@@ -36,10 +67,12 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
     name = 'learningunits_read'
     queryset = LearningUnitYear.objects.all().select_related(
         'language',
-        'campus'
+        'campus',
+        'academic_year',
+        'learning_container_year'
     ).prefetch_related(
         'learning_container_year__requirement_entity__entityversion_set',
         'learningcomponentyear_set'
-    )
+    ).annotate_full_title()
     serializer_class = LearningUnitDetailedSerializer
     lookup_field = 'uuid'
