@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 10:26+0200\n"
+"POT-Creation-Date: 2019-09-13 13:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2704,6 +2704,10 @@ msgstr ""
 #, python-format
 msgid ""
 "The learning unit %(acronym)s is included in the following education groups"
+msgstr ""
+
+#, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
 
 #, python-format
