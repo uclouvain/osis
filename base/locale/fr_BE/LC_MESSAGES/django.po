@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 10:26+0200\n"
+"POT-Creation-Date: 2019-09-10 12:38+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1272,6 +1272,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 
 msgid "Generate pdf"
 msgstr "Générer le pdf"
+
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr "Générer xls des cours qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
 msgstr "Générer xls des cours qui ont des prérequis"
@@ -3754,11 +3757,17 @@ msgstr "volume horaire total annuel"
 msgid "initial value"
 msgstr "valeur initiale"
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr "est un prérequis de"
 
 msgid "is using in"
 msgstr "est utilisée dans"
+
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
+msgstr "est_prérequis_de-%(year)s-%(acronym)s"
+
+msgid "is_prerequisited_of-%(year)s-%(acronym)s"
+msgstr "est_prérequis_de-%(year)s-%(acronym)s"
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisé"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 10:26+0200\n"
+"POT-Creation-Date: 2019-09-10 12:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1208,6 +1208,9 @@ msgid "Generate PDF not available. Please use EPC."
 msgstr ""
 
 msgid "Generate pdf"
+msgstr ""
+
+msgid "Generate xls of learning units that are prerequisites for"
 msgstr ""
 
 msgid "Generate xls of learning units that have prerequisites"
@@ -3528,10 +3531,18 @@ msgstr ""
 msgid "initial value"
 msgstr ""
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr ""
 
 msgid "is using in"
+msgstr ""
+
+#, python-format
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
+msgstr ""
+
+#, python-format
+msgid "is_prerequisited_of-%(year)s-%(acronym)s"
 msgstr ""
 
 msgid "learning unit year"

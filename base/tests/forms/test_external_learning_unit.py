@@ -156,6 +156,7 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertEqual(luy.externallearningunityear.author, self.person)
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_creation(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
         form = LearningUnitYearForExternalModelForm(person=self.person, data=data, subtype=learning_unit_year_subtypes.FULL, initial={})
