@@ -16,6 +16,48 @@ info:
   description: |-
     A set of API endpoints that allow you to get information about learning unit
 paths:
+  /learning_units:
+    get:
+      description: Return a list of all the learning unit with optional filtering.
+      operationId: learningunits_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          description: Number of results to return per page.
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          description: The initial index from which to return the results.
+          type: integer
+      - in: query
+        name: acronym
+        schema:
+          type: string
+      - in: query
+        name: title
+        schema:
+          type: string
+      - in: query
+        name: year
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnit'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - learning_units
   /learning_units/{uuid}:
     get:
       description: Return the detail of the learning unit
@@ -179,59 +221,76 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    LearningUnitDetailed:
+    LearningUnit:
       type: object
       properties:
         url:
           type: string
           format: uri
-        academic_year:
-          type: number
-          example: 2014
         acronym:
           type: string
-        credit:
-          type: number
-          multipleOf: 0.01
+        title:
+          type: object
+          required:
+          - en
+          - fr
+          example:
+            en: Elements of biochemistry
+            fr: Eléments de biochimie
+        type:
+          $ref: '#/components/schemas/LearningUnitTypeEnum'
+        type_text:
+          type: string
+        subtype:
+          $ref: '#/components/schemas/LearningUnitSubtypeEnum'
+        subtype_text:
+          type: string
         requirement_entity:
           type: string
-        status:
-          type: boolean
-        quadrimester:
-          $ref: '#/components/schemas/QuadrimesterEnum'
-        quadrimester_text:
-          type: string
-        periodicity:
-          $ref: '#/components/schemas/PeriodicityEnum'
-        periodicity_text:
-          type: string
-        campus:
-          $ref: '#/components/schemas/LearningUnitCampus'
-        components:
-          type: array
-          items:
-            $ref: '#/components/schemas/LearningUnitComponent'
-        partims:
-          type: array
-          items:
-            type: string
-            format: uri
-        parent:
-          type: string
-          format: uri
-        team:
-          type: boolean
-        language:
-          type: string
-          description: |
-            The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+        academic_year:
+          type: integer
+          example: 2014
+    LearningUnitDetailed:
+      allOf:
+        - $ref: '#/components/schemas/LearningUnit'
+        - type: object
+          properties:
+            credit:
+              type: number
+              multipleOf: 0.01
+            status:
+              type: boolean
+            quadrimester:
+              $ref: '#/components/schemas/QuadrimesterEnum'
+            periodicity:
+              $ref: '#/components/schemas/PeriodicityEnum'
+            campus:
+              $ref: '#/components/schemas/LearningUnitCampus'
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/LearningUnitComponent'
+            partims:
+              type: array
+              items:
+                type: string
+                format: uri
+            parent:
+              type: string
+              format: uri
+            team:
+              type: boolean
+            language:
+              type: string
+              description: |
+                The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
     LearningUnitComponent:
       type: object
       properties:
         type:
           $ref: '#/components/schemas/ComponentTypeEnum'
         type_text:
-            type: string
+          type: string
         planned_classes:
           type: integer
           format: int32
@@ -297,8 +356,8 @@ components:
             - en
             - fr
           example:
-            en: Hello!
-            fr: Bonjour!
+            en: Master [120] in Law
+            fr: Master [120] en droit
         decree_category:
           $ref: '#/components/schemas/DecreeCategoryEnum'
         decree_category_text:
@@ -395,6 +454,21 @@ components:
         - teaching_methods
         - themes_discussed
         - prerequisite
+    LearningUnitTypeEnum:
+      type: string
+      enum:
+        - COURSE
+        - INTERNSHIP
+        - DISSERTATION
+        - OTHER_COLLECTIVE
+        - OTHER_INDIVIDUAL
+        - MASTER_THESIS
+        - EXTERNAL
+    LearningUnitSubtypeEnum:
+      type: string
+      enum:
+        - FULL
+        - PARTIM
     QuadrimesterEnum:
       type: string
       enum:
