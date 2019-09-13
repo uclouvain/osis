@@ -366,12 +366,12 @@ def _build_excel_lines_prerequisited(egy: EducationGroupYear, prerequisite_qs: Q
                 LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title_i18n)
             )
 
-            results = PrerequisiteItem.objects.filter(
-                Q(learning_unit=luy.learning_unit) | Q(prerequisite__learning_unit_year=luy)
-            )
+            results = PrerequisiteItem.objects.filter(learning_unit=luy.learning_unit)
+
             first = True
             for result in results:
-                if result.prerequisite.learning_unit_year.academic_year == luy.academic_year:
+                if result.prerequisite.learning_unit_year.academic_year == luy.academic_year \
+                        and result.prerequisite.education_group_year == egy:
                     prerequisite_line = _build_is_prerequisite_for_line(
                         result.prerequisite.learning_unit_year,
                         first,
@@ -398,6 +398,8 @@ def _build_is_prerequisite_for_line(luy_item, first, learning_unit_years_parent)
 
 def _get_credits(luy_item, learning_unit_years_parent):
     res = learning_unit_years_parent.get(luy_item.id)
-    relative_credits = res.relative_credits
+    if res:
+        relative_credits = res.relative_credits
+    else:
+        relative_credits = ''
     return "{} / {:f}".format(relative_credits, luy_item.credits.normalize())
-
