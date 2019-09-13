@@ -3541,10 +3541,6 @@ msgstr ""
 msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
-#, python-format
-msgid "is_prerequisited_of-%(year)s-%(acronym)s"
-msgstr ""
-
 msgid "learning unit year"
 msgstr ""
 
