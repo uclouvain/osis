@@ -264,8 +264,12 @@ components:
               type: boolean
             quadrimester:
               $ref: '#/components/schemas/QuadrimesterEnum'
+            quadrimester_text:
+              type: string
             periodicity:
               $ref: '#/components/schemas/PeriodicityEnum'
+            periodicity_text:
+              type: string
             campus:
               $ref: '#/components/schemas/LearningUnitCampus'
             components:
@@ -447,6 +451,13 @@ components:
               type: string
             en:
               type: string
+        mobility:
+          type: object
+          properties:
+            fr:
+              type: string
+            en:
+              type: string
       required:
         - bibliography
         - resume
@@ -456,6 +467,7 @@ components:
         - teaching_methods
         - themes_discussed
         - prerequisite
+        - mobility
     LearningUnitTypeEnum:
       type: string
       enum:

@@ -34,7 +34,11 @@ class EducationGroupRootsTitleSerializer(serializers.Serializer):
     fr = serializers.CharField(source='title')
 
 
-class EducationGroupRootsListSerializer(serializers.ModelSerializer):
+class EducationGroupRootsListSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name='education_group_api_v1:training-detail',
+        lookup_field='uuid',
+    )
     academic_year = serializers.IntegerField(source='academic_year.year')
     education_group_type = serializers.SlugRelatedField(
         slug_field='name',
@@ -50,6 +54,7 @@ class EducationGroupRootsListSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationGroupYear
         fields = (
+            'url',
             'acronym',
             'credits',
             'decree_category',
