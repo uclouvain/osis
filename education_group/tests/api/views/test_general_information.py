@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
 
-from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
-    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS_KEY
+    SKILLS_AND_ACHIEVEMENTS_KEY, COMMON_DIDACTIC_PURPOSES
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
+from base.tests.factories.person import PersonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
@@ -38,68 +40,77 @@ from education_group.api.serializers.general_information import GeneralInformati
 from webservices.business import EVALUATION_KEY
 
 
-class GeneralInformationSerializerTestCase(TestCase):
+class GeneralInformationTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.language = 'en'
         cls.egy = EducationGroupYearFactory()
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS_KEY],
-            'common': [COMMON_DIDACTIC_PURPOSES]
+            'common': [COMMON_DIDACTIC_PURPOSES, EVALUATION_KEY]
         }
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             cls.egy.education_group_type.name
         ] = cls.pertinent_sections
+
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
             TranslatedTextFactory(
                 reference=common_egy.id,
                 entity=OFFER_YEAR,
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
             TranslatedTextFactory(
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
-        cls.serializer = GeneralInformationSerializer(cls.egy, context={'language': 'en'})
+        cls.url = reverse('education_group_api_v1:generalinformations_read', kwargs={
+            'acronym': cls.egy.acronym,
+            'year': cls.egy.academic_year.year,
+            'language': cls.language
+        })
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'language',
-            'acronym',
-            'title',
-            'year',
-            'sections'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
 
-    def test_ensure_content_field_is_list_of_dict(self):
-        expected_fields = [
-            'id',
-            'label',
-            'content',
-        ]
-        self.assertEqual(type(self.serializer.data['sections']), list)
-        self.assertEqual(
-            len(self.serializer.data['sections']),
-            len(self.pertinent_sections['common'] + self.pertinent_sections['specific']) - 1
-            # EVALUATION SPECIFIC AND COMMON IN ONLY ONE ENTRY
-        )
-        for section in self.serializer.data['sections']:
-            if section['id'] == EVALUATION_KEY:
-                self.assertTrue(isinstance(section, dict))
-                self.assertListEqual(list(section.keys()), expected_fields + ['free_text'])
-            else:
-                self.assertTrue(isinstance(section, collections.OrderedDict))
-                self.assertListEqual(list(section.keys()), expected_fields)
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_case_education_group_year_not_found(self):
+        invalid_url = reverse('education_group_api_v1:generalinformations_read', kwargs={
+            'acronym': 'dummy',
+            'year': 2019,
+            'language': 'en'
+        })
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = GeneralInformationSerializer(self.egy, context={'language': self.language})
+        self.assertEqual(response.data, serializer.data)
