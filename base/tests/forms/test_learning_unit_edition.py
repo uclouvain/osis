@@ -65,12 +65,12 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_odd_academic_years)
 
     def test_edit_end_date_send_dates_with_end_date_defined(self):
-        self.learning_unit.end_year = self.last_academic_year.year
+        self.learning_unit.end_year = self.last_academic_year
         form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
         self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_academic_years_after_now)
 
     def test_edit_end_date_send_dates_with_end_date_of_learning_unit_inferior_to_current_academic_year(self):
-        self.learning_unit.end_year = self.oldest_academic_year.year
+        self.learning_unit.end_year = self.oldest_academic_year
         form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
         self.assertEqual(form.fields['academic_year'].disabled, True)
 

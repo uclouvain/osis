@@ -58,7 +58,7 @@ class YearChoiceField(forms.ChoiceField):
         if not end_year:
             end_year = start_year + LEARNING_UNIT_CREATION_SPAN_YEARS
 
-        self.choices = [(year, self.academic_year_str(year)) for year in range(start_year, end_year + 1)]
+        self.choices = [(year, self.academic_year_str(year)) for year in range(start_year, end_year.year + 1)]
         self.choices = add_blank(self.choices)
 
     @staticmethod

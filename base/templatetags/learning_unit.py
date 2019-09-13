@@ -65,9 +65,9 @@ def academic_years(start_year, end_year):
 
 
 @register.filter
-def academic_year(year):
-    if year:
-        return "{}-{}".format(year, str(year + 1)[-2:])
+def academic_year(academic_year):
+    if academic_year:
+        return "{}-{}".format(academic_year.year, str(academic_year.year + 1)[-2:])
     return "-"
 
 
