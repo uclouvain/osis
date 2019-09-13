@@ -23,18 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.postponement import EDUCATION_GROUP_MAX_POSTPONE_YEARS, _compute_end_year
 from base.business.group_element_years.postponement import PostponeContent, NotPostponeError, \
-    ReuseOldLearningUnitYearWarning, PrerequisiteItemWarning
+    ReuseOldLearningUnitYearWarning
 from base.business.utils.model import model_to_dict_fk
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
-from base.models.enums.education_group_categories import GROUP, MINI_TRAINING, Categories
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -42,7 +41,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory, GroupEducationGroupTypeFactory
+from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity import EntityFactory
@@ -83,29 +82,6 @@ class EducationGroupPostponementTestCase(TestCase):
         EducationGroupYearDomainFactory(education_group_year=self.education_group_year)
         EducationGroupYearDomainFactory(education_group_year=self.education_group_year)
 
-    def assertPostponementEquals(self, education_group_year, education_group_year_postponed):
-        # Check all attribute without m2m / unreleveant fields
-        fields_to_exclude = ['id', 'external_id', 'academic_year', 'languages', 'secondary_domains']
-        egy_dict = model_to_dict(
-            education_group_year,
-            exclude=fields_to_exclude
-        )
-        egy_postponed_dict = model_to_dict(
-            education_group_year_postponed,
-            exclude=fields_to_exclude
-        )
-        self.assertDictEqual(egy_dict, egy_postponed_dict)
-
-        # Check if m2m is the same
-        self.assertEqual(
-            self.education_group_year.secondary_domains.all().count(),
-            education_group_year_postponed.secondary_domains.all().count()
-        )
-        self.assertEqual(
-            self.education_group_year.languages.all().count(),
-            education_group_year_postponed.languages.all().count()
-        )
-
 
 class TestComputeEndPostponement(EducationGroupPostponementTestCase):
     def test_education_group_max_postpone_years(self):
@@ -126,18 +102,18 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
 
     def test_compute_end_postponement_case_specific_end_date_and_no_data_in_future(self):
         # Set end date of education group
-        self.education_group_year.education_group.end_year = self.current_academic_year.year + 2
+        self.education_group_year.education_group.end_year = self.generated_ac_years.academic_years[1]
         self.education_group_year.education_group.save()
         self.education_group_year.refresh_from_db()
         # Remove all data in future
         EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
 
         result = _compute_end_year(self.education_group_year.education_group)
-        self.assertEqual(result, self.education_group_year.education_group.end_year)
+        self.assertEqual(result, self.education_group_year.education_group.end_year.year)
 
     def test_compute_end_postponement_case_specific_end_date_and_data_in_future_gte(self):
         # Set end date of education group
-        self.education_group_year.education_group.end_year = self.current_academic_year.year + 2
+        self.education_group_year.education_group.end_year = self.generated_ac_years.academic_years[1]
         self.education_group_year.refresh_from_db()
 
         # Create data in future
@@ -158,10 +134,12 @@ class TestPostpone(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.previous_academic_year, cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce()
+        cls.current_academic_year = create_current_academic_year()
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
     def setUp(self):
-        self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
+        self.education_group = EducationGroupFactory(end_year=self.next_academic_year)
 
         self.current_education_group_year = TrainingFactory(
             education_group=self.education_group,
@@ -223,7 +201,7 @@ class TestPostpone(TestCase):
         self.assertEqual(str(cm.exception), _("The content has already been postponed."))
 
     def test_init_old_education_group(self):
-        self.education_group.end_year = 1200
+        self.education_group.end_year = AcademicYearFactory(year=2000)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -572,7 +550,7 @@ class TestPostpone(TestCase):
         sub_group = GroupElementYearFactory(
             parent=self.current_group_element_year.child_branch,
             child_branch__academic_year=self.current_academic_year,
-            child_branch__education_group__end_year=self.current_academic_year.year,
+            child_branch__education_group__end_year=self.current_academic_year,
         )
         self.postponer = PostponeContent(self.current_education_group_year)
 

@@ -28,10 +28,10 @@ from django.http import HttpResponse
 from django.test import TestCase
 from rest_framework.reverse import reverse
 
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, TUTOR
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.views.user_list import UserListView
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, TUTOR_GROUP
 
 
 class UserListViewTestCase(TestCase):
@@ -54,13 +54,13 @@ class UserListViewTestCase(TestCase):
 
     def test_donot_return_teacher_only_in_tutor_group(self):
         a_tutor_person = PersonFactory()
-        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR_GROUP))
+        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR))
         a_tutor_person.save()
         self.assertCountEqual(UserListView().get_queryset(), [])
 
     def test_tutor_in_several_groups(self):
         a_tutor_person = PersonFactory()
-        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR_GROUP))
+        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR))
         a_tutor_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
         a_tutor_person.save()
 

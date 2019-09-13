@@ -28,14 +28,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.models import Group
 from django.db.models import Prefetch
 from django.db.models import Subquery, OuterRef
-from django.http import Http404
 from django.views.generic import ListView
 
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_manager import EntityManager
 from base.models.entity_version import EntityVersion
-from base.models.enums.groups import TUTOR_GROUP
+from base.models.enums.groups import TUTOR
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
 from base.models.program_manager import ProgramManager
@@ -90,7 +89,7 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 prefetch_personentity
             ).filter(
                 user__is_active=True,
-                user__groups__in=Group.objects.exclude(name=TUTOR_GROUP)
+                user__groups__in=Group.objects.exclude(name=TUTOR)
             ).distinct()
 
         if 'partnership' in settings.INSTALLED_APPS:

@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,37 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.test import TestCase
-from base.models import entity_manager
-from base.tests.factories.entity_manager import EntityManagerFactory
-from base.tests.factories.structure import StructureFactory
-from base.tests.factories.person import PersonFactory
-from django.contrib.auth.models import User, Permission
+from django.urls import reverse
+
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
+from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
-class EntityManagerTest(TestCase):
+class TestGetLearningUnitPrerequisitesExcel(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.education_group_year = EducationGroupYearFactory()
+
+        cls.url = reverse("education_group_learning_units_prerequisites", args=[cls.education_group_year.pk])
 
     def setUp(self):
-        self.faculty_administrator = EntityManagerFactory()
+        self.client.force_login(self.person.user)
 
-        self.user = User.objects.create_user("username", "test@test.com", "passtest",
-                                             first_name='first_name', last_name='last_name')
-        self.user.save()
+    def test_return_excel_file(self):
+        response = self.client.get(self.url)
 
-    def test_no_entity_manager_for_the_user(self):
-        self.assertFalse(entity_manager.is_entity_manager(self.user))
-
-    def test_entity_manager_for_the_user(self):
-        a_person = PersonFactory(user=self.user)
-        EntityManagerFactory(person=a_person)
-        self.assertTrue(entity_manager.is_entity_manager(self.user))
-
-
-def add_permission(user, codename):
-    perm = get_permission(codename)
-    user.user_permissions.add(perm)
-
-
-def get_permission(codename):
-    return Permission.objects.get(codename=codename)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)

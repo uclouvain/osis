@@ -26,6 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.db.models import Q
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -71,11 +72,10 @@ class AttributionCreationForm(AttributionForm):
             url='employee_autocomplete',
             attrs={
                 'data-theme': 'bootstrap',
-                'data-width': 'null',
-                'data-placeholder': _('Indicate the name or the FGS')
+                'data-placeholder': _('Indicate the name or the FGS'),
             }
         ),
-        label=_('Tutor'),
+        label='',
     )
 
     class Meta:
@@ -126,12 +126,16 @@ class AttributionChargeForm(forms.ModelForm):
         return attribution_charge_obj
 
 
+def _get_formatted_label(label, abbr):
+    return mark_safe('<abbr title="{}">{}</abbr>'.format(_(label), abbr))
+
+
 class LecturingAttributionChargeForm(AttributionChargeForm):
     component_type = learning_component_year_type.LECTURING
 
     class Meta(AttributionChargeForm.Meta):
         labels = {
-            'allocation_charge': _("Volume 1"),
+            'allocation_charge': _get_formatted_label('Lecturing', 'PM'),
         }
 
 
@@ -140,5 +144,5 @@ class PracticalAttributionChargeForm(AttributionChargeForm):
 
     class Meta(AttributionChargeForm.Meta):
         labels = {
-            'allocation_charge': _("Volume 2"),
+            'allocation_charge': _get_formatted_label('Practical exercises', 'PP')
         }
