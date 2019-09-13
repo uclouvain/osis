@@ -99,19 +99,22 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 translated_label=Value(translated_text_label.label, output_field=CharField())
         )
         if section == EVALUATION_KEY:
-            try:
-                _, text = get_evaluation_text(self.instance, language)
-            except TranslatedText.DoesNotExist:
-                text = None
-
-            translated_text = translated_text.annotate(
-                free_text=Value(text, output_field=CharField())
-            ).values(
-                'label', 'translated_label', 'text', 'free_text'
-            ).first()
+            translated_text = self._get_evaluation_text(language, translated_text)
         else:
             translated_text = translated_text.values(
                 'label', 'translated_label', 'text'
             ).first()
 
         return translated_text, translated_text_label
+
+    def _get_evaluation_text(self, language, translated_text):
+        try:
+            _, text = get_evaluation_text(self.instance, language)
+        except TranslatedText.DoesNotExist:
+            text = None
+        translated_text = translated_text.annotate(
+            free_text=Value(text, output_field=CharField())
+        ).values(
+            'label', 'translated_label', 'text', 'free_text'
+        ).first()
+        return translated_text
