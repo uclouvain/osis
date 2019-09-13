@@ -106,6 +106,25 @@ def validate_json_request(request, year, acronym):
 
 @api_view(['POST'])
 @renderer_classes((JSONRenderer,))
+def ws_catalog_offer_v02(request, year, language, acronym):
+    # Validation
+    education_group_year, iso_language, year = parameters_validation(acronym, language, year)
+
+    # Processing
+    context = new_context(education_group_year, iso_language, language, acronym)
+    type_sections = SECTIONS_PER_OFFER_TYPE[education_group_year.education_group_type.name]
+    items = type_sections['specific'] + [section + '-commun' for section in type_sections['common']]
+
+    with translation.override(context.language):
+        sections = process_message(context, education_group_year, items)
+        context.description['sections'] = convert_sections_to_list_of_dict(sections)
+        context.description['sections'].append(get_conditions_admissions(context))
+
+    return Response(context.description, content_type='application/json')
+
+
+@api_view(['POST'])
+@renderer_classes((JSONRenderer,))
 def ws_catalog_offer(request, year, language, acronym):
     # Validation
     education_group_year, iso_language, year = parameters_validation(acronym, language, year)
