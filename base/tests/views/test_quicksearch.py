@@ -24,6 +24,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -57,8 +58,9 @@ class TestQuickSearchView(TestCase):
                                    data={'academic_year': self.luy_to_find.academic_year.pk})
         self.assertIn(self.luy_to_find, response.context['object_list'])
 
+        other_anac = AcademicYear.objects.exclude(pk=self.luy_to_find.academic_year.pk).first()
         response = self.client.get(reverse('quick_search_learning_unit'),
-                                   data={'academic_year': self.luy_to_find.academic_year.pk + 1})
+                                   data={'academic_year': other_anac.pk})
         self.assertNotIn(self.luy_to_find, response.context['object_list'])
 
     def test_education_group_search_text_filter(self):
