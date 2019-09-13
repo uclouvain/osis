@@ -32,7 +32,7 @@ from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.api.serializers.section import SectionSerializer, SectionAchievementSerializer
+from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text
 
 
@@ -74,12 +74,11 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
 
                 sections.append(translated_text if translated_text else {
-                    'text': None,
                     'label': specific_section,
                     'translated_label': translated_text_label.label
                 })
             elif specific_section == SKILLS_AND_ACHIEVEMENTS_KEY:
-                achievements = SectionAchievementSerializer(
+                achievements = AchievementSectionSerializer(
                     {'id': specific_section},
                     context={'egy': obj, 'lang': language}
                 )

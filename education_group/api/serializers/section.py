@@ -32,7 +32,7 @@ from webservices import business
 class SectionSerializer(serializers.Serializer):
     id = serializers.CharField(source='label', read_only=True)
     label = serializers.CharField(source='translated_label', read_only=True)
-    content = serializers.CharField(source='text', read_only=True)
+    content = serializers.CharField(source='text', read_only=True, allow_null=True)
     free_text = serializers.CharField(read_only=True, required=False)
 
     class Meta:
@@ -44,7 +44,7 @@ class SectionSerializer(serializers.Serializer):
         )
 
 
-class SectionAchievementSerializer(serializers.Serializer):
+class AchievementSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     label = serializers.CharField(source='id', read_only=True)
     content = serializers.SerializerMethodField(read_only=True)
