@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import bleach
+import html
+
 from django.conf import settings
 from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.utils.translation import gettext_lazy as _
@@ -48,14 +51,14 @@ XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
 WORKSHEET_TITLE = _('Learning units list')
 WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
+CMS_ALLOWED_TAGS = []
 
 
 def create_xls_educational_information_and_specifications(user, learning_units, request):
 
     titles = _get_titles()
 
-    data = prepare_xls_educational_information_and_specifications(learning_units, request)
-    working_sheet_data = data.get('data')
+    working_sheet_data = prepare_xls_educational_information_and_specifications(learning_units, request)
 
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
                   xls_build.USER: get_name_or_username(user),
@@ -101,14 +104,16 @@ def _add_cms_title_fr_en(cms_labels, with_en=True):
     return titles
 
 
+def get_html_to_text(text_to_convert):
+    return bleach.clean(html.unescape(text_to_convert),
+                        strip=True, tags=CMS_ALLOWED_TAGS).lstrip()
+
+
 def prepare_xls_educational_information_and_specifications(learning_unit_years, request):
     qs = annotate_qs(learning_unit_years)
     user_language = get_user_interface_language(request.user)
 
     result = []
-    red_cells = []
-    border_top = []
-    wrapped_cells = []
 
     for learning_unit_yr in qs:
         translated_labels_with_text = _get_translated_labels_with_text(learning_unit_yr.id, user_language)
@@ -123,14 +128,21 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
         for label_key in CMS_LABEL_PEDAGOGY_FR_AND_EN:
             translated_label = translated_labels_with_text.filter(text_label__label=label_key).first()
             if translated_label:
-                line.append(translated_label.text_label.text_fr[0].text if translated_label.text_label.text_fr else '')
-                line.append(translated_label.text_label.text_en[0].text if translated_label.text_label.text_en else '')
+                line.append(
+                    get_html_to_text(translated_label.text_label.text_fr[0].text)
+                    if translated_label.text_label.text_fr and translated_label.text_label.text_fr[0].text else ''
+                )
+                line.append(
+                    get_html_to_text(translated_label.text_label.text_en[0].text)
+                    if translated_label.text_label.text_en and translated_label.text_label.text_en[0].text else '')
             else:
                 line.append('')
                 line.append('')
 
         if teaching_materials:
-            line.append("\n".join([teaching_material.title for teaching_material in teaching_materials]))
+            line.append("\n".join(
+                [get_html_to_text(teaching_material.title) for teaching_material in
+                 teaching_materials]))
         else:
             line.append('')
 
@@ -138,7 +150,11 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
             translated_label = translated_labels_with_text.filter(text_label__label=label_key).first()
 
             if translated_label:
-                line.append(translated_label.text_label.text_fr[0].text if translated_label.text_label.text_fr else '')
+                line.append(
+                    get_html_to_text(translated_label.text_label.text_fr[0].text)
+                    if translated_label.text_label.text_fr and translated_label.text_label.text_fr[0].text else ''
+                )
+
             else:
                 line.append('')
         _add_specifications(learning_unit_yr, line, request)
@@ -146,20 +162,17 @@ def prepare_xls_educational_information_and_specifications(learning_unit_years, 
 
         result.append(line)
 
-    return {
-        'data': result,
-        'missing_values': red_cells,
-        'border_top': border_top,
-        'wrapped_cells': wrapped_cells
-    }
+    return result
 
 
 def _add_achievements(learning_unit_yr):
     achievements = get_achievements_group_by_language(learning_unit_yr)
     achievements_fr = (achievements.get('achievements_FR', None))
     achievements_en = (achievements.get('achievements_EN', None))
-    return ["\n".join([achievement.text for achievement in achievements_fr]) if achievements_fr else '',
-            "\n".join([achievement.text for achievement in achievements_en]) if achievements_en else ''
+    return ["\n".join([get_html_to_text(achievement.text) for achievement in
+                       achievements_fr]) if achievements_fr else '',
+            "\n".join([get_html_to_text(achievement.text) for achievement in
+                       achievements_en]) if achievements_en else ''
             ]
 
 
@@ -168,8 +181,8 @@ def _add_specifications(learning_unit_yr, line, request):
     obj_fr = specifications.get('form_french')
     obj_en = specifications.get('form_english')
     for label_key in CMS_LABEL_SPECIFICATIONS:
-        line.append(getattr(obj_fr, label_key, None))
-        line.append(getattr(obj_en, label_key, None))
+        line.append(get_html_to_text(getattr(obj_fr, label_key, '')))
+        line.append(get_html_to_text(getattr(obj_en, label_key, '')))
 
 
 def _get_translated_labels_with_text(learning_unit_year_id, user_language):

@@ -188,9 +188,8 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
             entity_requirement=Subquery(self.entity_requirement)
         )
 
-        data = prepare_xls_educational_information_and_specifications(
+        working_sheet_data = prepare_xls_educational_information_and_specifications(
             qs, request)
-        working_sheet_data = data.get('data')
 
         self.assertEqual(working_sheet_data[0][0], self.l_unit_yr_1.acronym)
         self.assertEqual(working_sheet_data[0][1], self.l_unit_yr_1.complete_title)
