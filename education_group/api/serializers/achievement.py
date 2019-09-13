@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,18 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+class DetailedAchievementSerializer(serializers.Serializer):
+    code_name = serializers.CharField(read_only=True)
+    text = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = (
+            'code_name',
+            'text'
+        )
+
+
+class AchievementSerializer(serializers.Serializer):
+    teaser = serializers.CharField(read_only=True)
+    detailed_achievements = DetailedAchievementSerializer(read_only=True, many=True)
+    code_name = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = (
+            'teaser',
+            'detailed_achievements',
+            'code_name'
+        )
+
+
+class AchievementsSerializer(serializers.Serializer):
+    intro = serializers.CharField(read_only=True)
+    blocs = AchievementSerializer(many=True, read_only=True)
+    extra = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = (
+            'intro',
+            'blocs',
+            'extra'
+        )
