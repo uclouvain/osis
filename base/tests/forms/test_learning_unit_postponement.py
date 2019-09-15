@@ -62,12 +62,13 @@ class LearningUnitPostponementFormContextMixin(TestCase):
 
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
-        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
-                                                       self.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
+        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
 
         # Creation of a LearingContainerYear and all related models - FOR 6 years
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year.year,
-                                                      self.current_academic_year.year + 6)
+        self.learn_unit_structure = GenerateContainer(self.current_academic_year, end_year_6)
         # Build in Generated Container [first index = start Generate Container ]
         self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
 

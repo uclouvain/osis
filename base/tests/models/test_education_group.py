@@ -123,7 +123,9 @@ class TestEducationGroupAdmin(TestCase):
     def test_apply_education_group_year_postponement(self):
         """ Postpone to N+6 in Education Group Admin """
         current_year = get_current_year()
-        academic_years = GenerateAcademicYear(current_year, current_year + 6)
+        current_academic_year = AcademicYearFactory(year=current_year)
+        end_year = AcademicYearFactory(year=current_year + 6)
+        academic_years = GenerateAcademicYear(current_academic_year, end_year)
 
         eg = EducationGroupFactory(end_year=None)
         EducationGroupYearFactory(

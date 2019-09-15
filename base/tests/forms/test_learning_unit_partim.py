@@ -324,9 +324,9 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
 
     def test_save_method_create_new_instance_with_start_anac(self):
         partim_acronym = FULL_ACRONYM+"B"
-        start_year = self.current_academic_year.year + 2
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
-            academic_year__year=start_year,
+            academic_year=start_year,
             acronym=FULL_ACRONYM,
             subtype=learning_unit_year_subtypes.PARTIM,
             language=self.learning_unit_year_full.language
