@@ -185,7 +185,7 @@ def _decrement_end_year_learning_unit(learning_unit_year):
     start_year = learning_unit_to_edit.start_year
     new_end_year = learning_unit_year.academic_year.year - 1
     if new_end_year >= start_year.year:
-        learning_unit_to_edit.end_year = academic_year.find_academic_year_by_year(new_end_year-1)
+        learning_unit_to_edit.end_year = academic_year.find_academic_year_by_year(new_end_year)
         learning_unit_to_edit.save()
 
 

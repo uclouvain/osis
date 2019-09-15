@@ -1182,8 +1182,10 @@ def _generate_xls_build_parameter(xls_data, user):
 
 class TestLearningUnitComponents(TestCase):
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(start_year=2010, end_year=2020).academic_years
-        self.generated_container = GenerateContainer(start_year=2010, end_year=2020)
+        start_year = AcademicYearFactory(year=2010)
+        end_year = AcademicYearFactory(year=2020)
+        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        self.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
         self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
         self.person = PersonFactory(user=self.a_superuser)

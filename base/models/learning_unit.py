@@ -31,6 +31,7 @@ from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models import academic_year
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
@@ -183,8 +184,8 @@ class LearningUnit(SerializableModel):
         """ Compute the maximal possible end_year value when the end_year is None """
         if self.end_year:
             return self.end_year
-
-        return AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
+        end_year = AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
+        return academic_year.find_academic_year_by_year(end_year)
 
 
 def get_by_acronym_with_highest_academic_year(acronym):
