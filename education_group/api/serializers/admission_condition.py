@@ -26,10 +26,11 @@
 from django.utils import translation
 from rest_framework import serializers
 
+from base.api.serializers.common import DynamicLanguageFieldsModelSerializer
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 
 
-class AdmissionConditionsSerializer(serializers.ModelSerializer):
+class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
     free_text = serializers.SerializerMethodField(read_only=True, required=False)
     alert_message = serializers.SerializerMethodField(read_only=True)
 
@@ -172,7 +173,7 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         return sections
 
 
-class AdmissionConditionTextsSerializer(serializers.ModelSerializer):
+class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
     text = serializers.SerializerMethodField(read_only=True)
     text_common = serializers.SerializerMethodField(read_only=True)
 
@@ -191,7 +192,7 @@ class AdmissionConditionTextsSerializer(serializers.ModelSerializer):
         return _get_appropriate_text(self.context.get('section'), self.context.get('lang'), self.context.get('common'))
 
 
-class AdmissionConditionLineSerializer(serializers.ModelSerializer):
+class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
     access = serializers.SerializerMethodField(read_only=True)
     conditions = serializers.SerializerMethodField(read_only=True)
     diploma = serializers.SerializerMethodField(read_only=True)
