@@ -41,7 +41,9 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
 
         if language is not None:
-            for field_name, _ in self.fields:
+            keys_list = list(self.fields.keys())
+            keys_list.remove('alert_message')
+            for field_name in keys_list:
                 if language == settings.LANGUAGE_CODE_FR and settings.LANGUAGE_CODE_EN in field_name:
                     self.fields.pop(field_name)
                 elif language == settings.LANGUAGE_CODE_EN not in field_name:
