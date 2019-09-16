@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, Value, CharField
+from django.db.models import Case, When, CharField, F
 from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -104,7 +104,7 @@ class AchievementsSerializer(serializers.ModelSerializer):
         ).annotate(
             text_or_none=Case(
                 When(text__exact='', then=None),
-                default=Value('text'),
+                default=F('text'),
                 output_field=CharField()
             )
         ).get(
