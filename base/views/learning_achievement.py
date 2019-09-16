@@ -41,7 +41,6 @@ from base.views.learning_units import perms
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
-
 def operation(learning_achievement_id, operation_str):
     achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     lu_yr_id = achievement_fr.learning_unit_year.id
@@ -133,11 +132,6 @@ def _save_and_redirect(request, form, learning_unit_year_id):
         _build_edit_achievement_success_message(achievement, last_academic_year)
     )
     return HttpResponse()
-
-    # return HttpResponseRedirect(
-    #     reverse(learning_unit_specifications, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    #     + "{}{}".format(HTML_ANCHOR, achievement.id)
-    # )
 
 
 def _build_edit_achievement_success_message(achievement, last_academic_year):
