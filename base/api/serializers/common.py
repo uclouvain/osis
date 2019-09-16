@@ -44,7 +44,8 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
             keys_list = list(self.fields.keys())
             keys_list.remove('alert_message')
             for field_name in keys_list:
-                if language == settings.LANGUAGE_CODE_FR and settings.LANGUAGE_CODE_EN in field_name:
-                    self.fields.pop(field_name)
-                elif language == settings.LANGUAGE_CODE_EN not in field_name:
-                    self.fields.pop(field_name)
+                field_source = 'free' if field_name == 'free_text' else field_name
+                if language == settings.LANGUAGE_CODE_FR:
+                    self.fields[field_source] = serializers.CharField(source='text_' + field_source)
+                else:
+                    self.fields[field_source] = serializers.CharField(source='text_' + field_source + '_' + language)
