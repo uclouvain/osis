@@ -25,20 +25,34 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
+from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from cms.enums.entity_name import OFFER_YEAR
+from cms.tests.factories.translated_text import TranslatedTextFactory
 from education_group.api.serializers.achievement import AchievementSerializer, AchievementsSerializer, \
     DetailedAchievementSerializer
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
 class AchievementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.data_to_serialize = {
-            'intro': 'INTRO',
-            'extra': 'EXTRA',
-            'blocs': AchievementSerializer(),
-            'dummy': 'DUMMY'
-        }
-        cls.serializer = AchievementsSerializer(cls.data_to_serialize)
+        cls.language = 'en'
+        cls.egy = EducationGroupYearFactory()
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_INTRO,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_EXTRA,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
+        cls.serializer = AchievementsSerializer(cls.egy, context={'lang': cls.language})
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -52,13 +66,8 @@ class AchievementsSerializerTestCase(TestCase):
 class AchievementSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.data_to_serialize = {
-            'teaser': 'TEASER',
-            'code_name': 'CODE',
-            'detailed_achievements': DetailedAchievementSerializer(),
-            'dummy': 'DUMMY'
-        }
-        cls.serializer = AchievementSerializer(cls.data_to_serialize)
+        cls.achievement = EducationGroupAchievementFactory()
+        cls.serializer = AchievementSerializer(cls.achievement)
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -72,12 +81,8 @@ class AchievementSerializerTestCase(TestCase):
 class DetailedAchievementSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.data_to_serialize = {
-            'code_name': 'CODE',
-            'text': 'TEXT',
-            'dummy': 'DUMMY'
-        }
-        cls.serializer = DetailedAchievementSerializer(cls.data_to_serialize)
+        cls.achievement = EducationGroupDetailedAchievementFactory()
+        cls.serializer = DetailedAchievementSerializer(cls.achievement)
 
     def test_contains_expected_fields(self):
         expected_fields = [

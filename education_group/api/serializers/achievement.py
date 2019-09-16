@@ -25,39 +25,94 @@
 ##############################################################################
 from rest_framework import serializers
 
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
+from cms.enums.entity_name import OFFER_YEAR
+from cms.models.translated_text import TranslatedText
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
-class DetailedAchievementSerializer(serializers.Serializer):
-    code_name = serializers.CharField(read_only=True)
-    text = serializers.CharField(read_only=True)
+
+class DetailedAchievementSerializer(serializers.ModelSerializer):
+    code_name = serializers.SerializerMethodField(read_only=True)
+    text = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
+        model = EducationGroupDetailedAchievement
+
         fields = (
             'code_name',
-            'text'
+            'text',
         )
 
+    def get_text(self, obj):
+        return _get_appropriate_text(obj, self.context)
 
-class AchievementSerializer(serializers.Serializer):
-    teaser = serializers.CharField(read_only=True)
-    detailed_achievements = DetailedAchievementSerializer(read_only=True, many=True)
-    code_name = serializers.CharField(read_only=True)
+    def get_code_name(self, obj):
+        return _get_appropriate_code_name(obj)
+
+
+class AchievementSerializer(serializers.ModelSerializer):
+    code_name = serializers.SerializerMethodField(read_only=True)
+    teaser = serializers.SerializerMethodField(read_only=True, source='text')
+    detailed_achievements = DetailedAchievementSerializer(
+        source='educationgroupdetailedachievement_set',
+        read_only=True,
+        many=True
+    )
 
     class Meta:
+        model = EducationGroupAchievement
+
         fields = (
             'teaser',
             'detailed_achievements',
             'code_name'
         )
 
+    def get_teaser(self, obj):
+        return _get_appropriate_text(obj, self.context)
 
-class AchievementsSerializer(serializers.Serializer):
-    intro = serializers.CharField(read_only=True)
-    blocs = AchievementSerializer(many=True, read_only=True)
-    extra = serializers.CharField(read_only=True)
+    def get_code_name(self, obj):
+        return _get_appropriate_code_name(obj)
+
+
+class AchievementsSerializer(serializers.ModelSerializer):
+    intro = serializers.SerializerMethodField(read_only=True)
+    blocs = AchievementSerializer(source='educationgroupachievement_set', many=True, read_only=True)
+    extra = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
+        model = EducationGroupYear
         fields = (
             'intro',
             'blocs',
             'extra'
         )
+
+    def get_intro(self, obj):
+        intro = self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_INTRO)
+        return intro
+
+    def get_extra(self, obj):
+        extra = self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_EXTRA)
+        return extra
+
+    def _get_cms_achievement_data(self, cms_type):
+        data = TranslatedText.objects.filter(
+            entity=OFFER_YEAR,
+            reference=self.instance.id,
+            language=self.context['lang'],
+            text_label__label=cms_type
+        ).select_related('text_label').first()
+        return data.text if data.text else None
+
+
+def _get_appropriate_text(eg_achievement, context):
+    if context.get('lang') == 'en':
+        return eg_achievement.english_text
+    return eg_achievement.french_text
+
+
+def _get_appropriate_code_name(eg_achievement):
+    return eg_achievement.code_name if eg_achievement.code_name != '.' else None

@@ -40,6 +40,8 @@ from cms.models.translated_text import TranslatedText
 SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
 SKILLS_AND_ACHIEVEMENTS_AA_DATA = 'achievements'
 SKILLS_AND_ACHIEVEMENTS_CMS_DATA = ('skills_and_achievements_introduction', 'skills_and_achievements_additional_text',)
+SKILLS_AND_ACHIEVEMENTS_INTRO = 'skills_and_achievements_introduction'
+SKILLS_AND_ACHIEVEMENTS_EXTRA = 'skills_and_achievements_additional_text'
 
 EVALUATION_KEY = 'evaluation'
 CONTACTS_KEY = 'contacts'

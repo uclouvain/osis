@@ -37,7 +37,7 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.api.serializers.general_information import GeneralInformationSerializer
-from webservices.business import EVALUATION_KEY
+from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
 class GeneralInformationTestCase(APITestCase):
@@ -77,6 +77,18 @@ class GeneralInformationTestCase(APITestCase):
                 language=cls.language,
                 text_label__label=section
             )
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_INTRO,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_EXTRA,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
         cls.url = reverse('education_group_api_v1:generalinformations_read', kwargs={
             'acronym': cls.egy.acronym,
             'year': cls.egy.academic_year.year,

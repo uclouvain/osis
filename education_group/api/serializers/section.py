@@ -26,7 +26,6 @@
 from rest_framework import serializers
 
 from education_group.api.serializers.achievement import AchievementsSerializer
-from webservices import business
 
 
 class SectionSerializer(serializers.Serializer):
@@ -58,13 +57,4 @@ class AchievementSectionSerializer(serializers.Serializer):
 
     def get_content(self, obj):
         egy = self.context.get('egy')
-        language = self.context.get('lang')
-        intro_extra_content = business.get_intro_extra_content_achievements(egy, language)
-        return AchievementsSerializer(
-            {
-                'intro': intro_extra_content.get('skills_and_achievements_introduction') or None,
-                'blocs': business.get_achievements(egy, language),
-                'extra': intro_extra_content.get('skills_and_achievements_additional_text') or None
-            },
-            context=self.context
-        ).data
+        return AchievementsSerializer(egy, context=self.context).data

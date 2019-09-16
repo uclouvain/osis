@@ -26,7 +26,10 @@
 from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from cms.enums.entity_name import OFFER_YEAR
+from cms.tests.factories.translated_text import TranslatedTextFactory
 from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
 class SectionSerializerTestCase(TestCase):
@@ -67,10 +70,23 @@ class AchievementSectionSerializerTestCase(TestCase):
             'id': 'ID',
             'dummy': 'DUMMY'
         }
-
+        cls.language = 'en'
+        cls.egy = EducationGroupYearFactory()
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_INTRO,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_EXTRA,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
         cls.serializer = AchievementSectionSerializer(cls.data_to_serialize, context={
-            'egy': EducationGroupYearFactory(),
-            'lang': 'en'
+            'egy': cls.egy,
+            'lang': cls.language
         })
 
     def test_contains_expected_fields(self):

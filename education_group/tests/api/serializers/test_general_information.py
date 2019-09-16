@@ -35,7 +35,7 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.api.serializers.general_information import GeneralInformationSerializer
-from webservices.business import EVALUATION_KEY
+from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
 class GeneralInformationSerializerTestCase(TestCase):
@@ -43,6 +43,7 @@ class GeneralInformationSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.egy = EducationGroupYearFactory()
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
+        cls.language = 'en'
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS_KEY],
             'common': [COMMON_DIDACTIC_PURPOSES]
@@ -52,27 +53,39 @@ class GeneralInformationSerializerTestCase(TestCase):
         ] = cls.pertinent_sections
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
             TranslatedTextFactory(
                 reference=common_egy.id,
                 entity=OFFER_YEAR,
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
             TranslatedTextFactory(
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
-                language='en',
+                language=cls.language,
                 text_label__label=section
             )
-        cls.serializer = GeneralInformationSerializer(cls.egy, context={'language': 'en'})
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_INTRO,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
+        TranslatedTextFactory(
+            text_label__label=SKILLS_AND_ACHIEVEMENTS_EXTRA,
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language
+        )
+        cls.serializer = GeneralInformationSerializer(cls.egy, context={'language': cls.language})
 
     def test_contains_expected_fields(self):
         expected_fields = [
