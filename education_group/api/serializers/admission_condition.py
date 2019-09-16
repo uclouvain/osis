@@ -47,6 +47,7 @@ class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
 
     def get_alert_message(self, obj):
         common = self.context.get('common')
+        # property to get common and use it for source ?
         return _get_appropriate_text('alert_message', self.context.get('lang'), common) if common else None
 
 
