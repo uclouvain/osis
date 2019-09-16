@@ -68,20 +68,21 @@ def execute_operation(an_achievement, operation_str):
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
-        while next_luy.get_learning_unit_next_year():
-            next_luy = next_luy.get_learning_unit_next_year()
-            if LearningAchievement.objects.filter(
-                    learning_unit_year=next_luy,
-                    code_name=an_achievement.code_name,
-                    language=an_achievement.language
-            ).exists():
-                an_achievement = LearningAchievement.objects.get(
-                    learning_unit_year=next_luy,
-                    code_name=an_achievement.code_name,
-                    language=an_achievement.language
-                )
-                func = getattr(an_achievement, operation_str)
-                func()
+        if next_luy.is_past:
+            while next_luy.get_learning_unit_next_year():
+                next_luy = next_luy.get_learning_unit_next_year()
+                if LearningAchievement.objects.filter(
+                        learning_unit_year=next_luy,
+                        code_name=an_achievement.code_name,
+                        language=an_achievement.language
+                ).exists():
+                    an_achievement = LearningAchievement.objects.get(
+                        learning_unit_year=next_luy,
+                        code_name=an_achievement.code_name,
+                        language=an_achievement.language
+                    )
+                    func = getattr(an_achievement, operation_str)
+                    func()
     return an_achievement.learning_unit_year.academic_year
 
 
