@@ -126,7 +126,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertFalse(form._forms_to_delete)
 
     def test_forms_property_end_year_is_current_year(self):
-        self.learn_unit_structure.learning_unit_full.end_year = self.current_academic_year.year
+        self.learn_unit_structure.learning_unit_full.end_year = self.current_academic_year
         self.learn_unit_structure.learning_unit_full.save()
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
@@ -138,7 +138,8 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertEqual(len(form._forms_to_delete), 6)
 
     def test_forms_property_end_year_is_more_than_current_and_less_than_none(self):
-        self.learn_unit_structure.learning_unit_full.end_year = self.current_academic_year.year + 2
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
+        self.learn_unit_structure.learning_unit_full.end_year = end_year
         self.learn_unit_structure.learning_unit_full.save()
 
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
@@ -170,7 +171,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertFalse(diff)
 
     def test_get_end_postponement_partim(self):
-        self.learn_unit_structure.learning_unit_partim.end_year = self.current_academic_year.year
+        self.learn_unit_structure.learning_unit_partim.end_year = self.current_academic_year
         self.learn_unit_structure.learning_unit_partim.save()
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_partim, self.person)
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_partim.academic_year,
