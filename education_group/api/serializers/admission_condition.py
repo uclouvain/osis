@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils import translation
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
@@ -133,52 +134,41 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         )
 
     def get_sections(self, obj):
-        acl = obj.admissionconditionline_set
         university_types = ['bachelors_dutch', 'foreign_bachelors', 'others_bachelors_french', 'ucl_bachelors']
         second_degree_types = ['masters', 'graduates']
-        return {
-            'admission_enrollment_procedures': AdmissionConditionTextsSerializer(
+        acl_fields = [
+            ('university_bachelors', university_types),
+            ('holders_second_university_degree', second_degree_types)
+        ]
+        ac_fields = [
+            'admission_enrollment_procedures',
+            'non_university_bachelors',
+            'holders_non_university_second_degree',
+            'adults_taking_up_university_training',
+            'personalized_access'
+        ]
+        sections = {
+            field: AdmissionConditionTextsSerializer(
                 obj,
-                context=_update_and_get_dict(self.context, 'section', 'admission_enrollment_procedures')
-            ).data,
-            'non_university_bachelors': AdmissionConditionTextsSerializer(
-                obj,
-                context=_update_and_get_dict(self.context, 'section', 'non_university_bachelors')
-            ).data,
-            'holders_non_university_second_degree': AdmissionConditionTextsSerializer(
-                obj,
-                context=_update_and_get_dict(self.context, 'section', 'holders_non_university_second_degree')
-            ).data,
-            'adults_taking_up_university_training': AdmissionConditionTextsSerializer(
-                obj,
-                context=_update_and_get_dict(self.context, 'section', 'adults_taking_up_university_training')
-            ).data,
-            'personalized_access': AdmissionConditionTextsSerializer(
-                obj,
-                context=_update_and_get_dict(self.context, 'section', 'personalized_access')
-            ).data,
-
-            'university_bachelors': {
-                'text': _get_appropriate_text('university_bachelors', self.context.get('lang'), obj),
-                'records': {
-                    diploma_type: AdmissionConditionLineSerializer(
-                        acl.all().filter(section=diploma_type),
-                        many=True
-                    ).data
-                    for diploma_type in university_types
-                }
-            },
-            'holders_second_university_degree': {
-                'text': _get_appropriate_text('holders_second_university_degree', self.context.get('lang'), obj),
-                'records': {
-                    diploma_type: AdmissionConditionLineSerializer(
-                        acl.all().filter(section=diploma_type),
-                        many=True
-                    ).data
-                    for diploma_type in second_degree_types
-                }
-            }
+                context=_update_and_get_dict(self.context, 'section', field)
+            ).data
+            for field in ac_fields
         }
+        sections_line = {
+            field: {
+                'text': _get_appropriate_text(field, self.context.get('lang'), obj),
+                'records': {
+                    diploma_type: AdmissionConditionLineSerializer(
+                        obj.admissionconditionline_set.filter(section=diploma_type),
+                        many=True,
+                        context=self.context
+                    ).data
+                    for diploma_type in diploma_types
+                }
+            } for field, diploma_types in acl_fields
+        }
+        sections.update(sections_line)
+        return sections
 
 
 class AdmissionConditionTextsSerializer(serializers.ModelSerializer):
@@ -194,22 +184,17 @@ class AdmissionConditionTextsSerializer(serializers.ModelSerializer):
         )
 
     def get_text(self, obj):
-        return _get_appropriate_text(
-            self.context.get('section'),
-            self.context.get('lang'),
-            obj
-        )
+        return _get_appropriate_text(self.context.get('section'), self.context.get('lang'), obj)
 
     def get_text_common(self, obj):
-        return _get_appropriate_text(
-            self.context.get('section'),
-            self.context.get('lang'),
-            self.context.get('common')
-        )
+        return _get_appropriate_text(self.context.get('section'), self.context.get('lang'), self.context.get('common'))
 
 
 class AdmissionConditionLineSerializer(serializers.ModelSerializer):
-    access = serializers.CharField(source='get_access_display', read_only=True)
+    access = serializers.SerializerMethodField(read_only=True)
+    conditions = serializers.SerializerMethodField(read_only=True)
+    diploma = serializers.SerializerMethodField(read_only=True)
+    remarks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = AdmissionConditionLine
@@ -221,10 +206,29 @@ class AdmissionConditionLineSerializer(serializers.ModelSerializer):
             'remarks'
         )
 
+    def get_access(self, obj):
+        with translation.override(self.context.get('lang')):
+            return obj.get_access_display()
+
+    def get_conditions(self, obj):
+        return _get_appropriate_field('conditions', self.context.get('lang'), obj)
+
+    def get_diploma(self, obj):
+        return _get_appropriate_field('diploma', self.context.get('lang'), obj)
+
+    def get_remarks(self, obj):
+        return _get_appropriate_field('remarks', self.context.get('lang'), obj)
+
 
 def _get_appropriate_text(field, language, ac):
     lang = '' if language == 'fr-be' else '_' + language
     text = getattr(ac, 'text_' + field + lang)
+    return text if text else None
+
+
+def _get_appropriate_field(field, language, acl):
+    lang = '' if language == 'fr-be' else '_' + language
+    text = getattr(acl, field + lang)
     return text if text else None
 
 
