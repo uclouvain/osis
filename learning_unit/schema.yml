@@ -256,6 +256,8 @@ components:
           type: string
         requirement_entity:
           type: string
+        allocation_entity:
+          type: string
         academic_year:
           type: integer
           example: 2014

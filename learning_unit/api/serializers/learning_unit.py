@@ -40,6 +40,10 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
     )
+    allocation_entity = serializers.CharField(
+        source='learning_container_year.allocation_entity_version.acronym',
+        read_only=True
+    )
     title = serializers.SerializerMethodField(read_only=True)
     academic_year = serializers.IntegerField(source='academic_year.year')
 
@@ -57,6 +61,7 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
             'credits',
             'status',
             'requirement_entity',
+            'allocation_entity',
             'title',
             'type',
             'type_text',

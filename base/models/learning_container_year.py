@@ -118,6 +118,12 @@ class LearningContainerYear(SerializableModel):
             self.requirement_entity, self.academic_year
         )
 
+    @cached_property
+    def allocation_entity_version(self):
+        return entity_version.find_entity_version_according_academic_year(
+            self.allocation_entity, self.academic_year
+        )
+
     def get_partims_related(self):
         return learning_unit_year.search(learning_container_year_id=self,
                                          subtype=learning_unit_year_subtypes.PARTIM).order_by('acronym')
