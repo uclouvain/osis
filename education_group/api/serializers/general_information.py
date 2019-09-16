@@ -27,12 +27,13 @@ from django.db.models import Value, CharField
 from rest_framework import serializers
 
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE, \
-    SKILLS_AND_ACHIEVEMENTS_KEY
+    SKILLS_AND_ACHIEVEMENTS_KEY, ADMISSION_CONDITION
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer
+from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
+    AdmissionConditionSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text
 
 
@@ -57,8 +58,8 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         self.instance.language = kwargs['context']['language']
 
     def get_sections(self, obj):
+        datas = []
         sections = []
-        achievements = None
         language = 'fr-be' if self.instance.language == 'fr' else self.instance.language
         pertinent_sections = SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
         common_egy = EducationGroupYear.objects.get_common(
@@ -75,6 +76,13 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                     {'id': specific_section},
                     context={'egy': obj, 'lang': language}
                 )
+                datas.append(achievements.data)
+            elif specific_section == ADMISSION_CONDITION:
+                ac = AdmissionConditionSectionSerializer(
+                    {'id': specific_section},
+                    context={'egy': obj, 'lang': language}
+                )
+                datas.append(ac.data)
             elif specific_section != EVALUATION_KEY:
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
 
@@ -82,8 +90,8 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                     'label': specific_section,
                     'translated_label': translated_text_label.label
                 })
-
-        return SectionSerializer(sections, many=True).data + [achievements.data] if achievements else []
+        datas += SectionSerializer(sections, many=True).data
+        return datas
 
     def _get_translated_text(self, egy, section, language):
         translated_text_label = TranslatedTextLabel.objects.filter(

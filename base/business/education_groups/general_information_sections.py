@@ -59,6 +59,7 @@ OPTIONS = 'options'
 INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
+ADMISSION_CONDITION = 'conditions_admission'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -139,7 +140,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             CONTACT_INTRO,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
@@ -171,7 +173,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     TrainingType.CERTIFICATE.name: {
@@ -187,23 +190,31 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
+            ADMISSION_CONDITION
         ]
     },
     TrainingType.CAPAES.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
     },
     TrainingType.RESEARCH_CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
-        'specific': [WELCOME_INTRODUCTION, EVALUATION, PEDAGOGY, DETAILED_PROGRAM, STRUCTURE, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            EVALUATION,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            ADMISSION_CONDITION
+        ]
     },
     TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
     },
     TrainingType.PGRM_MASTER_120.name: {
         'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],
@@ -224,7 +235,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION,
         ]
     },
     TrainingType.MASTER_MA_120.name: {
@@ -258,7 +270,8 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             COMPLEMENTARY_MODULE,
             CONTACT_INTRO,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     TrainingType.MASTER_MA_180_240.name: {
@@ -290,7 +303,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             COMPLEMENTARY_MODULE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     TrainingType.MASTER_MC.name: {
@@ -308,7 +322,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
 
@@ -327,7 +342,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     MiniTrainingType.SOCIETY_MINOR.name: {
@@ -345,7 +361,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
@@ -363,7 +380,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     MiniTrainingType.OPEN_MINOR.name: {
@@ -381,7 +399,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: {
@@ -399,7 +418,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     MiniTrainingType.FSA_SPECIALITY.name: {
@@ -417,7 +437,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            ADMISSION_CONDITION
         ]
     },
     MiniTrainingType.OPTION.name: {
