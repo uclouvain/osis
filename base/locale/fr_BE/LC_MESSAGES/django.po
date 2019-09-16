@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 13:19+0200\n"
+"POT-Creation-Date: 2019-09-13 14:44+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1577,6 +1577,9 @@ msgstr "Type de lien"
 msgid "Linked with EPC"
 msgstr "Liens existants dans l'application EPC."
 
+msgid "List comparison LU / Proposal"
+msgstr "Liste de comparaison UE / Proposition"
+
 msgid "List education groups"
 msgstr "Liste des formations"
 
@@ -2831,6 +2834,7 @@ msgid ""
 msgstr ""
 "L'unité d'enseignement %(acronym)s est incluse dans les groupements suivants"
 
+#, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
@@ -3376,15 +3380,6 @@ msgstr "Accueil"
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
-
-msgid "Xls"
-msgstr "Xls"
-
-msgid "Xls UE/proposals comparison"
-msgstr "Xls de comparaison UE/proposition"
-
-msgid "Xls with proposals"
-msgstr "Xls avec les propositions"
 
 msgid "Yes"
 msgstr "Oui"
