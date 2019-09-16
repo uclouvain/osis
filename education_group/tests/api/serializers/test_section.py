@@ -25,10 +25,13 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.admission_condition import AdmissionConditionFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer
+from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
+    AdmissionConditionSectionSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
@@ -80,6 +83,35 @@ class AchievementSectionSerializerTestCase(TestCase):
                 language=cls.language
             )
         cls.serializer = AchievementSectionSerializer(cls.data_to_serialize, context={
+            'egy': cls.egy,
+            'lang': cls.language
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'id',
+            'label',
+            'content'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class AdmissionConditionSectionSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.data_to_serialize = {
+            'id': 'ID',
+            'dummy': 'DUMMY'
+        }
+        cls.language = 'en'
+        cls.egy = EducationGroupYearFactory(
+            acronym='ARKE2M',
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name
+        )
+        common_egy = EducationGroupYearCommonMasterFactory(academic_year=cls.egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
+        AdmissionConditionFactory(education_group_year=cls.egy)
+        cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
             'egy': cls.egy,
             'lang': cls.language
         })

@@ -45,7 +45,8 @@ class AdmissionConditionsSerializer(serializers.ModelSerializer):
         return _get_appropriate_text('free', self.context.get('lang'), obj)
 
     def get_alert_message(self, obj):
-        return _get_appropriate_text('alert_message', self.context.get('lang'), self.context.get('common'))
+        common = self.context.get('common')
+        return _get_appropriate_text('alert_message', self.context.get('lang'), common) if common else None
 
 
 class BachelorAdmissionConditionsSerializer(AdmissionConditionsSerializer):

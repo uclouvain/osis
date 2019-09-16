@@ -34,6 +34,7 @@ from education_group.api.serializers.admission_condition import AdmissionConditi
     AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
 
 ACRONYM_PATTERN = re.compile(r'(?P<prefix>[a-z]+)(?P<cycle>[0-9]{1,3})(?P<suffix>[a-z]+)(?P<year>[0-9]?)')
+COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
 
 
 class AcronymError(Exception):
@@ -92,11 +93,16 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             raise AcronymError("The acronym does not match the pattern")
         full_suffix = '{cycle}{suffix}{year}'.format(**acronym_match.groupdict())
         common_acronym = 'common-{}'.format(full_suffix)
-        common_education_group_year = EducationGroupYear.objects.get(
-            acronym=common_acronym,
-            academic_year=egy.academic_year
-        )
-        admission_condition_common = common_education_group_year.admissioncondition
+        if common_acronym == 'common-2m1':
+            common_acronym = 'common-2m'
+            full_suffix = '2m'
+        admission_condition_common = None
+        if full_suffix.upper() in COMMON_OFFER:
+            common_education_group_year = EducationGroupYear.objects.get(
+                acronym=common_acronym,
+                academic_year=egy.academic_year
+            )
+            admission_condition_common = common_education_group_year.admissioncondition
         context = {
             'lang': self.context.get('lang'),
             'common': admission_condition_common,
