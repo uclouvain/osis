@@ -149,7 +149,8 @@ class LearningAchievementEditForm(forms.ModelForm):
         for ac in ac_year_postponement_range:
             next_luy, created = LearningUnitYear.objects.get_or_create(
                 academic_year=ac,
-                acronym=luy.acronym
+                acronym=luy.acronym,
+                learning_unit=luy.learning_unit
             )
             LearningAchievement.objects.update_or_create(
                 code_name=self.old_code_name,

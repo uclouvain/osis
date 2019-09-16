@@ -29,7 +29,7 @@ from django.db.models import Max
 
 from base.forms.common import set_trans_txt
 from base.models import academic_year
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
@@ -129,7 +129,8 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         for ac in ac_year_postponement_range:
             next_luy, created = LearningUnitYear.objects.get_or_create(
                 academic_year=ac,
-                acronym=luy.acronym
+                acronym=luy.acronym,
+                learning_unit=luy.learning_unit
             )
             TranslatedText.objects.update_or_create(
                 entity=entity_name.LEARNING_UNIT_YEAR,
