@@ -88,6 +88,23 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
     def get_content(self, obj):
         egy = self.context.get('egy')
 
+        admission_condition_common = self._get_common_admission_condition(egy)
+        context = {
+            'lang': self.context.get('lang'),
+            'common': admission_condition_common,
+        }
+        if egy.is_bachelor:
+            return BachelorAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+        elif egy.is_specialized_master:
+            return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+        elif egy.is_aggregation:
+            return AggregationAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+        elif egy.is_master120 or egy.is_master60 or egy.is_master180:
+            return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+        else:
+            return AdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+
+    def _get_common_admission_condition(self, egy):
         acronym_match = re.match(ACRONYM_PATTERN, egy.acronym.lower())
         if not acronym_match:
             raise AcronymError("The acronym does not match the pattern")
@@ -103,17 +120,4 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
                 academic_year=egy.academic_year
             )
             admission_condition_common = common_education_group_year.admissioncondition
-        context = {
-            'lang': self.context.get('lang'),
-            'common': admission_condition_common,
-        }
-        if egy.is_bachelor:
-            return BachelorAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
-        elif egy.is_specialized_master:
-            return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
-        elif egy.is_aggregation:
-            return AggregationAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
-        elif egy.is_master120 or egy.is_master60 or egy.is_master180:
-            return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
-        else:
-            return AdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+        return admission_condition_common
