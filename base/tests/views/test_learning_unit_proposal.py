@@ -51,7 +51,7 @@ from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
-from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
@@ -61,7 +61,7 @@ from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.group import CentralManagerGroupFactory
+from base.tests.factories.group import CentralManagerGroupFactory, FacultyManagerGroupFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -385,6 +385,20 @@ class TestLearningUnitProposalSearch(TestCase):
         response = self.client.get(url, data={'tutor': self.person.first_name})
         self.assertEqual(response.context['learning_units_count'], 1)
 
+    def test_learning_units_proposal_force_state_available_choices_as_faculty_manager(self):
+        url = reverse(learning_units_proposal_search)
+        self.person.user.groups.add(FacultyManagerGroupFactory())
+        response = self.client.get(url, data={'acronym': self.proposals[0].learning_unit_year.acronym})
+        state_choices = response.context['form_proposal_state'].fields['state'].choices
+        self.assertEqual(state_choices, list(LimitedProposalState.choices()))
+
+    def test_learning_units_proposal_force_state_available_choices_as_central_manager(self):
+        url = reverse(learning_units_proposal_search)
+        self.person.user.groups.add(CentralManagerGroupFactory())
+        response = self.client.get(url, data={'acronym': self.proposals[0].learning_unit_year.acronym})
+        state_choices = response.context['form_proposal_state'].fields['state'].choices
+        self.assertEqual(state_choices, list(ProposalState.choices()))
+
 
 class TestGroupActionsOnProposals(TestCase):
     @classmethod
@@ -446,6 +460,7 @@ class TestGroupActionsOnProposals(TestCase):
         self.assertCountEqual(list(proposals), [self.proposals[0], self.proposals[2]])
         self.assertEqual(author, self.person)
         self.assertEqual(new_state, proposal_state.ProposalState.ACCEPTED.name)
+
 
 
 @override_flag('learning_unit_proposal_delete', active=True)

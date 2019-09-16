@@ -241,7 +241,8 @@ class LearningUnitPostponementForm:
             'start_year': start_year,
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance,
-            'postposal': not data
+            'postposal': not data,
+            'start_anac': self.start_postponement.year if self.subtype == learning_unit_year_subtypes.PARTIM else None
         }
         if self.external:
             return ExternalLearningUnitBaseForm(
@@ -270,7 +271,6 @@ class LearningUnitPostponementForm:
             current_learn_unit_year = self._forms_to_upsert[0].save()
             learning_unit = current_learn_unit_year.learning_unit
             self._luy_upserted.append(current_learn_unit_year)
-
             if len(self._forms_to_upsert) > 1:
                 for form in self._forms_to_upsert[1:]:
                     if self.consistency_errors and form.academic_year in self.consistency_errors:
@@ -278,7 +278,6 @@ class LearningUnitPostponementForm:
 
                     form.learning_unit_form.instance = learning_unit
                     self._luy_upserted.append(form.save())
-
         return self._luy_upserted
 
     def _check_consistency(self):
