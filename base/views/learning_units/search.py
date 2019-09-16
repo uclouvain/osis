@@ -41,7 +41,7 @@ from base.business.learning_units.xls_comparison import create_xls_comparison, g
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
-from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
+from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm, LearningUnitFilter
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import get_last_academic_years, starting_academic_year
@@ -74,7 +74,6 @@ def learning_units_search(request, search_type):
 
     service_course_search = search_type == SERVICE_COURSES_SEARCH
     borrowed_course_search = search_type == BORROWED_COURSE
-
     form = LearningUnitYearForm(
         request.GET or None,
         service_course_search=service_course_search,
@@ -114,6 +113,9 @@ def learning_units_search(request, search_type):
     if request.POST.get('xls_status') == "xls_attributions":
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
 
+    form_filter = LearningUnitFilter(request.GET or None)
+    if form_filter.is_valid():
+        found_learning_units = form_filter.qs
     object_list_paginated = paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES)
     if request.is_ajax():
         serializer = LearningUnitSerializer(object_list_paginated, context={'request': request}, many=True)

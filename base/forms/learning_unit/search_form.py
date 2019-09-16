@@ -32,7 +32,7 @@ from django.db.models import OuterRef, Subquery, Exists, Case, When, Q, Value, C
 from django.db.models.fields import BLANK_CHOICE_DASH, BooleanField
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
-from django_filters import FilterSet, filters
+from django_filters import FilterSet, filters, OrderingFilter
 
 from base import models as mdl
 from base.business.education_groups.general_information_sections import MOBILITY
@@ -52,7 +52,7 @@ from base.models.enums import entity_container_year_link_type, learning_unit_yea
     entity_type, learning_container_year_types, quadrimesters
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -69,13 +69,13 @@ class LearningUnitSearchForm(BaseSearchForm):
     MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
     _search_mobility = False
 
-    academic_year_id = forms.ModelChoiceField(
+    academic_year = forms.ModelChoiceField(
         label=_('Ac yr.'),
         queryset=AcademicYear.objects.all(),
         empty_label=pgettext_lazy("plural", "All"),
     )
 
-    requirement_entity_acronym = forms.CharField(
+    requirement_entity = forms.CharField(
         max_length=20,
         label=_('Req. Entity')
     )
@@ -90,7 +90,7 @@ class LearningUnitSearchForm(BaseSearchForm):
         label=_('Tutor')
     )
 
-    allocation_entity_acronym = forms.CharField(
+    allocation_entity = forms.CharField(
         max_length=20,
         label=_('Alloc. Ent.')
     )
@@ -158,8 +158,8 @@ class LearningUnitSearchForm(BaseSearchForm):
         :param qs: LearningUnitYearQuerySet
         :return: queryset
         """
-        requirement_entity_acronym = self.cleaned_data.get('requirement_entity_acronym')
-        allocation_entity_acronym = self.cleaned_data.get('allocation_entity_acronym')
+        requirement_entity_acronym = self.cleaned_data.get('requirement_entity')
+        allocation_entity_acronym = self.cleaned_data.get('allocation_entity')
         with_entity_subordinated = self.cleaned_data.get('with_entity_subordinated', False)
 
         if requirement_entity_acronym:
@@ -177,6 +177,151 @@ class LearningUnitSearchForm(BaseSearchForm):
             )
 
         return qs
+
+
+class LearningUnitFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        required=False,
+        label=_('Ac yr.'),
+        empty_label=pgettext_lazy("plural", "All"),
+    )
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr="icontains",
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
+    requirement_entity = filters.CharFilter(
+        method='filter_entity',
+        max_length=20,
+        label=_('Req. Entity'),
+    )
+    allocation_entity = filters.CharFilter(
+        method='filter_entity',
+        max_length=20,
+        label=_('Alloc. Entity'),
+    )
+    with_entity_subordinated = filters.BooleanFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        label=_('Include subordinate entities'),
+        widget=forms.CheckboxInput
+    )
+    tutor = filters.CharFilter(
+        method="filter_tutor",
+        max_length=40,
+        label=_('Tutor'),
+    )
+    quadrimester = filters.ChoiceFilter(
+        choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+        required=False,
+        field_name="quadrimester",
+        label=_('Quadri'),
+        empty_label=pgettext_lazy("plural", "All"),
+    )
+
+    container_type = filters.ChoiceFilter(
+        choices=LearningContainerYearType.choices() + LearningUnitSearchForm.MOBILITY_CHOICE,
+        required=False,
+        field_name="learning_container_year__container_type",
+        label=_('Type'),
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    subtype = filters.ChoiceFilter(
+        choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
+        required=False,
+        field_name="subtype",
+        label=_('Subtype'),
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    status = filters.ChoiceFilter(
+        choices=active_status.ACTIVE_STATUS_LIST[:-1],
+        required=False,
+        label=_('Status'),
+        field_name="status",
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    title = filters.CharFilter(
+        field_name="full_title",
+        lookup_expr="icontains",
+        max_length=40,
+        label=_('Title'),
+    )
+
+    order_by_field = 'ordering'
+    ordering = OrderingFilter(
+        fields=(
+            ('academic_year__year', 'academic_year'),
+            ('acronym', 'acronym'),
+            ('title', 'title'),
+        ),
+        widget=forms.HiddenInput
+    )
+
+    class Meta:
+        model = LearningUnitYear
+        fields = [
+            "academic_year",
+            "acronym",
+            "title",
+            "container_type",
+            "subtype",
+            "requirement_entity",
+            "allocation_entity",
+            "credits",
+            "status",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
+        self.form.fields["academic_year"].initial = starting_academic_year()
+
+    def filter_tutor(self, queryset, name, value):
+        for tutor_name in value.split():
+            queryset = queryset.filter(
+                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=
+                  tutor_name) |
+                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name)
+            ).distinct()
+        return queryset
+
+    def filter_entity(self, queryset, name, value):
+        with_subordinated = self.form.cleaned_data['with_entity_subordinated']
+        lookup_expression = "__".join(["learning_container_year", name, "in"])
+        if value:
+            entity_ids = get_entities_ids(value, with_subordinated)
+            queryset = queryset.filter(**{lookup_expression: entity_ids})
+        return queryset
+
+    def get_queryset(self):
+        """ Filter a LearningUnitYearQueryset """
+        has_proposal = ProposalLearningUnit.objects.filter(
+            learning_unit_year=OuterRef('pk'),
+        )
+        entity_requirement = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        entity_allocation = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        queryset = LearningUnitYear.objects_with_container.select_related(
+            'academic_year', 'learning_container_year__academic_year',
+            'language', 'proposallearningunit', 'externallearningunityear'
+        ).order_by('academic_year__year', 'acronym').annotate(
+            has_proposal=Exists(has_proposal),
+            entity_requirement=Subquery(entity_requirement),
+            entity_allocation=Subquery(entity_allocation),
+        )
+        queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
+        return queryset
 
 
 class LearningUnitYearForm(LearningUnitSearchForm):
@@ -202,7 +347,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         label=_('Title')
     )
 
-    allocation_entity_acronym = forms.CharField(
+    allocation_entity = forms.CharField(
         max_length=20,
         label=_('Alloc. Ent.')
     )
@@ -219,7 +364,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
         super().__init__(*args, **kwargs)
 
         if self.borrowed_course_search:
-            self.fields["academic_year_id"].empty_label = None
+            self.fields["academic_year"].empty_label = None
 
         self.fields["with_entity_subordinated"].initial = True
 
@@ -279,7 +424,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
     def _filter_borrowed_learning_units(self, qs_learning_units):
         faculty_borrowing_id = None
         faculty_borrowing_acronym = self.cleaned_data.get('faculty_borrowing_acronym')
-        academic_year = self.cleaned_data["academic_year_id"]
+        academic_year = self.cleaned_data["academic_year"]
 
         if faculty_borrowing_acronym:
             try:
@@ -339,8 +484,8 @@ def __search_faculty_for_entity(entity_id, entities):
 
 
 def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
-    learning_unit_years_with_entity = learning_unit_year_qs\
-        .select_related('learning_container_year__requirement_entity')\
+    learning_unit_years_with_entity = learning_unit_year_qs \
+        .select_related('learning_container_year__requirement_entity') \
         .values_list("id", 'learning_container_year__requirement_entity')
     return {luy_id: entity_id for luy_id, entity_id in learning_unit_years_with_entity}
 
