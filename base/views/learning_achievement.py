@@ -68,7 +68,7 @@ def execute_operation(an_achievement, operation_str):
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
-        if next_luy.is_past:
+        if not next_luy.is_past:
             while next_luy.get_learning_unit_next_year():
                 next_luy = next_luy.get_learning_unit_next_year()
                 if LearningAchievement.objects.filter(
