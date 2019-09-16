@@ -77,18 +77,13 @@ class GeneralInformationTestCase(APITestCase):
                 language=cls.language,
                 text_label__label=section
             )
-        TranslatedTextFactory(
-            text_label__label=SKILLS_AND_ACHIEVEMENTS_INTRO,
-            reference=cls.egy.id,
-            entity=OFFER_YEAR,
-            language=cls.language
-        )
-        TranslatedTextFactory(
-            text_label__label=SKILLS_AND_ACHIEVEMENTS_EXTRA,
-            reference=cls.egy.id,
-            entity=OFFER_YEAR,
-            language=cls.language
-        )
+        for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
+            TranslatedTextFactory(
+                text_label__label=label,
+                reference=cls.egy.id,
+                entity=OFFER_YEAR,
+                language=cls.language
+            )
         cls.url = reverse('education_group_api_v1:generalinformations_read', kwargs={
             'acronym': cls.egy.acronym,
             'year': cls.egy.academic_year.year,

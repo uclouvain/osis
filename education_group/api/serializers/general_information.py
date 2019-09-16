@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.db.models import Value, CharField
 from rest_framework import serializers
 
@@ -59,7 +60,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     def get_sections(self, obj):
         sections = []
         achievements = None
-        language = 'fr-be' if self.instance.language == 'fr' else self.instance.language
+        language = settings.LANGUAGE_CODE_FR if self.instance.language == 'fr' else self.instance.language
         pertinent_sections = SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
         common_egy = EducationGroupYear.objects.get_common(
             academic_year=obj.academic_year

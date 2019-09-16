@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
+from django.db.models import Case, When, Value, CharField
 from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -91,25 +93,31 @@ class AchievementsSerializer(serializers.ModelSerializer):
         )
 
     def get_intro(self, obj):
-        intro = self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_INTRO)
-        return intro
+        return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_INTRO)
 
     def get_extra(self, obj):
-        extra = self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_EXTRA)
-        return extra
+        return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_EXTRA)
 
     def _get_cms_achievement_data(self, cms_type):
-        data = TranslatedText.objects.filter(
+        data = TranslatedText.objects.select_related(
+            'text_label'
+        ).annotate(
+            text_or_none=Case(
+                When(text__exact='', then=None),
+                default=Value('text'),
+                output_field=CharField()
+            )
+        ).get(
             entity=OFFER_YEAR,
             reference=self.instance.id,
             language=self.context['lang'],
             text_label__label=cms_type
-        ).select_related('text_label').first()
-        return data.text if data.text else None
+        )
+        return data.text_or_none
 
 
 def _get_appropriate_text(eg_achievement, context):
-    if context.get('lang') == 'en':
+    if context.get('lang') == settings.LANGUAGE_CODE_EN:
         return eg_achievement.english_text
     return eg_achievement.french_text
 
