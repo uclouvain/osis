@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-12 16:04+0200\n"
+"POT-Creation-Date: 2019-09-16 15:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2323,7 +2323,7 @@ msgid ""
 "successfuly created."
 msgstr ""
 
-#: views/learning_achievement.py:144
+#: views/learning_achievement.py:156
 msgid "Learning achievement content has been successfully saved"
 msgstr ""
 
@@ -3088,6 +3088,10 @@ msgstr ""
 
 #: utils/send_mail.py:292
 msgid "Operation"
+msgstr ""
+
+#: views/learning_achievement.py:56
+msgid "Operation on learning achievement has been successfully completed"
 msgstr ""
 
 #: models/enums/education_group_types.py:117
@@ -5520,7 +5524,7 @@ msgstr ""
 msgid "aim number"
 msgstr ""
 
-#: views/learning_achievement.py:145 views/learning_unit.py:178
+#: views/learning_achievement.py:164 views/learning_unit.py:178
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr ""

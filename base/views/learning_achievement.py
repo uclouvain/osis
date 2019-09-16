@@ -31,7 +31,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.achievement import get_anchor_reference, DELETE, DOWN, UP, \
-    AVAILABLE_ACTIONS, HTML_ANCHOR
+    AVAILABLE_ACTIONS
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
@@ -41,7 +41,7 @@ from base.views.learning_units import perms
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
-def operation(learning_achievement_id, operation_str):
+def operation(request, learning_achievement_id, operation_str):
     achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     lu_yr_id = achievement_fr.learning_unit_year.id
 
@@ -49,8 +49,15 @@ def operation(learning_achievement_id, operation_str):
                                                     EN_CODE_LANGUAGE,
                                                     achievement_fr.order)
     anchor = get_anchor_reference(operation_str, achievement_fr)
-    execute_operation(achievement_fr, operation_str)
-    execute_operation(achievement_en, operation_str)
+
+    last_academic_year = execute_operation(achievement_fr, operation_str)
+    last_academic_year = execute_operation(achievement_en, operation_str)
+
+    default_success_msg = _("Operation on learning achievement has been successfully completed")
+    if last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
+        display_success_messages(request, _build_postponement_success_message(default_success_msg))
+    else:
+        display_success_messages(request, _build_postponement_success_message(default_success_msg, last_academic_year))
 
     return HttpResponseRedirect(reverse(learning_unit_specifications,
                                         kwargs={'learning_unit_year_id': lu_yr_id}) + anchor)
@@ -58,8 +65,24 @@ def operation(learning_achievement_id, operation_str):
 
 def execute_operation(an_achievement, operation_str):
     if an_achievement:
+        next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
+        while next_luy.get_learning_unit_next_year():
+            next_luy = next_luy.get_learning_unit_next_year()
+            if LearningAchievement.objects.filter(
+                    learning_unit_year=next_luy,
+                    code_name=an_achievement.code_name,
+                    language=an_achievement.language
+            ).exists():
+                an_achievement = LearningAchievement.objects.get(
+                    learning_unit_year=next_luy,
+                    code_name=an_achievement.code_name,
+                    language=an_achievement.language
+                )
+                func = getattr(an_achievement, operation_str)
+                func()
+    return an_achievement.learning_unit_year.academic_year
 
 
 @login_required
@@ -67,7 +90,7 @@ def execute_operation(an_achievement, operation_str):
 @require_http_methods(['POST'])
 @perms.can_update_learning_achievement
 def management(request, learning_unit_year_id):
-    return operation(request.POST.get('achievement_id'), get_action(request))
+    return operation(request, request.POST.get('achievement_id'), get_action(request))
 
 
 def get_action(request):
@@ -129,13 +152,15 @@ def _save_and_redirect(request, form, learning_unit_year_id):
     achievement, last_academic_year = form.save()
     display_success_messages(
         request,
-        _build_edit_achievement_success_message(achievement, last_academic_year)
+        _build_postponement_success_message(
+            _("Learning achievement content has been successfully saved"),
+            last_academic_year
+        )
     )
     return HttpResponse()
 
 
-def _build_edit_achievement_success_message(achievement, last_academic_year):
-    default_msg = _("Learning achievement content has been successfully saved")
+def _build_postponement_success_message(default_msg, last_academic_year=None):
     msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
     return msg % {
         'year': last_academic_year
@@ -167,7 +192,7 @@ def create_first(request, learning_unit_year_id):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @require_http_methods(['GET'])
 @perms.can_update_learning_achievement
-def check_code(request, learning_unit_year_id, learning_achievement_id):
+def check_code(request, learning_unit_year_id):
     code = request.GET['code']
     accept_postponement = True
     next_luy = LearningUnitYear.objects.get(id=learning_unit_year_id)

@@ -85,10 +85,11 @@
 
     let original_code_name = $("#id_code_name").val();
 
-    $('#modification_tabs a').click((e) => {
+    $('#modification_tabs a').click(function(e) {
         e.preventDefault();
         $(this).tab('show');
     });
+
     function submitForm(withPostponement){
         var input = $("<input>")
            .attr("type", "hidden")
@@ -104,7 +105,7 @@
     $("#id_code_name").change((e) => {
         if(e.target.value !== original_code_name){
             $.ajax({
-                url: "{% url 'achievement_check_code' learning_unit_year.id learning_achievement.id  %}",
+                url: "{% url 'achievement_check_code' learning_unit_year.id %}",
                 method: "GET",
                 data: {"code": e.target.value},
                 success: response => {

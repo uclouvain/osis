@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-12 16:04+0200\n"
+"POT-Creation-Date: 2019-09-16 15:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2400,7 +2400,7 @@ msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
 
-#: views/learning_achievement.py:144
+#: views/learning_achievement.py:156
 msgid "Learning achievement content has been successfully saved"
 msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
@@ -3186,6 +3186,10 @@ msgstr "Ouverture aux adultes"
 msgid "Operation"
 msgstr "Opération"
 
+#: views/learning_achievement.py:56
+msgid "Operation on learning achievement has been successfully completed"
+msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
+
 #: models/enums/education_group_types.py:117
 msgid "Option"
 msgstr "Option"
@@ -3460,7 +3464,9 @@ msgstr "Code postal"
 msgid ""
 "Postponement will not be possible as the chosen code already exists for "
 "future academic years"
-msgstr "Le report ne sera pas possible car le code choisi existe déjà pour les années académiques futures"
+msgstr ""
+"Le report ne sera pas possible car le code choisi existe déjà pour les "
+"années académiques futures"
 
 #: models/enums/component_type.py:33
 #: models/enums/learning_component_year_type.py:33
@@ -5750,7 +5756,7 @@ msgstr "accords"
 msgid "aim number"
 msgstr "numéro de l'attendu"
 
-#: views/learning_achievement.py:145 views/learning_unit.py:178
+#: views/learning_achievement.py:164 views/learning_unit.py:178
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr "et reporté jusque %(year)s"

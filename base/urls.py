@@ -222,7 +222,7 @@ urlpatterns = [
 
                 url(r'^(?P<learning_achievement_id>[0-9]+)/create/', learning_achievement.create,
                     name="achievement_create"),
-                url(r'^(?P<learning_achievement_id>[0-9]+)/check_code/', learning_achievement.check_code,
+                url(r'^check_code/', learning_achievement.check_code,
                     name="achievement_check_code"),
 
             ])),
