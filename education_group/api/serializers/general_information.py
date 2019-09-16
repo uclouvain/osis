@@ -70,18 +70,19 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             sections.append(common_translated_text)
 
         for specific_section in pertinent_sections['specific']:
-            if specific_section not in [EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_KEY]:
+            if specific_section == SKILLS_AND_ACHIEVEMENTS_KEY:
+                achievements = AchievementSectionSerializer(
+                    {'id': specific_section},
+                    context={'egy': obj, 'lang': language}
+                )
+            elif specific_section != EVALUATION_KEY:
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
 
                 sections.append(translated_text if translated_text else {
                     'label': specific_section,
                     'translated_label': translated_text_label.label
                 })
-            elif specific_section == SKILLS_AND_ACHIEVEMENTS_KEY:
-                achievements = AchievementSectionSerializer(
-                    {'id': specific_section},
-                    context={'egy': obj, 'lang': language}
-                )
+
         return SectionSerializer(sections, many=True).data + [achievements.data] if achievements else []
 
     def _get_translated_text(self, egy, section, language):
