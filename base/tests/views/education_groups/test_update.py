@@ -483,7 +483,7 @@ class TestUpdate(TestCase):
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
             "start_year": 2010,
-            "end_year": 2018,
+            "end_year": self.current_academic_year.year,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
