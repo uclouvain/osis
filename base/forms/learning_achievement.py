@@ -147,7 +147,7 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def _update_future_luy(self, ac_year_postponement_range, lang, luy, text):
         for ac in ac_year_postponement_range:
-            next_luy = LearningUnitYear.objects.get(
+            next_luy, created = LearningUnitYear.objects.get_or_create(
                 academic_year=ac,
                 acronym=luy.acronym
             )
