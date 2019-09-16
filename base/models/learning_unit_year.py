@@ -117,7 +117,11 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 class LearningUnitYearQuerySet(SerializableQuerySet):
     def annotate_full_title(self):
-        return self.annotate(
+        return self.annotate_full_title_class_method(self)
+
+    @classmethod
+    def annotate_full_title_class_method(cls, queryset):
+        return queryset.annotate(
             full_title=Case(
                 When(
                     Q(learning_container_year__common_title__isnull=True) |
@@ -523,6 +527,7 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
            title=None, subtype=None, status=None, container_type=None, tutor=None,
            summary_responsible=None, requirement_entities=None, learning_unit_year_id=None, *args, **kwargs):
     queryset = LearningUnitYear.objects_with_container
+    queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
 
     if learning_unit_year_id:
         queryset = queryset.filter(id=learning_unit_year_id)

@@ -46,6 +46,7 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.CharField(source='learning_container_year.container_type')
     type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
+    has_proposal = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = LearningUnitYear
@@ -53,12 +54,15 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
             'url',
             'acronym',
             'academic_year',
+            'credits',
+            'status',
             'requirement_entity',
             'title',
             'type',
             'type_text',
             'subtype',
-            'subtype_text'
+            'subtype_text',
+            'has_proposal'
         )
 
     def get_title(self, learning_unit_year):
@@ -66,6 +70,9 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
             'fr': getattr(learning_unit_year, 'full_title', None),
             'en': getattr(learning_unit_year, 'full_title_en', None)
         }
+
+    def get_has_proposal(self, learning_unit_year):
+        return getattr(learning_unit_year, "has_proposal", None)
 
 
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
@@ -94,8 +101,6 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitSerializer.Meta.fields + (
-            'credits',
-            'status',
             'quadrimester',
             'quadrimester_text',
             'periodicity',

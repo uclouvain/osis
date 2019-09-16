@@ -107,15 +107,84 @@
     {
 	 // Must be always DataTable declaration !!!
         setEventKeepIds('table_learning_units', 'learningUnitIds');
-
-        $('#table_learning_units').DataTable(
+        let domTable = $('#table_learning_units');
+        domTable.DataTable(
             {
                 columnDefs: [
-                    { targets: 2, type: 'diacritics-neutralise'}
+                    {
+                        "name": "academic_year",
+                        "targets": 0,
+                        "data": "academic_year",
+                        "render": function(data, type, row, meta){
+                            let year = data;
+                            let nextYear = data + 1;
+                            return `${year}-${nextYear.toString().slice(2)}`;
+                        }
+                    },
+                    {
+                        "name": "acronym",
+                        "targets": 1,
+                        "data": "acronym",
+                        "render": function ( data, type, row, meta ) {
+                            return '<a href="'+ row['url'] +'">'+ data + '</a>';
+                        }
+                    },
+                    {
+                        "name": "title",
+                        "targets": 2,
+                        "data": "title",
+                        "render": function(data, type, row, meta){
+                            return data["fr"]
+                        }
+                    },
+                    {"name": "type", "targets": 3,  "data": "type_text"},
+                    {"name": "subtype", "targets": 4,  "data": "subtype_text"},
+                    {"name": "requirement_entity", "targets": 5, "data": "requirement_entity"},
+                    {"name": "management_entity", "targets": 6, "data": "requirement_entity"},
+                    {"name": "credits", "targets": 7, "data": "credits"},
+                    {
+                        "name": "state",
+                        "targets": 8,
+                        "data": "status",
+                        "render": function(data, type, row, meta){
+                            if (data === true){
+                                return "<span class=\"glyphicon glyphicon-ok-circle\" aria-hidden=\"true\" style=\"color: limegreen;\"\n" +
+                                    "                                          title=\"{% trans 'Active' %}\"></span>\n" +
+                                    "                                    <div style=\"display:none;\">1</div>"
+                            }
+                            return "<span class=\"glyphicon glyphicon-remove-circle\" aria-hidden=\"true\" style=\"color: red;\"\n" +
+                                "                                          title=\"{% trans 'Inactive' %}\"></span>\n" +
+                                "                                    <div style=\"display:none;\">0</div>"
+                        }
+                    },
+                    {
+                        "name": "proposal",
+                        "targets": 9,
+                        "data": "has_proposal",
+                        "render": function(data, type, row, meta){
+                            if (data === true){
+                                return "<i class='fa fa-flag warning' data-toggle='tooltip' data-placement='right'" +
+                                    " title='{% trans 'In proposal' %}''></i>"
+                            }
+                            return ""
+                        }
+                    }
                 ],
                 "stateSave": true,
                 "paging" : false,
                 "ordering" : true,
+                "orderMulti": false,
+                "serverSide": true,
+                "ajax" : {
+                    "url": "{% url 'learning_units' %}",
+                    "type": "GET",
+                    "dataSrc": "object_list",
+                    "data": function (d){
+                        let pageNumber = {{ page_obj.number }};
+                        return getDataAjaxTable(domTable, d, pageNumber);
+                    },
+                    "traditional": true
+                },
                 "info"  : false,
                 "searching" : false,
                 "language": {

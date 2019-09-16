@@ -28,6 +28,7 @@ import itertools
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import WARNING
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -52,6 +53,7 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages, \
     paginate_queryset, remove_from_session
+from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -112,6 +114,11 @@ def learning_units_search(request, search_type):
     if request.POST.get('xls_status') == "xls_attributions":
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
 
+    object_list_paginated = paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES)
+    if request.is_ajax():
+        serializer = LearningUnitSerializer(object_list_paginated, context={'request': request}, many=True)
+        return JsonResponse({'object_list': serializer.data})
+
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
     starting_ac = starting_academic_year()
     context = {
@@ -127,7 +134,7 @@ def learning_units_search(request, search_type):
         'search_type': search_type,
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
+        'page_obj': object_list_paginated,
     }
 
     return render(request, "learning_units.html", context)

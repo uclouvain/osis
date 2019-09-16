@@ -231,6 +231,13 @@ components:
           format: uri
         acronym:
           type: string
+        credit:
+          type: number
+          multipleOf: 0.01
+        status:
+          type: boolean
+        has_proposal:
+          type: boolean
         title:
           type: object
           required:
@@ -257,11 +264,6 @@ components:
         - $ref: '#/components/schemas/LearningUnit'
         - type: object
           properties:
-            credit:
-              type: number
-              multipleOf: 0.01
-            status:
-              type: boolean
             quadrimester:
               $ref: '#/components/schemas/QuadrimesterEnum'
             quadrimester_text:
