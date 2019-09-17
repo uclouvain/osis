@@ -6339,30 +6339,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:182
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid ""
-#~ "Do you want to sent email to remind to update the educational "
-#~ "informations?"
-#~ msgstr "Voulez-vous envoyer un email de rappel?"
-
-#~ msgid "Mail to remind educational information update"
-#~ msgstr "Mail de rappel résumés"
-
-#~ msgid "Need no reminder"
-#~ msgstr "Pas besoin de rappel tout est en ordre"
-
-#~ msgid "Reminding mails sent"
-#~ msgstr "Messages de rappel envoyés"
-
-#~ msgid "Responsible"
-#~ msgstr "Responsable"
-
-#~ msgid "Sent email to remind to update description fiche"
-#~ msgstr ""
-#~ "Envoyer un email de rappel pour la mise à jour des fiches descriptives"
-
-#~ msgid "Volume 1"
-#~ msgstr "Volume 1"
-
-#~ msgid "Volume 2"
-#~ msgstr "Volume 2"
