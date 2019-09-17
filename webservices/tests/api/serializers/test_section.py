@@ -27,11 +27,12 @@ from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
+from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer
+    AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
@@ -112,6 +113,30 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         AdmissionConditionFactory(education_group_year=common_egy)
         AdmissionConditionFactory(education_group_year=cls.egy)
         cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
+            'egy': cls.egy,
+            'lang': cls.language
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'id',
+            'label',
+            'content'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class ContactsSectionSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.data_to_serialize = {
+            'id': 'ID',
+            'dummy': 'DUMMY'
+        }
+        cls.language = 'en'
+        cls.egy = EducationGroupYearFactory()
+        EducationGroupPublicationContactFactory(education_group_year=cls.egy)
+        cls.serializer = ContactsSectionSerializer(cls.data_to_serialize, context={
             'egy': cls.egy,
             'lang': cls.language
         })
