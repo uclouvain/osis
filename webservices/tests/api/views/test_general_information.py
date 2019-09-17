@@ -30,7 +30,7 @@ from rest_framework.test import APITestCase
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
-    SKILLS_AND_ACHIEVEMENTS_KEY, COMMON_DIDACTIC_PURPOSES
+    SKILLS_AND_ACHIEVEMENTS, COMMON_DIDACTIC_PURPOSES
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from base.tests.factories.person import PersonFactory
 from cms.enums.entity_name import OFFER_YEAR
@@ -48,7 +48,7 @@ class GeneralInformationTestCase(APITestCase):
         cls.egy = EducationGroupYearFactory()
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
-            'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS_KEY],
+            'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES, EVALUATION_KEY]
         }
         general_information_sections.SECTIONS_PER_OFFER_TYPE[

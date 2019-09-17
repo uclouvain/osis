@@ -28,7 +28,7 @@ from django.db.models import Value, CharField
 from rest_framework import serializers
 
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE, \
-    SKILLS_AND_ACHIEVEMENTS_KEY, ADMISSION_CONDITION
+    SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -72,7 +72,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             sections.append(common_translated_text)
 
         for specific_section in pertinent_sections['specific']:
-            if specific_section == SKILLS_AND_ACHIEVEMENTS_KEY:
+            if specific_section == SKILLS_AND_ACHIEVEMENTS:
                 achievements = AchievementSectionSerializer(
                     {'id': specific_section},
                     context={'egy': obj, 'lang': language}

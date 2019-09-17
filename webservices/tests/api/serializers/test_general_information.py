@@ -29,7 +29,7 @@ from django.test import TestCase
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
-    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS_KEY
+    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -45,7 +45,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = 'en'
         cls.pertinent_sections = {
-            'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS_KEY],
+            'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES]
         }
         general_information_sections.SECTIONS_PER_OFFER_TYPE[

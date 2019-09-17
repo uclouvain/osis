@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 # The key MUST be in french because it depend on Webservice (filtering)
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 
-SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
+SKILLS_AND_ACHIEVEMENTS = 'comp_acquis'
 PEDAGOGY = 'pedagogie'
 MOBILITY = 'mobilite'
 FURTHER_TRAININGS = 'formations_accessibles'
@@ -140,7 +140,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             CONTACT_INTRO,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -173,7 +173,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -235,7 +235,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
         ]
     },
@@ -270,7 +270,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             COMPLEMENTARY_MODULE,
             CONTACT_INTRO,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -303,7 +303,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             COMPLEMENTARY_MODULE,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -322,7 +322,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -342,7 +342,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -361,7 +361,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -380,7 +380,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -399,7 +399,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -418,7 +418,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
@@ -437,7 +437,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY,
+            SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
     },
