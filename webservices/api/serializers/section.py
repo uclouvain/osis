@@ -26,8 +26,6 @@
 
 from rest_framework import serializers
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import TrainingType
 from webservices.api.serializers.achievement import AchievementsSerializer
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
@@ -84,38 +82,19 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
 
     def get_content(self, obj):
         egy = self.context.get('egy')
-
-        admission_condition_common = self._get_common_admission_condition(egy)
+        language = self.context.get('lang')
+        admission_condition_common = egy.admissioncondition.common_admission_condition
         context = {
-            'lang': self.context.get('lang'),
+            'lang': language,
             'common': admission_condition_common,
         }
         if egy.is_bachelor:
-            return BachelorAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+            return BachelorAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
         elif egy.is_specialized_master:
-            return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+            return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
         elif egy.is_aggregation:
-            return AggregationAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+            return AggregationAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
         elif any([egy.is_master120, egy.is_master60, egy.is_master180]):
             return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
         else:
-            return AdmissionConditionsSerializer(egy.admissioncondition, context=context).data
-
-    def _get_common_admission_condition(self, egy):
-        admission_condition_common = None
-        egy_type = egy.education_group_type.name
-        if any([
-            egy.is_bachelor,
-            egy.is_master120, egy.is_master60, egy.is_master180,
-            egy.is_aggregation,
-            egy.is_specialized_master
-        ]):
-            if egy.is_master60:
-                egy_type = TrainingType.PGRM_MASTER_120.name
-            common_education_group_year = EducationGroupYear.objects.get(
-                acronym__icontains='common',
-                education_group_type__name=egy_type,
-                academic_year=egy.academic_year
-            )
-            admission_condition_common = common_education_group_year.admissioncondition
-        return admission_condition_common
+            return AdmissionConditionsSerializer(egy.admissioncondition, lang=language).data

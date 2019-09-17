@@ -26,6 +26,8 @@
 from django.conf import settings
 from rest_framework import serializers
 
+from base.models.admission_condition import AdmissionCondition
+
 
 class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -40,15 +42,34 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
         # Instantiate the superclass normally
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
 
+        is_admission_condition = isinstance(self.instance, AdmissionCondition)
         if language is not None:
-            keys_list = list(self.fields.keys())
-            keys_list.remove('alert_message')
+            keys_list = [
+                field for field in list(self.fields.keys()) if isinstance(self.fields[field], serializers.CharField)
+            ]
             for field_name in keys_list:
-                field_source = 'free' if field_name == 'free_text' else field_name
-                if language == settings.LANGUAGE_CODE_FR:
-                    self.fields[field_source] = serializers.CharField(source='text_' + field_source)
+                source = self._get_source(field_name, is_admission_condition)
+                if language == settings.LANGUAGE_CODE_FR and is_admission_condition:
+                    self.fields[field_name] = serializers.CharField(
+                        source=source,
+                        read_only=True
+                    )
                 else:
-                    self.fields[field_source] = serializers.CharField(source='text_' + field_source + '_' + language)
+                    self.fields[field_name] = serializers.CharField(
+                        source=source + '_' + language,
+                        read_only=True
+                    )
+
+    def _get_source(self, field_name, is_admission_condition):
+        specific_fields = ['free_text', 'text']
+        prefix = 'text_' if is_admission_condition else ''
+        ac_source = 'common_admission_condition.' \
+            if field_name not in specific_fields and is_admission_condition else ''
+        field_source = 'free' if field_name == 'free_text' else field_name
+        if 'section' in self.context:
+            field_source = self.context.get('section')
+        source = ac_source + prefix + field_source
+        return source
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

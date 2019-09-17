@@ -31,8 +31,13 @@ from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializ
 
 
 class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
-    free_text = serializers.SerializerMethodField(read_only=True, required=False)
-    alert_message = serializers.SerializerMethodField(read_only=True)
+    free_text = serializers.CharField(read_only=True, required=False)
+    alert_message = serializers.CharField(read_only=True)
+
+    def __init__(self, *args, **kwargs):
+        super(AdmissionConditionsSerializer, self).__init__(*args, **kwargs)
+        if not self.instance.common_admission_condition:
+            self.fields.pop('alert_message')
 
     class Meta:
         model = AdmissionCondition
@@ -42,20 +47,12 @@ class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
             'alert_message',
         )
 
-    def get_free_text(self, obj):
-        return _get_appropriate_text('free', self.context.get('lang'), obj)
-
-    def get_alert_message(self, obj):
-        common = self.context.get('common')
-        # property to get common and use it for source ?
-        return _get_appropriate_text('alert_message', self.context.get('lang'), common) if common else None
-
 
 class BachelorAdmissionConditionsSerializer(AdmissionConditionsSerializer):
-    ca_bacs_cond_generales = serializers.SerializerMethodField(method_name='get_general', read_only=True)
-    ca_bacs_cond_particulieres = serializers.SerializerMethodField(method_name='get_particulieres', read_only=True)
-    ca_bacs_examen_langue = serializers.SerializerMethodField(method_name='get_langue', read_only=True)
-    ca_bacs_cond_speciales = serializers.SerializerMethodField(method_name='get_speciales', read_only=True)
+    ca_bacs_cond_generales = serializers.CharField(read_only=True)
+    ca_bacs_cond_particulieres = serializers.CharField(read_only=True)
+    ca_bacs_examen_langue = serializers.CharField(read_only=True)
+    ca_bacs_cond_speciales = serializers.CharField(read_only=True)
 
     class Meta:
         model = AdmissionCondition
@@ -68,21 +65,9 @@ class BachelorAdmissionConditionsSerializer(AdmissionConditionsSerializer):
             'ca_bacs_cond_speciales'
         )
 
-    def get_general(self, obj):
-        return _get_appropriate_text('ca_bacs_cond_generales', self.context.get('lang'), self.context.get('common'))
-
-    def get_particulieres(self, obj):
-        return _get_appropriate_text('ca_bacs_cond_particulieres', self.context.get('lang'), self.context.get('common'))
-
-    def get_langue(self, obj):
-        return _get_appropriate_text('ca_bacs_examen_langue', self.context.get('lang'), self.context.get('common'))
-
-    def get_speciales(self, obj):
-        return _get_appropriate_text('ca_bacs_cond_speciales', self.context.get('lang'), self.context.get('common'))
-
 
 class SpecializedMasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
-    ca_cond_generales = serializers.SerializerMethodField(method_name='get_general', read_only=True)
+    ca_cond_generales = serializers.CharField(read_only=True)
 
     class Meta:
         model = AdmissionCondition
@@ -93,14 +78,11 @@ class SpecializedMasterAdmissionConditionsSerializer(AdmissionConditionsSerializ
             'ca_cond_generales',
         )
 
-    def get_general(self, obj):
-        return _get_appropriate_text('ca_cond_generales', self.context.get('lang'), self.context.get('common'))
-
 
 class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditionsSerializer):
-    ca_maitrise_fr = serializers.SerializerMethodField(method_name='get_maitrise', read_only=True)
-    ca_allegement = serializers.SerializerMethodField(method_name='get_allegement', read_only=True)
-    ca_ouv_adultes = serializers.SerializerMethodField(method_name='get_adultes', read_only=True)
+    ca_maitrise_fr = serializers.CharField(read_only=True)
+    ca_allegement = serializers.CharField(read_only=True)
+    ca_ouv_adultes = serializers.CharField(read_only=True)
 
     class Meta:
         model = AdmissionCondition
@@ -113,15 +95,6 @@ class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditi
             'ca_allegement',
             'ca_ouv_adultes'
         )
-
-    def get_maitrise(self, obj):
-        return _get_appropriate_text('ca_maitrise_fr', self.context.get('lang'), self.context.get('common'))
-
-    def get_allegement(self, obj):
-        return _get_appropriate_text('ca_allegement', self.context.get('lang'), self.context.get('common'))
-
-    def get_adultes(self, obj):
-        return _get_appropriate_text('ca_ouv_adultes', self.context.get('lang'), self.context.get('common'))
 
 
 class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
@@ -148,11 +121,12 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
             'non_university_bachelors',
             'holders_non_university_second_degree',
             'adults_taking_up_university_training',
-            'personalized_access'
+            'personalized_access',
         ]
         sections = {
             field: AdmissionConditionTextsSerializer(
                 obj,
+                lang=self.context.get('lang'),
                 context=_update_and_get_dict(self.context, 'section', field)
             ).data
             for field in ac_fields
@@ -164,6 +138,7 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
                     diploma_type: AdmissionConditionLineSerializer(
                         obj.admissionconditionline_set.filter(section=diploma_type),
                         many=True,
+                        lang=self.context.get('lang'),
                         context=self.context
                     ).data
                     for diploma_type in diploma_types
@@ -201,7 +176,7 @@ class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
 
         fields = (
             'access',
-            'conditions_en',
+            'conditions',
             'diploma',
             'remarks'
         )
