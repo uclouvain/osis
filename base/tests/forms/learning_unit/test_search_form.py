@@ -39,8 +39,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory

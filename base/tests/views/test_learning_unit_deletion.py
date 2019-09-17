@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
@@ -42,7 +41,7 @@ from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_editable_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -78,7 +77,7 @@ class LearningUnitDelete(TestCase):
 
         learning_unit_years = []
         for year in range(4):
-            ac_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION + year)
+            ac_year = AcademicYearFactory(year=academic_year.year + year)
             l_containeryear = LearningContainerYearFactory(
                 academic_year=ac_year,
                 requirement_entity=self.entity_version.entity,

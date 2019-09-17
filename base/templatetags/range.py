@@ -23,13 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
 
 from django import template
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
-
-from base.models import learning_unit_year
 
 register = template.Library()
 

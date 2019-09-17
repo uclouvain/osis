@@ -39,8 +39,7 @@ from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data

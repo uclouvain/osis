@@ -27,13 +27,12 @@ import datetime
 from unittest import mock
 
 from django.contrib import messages
-from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -46,11 +45,10 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
 from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, \

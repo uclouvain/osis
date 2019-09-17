@@ -28,10 +28,10 @@ from io import BytesIO
 from unittest.mock import patch
 
 from django.contrib.messages import get_messages
-from django.urls import reverse
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from openpyxl import load_workbook
 

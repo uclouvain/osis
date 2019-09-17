@@ -34,7 +34,7 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import GROUP
 from base.models.enums.education_group_types import TrainingType, GroupType
-from base.tests.factories.academic_year import AcademicYearFactory, get_current_year, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
