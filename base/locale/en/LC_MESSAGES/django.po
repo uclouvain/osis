@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-10 12:38+0200\n"
+"POT-Creation-Date: 2019-09-13 14:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1502,6 +1502,9 @@ msgstr ""
 msgid "Linked with EPC"
 msgstr ""
 
+msgid "List comparison LU / Proposal"
+msgstr ""
+
 msgid "List education groups"
 msgstr ""
 
@@ -2710,6 +2713,10 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr ""
+
+#, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
 msgstr ""
 
@@ -3199,15 +3206,6 @@ msgstr ""
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
-msgstr ""
-
-msgid "Xls"
-msgstr ""
-
-msgid "Xls UE/proposals comparison"
-msgstr ""
-
-msgid "Xls with proposals"
 msgstr ""
 
 msgid "Yes"
