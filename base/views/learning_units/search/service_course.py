@@ -80,4 +80,4 @@ def learning_units_service_course(request):
         "form_comparison": form_comparison,
     }
 
-    return render(request, "learning_unit/search/simple.html", context)
+    return render(request, "learning_unit/search/service_course.html", context)

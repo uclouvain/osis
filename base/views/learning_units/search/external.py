@@ -40,4 +40,4 @@ def learning_units_external_search(request):
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
         'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
-    return render(request, "learning_units.html", context)
+    return render(request, "learning_unit/search/external.html", context)

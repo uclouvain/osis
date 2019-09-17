@@ -74,7 +74,7 @@ def learning_units_proposal_search(request):
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
         'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
-    return render(request, "learning_units.html", context)
+    return render(request, "learning_unit/search/proposal.html", context)
 
 
 def apply_action_on_proposals(proposals, author, post_data, research_criteria):

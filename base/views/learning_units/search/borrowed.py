@@ -80,4 +80,4 @@ def learning_units_borrowed_course(request):
         "form_comparison": form_comparison,
     }
 
-    return render(request, "learning_unit/search/simple.html", context)
+    return render(request, "learning_unit/search/borrowed.html", context)
