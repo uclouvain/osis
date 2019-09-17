@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, ValidationError
@@ -42,7 +41,7 @@ from base.models.education_group_type import find_authorized_types, EducationGro
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import academic_calendar_type, education_group_categories
-from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
@@ -116,6 +115,18 @@ class PermissionFieldEducationGroupMixin(PermissionFieldMixin):
             return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
                 GROUP_DAILY_MANAGEMENT
         return super().get_context()
+
+
+class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
+    """
+    Permission Field for Hops(year) and for Coorganization
+
+    This mixin will get allowed field on reference_field model according to perm's
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.category = TRAINING
+        super().__init__(*args, **kwargs)
 
 
 class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupMixin,
