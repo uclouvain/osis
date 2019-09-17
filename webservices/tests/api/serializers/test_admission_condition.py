@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonBachelorFactory
-from education_group.api.serializers.admission_condition import AdmissionConditionsSerializer, \
+from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer
 
 

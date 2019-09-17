@@ -33,7 +33,7 @@ from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
+from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text
 

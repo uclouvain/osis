@@ -23,18 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
 from rest_framework import serializers
 
 from base.models.education_group_year import EducationGroupYear
-from education_group.api.serializers.achievement import AchievementsSerializer
-from education_group.api.serializers.admission_condition import AdmissionConditionsSerializer, \
+from base.models.enums.education_group_types import TrainingType
+from webservices.api.serializers.achievement import AchievementsSerializer
+from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
     AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
-
-ACRONYM_PATTERN = re.compile(r'(?P<prefix>[a-z]+)(?P<cycle>[0-9]{1,3})(?P<suffix>[a-z]+)(?P<year>[0-9]?)')
-COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
 
 
 class AcronymError(Exception):
@@ -99,24 +96,25 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
         elif egy.is_aggregation:
             return AggregationAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
-        elif egy.is_master120 or egy.is_master60 or egy.is_master180:
+        elif any([egy.is_master120, egy.is_master60, egy.is_master180]):
             return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
         else:
             return AdmissionConditionsSerializer(egy.admissioncondition, context=context).data
 
     def _get_common_admission_condition(self, egy):
-        acronym_match = re.match(ACRONYM_PATTERN, egy.acronym.lower())
-        if not acronym_match:
-            raise AcronymError("The acronym does not match the pattern")
-        full_suffix = '{cycle}{suffix}{year}'.format(**acronym_match.groupdict())
-        common_acronym = 'common-{}'.format(full_suffix)
-        if common_acronym == 'common-2m1':
-            common_acronym = 'common-2m'
-            full_suffix = '2m'
         admission_condition_common = None
-        if full_suffix.upper() in COMMON_OFFER:
+        egy_type = egy.education_group_type.name
+        if any([
+            egy.is_bachelor,
+            egy.is_master120, egy.is_master60, egy.is_master180,
+            egy.is_aggregation,
+            egy.is_specialized_master
+        ]):
+            if egy.is_master60:
+                egy_type = TrainingType.PGRM_MASTER_120.name
             common_education_group_year = EducationGroupYear.objects.get(
-                acronym=common_acronym,
+                acronym__icontains='common',
+                education_group_type__name=egy_type,
                 academic_year=egy.academic_year
             )
             admission_condition_common = common_education_group_year.admissioncondition

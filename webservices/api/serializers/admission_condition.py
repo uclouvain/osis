@@ -26,8 +26,8 @@
 from django.utils import translation
 from rest_framework import serializers
 
-from base.api.serializers.common import DynamicLanguageFieldsModelSerializer
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializer
 
 
 class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
@@ -195,16 +195,13 @@ class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
 
 class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
     access = serializers.SerializerMethodField(read_only=True)
-    conditions = serializers.SerializerMethodField(read_only=True)
-    diploma = serializers.SerializerMethodField(read_only=True)
-    remarks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = AdmissionConditionLine
 
         fields = (
             'access',
-            'conditions',
+            'conditions_en',
             'diploma',
             'remarks'
         )
@@ -212,15 +209,6 @@ class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
     def get_access(self, obj):
         with translation.override(self.context.get('lang')):
             return obj.get_access_display()
-
-    def get_conditions(self, obj):
-        return _get_appropriate_field('conditions', self.context.get('lang'), obj)
-
-    def get_diploma(self, obj):
-        return _get_appropriate_field('diploma', self.context.get('lang'), obj)
-
-    def get_remarks(self, obj):
-        return _get_appropriate_field('remarks', self.context.get('lang'), obj)
 
 
 def _get_appropriate_text(field, language, ac):

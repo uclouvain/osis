@@ -30,7 +30,7 @@ from base.tests.factories.education_group_detailed_achievement import EducationG
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from education_group.api.serializers.achievement import AchievementSerializer, AchievementsSerializer, \
+from webservices.api.serializers.achievement import AchievementSerializer, AchievementsSerializer, \
     DetailedAchievementSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 

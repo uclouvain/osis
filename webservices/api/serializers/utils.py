@@ -49,3 +49,11 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
                     self.fields[field_source] = serializers.CharField(source='text_' + field_source)
                 else:
                     self.fields[field_source] = serializers.CharField(source='text_' + field_source + '_' + language)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        for field in data:
+            if data[field] == '':
+                data[field] = None
+        return data
+

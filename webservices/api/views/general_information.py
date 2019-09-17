@@ -27,7 +27,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from base.models.education_group_year import EducationGroupYear
-from education_group.api.serializers.general_information import GeneralInformationSerializer
+from webservices.api.serializers.general_information import GeneralInformationSerializer
 
 
 class GeneralInformation(generics.RetrieveAPIView):
