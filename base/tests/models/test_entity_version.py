@@ -604,6 +604,7 @@ class EntityVersionLoadInMemoryTest(TestCase):
 
         for case in test_cases:
             with self.subTest(status_code=case.get('comment')):
+                del case.get('entity_version_test').entity.most_recent_acronym
                 to_test = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
                                                                         entity=case.get('entity_version_test').entity
                                                                         .most_recent_acronym,
