@@ -95,6 +95,6 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
         elif egy.is_aggregation:
             return AggregationAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
         elif any([egy.is_master120, egy.is_master60, egy.is_master180]):
-            return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=context).data
+            return MasterAdmissionConditionsSerializer(egy.admissioncondition, lang=language, context=context).data
         else:
             return AdmissionConditionsSerializer(egy.admissioncondition, lang=language).data

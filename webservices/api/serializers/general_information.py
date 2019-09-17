@@ -56,7 +56,10 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.instance.language = kwargs['context']['language']
+        lang = kwargs['context']['language']
+        self.instance.language = lang
+        if lang != 'fr':
+            self.fields['title'] = serializers.CharField(source='title_english', read_only=True)
 
     def get_sections(self, obj):
         datas = []
