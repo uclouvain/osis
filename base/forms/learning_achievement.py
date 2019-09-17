@@ -108,7 +108,6 @@ class LearningAchievementEditForm(forms.ModelForm):
             # For sync purpose, we need to trigger
             # an update of the THEMES_DISCUSSED cms when we update learning achievement
             update_themes_discussed_changed_field_in_cms(luy)
-
             self.last_postponed_academic_year = None
             if not luy.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = self._get_ac_year_postponement_year(luy)

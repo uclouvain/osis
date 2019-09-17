@@ -1124,12 +1124,11 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_specifications_save(self):
         learning_unit_year = LearningUnitYearFactory()
-        response = self.client.post(reverse('learning_unit_specifications_edit',
-                                            kwargs={'learning_unit_year_id': learning_unit_year.id}))
-
-        expected_redirection = reverse("learning_unit_specifications",
-                                       kwargs={'learning_unit_year_id': learning_unit_year.id})
-        self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
+        response = self.client.post(
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            data={'postpone': 0}
+        )
+        self.assertEqual(response.status_code, 200)
 
 
 class TestCreateXls(TestCase):

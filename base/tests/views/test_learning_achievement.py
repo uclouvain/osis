@@ -26,18 +26,20 @@
 from unittest import mock
 
 from django.contrib.auth.models import Permission
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
-from base.business.learning_units.achievement import DELETE, DOWN, UP, HTML_ANCHOR
+from base.business.learning_units.achievement import DELETE, DOWN, UP
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -74,20 +76,26 @@ class TestLearningAchievementView(TestCase):
 
     def test_operation_method_not_allowed(self):
         request_factory = RequestFactory()
-        request = request_factory.post(reverse('achievement_management',
-                                               args=[self.achievement_fr.learning_unit_year.id]),
-                                       data={'achievement_id': self.achievement_fr.id,
-                                             'action': DELETE})
+        request = request_factory.post(
+            reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]),
+            data={'achievement_id': self.achievement_fr.id, 'action': DELETE}
+        )
         request.user = self.user
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
         with self.assertRaises(PermissionDenied):
             management(request, self.achievement_fr.learning_unit_year.id)
 
     def test_delete_redirection(self):
         request_factory = RequestFactory()
-        request = request_factory.post(reverse('achievement_management',
-                                               args=[self.achievement_fr.learning_unit_year.id]),
-                                       data={'achievement_id': self.achievement_fr.id,
-                                             'action': DELETE})
+        request = request_factory.post(
+            reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]),
+            data={'achievement_id': self.achievement_fr.id, 'action': DELETE}
+        )
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
         request.user = self.user
@@ -176,8 +184,11 @@ class TestLearningAchievementActions(TestCase):
                                    order=1)
         request_factory = RequestFactory()
         request = request_factory.post(management)
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
         request.user = self.user
-        operation(achievement_fr_1.id, 'delete')
+        operation(request, achievement_fr_1.id, 'delete')
         self.assertCountEqual(LearningAchievement.objects.all(), [achievement_fr_0,
                                                                   achievement_en_0])
 
@@ -198,7 +209,10 @@ class TestLearningAchievementActions(TestCase):
         request_factory = RequestFactory()
         request = request_factory.post(management)
         request.user = self.user
-        operation(achievement_fr_1.id, UP)
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        operation(request, achievement_fr_1.id, UP)
 
         self.assertEqual(LearningAchievement.objects.get(pk=id_fr_0).order, 1)
         self.assertEqual(LearningAchievement.objects.get(pk=id_fr_1).order, 0)
@@ -222,7 +236,10 @@ class TestLearningAchievementActions(TestCase):
         request_factory = RequestFactory()
         request = request_factory.post(reverse('achievement_management', args=[achievement_fr_0.learning_unit_year.id]))
         request.user = self.user
-        operation(achievement_fr_0.id, DOWN)
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+        operation(request, achievement_fr_0.id, DOWN)
 
         self.assertEqual(LearningAchievement.objects.get(pk=id_fr_0).order, 1)
         self.assertEqual(LearningAchievement.objects.get(pk=id_fr_1).order, 0)
@@ -259,15 +276,11 @@ class TestLearningAchievementActions(TestCase):
                 'code_name': 'AA1',
                 'text_fr': 'Text',
                 'lua_fr_id': learning_achievement.id,
-                'lua_en_id': learning_achievement_en.id
+                'lua_en_id': learning_achievement_en.id,
+                'postpone': 0
             }
         )
-
-        expected_redirection = reverse(
-            "learning_unit_specifications",
-            kwargs={'learning_unit_year_id': self.learning_unit_year.id}
-        ) + "{}{}".format(HTML_ANCHOR, learning_achievement.id)
-        self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
+        self.assertEqual(response.status_code, 200)
 
     @mock.patch("cms.models.translated_text.update_or_create")
     def test_learning_achievement_save_triggers_cms_save(self, mock_translated_text_update_or_create):
@@ -292,7 +305,8 @@ class TestLearningAchievementActions(TestCase):
                 'code_name': 'AA1',
                 'text_fr': 'Text',
                 'lua_fr_id': learning_achievement.id,
-                'lua_en_id': learning_achievement_en.id
+                'lua_en_id': learning_achievement_en.id,
+                'postpone': 0,
             }
         )
         self.assertTrue(mock_translated_text_update_or_create.called)
@@ -323,3 +337,86 @@ class TestLearningAchievementActions(TestCase):
         self.assertIsInstance(context['form'], LearningAchievementEditForm)
         self.assertEqual(context['learning_unit_year'], self.learning_unit_year)
         self.assertEqual(context['language_code'], FR_CODE_LANGUAGE)
+
+
+class TestLearningAchievementPostponement(TestCase):
+
+    @classmethod
+    def setUpTestData(self):
+        self.language_fr = LanguageFactory(code="FR")
+        self.language_en = LanguageFactory(code="EN")
+        self.user = UserFactory()
+        flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
+        flag.users.add(self.user)
+        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
+        self.person = PersonFactory(user=self.user)
+        self.person_entity = PersonEntityFactory(person=self.person)
+        self.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]
+        self.learning_unit = LearningUnitFactory(start_year=get_current_year(), end_year=get_current_year()+5)
+        self.learning_unit_years = [LearningUnitYearFactory(
+            academic_year=academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year__requirement_entity=self.person_entity.entity,
+            learning_unit=self.learning_unit,
+            acronym="TEST0000"
+        ) for academic_year in self.academic_years]
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_learning_achievement_create_with_postponement(self):
+        create_response = self._create_achievements(code_name=1)
+        self.assertEqual(create_response.status_code, 200)
+        for achievement in LearningAchievement.objects.filter(language__code=FR_CODE_LANGUAGE):
+            self.assertEqual(achievement.text, 'text')
+
+    def test_learning_achievement_deletion_with_postponement(self):
+        self._create_achievements(code_name=1)
+        operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
+        self.client.post(operation_url, data={
+            'achievement_id': self.achievement_id,
+            'action': DELETE
+        })
+        self.assertFalse(LearningAchievement.objects.all().exists())
+
+    def test_learning_achievement_move_up_with_postponement(self):
+        self._move_achievement(achievement_code_name=2, operation=UP)
+        for achievement in LearningAchievement.objects.filter(code_name=1):
+            self.assertEqual(achievement.order, 1)
+        for achievement in LearningAchievement.objects.filter(code_name=2):
+            self.assertEqual(achievement.order, 0)
+
+    def test_learning_achievement_move_down_with_postponement(self):
+        self._move_achievement(achievement_code_name=1, operation=DOWN)
+        for achievement in LearningAchievement.objects.filter(code_name=1):
+            self.assertEqual(achievement.order, 1)
+        for achievement in LearningAchievement.objects.filter(code_name=2):
+            self.assertEqual(achievement.order, 0)
+
+    def _create_achievements(self, code_name):
+        create_first_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
+        create_first_response = self.client.post(create_first_url)
+        lua_form = create_first_response.context['form']
+        lua_fr_id = lua_form.fields['lua_fr_id'].initial
+        lua_en_id = lua_form.fields['lua_en_id'].initial
+        self.achievement_id = lua_fr_id
+        create_url = reverse('achievement_create', args=[self.learning_unit_years[0].id, lua_fr_id])
+        create_response = self.client.post(create_url, data={
+            'language_code': 'fr-be',
+            'code_name': code_name,
+            'text_fr': 'text',
+            'lua_fr_id': lua_fr_id,
+            'lua_en_id': lua_en_id,
+            'postpone': '1'
+        })
+        return create_response
+
+    def _move_achievement(self, achievement_code_name, operation):
+        for code_name in [1, 2]:
+            self._create_achievements(code_name=code_name)
+        operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
+        self.client.post(operation_url, data={
+            'achievement_id': LearningAchievement.objects.filter(code_name=achievement_code_name).first().id,
+            'action': operation
+        })

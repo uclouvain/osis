@@ -51,7 +51,8 @@ class TestLearningAchievementForm(TestCase):
         data = {
             'code_name': 'TEST',
             'lua_fr_id': 1,
-            'lua_en_id': 2
+            'lua_en_id': 2,
+            'postpone': 0,
         }
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
