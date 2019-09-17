@@ -26,23 +26,24 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import Permission
-from django.utils.translation import ugettext_lazy as _
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ngettext_lazy
+from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 
@@ -51,6 +52,9 @@ class TestDeleteGroupEducationView(TestCase):
 
     def setUp(self):
         self.current_ac = create_current_academic_year()
+        self.academic_calendar = OpenAcademicCalendarFactory(academic_year=self.current_ac,
+                                                             data_year=self.current_ac,
+                                                             reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
 
         self.education_group1 = EducationGroupFactory()
         self.education_group2 = EducationGroupFactory()

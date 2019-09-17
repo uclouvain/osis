@@ -204,6 +204,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
                and self.is_general_info_and_condition_admission_in_display_range()
 
     def is_general_info_and_condition_admission_in_display_range(self):
+        # return get_academic_calendar_by_date_and_reference_and_data_year(
+        #     self.object.academic_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
                self.starting_academic_year.year + 2
 

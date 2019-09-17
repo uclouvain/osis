@@ -35,8 +35,9 @@ from base.business.education_groups.perms import is_education_group_edit_period_
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
     _is_eligible_to_add_education_group_with_category
 from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, Categories
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
@@ -150,8 +151,13 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory()
         cls.current_academic_year = create_current_academic_year()
+        OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=cls.current_academic_year,
+                                    data_year=cls.current_academic_year)
+        OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION,
+                                    academic_year__year=cls.current_academic_year.year + 1,
+                                    data_year=AcademicYearFactory(year=cls.current_academic_year.year + 1))
         for year in range(cls.current_academic_year.year - 10, cls.current_academic_year.year + 10):
-            AcademicYearFactory(year=year)
+            aca_year = AcademicYearFactory(year=year)
 
     def test_person_property(self):
         person = PersonWithPermissionsFactory()

@@ -28,8 +28,9 @@ from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
+from base.business.event_perms import EventPermEducationGroupEdition
 from base.business.group_element_years import management, postponement
-from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_calendar import AcademicCalendar, get_academic_calendar_by_date_and_reference_and_data_year
 from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
@@ -145,7 +146,11 @@ def is_education_group_edit_period_opened(education_group, raise_exception=False
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
+            # (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
+            EventPermEducationGroupEdition.is_open(person=person,
+                                                   education_group=education_group,
+                                                   raise_exception=raise_exception)
+            )
 
 
 def _is_eligible_certificate_aims(person, education_group, raise_exception):
@@ -272,7 +277,8 @@ class CommonEducationGroupStrategyPerms(object):
         return True
 
     def _is_current_academic_year_in_range_of_editable_education_group_year(self):
-        return self.education_group_year.academic_year.year < starting_academic_year().year + 2
+        return get_academic_calendar_by_date_and_reference_and_data_year(
+            self.education_group_year.academic_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
@@ -334,9 +340,11 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if self.education_group_year.academic_year.year < starting_academic_year().year:
+        if get_academic_calendar_by_date_and_reference_and_data_year(self.education_group_year.academic_year,
+                                                                     academic_calendar_type.EDUCATION_GROUP_EDITION):
+        # if self.education_group_year.academic_year.year < starting_academic_year().year:
             raise PermissionDenied(_("The faculty manager cannot modify admission which are lower than N"))
-        if not is_education_group_edit_period_opened(self.education_group_year):
+        if not EventPermEducationGroupEdition.is_open(person=self.person, education_group=self.education_group_year):
             raise PermissionDenied(_("The faculty manager cannot modify outside of program edition period"))
         return True
 

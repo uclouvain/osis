@@ -338,6 +338,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(weeks=+1),
             academic_year=academic_year,
+            data_year=academic_year,
         )
 
         self.client.force_login(user=self.person.user)
