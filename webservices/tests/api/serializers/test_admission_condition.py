@@ -27,21 +27,24 @@ from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonBachelorFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, \
+    EducationGroupYearCommonBachelorFactory, EducationGroupYearCommonSpecializedMasterFactory, \
+    EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonMasterFactory
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
-    BachelorAdmissionConditionsSerializer
+    BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
+    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
 
 
 class AdmissionConditionsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.ac = AdmissionConditionFactory()
-        cls.serializer = AdmissionConditionsSerializer(cls.ac, context={'lang': 'en'})
+        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.CERTIFICATE.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        cls.serializer = AdmissionConditionsSerializer(cls.ac, lang='en')
 
     def test_contains_expected_fields(self):
         expected_fields = [
             'free_text',
-            'alert_message',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -51,11 +54,9 @@ class BachelorAdmissionConditionsSerializerTestCase(TestCase):
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.BACHELOR.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
-        cls.common_ac = AdmissionConditionFactory(education_group_year=EducationGroupYearCommonBachelorFactory())
-        cls.serializer = BachelorAdmissionConditionsSerializer(cls.ac, context={
-            'lang': 'en',
-            'common': cls.common_ac
-        })
+        common_egy = EducationGroupYearCommonBachelorFactory(academic_year=egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
+        cls.serializer = BachelorAdmissionConditionsSerializer(cls.ac, lang='en')
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -66,3 +67,76 @@ class BachelorAdmissionConditionsSerializerTestCase(TestCase):
             'ca_bacs_cond_speciales'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class SpecializedMasterAdmissionConditionsSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.MASTER_MC.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        common_egy = EducationGroupYearCommonSpecializedMasterFactory(academic_year=egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
+        cls.serializer = SpecializedMasterAdmissionConditionsSerializer(cls.ac, lang='en')
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'free_text',
+            'alert_message',
+            'ca_cond_generales',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class AggregationAdmissionConditionsSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.AGGREGATION.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        common_egy = EducationGroupYearCommonAgregationFactory(academic_year=egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
+        cls.serializer = AggregationAdmissionConditionsSerializer(cls.ac, lang='en')
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'free_text',
+            'alert_message',
+            'ca_cond_generales',
+            'ca_maitrise_fr',
+            'ca_allegement',
+            'ca_ouv_adultes'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class MasterAdmissionConditionsSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
+        cls.serializer = MasterAdmissionConditionsSerializer(cls.ac, lang='en', context={
+            'lang': 'en',
+            'common': common_egy.admissioncondition
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'free_text',
+            'alert_message',
+            'sections',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_sections_is_a_dict(self):
+        self.assertEqual(type(self.serializer.data['sections']), dict)
+        expected_fields = [
+            'admission_enrollment_procedures',
+            'non_university_bachelors',
+            'holders_non_university_second_degree',
+            'adults_taking_up_university_training',
+            'personalized_access',
+            'university_bachelors',
+            'holders_second_university_degree'
+        ]
+        self.assertListEqual(list(self.serializer.data['sections'].keys()), expected_fields)

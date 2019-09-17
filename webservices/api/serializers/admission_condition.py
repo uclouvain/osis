@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils import translation
 from rest_framework import serializers
 
-from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.admission_condition import AdmissionCondition
+from webservices.api.serializers.admission_condition_line import AdmissionConditionTextsSerializer, \
+    AdmissionConditionLineSerializer
 from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializer
 
 
@@ -147,37 +148,6 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         }
         sections.update(sections_line)
         return sections
-
-
-class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
-    text = serializers.CharField(read_only=True)
-    text_common = serializers.CharField(read_only=True)
-
-    class Meta:
-        model = AdmissionCondition
-
-        fields = (
-            'text',
-            'text_common',
-        )
-
-
-class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
-    access = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        model = AdmissionConditionLine
-
-        fields = (
-            'access',
-            'conditions',
-            'diploma',
-            'remarks'
-        )
-
-    def get_access(self, obj):
-        with translation.override(self.context.get('lang')):
-            return obj.get_access_display()
 
 
 def _get_appropriate_text(field, language, ac):

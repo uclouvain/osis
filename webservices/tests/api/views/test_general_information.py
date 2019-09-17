@@ -84,7 +84,7 @@ class GeneralInformationTestCase(APITestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
-        cls.url = reverse('education_group_api_v1:generalinformations_read', kwargs={
+        cls.url = reverse('generalinformations_read', kwargs={
             'acronym': cls.egy.acronym,
             'year': cls.egy.academic_year.year,
             'language': cls.language
@@ -107,7 +107,7 @@ class GeneralInformationTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_education_group_year_not_found(self):
-        invalid_url = reverse('education_group_api_v1:generalinformations_read', kwargs={
+        invalid_url = reverse('generalinformations_read', kwargs={
             'acronym': 'dummy',
             'year': 2019,
             'language': 'en'

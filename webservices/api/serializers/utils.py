@@ -69,8 +69,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
         if 'section' in self.context and is_admission_condition:
             field_source = self.context.get('section')
 
-        source = ac_source + prefix + field_source
-        return source
+        return ac_source + prefix + field_source
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

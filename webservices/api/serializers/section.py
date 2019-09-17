@@ -83,10 +83,8 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
     def get_content(self, obj):
         egy = self.context.get('egy')
         language = self.context.get('lang')
-        admission_condition_common = egy.admissioncondition.common_admission_condition
         context = {
             'lang': language,
-            'common': admission_condition_common,
         }
         if egy.is_bachelor:
             return BachelorAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
