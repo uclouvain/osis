@@ -56,6 +56,7 @@ class Entity(SerializableModel):
         return "{0}".format(self.most_recent_acronym)
 
     @cached_property
+    # @property
     def most_recent_acronym(self):
         try:
             most_recent_entity_version = sorted(self.entityversion_set.all(), key=lambda x: x.start_date)
