@@ -225,8 +225,11 @@ class ManageMyCoursesMixin(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-                                                        start_date=datetime.date(timezone.now().year - 1, 9, 30),
-                                                        end_date=datetime.date(timezone.now().year + 1, 9, 30))
+                                                        start_date=datetime.date(
+                                                            cls.current_academic_year.year - 1, 9, 30),
+                                                        end_date=datetime.date(
+                                                            cls.current_academic_year.year + 1, 9, 30)
+                                                        )
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
         cls.learning_unit_year = LearningUnitYearFactory(

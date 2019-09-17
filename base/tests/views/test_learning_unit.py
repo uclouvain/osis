@@ -341,7 +341,8 @@ class LearningUnitViewTestCase(TestCase):
         )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
-            learning_container_year=cls.learning_container_yr
+            learning_container_year=cls.learning_container_yr,
+            learning_unit=cls.learning_unit
         )
         cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
                                                                  hourly_volume_total_annual=10,
