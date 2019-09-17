@@ -1,7 +1,6 @@
-{% load staticfiles %}
-{% load i18n %}
-{% load learning_unit %}
+{% load staticfiles i18n %}
 {% load bootstrap3 %}
+{% load learning_unit pagination %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -93,11 +92,17 @@
                         <th id="th_9_has_proposal"><span data-toggle="tooltip" data-placement="right" title="{% trans 'Proposal' %}">{% trans 'P.' %}</span></th>
                     </tr>
                     </thead>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                            </td>
+                            <td colspan="2">
+                                {% pagination_size_select %}
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
-
-                <div class="text-center">
-                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
-                </div>
 
             {% endif %}
         </div>

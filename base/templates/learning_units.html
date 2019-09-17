@@ -181,7 +181,10 @@
                     "dataSrc": "object_list",
                     "data": function (d){
                         let pageNumber = {{ page_obj.number }};
-                        return getDataAjaxTable(domTable, d, pageNumber);
+                        let paginator_size = {{ items_per_page }};
+                        let querystring = getDataAjaxTable(domTable, d, pageNumber);
+                        querystring["paginator_size"] = paginator_size;
+                        return querystring;
                     },
                     "traditional": true
                 },

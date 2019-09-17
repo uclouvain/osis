@@ -116,7 +116,8 @@ def learning_units_search(request, search_type):
     form_filter = LearningUnitFilter(request.GET or None)
     if form_filter.is_valid():
         found_learning_units = form_filter.qs
-    object_list_paginated = paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES)
+    items_per_page = request.GET.get("paginator_size", ITEMS_PER_PAGES)
+    object_list_paginated = paginate_queryset(found_learning_units, request.GET, items_per_page=items_per_page)
     if request.is_ajax():
         serializer = LearningUnitSerializer(object_list_paginated, context={'request': request}, many=True)
         return JsonResponse({'object_list': serializer.data})
@@ -137,6 +138,7 @@ def learning_units_search(request, search_type):
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
         'page_obj': object_list_paginated,
+        'items_per_page': items_per_page,
     }
 
     return render(request, "learning_units.html", context)
