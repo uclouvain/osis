@@ -25,7 +25,6 @@
 ##############################################################################
 import string
 
-import factory
 import factory.fuzzy
 from django.utils import timezone
 from factory.django import DjangoModelFactory
