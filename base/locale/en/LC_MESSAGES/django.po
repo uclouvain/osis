@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-11 14:48+0200\n"
+"POT-Creation-Date: 2019-09-13 11:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -217,8 +217,8 @@ msgstr ""
 msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr ""
 
-#: forms/prerequisite.py:112
-#: tests/views/education_groups/learning_unit/test_update.py:256
+#: forms/prerequisite.py:119
+#: tests/views/education_groups/learning_unit/test_update.py:270
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
@@ -2940,9 +2940,9 @@ msgstr ""
 msgid "No enrollment for this learning unit"
 msgstr ""
 
-#: forms/prerequisite.py:120
-#: tests/views/education_groups/learning_unit/test_update.py:234
-#: tests/views/education_groups/learning_unit/test_update.py:238
+#: forms/prerequisite.py:114
+#: tests/views/education_groups/learning_unit/test_update.py:248
+#: tests/views/education_groups/learning_unit/test_update.py:252
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
@@ -3386,7 +3386,7 @@ msgstr[1] ""
 msgid "Prerequisites are invalid"
 msgstr ""
 
-#: views/education_groups/learning_unit/update.py:124
+#: views/education_groups/learning_unit/update.py:135
 msgid "Prerequisites saved."
 msgstr ""
 
@@ -4351,6 +4351,11 @@ msgstr ""
 #, python-format
 msgid ""
 "The learning unit %(acronym)s is included in the following education groups"
+msgstr ""
+
+#: forms/prerequisite.py:124
+#, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
 
 #: templates/learning_unit/formations.html:101
@@ -5395,7 +5400,7 @@ msgstr ""
 msgid "You have the choice between"
 msgstr ""
 
-#: views/education_groups/learning_unit/update.py:114
+#: views/education_groups/learning_unit/update.py:125
 #, python-format
 msgid ""
 "You must be in the context of a training to modify the prerequisites to a "

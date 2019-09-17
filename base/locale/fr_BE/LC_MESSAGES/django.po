@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-11 14:48+0200\n"
+"POT-Creation-Date: 2019-09-13 11:40+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -252,8 +252,8 @@ msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant cet acronym
 msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr "<b>Prolonger</b> l’unité d’enseignement du même acronyme"
 
-#: forms/prerequisite.py:112
-#: tests/views/education_groups/learning_unit/test_update.py:256
+#: forms/prerequisite.py:119
+#: tests/views/education_groups/learning_unit/test_update.py:270
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
@@ -646,9 +646,6 @@ msgid "Alert Message"
 msgstr "Message d'alerte"
 
 #: forms/learning_unit/search_form.py:461
-#, fuzzy
-#| msgctxt "plural"
-#| msgid "All"
 msgid "All"
 msgstr "Tous"
 
@@ -3028,9 +3025,9 @@ msgstr "Aucune différence"
 msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
 
-#: forms/prerequisite.py:120
-#: tests/views/education_groups/learning_unit/test_update.py:234
-#: tests/views/education_groups/learning_unit/test_update.py:238
+#: forms/prerequisite.py:114
+#: tests/views/education_groups/learning_unit/test_update.py:248
+#: tests/views/education_groups/learning_unit/test_update.py:252
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
@@ -3494,7 +3491,7 @@ msgstr[1] "Prérequis"
 msgid "Prerequisites are invalid"
 msgstr "<p>Prérequis invalides</p>"
 
-#: views/education_groups/learning_unit/update.py:124
+#: views/education_groups/learning_unit/update.py:135
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
@@ -4480,6 +4477,10 @@ msgid ""
 "The learning unit %(acronym)s is included in the following education groups"
 msgstr ""
 "L'unité d'enseignement %(acronym)s est incluse dans les groupements suivants"
+
+#: forms/prerequisite.py:124
+msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
 #: templates/learning_unit/formations.html:101
 #, python-format
@@ -5611,7 +5612,7 @@ msgstr "Vous n'avez pas le droit de consolider"
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"
 
-#: views/education_groups/learning_unit/update.py:114
+#: views/education_groups/learning_unit/update.py:125
 #, python-format
 msgid ""
 "You must be in the context of a training to modify the prerequisites to a "
