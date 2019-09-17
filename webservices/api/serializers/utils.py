@@ -48,28 +48,14 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
                 field for field in list(self.fields.keys()) if isinstance(self.fields[field], serializers.CharField)
             ]
             for field_name in keys_list:
-                source = self._get_source(field_name, is_admission_condition)
-                if language == settings.LANGUAGE_CODE_FR and is_admission_condition:
+                source = self._get_source(field_name, is_admission_condition, language)
+                # if not instance of AdmissionCondition and language is french,
+                # no need to add parameter source (source = field name)
+                if not language == settings.LANGUAGE_CODE_FR or is_admission_condition:
                     self.fields[field_name] = serializers.CharField(
                         source=source,
                         read_only=True
                     )
-                elif language == settings.LANGUAGE_CODE_EN:
-                    self.fields[field_name] = serializers.CharField(
-                        source=source + '_' + language,
-                        read_only=True
-                    )
-
-    def _get_source(self, field_name, is_admission_condition):
-        specific_fields = ['free_text', 'text']
-        prefix = 'text_' if is_admission_condition else ''
-        ac_source = 'common_admission_condition.' \
-            if field_name not in specific_fields and is_admission_condition else ''
-        field_source = 'free' if field_name == 'free_text' else field_name
-        if 'section' in self.context and is_admission_condition:
-            field_source = self.context.get('section')
-
-        return ac_source + prefix + field_source
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -78,3 +64,17 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
                 data[field] = None
         return data
 
+    def _get_source(self, field_name, is_ac, language):
+        specific_fields = ['free_text', 'text']
+
+        prefix = 'text_' if is_ac else ''
+
+        object_source = 'common_admission_condition.' if field_name not in specific_fields and is_ac else ''
+
+        field_source = 'free' if field_name == 'free_text' else field_name
+        if 'section' in self.context and is_ac:
+            field_source = self.context.get('section')
+
+        lang = '' if language == settings.LANGUAGE_CODE_FR else '_' + language
+
+        return object_source + prefix + field_source + lang
