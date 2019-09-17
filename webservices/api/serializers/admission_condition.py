@@ -150,8 +150,8 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
 
 
 class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
-    text = serializers.SerializerMethodField(read_only=True)
-    text_common = serializers.SerializerMethodField(read_only=True)
+    text = serializers.CharField(read_only=True)
+    text_common = serializers.CharField(read_only=True)
 
     class Meta:
         model = AdmissionCondition
@@ -160,12 +160,6 @@ class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
             'text',
             'text_common',
         )
-
-    def get_text(self, obj):
-        return _get_appropriate_text(self.context.get('section'), self.context.get('lang'), obj)
-
-    def get_text_common(self, obj):
-        return _get_appropriate_text(self.context.get('section'), self.context.get('lang'), self.context.get('common'))
 
 
 class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
@@ -189,12 +183,6 @@ class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
 def _get_appropriate_text(field, language, ac):
     lang = '' if language == 'fr-be' else '_' + language
     text = getattr(ac, 'text_' + field + lang)
-    return text if text else None
-
-
-def _get_appropriate_field(field, language, acl):
-    lang = '' if language == 'fr-be' else '_' + language
-    text = getattr(acl, field + lang)
     return text if text else None
 
 

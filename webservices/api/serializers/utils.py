@@ -54,7 +54,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
                         source=source,
                         read_only=True
                     )
-                else:
+                elif language == settings.LANGUAGE_CODE_EN:
                     self.fields[field_name] = serializers.CharField(
                         source=source + '_' + language,
                         read_only=True
@@ -66,8 +66,9 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
         ac_source = 'common_admission_condition.' \
             if field_name not in specific_fields and is_admission_condition else ''
         field_source = 'free' if field_name == 'free_text' else field_name
-        if 'section' in self.context:
+        if 'section' in self.context and is_admission_condition:
             field_source = self.context.get('section')
+
         source = ac_source + prefix + field_source
         return source
 
