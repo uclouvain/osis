@@ -254,7 +254,14 @@ class LearningUnitFilter(FilterSet):
         fields=(
             ('academic_year__year', 'academic_year'),
             ('acronym', 'acronym'),
-            ('title', 'title'),
+            ('full_title', 'title'),
+            ('learning_container_year__container_type', 'type'),
+            ('subtype', 'subtype'),
+            ('entity_requirement', 'requirement_entity'),
+            ('entity_allocation', 'allocation_entity'),
+            ('credits', 'credits'),
+            ('status', 'status'),
+            ('has_proposal', 'has_proposal'),
         ),
         widget=forms.HiddenInput
     )
