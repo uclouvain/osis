@@ -83,6 +83,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -331,6 +332,8 @@ class LearningUnitViewTestCase(TestCase):
 
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
+
+        cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
 
         cls.learning_container_yr = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
