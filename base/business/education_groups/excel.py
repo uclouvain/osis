@@ -68,11 +68,14 @@ PrerequisiteItemLine = namedtuple(
     'PrerequisiteItemLine',
     ['text', 'operator', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
 )
-PrerequisitedItemLine = namedtuple(
+PrerequisiteOfItemLine = namedtuple(
     'PrerequisitedItemLine',
-    ['text', 'luy_acronym', 'luy_title', 'credits']
+    ['text', 'luy_acronym', 'luy_title', 'credits', 'block', 'mandatory']
 
 )
+HeaderLinePrerequisiteOf = namedtuple('HeaderLinePrerequisiteOf', ['egy_acronym', 'egy_title', 'title_header',
+                                                                   'credits_header', 'block_header',
+                                                                   'mandatory_header'])
 
 
 class EducationGroupYearLearningUnitsPrerequisitesToExcel:
@@ -134,7 +137,7 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
 
 
 def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
-    content = _first_line_content(egy)
+    content = _first_line_content(HeaderLine(egy_acronym=egy.acronym, egy_title=egy.title))
 
     for prerequisite in prerequisite_qs:
         luy = prerequisite.learning_unit_year
@@ -152,10 +155,10 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
     return content
 
 
-def _first_line_content(egy):
+def _first_line_content(header_line):
     content = []
     content.append(
-        HeaderLine(egy_acronym=egy.acronym, egy_title=egy.title)
+        header_line
     )
     content.append(
         OfficialTextLine(text=_("Official"))
@@ -243,11 +246,19 @@ def _get_style_to_apply(excel_lines: list):
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("E{index}".format(index=index))
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("F{index}".format(index=index))
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("G{index}".format(index=index))
-        elif isinstance(row, PrerequisitedItemLine):
+        elif isinstance(row, PrerequisiteOfItemLine):
             if (last_luy_line_index - index) % 2 == 1:
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("C{index}".format(index=index))
                 style_to_apply_dict[STYLE_LIGHTER_GRAY].append("D{index}".format(index=index))
-
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("E{index}".format(index=index))
+                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("F{index}".format(index=index))
+        if isinstance(row, HeaderLinePrerequisiteOf):
+            style_to_apply_dict[STYLE_NO_GRAY].append("A{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("C{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("D{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("E{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("F{index}".format(index=index))
     return style_to_apply_dict
 
 
@@ -273,7 +284,7 @@ def _add_hyperlink(excel_lines, workbook: Workbook, year):
             cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym)
             cell.font = FONT_HYPERLINK
 
-        if isinstance(row, PrerequisiteItemLine) or isinstance(row, PrerequisitedItemLine):
+        if isinstance(row, PrerequisiteItemLine) or isinstance(row, PrerequisiteOfItemLine):
             column_nb = 3 if isinstance(row, PrerequisiteItemLine) else 2
             cell = worksheet.cell(row=index, column=column_nb)
             cell.hyperlink = LEARNING_UNIT_PORTAL_URL.format(year=year, acronym=row.luy_acronym.strip("()"))
@@ -338,7 +349,7 @@ def generate_ue_is_prerequisite_for_workbook(egy: EducationGroupYear, prerequisi
         get_all_group_elements_in_tree(egy, prerequisites_qs) or {},
         learning_unit_years_parent
     )
-    return _get_workbook(egy, excel_lines, workbook, worksheet_title, 4)
+    return _get_workbook(egy, excel_lines, workbook, worksheet_title, 6)
 
 
 def _get_workbook(egy, excel_lines, workbook, worksheet_title, end_column):
@@ -357,7 +368,13 @@ def _get_workbook(egy, excel_lines, workbook, worksheet_title, end_column):
 
 
 def _build_excel_lines_prerequisited(egy: EducationGroupYear, prerequisite_qs: QuerySet, learning_unit_years_parent):
-    content = _first_line_content(egy)
+    content = _first_line_content(HeaderLinePrerequisiteOf(egy_acronym=egy.acronym,
+                                                           egy_title=egy.title,
+                                                           title_header=_('Title'),
+                                                           credits_header=_('Credits'),
+                                                           block_header=_('Block'),
+                                                           mandatory_header=_('Mandatory'))
+                                  )
 
     for gey in prerequisite_qs:
         if gey.is_prerequisite:
@@ -369,6 +386,7 @@ def _build_excel_lines_prerequisited(egy: EducationGroupYear, prerequisite_qs: Q
             results = PrerequisiteItem.objects.filter(learning_unit=luy.learning_unit)
 
             first = True
+
             for result in results:
                 if result.prerequisite.learning_unit_year.academic_year == luy.academic_year \
                         and result.prerequisite.education_group_year == egy:
@@ -387,19 +405,32 @@ def _build_is_prerequisite_for_line(luy_item, first, learning_unit_years_parent)
     text = (_("is a prerequisite of") + " :") if first else None
 
     luy_acronym = luy_item.acronym
-    credits = _get_credits(luy_item, learning_unit_years_parent)
-    return PrerequisitedItemLine(
+    gey = learning_unit_years_parent.get(luy_item.id)
+
+    credits = _get_credits_prerequisite_of(luy_item, gey)
+    block = _get_blocks_prerequisite_of(gey)
+    return PrerequisiteOfItemLine(
         text=text,
         luy_acronym=luy_acronym,
         luy_title=luy_item.complete_title_i18n,
-        credits=credits
+        credits=credits,
+        block=block,
+        mandatory=_("Yes") if gey.is_mandatory else _("No")
     )
 
 
-def _get_credits(luy_item, learning_unit_years_parent):
-    res = learning_unit_years_parent.get(luy_item.id)
-    if res:
-        relative_credits = res.relative_credits
+def _get_credits_prerequisite_of(luy_item, gey):
+    if gey:
+        relative_credits = gey.relative_credits
     else:
         relative_credits = ''
     return "{} / {:f}".format(relative_credits, luy_item.credits.normalize())
+
+
+def _get_blocks_prerequisite_of(gey):
+    if gey:
+        l = [i for i in str(gey.block)]
+        return " ; ".join(
+            l
+        )
+    return ''
