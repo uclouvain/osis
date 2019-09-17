@@ -27,10 +27,10 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
-    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel
+    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
+from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
@@ -121,6 +121,12 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
         ]
         content = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A5:G8")]
         self.assertListEqual(expected_content, content)
+
+    def test_get_blocks_prerequisite_of(self):
+        gey = GroupElementYearFactory(block=123)
+        self.assertEqual(_get_blocks_prerequisite_of(gey), '1 ; 2 ; 3')
+        gey = GroupElementYearFactory(block=1)
+        self.assertEqual(_get_blocks_prerequisite_of(gey), '1')
 
 
 def row_to_value(sheet_row):
