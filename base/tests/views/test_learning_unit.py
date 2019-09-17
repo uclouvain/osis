@@ -65,10 +65,12 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -83,6 +85,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -99,6 +102,7 @@ from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
@@ -1129,6 +1133,43 @@ class LearningUnitViewTestCase(TestCase):
             data={'postpone': 0}
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_learning_unit_specifications_save_with_postponement(self):
+        year_range = 5
+        learning_unit_year = LearningUnitYearFactory(
+            academic_year=create_current_academic_year(),
+            learning_unit=LearningUnitFactory(start_year=get_current_year(), end_year=get_current_year()+year_range)
+        )
+        future_learning_unit_years = [LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
+            learning_unit=learning_unit_year.learning_unit,
+            acronym=learning_unit_year.acronym
+        ) for i in range(1, year_range)]
+        label = TextLabelFactory(label='label')
+
+        for language in ['fr-be', 'en']:
+            vars()['trans_{}'.format(language)] = [TranslatedTextFactory(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=luy.id,
+                language=language,
+                text_label=label
+            ) for luy in [learning_unit_year, *future_learning_unit_years]]
+
+        response = self.client.post(
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            data={
+                'trans_text_fr': 'textFR',
+                'trans_text_en': 'textEN',
+                'postpone': 1,
+                'cms_fr_id': vars()['trans_fr-be'][0].id,
+                'cms_en_id': vars()['trans_en'][0].id
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        for translated_text in TranslatedText.objects.filter(language='fr-be'):
+            self.assertEqual(translated_text.text, 'textFR')
+        for translated_text in TranslatedText.objects.filter(language='en'):
+            self.assertEqual(translated_text.text, 'textEN')
 
 
 class TestCreateXls(TestCase):

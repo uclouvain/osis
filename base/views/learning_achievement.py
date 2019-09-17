@@ -52,9 +52,8 @@ def operation(request, learning_achievement_id, operation_str):
 
     last_academic_year = execute_operation(achievement_fr, operation_str)
     last_academic_year = execute_operation(achievement_en, operation_str)
-
     default_success_msg = _("Operation on learning achievement has been successfully completed")
-    if last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
+    if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
         display_success_messages(request, _build_postponement_success_message(default_success_msg))
     else:
         display_success_messages(request, _build_postponement_success_message(default_success_msg, last_academic_year))
@@ -68,7 +67,7 @@ def execute_operation(an_achievement, operation_str):
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
-        if not next_luy.is_past:
+        if not next_luy.is_past():
             while next_luy.get_learning_unit_next_year():
                 next_luy = next_luy.get_learning_unit_next_year()
                 if LearningAchievement.objects.filter(
@@ -83,7 +82,7 @@ def execute_operation(an_achievement, operation_str):
                     )
                     func = getattr(an_achievement, operation_str)
                     func()
-    return an_achievement.learning_unit_year.academic_year
+        return an_achievement.learning_unit_year.academic_year
 
 
 @login_required

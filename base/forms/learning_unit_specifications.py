@@ -96,7 +96,6 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             trans_text.save()
 
             luy = LearningUnitYear.objects.get(id=trans_text.reference)
-
             last_postponed_academic_year = None
             if not luy.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
