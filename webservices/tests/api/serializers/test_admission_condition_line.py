@@ -25,7 +25,9 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory, AdmissionConditionLineFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
 from webservices.api.serializers.admission_condition_line import AdmissionConditionTextsSerializer, \
     AdmissionConditionLineSerializer
 
@@ -33,7 +35,10 @@ from webservices.api.serializers.admission_condition_line import AdmissionCondit
 class AdmissionConditionTextsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.ac = AdmissionConditionFactory()
+        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
         cls.serializer = AdmissionConditionTextsSerializer(cls.ac, lang='en', context={
             'lang': 'en',
             'section': 'personalized_access'
@@ -44,6 +49,8 @@ class AdmissionConditionTextsSerializerTestCase(TestCase):
             'text',
             'text_common',
         ]
+        print(self.serializer.data)
+        print(self.serializer.fields)
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 

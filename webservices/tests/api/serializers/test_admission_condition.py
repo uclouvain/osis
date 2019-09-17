@@ -29,7 +29,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, EducationGroupYearCommonSpecializedMasterFactory, \
-    EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonMasterFactory
+    EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonMasterFactory, TrainingFactory
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
     AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
@@ -111,7 +111,7 @@ class AggregationAdmissionConditionsSerializerTestCase(TestCase):
 class MasterAdmissionConditionsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
