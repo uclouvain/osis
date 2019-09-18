@@ -36,10 +36,8 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        # Don't pass the 'lang' arg up to the superclass
         language = kwargs.pop('lang', None)
 
-        # Instantiate the superclass normally
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
 
         is_admission_condition = isinstance(self.instance, AdmissionCondition)
@@ -71,10 +69,14 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
 
         object_source = 'common_admission_condition.' if field_name not in specific_fields and is_ac else ''
 
-        field_source = 'free' if field_name == 'free_text' else field_name
-        if 'section' in self.context and is_ac:
-            field_source = self.context.get('section')
+        field_source = self._manage_special_field_cases(field_name, is_ac)
 
         lang = '' if language == settings.LANGUAGE_CODE_FR else '_' + language
 
         return object_source + prefix + field_source + lang
+
+    def _manage_special_field_cases(self, field_name, is_ac):
+        field_source = 'free' if field_name == 'free_text' else field_name
+        if 'section' in self.context and is_ac:
+            field_source = self.context.get('section')
+        return field_source

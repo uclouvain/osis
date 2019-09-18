@@ -33,10 +33,6 @@ from webservices.api.serializers.admission_condition import AdmissionConditionsS
 from webservices.api.serializers.contacts import ContactsSerializer
 
 
-class AcronymError(Exception):
-    pass
-
-
 class SectionSerializer(serializers.Serializer):
     id = serializers.CharField(source='label', read_only=True)
     label = serializers.CharField(source='translated_label', read_only=True)
@@ -93,7 +89,7 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
         elif egy.is_aggregation:
             return AggregationAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
-        elif any([egy.is_master120, egy.is_master60, egy.is_master180]):
+        elif egy.is_a_master:
             return MasterAdmissionConditionsSerializer(egy.admissioncondition, lang=language, context=context).data
         else:
             return AdmissionConditionsSerializer(egy.admissioncondition, lang=language).data

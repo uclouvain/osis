@@ -29,6 +29,7 @@ from base.models.admission_condition import AdmissionCondition
 from webservices.api.serializers.admission_condition_line import AdmissionConditionTextsSerializer, \
     AdmissionConditionLineSerializer
 from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializer
+from webservices.business import ADMISSION_CONDITION_FIELDS, ADMISSION_CONDITION_LINE_FIELDS
 
 
 class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
@@ -111,30 +112,17 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         )
 
     def get_sections(self, obj):
-        university_types = ['bachelors_dutch', 'foreign_bachelors', 'others_bachelors_french', 'ucl_bachelors']
-        second_degree_types = ['masters', 'graduates']
-        acl_fields = [
-            ('university_bachelors', university_types),
-            ('holders_second_university_degree', second_degree_types)
-        ]
-        ac_fields = [
-            'admission_enrollment_procedures',
-            'non_university_bachelors',
-            'holders_non_university_second_degree',
-            'adults_taking_up_university_training',
-            'personalized_access',
-        ]
         sections = {
             field: AdmissionConditionTextsSerializer(
                 obj,
                 lang=self.context.get('lang'),
-                context=_update_and_get_dict(self.context, 'section', field)
+                context=self._update_and_get_dict('section', field)
             ).data
-            for field in ac_fields
+            for field in ADMISSION_CONDITION_FIELDS
         }
         sections_line = {
             field: {
-                'text': _get_appropriate_text(field, self.context.get('lang'), obj),
+                'text': self._get_appropriate_text(field, obj),
                 'records': {
                     diploma_type: AdmissionConditionLineSerializer(
                         obj.admissionconditionline_set.filter(section=diploma_type),
@@ -144,18 +132,17 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
                     ).data
                     for diploma_type in diploma_types
                 }
-            } for field, diploma_types in acl_fields
+            } for field, diploma_types in ADMISSION_CONDITION_LINE_FIELDS
         }
         sections.update(sections_line)
         return sections
 
+    def _get_appropriate_text(self, field, ac):
+        language = self.context.get('lang')
+        lang = '' if language == 'fr-be' else '_' + language
+        text = getattr(ac, 'text_' + field + lang)
+        return text if text else None
 
-def _get_appropriate_text(field, language, ac):
-    lang = '' if language == 'fr-be' else '_' + language
-    text = getattr(ac, 'text_' + field + lang)
-    return text if text else None
-
-
-def _update_and_get_dict(init_dict, key, value):
-    init_dict.update({key: value})
-    return init_dict
+    def _update_and_get_dict(self, key, value):
+        self.context.update({key: value})
+        return self.context
