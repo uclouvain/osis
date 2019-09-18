@@ -112,7 +112,7 @@ class LearningAchievementEditForm(forms.ModelForm):
             if not luy.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
-                self._update_future_luy(ac_year_postponement_range, self.text.language, luy, self.text)
+                self._update_future_luy(ac_year_postponement_range, luy, self.text)
 
         return self.text, self.last_postponed_academic_year
 
@@ -144,7 +144,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         max_postponement_year = min(end_year, max_postponement_year) if end_year else max_postponement_year
         return max_postponement_year
 
-    def _update_future_luy(self, ac_year_postponement_range, lang, luy, text):
+    def _update_future_luy(self, ac_year_postponement_range, luy, text):
         for ac in ac_year_postponement_range:
             next_luy, created = LearningUnitYear.objects.get_or_create(
                 academic_year=ac,
@@ -153,7 +153,7 @@ class LearningAchievementEditForm(forms.ModelForm):
             )
             LearningAchievement.objects.update_or_create(
                 code_name=self.old_code_name,
-                language=lang,
+                language=text.language,
                 learning_unit_year=next_luy,
                 defaults={'text': text.text, 'code_name': self.cleaned_data.get('code_name')}
             )
