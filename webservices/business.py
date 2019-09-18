@@ -46,6 +46,19 @@ SKILLS_AND_ACHIEVEMENTS_CMS_DATA = (SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_AC
 EVALUATION_KEY = 'evaluation'
 CONTACTS_KEY = 'contacts'
 CONTACT_INTRO_KEY = 'contact_intro'
+UNIVERSITY_TYPES = ['bachelors_dutch', 'foreign_bachelors', 'others_bachelors_french', 'ucl_bachelors']
+SECOND_DEGREE_TYPES = ['masters', 'graduates']
+ADMISSION_CONDITION_LINE_FIELDS = [
+    ('university_bachelors', UNIVERSITY_TYPES),
+    ('holders_second_university_degree', SECOND_DEGREE_TYPES)
+]
+ADMISSION_CONDITION_FIELDS = [
+    'admission_enrollment_procedures',
+    'non_university_bachelors',
+    'holders_non_university_second_degree',
+    'adults_taking_up_university_training',
+    'personalized_access',
+]
 
 
 def get_achievements(education_group_year, language_code):
