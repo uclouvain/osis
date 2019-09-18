@@ -28,7 +28,8 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, When, CharField, Value, Case
+from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -49,7 +50,8 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, 
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
+    SerializableQuerySet
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -113,6 +115,43 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
+class LearningUnitYearQuerySet(SerializableQuerySet):
+    def annotate_full_title(self):
+        return self.annotate(
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
+            ),
+            full_title_en=Case(
+                When(
+                    Q(learning_container_year__common_title_english__isnull=True) |
+                    Q(learning_container_year__common_title_english__exact=''),
+                    then='specific_title_english'
+                ),
+                When(
+                    Q(specific_title_english__isnull=True) | Q(specific_title_english__exact=''),
+                    then='learning_container_year__common_title_english'
+                ),
+                default=Concat('learning_container_year__common_title_english', Value(' - '), 'specific_title_english'),
+                output_field=CharField(),
+            ),
+        )
+
+
+class BaseLearningUnitYearManager(SerializableModelManager):
+    def get_queryset(self):
+        return LearningUnitYearQuerySet(self.model, using=self._db)
+
+
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
@@ -120,15 +159,7 @@ class LearningUnitYearWithContainerManager(models.Manager):
             .filter(learning_container_year__isnull=False)
 
 
-class ExtraManagerLearningUnitYear(models.Model):
-    # This class ensure that the default manager (from serializable model) is not override by this manager
-    objects_with_container = LearningUnitYearWithContainerManager()
-
-    class Meta:
-        abstract = True
-
-
-class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
+class LearningUnitYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator], on_delete=models.PROTECT)
@@ -176,6 +207,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
+
+    objects = BaseLearningUnitYearManager()
+    objects_with_container = LearningUnitYearWithContainerManager()
+
     _warnings = None
 
     class Meta:

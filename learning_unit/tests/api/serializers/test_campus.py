@@ -23,18 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.test import TestCase
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
+from base.tests.factories.campus import CampusFactory
+from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+
+class LearningUnitCampusSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.campus = CampusFactory()
+        cls.serializer = LearningUnitCampusSerializer(cls.campus)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'name',
+            'organization'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

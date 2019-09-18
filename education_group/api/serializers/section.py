@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,18 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
+from education_group.api.serializers.achievement import AchievementsSerializer
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+
+class SectionSerializer(serializers.Serializer):
+    id = serializers.CharField(source='label', read_only=True)
+    label = serializers.CharField(source='translated_label', read_only=True)
+    content = serializers.CharField(source='text', read_only=True, allow_null=True)
+    free_text = serializers.CharField(read_only=True, required=False)
+
+    class Meta:
+        fields = (
+            'id',
+            'label',
+            'content',
+            'free_text'
+        )
+
+
+class AchievementSectionSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    label = serializers.CharField(source='id', read_only=True)
+    content = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        fields = (
+            'id',
+            'label',
+            'content',
+        )
+
+    def get_content(self, obj):
+        egy = self.context.get('egy')
+        return AchievementsSerializer(egy, context=self.context).data
