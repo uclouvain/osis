@@ -121,7 +121,8 @@ def ws_catalog_offer_v02(request, year, language, acronym):
         parent=education_group_year,
         child_branch__education_group_type__name=GroupType.COMMON_CORE.name
     ).values_list(Lower('child_branch__partial_acronym'), flat=True).first()
-    extra_intro_fields.append("intro-" + common_core)
+    if common_core:
+        extra_intro_fields.append("intro-" + common_core)
 
     # Processing
     context = new_context(education_group_year, iso_language, language, acronym)
