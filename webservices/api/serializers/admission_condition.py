@@ -140,7 +140,7 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
     def _get_appropriate_text(self, field, ac):
         language = self.context.get('lang')
         lang = '' if language == 'fr-be' else '_' + language
-        return getattr(ac, 'text_' + field + lang)
+        text = getattr(ac, 'text_' + field + lang)
         return text if text else None
 
     def _update_and_get_dict(self, key, value):

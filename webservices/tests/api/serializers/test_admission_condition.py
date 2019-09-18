@@ -139,4 +139,5 @@ class MasterAdmissionConditionsSerializerTestCase(TestCase):
             'university_bachelors',
             'holders_second_university_degree'
         ]
-        self.assertListEqual(list(self.serializer.data['sections'].keys()), expected_fields)
+
+        self.assertCountEqual(list(self.serializer.data['sections'].keys()), expected_fields)
