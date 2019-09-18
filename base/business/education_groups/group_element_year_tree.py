@@ -278,14 +278,7 @@ class EducationGroupHierarchy:
 
         return [
             element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function)
-            if element.child_branch.education_group_type.name in [
-                TrainingType.MASTER_MA_120.name,
-                TrainingType.MASTER_MA_180_240.name,
-                TrainingType.MASTER_MD_120.name,
-                TrainingType.MASTER_MD_180_240.name,
-                TrainingType.MASTER_MS_120.name,
-                TrainingType.MASTER_MS_180_240.name
-            ]
+            if element.child_branch.education_group_type.name in TrainingType.finality_types()
         ]
 
     def get_learning_unit_year_list(self):
