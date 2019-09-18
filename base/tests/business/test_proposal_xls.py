@@ -58,7 +58,7 @@ class TestProposalXls(TestCase):
 
     def setUp(self):
         academic_year = create_current_academic_year()
-        self.learning_unit = LearningUnitFactory(start_year=1900)
+        self.learning_unit = LearningUnitFactory(start_year__year=1900)
 
         l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=academic_year)
         self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,

@@ -60,10 +60,7 @@ class LearningUnitEndDateForm(forms.Form):
             self.fields['academic_year'].required = True
 
     def _set_initial_value(self, end_year):
-        try:
-            self.fields['academic_year'].initial = AcademicYear.objects.get(year=end_year)
-        except (AcademicYear.DoesNotExist, AcademicYear.MultipleObjectsReturned):
-            self.fields['academic_year'].initial = None
+        self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
         current_academic_year = academic_year.starting_academic_year()
@@ -72,7 +69,7 @@ class LearningUnitEndDateForm(forms.Form):
         if not max_year:
             max_year = compute_max_academic_year_adjournment()
 
-        if self.learning_unit.start_year > min_year:
+        if self.learning_unit.start_year.year > min_year:
             min_year = self.learning_unit.start_year
 
         if self.learning_unit.is_past():

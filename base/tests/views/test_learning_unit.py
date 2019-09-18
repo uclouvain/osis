@@ -83,6 +83,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -332,13 +333,16 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
+        cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
+
         cls.learning_container_yr = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
             requirement_entity=cls.entities[0],
         )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
-            learning_container_year=cls.learning_container_yr
+            learning_container_year=cls.learning_container_yr,
+            learning_unit=cls.learning_unit
         )
         cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
                                                                  hourly_volume_total_annual=10,
@@ -1186,8 +1190,10 @@ def _generate_xls_build_parameter(xls_data, user):
 
 class TestLearningUnitComponents(TestCase):
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(start_year=2010, end_year=2020).academic_years
-        self.generated_container = GenerateContainer(start_year=2010, end_year=2020)
+        start_year = AcademicYearFactory(year=2010)
+        end_year = AcademicYearFactory(year=2020)
+        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        self.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
         self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
         self.person = PersonFactory(user=self.a_superuser)

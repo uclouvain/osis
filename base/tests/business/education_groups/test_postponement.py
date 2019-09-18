@@ -59,8 +59,9 @@ class EducationGroupPostponementTestCase(TestCase):
     def setUpTestData(cls):
         # Create several academic year
         cls.current_academic_year = create_current_academic_year()
-        cls.generated_ac_years = GenerateAcademicYear(cls.current_academic_year.year + 1,
-                                                      cls.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
 
     def setUp(self):
         # Create small entities
