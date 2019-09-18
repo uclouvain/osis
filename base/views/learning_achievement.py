@@ -50,8 +50,7 @@ def operation(request, learning_achievement_id, operation_str):
                                                     achievement_fr.order)
     anchor = get_anchor_reference(operation_str, achievement_fr)
 
-    last_academic_year = execute_operation(achievement_fr, operation_str)
-    last_academic_year = execute_operation(achievement_en, operation_str)
+    last_academic_year = execute_operation([achievement_fr, achievement_en], operation_str)
     default_success_msg = _("Operation on learning achievement has been successfully completed")
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
         display_success_messages(request, _build_postponement_success_message(default_success_msg))
@@ -62,27 +61,27 @@ def operation(request, learning_achievement_id, operation_str):
                                         kwargs={'learning_unit_year_id': lu_yr_id}) + anchor)
 
 
-def execute_operation(an_achievement, operation_str):
-    if an_achievement:
+def execute_operation(achievements, operation_str):
+    last_academic_year = None
+    for an_achievement in achievements:
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
         if not next_luy.is_past():
-            while next_luy.get_learning_unit_next_year():
-                next_luy = next_luy.get_learning_unit_next_year()
-                if LearningAchievement.objects.filter(
-                        learning_unit_year=next_luy,
-                        code_name=an_achievement.code_name,
-                        language=an_achievement.language
-                ).exists():
-                    an_achievement = LearningAchievement.objects.get(
-                        learning_unit_year=next_luy,
-                        code_name=an_achievement.code_name,
-                        language=an_achievement.language
-                    )
-                    func = getattr(an_achievement, operation_str)
-                    func()
-        return an_achievement.learning_unit_year.academic_year
+            last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
+    return last_academic_year
+
+
+def _postpone_operation(an_achievement, next_luy, operation_str):
+    while next_luy.get_learning_unit_next_year():
+        next_luy = next_luy.get_learning_unit_next_year()
+        an_achievement = LearningAchievement.objects.filter(
+            learning_unit_year=next_luy,
+            code_name=an_achievement.code_name,
+            language=an_achievement.language
+        ).first()
+        getattr(an_achievement, operation_str)()
+    return next_luy.academic_year
 
 
 @login_required
@@ -192,9 +191,8 @@ def create_first(request, learning_unit_year_id):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @require_http_methods(['GET'])
 @perms.can_update_learning_achievement
-def check_code(request, learning_unit_year_id):
+def check_code(request, learning_unit_year_id, accept_postponement=True):
     code = request.GET['code']
-    accept_postponement = True
     next_luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
     academic_year = next_luy.academic_year
     while next_luy.get_learning_unit_next_year():
