@@ -105,6 +105,7 @@ from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
@@ -1145,9 +1146,9 @@ class LearningUnitViewTestCase(TestCase):
             learning_unit=learning_unit_year.learning_unit,
             acronym=learning_unit_year.acronym
         ) for i in range(1, year_range)]
-        label = TextLabelFactory(label='label')
-
+        label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
         for language in ['fr-be', 'en']:
+            TranslatedTextLabelFactory(text_label=label, language=language)
             vars()['trans_{}'.format(language)] = [TranslatedTextFactory(
                 entity=entity_name.LEARNING_UNIT_YEAR,
                 reference=luy.id,
