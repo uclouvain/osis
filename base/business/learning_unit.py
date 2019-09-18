@@ -126,8 +126,7 @@ def get_cms_label_data(cms_label, user_language):
 
 def get_cms_label_translated(cms_label, user_language):
     return TranslatedTextLabel.objects.filter(
-        text_label__entity=entity_name.LEARNING_UNIT_YEAR,
-        text_label__label=cms_label,
+        text_label=cms_label,
         language=user_language
     ).first().label
 
