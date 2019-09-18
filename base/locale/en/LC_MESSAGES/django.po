@@ -5309,8 +5309,13 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr ""
 
+#: business/group_element_years/attach.py:167
+#, python-format
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+
 #: business/group_element_years/attach.py:154
-#: business/group_element_years/attach.py:170
+#: business/group_element_years/attach.py:175
 msgid "You can not attach the same child several times."
 msgstr ""
 
