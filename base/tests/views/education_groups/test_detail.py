@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
+import datetime
 from http import HTTPStatus
 
 import reversion
@@ -273,10 +273,10 @@ class TestReadEducationGroup(TestCase):
 
     def test_fetching_starting_academic_year(self):
         current_academic_year = self.academic_year
-        today = date.today()
+        today = datetime.date.today()
         today.replace(year=current_academic_year.year - 1)
         starting_academic_year, created = AcademicYear.objects.update_or_create(
-            year=current_academic_year.year - 1,
+            year=current_academic_year.year-1,
             defaults={
                 'start_date': current_academic_year.start_date.replace(year=current_academic_year.year - 1),
                 'end_date': current_academic_year.end_date.replace(year=current_academic_year.year)
