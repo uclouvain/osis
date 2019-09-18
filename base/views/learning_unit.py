@@ -42,7 +42,7 @@ from attribution.models.enums.function import Functions
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
-    get_components_identification
+    get_components_identification, get_cms_label_translated
 from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
@@ -150,7 +150,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         form = LearningUnitSpecificationsEditForm(request.POST)
         if form.is_valid():
             field_label, last_academic_year = form.save()
-            translated_field_label = _get_translated_field_label(field_label)
+            translated_field_label = get_cms_label_translated(field_label, get_language())
             display_success_messages(
                 request,
                 _build_edit_specification_success_message(last_academic_year, translated_field_label)
@@ -167,9 +167,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         })
         form.load_initial()  # Load data from database
         context['form'] = form
-
-        user_language = mdl.person.get_user_interface_language(request.user)
-        context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
+        context['text_label_translated'] = get_text_label_translated(text_lb, get_language())
         return render(request, "learning_unit/specifications_edit.html", context)
 
 
@@ -180,10 +178,6 @@ def _build_edit_specification_success_message(last_academic_year, translated_fie
         'field': translated_field_label,
         'year': last_academic_year
     }
-
-
-def _get_translated_field_label(field_label):
-    return list(get_cms_label_data([field_label], get_language()).values())[0]
 
 
 @login_required
