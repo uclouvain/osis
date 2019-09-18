@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,18 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.test import TestCase
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
+from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+
+class LearningAchievementListSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.serializer = LearningUnitSummarySpecificationSerializer({})
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'bibliography',
+            'resume',
+            'evaluation_methods',
+            'other_informations',
+            'online_resources',
+            'teaching_methods',
+            'themes_discussed',
+            'prerequisite',
+            'mobility',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

@@ -23,18 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.test import TestCase
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+
+class LearningUnitComponentSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.component = LearningComponentYearFactory()
+        cls.serializer = LearningUnitComponentSerializer(cls.component)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'type',
+            'type_text',
+            'planned_classes',
+            'hourly_volume_total_annual',
+            'hourly_volume_total_annual_computed'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_compute_correct_volume(self):
+        self.assertEqual(
+            self.serializer.data['hourly_volume_total_annual_computed'],
+            str(self.component.vol_global)
+        )

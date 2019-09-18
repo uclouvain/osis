@@ -23,18 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
+from rest_framework import serializers
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+from base.models.learning_component_year import LearningComponentYear
+
+
+class LearningUnitComponentSerializer(serializers.ModelSerializer):
+    type_text = serializers.CharField(source='get_type_display', read_only=True)
+    hourly_volume_total_annual_computed = serializers.SerializerMethodField('get_computed_volume', read_only=True)
+
+    class Meta:
+        model = LearningComponentYear
+        fields = (
+            'type',
+            'type_text',
+            'planned_classes',
+            'hourly_volume_total_annual',
+            'hourly_volume_total_annual_computed'
+        )
+
+    def get_computed_volume(self, obj):
+        return str(obj.vol_global)

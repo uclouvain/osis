@@ -23,18 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.shortcuts import get_object_or_404
+from rest_framework import generics
 
-from education_group.api.views.general_information import GeneralInformation
-from education_group.api.views.training import TrainingList, TrainingDetail
+from base.models.education_group_year import EducationGroupYear
+from education_group.api.serializers.general_information import GeneralInformationSerializer
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<language>[\w]{2})/(?P<acronym>[\w]+)$',
-        GeneralInformation.as_view(),
-        name=GeneralInformation.name
-    )
-]
+
+class GeneralInformation(generics.RetrieveAPIView):
+    """
+        Return the general informations for an Education Group Year
+    """
+    name = 'generalinformations_read'
+    serializer_class = GeneralInformationSerializer
+
+    def get_object(self):
+        egy = get_object_or_404(
+            EducationGroupYear.objects.select_related('academic_year'),
+            acronym=self.kwargs['acronym'].upper(),
+            academic_year__year=self.kwargs['year']
+        )
+        return egy
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.kwargs['language']
+        return serializer_context
