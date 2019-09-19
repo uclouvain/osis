@@ -36,7 +36,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        language = kwargs.pop('lang', None)
+        language = self.context.get('lang', None)
 
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
 
@@ -58,8 +58,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         for field in data:
-            if data[field] == '':
-                data[field] = None
+            data[field] = data[field] or None
         return data
 
     def _get_source(self, field_name, is_ac, language):
@@ -75,8 +74,8 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
 
         return object_source + prefix + field_source + lang
 
-    def _manage_special_field_cases(self, field_name, is_ac):
+    def _manage_special_field_cases(self, field_name, is_admission_condition):
         field_source = 'free' if field_name == 'free_text' else field_name
-        if 'section' in self.context and is_ac:
+        if 'section' in self.context and is_admission_condition:
             field_source = self.context.get('section')
         return field_source

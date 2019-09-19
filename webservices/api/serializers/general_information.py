@@ -74,19 +74,16 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             common_translated_text, _ = self._get_translated_text(common_egy, common_section, language)
             sections.append(common_translated_text)
 
+        cms_serializers = {
+            SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
+            ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
+        }
+
         for specific_section in pertinent_sections['specific']:
-            if specific_section == SKILLS_AND_ACHIEVEMENTS:
-                achievements = AchievementSectionSerializer(
-                    {'id': specific_section},
-                    context={'egy': obj, 'lang': language}
-                )
-                datas.append(achievements.data)
-            elif specific_section == ADMISSION_CONDITION:
-                ac = AdmissionConditionSectionSerializer(
-                    {'id': specific_section},
-                    context={'egy': obj, 'lang': language}
-                )
-                datas.append(ac.data)
+            serializer = cms_serializers.get(specific_section)
+            if serializer:
+                serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
+                datas.append(serializer.data)
             elif specific_section != EVALUATION_KEY:
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
 

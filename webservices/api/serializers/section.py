@@ -78,16 +78,12 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
 
     def get_content(self, obj):
         egy = self.context.get('egy')
-        language = self.context.get('lang')
-        context = {
-            'lang': language,
-        }
         if egy.is_bachelor:
-            return BachelorAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
+            return BachelorAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
         elif egy.is_specialized_master:
-            return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
+            return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
         elif egy.is_aggregation:
-            return AggregationAdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
+            return AggregationAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
         elif egy.is_a_master:
-            return MasterAdmissionConditionsSerializer(egy.admissioncondition, lang=language, context=context).data
-        return AdmissionConditionsSerializer(egy.admissioncondition, lang=language).data
+            return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
+        return AdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data

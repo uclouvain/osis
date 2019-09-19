@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
@@ -115,8 +116,7 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         sections = {
             field: AdmissionConditionTextsSerializer(
                 obj,
-                lang=self.context.get('lang'),
-                context=self._update_and_get_dict('section', field)
+                context={**self.context, 'section': field}
             ).data
             for field in ADMISSION_CONDITION_FIELDS
         }
@@ -127,7 +127,6 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
                     diploma_type: AdmissionConditionLineSerializer(
                         obj.admissionconditionline_set.filter(section=diploma_type),
                         many=True,
-                        lang=self.context.get('lang'),
                         context=self.context
                     ).data
                     for diploma_type in diploma_types
@@ -139,10 +138,6 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
 
     def _get_appropriate_text(self, field, ac):
         language = self.context.get('lang')
-        lang = '' if language == 'fr-be' else '_' + language
+        lang = '' if language == settings.LANGUAGE_CODE_FR else '_' + language
         text = getattr(ac, 'text_' + field + lang)
         return text if text else None
-
-    def _update_and_get_dict(self, key, value):
-        self.context.update({key: value})
-        return self.context
