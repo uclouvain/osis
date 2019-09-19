@@ -61,14 +61,15 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
             data[field] = data[field] or None
         return data
 
-    def _get_source(self, field_name, is_ac, language):
+    def _get_source(self, field_name, is_admission_condition, language):
         specific_fields = ['free_text', 'text']
 
-        prefix = 'text_' if is_ac else ''
+        prefix = 'text_' if is_admission_condition else ''
 
-        object_source = 'common_admission_condition.' if field_name not in specific_fields and is_ac else ''
+        object_source = 'common_admission_condition.' \
+            if field_name not in specific_fields and is_admission_condition else ''
 
-        field_source = self._manage_special_field_cases(field_name, is_ac)
+        field_source = self._manage_special_field_cases(field_name, is_admission_condition)
 
         lang = '' if language == settings.LANGUAGE_CODE_FR else '_' + language
 
