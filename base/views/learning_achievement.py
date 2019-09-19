@@ -42,7 +42,10 @@ from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
 def operation(request, learning_achievement_id, operation_str):
-    achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
+    achievement_fr = get_object_or_404(
+        LearningAchievement.objects.select_related('learning_unit_year__academic_year'),
+        pk=learning_achievement_id
+    )
     lu_yr_id = achievement_fr.learning_unit_year.id
 
     achievement_en = find_learning_unit_achievement(achievement_fr.learning_unit_year,

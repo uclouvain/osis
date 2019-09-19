@@ -26,18 +26,15 @@
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
-from django.db.models import Max
 from django.utils.translation import gettext_lazy as _
 
-from base.models import academic_year
-from base.models.academic_year import AcademicYear
-from base.models.enums import learning_unit_year_subtypes
-from base.models.learning_achievement import LearningAchievement, search
+from base.business.learning_unit import get_academic_year_postponement_range
+from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
 from reference.models import language
-from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
+from reference.models.language import EN_CODE_LANGUAGE
 
 
 def update_themes_discussed_changed_field_in_cms(learning_unit_year):
@@ -70,7 +67,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         initial = initial or {}
         self.postponement = bool(int(data['postpone'])) if data else False
         self.luy = kwargs.pop('luy', None)
-        self.code = kwargs.pop('code', None)
+        self.code = kwargs.pop('code', '')
         super().__init__(data, initial=initial, **kwargs)
 
         self._get_code_name_disabled_status()
@@ -82,7 +79,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         for code, label in settings.LANGUAGES:
             self.value, _ = LearningAchievement.objects.get_or_create(
                 learning_unit_year_id=self.luy.id,
-                code_name=self.code if self.code else '',
+                code_name=self.code,
                 language=language.find_by_code(code[:2].upper())
             )
             self.fields['text_{}'.format(code[:2])].initial = self.value.text
@@ -98,22 +95,26 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def _save_translated_text(self):
         for code, label in settings.LANGUAGES:
-            self.text = LearningAchievement.objects.get(id=self.cleaned_data['lua_{}_id'.format(code[:2])])
+            self.text = LearningAchievement.objects.select_related(
+                'learning_unit_year__academic_year').prefetch_related(
+                'learning_unit_year__learning_unit__learningunityear_set'
+            ).get(
+                id=self.cleaned_data['lua_{}_id'.format(code[:2])]
+            )
             self.old_code_name = self.text.code_name
             self.text.code_name = self.cleaned_data.get('code_name')
             self.text.text = self.cleaned_data.get('text_{}'.format(code[:2]))
             self.text.save()
 
-            luy = self.text.learning_unit_year
-            # For sync purpose, we need to trigger
-            # an update of the THEMES_DISCUSSED cms when we update learning achievement
-            update_themes_discussed_changed_field_in_cms(luy)
             self.last_postponed_academic_year = None
-            if not luy.academic_year.is_past and self.postponement:
-                ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
+            if not self.text.learning_unit_year.academic_year.is_past and self.postponement:
+                ac_year_postponement_range = get_academic_year_postponement_range(self.text.learning_unit_year)
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
-                self._update_future_luy(ac_year_postponement_range, luy, self.text)
+                self._update_future_luy(ac_year_postponement_range, self.text)
 
+        # For sync purpose, we need to trigger for the first year
+        # an update of the THEMES_DISCUSSED cms when we update learning achievement
+        update_themes_discussed_changed_field_in_cms(self.text.learning_unit_year)
         return self.text, self.last_postponed_academic_year
 
     def clean_code_name(self):
@@ -124,28 +125,12 @@ class LearningAchievementEditForm(forms.ModelForm):
             raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
         return code_name
 
-    def _get_ac_year_postponement_year(self, luy):
-        max_postponement_year = self._get_end_postponement_year(luy)
-        ac_year_postponement_range = AcademicYear.objects.min_max_years(
-            luy.academic_year.year + 1,
-            max_postponement_year
-        )
-        return ac_year_postponement_range
-
-    def _get_end_postponement_year(self, luy):
-        end_postponement = academic_year.find_academic_year_by_year(luy.learning_unit.end_year)
-        if luy.subtype == learning_unit_year_subtypes.PARTIM:
-            max_postponement_year = luy.learning_unit.learningunityear_set.aggregate(
-                Max('academic_year__year')
-            )['academic_year__year__max']
-        else:
-            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
-        end_year = end_postponement.year if end_postponement else None
-        max_postponement_year = min(end_year, max_postponement_year) if end_year else max_postponement_year
-        return max_postponement_year
-
-    def _update_future_luy(self, ac_year_postponement_range, luy, text):
+    def _update_future_luy(self, ac_year_postponement_range, text):
         for ac in ac_year_postponement_range:
+            # For sync purpose, we need to trigger for the following years
+            # an update of the THEMES_DISCUSSED cms when we update learning achievement
+            update_themes_discussed_changed_field_in_cms(text.learning_unit_year)
+            luy = text.learning_unit_year
             next_luy, created = LearningUnitYear.objects.get_or_create(
                 academic_year=ac,
                 acronym=luy.acronym,

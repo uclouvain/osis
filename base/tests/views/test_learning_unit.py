@@ -1163,7 +1163,7 @@ class LearningUnitViewTestCase(TestCase):
                 'trans_text_en': 'textEN',
                 'postpone': 1,
                 'cms_fr_id': vars()['trans_fr-be'][0].id,
-                'cms_en_id': vars()['trans_en'][0].id
+                'cms_en_id': vars()['trans_en'][0].id,
             }
         )
         self.assertEqual(response.status_code, 200)

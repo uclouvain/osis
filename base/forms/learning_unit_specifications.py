@@ -26,12 +26,9 @@
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
-from django.db.models import Max
 
+from base.business.learning_unit import get_academic_year_postponement_range
 from base.forms.common import set_trans_txt
-from base.models import academic_year
-from base.models.academic_year import AcademicYear
-from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -97,32 +94,16 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             self.text_label = self.trans_text.text_label
             self.trans_text.save()
 
-            luy = LearningUnitYear.objects.get(id=self.trans_text.reference)
+            self.learning_unit_year = LearningUnitYear.objects.select_related(
+                'academic_year').prefetch_related(
+                'learning_unit__learningunityear_set'
+            ).get(id=self.trans_text.reference)
+
             self.last_postponed_academic_year = None
-            if not luy.academic_year.is_past and self.postponement:
-                ac_year_postponement_range = self._get_ac_year_postponement_year(luy)
+            if not self.learning_unit_year.academic_year.is_past and self.postponement:
+                ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
-                self._update_future_luy(ac_year_postponement_range, luy)
-
-    def _get_ac_year_postponement_year(self, luy):
-        max_postponement_year = self._get_end_postponement_year(luy)
-        ac_year_postponement_range = AcademicYear.objects.min_max_years(
-            luy.academic_year.year + 1,
-            max_postponement_year
-        )
-        return ac_year_postponement_range
-
-    def _get_end_postponement_year(self, luy):
-        end_postponement = academic_year.find_academic_year_by_year(luy.learning_unit.end_year)
-        if luy.subtype == learning_unit_year_subtypes.PARTIM:
-            max_postponement_year = luy.learning_unit.learningunityear_set.aggregate(
-                Max('academic_year__year')
-            )['academic_year__year__max']
-        else:
-            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
-        end_year = end_postponement.year if end_postponement else None
-        max_postponement_year = min(end_year, max_postponement_year) if end_year else max_postponement_year
-        return max_postponement_year
+                self._update_future_luy(ac_year_postponement_range, self.learning_unit_year)
 
     def _update_future_luy(self, ac_year_postponement_range, luy):
         for ac in ac_year_postponement_range:
@@ -135,6 +116,6 @@ class LearningUnitSpecificationsEditForm(forms.Form):
                 entity=entity_name.LEARNING_UNIT_YEAR,
                 reference=next_luy.id,
                 language=self.trans_text.language,
-                text_label=self.trans_text.text_label,
+                text_label=self.text_label,
                 defaults={'text': self.trans_text.text}
             )
