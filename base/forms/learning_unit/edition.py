@@ -70,7 +70,7 @@ class LearningUnitEndDateForm(forms.Form):
             max_year = compute_max_academic_year_adjournment()
 
         if self.learning_unit.start_year.year > min_year:
-            min_year = self.learning_unit.start_year
+            min_year = self.learning_unit.start_year.year
 
         if self.learning_unit.is_past():
             raise ValueError(
