@@ -534,6 +534,7 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
 
     def setUp(self):
         self.iso_language, self.language = settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]
+
         self.education_group_year = EducationGroupYearMasterFactory(
             academic_year__year=1992
         )
