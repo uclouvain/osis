@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase
 
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
