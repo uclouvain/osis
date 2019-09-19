@@ -3267,6 +3267,9 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr ""
 
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+
 msgid "You can not attach the same child several times."
 msgstr ""
 
