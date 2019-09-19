@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import timedelta
 
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import ngettext_lazy
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
@@ -36,8 +34,7 @@ from waffle.testutils import override_flag
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
-from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -75,13 +72,6 @@ class TestDeleteGroupEducationView(TestCase):
         self.url2 = reverse('delete_education_group', args=[self.education_group_year2.id,
                                                             self.education_group_year2.education_group.id])
         self.client.force_login(user=self.person.user)
-
-        self.academic_calendar = AcademicCalendarFactory(
-            reference=EDUCATION_GROUP_EDITION,
-            start_date=timezone.now(),
-            end_date=timezone.now() + timedelta(weeks=+1),
-            academic_year=self.current_ac,
-        )
 
     def test_delete_get_permission_denied(self):
         self.person.user.user_permissions.remove(Permission.objects.get(codename="delete_educationgroup"))
