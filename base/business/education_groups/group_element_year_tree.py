@@ -300,13 +300,13 @@ class EducationGroupHierarchy:
             else:
                 root = self.cache_entity_parent_root
             root_entities = get_structure_of_entity_version(self.cache_structure, root.acronym)
-            list_entities_from_root = [e for e in root_entities['all_children']]
-            list_entities_from_root.append(root_entities['entity_version'])
+            list_entities_from_root = [e for e in root_entities.get('all_children')]
+            list_entities_from_root.append(root_entities.get('entity_version'))
             entities = get_structure_of_entity_version(self.cache_structure, to_compare)
-            list_entities_children_from_self = [e for e in entities['all_children']]
-            list_entities_children_from_self.append(entities['entity_version'])
-            if entities['entity_version'].entity_type != root.entity_type:
-                list_entities_children_from_self.append(entities['entity_version_parent'])
+            list_entities_children_from_self = [e for e in entities.get('all_children', [])]
+            list_entities_children_from_self.append(entities.get('entity_version'))
+            if entities.get('entity_version') and entities.get('entity_version').entity_type != root.entity_type:
+                list_entities_children_from_self.append(entities.get('entity_version_parent'))
             return set(list_entities_from_root) & set(list_entities_children_from_self) == set()
         except AttributeError:
             return False
