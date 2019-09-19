@@ -39,6 +39,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from webservices import business
+from django.conf import settings
 
 
 class EnsureKeyTestCase(TestCase):
@@ -145,14 +146,14 @@ class GetEvaluationTestCase(TestCase):
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
         TranslatedTextLabelFactory(text_label=text_label,
-                                   language='fr-be')
+                                   language=settings.LANGUAGE_CODE_FR)
         self.evaluation = TranslatedTextRandomFactory(text_label=text_label,
-                                                      language='fr-be',
+                                                      language=settings.LANGUAGE_CODE_FR,
                                                       reference=self.education_group_year.id,
                                                       entity=text_label.entity)
 
         self.common = TranslatedTextRandomFactory(text_label=text_label,
-                                                  language='fr-be',
+                                                  language=settings.LANGUAGE_CODE_FR,
                                                   reference=common_education_group_year.id,
                                                   entity=text_label.entity)
 

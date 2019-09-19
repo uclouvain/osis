@@ -44,7 +44,7 @@ class GeneralInformationTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
-        cls.language = 'en'
+        cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
@@ -110,7 +110,7 @@ class GeneralInformationTestCase(APITestCase):
         invalid_url = reverse('generalinformations_read', kwargs={
             'acronym': 'dummy',
             'year': 2019,
-            'language': 'en'
+            'language': settings.LANGUAGE_CODE_EN
         })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

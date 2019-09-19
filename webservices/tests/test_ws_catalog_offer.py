@@ -44,7 +44,8 @@ from base.tests.factories.education_group_year import (
     EducationGroupYearMasterFactory,
     EducationGroupYearCommonBachelorFactory,
     EducationGroupYearCommonFactory, EducationGroupYearCommonSpecializedMasterFactory,
-    EducationGroupYearCommonAgregationFactory)
+    EducationGroupYearCommonAgregationFactory
+)
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -87,7 +88,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.education_group_year.academic_year
         )
-        ac = AdmissionConditionFactory(
+        AdmissionConditionFactory(
             education_group_year=common_master_education_group_year
         )
 
@@ -207,7 +208,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         text_label = TextLabelFactory(entity=OFFER_YEAR)
 
         for iso_language, language in [
-            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]), 
+            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
@@ -253,7 +254,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
         for iso_language, language in [
-            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]), 
+            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
@@ -307,7 +308,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
         for iso_language, language in [
-            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]), 
+            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
@@ -541,7 +542,7 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
         self.common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.education_group_year.academic_year
         )
-        ac = AdmissionConditionFactory(
+        AdmissionConditionFactory(
             education_group_year=common_master_education_group_year
         )
         TranslatedTextFactory(
@@ -1313,7 +1314,8 @@ class WebServiceNewContextTestCase(TestCase):
     def test_with_partial_acronym(self):
         education_group_year = EducationGroupYearFactory()
 
-        context = new_context(education_group_year, settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2], education_group_year.acronym)
+        context = new_context(education_group_year, settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2],
+                              education_group_year.acronym)
 
         self.assertEqual(context.acronym, education_group_year.acronym)
         self.assertEqual(context.year, education_group_year.academic_year.year)
@@ -1347,7 +1349,8 @@ class ProcessSectionTestCase(TestCase):
             academic_year=education_group_year.academic_year
         )
 
-        context = new_context(education_group_year, settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2], education_group_year.acronym)
+        context = new_context(education_group_year, settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2],
+                              education_group_year.acronym)
 
         text_label = TextLabelFactory(label='caap', entity='offer_year')
         translated_text_label = TranslatedTextLabelFactory(text_label=text_label, language=context.language)
@@ -1368,7 +1371,8 @@ class ProcessSectionTestCase(TestCase):
             academic_year=education_group_year.academic_year
         )
 
-        context = new_context(education_group_year, settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2], education_group_year.acronym)
+        context = new_context(education_group_year, settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2],
+                              education_group_year.acronym)
 
         text_label = TextLabelFactory(label='caap', entity='offer_year')
         TranslatedTextLabelFactory(text_label=text_label, language=context.language)
@@ -1388,7 +1392,8 @@ class ProcessSectionTestCase(TestCase):
             academic_year=education_group_year_random.academic_year
         )
         context = new_context(education_group_year_random,
-                              settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2], education_group_year_random.acronym)
+                              settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2],
+                              education_group_year_random.acronym)
 
         text_label = TextLabelFactory(entity='offer_year', label='intro')
         translated_text_label = TranslatedTextLabelFactory(text_label=text_label, language=context.language)

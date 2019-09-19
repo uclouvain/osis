@@ -58,13 +58,13 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         lang = kwargs['context']['language']
         self.instance.language = lang
-        if lang != 'fr':
+        if lang != settings.LANGUAGE_CODE_FR[:2]:
             self.fields['title'] = serializers.CharField(source='title_english', read_only=True)
 
     def get_sections(self, obj):
         datas = []
         sections = []
-        language = settings.LANGUAGE_CODE_FR if self.instance.language == 'fr' else self.instance.language
+        language = settings.LANGUAGE_CODE_FR if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
         common_egy = EducationGroupYear.objects.get_common(
             academic_year=obj.academic_year

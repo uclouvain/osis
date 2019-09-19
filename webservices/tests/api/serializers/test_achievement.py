@@ -38,7 +38,7 @@ from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIE
 class AchievementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.language = 'en'
+        cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
