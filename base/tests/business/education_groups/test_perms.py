@@ -30,10 +30,11 @@ from unittest import mock
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
-from base.business.education_groups.perms import is_education_group_edit_period_opened, check_permission, \
+from base.business.education_groups.perms import check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
     _is_eligible_to_add_education_group_with_category
+from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year
 from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, Categories
@@ -67,20 +68,24 @@ class TestPerms(TestCase):
             start_date=today + datetime.timedelta(days=1),
             end_date=today + datetime.timedelta(days=3),
             academic_year=self.current_academic_year,
+            data_year=self.current_academic_year,
             reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
-        self.assertFalse(is_education_group_edit_period_opened(self.education_group_year))
+        self.assertIsNone(get_academic_calendar_by_date_and_reference_and_data_year(
+                self.education_group_year.academic_year, academic_calendar_type.EDUCATION_GROUP_EDITION))
 
     def test_is_education_group_edit_period_opened_case_period_opened(self):
         today = datetime.date.today()
 
-        AcademicCalendarFactory(
+        aca_calendar = AcademicCalendarFactory(
             start_date=today - datetime.timedelta(days=1),
             end_date=today + datetime.timedelta(days=3),
             academic_year=self.current_academic_year,
+            data_year=self.current_academic_year,
             reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
-        self.assertTrue(is_education_group_edit_period_opened(self.education_group_year))
+        self.assertEqual(aca_calendar, get_academic_calendar_by_date_and_reference_and_data_year(
+            self.education_group_year.academic_year, academic_calendar_type.EDUCATION_GROUP_EDITION))
 
     def test_is_education_group_edit_period_opened_case_period_opened_but_not_same_academic_year(self):
         today = datetime.date.today()
@@ -90,9 +95,11 @@ class TestPerms(TestCase):
             start_date=today - datetime.timedelta(days=1),
             end_date=today + datetime.timedelta(days=3),
             academic_year=self.current_academic_year,
+            data_year__year=self.current_academic_year.year+1,
             reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
-        self.assertFalse(is_education_group_edit_period_opened(education_group_year))
+        self.assertIsNone(get_academic_calendar_by_date_and_reference_and_data_year(
+            self.education_group_year.academic_year, academic_calendar_type.EDUCATION_GROUP_EDITION))
 
     def test_check_unauthorized_type(self):
         education_group = EducationGroupYearFactory()
@@ -226,7 +233,7 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         self.assertTrue(mock_is_current_in_range.called)
 
     @mock.patch(
-        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year",
+        "base.models.academic_calendar.get_academic_calendar_by_date_and_reference_and_data_year",
         return_value=False)
     @mock.patch(
         "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity",
@@ -238,7 +245,7 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
             perm._is_eligible()
 
     @mock.patch(
-        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year",
+        "base.models.academic_calendar.get_academic_calendar_by_date_and_reference_and_data_year",
         return_value=True)
     @mock.patch(
         "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity",
@@ -254,6 +261,8 @@ class TestGeneralInformationPerms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
+        OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=cls.current_academic_year,
+                                    data_year=cls.current_academic_year)
         cls.common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=cls.current_academic_year)
         cls.training = TrainingFactory(academic_year=cls.current_academic_year)
 
@@ -470,7 +479,8 @@ class TestAdmissionConditionPerms(TestCase):
             with self.assertRaises(PermissionDenied):
                 perm._is_faculty_manager_eligible()
 
-    @mock.patch("base.business.education_groups.perms.is_education_group_edit_period_opened", return_value=False)
+    @mock.patch("base.models.academic_calendar.get_academic_calendar_by_date_and_reference_and_data_year",
+                return_value=False)
     def test_is_faculty_manager_case_cannot_modify_data_outside_period(self, mock_calendar_opened):
         person = PersonWithPermissionsFactory()
 
