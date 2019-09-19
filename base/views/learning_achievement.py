@@ -67,12 +67,11 @@ def operation(request, learning_achievement_id, operation_str):
 def execute_operation(achievements, operation_str):
     last_academic_year = None
     for an_achievement in achievements:
-        if an_achievement:
-            next_luy = an_achievement.learning_unit_year
-            func = getattr(an_achievement, operation_str)
-            func()
-            if not next_luy.is_past():
-                last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
+        next_luy = an_achievement.learning_unit_year
+        func = getattr(an_achievement, operation_str)
+        func()
+        if not next_luy.is_past():
+            last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
     return last_academic_year
 
 
@@ -197,7 +196,7 @@ def create_first(request, learning_unit_year_id):
 @perms.can_update_learning_achievement
 def check_code(request, learning_unit_year_id, accept_postponement=True):
     code = request.GET['code']
-    next_luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
+    next_luy = LearningUnitYear.objects.select_related('academic_year').get(id=learning_unit_year_id)
     academic_year = next_luy.academic_year
     while next_luy.get_learning_unit_next_year():
         next_luy = next_luy.get_learning_unit_next_year()
