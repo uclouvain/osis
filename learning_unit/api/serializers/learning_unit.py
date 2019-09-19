@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from rest_framework import serializers
 
 from base.models.learning_unit_year import LearningUnitYear
@@ -63,8 +64,8 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_title(self, learning_unit_year):
         return {
-            'fr': getattr(learning_unit_year, 'full_title', None),
-            'en': getattr(learning_unit_year, 'full_title_en', None)
+            settings.LANGUAGE_CODE_FR[:2]: getattr(learning_unit_year, 'full_title', None),
+            settings.LANGUAGE_CODE_EN: getattr(learning_unit_year, 'full_title_en', None)
         }
 
 

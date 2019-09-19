@@ -26,6 +26,7 @@
 import uuid
 from collections import OrderedDict
 
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -93,7 +94,7 @@ class LearningAchievementListTestCase(APITestCase):
 
         expected_response = OrderedDict([
             ('code_name', self.achievements[0].code_name),
-            ('fr', self.achievements[0].text),
-            ('en', '')
+            (settings.LANGUAGE_CODE_FR[:2], self.achievements[0].text),
+            (settings.LANGUAGE_CODE_EN, '')
         ])
         self.assertDictEqual(response.data[0], expected_response)

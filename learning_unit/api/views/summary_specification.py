@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.db.models import Case, When, CharField, F, Value
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -51,8 +52,8 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         ).annotate(
             iso_code=Case(
-                When(language=LANGUAGE_CODE_FR, then=Value('fr')),
-                When(language=LANGUAGE_CODE_EN, then=Value('en')),
+                When(language=LANGUAGE_CODE_FR, then=Value(settings.LANGUAGE_CODE_FR[:2])),
+                When(language=LANGUAGE_CODE_EN, then=Value(settings.LANGUAGE_CODE_EN)),
                 default=None,
                 output_field=CharField(),
             ),
@@ -62,7 +63,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         summary_specification_grouped = {}
         for translated_text in qs:
             key = translated_text['label']
-            summary_specification_grouped.setdefault(key, {'fr': '', 'en': ''})
+            summary_specification_grouped.setdefault(key, {settings.LANGUAGE_CODE_FR[:2]: '', settings.LANGUAGE_CODE_EN: ''})
             summary_specification_grouped[key][translated_text['iso_code']] = translated_text['text']
 
         serializer = self.get_serializer(summary_specification_grouped)

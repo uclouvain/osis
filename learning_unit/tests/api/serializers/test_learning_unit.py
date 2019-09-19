@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
@@ -67,8 +68,8 @@ class LearningUnitSerializerTestCase(TestCase):
         title = self.serializer.data['title']
 
         self.assertIsInstance(title, dict)
-        self.assertTrue('fr' in title)
-        self.assertTrue('en' in title)
+        self.assertTrue(settings.LANGUAGE_CODE_FR[:2] in title)
+        self.assertTrue(settings.LANGUAGE_CODE_EN in title)
 
 
 class LearningUnitDetailedSerializerTestCase(TestCase):
