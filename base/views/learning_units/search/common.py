@@ -42,7 +42,8 @@ ACTION_BACK_TO_INITIAL = "back_to_initial"
 ACTION_CONSOLIDATE = "consolidate"
 ACTION_FORCE_STATE = "force_state"
 
-ITEMS_PER_PAGES = 2000
+# TODO mofify value
+ITEMS_PER_PAGES = 10
 
 
 def _manage_session_variables(request, search_type):

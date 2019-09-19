@@ -33,13 +33,13 @@ from base.forms.learning_unit.search_form import LearningUnitDescriptionFicheFil
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.views.common import display_warning_messages, remove_from_session
-from base.views.learning_units.search import SUMMARY_LIST
+from base.views.learning_units.search.common import SUMMARY_LIST
 
 
 class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
     model = LearningUnitYear
     paginate_by = 2000
-    template_name = "learning_units.html"
+    template_name = "learning_unit/search/description_fiche.html"
     raise_exception = True
 
     filterset_class = LearningUnitDescriptionFicheFilter
