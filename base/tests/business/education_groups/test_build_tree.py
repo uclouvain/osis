@@ -818,27 +818,3 @@ class TestGetFinalityList(TestCase):
 
         node = EducationGroupHierarchy(self.root)
         self.assertCountEqual(node.get_finality_list(), list_finality)
-
-    def test_get_finality_list_case_ignore_option_list_choice(self):
-        """
-        This test ensure that the tree will be pruned when a child if type of finality list choice and option
-        isn't considered as part of tree
-        """
-        finality_1 = EducationGroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=TrainingType.MASTER_MS_120.name
-        )
-        GroupElementYearFactory(parent=self.root, child_branch=finality_1)
-
-        option_group = EducationGroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
-        )
-        GroupElementYearFactory(parent=self.root, child_branch=option_group)
-        GroupElementYearFactory(parent=option_group, child_branch=EducationGroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=TrainingType.MASTER_MS_120.name
-        ))
-
-        node = EducationGroupHierarchy(self.root)
-        self.assertListEqual(node.get_finality_list(), [finality_1])
