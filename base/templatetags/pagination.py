@@ -25,6 +25,7 @@
 ##############################################################################
 from django.template.defaulttags import register
 
+# TODO increase value
 PAGINATOR_SIZE_LIST = [10, 25, 50, 100]
 
 
