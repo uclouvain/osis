@@ -271,14 +271,9 @@ class EducationGroupHierarchy:
         ]
 
     def get_finality_list(self):
-        def pruning_function(node):
-            return node.group_element_year.child_branch and \
-                   node.group_element_year.child_branch.education_group_type.name not in \
-                   [GroupType.OPTION_LIST_CHOICE.name]
-
         return [
-            element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function)
-            if element.child_branch.education_group_type.name in TrainingType.finality_types()
+            element.child_branch for element in self.to_list(flat=True)
+            if element.child_branch and element.child_branch.education_group_type.name in TrainingType.finality_types()
         ]
 
     def get_learning_unit_year_list(self):
