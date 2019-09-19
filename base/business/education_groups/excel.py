@@ -371,7 +371,7 @@ def _build_excel_lines_prerequisited(egy: EducationGroupYear, prerequisite_qs: Q
     content = _first_line_content(HeaderLinePrerequisiteOf(egy_acronym=egy.acronym,
                                                            egy_title=egy.title,
                                                            title_header=_('Title'),
-                                                           credits_header=_('Credits'),
+                                                           credits_header=_('Cred. rel./abs.'),
                                                            block_header=_('Block'),
                                                            mandatory_header=_('Mandatory'))
                                   )
