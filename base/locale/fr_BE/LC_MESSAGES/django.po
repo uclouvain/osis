@@ -3456,6 +3456,12 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
 
+#, python-format
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
+"de type %(type)s."
+
 msgid "You can not attach the same child several times."
 msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
 
