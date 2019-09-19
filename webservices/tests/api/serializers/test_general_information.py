@@ -25,6 +25,7 @@
 ##############################################################################
 import collections
 
+from django.conf import settings
 from django.test import TestCase
 
 from base.business.education_groups import general_information_sections

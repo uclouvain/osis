@@ -41,7 +41,9 @@ class AdmissionConditionsSerializerTestCase(TestCase):
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.CERTIFICATE.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
-        cls.serializer = AdmissionConditionsSerializer(cls.ac, lang=settings.LANGUAGE_CODE_EN)
+        cls.serializer = AdmissionConditionsSerializer(cls.ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -57,7 +59,9 @@ class BachelorAdmissionConditionsSerializerTestCase(TestCase):
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonBachelorFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = BachelorAdmissionConditionsSerializer(cls.ac, lang=settings.LANGUAGE_CODE_EN)
+        cls.serializer = BachelorAdmissionConditionsSerializer(cls.ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -77,7 +81,9 @@ class SpecializedMasterAdmissionConditionsSerializerTestCase(TestCase):
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonSpecializedMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = SpecializedMasterAdmissionConditionsSerializer(cls.ac, lang=settings.LANGUAGE_CODE_EN)
+        cls.serializer = SpecializedMasterAdmissionConditionsSerializer(cls.ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -95,7 +101,9 @@ class AggregationAdmissionConditionsSerializerTestCase(TestCase):
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonAgregationFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = AggregationAdmissionConditionsSerializer(cls.ac, lang=settings.LANGUAGE_CODE_EN)
+        cls.serializer = AggregationAdmissionConditionsSerializer(cls.ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -116,9 +124,8 @@ class MasterAdmissionConditionsSerializerTestCase(TestCase):
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = MasterAdmissionConditionsSerializer(cls.ac, lang=settings.LANGUAGE_CODE_EN, context={
+        cls.serializer = MasterAdmissionConditionsSerializer(cls.ac, context={
             'lang': settings.LANGUAGE_CODE_EN,
-            'common': common_egy.admissioncondition
         })
 
     def test_contains_expected_fields(self):
