@@ -36,7 +36,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        language = self.context.get('lang', None)
+        language = self.context.get('lang')
 
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
 
