@@ -99,7 +99,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_string_year_not_found(self):
-        response = self.post('1990', settings.LANGUAGE_CODE_FR[:2], 'actu2m', data={})
+        response = self.post('1990', self.language, 'actu2m', data={})
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_language_not_found(self):
@@ -107,7 +107,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_acronym_not_found(self):
-        response = self.post(2017, settings.LANGUAGE_CODE_FR[:2], 'XYZ', data={})
+        response = self.post(2017, self.language, 'XYZ', data={})
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_first_based_on_the_original_message(self):
@@ -208,7 +208,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         text_label = TextLabelFactory(entity=OFFER_YEAR)
 
         for iso_language, language in [
-            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]),
+            (self.iso_language, self.language),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
@@ -241,7 +241,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 response_json['sections'] = sections
 
                 title_to_test = self.education_group_year.title \
-                    if language == settings.LANGUAGE_CODE_FR[:2] else self.education_group_year.title_english
+                    if language == self.language else self.education_group_year.title_english
                 self.assertDictEqual(response_json, {
                     'acronym': self.education_group_year.acronym.upper(),
                     'language': language,
@@ -254,7 +254,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
         for iso_language, language in [
-            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]),
+            (self.iso_language, self.language),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
@@ -288,7 +288,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 response_json['sections'] = sections
 
                 title_to_test = self.education_group_year.title \
-                    if language == settings.LANGUAGE_CODE_FR[:2] else self.education_group_year.title_english
+                    if language == self.language else self.education_group_year.title_english
 
                 self.assertDictEqual(response_json, {
                     'acronym': self.education_group_year.acronym.upper(),
@@ -308,7 +308,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='caap')
 
         for iso_language, language in [
-            (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]),
+            (self.iso_language, self.language),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
@@ -346,7 +346,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                 response_json = response.json()
 
                 title_to_test = self.education_group_year.title \
-                    if language == settings.LANGUAGE_CODE_FR[:2] else self.education_group_year.title_english
+                    if language == self.language else self.education_group_year.title_english
 
                 sections, conditions_admission_section = remove_conditions_admission(response_json.pop('sections', []))
                 response_sections = convert_sections_list_of_dict_to_dict(sections)
@@ -513,7 +513,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
         response = self.post(
             year=self.education_group_year.academic_year.year,
-            language=settings.LANGUAGE_CODE_FR[:2],
+            language=self.language,
             acronym=self.education_group_year.acronym,
             data=message
         )
@@ -533,6 +533,7 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
     maxDiff = None
 
     def setUp(self):
+        self.iso_language, self.language = settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]
         self.education_group_year = EducationGroupYearMasterFactory(
             academic_year__year=1992
         )
@@ -548,18 +549,17 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
         TranslatedTextFactory(
             text_label__entity=OFFER_YEAR,
             text_label__label=EVALUATION_KEY,
-            language=settings.LANGUAGE_CODE_FR,
+            language=self.iso_language,
             entity=OFFER_YEAR,
             reference=self.common_education_group_year.id
         )
-        self.iso_language, self.language = settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_FR[:2]
 
     def test_year_not_found(self):
-        response = self.post(1990, settings.LANGUAGE_CODE_FR[:2], 'actu2m', data={})
+        response = self.post(1990, self.language, 'actu2m', data={})
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_string_year_not_found(self):
-        response = self.post('1990', settings.LANGUAGE_CODE_FR[:2], 'actu2m', data={})
+        response = self.post('1990', self.language, 'actu2m', data={})
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_language_not_found(self):
@@ -567,7 +567,7 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_acronym_not_found(self):
-        response = self.post(2017, settings.LANGUAGE_CODE_FR[:2], 'XYZ', data={})
+        response = self.post(2017, self.language, 'XYZ', data={})
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_first_based_on_the_original_message(self):
