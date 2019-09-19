@@ -191,7 +191,6 @@ class LearningUnitPostponementForm:
         else:
             data_to_postpone = self._get_data_to_postpone(luy_to_update, data)
             self._update_form_set_data(data_to_postpone, luy_to_update)
-
         return self._get_learning_unit_base_form(
             luy_to_update.academic_year,
             learning_unit_instance=luy_to_update.learning_unit,

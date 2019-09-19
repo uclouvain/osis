@@ -55,6 +55,7 @@ from reference.tests.factories.language import LanguageFactory
 class TestLearningAchievementView(TestCase):
     def setUp(self):
         self.language_fr = LanguageFactory(code="FR")
+        self.language_en = LanguageFactory(code="EN")
         self.user = UserFactory()
         self.person = PersonFactory(user=self.user)
         self.person_entity = PersonEntityFactory(person=self.person)
@@ -67,9 +68,17 @@ class TestLearningAchievementView(TestCase):
         )
 
         self.client.force_login(self.user)
-        self.achievement_fr = LearningAchievementFactory(language=self.language_fr,
-                                                         learning_unit_year=self.learning_unit_year,
-                                                         order=0)
+        self.achievement_fr = LearningAchievementFactory(
+            language=self.language_fr,
+            learning_unit_year=self.learning_unit_year,
+            order=0
+        )
+        self.achievement_en = LearningAchievementFactory(
+            language=self.language_en,
+            learning_unit_year=self.learning_unit_year,
+            order=0,
+            code_name=self.achievement_fr.code_name
+        )
         self.reverse_learning_unit_yr = reverse('learning_unit', args=[self.learning_unit_year.id])
         flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
         flag.users.add(self.user)
@@ -99,7 +108,6 @@ class TestLearningAchievementView(TestCase):
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
         request.user = self.user
-
         response = management(request, self.achievement_fr.learning_unit_year.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url,
