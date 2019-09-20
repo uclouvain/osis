@@ -54,7 +54,6 @@ class GeneralInformationTestCase(APITestCase):
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             cls.egy.education_group_type.name
         ] = cls.pertinent_sections
-
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
                 language=cls.language,
@@ -67,10 +66,11 @@ class GeneralInformationTestCase(APITestCase):
                 text_label__label=section
             )
         for section in cls.pertinent_sections['specific']:
-            TranslatedTextLabelFactory(
-                language=cls.language,
-                text_label__label=section
-            )
+            if section != EVALUATION_KEY:
+                TranslatedTextLabelFactory(
+                    language=cls.language,
+                    text_label__label=section
+                )
             TranslatedTextFactory(
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
