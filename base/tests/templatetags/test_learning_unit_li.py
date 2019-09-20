@@ -30,22 +30,23 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
     MSG_NOT_PROPOSAL_STATE_FACULTY, MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL, \
-    MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, MSG_NOT_GOOD_RANGE_OF_YEARS, \
-    MSG_NO_RIGHTS_TO_CONSOLIDATE, \
-    MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
+    MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, \
+    MSG_NOT_GOOD_RANGE_OF_YEARS, MSG_NO_RIGHTS_TO_CONSOLIDATE, MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
     MSG_CAN_DELETE_ACCORDING_TO_TYPE, can_modify_end_year_by_proposal, can_modify_by_proposal, \
     MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
-from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, is_valid_proposal, \
-    MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, li_cancel_proposal, \
-    li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
+from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, \
+    is_valid_proposal, MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, \
+    li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -63,7 +64,7 @@ ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
 
 @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
 class LearningUnitTagLiEditTest(TestCase):
-
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def setUp(self):
         self.user = UserFactory()
         self.central_manager_person = create_person_with_permission_and_group(
@@ -80,8 +81,9 @@ class LearningUnitTagLiEditTest(TestCase):
         self.learning_unit = LearningUnitFactory()
         self.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
         self.current_academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
+
         AcademicYearFactory(year=self.current_academic_year.year + 2)
         AcademicYearFactory(year=self.current_academic_year.year + 3)
         AcademicYearFactory(year=self.current_academic_year.year + 4)
@@ -124,6 +126,7 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.client.force_login(user=self.central_manager_person.user)
         self.url_edit = reverse('edit_learning_unit', args=[self.learning_unit_year.id])
+        self.url_edit_non_editable = reverse('edit_learning_unit', args=[self.previous_learning_unit_year.id])
         self.request = RequestFactory().get("")
         self.context = {
             "learning_unit_year": self.learning_unit_year,
@@ -150,7 +153,7 @@ class LearningUnitTagLiEditTest(TestCase):
                     'id_li': ID_LINK_EDIT_LU,
                     'url': "#",
                     'title': "{}.  {}".format("You can't modify learning unit under year : %(year)d" %
-                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
                                               "Modifications should be made in EPC for year %(year)d" %
                                               {"year": self.previous_learning_unit_year.academic_year.year}),
                     'class_li': DISABLED,
@@ -237,10 +240,12 @@ class LearningUnitTagLiEditTest(TestCase):
             result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit)
         )
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
+        current_academic_yr = AcademicYear.objects.get(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
         lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=current_academic_yr,
             learning_unit=lu,
         )
         person_faculty_managers = [
@@ -252,7 +257,8 @@ class LearningUnitTagLiEditTest(TestCase):
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
             learning_unit_year_without_proposal.learning_container_year = self.lcy
-            learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.COURSE
+            learning_unit_year_without_proposal.learning_container_year.container_type = \
+                learning_container_year_types.COURSE
             learning_unit_year_without_proposal.learning_container_year.save()
             learning_unit_year_without_proposal.save()
             PersonEntityFactory(
@@ -287,7 +293,8 @@ class LearningUnitTagLiEditTest(TestCase):
             self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
                              self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
             # test 3rd condition true
-            learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.OTHER_COLLECTIVE
+            learning_unit_year_without_proposal.learning_container_year.container_type = \
+                learning_container_year_types.OTHER_COLLECTIVE
             learning_unit_year_without_proposal.learning_container_year.save()
             learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
             learning_unit_year_without_proposal.save()
@@ -433,15 +440,17 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.assertEqual(result, expected)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_delete_all_lu_everything_ok(self):
-        result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
+        result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
 
         expected = {
             'class_li': 'disabled',
             'load_modal': False,
             'url': '#',
             'id_li': 'link_delete_lus',
-            'title': "Vous ne pouvez pas supprimer une unité d'enseignement existant avant 2018",
+            'title': _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION},
             'text': '',
             'data_target': ''
         }

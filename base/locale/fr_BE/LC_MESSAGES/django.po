@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-05 10:56+0200\n"
+"POT-Creation-Date: 2019-09-13 14:44+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -975,7 +975,7 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
 
 msgid "Education group edition"
-msgstr "Edition d'organisation de formations"
+msgstr "Édition des programmes"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
@@ -1272,6 +1272,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 
 msgid "Generate pdf"
 msgstr "Générer le pdf"
+
+msgid "Generate xls of learning units that have prerequisites"
+msgstr "Générer xls des cours qui ont des prérequis"
 
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
@@ -1573,6 +1576,9 @@ msgstr "Type de lien"
 
 msgid "Linked with EPC"
 msgstr "Liens existants dans l'application EPC."
+
+msgid "List comparison LU / Proposal"
+msgstr "Liste de comparaison UE / Proposition"
 
 msgid "List education groups"
 msgstr "Liste des formations"
@@ -1955,6 +1961,9 @@ msgstr "OU"
 
 msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
+
+msgid "Official"
+msgstr "Officiel"
 
 msgid "On the file: direct access or access with additional training"
 msgstr ""
@@ -2500,7 +2509,7 @@ msgid "Scores exam diffusion"
 msgstr "Diffusion des feuilles de note"
 
 msgid "Scores exam submission"
-msgstr "Soumission des feuilles de note"
+msgstr "Soumission des notes d'examen"
 
 msgid "Scores must be between 0 and 20"
 msgstr "Les scores doivent être compris entre 0 et 20"
@@ -2653,7 +2662,7 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Résumé du cours"
+msgstr "Soumission des fiches descriptives"
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2668,7 +2677,7 @@ msgid "T=Cheating"
 msgstr "T=Tricherie"
 
 msgid "Teaching charge application"
-msgstr "Demande de frais d’enseignement"
+msgstr "Candidature en ligne"
 
 msgid "Teaching internship"
 msgstr "Stage d’enseignement"
@@ -2834,6 +2843,10 @@ msgid ""
 "The learning unit %(acronym)s is included in the following education groups"
 msgstr ""
 "L'unité d'enseignement %(acronym)s est incluse dans les groupements suivants"
+
+#, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
 #, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
@@ -3378,15 +3391,6 @@ msgstr "Accueil"
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
 
-msgid "Xls"
-msgstr "Xls"
-
-msgid "Xls UE/proposals comparison"
-msgstr "Xls de comparaison UE/proposition"
-
-msgid "Xls with proposals"
-msgstr "Xls avec les propositions"
-
 msgid "Yes"
 msgstr "Oui"
 
@@ -3456,11 +3460,17 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas modifier la date de fin de cette unité d'enseignement. "
 "Vous devriez être gestionnaire central ou l'unité d'enseignement devrait "
-"être un partim ou encore l'unité d'enseignement devrait être un cours/"
-"mémoire/stage"
+"être un partim ou encore l'unité d'enseignement devrait être un autre "
+"collectif/autre individuel/thèse"
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+#, python-format
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
+"de type %(type)s."
 
 msgid "You can not attach the same child several times."
 msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
@@ -3741,6 +3751,9 @@ msgstr "jj/mm/aaaa"
 msgid "french help text"
 msgstr "texte d'aide en français"
 
+msgid "has as prerequisite"
+msgstr "a comme prérequis"
+
 msgid "has the following prerequisites"
 msgstr "a des prérequis"
 
@@ -3830,6 +3843,10 @@ msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
+
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr "prérequis-%(year)s-%(acronym)s"
 
 msgid "professional integration"
 msgstr "intégration professionnelle"

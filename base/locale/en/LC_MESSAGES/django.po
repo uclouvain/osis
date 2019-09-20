@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-05 10:56+0200\n"
+"POT-Creation-Date: 2019-09-13 14:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1210,6 +1210,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units that have prerequisites"
+msgstr ""
+
 msgid "Get back to initial data"
 msgstr ""
 
@@ -1494,6 +1497,9 @@ msgid "Link type"
 msgstr ""
 
 msgid "Linked with EPC"
+msgstr ""
+
+msgid "List comparison LU / Proposal"
 msgstr ""
 
 msgid "List education groups"
@@ -1863,6 +1869,9 @@ msgid "OR"
 msgstr ""
 
 msgid "Offers enrollments"
+msgstr ""
+
+msgid "Official"
 msgstr ""
 
 msgid "On the file: direct access or access with additional training"
@@ -2709,6 +2718,10 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr ""
+
+#, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
 msgstr ""
 
@@ -3200,15 +3213,6 @@ msgstr ""
 msgid "Which type of %(category)s do you want to create ?"
 msgstr ""
 
-msgid "Xls"
-msgstr ""
-
-msgid "Xls UE/proposals comparison"
-msgstr ""
-
-msgid "Xls with proposals"
-msgstr ""
-
 msgid "Yes"
 msgstr ""
 
@@ -3269,6 +3273,9 @@ msgid ""
 msgstr ""
 
 msgid "You are succesfully logout."
+msgstr ""
+
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
 msgid "You can not attach the same child several times."
@@ -3512,6 +3519,9 @@ msgstr "mm/dd/yyyy"
 msgid "french help text"
 msgstr ""
 
+msgid "has as prerequisite"
+msgstr ""
+
 msgid "has the following prerequisites"
 msgstr ""
 
@@ -3597,6 +3607,10 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
+
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr ""
 
 msgid "professional integration"
 msgstr ""
