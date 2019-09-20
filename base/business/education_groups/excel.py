@@ -429,8 +429,8 @@ def _get_credits_prerequisite_of(luy_item, gey):
 
 def _get_blocks_prerequisite_of(gey):
     if gey:
-        l = [i for i in str(gey.block)]
+        block_in_array = [i for i in str(gey.block)]
         return " ; ".join(
-            l
+            block_in_array
         )
     return ''

@@ -461,4 +461,4 @@ def get_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
     elements = fetch_row_sql([root.id])
 
     distinct_group_elem_ids = {elem['id'] for elem in elements}
-    return  queryset.filter(pk__in=distinct_group_elem_ids)
+    return queryset.filter(pk__in=distinct_group_elem_ids)
