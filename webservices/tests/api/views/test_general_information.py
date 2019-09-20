@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -44,7 +44,7 @@ class GeneralInformationTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
-        cls.language = 'en'
+        cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
@@ -54,7 +54,6 @@ class GeneralInformationTestCase(APITestCase):
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             cls.egy.education_group_type.name
         ] = cls.pertinent_sections
-
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
                 language=cls.language,
@@ -67,10 +66,11 @@ class GeneralInformationTestCase(APITestCase):
                 text_label__label=section
             )
         for section in cls.pertinent_sections['specific']:
-            TranslatedTextLabelFactory(
-                language=cls.language,
-                text_label__label=section
-            )
+            if section != EVALUATION_KEY:
+                TranslatedTextLabelFactory(
+                    language=cls.language,
+                    text_label__label=section
+                )
             TranslatedTextFactory(
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
@@ -110,7 +110,7 @@ class GeneralInformationTestCase(APITestCase):
         invalid_url = reverse('generalinformations_read', kwargs={
             'acronym': 'dummy',
             'year': 2019,
-            'language': 'en'
+            'language': settings.LANGUAGE_CODE_EN
         })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -25,6 +25,7 @@
 ##############################################################################
 import collections
 
+from django.conf import settings
 from django.test import TestCase
 
 from base.business.education_groups import general_information_sections
@@ -43,7 +44,7 @@ class GeneralInformationSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.egy = EducationGroupYearFactory()
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
-        cls.language = 'en'
+        cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES]

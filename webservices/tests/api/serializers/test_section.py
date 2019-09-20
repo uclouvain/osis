@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType
@@ -74,7 +75,7 @@ class AchievementSectionSerializerTestCase(TestCase):
             'id': 'ID',
             'dummy': 'DUMMY'
         }
-        cls.language = 'en'
+        cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
@@ -104,7 +105,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             'id': 'ID',
             'dummy': 'DUMMY'
         }
-        cls.language = 'en'
+        cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory(
             acronym='ARKE2M',
             education_group_type__name=TrainingType.PGRM_MASTER_120.name

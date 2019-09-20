@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase
 
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory, AdmissionConditionLineFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
 from webservices.api.serializers.admission_condition_line import AdmissionConditionTextsSerializer, \
     AdmissionConditionLineSerializer
 
@@ -33,9 +36,12 @@ from webservices.api.serializers.admission_condition_line import AdmissionCondit
 class AdmissionConditionTextsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.ac = AdmissionConditionFactory()
-        cls.serializer = AdmissionConditionTextsSerializer(cls.ac, lang='en', context={
-            'lang': 'en',
+        egy = EducationGroupYearFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
+        AdmissionConditionFactory(education_group_year=common_egy)
+        cls.serializer = AdmissionConditionTextsSerializer(cls.ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
             'section': 'personalized_access'
         })
 
@@ -51,8 +57,8 @@ class AdmissionConditionlineSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.acl = AdmissionConditionLineFactory()
-        cls.serializer = AdmissionConditionLineSerializer(cls.acl, lang='en', context={
-            'lang': 'en',
+        cls.serializer = AdmissionConditionLineSerializer(cls.acl, context={
+            'lang': settings.LANGUAGE_CODE_EN,
         })
 
     def test_contains_expected_fields(self):

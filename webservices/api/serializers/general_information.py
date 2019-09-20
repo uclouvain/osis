@@ -58,13 +58,14 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         lang = kwargs['context']['language']
         self.instance.language = lang
-        if lang != 'fr':
+        if lang != settings.LANGUAGE_CODE_FR[:2]:
             self.fields['title'] = serializers.CharField(source='title_english', read_only=True)
 
     def get_sections(self, obj):
         datas = []
         sections = []
-        language = settings.LANGUAGE_CODE_FR if self.instance.language == 'fr' else self.instance.language
+        language = settings.LANGUAGE_CODE_FR \
+            if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
         common_egy = EducationGroupYear.objects.get_common(
             academic_year=obj.academic_year
@@ -74,18 +75,16 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             common_translated_text, _ = self._get_translated_text(common_egy, common_section, language)
             sections.append(common_translated_text)
 
-        context = {'egy': obj, 'lang': language}
+        cms_serializers = {
+            SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
+            ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
+            CONTACTS: ContactsSectionSerializer
+        }
         for specific_section in pertinent_sections['specific']:
-            section_data = {'id': specific_section}
-            if specific_section == SKILLS_AND_ACHIEVEMENTS:
-                achievements = AchievementSectionSerializer(section_data, context=context)
-                datas.append(achievements.data)
-            elif specific_section == ADMISSION_CONDITION:
-                ac = AdmissionConditionSectionSerializer(section_data, context=context)
-                datas.append(ac.data)
-            elif specific_section == CONTACTS:
-                contacts = ContactsSectionSerializer(section_data, context=context)
-                datas.append(contacts.data)
+            serializer = cms_serializers.get(specific_section)
+            if serializer:
+                serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
+                datas.append(serializer.data)
             elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
 
@@ -97,10 +96,10 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         return datas
 
     def _get_translated_text(self, egy, section, language):
-        translated_text_label = TranslatedTextLabel.objects.filter(
+        translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
-        ).first()
+        )
         translated_text = TranslatedText.objects.filter(
             text_label__label=section,
             language=language,

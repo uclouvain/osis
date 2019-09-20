@@ -36,11 +36,8 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        # Don't pass the 'lang' arg up to the superclass
-        language = kwargs.pop('lang', None)
-
-        # Instantiate the superclass normally
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
+        language = self.context.get('lang')
 
         is_admission_condition = isinstance(self.instance, AdmissionCondition)
         if language is not None:
@@ -60,21 +57,25 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         for field in data:
-            if data[field] == '':
-                data[field] = None
+            data[field] = data[field] or None
         return data
 
-    def _get_source(self, field_name, is_ac, language):
+    def _get_source(self, field_name, is_admission_condition, language):
         specific_fields = ['free_text', 'text']
 
-        prefix = 'text_' if is_ac else ''
+        prefix = 'text_' if is_admission_condition else ''
 
-        object_source = 'common_admission_condition.' if field_name not in specific_fields and is_ac else ''
+        object_source = 'common_admission_condition.' \
+            if field_name not in specific_fields and is_admission_condition else ''
 
-        field_source = 'free' if field_name == 'free_text' else field_name
-        if 'section' in self.context and is_ac:
-            field_source = self.context.get('section')
+        field_source = self._manage_special_field_cases(field_name, is_admission_condition)
 
         lang = '' if language == settings.LANGUAGE_CODE_FR else '_' + language
 
         return object_source + prefix + field_source + lang
+
+    def _manage_special_field_cases(self, field_name, is_admission_condition):
+        field_source = 'free' if field_name == 'free_text' else field_name
+        if 'section' in self.context and is_admission_condition:
+            field_source = self.context.get('section')
+        return field_source

@@ -83,12 +83,7 @@ class AdmissionCondition(models.Model):
         admission_condition_common = None
         egy = self.education_group_year
         egy_type = egy.education_group_type.name
-        if any([
-            egy.is_bachelor,
-            egy.is_master120, egy.is_master60, egy.is_master180,
-            egy.is_aggregation,
-            egy.is_specialized_master
-        ]):
+        if egy.has_common_admission_condition:
             if egy.is_master60 or egy.is_master180:
                 egy_type = TrainingType.PGRM_MASTER_120.name
             common_education_group_year = EducationGroupYear.objects.get(

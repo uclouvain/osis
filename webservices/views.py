@@ -27,6 +27,7 @@ import collections
 import functools
 import re
 
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
@@ -48,7 +49,7 @@ from webservices import business
 from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
 
-LANGUAGES = {'fr': 'fr-be', 'en': 'en'}
+LANGUAGES = {settings.LANGUAGE_CODE_FR[:2]: settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN: settings.LANGUAGE_CODE_EN}
 INTRO_PATTERN = r'intro-(?P<acronym>\w+)'
 COMMON_PATTERN = r'(?P<section_name>\w+)-commun'
 ACRONYM_PATTERN = re.compile(r'(?P<prefix>[a-z]+)(?P<cycle>[0-9]{1,3})(?P<suffix>[a-z]+)(?P<year>[0-9]?)')
@@ -78,7 +79,7 @@ def new_description(education_group_year, language, title, acronym):
 
 
 def get_title_of_education_group_year(education_group_year, iso_language):
-    if iso_language == 'fr-be':
+    if iso_language == settings.LANGUAGE_CODE_FR:
         title = education_group_year.title
     else:
         title = education_group_year.title_english
@@ -234,8 +235,8 @@ def get_intro_or_common_section(context, education_group_year, m_intro, m_common
 
 def new_context(education_group_year, iso_language, language, original_acronym):
     assert isinstance(education_group_year, EducationGroupYear)
-    assert isinstance(iso_language, str) and iso_language in ('fr-be', 'en')
-    assert isinstance(language, str) and language in ('fr', 'en')
+    assert isinstance(iso_language, str) and iso_language in (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN)
+    assert isinstance(language, str) and language in (settings.LANGUAGE_CODE_FR[:2], settings.LANGUAGE_CODE_EN)
     assert isinstance(original_acronym, str)
 
     title = get_title_of_education_group_year(education_group_year, iso_language)
@@ -254,7 +255,7 @@ def new_context(education_group_year, iso_language, language, original_acronym):
         education_group_year=education_group_year,
         academic_year=education_group_year.academic_year,
         language=iso_language,
-        suffix_language='' if iso_language == 'fr-be' else '_en'
+        suffix_language='' if iso_language == settings.LANGUAGE_CODE_FR else '_en'
     )
     return context
 
