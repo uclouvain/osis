@@ -31,9 +31,9 @@ import factory.fuzzy
 
 from base.models import academic_year as mdl_academic_year
 from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, compute_max_academic_year_adjournment
-from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
-    learning_unit_year_periodicity, learning_unit_year_subtypes, component_type
 from base.models.enums import entity_type
+from base.models.enums import learning_container_year_types, \
+    learning_unit_year_periodicity, learning_unit_year_subtypes, component_type
 from base.models.enums import learning_unit_year_session
 from base.models.enums import organization_type
 from base.models.enums import quadrimesters
@@ -50,20 +50,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from reference.tests.factories.language import LanguageFactory
-
-
-def create_learning_unit_with_context(academic_year, structure, entity, acronym):
-    learning_container_year = LearningContainerYearFactory(
-        academic_year=academic_year,
-        acronym=acronym,
-        allocation_entity=entity,
-    )
-    learning_unit_year = LearningUnitYearFactory(structure=structure,
-                                                 acronym=acronym,
-                                                 learning_container_year=learning_container_year,
-                                                 academic_year=academic_year)
-
-    return learning_unit_year
 
 
 class LearningUnitsMixin:

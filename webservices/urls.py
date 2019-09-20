@@ -30,7 +30,8 @@ from django.conf import settings
 from django.conf.urls import url, include
 
 from webservices.api.views.auth_token import AuthToken
-from webservices.views import ws_catalog_offer, ws_catalog_common_offer, ws_catalog_common_admission_condition
+from webservices.views import ws_catalog_offer, ws_catalog_common_offer, ws_catalog_common_admission_condition, \
+    ws_catalog_offer_v02
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -38,6 +39,7 @@ url_api_v1 = [url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name)]
 
 webservice_apps = [
     'education_group',
+    'learning_unit',
     'reference',
     'continuing_education',
     'base',
@@ -68,5 +70,8 @@ urlpatterns = [
     url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
         ws_catalog_offer,
         name='v0.1-ws_catalog_offer'),
+    url('^v0.2/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
+        ws_catalog_offer_v02,
+        name='v0.2-ws_catalog_offer'),
     url(r'^v1/', include(url_api_v1)),
 ]
