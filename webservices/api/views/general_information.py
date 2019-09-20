@@ -23,19 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.shortcuts import get_object_or_404
+from rest_framework import generics
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from webservices.views import get_title_of_education_group_year
-from django.conf import settings
+from base.models.education_group_year import EducationGroupYear
+from webservices.api.serializers.general_information import GeneralInformationSerializer
 
 
-class GetTitleOrEducationGroupYear_TestCase(TestCase):
-    def test_get_title_or_education_group_year(self):
-        ega = EducationGroupYearFactory(title='french', title_english='english')
+class GeneralInformation(generics.RetrieveAPIView):
+    """
+        Return the general informations for an Education Group Year
+    """
+    name = 'generalinformations_read'
+    serializer_class = GeneralInformationSerializer
 
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_FR)
-        self.assertEqual('french', title)
+    def get_object(self):
+        egy = get_object_or_404(
+            EducationGroupYear.objects.select_related('academic_year'),
+            acronym=self.kwargs['acronym'].upper(),
+            academic_year__year=self.kwargs['year']
+        )
+        return egy
 
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_EN)
-        self.assertEqual('english', title)
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.kwargs['language']
+        return serializer_context

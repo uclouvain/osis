@@ -25,6 +25,7 @@
 ##############################################################################
 from collections import OrderedDict
 
+from django.conf import settings
 from django.db.models.functions import Lower
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -52,7 +53,7 @@ class LearningAchievementList(generics.GenericAPIView):
         learning_achievements_grouped = OrderedDict()
         for learning_achievement in qs:
             code_name = learning_achievement['code_name']
-            learning_achievements_grouped.setdefault(code_name, {'fr': '', 'en': '', 'code_name': code_name})
+            learning_achievements_grouped.setdefault(code_name, {settings.LANGUAGE_CODE_FR[:2]: '', settings.LANGUAGE_CODE_EN: '', 'code_name': code_name})
             learning_achievements_grouped[code_name][learning_achievement['iso_code']] = \
                 learning_achievement['text']
 

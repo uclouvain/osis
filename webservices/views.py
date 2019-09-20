@@ -47,8 +47,9 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from webservices import business
 from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
+from django.conf import settings
 
-LANGUAGES = {'fr': 'fr-be', 'en': 'en'}
+LANGUAGES = {settings.LANGUAGE_CODE_FR[:2]: settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN: settings.LANGUAGE_CODE_EN}
 INTRO_PATTERN = r'intro-(?P<acronym>\w+)'
 COMMON_PATTERN = r'(?P<section_name>\w+)-commun'
 ACRONYM_PATTERN = re.compile(r'(?P<prefix>[a-z]+)(?P<cycle>[0-9]{1,3})(?P<suffix>[a-z]+)(?P<year>[0-9]?)')
@@ -78,7 +79,7 @@ def new_description(education_group_year, language, title, acronym):
 
 
 def get_title_of_education_group_year(education_group_year, iso_language):
-    if iso_language == 'fr-be':
+    if iso_language == settings.LANGUAGE_CODE_FR:
         title = education_group_year.title
     else:
         title = education_group_year.title_english
@@ -102,6 +103,25 @@ def validate_json_request(request, year, acronym):
 
     if not all(isinstance(item, str) for item in request_json['sections']):
         raise SuspiciousOperation('Invalid JSON')
+
+
+@api_view(['POST'])
+@renderer_classes((JSONRenderer,))
+def ws_catalog_offer_v02(request, year, language, acronym):
+    # Validation
+    education_group_year, iso_language, year = parameters_validation(acronym, language, year)
+
+    # Processing
+    context = new_context(education_group_year, iso_language, language, acronym)
+    type_sections = SECTIONS_PER_OFFER_TYPE[education_group_year.education_group_type.name]
+    items = type_sections['specific'] + [section + '-commun' for section in type_sections['common']]
+
+    with translation.override(context.language):
+        sections = process_message(context, education_group_year, items)
+        context.description['sections'] = convert_sections_to_list_of_dict(sections)
+        context.description['sections'].append(get_conditions_admissions(context))
+
+    return Response(context.description, content_type='application/json')
 
 
 @api_view(['POST'])
@@ -215,8 +235,8 @@ def get_intro_or_common_section(context, education_group_year, m_intro, m_common
 
 def new_context(education_group_year, iso_language, language, original_acronym):
     assert isinstance(education_group_year, EducationGroupYear)
-    assert isinstance(iso_language, str) and iso_language in ('fr-be', 'en')
-    assert isinstance(language, str) and language in ('fr', 'en')
+    assert isinstance(iso_language, str) and iso_language in (settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN)
+    assert isinstance(language, str) and language in (settings.LANGUAGE_CODE_FR[:2], settings.LANGUAGE_CODE_EN)
     assert isinstance(original_acronym, str)
 
     title = get_title_of_education_group_year(education_group_year, iso_language)
@@ -235,7 +255,7 @@ def new_context(education_group_year, iso_language, language, original_acronym):
         education_group_year=education_group_year,
         academic_year=education_group_year.academic_year,
         language=iso_language,
-        suffix_language='' if iso_language == 'fr-be' else '_en'
+        suffix_language='' if iso_language == settings.LANGUAGE_CODE_FR else '_en'
     )
     return context
 

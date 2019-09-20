@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,19 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.utils import translation
+from rest_framework import serializers
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from webservices.views import get_title_of_education_group_year
-from django.conf import settings
+from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializer
 
 
-class GetTitleOrEducationGroupYear_TestCase(TestCase):
-    def test_get_title_or_education_group_year(self):
-        ega = EducationGroupYearFactory(title='french', title_english='english')
+class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
+    text = serializers.CharField(read_only=True)
+    text_common = serializers.CharField(read_only=True)
 
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_FR)
-        self.assertEqual('french', title)
+    class Meta:
+        model = AdmissionCondition
 
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_EN)
-        self.assertEqual('english', title)
+        fields = (
+            'text',
+            'text_common',
+        )
+
+
+class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
+    access = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = AdmissionConditionLine
+
+        fields = (
+            'access',
+            'conditions',
+            'diploma',
+            'remarks'
+        )
+
+    def get_access(self, obj):
+        with translation.override(self.context.get('lang')):
+            return obj.get_access_display()

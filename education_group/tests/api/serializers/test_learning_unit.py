@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
@@ -74,7 +75,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
 
     def test_ensure_title_field_is_dict(self):
         expected_dict = {
-            'fr': self.training.title,
-            'en': self.training.title_english
+            settings.LANGUAGE_CODE_FR[:2]: self.training.title,
+            settings.LANGUAGE_CODE_EN: self.training.title_english
         }
         self.assertDictEqual(self.serializer.data['title'], expected_dict)
