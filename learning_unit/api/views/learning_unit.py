@@ -78,8 +78,14 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
         'learningcomponentyear_set'
     ).annotate_full_title()
     lookup_field = 'uuid'
+    serializer_class = LearningUnitDetailedSerializer
 
-    def get_serializer_class(self):
-        if GET_PART_URL in self.request.get_full_path():
-            return LearningUnitTitleSerializer
-        return LearningUnitDetailedSerializer
+
+class LearningUnitTitle(generics.RetrieveAPIView):
+    """
+        Return the title of the learning unit
+    """
+    name = 'learningunitstitle_read'
+    queryset = LearningUnitYear.objects.all().annotate_full_title()
+    lookup_field = 'uuid'
+    serializer_class = LearningUnitTitleSerializer
