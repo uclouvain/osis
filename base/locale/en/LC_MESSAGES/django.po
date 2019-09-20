@@ -1210,6 +1210,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr ""
+
 msgid "Generate xls of learning units that have prerequisites"
 msgstr ""
 
@@ -3537,10 +3540,14 @@ msgstr ""
 msgid "initial value"
 msgstr ""
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr ""
 
 msgid "is using in"
+msgstr ""
+
+#, python-format
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
 msgid "learning unit year"
