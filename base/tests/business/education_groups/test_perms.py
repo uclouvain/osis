@@ -201,8 +201,9 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         training = TrainingFactory(academic_year=self.current_academic_year)
 
         for education_group_year in [training_n1, training]:
-            perm = CommonEducationGroupStrategyPerms(self.person.user, education_group_year)
-            self.assertTrue(perm._is_current_academic_year_in_range_of_editable_education_group_year())
+            with self.subTest(msg=education_group_year):
+                perm = CommonEducationGroupStrategyPerms(self.person.user, education_group_year)
+                self.assertTrue(perm._is_current_academic_year_in_range_of_editable_education_group_year())
 
     @mock.patch('base.business.education_groups.perms.check_link_to_management_entity', return_value=True)
     def test_is_linked_to_management_entity(self, mock_check_link):
@@ -376,8 +377,9 @@ class TestGeneralInformationPerms(TestCase):
         faculty_manager = FacultyManagerFactory()
 
         for education_group_year in [self.training, self.common_bachelor]:
-            perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
-            self.assertTrue(perm._is_faculty_manager_eligible())
+            with self.subTest(msg=education_group_year):
+                perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
+                self.assertTrue(perm._is_faculty_manager_eligible())
 
 
 class TestAdmissionConditionPerms(TestCase):

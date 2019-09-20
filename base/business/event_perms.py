@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from abc import ABC
+
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import perms
@@ -30,174 +32,57 @@ from base.models.academic_calendar import get_academic_calendar_by_date_and_refe
 from base.models.enums import academic_calendar_type
 
 
-class EventPermDeliberation:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermDeliberation.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermDeliberation.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermDissertationSubmission:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermDissertationSubmission.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermDissertationSubmission.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermExamEnrollment:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermExamEnrollment.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermExamEnrollment.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermScoresExamDiffusion:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermEducationGroupEdition.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermEducationGroupEdition.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermScoresExamSubmission:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermScoresExamSubmission.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermScoresExamSubmission.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermTeachingChargeApplication:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermTeachingChargeApplication.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermTeachingChargeApplication.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermCourseEnrollment:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermCourseEnrollment.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermCourseEnrollment.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermSummaryCourseSubmission:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermSummaryCourseSubmission.__is_open_central(args, kwargs)
-        elif person and person.is_faculty_manager:
-            return EventPermSummaryCourseSubmission.__is_open_faculty(args, kwargs)
-        return False
-
-    @staticmethod
-    def __is_open_central(*args, **kwargs):
-        pass
-
-    @staticmethod
-    def __is_open_faculty(*args, **kwargs):
-        pass
-
-
-class EventPermEducationGroupEdition:
-    @staticmethod
-    def is_open(*args, **kwargs):
-        person = kwargs.get('person')
-        if person and person.is_central_manager:
-            return EventPermEducationGroupEdition.__is_open_central(*args, **kwargs)
+class EventPerm(ABC):
+    @classmethod
+    def is_open(cls, *args, **kwargs):
         if kwargs.get('education_group'):
-            EventPermEducationGroupEdition.__is_open_other(*args, **kwargs)
-        return EventPermEducationGroupEdition.__is_calendar_opened(*args, **kwargs)
+            return cls.__is_open_for_spec_egy(*args, **kwargs)
+        return cls.__is_open_other_rules(*args, **kwargs)
 
     @staticmethod
-    def __is_open_central(*args, **kwargs):
-        return True
+    def __is_open_for_spec_egy(*args, **kwargs):
+        return False
 
     @staticmethod
-    def __is_open_other(*args, **kwargs):
+    def __is_open_other_rules(*args, **kwargs):
+        return False
+
+
+class EventPermDeliberation(EventPerm):
+    pass
+
+
+class EventPermDissertationSubmission(EventPerm):
+    pass
+
+
+class EventPermExamEnrollment(EventPerm):
+    pass
+
+
+class EventPermScoresExamDiffusion(EventPerm):
+    pass
+
+
+class EventPermScoresExamSubmission(EventPerm):
+    pass
+
+
+class EventPermTeachingChargeApplication(EventPerm):
+    pass
+
+
+class EventPermCourseEnrollment(EventPerm):
+    pass
+
+
+class EventPermSummaryCourseSubmission(EventPerm):
+    pass
+
+
+class EventPermEducationGroupEdition(EventPerm):
+    @staticmethod
+    def __is_open_for_spec_egy(*args, **kwargs):
         aca_year = kwargs.get('education_group').academic_year
         academic_calendar = get_academic_calendar_by_date_and_reference_and_data_year(
             aca_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
@@ -207,7 +92,7 @@ class EventPermEducationGroupEdition:
 
         result = error_msg is None
         perms.can_raise_exception(kwargs.get('raise_exception', False), result, error_msg)
-        return result
+        return result if kwargs.get('raise_exception', False) else academic_calendar
 
     @staticmethod
     def __is_calendar_opened(*args, **kwargs):
