@@ -64,7 +64,8 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     def get_sections(self, obj):
         datas = []
         sections = []
-        language = settings.LANGUAGE_CODE_FR if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
+        language = settings.LANGUAGE_CODE_FR \
+            if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
         common_egy = EducationGroupYear.objects.get_common(
             academic_year=obj.academic_year
@@ -95,10 +96,10 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         return datas
 
     def _get_translated_text(self, egy, section, language):
-        translated_text_label = TranslatedTextLabel.objects.filter(
+        translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
-        ).first()
+        )
         translated_text = TranslatedText.objects.filter(
             text_label__label=section,
             language=language,
