@@ -37,6 +37,11 @@ urlpatterns = [
     url(r'^learning_units$', LearningUnitList.as_view(), name=LearningUnitList.name),
     url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitDetailed.as_view(), name=LearningUnitDetailed.name),
     url(
+        r'^learning_units/(?P<uuid>[0-9a-f-]+)/get_title',
+        LearningUnitDetailed.as_view(),
+        name='learningunitstitle_read'
+    ),
+    url(
         r'^learning_units/(?P<uuid>[0-9a-f-]+)/attributions',
         LearningUnitAttribution.as_view(),
         name=LearningUnitAttribution.name

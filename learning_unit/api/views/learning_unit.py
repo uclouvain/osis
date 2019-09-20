@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
 from django_filters import rest_framework as filters
+from rest_framework import generics
 
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
+    LearningUnitTitleSerializer
+
+GET_PART_URL = 'get_title'
 
 
 class LearningUnitFilter(filters.FilterSet):
@@ -74,5 +77,9 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
         'learning_container_year__requirement_entity__entityversion_set',
         'learningcomponentyear_set'
     ).annotate_full_title()
-    serializer_class = LearningUnitDetailedSerializer
     lookup_field = 'uuid'
+
+    def get_serializer_class(self):
+        if GET_PART_URL in self.request.get_full_path():
+            return LearningUnitTitleSerializer
+        return LearningUnitDetailedSerializer
