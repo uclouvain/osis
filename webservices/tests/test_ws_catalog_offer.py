@@ -320,7 +320,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
                                                  entity=text_label.entity)
 
                 tt2 = TranslatedTextRandomFactory(text_label=text_label,
-                                                  language=self.iso_language,
+                                                  language=iso_language,
                                                   reference=self.common_education_group_year.id,
                                                   entity=text_label.entity)
 
