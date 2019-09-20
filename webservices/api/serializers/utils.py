@@ -36,9 +36,8 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        language = self.context.get('lang')
-
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
+        language = self.context.get('lang')
 
         is_admission_condition = isinstance(self.instance, AdmissionCondition)
         if language is not None:

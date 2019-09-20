@@ -257,11 +257,11 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
             (self.iso_language, self.language),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
-            with self.subTest(iso_language=self.iso_language, language=language):
+            with self.subTest(iso_language=iso_language, language=language):
                 ttl = TranslatedTextLabelFactory(text_label=text_label,
-                                                 language=self.iso_language)
+                                                 language=iso_language)
                 tt = TranslatedTextRandomFactory(text_label=text_label,
-                                                 language=self.iso_language,
+                                                 language=iso_language,
                                                  reference=self.education_group_year.id,
                                                  entity=text_label.entity)
 
@@ -311,11 +311,11 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
             (self.iso_language, self.language),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
-            with self.subTest(iso_language=self.iso_language, language=language):
+            with self.subTest(iso_language=iso_language, language=language):
                 ttl = TranslatedTextLabelFactory(text_label=text_label,
-                                                 language=self.iso_language)
+                                                 language=iso_language)
                 tt = TranslatedTextRandomFactory(text_label=text_label,
-                                                 language=self.iso_language,
+                                                 language=iso_language,
                                                  reference=self.education_group_year.id,
                                                  entity=text_label.entity)
 
