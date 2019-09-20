@@ -26,7 +26,7 @@
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import perms
-from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year
+from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
 from base.models.enums import academic_calendar_type
 
 
@@ -188,7 +188,9 @@ class EventPermEducationGroupEdition:
         person = kwargs.get('person')
         if person and person.is_central_manager:
             return EventPermEducationGroupEdition.__is_open_central(*args, **kwargs)
-        return EventPermEducationGroupEdition.__is_open_other(*args, **kwargs)
+        if kwargs.get('education_group'):
+            EventPermEducationGroupEdition.__is_open_other(*args, **kwargs)
+        return EventPermEducationGroupEdition.__is_calendar_opened(*args, **kwargs)
 
     @staticmethod
     def __is_open_central(*args, **kwargs):
@@ -196,8 +198,9 @@ class EventPermEducationGroupEdition:
 
     @staticmethod
     def __is_open_other(*args, **kwargs):
+        aca_year = kwargs.get('education_group').academic_year
         academic_calendar = get_academic_calendar_by_date_and_reference_and_data_year(
-            kwargs.get('education_group').academic_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
+            aca_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
         error_msg = None
         if not academic_calendar:
             error_msg = _("This education group is not editable during this period.")
@@ -205,3 +208,9 @@ class EventPermEducationGroupEdition:
         result = error_msg is None
         perms.can_raise_exception(kwargs.get('raise_exception', False), result, error_msg)
         return result
+
+    @staticmethod
+    def __is_calendar_opened(*args, **kwargs):
+        return AcademicCalendar.objects.open_calendars()\
+            .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
+            .exists()
