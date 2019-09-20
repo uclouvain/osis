@@ -31,7 +31,7 @@ from django.test import TestCase, override_settings
 
 from base.forms.education_group.common import EducationGroupModelForm, CommonBaseForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm, MiniTrainingForm
-from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.academic_year import current_academic_year, AcademicYear, starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -316,7 +316,7 @@ class TestCommonBaseFormSave(TestCase):
         initial_educ_group_year = EducationGroupYearFactory(
             management_entity=entity_version.entity,
             academic_year=self.expected_educ_group_year.academic_year,
-            education_group__start_year=current_academic_year()
+            education_group__start_year=starting_academic_year()
         )
 
         GroupElementYearFactory(parent=parent, child_branch=initial_educ_group_year)
