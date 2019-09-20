@@ -30,8 +30,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
     LearningUnitTitleSerializer
 
-GET_PART_URL = 'get_title'
-
 
 class LearningUnitFilter(filters.FilterSet):
     acronym_like = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
