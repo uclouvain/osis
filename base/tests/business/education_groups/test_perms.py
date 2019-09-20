@@ -369,9 +369,10 @@ class TestGeneralInformationPerms(TestCase):
         faculty_manager = FacultyManagerFactory()
 
         for education_group_year in [training_in_past, common_in_past]:
-            perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
-            with self.assertRaises(PermissionDenied):
-                perm._is_faculty_manager_eligible()
+            with self.subTest(msg=education_group_year):
+                perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
+                with self.assertRaises(PermissionDenied):
+                    perm._is_faculty_manager_eligible()
 
     def test_is_faculty_manager_eligible(self):
         faculty_manager = FacultyManagerFactory()

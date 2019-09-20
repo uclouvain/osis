@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,18 +34,19 @@ from base.models.enums import academic_calendar_type
 
 class EventPerm(ABC):
     @classmethod
+    @abstractmethod
     def is_open(cls, *args, **kwargs):
-        if kwargs.get('education_group'):
-            return cls.__is_open_for_spec_egy(*args, **kwargs)
-        return cls.__is_open_other_rules(*args, **kwargs)
+        pass
 
-    @staticmethod
-    def __is_open_for_spec_egy(*args, **kwargs):
-        return False
+    @classmethod
+    @abstractmethod
+    def __is_open_for_spec_egy(cls, *args, **kwargs):
+        pass
 
-    @staticmethod
-    def __is_open_other_rules(*args, **kwargs):
-        return False
+    @classmethod
+    @abstractmethod
+    def __is_open_other_rules(cls, *args, **kwargs):
+        pass
 
 
 class EventPermDeliberation(EventPerm):
@@ -81,18 +82,30 @@ class EventPermSummaryCourseSubmission(EventPerm):
 
 
 class EventPermEducationGroupEdition(EventPerm):
-    @staticmethod
-    def __is_open_for_spec_egy(*args, **kwargs):
+    @classmethod
+    def is_open(cls, *args, **kwargs):
+        if kwargs.get('education_group'):
+            return cls.__is_open_for_spec_egy(*args, **kwargs)
+        return cls.__is_open_other_rules(*args, **kwargs)
+
+    @classmethod
+    def __is_open_for_spec_egy(cls, *args, **kwargs):
         aca_year = kwargs.get('education_group').academic_year
         academic_calendar = get_academic_calendar_by_date_and_reference_and_data_year(
             aca_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
+        if kwargs.get('in_range'):
+            return academic_calendar
         error_msg = None
         if not academic_calendar:
             error_msg = _("This education group is not editable during this period.")
 
         result = error_msg is None
         perms.can_raise_exception(kwargs.get('raise_exception', False), result, error_msg)
-        return result if kwargs.get('raise_exception', False) else academic_calendar
+        return result
+
+    @classmethod
+    def __is_open_other_rules(cls, *args, **kwargs):
+        return cls.__is_calendar_opened(*args, **kwargs)
 
     @staticmethod
     def __is_calendar_opened(*args, **kwargs):

@@ -258,7 +258,7 @@ class CommonEducationGroupStrategyPerms(object):
         return True
 
     def _is_current_academic_year_in_range_of_editable_education_group_year(self):
-        return EventPermEducationGroupEdition.is_open(education_group=self.education_group_year)
+        return EventPermEducationGroupEdition.is_open(education_group=self.education_group_year, in_range=True)
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
@@ -288,8 +288,7 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        # if not EventPermEducationGroupEdition.is_open(education_group=self.education_group_year):
-        if not EventPermEducationGroupEdition.is_open():
+        if not EventPermEducationGroupEdition.is_open(education_group=self.education_group_year):
             raise PermissionDenied(_("The faculty manager cannot modify general information which are lower than N"))
         return True
 
