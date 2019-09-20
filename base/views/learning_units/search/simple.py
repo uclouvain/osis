@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import JsonResponse
@@ -39,14 +40,13 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import cache_filter, CacheFilterMixin
 from base.views.common import paginate_queryset
 from base.views.learning_units.search.common import SIMPLE_SEARCH, _get_filter, \
-    ITEMS_PER_PAGES
+    ITEMS_PER_PAGES, SerializeFilterListIfAjaxMixin
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
 # TODO login required
-class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
     model = LearningUnitYear
-    paginate_by = 2000
     template_name = "learning_unit/search/simple.html"
     raise_exception = True
     search_type = SIMPLE_SEARCH
@@ -54,6 +54,8 @@ class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
     filterset_class = LearningUnitFilter
     permission_required = 'base.can_access_learningunit'
     cache_exclude_params = 'xls_status'
+
+    serializer_class = LearningUnitSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -76,12 +78,6 @@ class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = LearningUnitSerializer(context["page_obj"], context={'request': self.request}, many=True)
-            return JsonResponse({'object_list': serializer.data})
-        return super().render_to_response(context, **response_kwargs)
 
 
 @login_required
@@ -122,10 +118,6 @@ def learning_units(request):
 
     items_per_page = request.GET.get("paginator_size", ITEMS_PER_PAGES)
     object_list_paginated = paginate_queryset(found_learning_units, request.GET, items_per_page=items_per_page)
-    # TODO move to decorator
-    if request.is_ajax():
-        serializer = LearningUnitSerializer(object_list_paginated, context={'request': request}, many=True)
-        return JsonResponse({'object_list': serializer.data})
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
     starting_ac = starting_academic_year()

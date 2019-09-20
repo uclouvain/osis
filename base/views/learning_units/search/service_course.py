@@ -33,15 +33,15 @@ from base.forms.learning_unit.search_form import LearningUnitFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
-from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, ITEMS_PER_PAGES
+from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, ITEMS_PER_PAGES, \
+    SerializeFilterListIfAjaxMixin
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
 # TODO adapt filter to service course
 # TODO excel for service course
-class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
     model = LearningUnitYear
-    paginate_by = 2000
     template_name = "learning_unit/search/service_course.html"
     raise_exception = True
     search_type = SERVICE_COURSES_SEARCH
@@ -49,6 +49,8 @@ class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView)
     filterset_class = LearningUnitFilter
     permission_required = 'base.can_access_learningunit'
     cache_exclude_params = 'xls_status'
+
+    serializer_class = LearningUnitSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -71,9 +73,3 @@ class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView)
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = LearningUnitSerializer(context["page_obj"], context={'request': self.request}, many=True)
-            return JsonResponse({'object_list': serializer.data})
-        return super().render_to_response(context, **response_kwargs)

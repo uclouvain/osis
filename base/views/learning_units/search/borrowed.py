@@ -33,15 +33,14 @@ from base.forms.learning_unit.search_form import LearningUnitFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
-from base.views.learning_units.search.common import BORROWED_COURSE, ITEMS_PER_PAGES
+from base.views.learning_units.search.common import BORROWED_COURSE, ITEMS_PER_PAGES, SerializeFilterListIfAjaxMixin
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
 # TODO adapt filter to borrowed course
 # TODO excel for borrowed course
-class BorrowedLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+class BorrowedLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
     model = LearningUnitYear
-    paginate_by = 2000
     template_name = "learning_unit/search/service_course.html"
     raise_exception = True
     search_type = BORROWED_COURSE
@@ -49,6 +48,8 @@ class BorrowedLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, Filt
     filterset_class = LearningUnitFilter
     permission_required = 'base.can_access_learningunit'
     cache_exclude_params = 'xls_status'
+
+    serializer_class = LearningUnitSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

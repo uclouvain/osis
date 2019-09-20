@@ -26,6 +26,7 @@
 import collections
 import itertools
 
+from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.search.search_form import get_research_criteria
@@ -67,3 +68,11 @@ def _get_search_type_label(search_type):
         SERVICE_COURSES_SEARCH: _('Service courses'),
         BORROWED_COURSE: _('Borrowed courses')
     }.get(search_type, _('Learning units'))
+
+
+class SerializeFilterListIfAjaxMixin:
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            serializer = self.serializer_class(context["page_obj"], context={'request': self.request}, many=True)
+            return JsonResponse({'object_list': serializer.data})
+        return super().render_to_response(context, **response_kwargs)
