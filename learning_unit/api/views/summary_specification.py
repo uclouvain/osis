@@ -32,7 +32,8 @@ from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS
 from base.models.learning_unit_year import LearningUnitYear
 from cms.models.translated_text import TranslatedText
-from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
+from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer, \
+    LearningUnitSummarySpecificationSpecificLanguageSerializer
 
 
 class LearningUnitSummarySpecification(generics.GenericAPIView):
@@ -40,30 +41,59 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         Return all summary and specification information of the learning unit specified
     """
     name = 'learningunitsummaryspecification_read'
-    serializer_class = LearningUnitSummarySpecificationSerializer
+    # serializer_class = LearningUnitSummarySpecificationSerializer
     filter_backends = []
     paginator = None
 
     def get(self, request, *args, **kwargs):
         learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
+        language = self.request.query_params.get('lang')
         qs = TranslatedText.objects.filter(
             reference=learning_unit_year.pk,
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         ).annotate(
-            iso_code=Case(
-                When(language=LANGUAGE_CODE_FR, then=Value('fr')),
-                When(language=LANGUAGE_CODE_EN, then=Value('en')),
-                default=None,
-                output_field=CharField(),
-            ),
             label=F('text_label__label')
-        ).exclude(iso_code__isnull=True).values('label', 'iso_code', 'text')
+        )
 
+        if language:
+            qs = qs.filter(
+                language=LANGUAGE_CODE_FR if language == 'fr' else language
+            ).values('label', 'text')
+        else:
+            qs = qs.annotate(
+                iso_code=Case(
+                    When(language=LANGUAGE_CODE_FR, then=Value('fr')),
+                    When(language=LANGUAGE_CODE_EN, then=Value('en')),
+                    default=None,
+                    output_field=CharField(),
+                ),
+            ).exclude(iso_code__isnull=True).values('label', 'iso_code', 'text')
+        if language:
+            serializer = self._get_for_specific_language(qs)
+        else:
+            serializer = self._get_for_both_languages(qs)
+
+        return Response(serializer.data)
+
+    def _get_for_both_languages(self, qs):
         summary_specification_grouped = {}
         for translated_text in qs:
             key = translated_text['label']
             summary_specification_grouped.setdefault(key, {'fr': '', 'en': ''})
             summary_specification_grouped[key][translated_text['iso_code']] = translated_text['text']
-
+        print(summary_specification_grouped)
         serializer = self.get_serializer(summary_specification_grouped)
-        return Response(serializer.data)
+        return serializer
+
+    def _get_for_specific_language(self, qs):
+        summary_specification_grouped = {}
+        for translated_text in qs:
+            key = translated_text['label']
+            summary_specification_grouped[key] = translated_text['text']
+        serializer = self.get_serializer(summary_specification_grouped)
+        return serializer
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.query_params.get('lang'):
+            return LearningUnitSummarySpecificationSpecificLanguageSerializer
+        return LearningUnitSummarySpecificationSerializer

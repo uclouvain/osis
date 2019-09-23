@@ -38,3 +38,15 @@ class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
     themes_discussed = common_serializers.TranslatedSerializer()
     prerequisite = common_serializers.TranslatedSerializer()
     mobility = common_serializers.TranslatedSerializer()
+
+
+class LearningUnitSummarySpecificationSpecificLanguageSerializer(serializers.Serializer):
+    bibliography = serializers.CharField()
+    resume = serializers.CharField()
+    evaluation_methods = serializers.CharField()
+    other_informations = serializers.CharField()
+    online_resources = serializers.CharField()
+    teaching_methods = serializers.CharField()
+    themes_discussed = serializers.CharField()
+    prerequisite = serializers.CharField()
+    mobility = serializers.CharField()
