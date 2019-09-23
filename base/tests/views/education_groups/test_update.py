@@ -482,7 +482,7 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
+            "start_year": self.current_academic_year.year-8,
             "end_year": self.current_academic_year.year,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
