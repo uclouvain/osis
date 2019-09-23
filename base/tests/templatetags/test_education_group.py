@@ -46,7 +46,7 @@ from base.tests.factories.person import FacultyManagerFactory, CentralManagerFac
 from base.tests.factories.person_entity import PersonEntityFactory
 
 DELETE_MSG = _("delete education group")
-PERMISSION_DENIED_MSG = _("The education group edition period is not open.")
+PERMISSION_DENIED_MSG = _("This education group is not editable during this period.")
 UNAUTHORIZED_TYPE_MSG = "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
 
 CUSTOM_LI_TEMPLATE = """
@@ -338,6 +338,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(weeks=+1),
             academic_year=academic_year,
+            data_year=academic_year,
         )
 
         self.client.force_login(user=self.person.user)
