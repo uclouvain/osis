@@ -153,7 +153,7 @@ urlpatterns = [
         url(r'^by_summary/',
             base.views.learning_units.search.educational_information.LearningUnitDescriptionFicheSearch.as_view(),
             name='learning_units_summary'),
-        url(r'^by_external/', base.views.learning_units.search.external.learning_units_external_search,
+        url(r'^by_external/', base.views.learning_units.search.external.ExternalLearningUnitSearch.as_view(),
             name='learning_units_external'),
         url(r'^new/', include([
             url(r'^academic_year_id=(?P<academic_year_id>[0-9]+)$',

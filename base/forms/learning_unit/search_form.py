@@ -178,7 +178,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
         return qs
 
-
+# TODO fix status search
 class LearningUnitFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
