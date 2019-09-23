@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,37 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.test import TestCase
-from base.models import entity_manager
-from base.tests.factories.entity_manager import EntityManagerFactory
-from base.tests.factories.structure import StructureFactory
-from base.tests.factories.person import PersonFactory
-from django.contrib.auth.models import User, Permission
+
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
 
-class EntityManagerTest(TestCase):
+class LearningUnitComponentSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.component = LearningComponentYearFactory()
+        cls.serializer = LearningUnitComponentSerializer(cls.component)
 
-    def setUp(self):
-        self.faculty_administrator = EntityManagerFactory()
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'type',
+            'type_text',
+            'planned_classes',
+            'hourly_volume_total_annual',
+            'hourly_volume_total_annual_computed'
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
-        self.user = User.objects.create_user("username", "test@test.com", "passtest",
-                                             first_name='first_name', last_name='last_name')
-        self.user.save()
-
-    def test_no_entity_manager_for_the_user(self):
-        self.assertFalse(entity_manager.is_entity_manager(self.user))
-
-    def test_entity_manager_for_the_user(self):
-        a_person = PersonFactory(user=self.user)
-        EntityManagerFactory(person=a_person)
-        self.assertTrue(entity_manager.is_entity_manager(self.user))
-
-
-def add_permission(user, codename):
-    perm = get_permission(codename)
-    user.user_permissions.add(perm)
-
-
-def get_permission(codename):
-    return Permission.objects.get(codename=codename)
+    def test_ensure_compute_correct_volume(self):
+        self.assertEqual(
+            self.serializer.data['hourly_volume_total_annual_computed'],
+            str(self.component.vol_global)
+        )
