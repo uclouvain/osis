@@ -33,8 +33,7 @@ from django.test import TestCase
 
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm, TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -134,7 +133,7 @@ class TestTeachingMaterialForm(LearningUnitPedagogyContextMixin):
     def test_save_with_postponement(self, mock_postpone_teaching_materials):
         """In this test, we ensure that if we modify UE of N+1 or N+X => The postponement until the lastest UE"""
         luy_in_future = self.luys[self.current_ac.year + 1]
-        teaching_material = TeachingMaterialFactory.build(learning_unit_year=luy_in_future)
+        teaching_material = TeachingMaterialFactory.build(learning_unit_year=luy_in_future, mandatory=True)
         post_data = _get_valid_teaching_material_form_data(teaching_material)
         teaching_material_form = TeachingMaterialModelForm(post_data)
         self.assertTrue(teaching_material_form.is_valid(), teaching_material_form.errors)

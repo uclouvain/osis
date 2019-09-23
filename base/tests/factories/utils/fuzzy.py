@@ -23,37 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.test import TestCase
-from base.models import entity_manager
-from base.tests.factories.entity_manager import EntityManagerFactory
-from base.tests.factories.structure import StructureFactory
-from base.tests.factories.person import PersonFactory
-from django.contrib.auth.models import User, Permission
+import factory.fuzzy
 
 
-class EntityManagerTest(TestCase):
-
-    def setUp(self):
-        self.faculty_administrator = EntityManagerFactory()
-
-        self.user = User.objects.create_user("username", "test@test.com", "passtest",
-                                             first_name='first_name', last_name='last_name')
-        self.user.save()
-
-    def test_no_entity_manager_for_the_user(self):
-        self.assertFalse(entity_manager.is_entity_manager(self.user))
-
-    def test_entity_manager_for_the_user(self):
-        a_person = PersonFactory(user=self.user)
-        EntityManagerFactory(person=a_person)
-        self.assertTrue(entity_manager.is_entity_manager(self.user))
-
-
-def add_permission(user, codename):
-    perm = get_permission(codename)
-    user.user_permissions.add(perm)
-
-
-def get_permission(codename):
-    return Permission.objects.get(codename=codename)
+class FuzzyBoolean(factory.fuzzy.BaseFuzzyAttribute):
+    """Random boolean value"""
+    def fuzz(self):
+        return factory.fuzzy._random.choice([True, False])

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-05 10:56+0200\n"
+"POT-Creation-Date: 2019-09-13 14:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1210,6 +1210,12 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr ""
+
+msgid "Generate xls of learning units that have prerequisites"
+msgstr ""
+
 msgid "Get back to initial data"
 msgstr ""
 
@@ -1496,6 +1502,9 @@ msgstr ""
 msgid "Linked with EPC"
 msgstr ""
 
+msgid "List comparison LU / Proposal"
+msgstr ""
+
 msgid "List education groups"
 msgstr ""
 
@@ -1503,6 +1512,9 @@ msgid "List of comparison between proposals and UE"
 msgstr ""
 
 msgid "List of learning units with comparison"
+msgstr ""
+
+msgid "List of learning units with educational information and specifications"
 msgstr ""
 
 msgid "List of learning units with with one line per attribution"
@@ -1862,6 +1874,9 @@ msgstr ""
 msgid "Offers enrollments"
 msgstr ""
 
+msgid "Official"
+msgstr ""
+
 msgid "On the file: direct access or access with additional training"
 msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
@@ -2115,6 +2130,11 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
+msgstr ""
+
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
 msgstr ""
 
 msgid "Produce a xls of learning units with one line per attribution"
@@ -2701,6 +2721,10 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr ""
+
+#, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
 msgstr ""
 
@@ -3192,15 +3216,6 @@ msgstr ""
 msgid "Which type of %(category)s do you want to create ?"
 msgstr ""
 
-msgid "Xls"
-msgstr ""
-
-msgid "Xls UE/proposals comparison"
-msgstr ""
-
-msgid "Xls with proposals"
-msgstr ""
-
 msgid "Yes"
 msgstr ""
 
@@ -3261,6 +3276,9 @@ msgid ""
 msgstr ""
 
 msgid "You are succesfully logout."
+msgstr ""
+
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
 msgid "You can not attach the same child several times."
@@ -3504,6 +3522,9 @@ msgstr "mm/dd/yyyy"
 msgid "french help text"
 msgstr ""
 
+msgid "has as prerequisite"
+msgstr ""
+
 msgid "has the following prerequisites"
 msgstr ""
 
@@ -3519,10 +3540,14 @@ msgstr ""
 msgid "initial value"
 msgstr ""
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr ""
 
 msgid "is using in"
+msgstr ""
+
+#, python-format
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
 msgid "learning unit year"
@@ -3589,6 +3614,10 @@ msgid "please_enable_javascript"
 msgstr ""
 "Please <a href='http://enable-javascript.com' target='_blank'>enable "
 "JavaScript</a> to use this application."
+
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr ""
 
 msgid "professional integration"
 msgstr ""
