@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render
 
 from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
-from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
+from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm, ExternalLearningUnitFilter
 from base.models.academic_year import starting_academic_year, get_last_academic_years
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
@@ -19,19 +19,16 @@ def learning_units_external_search(request):
     _manage_session_variables(request, 'EXTERNAL')
 
     starting_ac_year = starting_academic_year()
-    search_form = ExternalLearningUnitYearForm(
-        request.GET or None,
-        initial={'academic_year_id': starting_ac_year, 'with_entity_subordinated': True}
-    )
+    search_form = ExternalLearningUnitFilter(request.GET or None)
     user_person = get_object_or_404(Person, user=request.user)
     found_learning_units = LearningUnitYear.objects.none()
 
     if search_form.is_valid():
-        found_learning_units = search_form.get_queryset()
+        found_learning_units = search_form.qs
         check_if_display_message(request, found_learning_units)
 
     context = {
-        'form': search_form,
+        'form': search_form.form,
         'academic_years': get_last_academic_years(),
         'current_academic_year': starting_ac_year,
         'search_type': EXTERNAL_SEARCH,

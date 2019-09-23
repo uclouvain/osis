@@ -331,6 +331,167 @@ class LearningUnitFilter(FilterSet):
         return queryset
 
 
+class ServiceCourseFilter(LearningUnitFilter):
+
+    def filter_queryset(self, queryset):
+        qs = super().filter_queryset(queryset)
+        qs = qs.prefetch_related(
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
+        )
+
+        for luy in qs:
+            append_latest_entities(luy, service_course_search=True)
+
+        return qs.filter(pk__in=[lu.pk for lu in qs if lu.entities.get(SERVICE_COURSE)])
+
+
+class BorrowedLearningUnitSearch(LearningUnitFilter):
+    faculty_borrowing_acronym = filters.CharFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        max_length=20,
+        label=_("Faculty borrowing")
+    )
+
+    def filter_queryset(self, queryset):
+        qs = super(self).filter_queryset(queryset)
+
+        faculty_borrowing_id = None
+        faculty_borrowing_acronym = self.form.cleaned_data.get('faculty_borrowing_acronym')
+        academic_year = self.form.cleaned_data["academic_year"]
+
+        if faculty_borrowing_acronym:
+            try:
+                faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
+                    get(acronym=faculty_borrowing_acronym).entity.id
+            except EntityVersion.DoesNotExist:
+                return LearningUnitYear.objects.none()
+
+        ids = filter_is_borrowed_learning_unit_year(
+            qs,
+            academic_year.start_date,
+            faculty_borrowing=faculty_borrowing_id
+        )
+        return qs.filter(id__in=ids)
+
+
+class ExternalLearningUnitFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        required=False,
+        label=_('Ac yr.'),
+        empty_label=pgettext_lazy("plural", "All"),
+    )
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr="icontains",
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
+    title = filters.CharFilter(
+        field_name="full_title",
+        lookup_expr="icontains",
+        max_length=40,
+        label=_('Title'),
+    )
+    status = filters.ChoiceFilter(
+        choices=active_status.ACTIVE_STATUS_LIST[:-1],
+        required=False,
+        label=_('Status'),
+        field_name="status",
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    country = filters.ModelChoiceFilter(
+        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
+        field_name="campus__organization__organizationaddress__country",
+        required=False,
+        label=_("Country")
+    )
+    city = filters.ChoiceFilter(
+        choices=BLANK_CHOICE_DASH,
+        field_name="campus__organization__organizationaddress__city",
+        required=False,
+        label=_("City"),
+        help_text=_("Please select a country first")
+    )
+    campus = filters.ChoiceFilter(
+        choices=BLANK_CHOICE_DASH,
+        required=False,
+        label=_("Institution"),
+        help_text=_("Please select a country and a city first")
+    )
+
+    order_by_field = 'ordering'
+    ordering = OrderingFilter(
+        fields=(
+            ('academic_year__year', 'academic_year'),
+            ('acronym', 'acronym'),
+            ('full_title', 'title'),
+            ('status', 'status'),
+            ('campus', 'campus'),
+            ('credits', 'credits'),
+        ),
+        widget=forms.HiddenInput
+    )
+
+    class Meta:
+        model = LearningUnitYear
+        fields = [
+            "academic_year",
+            "acronym",
+            "title",
+            "credits",
+            "status",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
+        self.form.fields["academic_year"].initial = starting_academic_year()
+
+        if self.data.get('country'):
+            self._init_dropdown_list()
+
+    def _init_dropdown_list(self):
+        if self.data.get('city', None):
+            self._get_cities()
+        if self.data.get('campus', None):
+            self._get_campus_list()
+
+    def _get_campus_list(self):
+        campus_list = Campus.objects.filter(
+            organization__organizationaddress__city=self.data['city']
+        ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
+        campus_choice_list = []
+        for a_campus in campus_list:
+            campus_choice_list.append(((a_campus['pk']), (a_campus['organization__name'])))
+        self.form.fields['campus'].choices = add_blank(campus_choice_list)
+
+    def _get_cities(self):
+        cities = find_distinct_by_country(self.data['country'])
+        cities_choice_list = []
+        for a_city in cities:
+            city_name = a_city['city']
+            cities_choice_list.append(tuple((city_name, city_name)))
+
+        self.form.fields['city'].choices = add_blank(cities_choice_list)
+
+    def get_queryset(self):
+        qs = LearningUnitYear.objects_with_container.filter(
+            externallearningunityear__co_graduation=True,
+            externallearningunityear__mobility=False,
+        ).select_related(
+            'academic_year',
+            'learning_container_year__academic_year',
+            'language',
+            'externallearningunityear',
+            'campus__organization',
+        ).order_by('academic_year__year', 'acronym')
+        qs = LearningUnitYearQuerySet.annotate_full_title_class_method(qs)
+        return qs
+
+
 class LearningUnitYearForm(LearningUnitSearchForm):
     MAX_RECORDS = 2000
     container_type = forms.ChoiceField(

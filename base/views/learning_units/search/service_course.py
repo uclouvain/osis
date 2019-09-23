@@ -24,12 +24,11 @@
 #
 ##############################################################################
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.http import JsonResponse
 from django_filters.views import FilterView
 
 from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
-from base.forms.learning_unit.search_form import LearningUnitFilter
+from base.forms.learning_unit.search_form import ServiceCourseFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
@@ -50,7 +49,7 @@ class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFi
     raise_exception = True
     search_type = SERVICE_COURSES_SEARCH
 
-    filterset_class = LearningUnitFilter
+    filterset_class = ServiceCourseFilter
     permission_required = 'base.can_access_learningunit'
     cache_exclude_params = 'xls_status'
 
