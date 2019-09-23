@@ -42,7 +42,11 @@ class EducationGroupRootsList(generics.ListAPIView):
     paginator = None
 
     def get_queryset(self):
-        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=self.kwargs['uuid'])
+        learning_unit_year = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym=self.kwargs.pop('acronym'),
+            academic_year__year=self.kwargs.pop('year')
+        )
         education_group_root_ids = group_element_year.find_learning_unit_formations([learning_unit_year]). \
             get(learning_unit_year.id, [])
         return EducationGroupYear.objects.filter(pk__in=education_group_root_ids)\

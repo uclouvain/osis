@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework import generics
 
@@ -65,14 +66,22 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
         Return the detail of the learning unit
     """
     name = 'learningunits_read'
-    queryset = LearningUnitYear.objects.all().select_related(
-        'language',
-        'campus',
-        'academic_year',
-        'learning_container_year'
-    ).prefetch_related(
-        'learning_container_year__requirement_entity__entityversion_set',
-        'learningcomponentyear_set'
-    ).annotate_full_title()
     serializer_class = LearningUnitDetailedSerializer
-    lookup_field = 'uuid'
+
+    def get_object(self):
+        acronym = self.kwargs.pop('acronym')
+        year = self.kwargs.pop('year')
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'language',
+                'campus',
+                'academic_year',
+                'learning_container_year'
+            ).prefetch_related(
+                'learning_container_year__requirement_entity__entityversion_set',
+                'learningcomponentyear_set'
+            ).annotate_full_title(),
+            acronym=acronym,
+            academic_year__year=year
+        )
+        return luy

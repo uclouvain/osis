@@ -24,18 +24,32 @@
 #
 ##############################################################################
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
 
+class LearningUnitHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+    def __init__(self, **kwargs):
+        super().__init__(view_name='learning_unit_api_v1:learningunits_read', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        if 'source' in self._kwargs and self._kwargs.get('source') == 'parent':
+            obj = obj.parent
+
+        if obj:
+            url_kwargs = {
+                'acronym': obj.acronym,
+                'year': obj.academic_year.year
+            }
+            return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+        return None
+
+
 class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid',
-        read_only=True
-    )
+    url = LearningUnitHyperlinkedIdentityField(read_only=True)
     requirement_entity = serializers.CharField(
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
@@ -78,18 +92,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     campus = LearningUnitCampusSerializer(read_only=True)
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
 
-    parent = serializers.HyperlinkedRelatedField(
-        view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid',
-        read_only=True
-    )
-    partims = serializers.HyperlinkedRelatedField(
-        view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid',
-        many=True,
-        source='get_partims_related',
-        read_only=True
-    )
+    parent = LearningUnitHyperlinkedIdentityField(read_only=True, source='parent')
+    partims = LearningUnitHyperlinkedIdentityField(read_only=True, many=True, source='get_partims_related')
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
