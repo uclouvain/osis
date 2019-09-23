@@ -24,14 +24,13 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import QuerySet
 from django.test import TestCase
 
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -39,7 +38,6 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from webservices import business
-from django.conf import settings
 
 
 class EnsureKeyTestCase(TestCase):

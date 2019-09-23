@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from webservices.views import get_title_of_education_group_year
-from django.conf import settings
 
 
 class GetTitleOrEducationGroupYear_TestCase(TestCase):

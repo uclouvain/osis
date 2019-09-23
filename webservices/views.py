@@ -27,6 +27,7 @@ import collections
 import functools
 import re
 
+from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
@@ -47,7 +48,6 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from webservices import business
 from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
-from django.conf import settings
 
 LANGUAGES = {settings.LANGUAGE_CODE_FR[:2]: settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN: settings.LANGUAGE_CODE_EN}
 INTRO_PATTERN = r'intro-(?P<acronym>\w+)'

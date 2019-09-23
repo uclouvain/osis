@@ -30,6 +30,7 @@ from webservices.api.serializers.achievement import AchievementsSerializer
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
     AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
+from webservices.api.serializers.contacts import ContactsSerializer
 
 
 class SectionSerializer(serializers.Serializer):
@@ -87,3 +88,20 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
         elif egy.is_a_master:
             return MasterAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
         return AdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
+
+
+class ContactsSectionSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    label = serializers.CharField(source='id', read_only=True)
+    content = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        fields = (
+            'id',
+            'label',
+            'content',
+        )
+
+    def get_content(self, obj):
+        egy = self.context.get('egy')
+        return ContactsSerializer(egy, context=self.context).data

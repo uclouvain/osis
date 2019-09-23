@@ -28,13 +28,13 @@ from django.db.models import Value, CharField
 from rest_framework import serializers
 
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE, \
-    SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION
+    SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO
 from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer
+    AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text
 
 
@@ -78,14 +78,14 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
             ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
+            CONTACTS: ContactsSectionSerializer
         }
-
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
             if serializer:
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
-            elif specific_section != EVALUATION_KEY:
+            elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
 
                 sections.append(translated_text if translated_text else {

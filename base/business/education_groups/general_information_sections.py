@@ -140,6 +140,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             CONTACT_INTRO,
+            CONTACTS,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
@@ -161,6 +162,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             MINORS,
             MOBILITY,
@@ -181,6 +183,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
         'specific': [
             CONTACT_INTRO,
+            CONTACTS,
             MOBILITY,
             PEDAGOGY,
             DETAILED_PROGRAM,
@@ -224,6 +227,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             CERTIFICATES,
             CONTACT_INTRO,
+            CONTACTS,
             PURPOSES,
             FURTHER_TRAININGS,
             MOBILITY,
@@ -270,6 +274,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             COMPLEMENTARY_MODULE,
             CONTACT_INTRO,
+            CONTACTS,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION
         ]
@@ -292,6 +297,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             CERTIFICATES,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             MOBILITY,
             OPTIONS,
@@ -312,6 +318,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             MOBILITY,
             PEDAGOGY,
@@ -333,6 +340,7 @@ SECTIONS_PER_OFFER_TYPE = {
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
@@ -352,6 +360,7 @@ SECTIONS_PER_OFFER_TYPE = {
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
@@ -371,6 +380,7 @@ SECTIONS_PER_OFFER_TYPE = {
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
@@ -390,6 +400,7 @@ SECTIONS_PER_OFFER_TYPE = {
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
@@ -409,6 +420,7 @@ SECTIONS_PER_OFFER_TYPE = {
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
@@ -428,6 +440,7 @@ SECTIONS_PER_OFFER_TYPE = {
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
             CONTACT_INTRO,
+            CONTACTS,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             PEDAGOGY,
