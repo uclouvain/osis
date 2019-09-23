@@ -25,9 +25,9 @@
 ##############################################################################
 from abc import ABC, abstractmethod
 
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.education_groups import perms
 from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
 from base.models.enums import academic_calendar_type
 
@@ -100,7 +100,8 @@ class EventPermEducationGroupEdition(EventPerm):
             error_msg = _("This education group is not editable during this period.")
 
         result = error_msg is None
-        perms.can_raise_exception(kwargs.get('raise_exception', False), result, error_msg)
+        if kwargs.get('raise_exception', False) and not result:
+            raise PermissionDenied(_(error_msg).capitalize())
         return result
 
     @classmethod
