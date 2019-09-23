@@ -36,49 +36,17 @@ class EventPerm(ABC):
     @classmethod
     @abstractmethod
     def is_open(cls, *args, **kwargs):
-        pass
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod
     def __is_open_for_spec_egy(cls, *args, **kwargs):
-        pass
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod
     def __is_open_other_rules(cls, *args, **kwargs):
-        pass
-
-
-class EventPermDeliberation(EventPerm):
-    pass
-
-
-class EventPermDissertationSubmission(EventPerm):
-    pass
-
-
-class EventPermExamEnrollment(EventPerm):
-    pass
-
-
-class EventPermScoresExamDiffusion(EventPerm):
-    pass
-
-
-class EventPermScoresExamSubmission(EventPerm):
-    pass
-
-
-class EventPermTeachingChargeApplication(EventPerm):
-    pass
-
-
-class EventPermCourseEnrollment(EventPerm):
-    pass
-
-
-class EventPermSummaryCourseSubmission(EventPerm):
-    pass
+        raise NotImplementedError
 
 
 class EventPermEducationGroupEdition(EventPerm):

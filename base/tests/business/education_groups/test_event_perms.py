@@ -25,16 +25,11 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.business.event_perms import EventPerm, EventPermEducationGroupEdition
+from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory
-
-
-class TestEventPerm(TestCase):
-    def test_is_open(self):
-        self.assertIsNone(EventPerm.is_open())
 
 
 class TestEventPermEducationGroupEditionPerms(TestCase):
