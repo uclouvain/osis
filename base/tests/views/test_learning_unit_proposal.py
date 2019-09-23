@@ -42,7 +42,7 @@ from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
-from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
+from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
 from base.models import entity_version
 from base.models import proposal_learning_unit
 from base.models.enums import learning_component_year_type
@@ -368,7 +368,7 @@ class TestLearningUnitProposalSearch(TestCase):
         url = reverse(learning_units_proposal_search)
         response = self.client.get(url, data={'acronym': self.proposals[0].learning_unit_year.acronym})
 
-        self.assertIsInstance(response.context['form'], LearningUnitProposalForm)
+        self.assertIsInstance(response.context['form'], ProposalLearningUnitFilter)
         self.assertEqual(response.context['search_type'], PROPOSAL_SEARCH)
         self.assertEqual(response.context['learning_units_count'], 1)
 

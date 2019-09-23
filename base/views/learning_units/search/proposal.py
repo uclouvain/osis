@@ -8,7 +8,8 @@ from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_units.xls_comparison import create_xls_proposal_comparison, get_academic_year_of_reference
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.learning_unit.comparison import SelectComparisonYears
-from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
+from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm, \
+    ProposalLearningUnitFilter
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year, get_last_academic_years
 from base.models.learning_unit_year import LearningUnitYear
@@ -29,15 +30,11 @@ def learning_units_proposal_search(request):
 
     user_person = get_object_or_404(Person, user=request.user)
     starting_ac_year = starting_academic_year()
-    search_form = LearningUnitProposalForm(
-        request.GET or None,
-        person=user_person,
-        initial={'academic_year_id': starting_ac_year, 'with_entity_subordinated': True},
-    )
+    search_form = ProposalLearningUnitFilter(user_person, request.GET or None)
     found_learning_units = LearningUnitYear.objects.none()
 
     if search_form.is_valid():
-        found_learning_units = search_form.get_proposal_learning_units()
+        found_learning_units = search_form.qs
         check_if_display_message(request, found_learning_units)
 
     if request.POST.get('xls_status_proposal') == "xls":
@@ -64,7 +61,7 @@ def learning_units_proposal_search(request):
         return redirect(reverse("learning_unit_proposal_search") + "?{}".format(request.GET.urlencode()))
 
     context = {
-        'form': search_form,
+        'form': search_form.form,
         'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
         'academic_years': get_last_academic_years(),
         'current_academic_year': starting_ac_year,
