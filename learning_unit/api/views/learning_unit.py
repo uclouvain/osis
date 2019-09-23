@@ -27,7 +27,8 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
+    LearningUnitTitleSerializer
 
 
 class LearningUnitFilter(filters.FilterSet):
@@ -74,5 +75,15 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
         'learning_container_year__requirement_entity__entityversion_set',
         'learningcomponentyear_set'
     ).annotate_full_title()
-    serializer_class = LearningUnitDetailedSerializer
     lookup_field = 'uuid'
+    serializer_class = LearningUnitDetailedSerializer
+
+
+class LearningUnitTitle(generics.RetrieveAPIView):
+    """
+        Return the title of the learning unit
+    """
+    name = 'learningunitstitle_read'
+    queryset = LearningUnitYear.objects.all().annotate_full_title()
+    lookup_field = 'uuid'
+    serializer_class = LearningUnitTitleSerializer

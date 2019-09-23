@@ -28,7 +28,7 @@ from django.conf.urls import url
 
 from learning_unit.api.views.attribution import LearningUnitAttribution
 from learning_unit.api.views.learning_achievement import LearningAchievementList
-from learning_unit.api.views.learning_unit import LearningUnitDetailed, LearningUnitList
+from learning_unit.api.views.learning_unit import LearningUnitDetailed, LearningUnitList, LearningUnitTitle
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
 
 app_name = "learning_unit"
@@ -36,6 +36,11 @@ app_name = "learning_unit"
 urlpatterns = [
     url(r'^learning_units$', LearningUnitList.as_view(), name=LearningUnitList.name),
     url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitDetailed.as_view(), name=LearningUnitDetailed.name),
+    url(
+        r'^learning_units/(?P<uuid>[0-9a-f-]+)/get_title',
+        LearningUnitTitle.as_view(),
+        name=LearningUnitTitle.name
+    ),
     url(
         r'^learning_units/(?P<uuid>[0-9a-f-]+)/attributions',
         LearningUnitAttribution.as_view(),

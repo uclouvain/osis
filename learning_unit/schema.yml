@@ -86,6 +86,35 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
+  /learning_units/{uuid}/get_title:
+    get:
+      description: Return the title of the learning unit
+      operationId: learningunitstitle_read
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                  properties:
+                    title:
+                      type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
   /learning_units/{uuid}/attributions:
     get:
       description: Return all attributions assign to the learning unit

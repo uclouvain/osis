@@ -30,7 +30,23 @@ from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
 
-class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
+class LearningUnitTitleSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = LearningUnitYear
+        fields = (
+            'title',
+        )
+
+    def get_title(self, learning_unit_year):
+        return {
+            'fr': getattr(learning_unit_year, 'full_title', None),
+            'en': getattr(learning_unit_year, 'full_title_en', None)
+        }
+
+
+class LearningUnitSerializer(LearningUnitTitleSerializer, serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='learning_unit_api_v1:learningunits_read',
         lookup_field='uuid',
@@ -40,7 +56,6 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
     )
-    title = serializers.SerializerMethodField(read_only=True)
     academic_year = serializers.IntegerField(source='academic_year.year')
 
     type = serializers.CharField(source='learning_container_year.container_type')
@@ -49,23 +64,16 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = LearningUnitYear
-        fields = (
+        fields = LearningUnitTitleSerializer.Meta.fields + (
             'url',
             'acronym',
             'academic_year',
             'requirement_entity',
-            'title',
             'type',
             'type_text',
             'subtype',
             'subtype_text'
         )
-
-    def get_title(self, learning_unit_year):
-        return {
-            'fr': getattr(learning_unit_year, 'full_title', None),
-            'en': getattr(learning_unit_year, 'full_title_en', None)
-        }
 
 
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
