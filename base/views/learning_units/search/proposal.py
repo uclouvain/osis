@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages import WARNING
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django_filters.views import FilterView
 
 from base.business import learning_unit_proposal as proposal_business
-from base.business.learning_units.xls_comparison import create_xls_proposal_comparison, get_academic_year_of_reference
-from base.business.proposal_xls import create_xls as create_xls_proposal
+from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm, \
     ProposalLearningUnitFilter
@@ -15,44 +16,60 @@ from base.models.academic_year import starting_academic_year, get_last_academic_
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.utils.cache import cache_filter
+from base.utils.cache import cache_filter, CacheFilterMixin
 from base.views.common import check_if_display_message, display_messages_by_level, paginate_queryset
-from base.views.learning_units.search.common import _manage_session_variables, PROPOSAL_SEARCH, _get_filter, \
-    ITEMS_PER_PAGES, \
-    ACTION_BACK_TO_INITIAL, ACTION_CONSOLIDATE, ACTION_FORCE_STATE
+from base.views.learning_units.search.common import _manage_session_variables, PROPOSAL_SEARCH, ITEMS_PER_PAGES, \
+    ACTION_BACK_TO_INITIAL, ACTION_CONSOLIDATE, ACTION_FORCE_STATE, SerializeFilterListIfAjaxMixin, RenderToExcel, \
+    _create_xls_proposal, _create_xls_proposal_comparison
+from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
-@login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
-@cache_filter()
-def learning_units_proposal_search(request):
-    _manage_session_variables(request, PROPOSAL_SEARCH)
+@RenderToExcel("xls", _create_xls_proposal)
+@RenderToExcel("xls_comparison", _create_xls_proposal_comparison)
+class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
+    model = LearningUnitYear
+    template_name = "learning_unit/search/proposal.html"
+    raise_exception = True
+    search_type = PROPOSAL_SEARCH
 
-    user_person = get_object_or_404(Person, user=request.user)
-    starting_ac_year = starting_academic_year()
-    search_form = ProposalLearningUnitFilter(user_person, request.GET or None)
-    found_learning_units = LearningUnitYear.objects.none()
+    filterset_class = ProposalLearningUnitFilter
+    permission_required = 'base.can_access_learningunit'
+    cache_exclude_params = 'xls_status'
 
-    if search_form.is_valid():
-        found_learning_units = search_form.qs
-        check_if_display_message(request, found_learning_units)
+    serializer_class = LearningUnitSerializer
 
-    if request.POST.get('xls_status_proposal') == "xls":
-        return create_xls_proposal(
-            user_person.user,
-            list(found_learning_units),
-            _get_filter(search_form, PROPOSAL_SEARCH)
-        )
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = super().get_filterset_kwargs(filterset_class)
+        kwargs["person"] = get_object_or_404(Person, user=self.request.user)
+        return kwargs
 
-    if request.POST.get('xls_status_proposal') == "xls_comparison":
-        return create_xls_proposal_comparison(
-            user_person.user,
-            list(found_learning_units),
-            _get_filter(search_form, PROPOSAL_SEARCH)
-        )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    if request.POST:
-        research_criteria = get_research_criteria(search_form) if search_form.is_valid() else []
+        starting_ac = starting_academic_year()
+        user_person = get_object_or_404(Person, user=self.request.user)
+        context.update({
+            'form': context['filter'].form,
+            'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
+            'can_change_proposal_state': user_person.is_faculty_manager or user_person.is_central_manager,
+            'learning_units_count': context["paginator"].count,
+            'current_academic_year': starting_ac,
+            'proposal_academic_year': starting_ac.next(),
+            'search_type': self.search_type,
+            'page_obj': context["page_obj"],
+            'items_per_page': context["paginator"].per_page,
+            "form_comparison": SelectComparisonYears(
+                academic_year=get_academic_year_of_reference(context['object_list'])
+            ),
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        # FIXME Extract to other view
+        user_person = get_object_or_404(Person, user=self.request.user)
+
+        search_form = ProposalLearningUnitFilter(request.GET or None, person=user_person)
+        research_criteria = get_research_criteria(search_form.form) if search_form.is_valid() else []
 
         selected_proposals_id = request.POST.getlist("selected_action", default=[])
         selected_proposals = ProposalLearningUnit.objects.filter(id__in=selected_proposals_id)
@@ -60,18 +77,8 @@ def learning_units_proposal_search(request):
         display_messages_by_level(request, messages_by_level)
         return redirect(reverse("learning_unit_proposal_search") + "?{}".format(request.GET.urlencode()))
 
-    context = {
-        'form': search_form.form,
-        'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
-        'academic_years': get_last_academic_years(),
-        'current_academic_year': starting_ac_year,
-        'search_type': PROPOSAL_SEARCH,
-        'learning_units_count': found_learning_units.count(),
-        'can_change_proposal_state': user_person.is_faculty_manager or user_person.is_central_manager,
-        'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
-    }
-    return render(request, "learning_unit/search/proposal.html", context)
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
 
 
 def apply_action_on_proposals(proposals, author, post_data, research_criteria):

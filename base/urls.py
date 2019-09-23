@@ -146,7 +146,7 @@ urlpatterns = [
             name='learning_units'),
         url(r'^by_service_course/', base.views.learning_units.search.service_course.ServiceCourseSearch.as_view(),
             name='learning_units_service_course'),
-        url(r'^by_proposal/', base.views.learning_units.search.proposal.learning_units_proposal_search,
+        url(r'^by_proposal/', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
             name='learning_units_proposal'),
         url(r'^by_borrowed_course/', base.views.learning_units.search.borrowed.BorrowedLearningUnitSearch.as_view(),
             name='learning_units_borrowed_course'),
@@ -244,7 +244,7 @@ urlpatterns = [
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
     ])),
-    url(r'^proposals/search/$', base.views.learning_units.search.proposal.learning_units_proposal_search,
+    url(r'^proposals/search/$', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
         name="learning_unit_proposal_search"),
 
     url(r'^my_osis/', include([

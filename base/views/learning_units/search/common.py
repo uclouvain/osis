@@ -32,7 +32,8 @@ from django_filters.views import FilterView
 
 from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
     create_xls_attributions
-from base.business.learning_units.xls_comparison import create_xls_comparison
+from base.business.proposal_xls import create_xls as create_xls_proposal
+from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
 from base.forms.search.search_form import get_research_criteria
 from base.views.common import remove_from_session
 
@@ -130,3 +131,17 @@ def _create_xls_attributions(view_obj, context, **response_kwargs):
     luys = context["object_list"]
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_attributions(user, luys, filters)
+
+
+def _create_xls_proposal(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["object_list"]
+    filters = _get_filter(context["form"], view_obj.search_type)
+    return create_xls_proposal(user, luys, filters)
+
+
+def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["object_list"]
+    filters = _get_filter(context["form"], view_obj.search_type)
+    return create_xls_proposal_comparison(user, luys, filters)

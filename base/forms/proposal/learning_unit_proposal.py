@@ -124,7 +124,7 @@ class ProposalLearningUnitFilter(FilterSet):
             "requirement_entity",
         ]
 
-    def __init__(self, person, *args, **kwargs):
+    def __init__(self, *args, person=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.person = person
         self.queryset = self.get_queryset()
