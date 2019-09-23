@@ -34,12 +34,16 @@ from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, ITEMS_PER_PAGES, \
-    SerializeFilterListIfAjaxMixin
+    SerializeFilterListIfAjaxMixin, RenderToExcel, _create_xls_with_parameters, _create_xls_attributions, \
+    _create_xls_comparison, _create_xls
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
 # TODO adapt filter to service course
-# TODO excel for service course
+@RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
+@RenderToExcel("xls_attributions", _create_xls_attributions)
+@RenderToExcel("xls_comparison", _create_xls_comparison)
+@RenderToExcel("xls", _create_xls)
 class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
     model = LearningUnitYear
     template_name = "learning_unit/search/service_course.html"

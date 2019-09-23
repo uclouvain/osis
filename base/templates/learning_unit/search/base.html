@@ -145,7 +145,7 @@
                         </li>
                     </ul>
                 </div>
-                <form id="download_xls" action="{{ request.path }}" method="post">
+                <form id="download_xls" action="{{ request.path }}" method="get">
                     {% csrf_token %}
                     <input type="hidden" id="xls_status" name="xls_status">
                     <input type="hidden" id="comparison_year" name="comparison_year">

@@ -28,7 +28,11 @@ import itertools
 
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
+from django_filters.views import FilterView
 
+from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
+    create_xls_attributions
+from base.business.learning_units.xls_comparison import create_xls_comparison
 from base.forms.search.search_form import get_research_criteria
 from base.views.common import remove_from_session
 
@@ -70,9 +74,59 @@ def _get_search_type_label(search_type):
     }.get(search_type, _('Learning units'))
 
 
+# TODO comment
 class SerializeFilterListIfAjaxMixin:
     def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
             serializer = self.serializer_class(context["page_obj"], context={'request': self.request}, many=True)
             return JsonResponse({'object_list': serializer.data})
         return super().render_to_response(context, **response_kwargs)
+
+
+# TODO comment
+class RenderToExcel:
+    def __init__(self, name, render_method):
+        self.name = name
+        self.render_method = render_method
+
+    def __call__(self, filter_class: FilterView):
+        class Wrapped(filter_class):
+            def render_to_response(obj, context, **response_kwargs):
+                if obj.request.GET.get('xls_status') == self.name:
+                    return self.render_method(obj, context, **response_kwargs)
+                return super().render_to_response(context, **response_kwargs)
+        return Wrapped
+
+
+# TODO refactor
+def _create_xls(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["object_list"]
+    filters = _get_filter(context["form"], view_obj.search_type)
+    return create_xls(user, luys, filters)
+
+
+def _create_xls_comparison(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["object_list"]
+    filters = _get_filter(context["form"], view_obj.search_type)
+    comparison_year = view_obj.request.POST.get('comparison_year')
+    return create_xls_comparison(user, luys, filters, comparison_year)
+
+
+def _create_xls_with_parameters(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["object_list"]
+    filters = _get_filter(context["form"], view_obj.search_type)
+    other_params = {
+        WITH_GRP: view_obj.request.POST.get('with_grp') == 'true',
+        WITH_ATTRIBUTIONS: view_obj.request.POST.get('with_attributions') == 'true'
+    }
+    return create_xls_with_parameters(user, luys, filters, other_params)
+
+
+def _create_xls_attributions(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["object_list"]
+    filters = _get_filter(context["form"], view_obj.search_type)
+    return create_xls_attributions(user, luys, filters)

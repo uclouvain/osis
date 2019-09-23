@@ -23,28 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.http import JsonResponse
-from django.shortcuts import render
 from django_filters.views import FilterView
 
-from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
-    create_xls_attributions
-from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference
+from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import cache_filter, CacheFilterMixin
-from base.views.common import paginate_queryset
-from base.views.learning_units.search.common import SIMPLE_SEARCH, _get_filter, \
-    ITEMS_PER_PAGES, SerializeFilterListIfAjaxMixin
+from base.utils.cache import CacheFilterMixin
+from base.views.learning_units.search.common import SIMPLE_SEARCH, ITEMS_PER_PAGES, SerializeFilterListIfAjaxMixin, \
+    RenderToExcel, _create_xls, _create_xls_comparison, _create_xls_attributions, _create_xls_with_parameters
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
-# TODO login required
+@RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
+@RenderToExcel("xls_attributions", _create_xls_attributions)
+@RenderToExcel("xls_comparison", _create_xls_comparison)
+@RenderToExcel("xls", _create_xls)
 class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
     model = LearningUnitYear
     template_name = "learning_unit/search/simple.html"
@@ -78,59 +74,3 @@ class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFil
 
     def get_paginate_by(self, queryset):
         return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
-
-
-@login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
-@cache_filter()
-def learning_units(request):
-    search_type = SIMPLE_SEARCH
-    found_learning_units = LearningUnitYear.objects.none()
-    learning_unit_filter = LearningUnitFilter(request.GET or None)
-    form = learning_unit_filter.form
-    if learning_unit_filter.is_valid():
-        found_learning_units = learning_unit_filter.qs
-
-    # TODO move xls to decorators
-    if request.POST.get('xls_status') == "xls":
-        return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
-
-    if request.POST.get('xls_status') == "xls_comparison":
-        return create_xls_comparison(
-            request.user,
-            found_learning_units,
-            _get_filter(form, search_type),
-            request.POST.get('comparison_year')
-        )
-    if request.POST.get('xls_status') == "xls_with_parameters":
-        return create_xls_with_parameters(
-            request.user,
-            found_learning_units,
-            _get_filter(learning_unit_filter.form, search_type),
-            {
-                WITH_GRP: request.POST.get('with_grp') == 'true',
-                WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'
-            }
-        )
-
-    if request.POST.get('xls_status') == "xls_attributions":
-        return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
-
-    items_per_page = request.GET.get("paginator_size", ITEMS_PER_PAGES)
-    object_list_paginated = paginate_queryset(found_learning_units, request.GET, items_per_page=items_per_page)
-
-    form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
-    starting_ac = starting_academic_year()
-
-    return render(request, "learning_unit/search/simple.html", {
-        'form': form,
-        'learning_units_count': len(found_learning_units)
-        if isinstance(found_learning_units, list) else
-        found_learning_units.count(),
-        'current_academic_year': starting_ac,
-        'proposal_academic_year': starting_ac.next(),
-        'search_type': search_type,
-        'page_obj': object_list_paginated,
-        'items_per_page': items_per_page,
-        "form_comparison": form_comparison,
-    })
