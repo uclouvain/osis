@@ -94,7 +94,7 @@ class LearningUnit(SerializableModel):
         'AcademicYear',
         blank=True,
         null=True,
-        verbose_name=_('Start'),
+        verbose_name=_('Start academic year'),
         related_name='learning_unit_start_years',
         on_delete=models.PROTECT
     )
