@@ -78,6 +78,11 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
     lookup_field = 'uuid'
     serializer_class = LearningUnitDetailedSerializer
 
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.request.query_params.get('lang')
+        return serializer_context
+
 
 class LearningUnitTitle(generics.RetrieveAPIView):
     """
@@ -87,3 +92,8 @@ class LearningUnitTitle(generics.RetrieveAPIView):
     queryset = LearningUnitYear.objects.all().annotate_full_title()
     lookup_field = 'uuid'
     serializer_class = LearningUnitTitleSerializer
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.request.query_params.get('lang')
+        return serializer_context

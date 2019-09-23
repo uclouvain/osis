@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from rest_framework import serializers
 
 from base.models.learning_unit_year import LearningUnitYear
@@ -40,6 +41,12 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, learning_unit_year):
+        language = self.context.get('language')
+        if language:
+            return getattr(
+                learning_unit_year,
+                'full_title' + ('_' + language if language != settings.LANGUAGE_CODE_FR[:2] else '')
+            )
         return {
             'fr': getattr(learning_unit_year, 'full_title', None),
             'en': getattr(learning_unit_year, 'full_title_en', None)
