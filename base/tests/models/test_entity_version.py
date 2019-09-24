@@ -589,28 +589,27 @@ class EntityVersionLoadInMemoryTest(TestCase):
 
     def test_get_entity_version_from_type(self):
         structure = entity_version.build_current_entity_version_structure_in_memory()
-        to_test_sector = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
-                                                                       entity=self.MATH.entity.most_recent_acronym,
-                                                                       entity_type='SECTOR')
-        to_test_faculty = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
-                                                                        entity=self.MATH.entity.most_recent_acronym,
-                                                                        entity_type='FACULTY')
-        to_test_itself = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
-                                                                       entity=self.MATH.entity.most_recent_acronym,
-                                                                       entity_type='SCHOOL')
-        self.assertEqual(self.root, to_test_sector)
-        self.assertEqual(self.SC, to_test_faculty)
-        self.assertEqual(self.MATH, to_test_itself)
+        test_cases = [
+            {"entity_version_test": self.MATH, 'entity_type': 'SECTOR', 'expected_result': self.root,
+             'comment': 'to_test_sector'},
+            {"entity_version_test": self.MATH, 'entity_type': 'FACULTY', 'expected_result': self.SC,
+             'comment': 'to_test_faculty'},
+            {"entity_version_test": self.MATH, 'entity_type': 'SCHOOL', 'expected_result': self.MATH,
+             'comment': 'to_test_itself'},
+            {"entity_version_test": self.root, 'entity_type': 'SCHOOL', 'expected_result': None,
+             'comment': 'to_test_lt_itself'},
+            {"entity_version_test": self.root, 'entity_type': 'SECTOR', 'expected_result': self.root,
+             'comment': 'to_test_itself_without_parent'},
+        ]
 
-        to_test_lt_itself = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
-                                                                          entity=self.root.entity.most_recent_acronym,
-                                                                          entity_type='SCHOOL')
-        to_test_itself_without_parent = \
-            get_entity_version_parent_or_itself_from_type(entity_versions=structure,
-                                                          entity=self.root.entity.most_recent_acronym,
-                                                          entity_type='SECTOR')
-        self.assertIsNone(to_test_lt_itself)
-        self.assertEqual(self.root, to_test_itself_without_parent)
+        for case in test_cases:
+            with self.subTest(status_code=case.get('comment')):
+                del case.get('entity_version_test').entity.most_recent_acronym
+                to_test = get_entity_version_parent_or_itself_from_type(entity_versions=structure,
+                                                                        entity=case.get('entity_version_test').entity
+                                                                        .most_recent_acronym,
+                                                                        entity_type=case.get('entity_type'))
+                self.assertEqual(case.get('expected_result'), to_test)
 
 
 class TestFindLastEntityVersionByLearningUnitYearId(TestCase):

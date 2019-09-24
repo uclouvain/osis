@@ -1204,6 +1204,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr ""
+
 msgid "Generate xls of learning units that have prerequisites"
 msgstr ""
 
@@ -1503,6 +1506,9 @@ msgid "List of comparison between proposals and UE"
 msgstr ""
 
 msgid "List of learning units with comparison"
+msgstr ""
+
+msgid "List of learning units with educational information and specifications"
 msgstr ""
 
 msgid "List of learning units with with one line per attribution"
@@ -2118,6 +2124,11 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
+msgstr ""
+
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
 msgstr ""
 
 msgid "Produce a xls of learning units with one line per attribution"
@@ -3261,6 +3272,9 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr ""
 
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+
 msgid "You can not attach the same child several times."
 msgstr ""
 
@@ -3520,10 +3534,14 @@ msgstr ""
 msgid "initial value"
 msgstr ""
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr ""
 
 msgid "is using in"
+msgstr ""
+
+#, python-format
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
 msgid "learning unit year"
