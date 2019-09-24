@@ -213,6 +213,7 @@ def process_section(context, education_group_year, item):
 
     m_intro = re.match(INTRO_PATTERN, item)
     m_common = re.match(COMMON_PATTERN, item)
+    excluded_keys = [business.CONTACT_INTRO_KEY]
     if m_intro or m_common:
         return get_intro_or_common_section(context, education_group_year, m_intro, m_common)
     elif item == business.SKILLS_AND_ACHIEVEMENTS_KEY:
@@ -221,7 +222,7 @@ def process_section(context, education_group_year, item):
         return get_evaluation(education_group_year, context.language)
     elif item == business.CONTACTS_KEY:
         return get_contacts(education_group_year, context.language)
-    else:
+    elif item not in excluded_keys:
         text_label = TextLabel.objects.filter(entity=OFFER_YEAR, label=item).first()
         if text_label:
             return insert_section(context, education_group_year, text_label)
