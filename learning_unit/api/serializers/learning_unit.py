@@ -24,23 +24,12 @@
 #
 ##############################################################################
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
-
-
-class LearningUnitHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
-    def __init__(self, **kwargs):
-        super().__init__(view_name='learning_unit_api_v1:learningunits_read', **kwargs)
-
-    def get_url(self, obj, view_name, request, format):
-        url_kwargs = {
-            'acronym': obj.acronym,
-            'year': obj.academic_year.year
-        }
-        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+from learning_unit.api.serializers.utils import LearningUnitHyperlinkedIdentityField, \
+    LearningUnitHyperlinkedRelatedField
 
 
 class LearningUnitTitleSerializer(serializers.ModelSerializer):
@@ -59,8 +48,8 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
         }
 
 
-class LearningUnitSerializer(LearningUnitTitleSerializer, serializers.HyperlinkedModelSerializer):
-    url = LearningUnitHyperlinkedRelatedField(read_only=True)
+class LearningUnitSerializer(LearningUnitTitleSerializer):
+    url = LearningUnitHyperlinkedIdentityField(read_only=True)
     requirement_entity = serializers.CharField(
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
@@ -71,7 +60,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer, serializers.Hyperlinke
     type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
 
-    class Meta:
+    class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitTitleSerializer.Meta.fields + (
             'url',

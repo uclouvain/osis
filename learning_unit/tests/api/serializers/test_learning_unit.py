@@ -86,6 +86,7 @@ class LearningUnitSerializerTestCase(TestCase):
             'subtype',
             'subtype_text'
         ]
+        print(list(self.serializer.data.keys()))
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_title_is_dict_contains_iso_code_as_key(self):
