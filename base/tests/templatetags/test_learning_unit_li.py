@@ -82,7 +82,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.learning_unit = LearningUnitFactory()
         self.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
         self.current_academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=2017)
+        self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
 
         AcademicYearFactory(year=self.current_academic_year.year + 2)
