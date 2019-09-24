@@ -55,9 +55,7 @@ class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFil
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         starting_ac = starting_academic_year()
-
         context.update({
             'form': context['filter'].form,
             'learning_units_count': context["paginator"].count,

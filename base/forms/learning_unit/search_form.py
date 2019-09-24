@@ -283,7 +283,6 @@ class LearningUnitFilter(FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.queryset = self.get_queryset()
         self.form.fields["academic_year"].initial = starting_academic_year()
 
     def filter_tutor(self, queryset, name, value):
@@ -304,7 +303,10 @@ class LearningUnitFilter(FilterSet):
         return queryset
 
     def get_queryset(self):
-        """ Filter a LearningUnitYearQueryset """
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return LearningUnitYear.objects.none()
+
         has_proposal = ProposalLearningUnit.objects.filter(
             learning_unit_year=OuterRef('pk'),
         )
@@ -479,6 +481,10 @@ class ExternalLearningUnitFilter(FilterSet):
         self.form.fields['city'].choices = add_blank(cities_choice_list)
 
     def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return LearningUnitYear.objects.none()
+
         qs = LearningUnitYear.objects_with_container.filter(
             externallearningunityear__co_graduation=True,
             externallearningunityear__mobility=False,
@@ -803,7 +809,17 @@ class LearningUnitDescriptionFicheFilter(FilterSet):
         model = LearningUnitYear
         fields = []
 
-    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
+        self.form.fields['academic_year'].initial = starting_academic_year()
+        self.form.fields['with_entity_subordinated'].initial = True
+
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return LearningUnitYear.objects.none()
+
         translated_text_qs = TranslatedText.objects.filter(
             entity=LEARNING_UNIT_YEAR,
             text_label__label__in=CMS_LABEL_PEDAGOGY,
@@ -811,7 +827,7 @@ class LearningUnitDescriptionFicheFilter(FilterSet):
             reference=OuterRef('pk')
         ).order_by("-changed")
 
-        queryset = LearningUnitYear.objects.all().annotate(
+        return LearningUnitYear.objects.all().annotate(
             full_title=Case(
                 When(
                     Q(learning_container_year__common_title__isnull=True) |
@@ -827,14 +843,6 @@ class LearningUnitDescriptionFicheFilter(FilterSet):
             ),
             last_translated_text_changed=Subquery(translated_text_qs.values('changed')[:1]),
         )
-        super(LearningUnitDescriptionFicheFilter, self).__init__(
-            data=data,
-            queryset=queryset,
-            request=request,
-            prefix=prefix,
-        )
-        self.form.fields['academic_year'].initial = starting_academic_year()
-        self.form.fields['with_entity_subordinated'].initial = True
 
     def filter_tutor(self, queryset, name, value):
         return queryset.filter(

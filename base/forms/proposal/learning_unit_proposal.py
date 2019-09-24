@@ -156,6 +156,9 @@ class ProposalLearningUnitFilter(FilterSet):
         return queryset
 
     def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return LearningUnitYear.objects.none()
         entity_requirement = EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(

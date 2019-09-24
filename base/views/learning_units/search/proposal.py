@@ -1,7 +1,6 @@
-from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages import WARNING
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
@@ -12,13 +11,13 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm, \
     ProposalLearningUnitFilter
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import starting_academic_year, get_last_academic_years
+from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.utils.cache import cache_filter, CacheFilterMixin
-from base.views.common import check_if_display_message, display_messages_by_level, paginate_queryset
-from base.views.learning_units.search.common import _manage_session_variables, PROPOSAL_SEARCH, ITEMS_PER_PAGES, \
+from base.utils.cache import CacheFilterMixin
+from base.views.common import display_messages_by_level
+from base.views.learning_units.search.common import PROPOSAL_SEARCH, ITEMS_PER_PAGES, \
     ACTION_BACK_TO_INITIAL, ACTION_CONSOLIDATE, ACTION_FORCE_STATE, SerializeFilterListIfAjaxMixin, RenderToExcel, \
     _create_xls_proposal, _create_xls_proposal_comparison
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
