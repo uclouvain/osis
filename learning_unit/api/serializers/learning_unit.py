@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from rest_framework import serializers
-from rest_framework.relations import PKOnlyObject
 from rest_framework.reverse import reverse
 
 from base.models.learning_unit_year import LearningUnitYear
@@ -32,13 +31,11 @@ from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
 
 
-class LearningUnitHyperlinkedIdentityField(serializers.HyperlinkedRelatedField):
+class LearningUnitHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
     def __init__(self, **kwargs):
         super().__init__(view_name='learning_unit_api_v1:learningunits_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        if isinstance(obj, PKOnlyObject):
-            obj = obj.pk
         url_kwargs = {
             'acronym': obj.acronym,
             'year': obj.academic_year.year
@@ -63,7 +60,7 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
 
 
 class LearningUnitSerializer(LearningUnitTitleSerializer, serializers.HyperlinkedModelSerializer):
-    url = LearningUnitHyperlinkedIdentityField(read_only=True)
+    url = LearningUnitHyperlinkedRelatedField(read_only=True)
     requirement_entity = serializers.CharField(
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
@@ -98,8 +95,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     campus = LearningUnitCampusSerializer(read_only=True)
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
 
-    parent = LearningUnitHyperlinkedIdentityField(read_only=True, source='parent_related')
-    partims = LearningUnitHyperlinkedIdentityField(read_only=True, many=True, source='get_partims_related')
+    parent = LearningUnitHyperlinkedRelatedField(read_only=True, lookup_field='acronym')
+    partims = LearningUnitHyperlinkedRelatedField(read_only=True, many=True, source='get_partims_related')
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
