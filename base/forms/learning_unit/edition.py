@@ -37,7 +37,7 @@ class LearningUnitEndDateForm(forms.Form):
     academic_year = forms.ModelChoiceField(required=True,
                                            queryset=AcademicYear.objects.none(),
                                            empty_label=BLANK_CHOICE_DISPLAY,
-                                           label=_('Academic end year')
+                                           label=_('Last year of organization')
                                            )
 
     def __init__(self, data, learning_unit_year, *args, max_year=None, **kwargs):
