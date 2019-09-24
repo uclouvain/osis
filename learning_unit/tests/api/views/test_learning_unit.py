@@ -36,7 +36,8 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
+    LearningUnitTitleSerializer
 from learning_unit.api.views.learning_unit import LearningUnitList
 
 
@@ -193,4 +194,45 @@ class LearningUnitDetailedTestCase(APITestCase):
             luy_with_full_title,
             context={'request': RequestFactory().get(self.url)}
         )
+        self.assertEqual(response.data, serializer.data)
+
+
+class LearningUnitTitleTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        anac = AcademicYearFactory()
+
+        cls.luy = LearningUnitYearFactory(
+            academic_year=anac,
+        )
+        cls.person = PersonFactory()
+        cls.url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={'uuid': cls.luy.uuid})
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_case_learning_unit_year_not_found(self):
+        invalid_url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={'uuid': uuid.uuid4()})
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
+        serializer = LearningUnitTitleSerializer(luy_with_full_title)
         self.assertEqual(response.data, serializer.data)

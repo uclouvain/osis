@@ -30,7 +30,32 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
+    LearningUnitTitleSerializer
+
+
+class LearningUnitTitleSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        academic_year = AcademicYearFactory()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=academic_year,
+        )
+
+        cls.serializer = LearningUnitTitleSerializer(cls.learning_unit_year)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'title',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_title_is_dict_contains_iso_code_as_key(self):
+        title = self.serializer.data['title']
+
+        self.assertIsInstance(title, dict)
+        self.assertTrue('fr' in title)
+        self.assertTrue('en' in title)
 
 
 class LearningUnitSerializerTestCase(TestCase):
@@ -51,11 +76,11 @@ class LearningUnitSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'academic_year',
             'requirement_entity',
-            'title',
             'type',
             'type_text',
             'subtype',
@@ -94,11 +119,11 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'academic_year',
             'requirement_entity',
-            'title',
             'type',
             'type_text',
             'subtype',
