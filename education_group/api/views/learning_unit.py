@@ -44,8 +44,8 @@ class EducationGroupRootsList(generics.ListAPIView):
     def get_queryset(self):
         learning_unit_year = get_object_or_404(
             LearningUnitYear.objects.all(),
-            acronym=self.kwargs.pop('acronym').upper(),
-            academic_year__year=self.kwargs.pop('year')
+            acronym=self.kwargs['acronym'].upper(),
+            academic_year__year=self.kwargs['year']
         )
         education_group_root_ids = group_element_year.find_learning_unit_formations([learning_unit_year]). \
             get(learning_unit_year.id, [])
