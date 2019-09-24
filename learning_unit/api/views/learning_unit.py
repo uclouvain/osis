@@ -71,6 +71,7 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs.pop('acronym').upper()
         year = self.kwargs.pop('year')
+
         luy = get_object_or_404(
             LearningUnitYear.objects.all().select_related(
                 'language',
