@@ -710,55 +710,6 @@ def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_
     return False
 
 
-class ExternalLearningUnitYearForm(LearningUnitYearForm):
-    country = forms.ModelChoiceField(
-        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
-        required=False, label=_("Country")
-    )
-    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"),
-                                help_text=_("Please select a country and a city first"))
-    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"),
-                              help_text=_("Please select a country first"))
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.data.get('country'):
-            self._init_dropdown_list()
-
-    def _init_dropdown_list(self):
-        if self.data.get('city', None):
-            self._get_cities()
-        if self.data.get('campus', None):
-            self._get_campus_list()
-
-    def _get_campus_list(self):
-        campus_list = Campus.objects.filter(
-            organization__organizationaddress__city=self.data['city']
-        ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
-        campus_choice_list = []
-        for a_campus in campus_list:
-            campus_choice_list.append(((a_campus['pk']), (a_campus['organization__name'])))
-        self.fields['campus'].choices = add_blank(campus_choice_list)
-
-    def _get_cities(self):
-        cities = find_distinct_by_country(self.data['country'])
-        cities_choice_list = []
-        for a_city in cities:
-            city_name = a_city['city']
-            cities_choice_list.append(tuple((city_name, city_name)))
-
-        self.fields['city'].choices = add_blank(cities_choice_list)
-
-    def get_queryset(self):
-        learning_units = super().get_queryset().filter(
-            externallearningunityear__co_graduation=True,
-            externallearningunityear__mobility=False,
-        ).select_related(
-            'campus__organization'
-        )
-        return learning_units
-
-
 class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

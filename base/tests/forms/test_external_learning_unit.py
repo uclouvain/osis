@@ -32,7 +32,7 @@ from base.forms.learning_unit.external_learning_unit import ExternalLearningUnit
     LearningUnitYearForExternalModelForm, ExternalPartimForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
-from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
+from base.forms.learning_unit.search_form import ExternalLearningUnitFilter
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
@@ -260,18 +260,18 @@ class TestExternalLearningUnitSearchForm(TestCase):
             "acronym": self.external_lu_1.learning_unit_year.acronym,
         }
 
-        form = ExternalLearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1.learning_unit_year])
+        external_filter = ExternalLearningUnitFilter(form_data)
+        self.assertTrue(external_filter.is_valid())
+        self.assertCountEqual(external_filter.qs, [self.external_lu_1.learning_unit_year])
 
     def test_search_learning_units_on_partial_acronym(self):
         form_data = {
             "acronym": self.external_lu_1.learning_unit_year.acronym[:5],
         }
 
-        form = ExternalLearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [
+        external_filter = ExternalLearningUnitFilter(form_data)
+        self.assertTrue(external_filter.is_valid())
+        self.assertCountEqual(external_filter.qs, [
             self.external_lu_1.learning_unit_year,
             self.external_lu_2.learning_unit_year
         ])
@@ -281,29 +281,31 @@ class TestExternalLearningUnitSearchForm(TestCase):
             "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
         }
 
-        form = ExternalLearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [
+        external_filter = ExternalLearningUnitFilter(form_data)
+        self.assertTrue(external_filter.is_valid(), external_filter.errors)
+        self.assertCountEqual(external_filter.qs, [
             self.external_lu_1.learning_unit_year, self.external_lu_2.learning_unit_year])
 
     def test_search_learning_units_by_city(self):
         form_data = {
+            "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
             "city": NAMEN,
         }
 
-        form = ExternalLearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1.learning_unit_year])
+        external_filter = ExternalLearningUnitFilter(form_data)
+        self.assertTrue(external_filter.is_valid())
+        self.assertCountEqual(external_filter.qs, [self.external_lu_1.learning_unit_year])
 
     def test_search_learning_units_by_campus(self):
         form_data = {
-
+            "country": self.external_lu_1.learning_unit_year.campus.organization.country.id,
+            "city": NAMEN,
             "campus": self.external_lu_1.learning_unit_year.campus.id,
         }
 
-        form = ExternalLearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertCountEqual(form.get_activity_learning_units(), [self.external_lu_1.learning_unit_year])
+        external_filter = ExternalLearningUnitFilter(form_data)
+        self.assertTrue(external_filter.is_valid(), external_filter.errors)
+        self.assertCountEqual(external_filter.qs, [self.external_lu_1.learning_unit_year])
 
     def test_assert_ignore_external_learning_units_of_type_mobility(self):
         original_count = LearningUnitYear.objects.filter(externallearningunityear__co_graduation=True,
@@ -317,6 +319,6 @@ class TestExternalLearningUnitSearchForm(TestCase):
         form_data = {
             "academic_year": self.academic_year.id,
         }
-        form = ExternalLearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.get_activity_learning_units().count(), original_count)
+        external_filter = ExternalLearningUnitFilter(form_data)
+        self.assertTrue(external_filter.is_valid())
+        self.assertEqual(external_filter.qs.count(), original_count)

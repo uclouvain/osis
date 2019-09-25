@@ -29,9 +29,9 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.common import TooManyResultsException
-from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, ExternalLearningUnitYearForm, \
-    LearningUnitFilter, MOBILITY, LearningUnitDescriptionFicheFilter, BorrowedLearningUnitSearch
+from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitFilter, MOBILITY, \
+    LearningUnitDescriptionFicheFilter, BorrowedLearningUnitSearch, \
+    ExternalLearningUnitFilter
 from base.forms.search.search_form import get_research_criteria
 from base.models.enums import entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
@@ -145,15 +145,16 @@ class TestSearchForm(TestCase):
         campus_2 = CampusFactory(organization=organization_1)
         campus_3 = CampusFactory(organization=organization_2)
 
-        form = ExternalLearningUnitYearForm({'city': NAMUR, 'country': country, "campus": campus_2})
-        form._init_dropdown_list()
+        form = ExternalLearningUnitFilter({'city': NAMUR, 'country': country, "campus": campus_2}).form
+        campus_form_choices = list(form.fields["campus"].choices)
+        self.assertEqual(campus_form_choices[0], ('', '---------'))
+        self.assertEqual(campus_form_choices[1], (None, '---------'))
+        self.assertEqual(campus_form_choices[2][1], 'organization 1')
+        self.assertEqual(campus_form_choices[3], (campus_3.id, 'organization 2'))
 
-        self.assertEqual(form.fields['campus'].choices[0], (None, '---------'))
-        self.assertEqual(form.fields['campus'].choices[1][1], 'organization 1')
-        self.assertEqual(form.fields['campus'].choices[2], (campus_3.id, 'organization 2'))
-
-        self.assertEqual(form.fields['city'].choices,
-                         [(None, '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
+        city_form_choices = list(form.fields['city'].choices)
+        self.assertEqual(city_form_choices,
+                         [('', '---------'), (None, '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
