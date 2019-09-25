@@ -66,35 +66,40 @@
     {% endblock pageheader %}
 
     {% block navtab %}
-
+        {% url 'learning_units' as learning_units_url %}
+        {% url 'learning_units_service_course' as service_course_url %}
+        {% url 'learning_units_borrowed_course' as borrowed_course_url %}
+        {% url 'learning_units_proposal' as learning_units_proposal_url %}
+        {% url 'learning_units_external' as learning_units_external_url %}
+        {% url 'learning_units_summary' as learning_units_summary_url %}
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" >
-            <a href="{% url 'learning_units'%}" role="tab" id="lnk_activity_search">
+        <li role="presentation" {% if request.path == learning_units_url %}class="active"{% endif %}>
+            <a href="{{ learning_units_url }}" role="tab" id="lnk_activity_search">
                 {% trans 'Learning unit'%}
             </a>
         </li>
-        <li role="presentation" >
-            <a href="{% url 'learning_units_service_course'%}" role="tab" id="lnk_service_course_search">
+        <li role="presentation" {% if request.path == service_course_url  %}class="active"{% endif %}>
+            <a href="{{ service_course_url }}" role="tab" id="lnk_service_course_search">
                 {% trans 'Service courses'%}
             </a>
         </li>
-        <li role="presentation" >
-            <a href="{% url 'learning_units_borrowed_course'%}" role="tab" id="lnk_borrowed_course_search">
+        <li role="presentation" {% if request.path == borrowed_course_url %}class="active"{% endif %}>
+            <a href="{{ borrowed_course_url }}" role="tab" id="lnk_borrowed_course_search">
                 {% trans 'Borrowed courses'%}
             </a>
         </li>
-        <li role="presentation" >
-            <a href="{% url 'learning_units_proposal'%}" role="tab" id="lnk_proposal_search">
+        <li role="presentation" {% if request.path == learning_units_proposal_url %}class="active"{% endif %}>
+            <a href="{{ learning_units_proposal_url }}" role="tab" id="lnk_proposal_search">
                 {% trans 'Proposals'%}
             </a>
         </li>
-        <li role="presentation" >
-            <a href="{% url 'learning_units_external'%}" role="tab" id="lnk_external_search">
+        <li role="presentation" {% if request.path == learning_units_external_url %}class="active"{% endif %}>
+            <a href="{{ learning_units_external_url }}" role="tab" id="lnk_external_search">
                 {% trans 'External learning units'%}
             </a>
         </li>
-        <li role="presentation" >
-            <a href="{% url 'learning_units_summary' %}" role="tab" id="lnk_summary_list">
+        <li role="presentation" {% if request.path == learning_units_summary_url %}class="active"{% endif %}>
+            <a href="{{ learning_units_summary_url }}" role="tab" id="lnk_summary_list">
                 {% trans 'Description fiche status' %}
             </a>
         </li>
