@@ -279,8 +279,14 @@ class CertificateAimsForm(forms.ModelForm):
             )
         }
 
+    def clean_certificate_aims(self):
+        certificate_aims = self.cleaned_data["certificate_aims"]
+        certificate_aims_type_2 = [ca for ca in certificate_aims if ca.section == 2]
+        if len(certificate_aims_type_2) >= MAX_NUMBER_CERTIFICATE_TYPE_2:
+            raise forms.ValidationError(_("There can only be one type 2 expectation"))
+        return certificate_aims
+
     def save(self, commit=True):
-        self.instance.certificate_aims.clear()
         for certificate_aim in self.cleaned_data["certificate_aims"]:
             EducationGroupCertificateAim.objects.get_or_create(
                 education_group_year=self.instance,
