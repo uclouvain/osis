@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 14:44+0200\n"
+"POT-Creation-Date: 2019-09-23 16:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,16 +227,10 @@ msgstr ""
 msgid "Academic calendars"
 msgstr ""
 
-msgid "Academic end year"
-msgstr ""
-
 msgid "Academic partner"
 msgstr ""
 
 msgid "Academic responsible"
-msgstr ""
-
-msgid "Academic start year"
 msgstr ""
 
 msgid "Academic type"
@@ -2495,6 +2489,9 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
+msgid "Start academic year"
+msgstr ""
+
 msgid "Start date"
 msgstr ""
 
@@ -2502,9 +2499,6 @@ msgid "Start date and end date are mandatory"
 msgstr ""
 
 msgid "Start date must be lower than end date"
-msgstr ""
-
-msgid "Starting year"
 msgstr ""
 
 msgid "State"
