@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import itertools
-from distutils.util import strtobool
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -35,7 +34,6 @@ from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base import models as mdl
-from base.business.education_groups.general_information_sections import MOBILITY
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
@@ -59,6 +57,10 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from reference.models.country import Country
+
+
+MOBILITY = 'mobility'
+MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
 
 
 class LearningUnitSearchForm(BaseSearchForm):
@@ -227,7 +229,8 @@ class LearningUnitFilter(FilterSet):
         required=False,
         field_name="learning_container_year__container_type",
         label=_('Type'),
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("plural", "All"),
+        method="filter_container_type"
     )
     subtype = filters.ChoiceFilter(
         choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
@@ -295,6 +298,13 @@ class LearningUnitFilter(FilterSet):
             ).distinct()
         return queryset
 
+    def filter_container_type(self, queryset, name, value):
+        if value == MOBILITY:
+            return queryset.filter(externallearningunityear__mobility=True)
+        elif value == learning_container_year_types.EXTERNAL:
+            return queryset.filter(externallearningunityear__co_graduation=True)
+        return queryset.filter(name=value)
+
     def filter_entity(self, queryset, name, value):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']
         lookup_expression = "__".join(["learning_container_year", name, "in"])
@@ -358,7 +368,7 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
     )
 
     def filter_queryset(self, queryset):
-        qs = super(self).filter_queryset(queryset)
+        qs = super().filter_queryset(queryset)
 
         faculty_borrowing_id = None
         faculty_borrowing_acronym = self.form.cleaned_data.get('faculty_borrowing_acronym')

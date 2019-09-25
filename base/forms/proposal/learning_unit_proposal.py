@@ -28,10 +28,7 @@ from django.db.models import Q, OuterRef, Subquery
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
-from base import models as mdl
 from base.business.entity import get_entities_ids
-from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.learning_unit.search_form import LearningUnitSearchForm
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
