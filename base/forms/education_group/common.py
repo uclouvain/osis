@@ -41,7 +41,7 @@ from base.models.education_group_type import find_authorized_types, EducationGro
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import academic_calendar_type, education_group_categories
-from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
@@ -115,6 +115,18 @@ class PermissionFieldEducationGroupMixin(PermissionFieldMixin):
             return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
                 GROUP_DAILY_MANAGEMENT
         return super().get_context()
+
+
+class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
+    """
+    Permission Field for Hops(year) and for Coorganization
+
+    This mixin will get allowed field on reference_field model according to perm's
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.category = TRAINING
+        super().__init__(*args, **kwargs)
 
 
 class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupMixin,
@@ -214,10 +226,11 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
-        widgets = {
-            "start_year": forms.TextInput(),
-            "end_year": forms.TextInput(),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['end_year'].queryset = \
+            self.fields['end_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
@@ -279,7 +292,7 @@ class CommonBaseForm:
 
         if self._is_creation() and not educ_group_form.instance.start_year:
             # Specific case, because start_date is hidden when creation, we should test start_date [validite] > end_date
-            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year']
             try:
                 educ_group_form.instance.clean()
             except ValidationError as error:
@@ -291,7 +304,7 @@ class CommonBaseForm:
     def save(self):
         start_year = None
         if self._is_creation() and not self.education_group_form.instance.start_year:
-            start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            start_year = self.education_group_year_form.cleaned_data['academic_year']
 
         education_group = self.education_group_form.save(start_year=start_year)
         self.education_group_year_form.instance.education_group = education_group

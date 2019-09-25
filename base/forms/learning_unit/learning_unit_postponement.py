@@ -102,9 +102,10 @@ class LearningUnitPostponementForm:
     def _get_academic_end_year(self, end_postponement):
         if end_postponement is None:
             if self.learning_unit_instance and self.learning_unit_instance.end_year:
-                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year)
+                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year.year)
             elif self.learning_unit_full_instance and self.learning_unit_full_instance.end_year:
-                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_full_instance.end_year)
+                end_postponement = academic_year.find_academic_year_by_year(
+                    self.learning_unit_full_instance.end_year.year)
         return end_postponement
 
     def _compute_max_postponement_year(self) -> int:
@@ -223,7 +224,7 @@ class LearningUnitPostponementForm:
                 data_to_postpone['component-1-id'] = learning_component_year.id
 
     def _instantiate_base_form_as_insert(self, ac_year, data):
-        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)
+        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement)
 
     @staticmethod
     def _get_data_to_postpone(lunit_year, data):
@@ -241,7 +242,8 @@ class LearningUnitPostponementForm:
             'start_year': start_year,
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance,
-            'postposal': not data
+            'postposal': not data,
+            'start_anac': self.start_postponement.year if self.subtype == learning_unit_year_subtypes.PARTIM else None
         }
         if self.external:
             return ExternalLearningUnitBaseForm(
@@ -270,7 +272,6 @@ class LearningUnitPostponementForm:
             current_learn_unit_year = self._forms_to_upsert[0].save()
             learning_unit = current_learn_unit_year.learning_unit
             self._luy_upserted.append(current_learn_unit_year)
-
             if len(self._forms_to_upsert) > 1:
                 for form in self._forms_to_upsert[1:]:
                     if self.consistency_errors and form.academic_year in self.consistency_errors:
@@ -278,7 +279,6 @@ class LearningUnitPostponementForm:
 
                     form.learning_unit_form.instance = learning_unit
                     self._luy_upserted.append(form.save())
-
         return self._luy_upserted
 
     def _check_consistency(self):

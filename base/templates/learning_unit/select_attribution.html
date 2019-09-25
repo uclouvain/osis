@@ -40,8 +40,8 @@
                         <th>{% trans 'Start' %}</th>
                         <th>{% trans 'Duration' %}</th>
                     {% endif %}
-                    <th>Volume 1</th>
-                    <th>Volume 2</th>
+                    <th><abbr title="{% trans 'Lecturing' %}">PM</abbr></th>
+                    <th><abbr title="{% trans 'Practical exercises' %}">PP</abbr></th>
                     <th>{% trans 'Substitute' %}</th>
                     <th></th>
                 </tr>
@@ -81,7 +81,7 @@
             </p>
         {% endif %}
         <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" class="btn btn-default" role="button">
-            {% trans "cancel" %}
+            {% trans "Cancel" %}
         </a>
     </div>
 {% endblock %}

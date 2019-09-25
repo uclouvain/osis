@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:42+0200\n"
+"POT-Creation-Date: 2019-09-23 16:38+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -263,17 +263,11 @@ msgstr "Gestion du calendrier académique"
 msgid "Academic calendars"
 msgstr "Calendriers académique"
 
-msgid "Academic end year"
-msgstr "Anac de fin"
-
 msgid "Academic partner"
 msgstr "Partenaire académique"
 
 msgid "Academic responsible"
 msgstr "Responsable académique"
-
-msgid "Academic start year"
-msgstr "Anac de début"
 
 msgid "Academic type"
 msgstr "Nature"
@@ -421,6 +415,9 @@ msgstr "Alerte"
 
 msgid "Alert Message"
 msgstr "Message d'alerte"
+
+msgid "All"
+msgstr "Tous"
 
 msgctxt "plural"
 msgid "All"
@@ -751,6 +748,10 @@ msgstr "Confirmer votre action."
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr "Erreur de consistance en %(academic_year)s : %(error)s"
 
+#, python-format
+msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
+msgstr "Erreur de consistance en %(academic_year)s avec %(model)s : %(error)s"
+
 msgid "Consolidate"
 msgstr "Consolider"
 
@@ -937,10 +938,6 @@ msgid "Do you want to report the modifications done to the next years ?"
 msgstr ""
 "Voulez-vous reporter les modifications faites pour les années suivantes ?"
 
-msgid ""
-"Do you want to sent email to remind to update the educational informations?"
-msgstr "Voulez-vous envoyer un email de rappel?"
-
 msgid "Doctoral commission"
 msgstr "Commission doctorale"
 
@@ -972,7 +969,7 @@ msgid "Education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
 
 msgid "Education group edition"
-msgstr "Edition d'organisation de formations"
+msgstr "Édition des programmes"
 
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
@@ -1011,9 +1008,6 @@ msgstr "Ouverture informations pédagoqiques"
 
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue des formations."
-
-msgid "End"
-msgstr "Fin"
 
 msgid "End date"
 msgstr "Date de fin"
@@ -1273,6 +1267,12 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr "Générer xls des cours qui sont des prérequis"
+
+msgid "Generate xls of learning units that have prerequisites"
+msgstr "Générer xls des cours qui ont des prérequis"
+
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
 
@@ -1478,6 +1478,9 @@ msgstr "Cours de langue"
 msgid "Last modifications"
 msgstr "Dernières modifications"
 
+msgid "Last year of organization"
+msgstr "Dernière année d'organisation"
+
 msgid "Lastname"
 msgstr "Nom"
 
@@ -1571,6 +1574,9 @@ msgstr "Type de lien"
 msgid "Linked with EPC"
 msgstr "Liens existants dans l'application EPC."
 
+msgid "List comparison LU / Proposal"
+msgstr "Liste de comparaison UE / Proposition"
+
 msgid "List education groups"
 msgstr "Liste des formations"
 
@@ -1579,6 +1585,9 @@ msgstr "Liste de comparaison entre les propositions et les UE"
 
 msgid "List of learning units with comparison"
 msgstr "Comparaison entre unités d'enseignement"
+
+msgid "List of learning units with educational information and specifications"
+msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "List of learning units with with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
@@ -1594,6 +1603,9 @@ msgstr "Liste des formations avec données administratives"
 
 msgid "List of users"
 msgstr "Liste des utilisateurs"
+
+msgid "List of users with their groups and linked entities"
+msgstr "Liste des utilisateurs avec leurs groupes et entités liés."
 
 msgid "List proposals"
 msgstr "Liste des propositions"
@@ -1624,9 +1636,6 @@ msgstr ""
 
 msgid "Made in"
 msgstr "Fait à"
-
-msgid "Mail to remind educational information update"
-msgstr "Mail de rappel résumés"
 
 msgid "Main"
 msgstr "Principal"
@@ -1827,9 +1836,6 @@ msgstr "Nom"
 msgid "Name of the teacher responsible"
 msgstr "Nom du professeur responsable de programme"
 
-msgid "Need no reminder"
-msgstr "Pas besoin de rappel tout est en ordre"
-
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
 
@@ -1952,6 +1958,9 @@ msgstr "OU"
 
 msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
+
+msgid "Official"
+msgstr "Officiel"
 
 msgid "On the file: direct access or access with additional training"
 msgstr ""
@@ -2222,6 +2231,13 @@ msgstr "Produire Excel"
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
 
+
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
+msgstr ""
+"Produire une liste des UE avec la fiche descriptive et le cahier des charges"
+
 msgid "Produce a xls of learning units with one line per attribution"
 msgstr ""
 "Produire une liste des unités d'enseignement avec le détail des attributions"
@@ -2427,9 +2443,6 @@ msgstr "Release"
 msgid "Remarks"
 msgstr "Remarques"
 
-msgid "Reminding mails sent"
-msgstr "Messages de rappel envoyés"
-
 #, python-format
 msgid "Repartition added for %(tutor)s (%(function)s)"
 msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
@@ -2471,9 +2484,6 @@ msgstr "Stage de recherche"
 msgid "Reserved for interns"
 msgstr "Réservé aux internes"
 
-msgid "Responsible"
-msgstr "Responsable"
-
 msgid "Result"
 msgstr "Résultat"
 
@@ -2496,7 +2506,7 @@ msgid "Scores exam diffusion"
 msgstr "Diffusion des feuilles de note"
 
 msgid "Scores exam submission"
-msgstr "Soumission des feuilles de note"
+msgstr "Soumission des notes d'examen"
 
 msgid "Scores must be between 0 and 20"
 msgstr "Les scores doivent être compris entre 0 et 20"
@@ -2542,9 +2552,6 @@ msgstr "Sélectionner tous les messages"
 
 msgid "Selected element"
 msgstr "Élément sélectionné"
-
-msgid "Sent email to remind to update description fiche"
-msgstr "Envoyer un email de rappel pour la mise à jour des fiches descriptives"
 
 msgid "Separate"
 msgstr "Séparer"
@@ -2594,6 +2601,9 @@ msgstr "Cahier des charges"
 msgid "Start"
 msgstr "Début"
 
+msgid "Start academic year"
+msgstr "Année académique de début"
+
 msgid "Start date"
 msgstr "Date de début"
 
@@ -2602,9 +2612,6 @@ msgstr "Les dates de début et de fin sont obligatoires"
 
 msgid "Start date must be lower than end date"
 msgstr "La date de début doit être inférieure à la date de fin"
-
-msgid "Starting year"
-msgstr "Année de départ"
 
 msgid "State"
 msgstr "État"
@@ -2652,7 +2659,7 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Résumé du cours"
+msgstr "Soumission des fiches descriptives"
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2667,7 +2674,7 @@ msgid "T=Cheating"
 msgstr "T=Tricherie"
 
 msgid "Teaching charge application"
-msgstr "Demande de frais d’enseignement"
+msgstr "Candidature en ligne"
 
 msgid "Teaching internship"
 msgstr "Stage d’enseignement"
@@ -2833,6 +2840,10 @@ msgid ""
 "The learning unit %(acronym)s is included in the following education groups"
 msgstr ""
 "L'unité d'enseignement %(acronym)s est incluse dans les groupements suivants"
+
+#, python-format
+msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
 #, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
@@ -3331,12 +3342,6 @@ msgstr "Vol. annuel"
 msgid "Vol. global"
 msgstr "Vol. global"
 
-msgid "Volume 1"
-msgstr "Volume 1"
-
-msgid "Volume 2"
-msgstr "Volume 2"
-
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
@@ -3461,11 +3466,17 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas modifier la date de fin de cette unité d'enseignement. "
 "Vous devriez être gestionnaire central ou l'unité d'enseignement devrait "
-"être un partim ou encore l'unité d'enseignement devrait être un cours/"
-"mémoire/stage"
+"être un partim ou encore l'unité d'enseignement devrait être un autre "
+"collectif/autre individuel/thèse"
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+#, python-format
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
+"de type %(type)s."
 
 msgid "You can not attach the same child several times."
 msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
@@ -3553,6 +3564,15 @@ msgstr "Vous n'avez pas le droit de consolider"
 
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"
+
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
+msgstr ""
+"Vous devez être dans le contexte d'une formation pour modifier les prérequis "
+"d'une unité d'enseignement(contexte actuel: %(partial_acronym)s - "
+"%(acronym)s)"
 
 msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis"
@@ -3644,9 +3664,6 @@ msgstr "bisannuelle impaire"
 msgid "blocked update for tutor"
 msgstr "mise-à-jour bloquée pour l'enseignant"
 
-msgid "cancel"
-msgstr "annuler"
-
 msgid "cannot be canceled"
 msgstr "ne peut pas être annulé"
 
@@ -3706,9 +3723,6 @@ msgstr "type durée"
 msgid "email"
 msgstr "email"
 
-msgid "end"
-msgstr "fin"
-
 msgid "english comment"
 msgstr "commentaire anglais"
 
@@ -3743,6 +3757,9 @@ msgstr "jj/mm/aaaa"
 msgid "french help text"
 msgstr "texte d'aide en français"
 
+msgid "has as prerequisite"
+msgstr "a comme prérequis"
+
 msgid "has the following prerequisites"
 msgstr "a des prérequis"
 
@@ -3758,11 +3775,14 @@ msgstr "volume horaire total annuel"
 msgid "initial value"
 msgstr "valeur initiale"
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr "est un prérequis de"
 
 msgid "is using in"
 msgstr "est utilisée dans"
+
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
+msgstr "est_prérequis_de-%(year)s-%(acronym)s"
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisé"
@@ -3833,6 +3853,10 @@ msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "
 "le JavaScript</a> pour utiliser l'application."
 
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr "prérequis-%(year)s-%(acronym)s"
+
 msgid "professional integration"
 msgstr "intégration professionnelle"
 
@@ -3865,9 +3889,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "save"
-msgstr "enregistrer"
 
 msgid "score(s) saved"
 msgstr "note(s) enregistrée(s)"
