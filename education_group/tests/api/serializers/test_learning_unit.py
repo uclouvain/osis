@@ -45,6 +45,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'credits',
@@ -55,7 +56,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'duration_unit_text',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'academic_year',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
