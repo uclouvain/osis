@@ -47,3 +47,8 @@ class EducationGroupRootsList(generics.ListAPIView):
             get(learning_unit_year.id, [])
         return EducationGroupYear.objects.filter(pk__in=education_group_root_ids)\
             .select_related('education_group_type', 'academic_year')
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.request.query_params.get('lang')
+        return serializer_context

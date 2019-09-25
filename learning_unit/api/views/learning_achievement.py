@@ -32,7 +32,8 @@ from rest_framework.response import Response
 
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_achievement import LearningAchievementListSerializer
+from learning_unit.api.serializers.learning_achievement import LearningAchievementListSerializer, \
+    LearningAchievementListSpecificLanguageSerializer
 
 
 class LearningAchievementList(generics.GenericAPIView):
@@ -45,16 +46,42 @@ class LearningAchievementList(generics.GenericAPIView):
     paginator = None
 
     def get(self, request, *args, **kwargs):
+        language = self.request.query_params.get('lang')
         learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
-        qs = LearningAchievement.objects.filter(learning_unit_year=learning_unit_year).order_by('order')\
-                                .annotate(iso_code=Lower('language__code')).values('code_name', 'text', 'iso_code')
+        qs = LearningAchievement.objects.filter(
+            learning_unit_year=learning_unit_year
+        ).order_by('order')
+        if language:
+            qs = qs.filter(
+                language__code=language.upper()
+            ).values('code_name', 'text')
+            serializer = self._get_for_specific_language(qs)
+        else:
+            qs = qs.annotate(
+                iso_code=Lower('language__code')
+            ).values('code_name', 'text', 'iso_code')
+            serializer = self._get_for_both_languages(qs)
 
+        return Response(serializer.data)
+
+    def _get_for_both_languages(self, qs):
         learning_achievements_grouped = OrderedDict()
         for learning_achievement in qs:
             code_name = learning_achievement['code_name']
             learning_achievements_grouped.setdefault(code_name, {'fr': '', 'en': '', 'code_name': code_name})
             learning_achievements_grouped[code_name][learning_achievement['iso_code']] = \
                 learning_achievement['text']
+        return self.get_serializer(learning_achievements_grouped.values(), many=True)
 
-        serializer = self.get_serializer(learning_achievements_grouped.values(), many=True)
-        return Response(serializer.data)
+    def _get_for_specific_language(self, qs):
+        learning_achievements_grouped = OrderedDict()
+        for learning_achievement in qs:
+            code_name = learning_achievement['code_name']
+            learning_achievements_grouped.setdefault(code_name, {'achievement': '', 'code_name': code_name})
+            learning_achievements_grouped[code_name]['achievement'] = learning_achievement['text']
+        return self.get_serializer(learning_achievements_grouped.values(), many=True)
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.query_params.get('lang'):
+            return LearningAchievementListSpecificLanguageSerializer
+        return LearningAchievementListSerializer
