@@ -1,7 +1,6 @@
-{% extends "layout.html" %}
-{% load staticfiles %}
-{% load i18n %}
-{% load waffle_tags %}
+{% extends "learning_unit/search/base.html" %}
+{% load staticfiles i18n%}
+{% load waffle_tags bootstrap3 %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -27,72 +26,52 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue'%}</a></li>
-<li class="active" id="lnk_learning_units">{% trans 'Learning units' %}</li>
-{% endblock %}
+{% block panel %}
 
-{% block content %}
-{% if request.GET.academic_year_id and request.GET.academic_year_id != '0' %}
-    {% url 'learning_unit_create' academic_year_id=request.GET.academic_year_id as create_learning_unit_url%}
-    {% url 'proposal_learning_unit_creation_form' academic_year=request.GET.academic_year_id as create_proposal_url%}
-    {% url 'learning_unit_create_external' academic_year=request.GET.academic_year_id as create_external_url%}
-{% else %}
-    {% url 'learning_unit_create' academic_year_id=current_academic_year.id as create_learning_unit_url%}
-    {% url 'proposal_learning_unit_creation_form' academic_year=proposal_academic_year.id as create_proposal_url%}
-    {% url 'learning_unit_create_external' academic_year=current_academic_year.id as create_external_url%}
-{% endif %}
+        {% include "learning_unit/blocks/form/search_form_external_learning_unit.html" %}
 
-<div class="page-header">
-    <div class="row">
-        <div class="col-md-10">
-            <h2>{% trans 'Learning units' %}</h2>
+        <div style="margin-top:10px;">
+            {% if page_obj %}
+                <br>
+                <strong style="margin-left:10px;color:grey;">
+                    {{ learning_units_count }}
+                    {% trans 'Learning units'|lower %}
+                </strong>
+
+                <table id="table_learning_units" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
+                            <th id="th_1_acronym">{% trans 'Code' %}</th>
+                            <th id="th_2_title">{% trans 'Title' %}</th>
+                            <th id="th_3_campus">{% trans 'Institution' %}</th>
+                            <th id="th_4_credits">{% trans 'Credits' %}</th>
+                            <th id="th_5_status">{% trans 'Status' %}</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="row">
+                    <div class="col-md-7">
+                        {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                    </div>
+                    <div class="col-md-5">
+                        {% pagination_size_select %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
-        <div class="col-md-2" style="margin-top:20px;">
-            <div class="btn-group pull-right">
-                {% include "blocks/button/learning_units_action_button.html" %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" >
-        <a href="{% url 'learning_units'%}" role="tab" id="lnk_activity_search">
-            {% trans 'Learning unit'%}
-        </a>
-    </li>
-    <li role="presentation" >
-        <a href="{% url 'learning_units_service_course'%}" role="tab" id="lnk_service_course_search">
-            {% trans 'Service courses'%}
-        </a>
-    </li>
-    <li role="presentation" >
-        <a href="{% url 'learning_units_borrowed_course'%}" role="tab" id="lnk_borrowed_course_search">
-            {% trans 'Borrowed courses'%}
-        </a>
-    </li>
-    <li role="presentation" {% if search_type == 3 %} class="active" {% endif %}>
-        <a href="{% url 'learning_units_proposal'%}" role="tab" id="lnk_proposal_search">
-            {% trans 'Proposals'%}
-        </a>
-    </li>
-    <li role="presentation" class="active" >
-        <a href="{% url 'learning_units_external'%}" role="tab" id="lnk_external_search">
-            {% trans 'External learning units'%}
-        </a>
-    </li>
-    <li role="presentation" >
-        <a href="{% url 'learning_units_summary' %}" role="tab" id="lnk_summary_list">
-            {% trans 'Description fiche status' %}
-        </a>
-    </li>
-</ul>
-    {% include 'learning_unit/by_external.html' %}
-{% endblock %}
+{% endblock panel %}
 
 {% block script %}
+<script src="{% static 'js/select_ajax_filtering.js' %}"></script>
 <script>
+    let country_node = $("select#id_country");
+    let city_node = $("select#id_city");
+    let campus_node = $("select#id_campus");
+
+    country_node.filterCityByCountry(city_node, campus_node, "{% url "filter_cities_by_country" %}");
+    city_node.filterCampusByCity(campus_node, "{% url "filter_campus_by_city" %}");
+
     $(document).ready(function()
     {
 	 // Must be always DataTable declaration !!!
@@ -127,14 +106,11 @@
                             return data["fr"]
                         }
                     },
-                    {"name": "type", "targets": 3,  "data": "type_text"},
-                    {"name": "subtype", "targets": 4,  "data": "subtype_text"},
-                    {"name": "requirement_entity", "targets": 5, "data": "requirement_entity"},
-                    {"name": "allocation_entity", "targets": 6, "data": "allocation_entity"},
-                    {"name": "credits", "targets": 7, "data": "credits"},
+                    {"name": "campus", "targets": 3, "data": "campus"},
+                    {"name": "credits", "targets": 4, "data": "credits"},
                     {
                         "name": "status",
-                        "targets": 8,
+                        "targets": 5,
                         "data": "status",
                         "render": function(data, type, row, meta){
                             if (data === true){
@@ -146,18 +122,6 @@
                                 "                                          title=\"{% trans 'Inactive' %}\"></span>\n" +
                                 "                                    <div style=\"display:none;\">0</div>"
                         }
-                    },
-                    {
-                        "name": "has_proposal",
-                        "targets": 9,
-                        "data": "has_proposal",
-                        "render": function(data, type, row, meta){
-                            if (data === true){
-                                return "<i class='fa fa-flag warning' data-toggle='tooltip' data-placement='right'" +
-                                    " title='{% trans 'In proposal' %}''></i>"
-                            }
-                            return ""
-                        }
                     }
                 ],
                 "stateSave": true,
@@ -166,7 +130,7 @@
                 "orderMulti": false,
                 "serverSide": true,
                 "ajax" : {
-                    "url": "{% url 'learning_units' %}",
+                    "url": "{% url 'learning_units_external' %}",
                     "type": "GET",
                     "dataSrc": "object_list",
                     "data": function (d){
@@ -196,50 +160,5 @@
             w = window.open(link, "id_tutor", 'height=500,width=800,resizable=yes,scrollbars=yes');
         });
     });
-
-    $("#btn_produce_xls").click(function(e) {
-        prepare_xls(e, 'xls');
-    });
-
-    $("#comparison_xls").click(function(e) {
-        prepare_xls(e, 'xls_comparison');
-        $("#comparison_year").val('');
-    });
-
-    $("#btn_xls_with_parameters").click(function(e) {
-        prepare_xls(e, 'xls_with_parameters');
-        $("#hdn_with_grp").val('');
-        $("#hdn_with_attributions").val('');
-    });
-
-    function prepare_xls(e, action_value){
-        e.preventDefault();
-        var status = $("#xls_status");
-        status.val(action_value);
-        $("#download_xls").submit();
-        status.val('');
-    }
-
-    $("#id_check_all").click(function(){
-        $('input:checkbox.selected_object').not(this).prop('checked', this.checked);
-    });
-
-    $("#btn_produce_xls_proposal").click(function(e) {
-        e.preventDefault();
-        var status = $("#xls_status_proposal");
-        status.val('xls');
-        $("#proposals_form").submit();
-        status.val('');
-    });
-    $("#btn_produce_xls_proposal_comparison").click(function(e) {
-        e.preventDefault();
-        var status = $("#xls_status_proposal");
-        status.val('xls_comparison');
-        $("#proposals_form").submit();
-        status.val('');
-    });
-    $("#btn_produce_xls_detailled_attributions").click(function (e) {
-        prepare_xls(e, 'xls_attributions');
-    });
 </script>
-{% endblock %}
+{% endblock script %}

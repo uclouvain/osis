@@ -80,6 +80,7 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         return getattr(learning_unit_year, "has_proposal", None)
 
 
+# FIXME Update scheme
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
     periodicity_text = serializers.CharField(source='get_periodicity_display', read_only=True)
     quadrimester_text = serializers.CharField(source='get_quadrimester_display', read_only=True)
@@ -102,6 +103,7 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
         source='get_partims_related',
         read_only=True
     )
+    proposal = serializers.SerializerMethodField(read_only=True)
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
@@ -115,5 +117,17 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'language',
             'components',
             'parent',
-            'partims'
+            'partims',
+            'proposal',
         )
+
+    def get_proposal(self, learning_unit_year):
+        if not hasattr(learning_unit_year, "proposallearningunit"):
+            return {}
+
+        return {
+            "folder": learning_unit_year.proposallearningunit.folder,
+            "type": learning_unit_year.proposallearningunit.get_type_display(),
+            "status": learning_unit_year.proposallearningunit.get_state_display(),
+        }
+

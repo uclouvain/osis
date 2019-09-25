@@ -20,7 +20,7 @@ from base.views.common import display_messages_by_level
 from base.views.learning_units.search.common import PROPOSAL_SEARCH, ITEMS_PER_PAGES, \
     ACTION_BACK_TO_INITIAL, ACTION_CONSOLIDATE, ACTION_FORCE_STATE, SerializeFilterListIfAjaxMixin, RenderToExcel, \
     _create_xls_proposal, _create_xls_proposal_comparison
-from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
 @RenderToExcel("xls", _create_xls_proposal)
@@ -35,7 +35,7 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Seri
     permission_required = 'base.can_access_learningunit'
     cache_exclude_params = 'xls_status'
 
-    serializer_class = LearningUnitSerializer
+    serializer_class = LearningUnitDetailedSerializer
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)

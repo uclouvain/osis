@@ -294,6 +294,15 @@ components:
               type: string
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            proposal:
+              type: object
+              properties:
+                folder:
+                  type: string
+                type:
+                  type: string
+                status:
+                  type: string
     LearningUnitComponent:
       type: object
       properties:

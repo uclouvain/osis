@@ -111,6 +111,8 @@ class ProposalLearningUnitFilter(FilterSet):
             ('entity_requirement', 'requirement_entity'),
             ('credits', 'credits'),
             ('status', 'status'),
+            # TODO fix that shit
+            ('acronym', 'folder'),
         ),
         widget=forms.HiddenInput
     )

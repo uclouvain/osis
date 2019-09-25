@@ -7,7 +7,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.views.learning_units.search.common import EXTERNAL_SEARCH, ITEMS_PER_PAGES, \
     SerializeFilterListIfAjaxMixin
-from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
 class ExternalLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
@@ -19,7 +19,7 @@ class ExternalLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, Seri
     filterset_class = ExternalLearningUnitFilter
     permission_required = 'base.can_access_learningunit'
 
-    serializer_class = LearningUnitSerializer
+    serializer_class = LearningUnitDetailedSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
