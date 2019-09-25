@@ -28,6 +28,7 @@ from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 
+import base.forms.learning_unit.search.borrowed
 import base.views.education_groups.create
 import base.views.learning_units.common
 import base.views.learning_units.create
@@ -148,7 +149,7 @@ urlpatterns = [
             name='learning_units_service_course'),
         url(r'^by_proposal/', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
             name='learning_units_proposal'),
-        url(r'^by_borrowed_course/', base.views.learning_units.search.borrowed.BorrowedLearningUnitSearch.as_view(),
+        url(r'^by_borrowed_course/', base.forms.learning_unit.search.borrowed.BorrowedLearningUnitSearch.as_view(),
             name='learning_units_borrowed_course'),
         url(r'^by_summary/',
             base.views.learning_units.search.educational_information.LearningUnitDescriptionFicheSearch.as_view(),

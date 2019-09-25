@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_filters.views import FilterView
 
-from base.forms.learning_unit.search_form import ExternalLearningUnitFilter
+from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin

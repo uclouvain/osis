@@ -32,7 +32,7 @@ from base.forms.learning_unit.external_learning_unit import ExternalLearningUnit
     LearningUnitYearForExternalModelForm, ExternalPartimForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
-from base.forms.learning_unit.search_form import ExternalLearningUnitFilter
+from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL

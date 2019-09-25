@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
 
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
-from base.forms.learning_unit.search_form import LearningUnitDescriptionFicheFilter
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.views.common import remove_from_session

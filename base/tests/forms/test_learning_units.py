@@ -26,10 +26,11 @@
 from django.test import TestCase
 from django.utils import timezone
 
+import base.forms.learning_unit.search.service_course
+import base.forms.learning_unit.search.simple
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
-from base.forms.learning_unit import search_form
 from base.models.entity_version import PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 from base.models.enums import entity_type
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -180,9 +181,9 @@ class TestLearningUnitForm(TestCase):
         }
 
     def test_get_service_courses_by_empty_requirement_and_allocation_entity(self):
-        form_data = {"academic_year": self.academic_yr.pk,}
+        form_data = {"academic_year": self.academic_yr.pk}
 
-        service_course_filter = search_form.ServiceCourseFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(
             [self.list_learning_unit_year[0], self.list_learning_unit_year[1]],
@@ -194,7 +195,7 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity": self.list_entity_version[1].acronym
         }
 
-        service_course_filter = search_form.ServiceCourseFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual([self.list_learning_unit_year[0]], list(service_course_filter.qs))
 
@@ -204,7 +205,7 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity": self.list_entity_version[5].acronym
         }
 
-        service_course_filter = search_form.ServiceCourseFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(list(service_course_filter.qs), [])
 
@@ -213,7 +214,7 @@ class TestLearningUnitForm(TestCase):
             "requirement_entity": self.list_entity_version[0].acronym
         }
 
-        service_course_filter = search_form.ServiceCourseFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(list(service_course_filter.qs), [self.list_learning_unit_year[0]])
 
@@ -223,7 +224,7 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity": self.list_entity_version[1].acronym
         }
 
-        service_course_filter = search_form.ServiceCourseFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(len(service_course_filter.qs), 1)
 
@@ -233,7 +234,7 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity": self.list_entity_version[3].acronym
         }
 
-        service_course_filter = search_form.ServiceCourseFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(list(service_course_filter.qs), [])
 
@@ -242,6 +243,6 @@ class TestLearningUnitForm(TestCase):
             "tutor": self.tutor.person.first_name,
         }
 
-        service_course_filter = search_form.LearningUnitFilter(form_data)
+        service_course_filter = base.forms.learning_unit.search.simple.LearningUnitFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(list(service_course_filter.qs), [self.list_learning_unit_year[0]])

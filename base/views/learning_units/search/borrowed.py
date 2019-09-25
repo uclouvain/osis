@@ -29,7 +29,7 @@ from django_filters.views import FilterView
 
 from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
-from base.forms.learning_unit.search_form import BorrowedLearningUnitSearch
+from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
