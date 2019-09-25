@@ -70,9 +70,22 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
     serializer_class = LearningUnitDetailedSerializer
 
     def get_object(self):
-        acronym = self.kwargs['acronym'].upper()
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        return _get_learning_unit_year_with_year_and_acronym(acronym, year)
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'language',
+                'campus',
+                'academic_year',
+                'learning_container_year'
+            ).prefetch_related(
+                'learning_container_year__requirement_entity__entityversion_set',
+                'learningcomponentyear_set'
+            ).annotate_full_title(),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return luy
 
 
 class LearningUnitTitle(generics.RetrieveAPIView):
@@ -83,23 +96,13 @@ class LearningUnitTitle(generics.RetrieveAPIView):
     serializer_class = LearningUnitTitleSerializer
 
     def get_object(self):
-        acronym = self.kwargs['acronym'].upper()
+        acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        return _get_learning_unit_year_with_year_and_acronym(acronym, year)
-
-
-def _get_learning_unit_year_with_year_and_acronym(acronym, year):
-    luy = get_object_or_404(
-        LearningUnitYear.objects.all().select_related(
-            'language',
-            'campus',
-            'academic_year',
-            'learning_container_year'
-        ).prefetch_related(
-            'learning_container_year__requirement_entity__entityversion_set',
-            'learningcomponentyear_set'
-        ).annotate_full_title(),
-        acronym=acronym,
-        academic_year__year=year
-    )
-    return luy
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'academic_year',
+            ).annotate_full_title(),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return luy

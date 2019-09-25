@@ -44,7 +44,7 @@ class LearningUnitAttribution(generics.ListAPIView):
     def get_queryset(self):
         luy = get_object_or_404(
             LearningUnitYear.objects.all(),
-            acronym=self.kwargs['acronym'].upper(),
+            acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
         return AttributionChargeNew.objects.select_related(

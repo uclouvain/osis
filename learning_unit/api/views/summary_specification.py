@@ -47,7 +47,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         learning_unit_year = get_object_or_404(
             LearningUnitYear.objects.all(),
-            acronym=self.kwargs['acronym'].upper(),
+            acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
         qs = TranslatedText.objects.filter(
