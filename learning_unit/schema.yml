@@ -303,6 +303,12 @@ components:
                   type: string
                 status:
                   type: string
+            summary_status:
+              type: string
+              enum:
+                - BLOCKED
+                - MODIFIED
+                - NOT MODIFIED
     LearningUnitComponent:
       type: object
       properties:

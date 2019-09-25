@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
 
@@ -32,19 +31,29 @@ from base.business.learning_units.xls_generator import generate_xls_teaching_mat
 from base.forms.learning_unit.search_form import LearningUnitDescriptionFicheFilter
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
-from base.views.common import display_warning_messages, remove_from_session
-from base.views.learning_units.search.common import SUMMARY_LIST
+from base.views.common import remove_from_session
+from base.views.learning_units.search.common import SUMMARY_LIST, RenderToExcel, \
+    SerializeFilterListIfAjaxMixin, ITEMS_PER_PAGES
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
-class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+def _create_xls_teaching_material(view_obj, context, **response_kwargs):
+    return generate_xls_teaching_material(view_obj.request.user, context["object_list"])
+
+
+@RenderToExcel("xls_with_parameters", _create_xls_teaching_material)
+class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin,
+                                         FilterView):
     model = LearningUnitYear
-    paginate_by = 2000
     template_name = "learning_unit/search/description_fiche.html"
     raise_exception = True
 
     filterset_class = LearningUnitDescriptionFicheFilter
+    search_type = SUMMARY_LIST
     permission_required = 'base.can_access_learningunit'
     cache_exclude_params = 'xls_status',
+
+    serializer_class = LearningUnitDetailedSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -53,15 +62,12 @@ class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMix
         context.update({
             'form': context['filter'].form,
             'is_faculty_manager': self.request.user.person.is_faculty_manager,
-            'search_type': SUMMARY_LIST,
-            'learning_units_count': context['paginator'].count
+            'search_type': self.search_type,
+            'learning_units_count': context['paginator'].count,
+            'page_obj': context["page_obj"],
+            'items_per_page': context["paginator"].per_page,
         })
         return context
 
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.GET.get('xls_status') == "xls_teaching_material":
-            try:
-                return generate_xls_teaching_material(self.request.user, context['object_list'])
-            except ObjectDoesNotExist:
-                display_warning_messages(self.request, _("the list to generate is empty.").capitalize())
-        return super().render_to_response(context, **response_kwargs)
+    def get_paginate_by(self, queryset):
+        return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)

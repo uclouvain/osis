@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from base.models.learning_unit_year import LearningUnitYear
@@ -104,6 +105,7 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
         read_only=True
     )
     proposal = serializers.SerializerMethodField(read_only=True)
+    summary_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
@@ -119,6 +121,7 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'parent',
             'partims',
             'proposal',
+            'summary_status'
         )
 
     def get_proposal(self, learning_unit_year):
@@ -131,3 +134,10 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             "status": learning_unit_year.proposallearningunit.get_state_display(),
         }
 
+    # TODO pretiffy
+    def get_summary_status(self, learning_unit_year):
+        if getattr(learning_unit_year, "summary_status", False):
+            return "MODIFIED"
+        elif learning_unit_year.summary_locked:
+            return "BLOCKED"
+        return "NOT MODIFIED"

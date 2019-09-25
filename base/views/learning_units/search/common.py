@@ -75,7 +75,7 @@ def _get_search_type_label(search_type):
     }.get(search_type, _('Learning units'))
 
 
-# TODO comment
+# TODO document
 class SerializeFilterListIfAjaxMixin:
     def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
@@ -84,7 +84,7 @@ class SerializeFilterListIfAjaxMixin:
         return super().render_to_response(context, **response_kwargs)
 
 
-# TODO comment
+# TODO document
 class RenderToExcel:
     def __init__(self, name, render_method):
         self.name = name
