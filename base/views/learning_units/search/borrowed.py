@@ -38,7 +38,6 @@ from base.views.learning_units.search.common import BORROWED_COURSE, ITEMS_PER_P
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
-# TODO adapt filter to borrowed course
 @RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
 @RenderToExcel("xls_attributions", _create_xls_attributions)
 @RenderToExcel("xls_comparison", _create_xls_comparison)
