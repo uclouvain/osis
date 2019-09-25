@@ -110,8 +110,11 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             academic_year=anac,
             learning_container_year__requirement_entity=requirement_entity
         )
-
-        url = reverse('learning_unit_api_v1:learningunits_read', kwargs={'uuid': cls.luy.uuid})
+        url_kwargs = {
+            'acronym': cls.luy.acronym,
+            'year': cls.luy.academic_year.year
+        }
+        url = reverse('learning_unit_api_v1:learningunits_read', kwargs=url_kwargs)
         cls.serializer = LearningUnitDetailedSerializer(cls.luy, context={'request': RequestFactory().get(url)})
 
     def test_contains_expected_fields(self):

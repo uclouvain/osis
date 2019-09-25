@@ -42,7 +42,11 @@ class LearningUnitAttribution(generics.ListAPIView):
     paginator = None
 
     def get_queryset(self):
-        luy = get_object_or_404(LearningUnitYear, uuid=self.kwargs['uuid'])
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year']
+        )
         return AttributionChargeNew.objects.select_related(
             'learning_component_year__learning_unit_year',
             'attribution__tutor__person',

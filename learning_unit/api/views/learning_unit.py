@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework import generics
 
@@ -66,17 +67,25 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
         Return the detail of the learning unit
     """
     name = 'learningunits_read'
-    queryset = LearningUnitYear.objects.all().select_related(
-        'language',
-        'campus',
-        'academic_year',
-        'learning_container_year'
-    ).prefetch_related(
-        'learning_container_year__requirement_entity__entityversion_set',
-        'learningcomponentyear_set'
-    ).annotate_full_title()
-    lookup_field = 'uuid'
     serializer_class = LearningUnitDetailedSerializer
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'language',
+                'campus',
+                'academic_year',
+                'learning_container_year'
+            ).prefetch_related(
+                'learning_container_year__requirement_entity__entityversion_set',
+                'learningcomponentyear_set'
+            ).annotate_full_title(),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return luy
 
 
 class LearningUnitTitle(generics.RetrieveAPIView):
@@ -84,6 +93,16 @@ class LearningUnitTitle(generics.RetrieveAPIView):
         Return the title of the learning unit
     """
     name = 'learningunitstitle_read'
-    queryset = LearningUnitYear.objects.all().annotate_full_title()
-    lookup_field = 'uuid'
     serializer_class = LearningUnitTitleSerializer
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'academic_year',
+            ).annotate_full_title(),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return luy

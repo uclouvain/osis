@@ -45,7 +45,11 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
     paginator = None
 
     def get(self, request, *args, **kwargs):
-        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
+        learning_unit_year = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year']
+        )
         qs = TranslatedText.objects.filter(
             reference=learning_unit_year.pk,
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS

@@ -35,28 +35,35 @@ app_name = "learning_unit"
 
 urlpatterns = [
     url(r'^learning_units$', LearningUnitList.as_view(), name=LearningUnitList.name),
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)$', LearningUnitDetailed.as_view(), name=LearningUnitDetailed.name),
     url(
-        r'^learning_units/(?P<uuid>[0-9a-f-]+)/get_title',
+        r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)$',
+        LearningUnitDetailed.as_view(),
+        name=LearningUnitDetailed.name
+    ),
+    url(
+        r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/get_title',
         LearningUnitTitle.as_view(),
         name=LearningUnitTitle.name
     ),
     url(
-        r'^learning_units/(?P<uuid>[0-9a-f-]+)/attributions',
+        r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/attributions',
         LearningUnitAttribution.as_view(),
         name=LearningUnitAttribution.name
     ),
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/achievements', LearningAchievementList.as_view(),
+    url(r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/achievements', LearningAchievementList.as_view(),
         name=LearningAchievementList.name),
-    url(r'^learning_units/(?P<uuid>[0-9a-f-]+)/summary_specification', LearningUnitSummarySpecification.as_view(),
-        name=LearningUnitSummarySpecification.name),
+    url(
+        r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/summary_specification',
+        LearningUnitSummarySpecification.as_view(),
+        name=LearningUnitSummarySpecification.name
+    ),
 ]
 
 if 'education_group' in settings.INSTALLED_APPS:
     from education_group.api.views.learning_unit import EducationGroupRootsList
     urlpatterns += (
       url(
-        r'^learning_units/(?P<uuid>[0-9a-f-]+)/education_group_roots$',
+        r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/education_group_roots$',
         EducationGroupRootsList.as_view(),
         name=EducationGroupRootsList.name
       ),
