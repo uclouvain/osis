@@ -26,23 +26,18 @@
 import itertools
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import OuterRef, Subquery, Exists, Case, When, Q, Value, CharField
 from django.db.models.fields import BLANK_CHOICE_DASH, BooleanField
 from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
-from base import models as mdl
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none, TooManyResultsException
-from base.forms.search.search_form import BaseSearchForm
 from base.forms.utils.choice_field import add_blank
-from base.forms.utils.dynamic_field import DynamicChoiceField
-from base.models import learning_unit_year, group_element_year, entity_calendar
+from base.models import group_element_year, entity_calendar
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
@@ -58,127 +53,8 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from reference.models.country import Country
 
-
 MOBILITY = 'mobility'
 MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
-
-
-class LearningUnitSearchForm(BaseSearchForm):
-    ALL_LABEL = (None, pgettext_lazy("plural", "All"))
-    ALL_CHOICES = (ALL_LABEL,)
-
-    MOBILITY = 'mobility'
-    MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
-    _search_mobility = False
-
-    academic_year = forms.ModelChoiceField(
-        label=_('Ac yr.'),
-        queryset=AcademicYear.objects.all(),
-        empty_label=pgettext_lazy("plural", "All"),
-    )
-
-    requirement_entity = forms.CharField(
-        max_length=20,
-        label=_('Req. Entity')
-    )
-
-    acronym = forms.CharField(
-        max_length=15,
-        label=_('Code')
-    )
-
-    tutor = forms.CharField(
-        max_length=40,
-        label=_('Tutor')
-    )
-
-    allocation_entity = forms.CharField(
-        max_length=20,
-        label=_('Alloc. Ent.')
-    )
-
-    quadrimester = forms.ChoiceField(
-        label=_('Quadri'),
-        choices=ALL_CHOICES + quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS
-    )
-
-    with_entity_subordinated = forms.BooleanField(label=_('Include subordinate entities'))
-
-    def get_queryset(self):
-        """ Filter a LearningUnitYearQueryset """
-        has_proposal = ProposalLearningUnit.objects.filter(
-            learning_unit_year=OuterRef('pk'),
-        )
-        entity_requirement = EntityVersion.objects.filter(
-            entity=OuterRef('learning_container_year__requirement_entity'),
-        ).current(
-            OuterRef('academic_year__start_date')
-        ).values('acronym')[:1]
-
-        entity_allocation = EntityVersion.objects.filter(
-            entity=OuterRef('learning_container_year__allocation_entity'),
-        ).current(
-            OuterRef('academic_year__start_date')
-        ).values('acronym')[:1]
-
-        queryset = mdl.learning_unit_year.search(**self.cleaned_data)
-
-        queryset = self._filter_external_learning_units(queryset)
-
-        queryset = queryset.select_related(
-            'academic_year', 'learning_container_year__academic_year',
-            'language', 'proposallearningunit', 'externallearningunityear'
-        ).order_by('academic_year__year', 'acronym').annotate(
-            has_proposal=Exists(has_proposal),
-            entity_requirement=Subquery(entity_requirement),
-            entity_allocation=Subquery(entity_allocation),
-        )
-        queryset = self.get_filter_learning_container_ids(queryset)
-
-        return queryset
-
-    def clean_container_type(self):
-        container_type = self.cleaned_data['container_type']
-        if container_type == LearningUnitSearchForm.MOBILITY:
-            self._search_mobility = True
-            return learning_container_year_types.EXTERNAL
-        return container_type
-
-    def _filter_external_learning_units(self, qs):
-        container_type = self.cleaned_data.get('container_type')
-        if container_type:
-            if self._search_mobility:
-                qs = qs.filter(externallearningunityear__mobility=True)
-            elif container_type == learning_container_year_types.EXTERNAL:
-                qs = qs.filter(externallearningunityear__co_graduation=True)
-        return qs
-
-    def get_filter_learning_container_ids(self, qs):
-        """
-        Append a filter on the queryset if entities are given in the search
-
-        :param qs: LearningUnitYearQuerySet
-        :return: queryset
-        """
-        requirement_entity_acronym = self.cleaned_data.get('requirement_entity')
-        allocation_entity_acronym = self.cleaned_data.get('allocation_entity')
-        with_entity_subordinated = self.cleaned_data.get('with_entity_subordinated', False)
-
-        if requirement_entity_acronym:
-            requirement_entity_ids = get_entities_ids(requirement_entity_acronym, with_entity_subordinated)
-
-            qs = qs.filter(
-                learning_container_year__requirement_entity__in=requirement_entity_ids,
-            )
-
-        if allocation_entity_acronym:
-            allocation_entity_ids = get_entities_ids(allocation_entity_acronym, with_entity_subordinated)
-
-            qs = qs.filter(
-                learning_container_year__allocation_entity__in=allocation_entity_ids,
-            )
-
-        return qs
 
 
 # TODO fix status search
@@ -225,7 +101,7 @@ class LearningUnitFilter(FilterSet):
     )
 
     container_type = filters.ChoiceFilter(
-        choices=LearningContainerYearType.choices() + LearningUnitSearchForm.MOBILITY_CHOICE,
+        choices=LearningContainerYearType.choices() + MOBILITY_CHOICE,
         required=False,
         field_name="learning_container_year__container_type",
         label=_('Type'),
