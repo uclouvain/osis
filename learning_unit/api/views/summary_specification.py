@@ -45,7 +45,11 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
     paginator = None
 
     def get(self, request, *args, **kwargs):
-        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
+        learning_unit_year = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year']
+        )
         language = self.request.query_params.get('lang')
         qs = TranslatedText.objects.filter(
             reference=learning_unit_year.pk,

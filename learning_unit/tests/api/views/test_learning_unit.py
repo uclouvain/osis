@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
 
 from django.test import RequestFactory
 from django.urls import reverse
@@ -156,7 +155,11 @@ class LearningUnitDetailedTestCase(APITestCase):
             learning_container_year__requirement_entity=requirement_entity
         )
         cls.person = PersonFactory()
-        cls.url = reverse('learning_unit_api_v1:learningunits_read', kwargs={'uuid': cls.luy.uuid})
+        url_kwargs = {
+            'acronym': cls.luy.acronym,
+            'year': cls.luy.academic_year.year
+        }
+        cls.url = reverse('learning_unit_api_v1:learningunits_read', kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)
@@ -175,7 +178,10 @@ class LearningUnitDetailedTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_learning_unit_year_not_found(self):
-        invalid_url = reverse('learning_unit_api_v1:learningunits_read', kwargs={'uuid': uuid.uuid4()})
+        invalid_url = reverse(
+            'learning_unit_api_v1:learningunits_read',
+            kwargs={'acronym': 'ACRO', 'year': 2019}
+        )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -200,7 +206,10 @@ class LearningUnitTitleTestCase(APITestCase):
             academic_year=anac,
         )
         cls.person = PersonFactory()
-        cls.url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={'uuid': cls.luy.uuid})
+        cls.url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={
+            'acronym': cls.luy.acronym,
+            'year': cls.luy.academic_year.year
+        })
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)
@@ -219,7 +228,10 @@ class LearningUnitTitleTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_learning_unit_year_not_found(self):
-        invalid_url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={'uuid': uuid.uuid4()})
+        invalid_url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={
+            'acronym': 'ACRO',
+            'year': 2019
+        })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

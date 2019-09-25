@@ -66,11 +66,17 @@ paths:
       operationId: learningunits_read
       parameters:
       - in: path
-        name: uuid
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
       responses:
         '200':
           description: OK
@@ -121,11 +127,17 @@ paths:
       operationId: learningunitattributions_read
       parameters:
       - in: path
-        name: uuid
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
       responses:
         '200':
           description: OK
@@ -149,11 +161,17 @@ paths:
       operationId: learningunitutilization_read
       parameters:
       - in: path
-        name: uuid
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
       responses:
         '200':
           description: OK
@@ -177,11 +195,17 @@ paths:
       operationId: learningunitachievements_read
       parameters:
       - in: path
-        name: uuid
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
       responses:
         '200':
           description: OK
@@ -205,11 +229,17 @@ paths:
       operationId: learningunitsummaryspecification_read
       parameters:
       - in: path
-        name: uuid
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
       responses:
         '200':
           description: OK

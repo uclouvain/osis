@@ -47,7 +47,11 @@ class LearningAchievementList(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         language = self.request.query_params.get('lang')
-        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
+        learning_unit_year = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year']
+        )
         qs = LearningAchievement.objects.filter(
             learning_unit_year=learning_unit_year
         ).order_by('order')

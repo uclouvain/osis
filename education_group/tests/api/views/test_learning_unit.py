@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
 
 from django.test import RequestFactory
 from django.urls import reverse
@@ -62,10 +61,11 @@ class TrainingListViewTestCase(APITestCase):
         )
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         cls.person = PersonFactory()
-        cls.url = reverse(
-            'learning_unit_api_v1:' + EducationGroupRootsList.name,
-            kwargs={'uuid': cls.learning_unit_year.uuid}
-        )
+        url_kwargs = {
+            'acronym': cls.learning_unit_year.acronym,
+            'year': cls.learning_unit_year.academic_year.year
+        }
+        cls.url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)
@@ -84,7 +84,10 @@ class TrainingListViewTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_learning_unit_year_not_found(self):
-        invalid_url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={'uuid': uuid.uuid4()})
+        invalid_url = reverse(
+            'learning_unit_api_v1:' + EducationGroupRootsList.name,
+            kwargs={'acronym': 'ACRO', 'year': 2019}
+        )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
