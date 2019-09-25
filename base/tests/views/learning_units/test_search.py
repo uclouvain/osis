@@ -67,7 +67,7 @@ class TestSearchBorrowedLearningUnits(TestCase):
 
         context = response.context
         self.assertEqual(context["search_type"], BORROWED_COURSE)
-        self.assertTemplateUsed(response, "learning_unit/by_activity.html")
+        self.assertTemplateUsed(response, "learning_unit/search/borrowed.html")
 
 
 class TestSearchExternalLearningUnits(TestCase):
@@ -101,4 +101,4 @@ class TestSearchExternalLearningUnits(TestCase):
 
         context = response.context
         self.assertEqual(context["search_type"], EXTERNAL_SEARCH)
-        self.assertTemplateUsed(response, "learning_unit/by_external.html")
+        self.assertTemplateUsed(response, "learning_unit/search/external.html")
