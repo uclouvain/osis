@@ -54,5 +54,5 @@ class EducationGroupRootsList(generics.ListAPIView):
 
     def get_serializer_context(self):
         serializer_context = super().get_serializer_context()
-        serializer_context['language'] = self.request.query_params.get('lang')
+        serializer_context['language'] = self.request.LANGUAGE_CODE
         return serializer_context

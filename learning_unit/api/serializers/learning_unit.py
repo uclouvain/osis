@@ -43,7 +43,7 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, learning_unit_year):
-        language = self.context.get('language')
+        language = self.context['language']
         if language:
             return getattr(
                 learning_unit_year,

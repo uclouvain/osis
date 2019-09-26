@@ -27,7 +27,9 @@ import os
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
+from django.middleware.locale import LocaleMiddleware
 from django.urls import reverse_lazy
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -89,9 +91,20 @@ INSTALLED_APPS = (
     'reversion',
 )
 
+
+class CustomLocaleMiddleware(LocaleMiddleware):
+    def process_request(self, request):
+        language = request.GET.get('lang')
+        if language:
+            translation.activate(language)
+            request.LANGUAGE_CODE = translation.get_language()
+        else:
+            super().process_request(request)
+
+
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'backoffice.settings.base.CustomLocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,6 +116,7 @@ MIDDLEWARE = (
     'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
+
 
 INTERNAL_IPS = ()
 # check if we are testing right now
@@ -167,7 +181,7 @@ DATABASES = {
 # you have to redefine the LANGUAGE_CODE and LANGUAGES vars in environment settings (ex: dev.py)
 LANGUAGE_CODE = 'fr-be'
 LANGUAGES = [
-    ('fr-be', _('French')),
+    ('fr', _('French')),
     ('en', _('English')),
 ]
 LANGUAGE_CODE_FR = 'fr-be'

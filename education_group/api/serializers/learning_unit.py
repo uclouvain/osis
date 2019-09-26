@@ -40,7 +40,7 @@ class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, education_group_year):
-        language = self.context.get('language')
+        language = self.context['language']
         if language:
             return getattr(
                 education_group_year,
