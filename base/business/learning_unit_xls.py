@@ -30,7 +30,6 @@ from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
-from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
@@ -40,6 +39,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
+from openpyxl.utils import get_column_letter
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
@@ -288,7 +288,7 @@ def _get_data_part2(learning_unit_yr, with_attributions):
                  for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
                     learning_unit_yr
                 ).values()
-                 ]
+                ]
             )
         )
 

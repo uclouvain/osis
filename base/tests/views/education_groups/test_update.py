@@ -516,11 +516,9 @@ class TestGetSuccessRedirectUrl(TestCase):
         self.education_group_year = EducationGroupYearFactory(
             academic_year=self.current_academic_year
         )
-
-        self.ac_year_in_future = GenerateAcademicYear(
-            start_year=self.current_academic_year.year + 1,
-            end_year=self.current_academic_year.year + 5,
-        )
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 5)
+        self.ac_year_in_future = GenerateAcademicYear(start_year=start_year, end_year=end_year)
 
         self.education_group_year_in_future = []
         for ac_in_future in self.ac_year_in_future.academic_years:
