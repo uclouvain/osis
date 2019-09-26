@@ -194,12 +194,10 @@ def _component_data(components, learning_component_yr_type):
 def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_comparison=False):
     organization = get_organization_from_learning_unit_year(learning_unit_yr)
     if proposal_comparison:
-        academic_year = _format_academic_year(learning_unit_yr.academic_year.name,
-                                              learning_unit_yr.learning_unit.end_year.name if learning_unit_yr.learning_unit.end_year else None)
-        # academic_year = "{} {}".format(
-        #     learning_unit_yr.academic_year.name,
-        #     "({} {})".format(_('End'), learning_unit_yr.learning_unit.end_year.name)
-        #     if learning_unit_yr.learning_unit.end_year and learning_unit_yr.learning_unit.end_year.name else '-')
+        academic_year = _format_academic_year(
+            learning_unit_yr.academic_year.name,
+            learning_unit_yr.learning_unit.end_year.name if learning_unit_yr.learning_unit.end_year else None
+        )
     else:
         academic_year = learning_unit_yr.academic_year.name
 
@@ -405,11 +403,8 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
     language = find_language_by_id(luy_initial.get('language'))
 
     if proposal_comparison:
-        academic_year = "{} ({} {})".format(learning_unit_yr.academic_year.name,
-                                            _('End'),
-                                            lu_initial.get('end_year')if lu_initial.get('end_year') else '-')
-
-        academic_year = _format_academic_year(learning_unit_yr.academic_year.name, lu_initial.get('end_year') if lu_initial.get('end_year') else None)
+        academic_year = _format_academic_year(learning_unit_yr.academic_year.name,
+                                              lu_initial.get('end_year') if lu_initial.get('end_year') else None)
     else:
         academic_year = learning_unit_yr.academic_year.name
 
