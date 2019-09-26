@@ -85,103 +85,66 @@
 {% endblock panel %}
 
 {% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
     <script>
         $(document).ready(function()
-    {
-	 // Must be always DataTable declaration !!!
-        setEventKeepIds('table_learning_units', 'learningUnitIds');
-        let domTable = $('#table_learning_units');
-        domTable.DataTable(
-            {
-                columnDefs: [
-                    {
-                        "name": "academic_year",
-                        "targets": 0,
-                        "data": "academic_year",
-                        "render": function(data, type, row, meta){
-                            let year = data;
-                            let nextYear = data + 1;
-                            return `${year}-${nextYear.toString().slice(2)}`;
-                        }
-                    },
-                    {
-                        "name": "acronym",
-                        "targets": 1,
-                        "data": "acronym",
-                        "render": function ( data, type, row, meta ) {
-                            return '<a href="'+ row['url'] +'">'+ data + '</a>';
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "targets": 2,
-                        "data": "title",
-                        "render": function(data, type, row, meta){
-                            return data["fr"]
-                        }
-                    },
-                    {"name": "type", "targets": 3,  "data": "type_text"},
-                    {"name": "subtype", "targets": 4,  "data": "subtype_text"},
-                    {
-                        "name": "status",
-                        "targets": 5,
-                        "data": "status",
-                        "render": function(data, type, row, meta){
-                            if (data === true){
-                                return "<span class=\"glyphicon glyphicon-ok-circle\" aria-hidden=\"true\" style=\"color: limegreen;\"\n" +
-                                    "                                          title=\"{% trans 'Active' %}\"></span>\n" +
-                                    "                                    <div style=\"display:none;\">1</div>"
-                            }
-                            return "<span class=\"glyphicon glyphicon-remove-circle\" aria-hidden=\"true\" style=\"color: red;\"\n" +
-                                "                                          title=\"{% trans 'Inactive' %}\"></span>\n" +
-                                "                                    <div style=\"display:none;\">0</div>"
-                        }
-                    },
-                    {
-                        "name": "summary_status",
-                        "targets": 6,
-                        "data": "summary_status",
-                        "render": function(data, type, row, meta){
-                            return data;
-                        }
-                    },
-                ],
-                "stateSave": true,
-                "paging" : false,
-                "ordering" : true,
-                "orderMulti": false,
-                "serverSide": true,
-                "ajax" : {
-                    "url": "{% url 'learning_units_summary' %}",
-                    "type": "GET",
-                    "dataSrc": "object_list",
-                    "data": function (d){
-                        let pageNumber = {{ page_obj.number }};
-                        let paginator_size = {{ items_per_page }};
-                        let querystring = getDataAjaxTable(domTable, d, pageNumber);
-                        querystring["paginator_size"] = paginator_size;
-                        return querystring;
-                    },
-                    "traditional": true
-                },
-                "info"  : false,
-                "searching" : false,
-                "language": {
-                    "oAria": {
-                        "sSortAscending":  "{% trans 'activate to sort column ascending'%}",
-                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
+        {
+            columnDefs = [
+                {
+                    "name": "academic_year",
+                    "targets": 0,
+                    "data": "academic_year",
+                    "render": function(data, type, row, meta){
+                        let year = data;
+                        let nextYear = data + 1;
+                        return `${year}-${nextYear.toString().slice(2)}`;
                     }
-                }
-            });
-
-        // If needed could be generalized by giving the anchor a data-value-link attribute equal to the id of the input
-        // that needs to be populated. Then extract this code to a file.
-        $('.link_data_lookup').on("click", function(event){
-            event.preventDefault();
-            var link = $(this).prop("href");
-            w = window.open(link, "id_tutor", 'height=500,width=800,resizable=yes,scrollbars=yes');
+                },
+                {
+                    "name": "acronym",
+                    "targets": 1,
+                    "data": "acronym",
+                    "render": function ( data, type, row, meta ) {
+                        return '<a href="'+ row['url'] +'">'+ data + '</a>';
+                    }
+                },
+                {
+                    "name": "title",
+                    "targets": 2,
+                    "data": "title",
+                    "render": function(data, type, row, meta){
+                        return data["fr"]
+                    }
+                },
+                {"name": "type", "targets": 3,  "data": "type_text"},
+                {"name": "subtype", "targets": 4,  "data": "subtype_text"},
+                {
+                    "name": "status",
+                    "targets": 5,
+                    "data": "status",
+                    "render": function(data, type, row, meta){
+                        if (data === true){
+                            return "<span class=\"glyphicon glyphicon-ok-circle\" aria-hidden=\"true\" style=\"color: limegreen;\"\n" +
+                                "                                          title=\"{% trans 'Active' %}\"></span>\n" +
+                                "                                    <div style=\"display:none;\">1</div>"
+                        }
+                        return "<span class=\"glyphicon glyphicon-remove-circle\" aria-hidden=\"true\" style=\"color: red;\"\n" +
+                            "                                          title=\"{% trans 'Inactive' %}\"></span>\n" +
+                            "                                    <div style=\"display:none;\">0</div>"
+                    }
+                },
+                {
+                    "name": "summary_status",
+                    "targets": 6,
+                    "data": "summary_status",
+                    "render": function(data, type, row, meta){
+                        return data;
+                    }
+                },
+            ];
+            initializeDataTable("table_learning_units", "learningUnitIds", {{ page_obj.number }},
+                        {{ items_per_page }}, "{{ request.path }}", columnDefs);
         });
-    });
         $("#btn_teaching_material_xls").click(function (e) {
             e.preventDefault();
             var status = $("#xls_status");

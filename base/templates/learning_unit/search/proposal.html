@@ -117,127 +117,91 @@
 {% endblock panel %}
 
 {% block script %}
-<script>
-    $(document).ready(function()
-    {
-	 // Must be always DataTable declaration !!!
-        setEventKeepIds('table_learning_units', 'learningUnitIds');
-        let domTable = $('#table_learning_units');
-        domTable.DataTable(
-            {
-                columnDefs: [
-                    {
-                        "name": "credits",
-                        "targets": 0,
-                        "data": "credits"
-                    },
-                    {
-                        "name": "folder",
-                        "targets": 1,
-                        "data": "proposal",
-                        "render": function(data, type, row, meta){
-                            return data["folder"];
-                        }
-                    },
-                    {
-                        "name": "acronym",
-                        "targets": 2,
-                        "data": "acronym",
-                        "render": function ( data, type, row, meta ) {
-                            return '<a href="'+ row['url'] +'">'+ data + '</a>';
-                        }
-                    },
-                    {
-                        "name": "academic_year",
-                        "targets": 3,
-                        "data": "academic_year",
-                        "render": function(data, type, row, meta){
-                            let year = data;
-                            let nextYear = data + 1;
-                            return `${year}-${nextYear.toString().slice(2)}`;
-                        }
-                    },
-                    {
-                        "name": "title",
-                        "targets": 4,
-                        "data": "title",
-                        "render": function(data, type, row, meta){
-                            return data["fr"]
-                        }
-                    },
-                    {"name": "type", "targets": 5,  "data": "type_text"},
-                    {"name": "requirement_entity", "targets": 6, "data": "requirement_entity"},
-                    {
-                        "name": "proposal_type",
-                        "targets": 7,
-                        "data": "proposal",
-                        "render": function(data, type, row, meta){
-                            return data["type"];
-                        }
-                    },
-                    {
-                        "name": "proposal_status",
-                        "targets": 8,
-                        "data": "proposal",
-                        "render": function(data, type, row, meta){
-                            return data["status"];
-                        }
-                    },
-                ],
-                "stateSave": true,
-                "paging" : false,
-                "ordering" : true,
-                "orderMulti": false,
-                "serverSide": true,
-                "ajax" : {
-                    "url": "{% url 'learning_units_proposal' %}",
-                    "type": "GET",
-                    "dataSrc": "object_list",
-                    "data": function (d){
-                        let pageNumber = {{ page_obj.number }};
-                        let paginator_size = {{ items_per_page }};
-                        let querystring = getDataAjaxTable(domTable, d, pageNumber);
-                        querystring["paginator_size"] = paginator_size;
-                        return querystring;
-                    },
-                    "traditional": true
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function()
+        {
+            columnDefs = [
+                {
+                    "name": "credits",
+                    "targets": 0,
+                    "data": "credits"
                 },
-                "info"  : false,
-                "searching" : false,
-                "language": {
-                    "oAria": {
-                        "sSortAscending":  "{% trans 'activate to sort column ascending'%}",
-                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
+                {
+                    "name": "folder",
+                    "targets": 1,
+                    "data": "proposal",
+                    "render": function(data, type, row, meta){
+                        return data["folder"];
                     }
-                }
-            });
+                },
+                {
+                    "name": "acronym",
+                    "targets": 2,
+                    "data": "acronym",
+                    "render": function ( data, type, row, meta ) {
+                        return '<a href="'+ row['url'] +'">'+ data + '</a>';
+                    }
+                },
+                {
+                    "name": "academic_year",
+                    "targets": 3,
+                    "data": "academic_year",
+                    "render": function(data, type, row, meta){
+                        let year = data;
+                        let nextYear = data + 1;
+                        return `${year}-${nextYear.toString().slice(2)}`;
+                    }
+                },
+                {
+                    "name": "title",
+                    "targets": 4,
+                    "data": "title",
+                    "render": function(data, type, row, meta){
+                        return data["fr"]
+                    }
+                },
+                {"name": "type", "targets": 5,  "data": "type_text"},
+                {"name": "requirement_entity", "targets": 6, "data": "requirement_entity"},
+                {
+                    "name": "proposal_type",
+                    "targets": 7,
+                    "data": "proposal",
+                    "render": function(data, type, row, meta){
+                        return data["type"];
+                    }
+                },
+                {
+                    "name": "proposal_status",
+                    "targets": 8,
+                    "data": "proposal",
+                    "render": function(data, type, row, meta){
+                        return data["status"];
+                    }
+                },
+            ];
 
-        // If needed could be generalized by giving the anchor a data-value-link attribute equal to the id of the input
-        // that needs to be populated. Then extract this code to a file.
-        $('.link_data_lookup').on("click", function(event){
-            event.preventDefault();
-            var link = $(this).prop("href");
-            w = window.open(link, "id_tutor", 'height=500,width=800,resizable=yes,scrollbars=yes');
+            initializeDataTable("table_learning_units", "learningUnitIds", {{ page_obj.number }},
+                {{ items_per_page }}, "{{ request.path }}", columnDefs);
         });
-    });
 
-    $("#id_check_all").click(function(){
-        $('input:checkbox.selected_object').not(this).prop('checked', this.checked);
-    });
+        $("#id_check_all").click(function(){
+            $('input:checkbox.selected_object').not(this).prop('checked', this.checked);
+        });
 
-    $("#btn_produce_xls_proposal").click(function(e) {
-        e.preventDefault();
-        var status = $("#xls_status");
-        status.val('xls');
-        $("#proposals_form").submit();
-        status.val('');
-    });
-    $("#btn_produce_xls_proposal_comparison").click(function(e) {
-        e.preventDefault();
-        var status = $("#xls_status");
-        status.val('xls_comparison');
-        $("#proposals_form").submit();
-        status.val('');
-    });
-</script>
-{% endblock %}
+        $("#btn_produce_xls_proposal").click(function(e) {
+            e.preventDefault();
+            var status = $("#xls_status");
+            status.val('xls');
+            $("#proposals_form").submit();
+            status.val('');
+        });
+        $("#btn_produce_xls_proposal_comparison").click(function(e) {
+            e.preventDefault();
+            var status = $("#xls_status");
+            status.val('xls_comparison');
+            $("#proposals_form").submit();
+            status.val('');
+        });
+    </script>
+    {% endblock %}
