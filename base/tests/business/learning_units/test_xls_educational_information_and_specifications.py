@@ -26,37 +26,38 @@
 
 import datetime
 
-from django.test import RequestFactory
+from django.conf import settings
 from django.db.models.expressions import Subquery, OuterRef
-from django.urls import reverse
+from django.test import RequestFactory, override_settings
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.entity_version import EntityVersion
-from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.person import PersonFactory
-from base.business.learning_units.xls_educational_information_and_specifications import _get_titles, \
-    _add_cms_title_fr_en, prepare_xls_educational_information_and_specifications
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
-from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_units.xls_educational_information_and_specifications import _get_titles, \
+    _add_cms_title_fr_en, prepare_xls_educational_information_and_specifications
+from base.models.entity_version import EntityVersion
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.organization_type import MAIN
-from base.tests.factories.academic_year import create_current_academic_year
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
-from base.tests.factories.learning_achievement import LearningAchievementFactory
+from base.tests.factories.user import UserFactory
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from reference.tests.factories.language import LanguageFactory
-from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
@@ -72,7 +73,6 @@ PREFIX_FAKE_TEXT_LABEL = "text_"
 
 
 class TestXlsEducationalInformationSpecificationXls(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls._create_luy()
@@ -118,9 +118,11 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
                                       entity=LEARNING_UNIT_YEAR)
 
     @classmethod
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def _create_luy(cls):
         academic_year = create_current_academic_year()
-        cls.learning_unit = LearningUnitFactory(start_year=2017)
+        start_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
+        cls.learning_unit = LearningUnitFactory(start_year=start_year)
         l_container_year = LearningContainerYearFactory(acronym="LBIR1212",
                                                         academic_year=academic_year)
         cls.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212",

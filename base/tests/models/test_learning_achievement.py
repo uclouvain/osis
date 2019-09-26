@@ -41,8 +41,7 @@ class LearningAchievementTest(TestCase):
 
     def setUp(self):
         current_academic_year = create_current_academic_year()
-        generated_container = GenerateContainer(start_year=current_academic_year.year,
-                                                end_year=current_academic_year.year)
+        generated_container = GenerateContainer(start_year=current_academic_year, end_year=current_academic_year)
         generated_container_first_year = generated_container.generated_container_years[0]
         self.luy = generated_container_first_year.learning_unit_year_full
         self.language_fr = LanguageFactory(code='FR')

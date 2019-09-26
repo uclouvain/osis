@@ -139,7 +139,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             CONTACTS,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
@@ -171,7 +172,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     TrainingType.CERTIFICATE.name: {
@@ -187,6 +189,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
+            EVALUATION
         ]
     },
     TrainingType.CAPAES.name: {
@@ -224,7 +227,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     TrainingType.MASTER_MA_120.name: {
@@ -258,7 +262,8 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             COMPLEMENTARY_MODULE,
             CONTACTS,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     TrainingType.MASTER_MA_180_240.name: {
@@ -290,7 +295,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             COMPLEMENTARY_MODULE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     TrainingType.MASTER_MC.name: {
@@ -308,7 +314,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
 
@@ -327,7 +334,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     MiniTrainingType.SOCIETY_MINOR.name: {
@@ -345,7 +353,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
@@ -363,7 +372,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     MiniTrainingType.OPEN_MINOR.name: {
@@ -381,7 +391,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: {
@@ -399,7 +410,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     MiniTrainingType.FSA_SPECIALITY.name: {
@@ -417,7 +429,8 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS_KEY,
+            EVALUATION
         ]
     },
     MiniTrainingType.OPTION.name: {
