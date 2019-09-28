@@ -473,3 +473,4 @@ STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
 LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
 
+
