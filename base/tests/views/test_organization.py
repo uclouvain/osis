@@ -93,6 +93,7 @@ class TestOrganizationAutocomplete(TestCase):
         response = self.client.get(self.url, data={'q': 'univ'})
 
         expected_results = [{'text': self.organization.name,
+                             'selected_text': self.organization.name,
                              'id': str(self.organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
@@ -114,6 +115,7 @@ class TestOrganizationAutocomplete(TestCase):
             data={'forward': '{"country": "%s"}' % self.organization_address.country.pk}
         )
         expected_results = [{'text': self.organization.name,
+                             'selected_text': self.organization.name,
                              'id': str(self.organization.pk)}]
 
         self.assertEqual(response.status_code, 200)
