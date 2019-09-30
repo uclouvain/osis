@@ -227,7 +227,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             self.fields['diploma_printing_title'].required = False
 
     def clean_certificate_aims(self):
-        EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
+        return EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
@@ -248,7 +248,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
 
     def save_certificate_aims(self):
         self.instance.certificate_aims.clear()
-        for certificate_aim in self.cleaned_data.get("certificate_aims"):
+        for certificate_aim in self.cleaned_data.get("certificate_aims", []):
             EducationGroupCertificateAim.objects.get_or_create(
                 education_group_year=self.instance,
                 certificate_aim=certificate_aim,
@@ -274,11 +274,11 @@ class CertificateAimsForm(forms.ModelForm):
         }
 
     def clean_certificate_aims(self):
-        EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
+        return EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
 
     def save(self, commit=True):
         self.instance.certificate_aims.clear()
-        for certificate_aim in self.cleaned_data.get("certificate_aims"):
+        for certificate_aim in self.cleaned_data.get("certificate_aims", []):
             EducationGroupCertificateAim.objects.get_or_create(
                 education_group_year=self.instance,
                 certificate_aim=certificate_aim,
