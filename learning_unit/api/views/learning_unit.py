@@ -27,6 +27,7 @@ from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework import generics
 
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
     LearningUnitTitleSerializer
@@ -41,7 +42,7 @@ class LearningUnitFilter(filters.FilterSet):
         fields = ['acronym', 'acronym_like', 'year']
 
 
-class LearningUnitList(generics.ListAPIView):
+class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return a list of all the learning unit with optional filtering.
     """
@@ -62,7 +63,7 @@ class LearningUnitList(generics.ListAPIView):
     )  # Default ordering
 
 
-class LearningUnitDetailed(generics.RetrieveAPIView):
+class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
         Return the detail of the learning unit
     """
@@ -88,7 +89,7 @@ class LearningUnitDetailed(generics.RetrieveAPIView):
         return luy
 
 
-class LearningUnitTitle(generics.RetrieveAPIView):
+class LearningUnitTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
         Return the title of the learning unit
     """

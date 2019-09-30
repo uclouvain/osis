@@ -46,22 +46,12 @@ class LearningAchievementListTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-
-        cls.resume_fr = TranslatedTextFactory(
-            reference=cls.learning_unit_year.pk,
-            text_label__label='resume',
-            language=settings.LANGUAGE_CODE_FR
-        )
-        cls.resume_en = TranslatedTextFactory(
-            reference=cls.learning_unit_year.pk,
-            text_label__label='resume',
-            language=settings.LANGUAGE_CODE_EN
-        )
-        cls.teaching_methods_fr = TranslatedTextFactory(
-            reference=cls.learning_unit_year.pk,
-            text_label__label='teaching_methods',
-            language=settings.LANGUAGE_CODE_FR
-        )
+        for label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
+            TranslatedTextFactory(
+                reference=cls.learning_unit_year.pk,
+                text_label__label=label,
+                language=settings.LANGUAGE_CODE_FR
+            )
 
         cls.person = PersonFactory()
         url_kwargs = {

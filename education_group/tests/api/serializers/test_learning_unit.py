@@ -23,17 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
-from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
-    LearningUnitYearPrerequisitesListSerializer
+from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
+from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
@@ -46,10 +46,14 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             academic_year=cls.academic_year,
         )
         url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={'request': RequestFactory().get(url)})
+        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            })
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'credits',
@@ -60,7 +64,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'duration_unit_text',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'academic_year',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
@@ -76,13 +79,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.training.education_group_type.name
         )
-
-    def test_ensure_title_field_is_dict(self):
-        expected_dict = {
-            'fr': self.training.title,
-            'en': self.training.title_english
-        }
-        self.assertDictEqual(self.serializer.data['title'], expected_dict)
 
 
 class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):

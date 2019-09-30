@@ -45,6 +45,10 @@ paths:
         name: year
         schema:
           type: integer
+      - in: query
+        name: lang
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -77,6 +81,10 @@ paths:
         schema:
           description: ''
           type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -108,6 +116,10 @@ paths:
         required: true
         schema:
           description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
           type: string
       responses:
         '200':
@@ -144,6 +156,10 @@ paths:
         schema:
           description: ''
           type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -178,6 +194,10 @@ paths:
         schema:
           description: ''
           type: string
+      - in: query
+        name: lang
+        schema:
+          type: string	
       responses:
         '200':
           description: OK
@@ -212,6 +232,10 @@ paths:
         schema:
           description: ''
           type: string
+      - in: query
+        name: lang
+        schema:
+          type: string 
       responses:
         '200':
           description: OK
@@ -245,6 +269,10 @@ paths:
         required: true
         schema:
           description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
           type: string
       responses:
         '200':
@@ -329,13 +357,7 @@ components:
         acronym:
           type: string
         title:
-          type: object
-          required:
-          - en
-          - fr
-          example:
-            en: Elements of biochemistry
-            fr: Eléments de biochimie
+          type: string
         type:
           $ref: '#/components/schemas/LearningUnitTypeEnum'
         type_text:
@@ -454,13 +476,7 @@ components:
           type: number
           multipleOf: 0.01
         title:
-          type: object
-          required:
-            - en
-            - fr
-          example:
-            en: Master [120] in Law
-            fr: Master [120] en droit
+          type: string
         decree_category:
           $ref: '#/components/schemas/DecreeCategoryEnum'
         decree_category_text:
@@ -485,76 +501,29 @@ components:
         codename:
           type: string
           example: '1.0'
-        fr:
-          type: string
-        en:
+        achievement:
           type: string
     LearningUnitSummarySpecification:
       type: object
       properties:
         bibliography:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         resume:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         evaluation_methods:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         other_informations:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         online_ressources:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         teaching_methods:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         themes_discussed:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         prerequisite:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         mobility:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
       required:
         - bibliography
         - resume

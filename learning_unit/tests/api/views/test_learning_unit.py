@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -44,7 +44,11 @@ from learning_unit.api.views.learning_unit import LearningUnitList
 class LearningUnitListTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = GenerateAcademicYear(start_year=2015, end_year=2020)
+
+        cls.academic_years = GenerateAcademicYear(
+            start_year=AcademicYearFactory(year=2015),
+            end_year=AcademicYearFactory(year=2020)
+        )
 
         cls.requirement_entity_version = EntityVersionFactory(
             start_date=cls.academic_years[0].start_date,
@@ -101,7 +105,10 @@ class LearningUnitListTestCase(APITestCase):
         serializer = LearningUnitSerializer(
             qs,
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -117,7 +124,10 @@ class LearningUnitListTestCase(APITestCase):
         serializer = LearningUnitSerializer(
             qs,
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -135,7 +145,10 @@ class LearningUnitListTestCase(APITestCase):
         serializer = LearningUnitSerializer(
             qs,
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -192,7 +205,10 @@ class LearningUnitDetailedTestCase(APITestCase):
         luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
         serializer = LearningUnitDetailedSerializer(
             luy_with_full_title,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data, serializer.data)
 
@@ -240,5 +256,5 @@ class LearningUnitTitleTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
-        serializer = LearningUnitTitleSerializer(luy_with_full_title)
+        serializer = LearningUnitTitleSerializer(luy_with_full_title, context={'language': settings.LANGUAGE_CODE})
         self.assertEqual(response.data, serializer.data)
