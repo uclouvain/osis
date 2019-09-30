@@ -53,7 +53,7 @@ class LearningAchievementList(generics.GenericAPIView):
         qs = LearningAchievement.objects.filter(
             learning_unit_year=learning_unit_year
         ).order_by('order').filter(
-            language__code=language.upper()
+            language__code=language[:2].upper()
         ).values('code_name', 'text')
         learning_achievements_grouped = OrderedDict()
         for learning_achievement in qs:

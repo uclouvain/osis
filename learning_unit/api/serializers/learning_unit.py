@@ -46,7 +46,7 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
         language = self.context['language']
         return getattr(
             learning_unit_year,
-            'full_title' + ('_' + language if language != settings.LANGUAGE_CODE_FR[:2] else '')
+            'full_title' + ('_' + language if language != settings.LANGUAGE_CODE_FR else '')
         )
 
 

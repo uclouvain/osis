@@ -184,7 +184,7 @@ DATABASES = {
 # you have to redefine the LANGUAGE_CODE and LANGUAGES vars in environment settings (ex: dev.py)
 LANGUAGE_CODE = 'fr-be'
 LANGUAGES = [
-    ('fr', _('French')),
+    ('fr-be', _('French')),
     ('en', _('English')),
 ]
 LANGUAGE_CODE_FR = 'fr-be'

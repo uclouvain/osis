@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -92,7 +92,6 @@ class LearningUnitListTestCase(APITestCase):
         expected_count = LearningUnitYear.objects.all().count()
         self.assertEqual(response.data['count'], expected_count)
 
-    @override_settings(LANGUAGE_CODE='fr')
     def test_get_results_without_filtering(self):
         response = self.client.get(self.url, {})
 
@@ -109,7 +108,6 @@ class LearningUnitListTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
-    @override_settings(LANGUAGE_CODE='fr')
     def test_get_results_filter_by_academic_year(self):
         response = self.client.get(self.url, data={'year': self.academic_years[3].year})
 
@@ -129,7 +127,6 @@ class LearningUnitListTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
-    @override_settings(LANGUAGE_CODE='fr')
     def test_get_results_filter_by_acronym_exact_match(self):
         expected_learning_unit_year = self.learning_unit_years[2]
 
@@ -197,7 +194,6 @@ class LearningUnitDetailedTestCase(APITestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @override_settings(LANGUAGE_CODE='fr')
     def test_get_results(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -251,7 +247,6 @@ class LearningUnitTitleTestCase(APITestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @override_settings(LANGUAGE_CODE='fr')
     def test_get_results(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
