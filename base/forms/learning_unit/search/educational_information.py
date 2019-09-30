@@ -40,8 +40,11 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         self.form.fields['with_entity_subordinated'].initial = True
 
     def get_queryset(self):
-        # Need this close so as to return empty query by default when form is unbound
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related(
+            'campus',
+        ).prefetch_related(
+            "learningcomponentyear_set",
+        )
 
         translated_text_qs = TranslatedText.objects.filter(
             entity=LEARNING_UNIT_YEAR,

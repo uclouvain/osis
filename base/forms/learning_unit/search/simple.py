@@ -192,8 +192,11 @@ class LearningUnitFilter(FilterSet):
         ).values('acronym')[:1]
 
         queryset = LearningUnitYear.objects_with_container.select_related(
-            'academic_year', 'learning_container_year__academic_year',
-            'language', 'proposallearningunit', 'externallearningunityear'
+            'academic_year',
+            'learning_container_year__academic_year',
+            'language',
+            'proposallearningunit',
+            'externallearningunityear'
         ).order_by('academic_year__year', 'acronym').annotate(
             has_proposal=Exists(has_proposal),
             entity_requirement=Subquery(entity_requirement),
