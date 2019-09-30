@@ -129,3 +129,16 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             'label', 'translated_label', 'text', 'free_text'
         ).first()
         return translated_text
+
+    # def _get_intro_sections(self, obj):
+    #     hierarchy = group_element_year_tree.EducationGroupHierarchy(root=obj)
+    #     extra_intro_fields = [
+    #         "intro-" + egy.partial_acronym.lower() for egy in
+    #         hierarchy.get_option_list() + hierarchy.get_finality_list()
+    #     ]
+    #     common_core = GroupElementYear.objects.filter(
+    #         parent=obj,
+    #         child_branch__education_group_type__name=GroupType.COMMON_CORE.name
+    #     ).values_list(Lower('child_branch__partial_acronym'), flat=True).first()
+    #     if common_core:
+    #         extra_intro_fields.append("intro-" + common_core)
