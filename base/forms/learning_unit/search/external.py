@@ -58,7 +58,7 @@ class ExternalLearningUnitFilter(FilterSet):
         label=_('Title'),
     )
     status = filters.ChoiceFilter(
-        choices=active_status.ACTIVE_STATUS_LIST[:-1],
+        choices=active_status.ACTIVE_STATUS_LIST_FOR_FILTER,
         required=False,
         label=_('Status'),
         field_name="status",

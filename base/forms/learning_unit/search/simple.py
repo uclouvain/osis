@@ -40,7 +40,6 @@ MOBILITY = 'mobility'
 MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
 
 
-# TODO fix status search
 class LearningUnitFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
@@ -99,7 +98,7 @@ class LearningUnitFilter(FilterSet):
         empty_label=pgettext_lazy("plural", "All")
     )
     status = filters.ChoiceFilter(
-        choices=active_status.ACTIVE_STATUS_LIST[:-1],
+        choices=active_status.ACTIVE_STATUS_LIST_FOR_FILTER,
         required=False,
         label=_('Status'),
         field_name="status",
