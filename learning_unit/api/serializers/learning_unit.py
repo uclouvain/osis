@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from base.models.enums.summary_status import SummaryStatus
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
@@ -81,7 +81,6 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         return getattr(learning_unit_year, "has_proposal", None)
 
 
-# FIXME Update scheme
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
     periodicity_text = serializers.CharField(source='get_periodicity_display', read_only=True)
     quadrimester_text = serializers.CharField(source='get_quadrimester_display', read_only=True)
@@ -134,10 +133,9 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             "status": learning_unit_year.proposallearningunit.get_state_display(),
         }
 
-    # TODO pretiffy
     def get_summary_status(self, learning_unit_year):
         if getattr(learning_unit_year, "summary_status", False):
-            return "MODIFIED"
+            return SummaryStatus.MODIFIED.value
         elif learning_unit_year.summary_locked:
-            return "BLOCKED"
-        return "NOT MODIFIED"
+            return SummaryStatus.BLOCKED.value
+        return SummaryStatus.NOT_MODIFIED.value
