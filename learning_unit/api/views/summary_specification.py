@@ -59,7 +59,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
             label=F('text_label__label')
         ).filter(
             Q(
-                language=settings.LANGUAGE_CODE_FR if language == 'fr' else language,
+                language=settings.LANGUAGE_CODE_FR if language == settings.LANGUAGE_CODE_FR[:2] else language,
                 text_label__label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
             )
             |
