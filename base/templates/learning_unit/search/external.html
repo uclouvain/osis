@@ -107,7 +107,11 @@
                 "targets": 3,
                 "data": "campus",
                 "render": function(data, type, row, meta){
-                    return data["name"];
+                    if (data !== null) {
+                        return data["name"];
+                    }
+                    return "";
+
                 }
             },
             {"name": "credits", "targets": 4, "data": "credits"},

@@ -150,8 +150,8 @@ class LearningUnitFilter(FilterSet):
     def filter_tutor(self, queryset, name, value):
         for tutor_name in value.split():
             queryset = queryset.filter(
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=
-                  tutor_name) |
+                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
+                  ) |
                 Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name)
             ).distinct()
         return queryset

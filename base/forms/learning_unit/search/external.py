@@ -24,16 +24,18 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import BLANK_CHOICE_DASH
+from django.db.models import BLANK_CHOICE_DASH, OuterRef, Subquery, Exists
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.forms.utils.choice_field import add_blank
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
+from base.models.entity_version import EntityVersion
 from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.organization_address import find_distinct_by_country
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from reference.models.country import Country
 
 
@@ -144,15 +146,41 @@ class ExternalLearningUnitFilter(FilterSet):
         if not self.data:
             return LearningUnitYear.objects.none()
 
+        entity_requirement = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        entity_allocation = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        has_proposal = ProposalLearningUnit.objects.filter(
+            learning_unit_year=OuterRef('pk'),
+        )
+
         qs = LearningUnitYear.objects_with_container.filter(
             externallearningunityear__co_graduation=True,
             externallearningunityear__mobility=False,
+
         ).select_related(
             'academic_year',
             'learning_container_year__academic_year',
             'language',
             'externallearningunityear',
+            'campus',
+            'proposallearningunit',
             'campus__organization',
+        ).prefetch_related(
+            "learningcomponentyear_set"
+        ).annotate(
+            has_proposal=Exists(has_proposal),
+            entity_requirement=Subquery(entity_requirement),
+            entity_allocation=Subquery(entity_allocation),
         ).order_by('academic_year__year', 'acronym')
+
         qs = LearningUnitYearQuerySet.annotate_full_title_class_method(qs)
         return qs
