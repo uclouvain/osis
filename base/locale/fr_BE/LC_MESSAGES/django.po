@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-23 16:38+0200\n"
+"POT-Creation-Date: 2019-09-30 08:40+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -344,8 +344,8 @@ msgstr "Ajouter un autre"
 msgid "Add attribution"
 msgstr "Ajouter attribution"
 
-msgid "Add current year attribution"
-msgstr "Ajouter attribution année en cours"
+msgid "Add current year teacher"
+msgstr "Ajouter enseignant année en cours"
 
 msgid "Add over the current year"
 msgstr "Ajouter sur l’année en cours"
@@ -2231,7 +2231,6 @@ msgstr "Produire Excel"
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
 
-
 msgid ""
 "Produce a xls of learning units with educational information and "
 "specifications"
@@ -3387,15 +3386,6 @@ msgstr "Accueil"
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
-
-msgid "Xls"
-msgstr "Xls"
-
-msgid "Xls UE/proposals comparison"
-msgstr "Xls de comparaison UE/proposition"
-
-msgid "Xls with proposals"
-msgstr "Xls avec les propositions"
 
 msgid "Yes"
 msgstr "Oui"
