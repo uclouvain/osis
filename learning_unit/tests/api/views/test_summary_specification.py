@@ -85,7 +85,7 @@ class LearningAchievementListTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_results_ensure_keys_are_always_present(self):
-        response = self.client.get(self.url + "?lang=fr")
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         expected_keys = set(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS)
