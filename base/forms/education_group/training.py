@@ -49,8 +49,6 @@ from reference.models.domain import Domain
 from reference.models.enums import domain_type
 from reference.models.language import find_all_languages
 
-MAX_NUMBER_CERTIFICATE_TYPE_2 = 2
-
 
 def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
@@ -229,11 +227,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             self.fields['diploma_printing_title'].required = False
 
     def clean_certificate_aims(self):
-        certificate_aims = self.cleaned_data["certificate_aims"]
-        certificate_aims_type_2 = [ca for ca in certificate_aims if ca.section == 2]
-        if len(certificate_aims_type_2) >= MAX_NUMBER_CERTIFICATE_TYPE_2:
-            raise forms.ValidationError(_("There can only be one type 2 expectation"))
-        return certificate_aims
+        EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
 
     def save(self, commit=True):
         education_group_year = super().save(commit=False)
@@ -280,11 +274,7 @@ class CertificateAimsForm(forms.ModelForm):
         }
 
     def clean_certificate_aims(self):
-        certificate_aims = self.cleaned_data["certificate_aims"]
-        certificate_aims_type_2 = [ca for ca in certificate_aims if ca.section == 2]
-        if len(certificate_aims_type_2) >= MAX_NUMBER_CERTIFICATE_TYPE_2:
-            raise forms.ValidationError(_("There can only be one type 2 expectation"))
-        return certificate_aims
+        EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
 
     def save(self, commit=True):
         self.instance.certificate_aims.clear()
