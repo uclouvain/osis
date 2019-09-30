@@ -22,6 +22,10 @@ from base.views.learning_units.search.common import PROPOSAL_SEARCH, ITEMS_PER_P
     _create_xls_proposal, _create_xls_proposal_comparison
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
+ACTION_BACK_TO_INITIAL = "back_to_initial"
+ACTION_CONSOLIDATE = "consolidate"
+ACTION_FORCE_STATE = "force_state"
+
 
 @RenderToExcel("xls", _create_xls_proposal)
 @RenderToExcel("xls_comparison", _create_xls_proposal_comparison)
@@ -64,7 +68,6 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Seri
         return context
 
     def post(self, request, *args, **kwargs):
-        # FIXME Extract to other view
         user_person = get_object_or_404(Person, user=self.request.user)
 
         search_form = ProposalLearningUnitFilter(request.GET or None, person=user_person)
@@ -97,8 +100,3 @@ def apply_action_on_proposals(proposals, author, post_data, research_criteria):
             new_state = form.cleaned_data.get("state")
             messages_by_level = proposal_business.force_state_of_proposals(proposals, author, new_state)
     return messages_by_level
-
-
-ACTION_BACK_TO_INITIAL = "back_to_initial"
-ACTION_CONSOLIDATE = "consolidate"
-ACTION_FORCE_STATE = "force_state"

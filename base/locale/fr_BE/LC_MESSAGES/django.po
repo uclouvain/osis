@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 14:44+0200\n"
+"POT-Creation-Date: 2019-09-30 17:41+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -422,9 +422,6 @@ msgstr "Alerte"
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
-msgid "All"
-msgstr "Tous"
-
 msgctxt "plural"
 msgid "All"
 msgstr "Tous"
@@ -433,6 +430,11 @@ msgid "All the scores are encoded."
 msgstr "Toutes les notes ont été soumises."
 
 msgid "Alloc. Ent."
+msgstr "Ent. attrib."
+
+#, fuzzy
+#| msgid "Alloc. Ent."
+msgid "Alloc. Entity"
 msgstr "Ent. attrib."
 
 msgid "Allocation entity"
@@ -573,7 +575,7 @@ msgid "Block"
 msgstr "Bloc"
 
 msgid "Blocked"
-msgstr "Bloc"
+msgstr "Bloqué"
 
 msgid "Borrowed courses"
 msgstr "Cours empruntés"
@@ -1793,9 +1795,6 @@ msgstr "Liste au choix Partenariat mobilité"
 msgid "Modification"
 msgstr "Modification"
 
-msgid "Modification made"
-msgstr "Modification apportée"
-
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
@@ -1939,6 +1938,9 @@ msgid "Not in range of years which can be edited by you"
 msgstr ""
 "L'unité d'enseignement n'est pas dans la fourchette d'années que vous pouvez "
 "modifier"
+
+msgid "Not modified"
+msgstr "Non modifié"
 
 msgid "Not required"
 msgstr "Non requis"
@@ -3184,9 +3186,6 @@ msgstr "Intitulé propre au partim"
 msgid "To complete"
 msgstr "A compléter"
 
-msgid "Too many results"
-msgstr "Trop de résultats"
-
 msgid "Training"
 msgstr "Formation"
 
@@ -3758,6 +3757,9 @@ msgstr "est un prérequis de"
 
 msgid "is using in"
 msgstr "est utilisée dans"
+
+msgid "items per page"
+msgstr ""
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisé"
