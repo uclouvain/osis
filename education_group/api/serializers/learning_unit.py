@@ -43,7 +43,7 @@ class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
         language = self.context['language']
         return getattr(
             education_group_year,
-            'title' + ('_english' if language != settings.LANGUAGE_CODE_FR else '')
+            'title' + ('_english' if language not in settings.LANGUAGE_CODE_FR else '')
         )
 
 
