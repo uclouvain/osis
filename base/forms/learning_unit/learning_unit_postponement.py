@@ -27,6 +27,7 @@ import operator
 from collections import OrderedDict
 
 from django.db import transaction
+from django.db.models import Max
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
@@ -126,7 +127,7 @@ class LearningUnitPostponementForm:
                 .select_related('learning_container_year', 'learning_unit', 'academic_year') \
                 .order_by('academic_year__year')
         else:
-            max_postponement_year = compute_max_postponement_year(self.learning_unit_full_instance, self.subtype)
+            max_postponement_year = self._compute_max_postponement_year()
             ac_year_postponement_range = AcademicYear.objects.min_max_years(
                 self.start_postponement.year,
                 max_postponement_year
@@ -280,7 +281,7 @@ class LearningUnitPostponementForm:
         current_form = self._get_learning_unit_base_form(self.start_postponement, **form_kwargs)
         if self._has_proposal(self.learning_unit_instance) and \
                 (self.person.is_faculty_manager and not self.person.is_central_manager):
-            max_postponement_year = compute_max_postponement_year(self.learning_unit_full_instance, self.subtype)
+            max_postponement_year = self._compute_max_postponement_year()
             academic_years = academic_year.find_academic_years(start_year=self.start_postponement.year,
                                                                end_year=max_postponement_year)
         else:
@@ -295,6 +296,21 @@ class LearningUnitPostponementForm:
             self._check_differences(current_form, next_form, ac_year)
 
         return self.consistency_errors
+
+    def _compute_max_postponement_year(self) -> int:
+        """ Compute the maximal year for the postponement of the learning unit
+
+        If the learning unit is a partim, the max year is the max year of the full
+        """
+        if self.subtype == learning_unit_year_subtypes.PARTIM:
+            max_postponement_year = self.learning_unit_full_instance.learningunityear_set.aggregate(
+                Max('academic_year__year')
+            )['academic_year__year__max']
+        else:
+            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
+
+        end_year = self.end_postponement.year if self.end_postponement else None
+        return min(end_year, max_postponement_year) if end_year else max_postponement_year
 
     @property
     def warnings(self):
