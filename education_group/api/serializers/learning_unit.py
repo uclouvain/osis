@@ -70,7 +70,7 @@ class EducationGroupRootsListSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class LearningUnitYearPrerequisitesListSerializer(serializers.Serializer):
+class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedRelatedField(
         view_name='education_group_api_v1:training-detail',
         lookup_field='uuid',
@@ -89,9 +89,10 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.Serializer):
         source='education_group_year.education_group_type.get_name_display',
         read_only=True,
     )
-    prerequisites = serializers.SerializerMethodField()
+    prerequisites = serializers.CharField(source='prerequisite_string')
 
     class Meta:
+        model = Prerequisite
         fields = (
             'url',
             'acronym',
@@ -101,6 +102,3 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.Serializer):
             'education_group_type_text',
             'prerequisites'
         )
-
-    def get_prerequisites(self, obj):
-        return obj.prerequisite_string
