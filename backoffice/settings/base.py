@@ -92,8 +92,10 @@ INSTALLED_APPS = (
 )
 
 
-# Set default language normally except if there is a query_param equal to 'lang'
 class CustomLocaleMiddleware(LocaleMiddleware):
+    """
+        Set default language normally except if there is a query_param equal to 'lang'
+    """
     def process_request(self, request):
         language = request.GET.get('lang')
         if language:
