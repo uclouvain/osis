@@ -38,11 +38,11 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True
     )
     requirement_entity = serializers.CharField(
-        source='learning_container_year.requirement_entity_version.acronym',
+        source='entity_requirement',
         read_only=True
     )
     allocation_entity = serializers.CharField(
-        source='learning_container_year.allocation_entity_version.acronym',
+        source='entity_allocation',
         read_only=True
     )
     title = serializers.SerializerMethodField(read_only=True)
