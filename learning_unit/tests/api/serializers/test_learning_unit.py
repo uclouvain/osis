@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -38,24 +40,21 @@ class LearningUnitTitleSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         academic_year = AcademicYearFactory()
-        cls.learning_unit_year = LearningUnitYearFactory(
+        learning_unit_year = LearningUnitYearFactory(
             academic_year=academic_year,
         )
+        cls.learning_unit_year = LearningUnitYear.objects.filter(pk=learning_unit_year.pk).annotate_full_title().get()
 
-        cls.serializer = LearningUnitTitleSerializer(cls.learning_unit_year)
+        cls.serializer = LearningUnitTitleSerializer(
+            cls.learning_unit_year,
+            context={'language': settings.LANGUAGE_CODE_EN}
+        )
 
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
-
-    def test_title_is_dict_contains_iso_code_as_key(self):
-        title = self.serializer.data['title']
-
-        self.assertIsInstance(title, dict)
-        self.assertTrue('fr' in title)
-        self.assertTrue('en' in title)
 
 
 class LearningUnitSerializerTestCase(TestCase):
@@ -66,13 +65,16 @@ class LearningUnitSerializerTestCase(TestCase):
             start_date=AcademicYearFactory(year=academic_year.year - 1).start_date,
             end_date=AcademicYearFactory(year=academic_year.year + 1).end_date,
         )
-        cls.learning_unit_year = LearningUnitYearFactory(
+        learning_unit_year = LearningUnitYearFactory(
             academic_year=academic_year,
             learning_container_year__requirement_entity=requirement_entity_version.entity
         )
-
+        cls.learning_unit_year = LearningUnitYear.objects.filter(pk=learning_unit_year.pk).annotate_full_title().get()
         url = reverse('learning_unit_api_v1:learningunits_list')
-        cls.serializer = LearningUnitSerializer(cls.learning_unit_year, context={'request': RequestFactory().get(url)})
+        cls.serializer = LearningUnitSerializer(cls.learning_unit_year, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -88,13 +90,6 @@ class LearningUnitSerializerTestCase(TestCase):
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
-    def test_title_is_dict_contains_iso_code_as_key(self):
-        title = self.serializer.data['title']
-
-        self.assertIsInstance(title, dict)
-        self.assertTrue('fr' in title)
-        self.assertTrue('en' in title)
-
 
 class LearningUnitDetailedSerializerTestCase(TestCase):
     @classmethod
@@ -106,16 +101,20 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             end_date=AcademicYearFactory(year=anac.year + 1).end_date,
             entity=requirement_entity
         )
-        cls.luy = LearningUnitYearFactory(
+        luy = LearningUnitYearFactory(
             academic_year=anac,
             learning_container_year__requirement_entity=requirement_entity
         )
+        cls.luy = LearningUnitYear.objects.filter(pk=luy.pk).annotate_full_title().get()
         url_kwargs = {
             'acronym': cls.luy.acronym,
             'year': cls.luy.academic_year.year
         }
         url = reverse('learning_unit_api_v1:learningunits_read', kwargs=url_kwargs)
-        cls.serializer = LearningUnitDetailedSerializer(cls.luy, context={'request': RequestFactory().get(url)})
+        cls.serializer = LearningUnitDetailedSerializer(cls.luy, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [

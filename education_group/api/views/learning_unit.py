@@ -26,13 +26,14 @@
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 
 
-class EducationGroupRootsList(generics.ListAPIView):
+class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return all education groups root which utilize the learning unit specified
     """
