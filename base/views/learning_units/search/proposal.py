@@ -18,7 +18,7 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import CacheFilterMixin
 from base.views.common import display_messages_by_level
 from base.views.learning_units.search.common import PROPOSAL_SEARCH, ITEMS_PER_PAGES, \
-    ACTION_BACK_TO_INITIAL, ACTION_CONSOLIDATE, ACTION_FORCE_STATE, SerializeFilterListIfAjaxMixin, RenderToExcel, \
+    SerializeFilterListIfAjaxMixin, RenderToExcel, \
     _create_xls_proposal, _create_xls_proposal_comparison
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
@@ -97,3 +97,8 @@ def apply_action_on_proposals(proposals, author, post_data, research_criteria):
             new_state = form.cleaned_data.get("state")
             messages_by_level = proposal_business.force_state_of_proposals(proposals, author, new_state)
     return messages_by_level
+
+
+ACTION_BACK_TO_INITIAL = "back_to_initial"
+ACTION_CONSOLIDATE = "consolidate"
+ACTION_FORCE_STATE = "force_state"

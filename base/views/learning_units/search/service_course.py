@@ -38,7 +38,6 @@ from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, ITEM
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
-# TODO adapt filter to service course
 @RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
 @RenderToExcel("xls_attributions", _create_xls_attributions)
 @RenderToExcel("xls_comparison", _create_xls_comparison)

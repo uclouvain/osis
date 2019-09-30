@@ -44,12 +44,7 @@ SUMMARY_LIST = 4
 BORROWED_COURSE = 5
 EXTERNAL_SEARCH = 6
 
-ACTION_BACK_TO_INITIAL = "back_to_initial"
-ACTION_CONSOLIDATE = "consolidate"
-ACTION_FORCE_STATE = "force_state"
-
-# TODO mofify value
-ITEMS_PER_PAGES = 10
+ITEMS_PER_PAGES = 50
 
 
 def _manage_session_variables(request, search_type):
@@ -75,8 +70,14 @@ def _get_search_type_label(search_type):
     }.get(search_type, _('Learning units'))
 
 
-# TODO document
 class SerializeFilterListIfAjaxMixin:
+    """
+        FilterView Mixin to return filter result as json when request is of type ajax.
+
+        serializer_class: class used to serialize the resulting queryset
+    """
+    serializer_class = None
+
     def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
             serializer = self.serializer_class(context["page_obj"], context={'request': self.request}, many=True)
@@ -84,8 +85,14 @@ class SerializeFilterListIfAjaxMixin:
         return super().render_to_response(context, **response_kwargs)
 
 
-# TODO document
 class RenderToExcel:
+    """
+        View Mixin to generate excel when xls_status parameter is set.
+
+        name: value of xls_status so as to generate the excel
+        render_method: function to generate the excel.
+                       The function must have as signature f(view_obj, context, **response_kwargs)
+    """
     def __init__(self, name, render_method):
         self.name = name
         self.render_method = render_method
@@ -99,7 +106,6 @@ class RenderToExcel:
         return Wrapped
 
 
-# TODO refactor
 def _create_xls(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["object_list"]
