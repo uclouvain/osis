@@ -404,7 +404,7 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
 
     if proposal_comparison:
         academic_year = _format_academic_year(learning_unit_yr.academic_year.name,
-                                              lu_initial.get('end_year') if lu_initial.get('end_year') else None)
+                                              lu_initial.get('end_year') or None)
     else:
         academic_year = learning_unit_yr.academic_year.name
 
