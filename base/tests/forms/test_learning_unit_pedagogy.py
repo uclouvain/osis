@@ -51,8 +51,9 @@ class LearningUnitPedagogyContextMixin(TestCase):
         self.person = PersonFactory()
         self.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
         self.current_ac = AcademicYearFactory(current=True)
-        self.ac_years_containers = GenerateAcademicYear(start_year=self.current_ac.year + 1,
-                                                        end_year=self.current_ac.year + 5)
+        start_year = AcademicYearFactory(year=self.current_ac.year + 1)
+        end_year = AcademicYearFactory(year=self.current_ac.year + 5)
+        self.ac_years_containers = GenerateAcademicYear(start_year=start_year, end_year=end_year)
         self.current_luy = LearningUnitYearFactory(
             learning_container_year__academic_year=self.current_ac,
             academic_year=self.current_ac,

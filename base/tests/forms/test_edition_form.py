@@ -30,6 +30,7 @@ from django.utils.translation import gettext
 from base.business.learning_unit_year_with_context import get_with_context
 from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEditionBaseFormset, \
     VolumeEditionFormsetContainer
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
@@ -37,8 +38,8 @@ from base.tests.factories.person import CentralManagerFactory, FacultyManagerFac
 
 class TestVolumeEditionForm(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.first_learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
@@ -213,8 +214,8 @@ def _get_valid_partim_data_alter():
 
 class TestVolumeEditionFormsetContainer(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.generated_container_year = self.generated_container.generated_container_years[0]
