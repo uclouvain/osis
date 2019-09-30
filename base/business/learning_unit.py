@@ -30,22 +30,17 @@ from django.db.models import Prefetch, Max
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl_base
-from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import learning_achievement, academic_year
-from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type, learning_unit_year_subtypes
 from base.models.enums import entity_container_year_link_type
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
-from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.translated_text_label import TranslatedTextLabel
-from osis_common.utils.datetime import convert_date_to_datetime
 
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
@@ -205,7 +200,7 @@ def get_academic_year_postponement_range(luy):
     return academic_year_postponement_range
 
 
-def compute_max_postponement_year(learning_unit, subtype) -> int:
+def compute_max_postponement_year(learning_unit, subtype, end_postponement) -> int:
     """ Compute the maximal year for the postponement of the learning unit
 
     If the learning unit is a partim, the max year is the max year of the full
@@ -216,6 +211,5 @@ def compute_max_postponement_year(learning_unit, subtype) -> int:
         )['academic_year__year__max']
     else:
         max_postponement_year = academic_year.compute_max_academic_year_adjournment()
-    end_postponement = academic_year.find_academic_year_by_year(learning_unit.end_year) if learning_unit else None
     end_year = end_postponement.year if end_postponement else None
     return min(end_year, max_postponement_year) if end_year else max_postponement_year

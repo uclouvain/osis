@@ -127,7 +127,7 @@ class LearningUnitPostponementForm:
                 .select_related('learning_container_year', 'learning_unit', 'academic_year') \
                 .order_by('academic_year__year')
         else:
-            max_postponement_year = self._compute_max_postponement_year()
+            max_postponement_year = compute_max_postponement_year(self.learning_unit_full_instance, self.subtype, self.end_postponement)
             ac_year_postponement_range = AcademicYear.objects.min_max_years(
                 self.start_postponement.year,
                 max_postponement_year
@@ -281,7 +281,7 @@ class LearningUnitPostponementForm:
         current_form = self._get_learning_unit_base_form(self.start_postponement, **form_kwargs)
         if self._has_proposal(self.learning_unit_instance) and \
                 (self.person.is_faculty_manager and not self.person.is_central_manager):
-            max_postponement_year = self._compute_max_postponement_year()
+            max_postponement_year = compute_max_postponement_year(self.learning_unit_full_instance, self.subtype, self.end_postponement)
             academic_years = academic_year.find_academic_years(start_year=self.start_postponement.year,
                                                                end_year=max_postponement_year)
         else:
