@@ -80,8 +80,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         )
         extra_intro_fields = self._get_intro_sections(obj)
         pertinent_sections['specific'] += extra_intro_fields
-        print(extra_intro_fields)
-        print(pertinent_sections)
+
         for common_section in pertinent_sections['common']:
             common_translated_text, _ = self._get_translated_text(common_egy, common_section, language)
             sections.append(common_translated_text)
@@ -98,8 +97,6 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 datas.append(serializer.data)
             elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
                 translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
-                print(translated_text_label)
-                print(translated_text)
                 sections.append(translated_text if translated_text else {
                     'label': specific_section,
                     'translated_label': translated_text_label.label
