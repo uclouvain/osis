@@ -248,7 +248,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
 
     def save_certificate_aims(self):
         self.instance.certificate_aims.clear()
-        for certificate_aim in self.cleaned_data["certificate_aims"]:
+        for certificate_aim in self.cleaned_data.get("certificate_aims"):
             EducationGroupCertificateAim.objects.get_or_create(
                 education_group_year=self.instance,
                 certificate_aim=certificate_aim,
@@ -278,7 +278,7 @@ class CertificateAimsForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.certificate_aims.clear()
-        for certificate_aim in self.cleaned_data["certificate_aims"]:
+        for certificate_aim in self.cleaned_data.get("certificate_aims"):
             EducationGroupCertificateAim.objects.get_or_create(
                 education_group_year=self.instance,
                 certificate_aim=certificate_aim,
