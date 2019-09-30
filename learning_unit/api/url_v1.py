@@ -60,11 +60,17 @@ urlpatterns = [
 ]
 
 if 'education_group' in settings.INSTALLED_APPS:
-    from education_group.api.views.learning_unit import EducationGroupRootsList
+    from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
+
     urlpatterns += (
       url(
         r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/education_group_roots$',
         EducationGroupRootsList.as_view(),
         name=EducationGroupRootsList.name
+      ),
+      url(
+          r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/prerequisites',
+          LearningUnitPrerequisitesList.as_view(),
+          name=LearningUnitPrerequisitesList.name
       ),
     )
