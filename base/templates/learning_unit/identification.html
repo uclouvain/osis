@@ -92,12 +92,13 @@
                                 <div>({% trans 'Formerly' %} : {{ old_acronym }})</div>
                                 <br>
                             {% endif %}
-                        {% endwith %}
-                        {% with new_acronym=learning_unit_year|get_next_acronym %}
-                            {% if new_acronym %}
-                                <div>({% trans 'Newly' %} : {{ new_acronym }})</div>
-                                <br>
-                            {% endif %}
+
+                            {% with new_acronym=learning_unit_year|get_next_acronym %}
+                                {% if new_acronym and new_acronym != old_acronym %}
+                                    <div>({% trans 'Newly' %} : {{ new_acronym }})</div>
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
                         {% endwith %}
                         <div class="row">
                             {% block content_row2 %}
