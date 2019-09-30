@@ -165,7 +165,6 @@ class ExternalLearningUnitFilter(FilterSet):
         qs = LearningUnitYear.objects_with_container.filter(
             externallearningunityear__co_graduation=True,
             externallearningunityear__mobility=False,
-
         ).select_related(
             'academic_year',
             'learning_container_year__academic_year',
