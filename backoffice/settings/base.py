@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.postgres',
     'analytical',
     'localflavor',
     'ckeditor',
@@ -70,6 +71,7 @@ INSTALLED_APPS = (
     'rules_management',
     'base',
     'education_group',
+    'learning_unit',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
@@ -415,6 +417,10 @@ BOOTSTRAP3 = {
     'set_placeholder': False,
     'success_css_class': '',
     'required_css_class': "required_field",
+    "field_renderers": {
+            "default": "base.utils.renderers.OsisBootstrap3FieldRenderer",
+            "inline": "bootstrap3.renderers.InlineFieldRenderer",
+        },
 }
 
 # Ajax select is not allowed to load external js libs
@@ -465,3 +471,4 @@ YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 
 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
+LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
