@@ -61,6 +61,11 @@ class LearningUnitList(generics.ListAPIView):
         'acronym',
     )  # Default ordering
 
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.request.LANGUAGE_CODE
+        return serializer_context
+
 
 class LearningUnitDetailed(generics.RetrieveAPIView):
     """

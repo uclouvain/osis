@@ -41,15 +41,10 @@ class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
 
     def get_title(self, education_group_year):
         language = self.context['language']
-        if language:
-            return getattr(
-                education_group_year,
-                'title' + ('_english' if language != settings.LANGUAGE_CODE_FR[:2] else '')
-            )
-        return {
-            'fr': getattr(education_group_year, 'title', None),
-            'en': getattr(education_group_year, 'title_english', None)
-        }
+        return getattr(
+            education_group_year,
+            'title' + ('_english' if language != settings.LANGUAGE_CODE_FR[:2] else '')
+        )
 
 
 class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, serializers.HyperlinkedModelSerializer):

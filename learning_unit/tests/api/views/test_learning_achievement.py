@@ -96,7 +96,6 @@ class LearningAchievementListTestCase(APITestCase):
 
         expected_response = OrderedDict([
             ('code_name', self.achievements[0].code_name),
-            ('fr', self.achievements[0].text),
-            ('en', '')
+            ('achievement', self.achievements[0].text),
         ])
         self.assertDictEqual(response.data[0], expected_response)

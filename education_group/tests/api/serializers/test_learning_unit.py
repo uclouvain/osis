@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
@@ -41,7 +42,10 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             academic_year=cls.academic_year,
         )
         url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={'request': RequestFactory().get(url)})
+        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -71,10 +75,3 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             self.serializer.data['education_group_type'],
             self.training.education_group_type.name
         )
-
-    def test_ensure_title_field_is_dict(self):
-        expected_dict = {
-            'fr': self.training.title,
-            'en': self.training.title_english
-        }
-        self.assertDictEqual(self.serializer.data['title'], expected_dict)

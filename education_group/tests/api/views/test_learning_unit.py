@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -98,6 +98,10 @@ class TrainingListViewTestCase(APITestCase):
         serializer = EducationGroupRootsListSerializer(
             [self.training],
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
         )
         self.assertEqual(response.data, serializer.data)
+

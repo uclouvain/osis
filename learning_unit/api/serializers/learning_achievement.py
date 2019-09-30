@@ -28,10 +28,4 @@ from rest_framework import serializers
 
 class LearningAchievementListSerializer(serializers.Serializer):
     code_name = serializers.CharField()
-    fr = serializers.CharField()
-    en = serializers.CharField()
-
-
-class LearningAchievementListSpecificLanguageSerializer(serializers.Serializer):
-    code_name = serializers.CharField()
     achievement = serializers.CharField()

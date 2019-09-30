@@ -24,16 +24,16 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, CharField, F, Value
+from django.db.models import F, Q
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
+    CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.models.learning_unit_year import LearningUnitYear
 from cms.models.translated_text import TranslatedText
-from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer, \
-    LearningUnitSummarySpecificationSpecificLanguageSerializer
+from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
 
 
 class LearningUnitSummarySpecification(generics.GenericAPIView):
@@ -43,6 +43,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
     name = 'learningunitsummaryspecification_read'
     filter_backends = []
     paginator = None
+    serializer_class = LearningUnitSummarySpecificationSerializer
 
     def get(self, request, *args, **kwargs):
         learning_unit_year = get_object_or_404(
@@ -50,48 +51,27 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
             acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
-        language = self.request.query_params.get('lang')
+        language = self.request.LANGUAGE_CODE
         qs = TranslatedText.objects.filter(
             reference=learning_unit_year.pk,
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         ).annotate(
             label=F('text_label__label')
-        )
-
-        if language:
-            qs = qs.filter(
-                language=settings.LANGUAGE_CODE_FR if language == 'fr' else language
-            ).values('label', 'text')
-            serializer = self._get_for_specific_language(qs)
-        else:
-            qs = qs.annotate(
-                iso_code=Case(
-                    When(language=settings.LANGUAGE_CODE_FR, then=Value('fr')),
-                    When(language=settings.LANGUAGE_CODE_EN, then=Value('en')),
-                    default=None,
-                    output_field=CharField(),
-                ),
-            ).exclude(iso_code__isnull=True).values('label', 'iso_code', 'text')
-            serializer = self._get_for_both_languages(qs)
-
-        return Response(serializer.data)
-
-    def _get_for_both_languages(self, qs):
-        summary_specification_grouped = {}
-        for translated_text in qs:
-            key = translated_text['label']
-            summary_specification_grouped.setdefault(key, {'fr': '', 'en': ''})
-            summary_specification_grouped[key][translated_text['iso_code']] = translated_text['text']
-        return self.get_serializer(summary_specification_grouped)
-
-    def _get_for_specific_language(self, qs):
+        ).filter(
+            Q(
+                language=settings.LANGUAGE_CODE_FR if language == 'fr' else language,
+                text_label__label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
+            )
+            |
+            Q(
+                language=settings.LANGUAGE_CODE_FR,
+                text_label__label__in=CMS_LABEL_PEDAGOGY_FR_ONLY
+            )
+        ).values('label', 'text')
         summary_specification_grouped = {}
         for translated_text in qs:
             key = translated_text['label']
             summary_specification_grouped[key] = translated_text['text']
-        return self.get_serializer(summary_specification_grouped)
+        serializer = self.get_serializer(summary_specification_grouped)
 
-    def get_serializer_class(self, *args, **kwargs):
-        if self.request.query_params.get('lang'):
-            return LearningUnitSummarySpecificationSpecificLanguageSerializer
-        return LearningUnitSummarySpecificationSerializer
+        return Response(serializer.data)
