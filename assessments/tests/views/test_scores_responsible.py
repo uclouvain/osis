@@ -123,7 +123,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         self.client.force_login(unauthorized_user)
 
         response = self.client.get(self.url)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_case_search_without_filter_ensure_ordering(self):
         data = {
