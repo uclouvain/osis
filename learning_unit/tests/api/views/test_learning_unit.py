@@ -44,7 +44,11 @@ from learning_unit.api.views.learning_unit import LearningUnitList
 class LearningUnitListTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = GenerateAcademicYear(start_year=2015, end_year=2020)
+
+        cls.academic_years = GenerateAcademicYear(
+            start_year=AcademicYearFactory(year=2015),
+            end_year=AcademicYearFactory(year=2020)
+        )
 
         cls.requirement_entity_version = EntityVersionFactory(
             start_date=cls.academic_years[0].start_date,

@@ -28,6 +28,7 @@ from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.prerequisite import Prerequisite
 
 
 class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
@@ -77,4 +78,38 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
             'education_group_type',
             'education_group_type_text',
             'academic_year',
+        )
+
+
+class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedRelatedField(
+        view_name='education_group_api_v1:training-detail',
+        lookup_field='uuid',
+        source='education_group_year',
+        read_only=True
+    )
+    acronym = serializers.CharField(source='education_group_year.acronym')
+    code = serializers.CharField(source='education_group_year.partial_acronym')
+    academic_year = serializers.IntegerField(source='education_group_year.academic_year.year')
+    education_group_type = serializers.SlugRelatedField(
+        source='education_group_year.education_group_type',
+        slug_field='name',
+        queryset=EducationGroupType.objects.all(),
+    )
+    education_group_type_text = serializers.CharField(
+        source='education_group_year.education_group_type.get_name_display',
+        read_only=True,
+    )
+    prerequisites = serializers.CharField(source='prerequisite_string')
+
+    class Meta:
+        model = Prerequisite
+        fields = (
+            'url',
+            'acronym',
+            'code',
+            'academic_year',
+            'education_group_type',
+            'education_group_type_text',
+            'prerequisites'
         )
