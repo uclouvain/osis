@@ -37,6 +37,11 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='uuid',
         read_only=True
     )
+    osis_url = serializers.HyperlinkedIdentityField(
+        view_name='learning_unit',
+        lookup_url_kwarg="learning_unit_year_id",
+        read_only=True
+    )
     requirement_entity = serializers.CharField(
         source='entity_requirement',
         read_only=True
@@ -57,6 +62,7 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         model = LearningUnitYear
         fields = (
             'url',
+            'osis_url',
             'acronym',
             'academic_year',
             'credits',

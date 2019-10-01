@@ -229,6 +229,9 @@ components:
         url:
           type: string
           format: uri
+        osis_url:
+          type: string
+          format: uri
         acronym:
           type: string
         credit:

@@ -73,8 +73,10 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Seri
         search_form = ProposalLearningUnitFilter(request.GET or None, person=user_person)
         research_criteria = get_research_criteria(search_form.form) if search_form.is_valid() else []
 
-        selected_proposals_id = request.POST.getlist("selected_action", default=[])
-        selected_proposals = ProposalLearningUnit.objects.filter(id__in=selected_proposals_id)
+        selected_proposals_acronym = request.POST.getlist("selected_action", default=[])
+        selected_proposals = ProposalLearningUnit.objects.filter(
+            learning_unit_year__acronym__in=selected_proposals_acronym
+        )
         messages_by_level = apply_action_on_proposals(selected_proposals, user_person, request.POST, research_criteria)
         display_messages_by_level(request, messages_by_level)
         return redirect(reverse("learning_unit_proposal_search") + "?{}".format(request.GET.urlencode()))
