@@ -382,9 +382,6 @@ class SimplifiedVolumeForm(forms.ModelForm):
             # In case of untyped component, we just need to create only 1 component (not more)
             if self.index != 0:
                 return None
-            if not self.instance.id:
-                self.instance, created = LearningComponentYear.objects.get_or_create(
-                    learning_unit_year=self._learning_unit_year, type=None)
             self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[None]
             self.instance.type = None
         self.instance.learning_unit_year = self._learning_unit_year
