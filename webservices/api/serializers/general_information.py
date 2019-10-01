@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
 from django.conf import settings
 from django.db.models import Value, CharField
-from django.db.models.functions import Lower
 from rest_framework import serializers
 
 from base.business.education_groups import group_element_year_tree
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE, \
-    SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO
+    SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
@@ -78,56 +76,48 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         common_egy = EducationGroupYear.objects.get_common(
             academic_year=obj.academic_year
         )
-        extra_intro_fields = self._get_intro_sections(obj)
-        pertinent_sections['specific'] += extra_intro_fields
-
-        for common_section in pertinent_sections['common']:
-            common_translated_text, _ = self._get_translated_text(common_egy, common_section, language)
-            sections.append(common_translated_text)
-
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
             ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
             CONTACTS: ContactsSectionSerializer
         }
+        extra_intro_offers = self._get_intro_offers(obj)
+
+        for common_section in pertinent_sections['common']:
+            self._get_translated_text(common_egy, common_section, language, sections)
+
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
             if serializer:
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
             elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
-                translated_text, translated_text_label = self._get_translated_text(obj, specific_section, language)
-                sections.append(translated_text if translated_text else {
-                    'label': specific_section,
-                    'translated_label': translated_text_label.label
-                })
+                self._get_translated_text(obj, specific_section, language, sections)
+
+        for offer in extra_intro_offers:
+            self._get_translated_text(offer, 'intro', language, sections)
+
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    def _get_translated_text(self, egy, section, language):
-        m_intro = re.match(INTRO_PATTERN, section)
-        used_egy = egy
-        used_section = section
-        if m_intro:
-            used_egy = EducationGroupYear.objects.filter(
-                partial_acronym__iexact=m_intro.group('acronym'),
-                academic_year__year=egy.academic_year.year
-            ).first()
-            used_section = 'intro'
-
+    def _get_translated_text(self, egy, section, language, sections):
         translated_text_label = TranslatedTextLabel.objects.get(
-            text_label__label=used_section,
+            text_label__label=section,
             language=language,
         )
         translated_text = TranslatedText.objects.filter(
-            text_label__label=used_section,
+            text_label__label=section,
             language=language,
             entity=OFFER_YEAR,
-            reference=used_egy.id
+            reference=egy.id
         ).annotate(
-                label=Value(section, output_field=CharField()),
-                translated_label=Value(translated_text_label.label, output_field=CharField())
+            label=Value(
+                self._get_correct_label_name(egy, section),
+                output_field=CharField()
+            ),
+            translated_label=Value(translated_text_label.label, output_field=CharField())
         )
+
         if section == EVALUATION_KEY:
             translated_text = self._get_evaluation_text(language, translated_text)
         else:
@@ -135,7 +125,18 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 'label', 'translated_label', 'text'
             ).first()
 
-        return translated_text, translated_text_label
+        sections.append(translated_text if translated_text else {
+            'label': self._get_correct_label_name(egy, section),
+            'translated_label': translated_text_label.label
+        })
+
+    @staticmethod
+    def _get_correct_label_name(egy, section):
+        if section == INTRODUCTION:
+            return 'intro-' + egy.partial_acronym.lower()
+        elif 'common' in egy.acronym:
+            return section + '-commun'
+        return section
 
     def _get_evaluation_text(self, language, translated_text):
         try:
@@ -149,16 +150,14 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         ).first()
         return translated_text
 
-    def _get_intro_sections(self, obj):
+    @staticmethod
+    def _get_intro_offers(obj):
         hierarchy = group_element_year_tree.EducationGroupHierarchy(root=obj)
-        extra_intro_fields = [
-            "intro-" + egy.partial_acronym.lower() for egy in
-            hierarchy.get_option_list() + hierarchy.get_finality_list()
-        ]
-        common_core = GroupElementYear.objects.filter(
+        extra_intro_offers = hierarchy.get_finality_list() + hierarchy.get_option_list()
+        common_core = GroupElementYear.objects.select_related('child_branch').filter(
             parent=obj,
             child_branch__education_group_type__name=GroupType.COMMON_CORE.name
-        ).values_list(Lower('child_branch__partial_acronym'), flat=True).first()
+        ).first()
         if common_core:
-            extra_intro_fields.append("intro-" + common_core)
-        return extra_intro_fields
+            extra_intro_offers.append(common_core.child_branch)
+        return extra_intro_offers
