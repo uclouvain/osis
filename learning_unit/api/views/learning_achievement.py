@@ -60,5 +60,5 @@ class LearningAchievementList(generics.GenericAPIView):
             code_name = learning_achievement['code_name']
             learning_achievements_grouped.setdefault(code_name, {'achievement': '', 'code_name': code_name})
             learning_achievements_grouped[code_name]['achievement'] = learning_achievement['text']
-        serializer =  self.get_serializer(learning_achievements_grouped.values(), many=True)
+        serializer = self.get_serializer(learning_achievements_grouped.values(), many=True)
         return Response(serializer.data)
