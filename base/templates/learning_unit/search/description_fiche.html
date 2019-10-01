@@ -138,7 +138,26 @@
                     "targets": 6,
                     "data": "summary_status",
                     "render": function(data, type, row, meta){
-                        return data;
+                        const not_modified_msg = "{% trans "Not modified" %}";
+                        const modified_msg = "{% trans "Modified" %}";
+                        const blocked_msg = "{% trans "Blocked" %}";
+
+                        if (data === modified_msg) {
+                            return "<span class='glyphicon glyphicon-check' aria-hidden='true' style='color:limegreen;' " +
+                            "data-toggle='tooltip' data-html='true' title='" +
+                            data +
+                            "' ><span style='display:None;'>2</span></span>"
+                        }
+                        else if (data === not_modified_msg) {
+                            return "<span class='glyphicon glyphicon-unchecked' aria-hidden='true' style='color:red;' " +
+                            "data-toggle='tooltip' data-html='true' title='" +
+                            data +
+                            "' ><span style='display:None;'>0</span></span>"
+                        }
+                        return "<span class='glyphicon glyphicon-minus-sign' aria-hidden='true' style='color:red;' " +
+                            "data-toggle='tooltip' data-html='true' title='" +
+                            data +
+                            "' ><span style='display:None;'>1</span></span>"
                     }
                 },
             ];
