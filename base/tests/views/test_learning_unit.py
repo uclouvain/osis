@@ -418,72 +418,67 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'))
 
         context = response.context
-        self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(context['academic_years'].count(), len(self.academic_years) + 1)
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
-        self.assertEqual(len(context['types']),
-                         len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
-        self.assertEqual(len(context['container_types']), len(LearningContainerYearType.choices()))
         self.assertEqual(context['learning_units_count'], 0)
 
     def test_learning_units_search_with_acronym_filtering(self):
         self._prepare_context_learning_units_search()
 
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'acronym': 'LBIR',
-            'status': active_status.ACTIVE
+            'status': True
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_learning_units_search_by_acronym_with_valid_regex(self):
         self._prepare_context_learning_units_search()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'acronym': '^DRT.+A'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_by_acronym_with_invalid_regex(self):
         self._prepare_context_learning_units_search()
 
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'acronym': '^LB(+)2+',
             'status': active_status.ACTIVE
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(response.context['form'].errors['acronym'], [_('LU_ERRORS_INVALID_REGEX_SYNTAX')])
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
 
     def test_learning_units_search_with_requirement_entity(self):
         self._prepare_context_learning_units_search()
 
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'ENVI'
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'ENVI'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_requirement_entity_and_subord(self):
         self._prepare_context_learning_units_search()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'AGRO',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'AGRO',
             'with_entity_subordinated': True
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
 
         self.assertEqual(response.context['learning_units_count'], 6)
 
@@ -491,30 +486,30 @@ class LearningUnitViewTestCase(TestCase):
         self._prepare_context_learning_units_search()
         request_factory = RequestFactory()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'allocation_entity_acronym': 'AGES'
+            'academic_year': self.current_academic_year.id,
+            'allocation_entity': 'AGES'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_with_requirement_and_allocation_entity(self):
         self._prepare_context_learning_units_search()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'ENVI',
-            'allocation_entity_acronym': 'AGES'
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'ENVI',
+            'allocation_entity': 'AGES'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_service_course_no_result(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'AGRO',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'AGRO',
             'with_entity_subordinated': True
         }
         number_of_results = 0
@@ -522,8 +517,8 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_with_service_course_without_entity_subordinated(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'ELOG',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'ELOG',
             'with_entity_subordinated': False
         }
         number_of_results = 1
@@ -531,8 +526,8 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_with_service_course_with_entity_subordinated(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'PSP',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'PSP',
             'with_entity_subordinated': True
         }
 
@@ -541,9 +536,9 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'PSP',
-            'allocation_entity_acronym': 'ELOG',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'PSP',
+            'allocation_entity': 'ELOG',
             'with_entity_subordinated': True
         }
         number_of_results = 0
@@ -553,7 +548,7 @@ class LearningUnitViewTestCase(TestCase):
         self._prepare_context_learning_units_search()
         response = self.client.get(reverse("learning_units_service_course"), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/service_course.html')
         self.assertEqual(response.context['learning_units_count'], number_of_results)
 
     def test_learning_units_search_quadrimester(self):
@@ -561,13 +556,13 @@ class LearningUnitViewTestCase(TestCase):
         self.luy_LBIR1100C.quadrimester = quadrimesters.Q1and2
         self.luy_LBIR1100C.save()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'quadrimester': quadrimesters.Q1and2,
             'acronym': 'LBIR1100C',
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_unit_read(self):
