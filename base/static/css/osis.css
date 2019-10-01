@@ -247,19 +247,18 @@ div:target{
 
 #loader {
     position: fixed;
-    left: 50%;
-    top: 50%;
+    left: calc(50% - 40px);
+    top: calc(50% - 40px);
     z-index: 10001;
     width: 150px;
     height: 150px;
-    margin: -75px 0 0 -75px;
     border-top: 16px solid #C90081;
     border-right: 16px solid #1F367C;
     border-bottom: 16px solid #079DEE;
     border-left: 16px solid #89BB2E;
     border-radius: 50%;
-    width: 150px;
-    height: 150px;
+    width: 80px;
+    height: 80px;
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
 }
