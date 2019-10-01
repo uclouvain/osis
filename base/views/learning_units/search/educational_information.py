@@ -30,10 +30,11 @@ from django_filters.views import FilterView
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.models.learning_unit_year import LearningUnitYear
+from base.templatetags import pagination
 from base.utils.cache import CacheFilterMixin
 from base.views.common import remove_from_session
 from base.views.learning_units.search.common import SUMMARY_LIST, RenderToExcel, \
-    SerializeFilterListIfAjaxMixin, ITEMS_PER_PAGES
+    SerializeFilterListIfAjaxMixin
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
@@ -70,4 +71,5 @@ class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMix
         return context
 
     def get_paginate_by(self, queryset):
-        return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
+        pagination.store_paginator_size(self.request)
+        return pagination.get_paginator_size(self.request)

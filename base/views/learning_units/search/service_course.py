@@ -31,9 +31,10 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
+from base.templatetags import pagination
 from base.utils.cache import CacheFilterMixin
-from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, ITEMS_PER_PAGES, \
-    SerializeFilterListIfAjaxMixin, RenderToExcel, _create_xls_with_parameters, _create_xls_attributions, \
+from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, SerializeFilterListIfAjaxMixin, \
+    RenderToExcel, _create_xls_with_parameters, _create_xls_attributions, \
     _create_xls_comparison, _create_xls
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
@@ -74,4 +75,5 @@ class ServiceCourseSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFi
         return context
 
     def get_paginate_by(self, queryset):
-        return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
+        pagination.store_paginator_size(self.request)
+        return pagination.get_paginator_size(self.request)

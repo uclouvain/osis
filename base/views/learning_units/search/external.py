@@ -4,9 +4,9 @@ from django_filters.views import FilterView
 from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
+from base.templatetags import pagination
 from base.utils.cache import CacheFilterMixin
-from base.views.learning_units.search.common import EXTERNAL_SEARCH, ITEMS_PER_PAGES, \
-    SerializeFilterListIfAjaxMixin
+from base.views.learning_units.search.common import EXTERNAL_SEARCH, SerializeFilterListIfAjaxMixin
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
@@ -38,4 +38,5 @@ class ExternalLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, Seri
         return context
 
     def get_paginate_by(self, queryset):
-        return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
+        pagination.store_paginator_size(self.request)
+        return pagination.get_paginator_size(self.request)

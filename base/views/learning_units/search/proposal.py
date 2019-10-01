@@ -15,10 +15,10 @@ from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.templatetags import pagination
 from base.utils.cache import CacheFilterMixin
 from base.views.common import display_messages_by_level
-from base.views.learning_units.search.common import PROPOSAL_SEARCH, ITEMS_PER_PAGES, \
-    SerializeFilterListIfAjaxMixin, RenderToExcel, \
+from base.views.learning_units.search.common import PROPOSAL_SEARCH, SerializeFilterListIfAjaxMixin, RenderToExcel, \
     _create_xls_proposal, _create_xls_proposal_comparison
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
@@ -80,7 +80,8 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Seri
         return redirect(reverse("learning_unit_proposal_search") + "?{}".format(request.GET.urlencode()))
 
     def get_paginate_by(self, queryset):
-        return self.request.GET.get("paginator_size", ITEMS_PER_PAGES)
+        pagination.store_paginator_size(self.request)
+        return pagination.get_paginator_size(self.request)
 
 
 def apply_action_on_proposals(proposals, author, post_data, research_criteria):

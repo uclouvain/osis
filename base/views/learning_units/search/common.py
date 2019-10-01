@@ -44,8 +44,6 @@ SUMMARY_LIST = 4
 BORROWED_COURSE = 5
 EXTERNAL_SEARCH = 6
 
-ITEMS_PER_PAGES = 50
-
 
 def _manage_session_variables(request, search_type):
     remove_from_session(request, 'search_url')

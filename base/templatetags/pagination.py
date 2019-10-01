@@ -25,8 +25,9 @@
 ##############################################################################
 from django.template.defaulttags import register
 
-# TODO increase value
-PAGINATOR_SIZE_LIST = [10, 25, 50, 100]
+
+DEFAULT_PAGINATOR_SIZE = 50
+PAGINATOR_SIZE_LIST = [10, 25, 50, 100, 250, 500]
 
 
 @register.inclusion_tag('templatetags/pagination_size_select.html', takes_context=True)
@@ -53,4 +54,4 @@ def get_paginator_size(request):
     elif 'paginator_size' in request.GET:
         return request.GET.get('paginator_size')
     else:
-        return PAGINATOR_SIZE_LIST[0]
+        return DEFAULT_PAGINATOR_SIZE
