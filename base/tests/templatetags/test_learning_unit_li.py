@@ -30,6 +30,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
@@ -57,7 +58,6 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
-from django.utils.translation import ugettext_lazy as _
 
 ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
