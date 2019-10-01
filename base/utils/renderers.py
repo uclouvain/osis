@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+import bootstrap3.renderers
+import dal_select2.widgets
 
-from education_group.api.views.training import TrainingList, TrainingDetail
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name)
-]
+# Exclude ModelSelect2Multiple from inheriting bootstrap 3 "form_control" class.
+# Otherwise the text and the clear button were not aligned inside the input.
+class OsisBootstrap3FieldRenderer(bootstrap3.renderers.FieldRenderer):
+    WIDGETS_NO_FORM_CONTROL = bootstrap3.renderers.FieldRenderer.WIDGETS_NO_FORM_CONTROL + \
+                              (dal_select2.widgets.ModelSelect2Multiple, )

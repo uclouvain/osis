@@ -440,20 +440,24 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.assertEqual(result, expected)
 
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_delete_all_lu_everything_ok(self):
-        result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
+        limit_yr = self.context['learning_unit_year'].academic_year.year - 1
 
-        expected = {
-            'class_li': 'disabled',
-            'load_modal': False,
-            'url': '#',
-            'id_li': 'link_delete_lus',
-            'title': _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
-                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION},
-            'text': '',
-            'data_target': ''
-        }
+        with override_settings(
+                YEAR_LIMIT_LUE_MODIFICATION=limit_yr):
+
+            result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
+
+            expected = {
+                'class_li': 'disabled',
+                'load_modal': False,
+                'url': '#',
+                'id_li': 'link_delete_lus',
+                'title': _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
+                    "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                'text': '',
+                'data_target': ''
+            }
 
         self.assertEqual(expected, result)
 
