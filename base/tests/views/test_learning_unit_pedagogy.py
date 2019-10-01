@@ -48,7 +48,7 @@ from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_units.search import SUMMARY_LIST
+from base.views.learning_units.search.common import SUMMARY_LIST
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
@@ -112,7 +112,7 @@ class LearningUnitPedagogyTestCase(TestCase):
     def test_learning_units_summary_list_filter_academic_year(self):
         response = self.client.get(self.url, data={'academic_year': self.learning_unit_year.academic_year.pk})
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/description_fiche.html')
         self.assertTrue(response.context['is_faculty_manager'])
         self.assertEqual(response.context['search_type'], SUMMARY_LIST)
         self.assertEqual(response.context['learning_units_count'], 1)

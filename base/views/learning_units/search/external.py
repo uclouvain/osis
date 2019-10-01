@@ -17,7 +17,7 @@ class ExternalLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, Seri
     search_type = EXTERNAL_SEARCH
 
     filterset_class = ExternalLearningUnitFilter
-    permission_required = 'base.can_access_learningunit'
+    permission_required = 'base.can_access_externallearningunityear'
 
     serializer_class = LearningUnitDetailedSerializer
 

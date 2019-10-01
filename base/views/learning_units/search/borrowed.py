@@ -45,7 +45,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls", _create_xls)
 class BorrowedLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
     model = LearningUnitYear
-    template_name = "learning_unit/search/service_course.html"
+    template_name = "learning_unit/search/borrowed.html"
     raise_exception = True
     search_type = BORROWED_COURSE
 
