@@ -63,9 +63,6 @@ class ProgramManager(models.Model):
 
     class Meta:
         unique_together = ('person', 'offer_year',)
-        permissions = (
-            ("view_programmanager", "Can view program manager"),
-        )
 
     def save(self, **kwargs):
         if not hasattr(self, "education_group"):

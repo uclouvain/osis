@@ -43,7 +43,7 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import get_last_academic_years, starting_academic_year
+from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
@@ -52,6 +52,9 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages, \
     paginate_queryset, remove_from_session
+from base.business.learning_units.xls_educational_information_and_specifications import \
+    create_xls_educational_information_and_specifications
+
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -111,6 +114,9 @@ def learning_units_search(request, search_type):
 
     if request.POST.get('xls_status') == "xls_attributions":
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
+
+    if request.POST.get('xls_status') == "xls_educational_specifications":
+        return create_xls_educational_information_and_specifications(request.user, found_learning_units, request)
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
     starting_ac = starting_academic_year()
