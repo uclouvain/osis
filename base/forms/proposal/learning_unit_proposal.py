@@ -24,7 +24,8 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import Q, OuterRef, Subquery, Exists
+from django.db.models import Q, OuterRef, Subquery, Exists, CharField
+from django.db.models.functions import Concat, Cast
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
@@ -40,6 +41,16 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 
 def _get_sorted_choices(tuple_of_choices):
     return tuple(sorted(tuple_of_choices, key=lambda item: item[1]))
+
+
+class ProposalLearningUnitOrderingFilter(OrderingFilter):
+    def filter(self, qs, value):
+        queryset = super().filter(qs, value)
+        if value and 'folder' in value:
+            queryset = queryset.order_by("entity_folder", "proposallearningunit__folder_id")
+        elif value and '-folder' in value:
+            queryset = queryset.order_by("-entity_folder", "-proposallearningunit__folder_id")
+        return queryset
 
 
 class ProposalLearningUnitFilter(FilterSet):
@@ -100,16 +111,16 @@ class ProposalLearningUnitFilter(FilterSet):
     )
 
     order_by_field = 'ordering'
-    ordering = OrderingFilter(
+    ordering = ProposalLearningUnitOrderingFilter(
         fields=(
             ('academic_year__year', 'academic_year'),
             ('acronym', 'acronym'),
-            ('subtype', 'subtype'),
+            ('full_title', 'title'),
+            ('learning_container_year__container_type', 'type'),
             ('entity_requirement', 'requirement_entity'),
-            ('credits', 'credits'),
-            ('status', 'status'),
-            # TODO fix that shit
-            ('acronym', 'folder'),
+            ('proposallearningunit__type', 'proposal_type'),
+            ('proposallearningunit__state', 'proposal_state'),
+            ('proposallearningunit__folder_id', 'folder'),  # Overrided by ProposalLearningUnitOrderingFilter
         ),
         widget=forms.HiddenInput
     )
@@ -126,7 +137,7 @@ class ProposalLearningUnitFilter(FilterSet):
     def __init__(self, *args, person=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.person = person
-        self.queryset = self.get_queryset()
+        self.queryset = self.get_queryset
         self.form.fields["academic_year"].initial = starting_academic_year()
         self._get_entity_folder_id_linked_ordered_by_acronym(self.person)
 
@@ -154,6 +165,7 @@ class ProposalLearningUnitFilter(FilterSet):
             ).distinct()
         return queryset
 
+    @property
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
@@ -167,6 +179,12 @@ class ProposalLearningUnitFilter(FilterSet):
 
         entity_allocation = EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        entity_folder = EntityVersion.objects.filter(
+            entity=OuterRef('proposallearningunit__entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
@@ -191,7 +209,8 @@ class ProposalLearningUnitFilter(FilterSet):
             has_proposal=Exists(has_proposal),
             entity_requirement=Subquery(entity_requirement),
             entity_allocation=Subquery(entity_allocation),
-        ).order_by('academic_year__year', 'acronym')
+            entity_folder=Subquery(entity_folder),
+        )
 
         queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
 

@@ -8,6 +8,7 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
         "paging" : false,
         "ordering" : true,
         "orderMulti": false,
+        "order": [[1, 'asc']],
         "serverSide": true,
         "ajax" : {
             "url": ajaxUrl,

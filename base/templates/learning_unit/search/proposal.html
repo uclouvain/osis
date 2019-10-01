@@ -94,7 +94,7 @@
                             <th id="th_5_type">{% trans 'Type' %}</th>
                             <th id="th_6_requirement_entity.acronym">{% trans 'Req. Entity' %}</th>
                             <th id="th_7_proposal_type">{% trans 'Proposal type' %}</th>
-                            <th id="th_8_proposal_status">{% trans 'Proposal status' %}</th>
+                            <th id="th_8_proposal_state">{% trans 'Proposal status' %}</th>
                         </tr>
                         </thead>
                         <tfoot>
@@ -127,6 +127,7 @@
                     "name": "credits",
                     "targets": 0,
                     "data": "acronym",
+                    "orderable": false,
                     "render": function(data, type, row, meta){
                         return "<input type='checkbox' name='selected_action' class='selected_object' value='" +
                                 data + "'/>"
@@ -177,7 +178,7 @@
                     }
                 },
                 {
-                    "name": "proposal_status",
+                    "name": "proposal_state",
                     "targets": 8,
                     "data": "proposal",
                     "render": function(data, type, row, meta){
