@@ -263,17 +263,11 @@ msgstr "Gestion du calendrier académique"
 msgid "Academic calendars"
 msgstr "Calendriers académique"
 
-msgid "Academic end year"
-msgstr "Anac de fin"
-
 msgid "Academic partner"
 msgstr "Partenaire académique"
 
 msgid "Academic responsible"
 msgstr "Responsable académique"
-
-msgid "Academic start year"
-msgstr "Anac de début"
 
 msgid "Academic type"
 msgstr "Nature"
@@ -350,8 +344,8 @@ msgstr "Ajouter un autre"
 msgid "Add attribution"
 msgstr "Ajouter attribution"
 
-msgid "Add current year attribution"
-msgstr "Ajouter attribution année en cours"
+msgid "Add current year teacher"
+msgstr "Ajouter enseignant année en cours"
 
 msgid "Add over the current year"
 msgstr "Ajouter sur l’année en cours"
@@ -963,7 +957,7 @@ msgid "Edit"
 msgstr "Éditer"
 
 msgid "Edit the proposal"
-msgstr "Editer la proposition"
+msgstr "Modifier la proposition"
 
 msgid "Education group"
 msgstr "Organisation de formations"
@@ -1272,6 +1266,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 
 msgid "Generate pdf"
 msgstr "Générer le pdf"
+
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr "Générer xls des cours qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
 msgstr "Générer xls des cours qui ont des prérequis"
@@ -1588,6 +1585,9 @@ msgstr "Liste de comparaison entre les propositions et les UE"
 
 msgid "List of learning units with comparison"
 msgstr "Comparaison entre unités d'enseignement"
+
+msgid "List of learning units with educational information and specifications"
+msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "List of learning units with with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
@@ -1974,7 +1974,7 @@ msgid ""
 "entity can edit."
 msgstr ""
 "Seuls les gestionnaires de programme d'organisation de formation OU les "
-"gestionnaires facultaires liées à l'entité peuvent éditer."
+"gestionnaires facultaires lié·es à l'entité peuvent modifier."
 
 msgid "Only the volume Q1 must have a value"
 msgstr "Seul le volume Q1 doit avoir une valeur"
@@ -2230,6 +2230,12 @@ msgstr "Produire Excel"
 
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
+
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
+msgstr ""
+"Produire une liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "Produce a xls of learning units with one line per attribution"
 msgstr ""
@@ -2594,6 +2600,9 @@ msgstr "Cahier des charges"
 msgid "Start"
 msgstr "Début"
 
+msgid "Start academic year"
+msgstr "Année académique de début"
+
 msgid "Start date"
 msgstr "Date de début"
 
@@ -2602,9 +2611,6 @@ msgstr "Les dates de début et de fin sont obligatoires"
 
 msgid "Start date must be lower than end date"
 msgstr "La date de début doit être inférieure à la date de fin"
-
-msgid "Starting year"
-msgstr "Année de départ"
 
 msgid "State"
 msgstr "État"
@@ -3388,8 +3394,8 @@ msgid ""
 "You are faculty manager and the proposal state is not 'Faculty', so you "
 "can't edit"
 msgstr ""
-"Vous êtes gestionnaire facultaire et le proposition n'est pas en état "
-"'faculté' donc vous ne pouvez pas éditer"
+"Vous êtes gestionnaire facultaire et la proposition n'est pas en état "
+"'Faculté', donc vous ne pouvez pas la modifier"
 
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
@@ -3419,8 +3425,8 @@ msgid ""
 "You are not attached to initial or current requirement entity, so you can't "
 "edit proposal"
 msgstr ""
-"Vous n'êtes pas rattaché à l'entity de charges (initiale ou courante), donc "
-"vous ne pouvez pas éditer la proposition"
+"Vous n'êtes pas rattaché·e à l'entité de charge (initiale ou courante), donc "
+"vous ne pouvez pas modifier la proposition"
 
 msgid "You are not attributed to this learning unit."
 msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
@@ -3452,6 +3458,12 @@ msgstr ""
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+#, python-format
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
+"de type %(type)s."
 
 msgid "You can not attach the same child several times."
 msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
@@ -3750,7 +3762,7 @@ msgstr "volume horaire total annuel"
 msgid "initial value"
 msgstr "valeur initiale"
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr "est un prérequis de"
 
 msgid "is using in"
@@ -3758,6 +3770,9 @@ msgstr "est utilisée dans"
 
 msgid "items per page"
 msgstr ""
+
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
+msgstr "est_prérequis_de-%(year)s-%(acronym)s"
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisé"
