@@ -250,10 +250,8 @@ div:target{
     left: calc(50% - 40px);
     top: calc(50% - 40px);
     z-index: 10001;
-    border-top: 16px solid #C90081;
-    border-right: 16px solid #1F367C;
-    border-bottom: 16px solid #079DEE;
-    border-left: 16px solid #89BB2E;
+    border: 10px solid #C90081;
+    border-top: 10px solid transparent;
     border-radius: 50%;
     width: 80px;
     height: 80px;
