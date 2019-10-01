@@ -417,6 +417,10 @@ BOOTSTRAP3 = {
     'set_placeholder': False,
     'success_css_class': '',
     'required_css_class': "required_field",
+    "field_renderers": {
+            "default": "base.utils.renderers.OsisBootstrap3FieldRenderer",
+            "inline": "bootstrap3.renderers.InlineFieldRenderer",
+        },
 }
 
 # Ajax select is not allowed to load external js libs
