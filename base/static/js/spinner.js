@@ -5,5 +5,5 @@ $( document ).ready(function() {
 
 window.addEventListener('beforeunload', function (e) {
   $("#loader").show();
-  document.getElementById("overlay").style.display = "block";
+  document.getElementById("overlay_fadein").style.display = "block";
 });
