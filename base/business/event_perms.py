@@ -81,3 +81,13 @@ class EventPermEducationGroupEdition(EventPerm):
         return AcademicCalendar.objects.open_calendars()\
             .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
             .exists()
+
+    @staticmethod
+    def get_academic_years(*args, **kwargs) -> []:
+        return [aca_calendar.data_year for aca_calendar in
+                AcademicCalendar.objects.open_calendars().filter(
+                    reference=academic_calendar_type.EDUCATION_GROUP_EDITION)]
+
+    @classmethod
+    def get_academic_years_ids(cls, *args, **kwargs) -> []:
+        return [year.id for year in cls.get_academic_years()]
