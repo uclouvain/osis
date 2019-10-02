@@ -133,11 +133,14 @@ if TESTING:
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
 
+# Remove this sh*t! We have inconsistency between module installed and tested
 APPS_TO_TEST = (
     'osis_common',
     'reference',
     'rules_management',
     'base',
+    'education_group',
+    'learning_unit',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
