@@ -34,7 +34,7 @@ from base.models.campus import Campus
 from base.models.entity_version import EntityVersion
 from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.models.organization_address import find_distinct_by_country
+from base.models.organization_address import find_distinct_by_country, OrganizationAddress
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from reference.models.country import Country
 
@@ -118,28 +118,34 @@ class ExternalLearningUnitFilter(FilterSet):
             self._init_dropdown_list()
 
     def _init_dropdown_list(self):
+        if self.data.get('country'):
+            self._init_cities_choices()
         if self.data.get('city'):
-            self._get_cities()
-        if self.data.get('campus'):
-            self._get_campus_list()
+            self._init_campus_choices()
 
-    def _get_campus_list(self):
-        campus_list = Campus.objects.filter(
+    def _init_cities_choices(self):
+        cities_choices = OrganizationAddress.objects.filter(
+            country=self.data["country"]
+        ).distinct(
+            'city'
+        ).order_by(
+            'city'
+        ).values_list('city', 'city')
+
+        self.form.fields['city'].choices = cities_choices
+
+    def _init_campus_choices(self):
+        campus_choices = Campus.objects.filter(
             organization__organizationaddress__city=self.data['city']
-        ).distinct('organization__name').order_by('organization__name').values('pk', 'organization__name')
-        campus_choice_list = []
-        for a_campus in campus_list:
-            campus_choice_list.append(((a_campus['pk']), (a_campus['organization__name'])))
-        self.form.fields['campus'].choices = add_blank(campus_choice_list)
-
-    def _get_cities(self):
-        cities = find_distinct_by_country(self.data['country'])
-        cities_choice_list = []
-        for a_city in cities:
-            city_name = a_city['city']
-            cities_choice_list.append(tuple((city_name, city_name)))
-
-        self.form.fields['city'].choices = add_blank(cities_choice_list)
+        ).distinct(
+            'organization__name'
+        ).order_by(
+            'organization__name'
+        ).values_list(
+            'pk',
+            'organization__name'
+        )
+        self.form.fields['campus'].choices = campus_choices
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
