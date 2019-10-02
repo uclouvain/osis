@@ -125,7 +125,8 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         except ObjectDoesNotExist:
             return {
                 'label': self._get_correct_label_name(egy, section),
-                'translated_label': translated_text_label.label
+                'translated_label': translated_text_label.label,
+                'text': None
             }
 
     @staticmethod
