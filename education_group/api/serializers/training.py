@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import urllib
 
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -41,9 +41,8 @@ class TrainingHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
         super().__init__(view_name='education_group_api_v1:training-detail', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        print(urllib.parse.quote(obj.acronym, safe=''))
         kwargs = {
-            'acronym': urllib.parse.quote(obj.acronym, safe=''),
+            'acronym': obj.acronym,
             'year': obj.academic_year.year
         }
         return reverse(view_name, kwargs=kwargs, request=request, format=format)
@@ -62,6 +61,7 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    title = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = EducationGroupYear
@@ -72,10 +72,16 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
             'education_group_type',
             'education_group_type_text',
             'title',
-            'title_english',
             'academic_year',
             'administration_entity',
             'management_entity',
+        )
+
+    def get_title(self, education_group_year):
+        language = self.context['language']
+        return getattr(
+            education_group_year,
+            'title' + ('_english' if language not in settings.LANGUAGE_CODE_FR else '')
         )
 
 

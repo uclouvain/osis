@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
@@ -40,8 +41,14 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={'request': RequestFactory().get(url)})
+        url = reverse('education_group_api_v1:training-detail', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.training.academic_year.year
+        })
+        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [

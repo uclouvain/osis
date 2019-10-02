@@ -25,6 +25,7 @@
 ##############################################################################
 import uuid
 
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -90,7 +91,10 @@ class GetAllTrainingTestCase(APITestCase):
         trainings = EducationGroupYear.objects.filter(
             education_group_type__category=education_group_categories.TRAINING,
         ).order_by('-academic_year__year', 'acronym')
-        serializer = TrainingListSerializer(trainings, many=True, context={'request': RequestFactory().get(self.url)})
+        serializer = TrainingListSerializer(trainings, many=True, context={
+            'request': RequestFactory().get(self.url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_all_training_specify_ordering_field(self):
@@ -108,7 +112,10 @@ class GetAllTrainingTestCase(APITestCase):
                 serializer = TrainingListSerializer(
                     trainings,
                     many=True,
-                    context={'request': RequestFactory().get(self.url, query_string)},
+                    context={
+                        'request': RequestFactory().get(self.url, query_string),
+                        'language': settings.LANGUAGE_CODE_EN
+                    },
                 )
                 self.assertEqual(response.data['results'], serializer.data)
 
@@ -142,7 +149,10 @@ class FilterTrainingTestCase(APITestCase):
         serializer = TrainingListSerializer(
             trainings,
             many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_EN
+            },
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -160,7 +170,10 @@ class FilterTrainingTestCase(APITestCase):
         serializer = TrainingListSerializer(
             trainings,
             many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_EN
+            },
         )
         self.assertEqual(response.data['results'], serializer.data)
 

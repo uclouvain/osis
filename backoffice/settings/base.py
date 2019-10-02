@@ -27,7 +27,9 @@ import os
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
+from django.middleware.locale import LocaleMiddleware
 from django.urls import reverse_lazy
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -89,9 +91,23 @@ INSTALLED_APPS = (
     'reversion',
 )
 
+
+class CustomLocaleMiddleware(LocaleMiddleware):
+    """
+        Set default language normally except if there is a query_param equal to 'lang'
+    """
+    def process_request(self, request):
+        language = request.GET.get('lang')
+        if language:
+            translation.activate(language)
+            request.LANGUAGE_CODE = translation.get_language()
+        else:
+            super().process_request(request)
+
+
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'backoffice.settings.base.CustomLocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
