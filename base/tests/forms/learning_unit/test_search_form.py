@@ -151,13 +151,12 @@ class TestSearchForm(TestCase):
         form = ExternalLearningUnitFilter({'city': NAMUR, 'country': country, "campus": campus_2}).form
         campus_form_choices = list(form.fields["campus"].choices)
         self.assertEqual(campus_form_choices[0], ('', '---------'))
-        self.assertEqual(campus_form_choices[1], (None, '---------'))
-        self.assertEqual(campus_form_choices[2][1], 'organization 1')
-        self.assertEqual(campus_form_choices[3], (campus_3.id, 'organization 2'))
+        self.assertEqual(campus_form_choices[1][1], 'organization 1')
+        self.assertEqual(campus_form_choices[2], (campus_3.id, 'organization 2'))
 
         city_form_choices = list(form.fields['city'].choices)
         self.assertEqual(city_form_choices,
-                         [('', '---------'), (None, '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
+                         [('', '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
