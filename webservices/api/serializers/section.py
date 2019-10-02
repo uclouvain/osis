@@ -80,6 +80,7 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
     def get_content(self, obj):
         egy = self.context.get('egy')
         if egy.is_bachelor:
+            # FIXME: Bachelor has no admissioncondition
             return BachelorAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
         elif egy.is_specialized_master:
             return SpecializedMasterAdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
