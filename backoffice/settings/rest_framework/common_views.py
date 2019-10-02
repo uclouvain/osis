@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
 
 
-class LearningAchievementListSerializer(serializers.Serializer):
-    code_name = serializers.CharField()
-    achievement = serializers.CharField()
+class LanguageContextSerializerMixin:
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.request.LANGUAGE_CODE
+        return serializer_context

@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as filters
 from rest_framework import generics
 
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.learning_unit_year import LearningUnitYear
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
+    LearningUnitTitleSerializer
 
 
 class LearningUnitFilter(filters.FilterSet):
@@ -39,7 +42,7 @@ class LearningUnitFilter(filters.FilterSet):
         fields = ['acronym', 'acronym_like', 'year']
 
 
-class LearningUnitList(generics.ListAPIView):
+class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return a list of all the learning unit with optional filtering.
     """
@@ -60,19 +63,47 @@ class LearningUnitList(generics.ListAPIView):
     )  # Default ordering
 
 
-class LearningUnitDetailed(generics.RetrieveAPIView):
+class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
         Return the detail of the learning unit
     """
     name = 'learningunits_read'
-    queryset = LearningUnitYear.objects.all().select_related(
-        'language',
-        'campus',
-        'academic_year',
-        'learning_container_year'
-    ).prefetch_related(
-        'learning_container_year__requirement_entity__entityversion_set',
-        'learningcomponentyear_set'
-    ).annotate_full_title()
     serializer_class = LearningUnitDetailedSerializer
-    lookup_field = 'uuid'
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'language',
+                'campus',
+                'academic_year',
+                'learning_container_year'
+            ).prefetch_related(
+                'learning_container_year__requirement_entity__entityversion_set',
+                'learningcomponentyear_set'
+            ).annotate_full_title(),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return luy
+
+
+class LearningUnitTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
+    """
+        Return the title of the learning unit
+    """
+    name = 'learningunitstitle_read'
+    serializer_class = LearningUnitTitleSerializer
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        luy = get_object_or_404(
+            LearningUnitYear.objects.all().select_related(
+                'academic_year',
+            ).annotate_full_title(),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return luy

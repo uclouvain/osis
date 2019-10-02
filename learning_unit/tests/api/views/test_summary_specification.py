@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
 
 from django.conf import settings
 from django.urls import reverse
@@ -35,7 +34,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from learning_unit.api.views.learning_achievement import LearningAchievementList
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
 
 
@@ -47,28 +45,19 @@ class LearningAchievementListTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-
-        cls.resume_fr = TranslatedTextFactory(
-            reference=cls.learning_unit_year.pk,
-            text_label__label='resume',
-            language=settings.LANGUAGE_CODE_FR
-        )
-        cls.resume_en = TranslatedTextFactory(
-            reference=cls.learning_unit_year.pk,
-            text_label__label='resume',
-            language=settings.LANGUAGE_CODE_EN
-        )
-        cls.teaching_methods_fr = TranslatedTextFactory(
-            reference=cls.learning_unit_year.pk,
-            text_label__label='teaching_methods',
-            language=settings.LANGUAGE_CODE_FR
-        )
+        for label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
+            TranslatedTextFactory(
+                reference=cls.learning_unit_year.pk,
+                text_label__label=label,
+                language=settings.LANGUAGE_CODE_FR
+            )
 
         cls.person = PersonFactory()
-        cls.url = reverse(
-            'learning_unit_api_v1:' + LearningUnitSummarySpecification.name,
-            kwargs={'uuid': cls.learning_unit_year.uuid}
-        )
+        url_kwargs = {
+            'acronym': cls.learning_unit_year.acronym,
+            'year': cls.learning_unit_year.academic_year.year
+        }
+        cls.url = reverse('learning_unit_api_v1:' + LearningUnitSummarySpecification.name, kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)
@@ -87,7 +76,10 @@ class LearningAchievementListTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_learning_unit_year_not_found(self):
-        invalid_url = reverse('learning_unit_api_v1:' + LearningAchievementList.name, kwargs={'uuid': uuid.uuid4()})
+        invalid_url = reverse(
+            'learning_unit_api_v1:' + LearningUnitSummarySpecification.name,
+            kwargs={'acronym': 'ACRO', 'year': 2019}
+        )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
