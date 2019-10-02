@@ -48,8 +48,8 @@ class ContactSerializer(serializers.ModelSerializer):
 
     def get_role(self, obj):
         if self.context.get('lang') == settings.LANGUAGE_CODE_EN:
-            return obj.role_fr
-        return obj.role_en
+            return obj.role_en_or_none
+        return obj.role_fr_or_none
 
 
 class ContactsSerializer(serializers.ModelSerializer):
@@ -86,10 +86,21 @@ class ContactsSerializer(serializers.ModelSerializer):
                         When(description__exact='', then=None),
                         default=F('description'),
                         output_field=CharField()
+                    ),
+                    role_fr_or_none=Case(
+                        When(role_fr__exact='', then=None),
+                        default=F('role_fr'),
+                        output_field=CharField()
+                    ),
+                    role_en_or_none=Case(
+                        When(role_en__exact='', then=None),
+                        default=F('role_en'),
+                        output_field=CharField()
                     )
                 ),
                 many=True,
-                read_only=True
+                read_only=True,
+                context=self.context
             ).data
             for type_name, contact_type in contact_types
         }
