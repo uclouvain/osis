@@ -48,6 +48,16 @@ class EventPerm(ABC):
     def __is_open_other_rules(cls, *args, **kwargs):
         raise NotImplementedError
 
+    @classmethod
+    @abstractmethod
+    def get_academic_years(*args, **kwargs) -> []:
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def get_academic_years_ids(cls, *args, **kwargs) -> []:
+        raise NotImplementedError
+
 
 class EventPermEducationGroupEdition(EventPerm):
     @classmethod
@@ -82,8 +92,8 @@ class EventPermEducationGroupEdition(EventPerm):
             .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
             .exists()
 
-    @staticmethod
-    def get_academic_years(*args, **kwargs) -> []:
+    @classmethod
+    def get_academic_years(cls, *args, **kwargs) -> []:
         return [aca_calendar.data_year for aca_calendar in
                 AcademicCalendar.objects.open_calendars().filter(
                     reference=academic_calendar_type.EDUCATION_GROUP_EDITION)]
