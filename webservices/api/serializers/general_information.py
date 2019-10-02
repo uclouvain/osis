@@ -132,7 +132,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     def _get_correct_label_name(egy, section):
         if section == INTRODUCTION:
             return 'intro-' + egy.partial_acronym.lower()
-        elif 'common' in egy.acronym:
+        elif 'common' in egy.acronym and section != EVALUATION_KEY:
             return section + '-commun'
         return section
 
