@@ -71,7 +71,6 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         summary_specification_grouped = {}
         for translated_text in qs:
             key = translated_text['label']
-            print(key)
             summary_specification_grouped[key] = translated_text['text']
         serializer = self.get_serializer(summary_specification_grouped)
 

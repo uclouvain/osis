@@ -81,7 +81,7 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
 
 
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
-    url = TrainingHyperlinkedRelatedField(lookup_field='education_group_year', read_only=True)
+    url = TrainingHyperlinkedRelatedField(source='education_group_year', lookup_field='acronym', read_only=True)
 
     acronym = serializers.CharField(source='education_group_year.acronym')
     code = serializers.CharField(source='education_group_year.partial_acronym')
