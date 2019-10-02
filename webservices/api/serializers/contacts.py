@@ -79,7 +79,7 @@ class ContactsSerializer(serializers.ModelSerializer):
             (PublicationContactType.JURY_MEMBER.name, 'jury_members'),
             (PublicationContactType.OTHER_CONTACT.name, 'other_contacts')
         ]
-        return{
+        datas = {
             contact_type: ContactSerializer(
                 obj.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
                     description_or_none=Case(
@@ -104,3 +104,11 @@ class ContactsSerializer(serializers.ModelSerializer):
             ).data
             for type_name, contact_type in contact_types
         }
+        return self._remove_empty_contact_type(datas)
+
+    @staticmethod
+    def _remove_empty_contact_type(datas):
+        for contact_type, contact in datas.copy().items():
+            if not contact:
+                datas.pop(contact_type)
+        return datas
