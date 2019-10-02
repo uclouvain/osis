@@ -208,6 +208,7 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         qs = LearningUnitYear.objects.filter(
             pk__in=[luy.pk for luy in self.luys_in_different_faculty_than_education_group]
         )
+
         group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
         entity = OfferYearEntity.objects.get(education_group_year=group.parent).entity
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,

@@ -79,8 +79,7 @@ def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_b
 
     entities_faculty = compute_faculty_for_entities(entities)
     map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
-    map_luy_education_group_entities = \
-        map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
+    map_luy_education_group_entities = map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
 
     ids = []
     for luy in learning_unit_year_qs:
@@ -95,14 +94,15 @@ def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_b
 
 
 def compute_faculty_for_entities(entities):
-    return {
-        ev["entity_version"].entity_id: entity_version.get_entity_version_parent_or_itself_from_type(
+    faculties_of_entities = {}
+    for ev in entities.values():
+        faculty = entity_version.get_entity_version_parent_or_itself_from_type(
             entities,
             ev["entity_version"].acronym,
             entity_type.FACULTY
         )
-        for ev in entities.values()
-    }
+        faculties_of_entities[ev["entity_version"].entity_id] = faculty.id if faculty else None
+    return faculties_of_entities
 
 
 def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
@@ -136,7 +136,7 @@ def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_
         return False
 
     def is_entity_allowed(entity):
-        return not entities_borrowing_allowed or map_entity_faculty.get(entity) in entities_borrowing_allowed
+        return not entities_borrowing_allowed or entity in entities_borrowing_allowed
 
     entities_allowed = filter(is_entity_allowed, map_luy_education_group_entities.get(luy.id, []))
     for education_group_entity in entities_allowed:
