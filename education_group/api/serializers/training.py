@@ -23,7 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import urllib
+
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from base.api.serializers.campus import CampusDetailSerializer
 from base.models.academic_year import AcademicYear
@@ -33,8 +36,21 @@ from base.models.enums import education_group_categories
 from reference.models.language import Language
 
 
+class TrainingHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(view_name='education_group_api_v1:training-detail', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        print(urllib.parse.quote(obj.acronym, safe=''))
+        kwargs = {
+            'acronym': urllib.parse.quote(obj.acronym, safe=''),
+            'year': obj.academic_year.year
+        }
+        return reverse(view_name, kwargs=kwargs, request=request, format=format)
+
+
 class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='education_group_api_v1:training-detail', lookup_field='uuid')
+    url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
@@ -51,7 +67,6 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
         model = EducationGroupYear
         fields = (
             'url',
-            'uuid',
             'acronym',
             'code',
             'education_group_type',
