@@ -59,7 +59,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
 
     @property
     def qs(self):
-        queryset = super(LearningUnitDescriptionFicheFilter, self).qs
+        queryset = super().qs
         if self.is_bound:
             queryset = self._compute_summary_status(queryset)
             queryset = queryset.select_related('learning_container_year__academic_year', 'academic_year')

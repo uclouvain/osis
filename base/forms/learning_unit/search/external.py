@@ -118,9 +118,9 @@ class ExternalLearningUnitFilter(FilterSet):
             self._init_dropdown_list()
 
     def _init_dropdown_list(self):
-        if self.data.get('city', None):
+        if self.data.get('city'):
             self._get_cities()
-        if self.data.get('campus', None):
+        if self.data.get('campus'):
             self._get_campus_list()
 
     def _get_campus_list(self):
