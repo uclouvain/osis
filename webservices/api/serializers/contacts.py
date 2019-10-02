@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, F, CharField
+from django.db.models import Case, When, F, CharField, Value, Q
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
@@ -34,7 +34,7 @@ from webservices.business import get_contacts_intro_text
 
 
 class ContactSerializer(serializers.ModelSerializer):
-    role = serializers.SerializerMethodField(read_only=True)
+    role = serializers.CharField(source='translated_role', read_only=True)
     description = serializers.CharField(source='description_or_none', read_only=True)
 
     class Meta:
@@ -45,11 +45,6 @@ class ContactSerializer(serializers.ModelSerializer):
             'email',
             'role'
         )
-
-    def get_role(self, obj):
-        if self.context.get('lang') == settings.LANGUAGE_CODE_EN:
-            return obj.role_en_or_none
-        return obj.role_fr_or_none
 
 
 class ContactsSerializer(serializers.ModelSerializer):
@@ -87,20 +82,18 @@ class ContactsSerializer(serializers.ModelSerializer):
                         default=F('description'),
                         output_field=CharField()
                     ),
-                    role_fr_or_none=Case(
-                        When(role_fr__exact='', then=None),
-                        default=F('role_fr'),
+                    language=Value(self.context.get('lang'), output_field=CharField()),
+                ).annotate(
+                    translated_role=Case(
+                        When(Q(role_fr__exact='') & Q(language=settings.LANGUAGE_CODE_FR), then=None),
+                        When(Q(language=settings.LANGUAGE_CODE_FR), then='role_fr'),
+                        When(Q(role_en__exact='') & Q(language=settings.LANGUAGE_CODE_EN), then=None),
+                        When(Q(language=settings.LANGUAGE_CODE_EN), then='role_en'),
                         output_field=CharField()
                     ),
-                    role_en_or_none=Case(
-                        When(role_en__exact='', then=None),
-                        default=F('role_en'),
-                        output_field=CharField()
-                    )
                 ),
                 many=True,
-                read_only=True,
-                context=self.context
+                read_only=True
             ).data
             for type_name, contact_type in contact_types
         }
