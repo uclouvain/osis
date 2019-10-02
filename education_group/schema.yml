@@ -323,8 +323,6 @@ components:
           type: string
         title:
           type: string
-        title_english:
-          type: string
         academic_year:
           type: number
         administration_entity:
