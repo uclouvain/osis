@@ -34,7 +34,7 @@ from webservices.business import get_contacts_intro_text
 
 
 class ContactSerializer(serializers.ModelSerializer):
-    role = serializers.SerializerMethodField(read_only=True)
+    role = serializers.CharField(source='translated_role', read_only=True)
     description = serializers.CharField(source='description_or_none', read_only=True)
 
     class Meta:
@@ -45,11 +45,6 @@ class ContactSerializer(serializers.ModelSerializer):
             'email',
             'role'
         )
-
-    def get_role(self, obj):
-        if self.context.get('lang') == settings.LANGUAGE_CODE_EN:
-            return obj.role_fr
-        return obj.role_en
 
 
 class ContactsSerializer(serializers.ModelSerializer):
@@ -79,17 +74,32 @@ class ContactsSerializer(serializers.ModelSerializer):
             (PublicationContactType.JURY_MEMBER.name, 'jury_members'),
             (PublicationContactType.OTHER_CONTACT.name, 'other_contacts')
         ]
-        return{
+        lookup_field = 'role_fr' if self.context.get('lang') == settings.LANGUAGE_CODE_FR else 'role_en'
+        lookup_expr = '__'.join([lookup_field, 'exact'])
+        datas = {
             contact_type: ContactSerializer(
                 obj.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
                     description_or_none=Case(
                         When(description__exact='', then=None),
                         default=F('description'),
                         output_field=CharField()
-                    )
+                    ),
+                    translated_role=Case(
+                        When(**{lookup_expr: ''}, then=None),
+                        default=lookup_field,
+                        output_field=CharField()
+                    ),
                 ),
                 many=True,
                 read_only=True
             ).data
             for type_name, contact_type in contact_types
         }
+        return self._remove_empty_contact_type(datas)
+
+    @staticmethod
+    def _remove_empty_contact_type(datas):
+        for contact_type, contact in datas.copy().items():
+            if not contact:
+                datas.pop(contact_type)
+        return datas
