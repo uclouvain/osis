@@ -66,10 +66,10 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
         )
 
     def get_title(self, education_group_year):
-        language = self.context['language']
+        language = self.context.get('language')
         return getattr(
             education_group_year,
-            'title' + ('_english' if language not in settings.LANGUAGE_CODE_FR else '')
+            'title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
 
 
