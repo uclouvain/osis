@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
-
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -37,14 +36,19 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
+    LearningUnitTitleSerializer
 from learning_unit.api.views.learning_unit import LearningUnitList
 
 
 class LearningUnitListTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = GenerateAcademicYear(start_year=2015, end_year=2020)
+
+        cls.academic_years = GenerateAcademicYear(
+            start_year=AcademicYearFactory(year=2015),
+            end_year=AcademicYearFactory(year=2020)
+        )
 
         cls.requirement_entity_version = EntityVersionFactory(
             start_date=cls.academic_years[0].start_date,
@@ -93,7 +97,7 @@ class LearningUnitListTestCase(APITestCase):
         self.assertEqual(response.data['count'], expected_count)
 
     def test_get_results_without_filtering(self):
-        response = self.client.get(self.url, {})
+        response = self.client.get(self.url, {'lang': 'fr'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -101,7 +105,10 @@ class LearningUnitListTestCase(APITestCase):
         serializer = LearningUnitSerializer(
             qs,
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -117,7 +124,10 @@ class LearningUnitListTestCase(APITestCase):
         serializer = LearningUnitSerializer(
             qs,
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -135,7 +145,10 @@ class LearningUnitListTestCase(APITestCase):
         serializer = LearningUnitSerializer(
             qs,
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -155,7 +168,11 @@ class LearningUnitDetailedTestCase(APITestCase):
             learning_container_year__requirement_entity=requirement_entity
         )
         cls.person = PersonFactory()
-        cls.url = reverse('learning_unit_api_v1:learningunits_read', kwargs={'uuid': cls.luy.uuid})
+        url_kwargs = {
+            'acronym': cls.luy.acronym,
+            'year': cls.luy.academic_year.year
+        }
+        cls.url = reverse('learning_unit_api_v1:learningunits_read', kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)
@@ -174,7 +191,10 @@ class LearningUnitDetailedTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_learning_unit_year_not_found(self):
-        invalid_url = reverse('learning_unit_api_v1:learningunits_read', kwargs={'uuid': uuid.uuid4()})
+        invalid_url = reverse(
+            'learning_unit_api_v1:learningunits_read',
+            kwargs={'acronym': 'ACRO', 'year': 2019}
+        )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -185,6 +205,56 @@ class LearningUnitDetailedTestCase(APITestCase):
         luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
         serializer = LearningUnitDetailedSerializer(
             luy_with_full_title,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
         )
+        self.assertEqual(response.data, serializer.data)
+
+
+class LearningUnitTitleTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        anac = AcademicYearFactory()
+
+        cls.luy = LearningUnitYearFactory(
+            academic_year=anac,
+        )
+        cls.person = PersonFactory()
+        cls.url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={
+            'acronym': cls.luy.acronym,
+            'year': cls.luy.academic_year.year
+        })
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_case_learning_unit_year_not_found(self):
+        invalid_url = reverse('learning_unit_api_v1:learningunitstitle_read', kwargs={
+            'acronym': 'ACRO',
+            'year': 2019
+        })
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
+        serializer = LearningUnitTitleSerializer(luy_with_full_title, context={'language': settings.LANGUAGE_CODE})
         self.assertEqual(response.data, serializer.data)
