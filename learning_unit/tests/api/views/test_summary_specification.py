@@ -34,7 +34,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from learning_unit.api.views.learning_achievement import LearningAchievementList
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
 
 
@@ -78,7 +77,7 @@ class LearningAchievementListTestCase(APITestCase):
 
     def test_get_results_case_learning_unit_year_not_found(self):
         invalid_url = reverse(
-            'learning_unit_api_v1:' + LearningAchievementList.name,
+            'learning_unit_api_v1:' + LearningUnitSummarySpecification.name,
             kwargs={'acronym': 'ACRO', 'year': 2019}
         )
         response = self.client.get(invalid_url)
