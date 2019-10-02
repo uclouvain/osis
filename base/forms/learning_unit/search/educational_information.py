@@ -54,19 +54,6 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
         ).order_by("-changed")
 
         return queryset.annotate(
-            full_title=Case(
-                When(
-                    Q(learning_container_year__common_title__isnull=True) |
-                    Q(learning_container_year__common_title__exact=''),
-                    then='specific_title'
-                ),
-                When(
-                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
-                    then='learning_container_year__common_title'
-                ),
-                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
-                output_field=CharField(),
-            ),
             last_translated_text_changed=Subquery(translated_text_qs.values('changed')[:1]),
         )
 
