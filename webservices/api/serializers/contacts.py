@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, F, CharField, Value, Q
+from django.db.models import Case, When, F, CharField, Value
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
@@ -74,6 +74,8 @@ class ContactsSerializer(serializers.ModelSerializer):
             (PublicationContactType.JURY_MEMBER.name, 'jury_members'),
             (PublicationContactType.OTHER_CONTACT.name, 'other_contacts')
         ]
+        lookup_field = 'role_fr' if self.context.get('lang') == settings.LANGUAGE_CODE_FR else 'role_en'
+        lookup_expr = '__'.join([lookup_field, 'exact'])
         datas = {
             contact_type: ContactSerializer(
                 obj.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
@@ -85,10 +87,8 @@ class ContactsSerializer(serializers.ModelSerializer):
                     language=Value(self.context.get('lang'), output_field=CharField()),
                 ).annotate(
                     translated_role=Case(
-                        When(Q(role_fr__exact='') & Q(language=settings.LANGUAGE_CODE_FR), then=None),
-                        When(Q(language=settings.LANGUAGE_CODE_FR), then='role_fr'),
-                        When(Q(role_en__exact='') & Q(language=settings.LANGUAGE_CODE_EN), then=None),
-                        When(Q(language=settings.LANGUAGE_CODE_EN), then='role_en'),
+                        When(**{lookup_expr: ''}, then=None),
+                        default=lookup_field,
                         output_field=CharField()
                     ),
                 ),
