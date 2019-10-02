@@ -28,7 +28,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
 from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils import translation
@@ -37,6 +37,7 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
+from base.models import entity_version
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
@@ -148,6 +149,35 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
                 default=Concat('learning_container_year__common_title_english', Value(' - '), 'specific_title_english'),
                 output_field=CharField(),
             ),
+        )
+
+    @classmethod
+    def annotate_entity_requirement_acronym(cls, queryset):
+        entity_requirement = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+        return queryset.annotate(
+            entity_requirement=Subquery(entity_requirement)
+        )
+
+    @classmethod
+    def annotate_entity_allocation_acronym(cls, queryset):
+        entity_allocation = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        return queryset.annotate(
+            entity_allocation=Subquery(entity_allocation)
+        )
+
+    @classmethod
+    def annotate_entities_allocation_and_requirement_acronym(cls, queryset):
+        return cls.annotate_entity_allocation_acronym(
+            cls.annotate_entity_requirement_acronym(queryset)
         )
 
 
