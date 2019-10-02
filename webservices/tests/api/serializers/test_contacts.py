@@ -73,6 +73,16 @@ class ContactSerializerTestCase(TestCase):
                 When(description__exact='', then=None),
                 default=F('description'),
                 output_field=CharField()
+            ),
+            role_fr_or_none=Case(
+                When(role_fr__exact='', then=None),
+                default=F('role_fr'),
+                output_field=CharField()
+            ),
+            role_en_or_none=Case(
+                When(role_en__exact='', then=None),
+                default=F('role_en'),
+                output_field=CharField()
             )
         ).first()
         cls.serializer = ContactSerializer(cls.annoted_contact, context={'lang': cls.language})
