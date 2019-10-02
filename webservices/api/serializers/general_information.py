@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Value, CharField
 from rest_framework import serializers
 
@@ -84,7 +85,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         extra_intro_offers = self._get_intro_offers(obj)
 
         for common_section in pertinent_sections['common']:
-            self._get_translated_text(common_egy, common_section, language, sections)
+            sections.append(self._get_translated_text(common_egy, common_section, language))
 
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
@@ -92,15 +93,15 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
             elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
-                self._get_translated_text(obj, specific_section, language, sections)
+                sections.append(self._get_translated_text(obj, specific_section, language))
 
         for offer in extra_intro_offers:
-            self._get_translated_text(offer, 'intro', language, sections)
+            sections.append(self._get_translated_text(offer, 'intro', language))
 
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    def _get_translated_text(self, egy, section, language, sections):
+    def _get_translated_text(self, egy, section, language):
         translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
@@ -119,16 +120,23 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         )
 
         if section == EVALUATION_KEY:
-            translated_text = self._get_evaluation_text(language, translated_text)
-        else:
-            translated_text = translated_text.values(
-                'label', 'translated_label', 'text'
-            ).first()
+            return self._get_evaluation_text(language, translated_text)
 
-        sections.append(translated_text if translated_text else {
-            'label': self._get_correct_label_name(egy, section),
-            'translated_label': translated_text_label.label
-        })
+        try:
+            return translated_text.values('label', 'translated_label', 'text').get()
+        except ObjectDoesNotExist:
+            return {
+                'label': self._get_correct_label_name(egy, section),
+                'translated_label': translated_text_label.label
+            }
+        #     translated_text = translated_text.values(
+        #         'label', 'translated_label', 'text'
+        #     ).first()
+        #
+        # sections.append(translated_text if translated_text else {
+        #     'label': self._get_correct_label_name(egy, section),
+        #     'translated_label': translated_text_label.label
+        # })
 
     @staticmethod
     def _get_correct_label_name(egy, section):
