@@ -120,6 +120,7 @@ MIDDLEWARE = (
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
 
+
 INTERNAL_IPS = ()
 # check if we are testing right now
 TESTING = 'test' in sys.argv
@@ -132,11 +133,14 @@ if TESTING:
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
 
+# Remove this sh*t! We have inconsistency between module installed and tested
 APPS_TO_TEST = (
     'osis_common',
     'reference',
     'rules_management',
     'base',
+    'education_group',
+    'learning_unit',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
@@ -433,6 +437,10 @@ BOOTSTRAP3 = {
     'set_placeholder': False,
     'success_css_class': '',
     'required_css_class': "required_field",
+    "field_renderers": {
+            "default": "base.utils.renderers.OsisBootstrap3FieldRenderer",
+            "inline": "bootstrap3.renderers.InlineFieldRenderer",
+        },
 }
 
 # Ajax select is not allowed to load external js libs

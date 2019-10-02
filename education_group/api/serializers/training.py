@@ -26,26 +26,14 @@
 
 from django.conf import settings
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 
 from base.api.serializers.campus import CampusDetailSerializer
 from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
-
-
-class TrainingHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
-    def __init__(self, *args, **kwargs):
-        super().__init__(view_name='education_group_api_v1:training-detail', **kwargs)
-
-    def get_url(self, obj, view_name, request, format):
-        kwargs = {
-            'acronym': obj.acronym,
-            'year': obj.academic_year.year
-        }
-        return reverse(view_name, kwargs=kwargs, request=request, format=format)
 
 
 class TrainingListSerializer(serializers.HyperlinkedModelSerializer):

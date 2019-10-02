@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,8 +24,24 @@
 #
 ##############################################################################
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 
-class LearningAchievementListSerializer(serializers.Serializer):
-    code_name = serializers.CharField()
-    achievement = serializers.CharField()
+class TrainingGetUrlMixin:
+    def __init__(self, **kwargs):
+        super().__init__(view_name='education_group_api_v1:training-detail', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'acronym': obj.acronym,
+            'year': obj.academic_year.year
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class TrainingHyperlinkedIdentityField(TrainingGetUrlMixin, serializers.HyperlinkedIdentityField):
+    pass
+
+
+class TrainingHyperlinkedRelatedField(TrainingGetUrlMixin, serializers.HyperlinkedRelatedField):
+    pass
