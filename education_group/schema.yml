@@ -215,7 +215,7 @@ paths:
   /mini_trainings/{year}/{partial_acronym}:
     get:
       description: Return the detail of the mini-training
-      operationId: minitraining_read
+      operationId: minitrainings_read
       parameters:
       - in: path
         name: year

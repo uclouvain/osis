@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,28 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.utils.translation import ugettext_lazy as _
+from osis_common.utils.enumerations import ChoiceEnum
 
-from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
-from education_group.api.views.training import TrainingList, TrainingDetail
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
-    url(
-        r'^trainings/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/tree$',
-        TrainingTreeView.as_view(),
-        name=TrainingTreeView.name
-    ),
-    url(
-        r'^groups/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9]+)/tree$',
-        GroupTreeView.as_view(),
-        name=GroupTreeView.name
-    ),
-    url(
-        r'^mini_trainings/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9]+)/tree$',
-        MiniTrainingTreeView.as_view(),
-        name=MiniTrainingTreeView.name
-    ),
-]
+class NodeType(ChoiceEnum):
+    TRAINING = _("Training")
+    MINI_TRAINING = _("Mini training")
+    GROUP = _("Group")
+    LEARNING_UNIT = _("Learning unit")
