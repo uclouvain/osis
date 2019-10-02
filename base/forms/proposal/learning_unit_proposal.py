@@ -182,18 +182,6 @@ class ProposalLearningUnitFilter(FilterSet):
         if not self.data:
             return LearningUnitYear.objects.none()
 
-        entity_requirement = EntityVersion.objects.filter(
-            entity=OuterRef('learning_container_year__requirement_entity'),
-        ).current(
-            OuterRef('academic_year__start_date')
-        ).values('acronym')[:1]
-
-        entity_allocation = EntityVersion.objects.filter(
-            entity=OuterRef('learning_container_year__allocation_entity'),
-        ).current(
-            OuterRef('academic_year__start_date')
-        ).values('acronym')[:1]
-
         entity_folder = EntityVersion.objects.filter(
             entity=OuterRef('proposallearningunit__entity'),
         ).current(
@@ -218,12 +206,11 @@ class ProposalLearningUnitFilter(FilterSet):
             "learningcomponentyear_set",
         ).annotate(
             has_proposal=Exists(has_proposal),
-            entity_requirement=Subquery(entity_requirement),
-            entity_allocation=Subquery(entity_allocation),
             entity_folder=Subquery(entity_folder),
         )
 
         queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
+        queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
 
         return queryset
 
