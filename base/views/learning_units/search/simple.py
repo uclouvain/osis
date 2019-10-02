@@ -31,9 +31,8 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
-from base.templatetags import pagination
 from base.utils.cache import CacheFilterMixin
-from base.views.learning_units.search.common import SIMPLE_SEARCH, SerializeFilterListIfAjaxMixin, \
+from base.views.learning_units.search.common import SIMPLE_SEARCH, SearchMixin, \
     RenderToExcel, _create_xls, _create_xls_comparison, _create_xls_attributions, _create_xls_with_parameters
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
@@ -42,7 +41,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls_attributions", _create_xls_attributions)
 @RenderToExcel("xls_comparison", _create_xls_comparison)
 @RenderToExcel("xls", _create_xls)
-class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFilterListIfAjaxMixin, FilterView):
+class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
     model = LearningUnitYear
     template_name = "learning_unit/search/simple.html"
     raise_exception = True
@@ -70,7 +69,3 @@ class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SerializeFil
             ),
         })
         return context
-
-    def get_paginate_by(self, queryset):
-        pagination.store_paginator_size(self.request)
-        return pagination.get_paginator_size(self.request)
