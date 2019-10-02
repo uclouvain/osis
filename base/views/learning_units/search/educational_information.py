@@ -41,7 +41,7 @@ def _create_xls_teaching_material(view_obj, context, **response_kwargs):
     return generate_xls_teaching_material(view_obj.request.user, context["object_list"])
 
 
-@RenderToExcel("xls_with_parameters", _create_xls_teaching_material)
+@RenderToExcel("xls_teaching_material", _create_xls_teaching_material)
 class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin,
                                          FilterView):
     model = LearningUnitYear

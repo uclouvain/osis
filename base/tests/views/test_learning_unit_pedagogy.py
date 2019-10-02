@@ -292,16 +292,11 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
     def test_learning_units_summary_list_by_client_xls_empty(self):
         response = self.client.get(self.url, data={
             'acronym': self.learning_unit_year_without_mandatory_teaching_materials.acronym,
+            'academic_year': self.academic_year,
             'xls_status': 'xls_teaching_material'
         })
 
-        # OK, the server will stay in the page
         self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        # A warning message should be generated
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), _("the list to generate is empty.").capitalize())
 
 
 class LearningUnitPedagogyEditTestCase(TestCase):

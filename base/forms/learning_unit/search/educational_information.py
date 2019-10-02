@@ -38,6 +38,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.form.fields['with_entity_subordinated'].initial = True
+        self.form.fields["academic_year"].required = True
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related(
