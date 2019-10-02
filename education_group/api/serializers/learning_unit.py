@@ -29,6 +29,8 @@ from rest_framework import serializers
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
+from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
+from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
 
 
 class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
@@ -49,10 +51,7 @@ class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
 
 
 class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='education_group_api_v1:training-detail',
-        lookup_field='uuid',
-    )
+    url = TrainingHyperlinkedIdentityField(read_only=True)
     academic_year = serializers.IntegerField(source='academic_year.year')
     education_group_type = serializers.SlugRelatedField(
         slug_field='name',
@@ -82,12 +81,8 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
 
 
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedRelatedField(
-        view_name='education_group_api_v1:training-detail',
-        lookup_field='uuid',
-        source='education_group_year',
-        read_only=True
-    )
+    url = TrainingHyperlinkedRelatedField(source='education_group_year', lookup_field='acronym', read_only=True)
+
     acronym = serializers.CharField(source='education_group_year.acronym')
     code = serializers.CharField(source='education_group_year.partial_acronym')
     academic_year = serializers.IntegerField(source='education_group_year.academic_year.year')
