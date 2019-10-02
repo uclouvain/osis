@@ -42,8 +42,6 @@ from webservices.api.serializers.section import SectionSerializer, AchievementSe
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text
 
-INTRO_PATTERN = r'intro-(?P<acronym>\w+)'
-
 
 class GeneralInformationSerializer(serializers.ModelSerializer):
     language = serializers.CharField(read_only=True)
