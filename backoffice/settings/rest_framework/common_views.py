@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
 
 
-class TranslatedSerializer(serializers.Serializer):
-    fr = serializers.CharField()
-    en = serializers.CharField()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, default={'fr': '', 'en': ''}, **kwargs)
+class LanguageContextSerializerMixin:
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.request.LANGUAGE_CODE
+        return serializer_context
