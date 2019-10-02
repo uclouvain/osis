@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, F, CharField, Value
+from django.db.models import Case, When, F, CharField
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
@@ -84,8 +84,6 @@ class ContactsSerializer(serializers.ModelSerializer):
                         default=F('description'),
                         output_field=CharField()
                     ),
-                    language=Value(self.context.get('lang'), output_field=CharField()),
-                ).annotate(
                     translated_role=Case(
                         When(**{lookup_expr: ''}, then=None),
                         default=lookup_field,
