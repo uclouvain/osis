@@ -142,11 +142,22 @@ class ProposalLearningUnitFilter(FilterSet):
         self._get_entity_folder_id_linked_ordered_by_acronym(self.person)
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
-        entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
-        entities_sorted_by_acronym = sorted(list(entities.filter(id__in=person.linked_entities)),
-                                            key=lambda t: t.most_recent_acronym)
-        self.form.fields['entity_folder'].choices = [(ent.pk, ent.most_recent_acronym)
-                                                     for ent in entities_sorted_by_acronym]
+        most_recent_acronym = EntityVersion.objects.filter(
+            entity__id=OuterRef('id'),
+        ).order_by(
+            "-start_date"
+        ).values('acronym')[:1]
+
+        entities = Entity.objects.filter(
+            proposallearningunit__isnull=False
+        ).annotate(
+            entity_acronym=Subquery(most_recent_acronym)
+        ).distinct().order_by(
+            "entity_acronym"
+        )
+
+        self.form.fields['entity_folder'].choices = [(ent.pk, ent.entity_acronym)
+                                                     for ent in entities]
 
     def filter_entity(self, queryset, name, value):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']
