@@ -129,14 +129,6 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 'label': self._get_correct_label_name(egy, section),
                 'translated_label': translated_text_label.label
             }
-        #     translated_text = translated_text.values(
-        #         'label', 'translated_label', 'text'
-        #     ).first()
-        #
-        # sections.append(translated_text if translated_text else {
-        #     'label': self._get_correct_label_name(egy, section),
-        #     'translated_label': translated_text_label.label
-        # })
 
     @staticmethod
     def _get_correct_label_name(egy, section):
