@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_filters import filters
 
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models import group_element_year
+from base.models import group_element_year, entity_version
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_type
 from base.models.learning_unit_year import LearningUnitYear
@@ -42,6 +42,10 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         max_length=20,
         label=_("Faculty borrowing")
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.form.fields["academic_year"].required = True
 
     def filter_queryset(self, queryset):
         qs = super().filter_queryset(queryset)
@@ -91,20 +95,14 @@ def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_b
 
 
 def compute_faculty_for_entities(entities):
-    return {entity_id: __search_faculty_for_entity(entity_id, entities) for entity_id in entities.keys()}
-
-
-def __search_faculty_for_entity(entity_id, entities):
-    entity_data = entities[entity_id]
-    if entity_data["entity_version"].entity_type == entity_type.FACULTY:
-        return entity_id
-
-    entity_version_parent = entity_data["entity_version_parent"]
-    if entity_version_parent is None or entity_version_parent.entity.id not in entities:
-        return entity_id
-
-    new_current = entity_version_parent.entity.id
-    return __search_faculty_for_entity(new_current, entities)
+    return {
+        ev["entity_version"].entity_id: entity_version.get_entity_version_parent_or_itself_from_type(
+            entities,
+            ev["entity_version"].acronym,
+            entity_type.FACULTY
+        )
+        for ev in entities.values()
+    }
 
 
 def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):

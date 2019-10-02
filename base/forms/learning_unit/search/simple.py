@@ -24,13 +24,12 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import Q, OuterRef, Exists, Subquery
+from django.db.models import Q, OuterRef, Exists
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.business.entity import get_entities_ids
 from base.models.academic_year import AcademicYear, starting_academic_year
-from base.models.entity_version import EntityVersion
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
