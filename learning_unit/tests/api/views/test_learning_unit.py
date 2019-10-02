@@ -97,7 +97,7 @@ class LearningUnitListTestCase(APITestCase):
         self.assertEqual(response.data['count'], expected_count)
 
     def test_get_results_without_filtering(self):
-        response = self.client.get(self.url, {})
+        response = self.client.get(self.url, {'lang': 'fr'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
