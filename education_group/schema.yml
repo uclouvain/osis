@@ -323,8 +323,6 @@ components:
           type: string
         title:
           type: string
-        title_english:
-          type: string
         academic_year:
           type: number
         administration_entity:
@@ -591,8 +589,6 @@ components:
           $ref: '#/components/schemas/NodeLinkTypeEnum'
         link_type_text:
           type: string
-        has_prerequisite:
-          type: boolean
         children:
           type: array
           items:

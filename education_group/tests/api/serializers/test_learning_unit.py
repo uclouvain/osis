@@ -31,9 +31,9 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
-from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
@@ -45,7 +45,10 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
+        url = reverse('education_group_api_v1:training-detail', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
         cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN

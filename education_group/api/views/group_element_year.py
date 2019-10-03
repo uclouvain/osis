@@ -26,13 +26,14 @@
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
 
 
-class EducationGroupTreeView(generics.RetrieveAPIView):
+class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     serializer_class = EducationGroupTreeSerializer
     filter_backends = []
     paginator = None
@@ -67,7 +68,7 @@ class MiniTrainingTreeView(EducationGroupTreeView):
     """
         Return the tree of the mini-training
     """
-    name = 'minitrainings_read'
+    name = 'minitrainings_tree'
     lookup_fields = ('academic_year__year', 'partial_acronym',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
     queryset = EducationGroupYear.objects.filter(

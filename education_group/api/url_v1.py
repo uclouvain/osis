@@ -30,10 +30,14 @@ from education_group.api.views.training import TrainingList, TrainingDetail
 
 app_name = "education_group"
 urlpatterns = [
-    url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),
+    url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
     url(
-        r'^trainings/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/tree$',
+        r'^trainings/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9\W]+)$',
+        TrainingDetail.as_view(),
+        name=TrainingDetail.name
+    ),
+    url(
+        r'^trainings/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9\W]+)/tree$',
         TrainingTreeView.as_view(),
         name=TrainingTreeView.name
     ),
@@ -46,5 +50,5 @@ urlpatterns = [
         r'^mini_trainings/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9]+)/tree$',
         MiniTrainingTreeView.as_view(),
         name=MiniTrainingTreeView.name
-    ),
+    ),	
 ]
