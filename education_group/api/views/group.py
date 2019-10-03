@@ -23,28 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
-from education_group.api.views.group import GroupDetail
-from education_group.api.views.mini_training import MiniTrainingDetail
-from education_group.api.views.training import TrainingList, TrainingDetail
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
+from education_group.api.serializers.group import GroupDetailSerializer
 
-app_name = "education_group"
-urlpatterns = [
-    url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2})?)$',
-        TrainingDetail.as_view(),
-        name=TrainingDetail.name
-    ),
-    url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
-        MiniTrainingDetail.as_view(),
-        name=MiniTrainingDetail.name
-    ),
-    url(
-        r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
-        GroupDetail.as_view(),
-        name=GroupDetail .name
-    )
-]
+
+class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
+    """
+        Return the detail of the group
+    """
+    name = 'group_read'
+    serializer_class = GroupDetailSerializer
+
+    def get_object(self):
+        partial_acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.filter(
+                education_group_type__category=education_group_categories.GROUP
+            ).select_related(
+                'education_group_type',
+                'academic_year',
+                'main_teaching_campus',
+            ).prefetch_related(
+                'management_entity__entityversion_set',
+            ),
+            partial_acronym__iexact=partial_acronym,
+            academic_year__year=year
+        )
+        return egy
