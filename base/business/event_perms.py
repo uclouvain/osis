@@ -26,9 +26,11 @@
 from abc import ABC, abstractmethod
 
 from django.core.exceptions import PermissionDenied
+from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
+from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 
 
@@ -46,6 +48,16 @@ class EventPerm(ABC):
     @classmethod
     @abstractmethod
     def __is_open_other_rules(cls, *args, **kwargs):
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def get_academic_years(*args, **kwargs) -> QuerySet:
+        raise NotImplementedError
+
+    @classmethod
+    @abstractmethod
+    def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
         raise NotImplementedError
 
 
@@ -81,3 +93,13 @@ class EventPermEducationGroupEdition(EventPerm):
         return AcademicCalendar.objects.open_calendars()\
             .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
             .exists()
+
+    @classmethod
+    def get_academic_years(cls, *args, **kwargs) -> QuerySet:
+        return AcademicYear.objects.filter(pk__in=cls.get_academic_years_ids())
+
+    @classmethod
+    def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
+        return AcademicCalendar.objects.open_calendars()\
+            .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
+            .values_list('data_year', flat=True)
