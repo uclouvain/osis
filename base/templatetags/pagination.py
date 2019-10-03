@@ -23,21 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from django.template.defaulttags import register
 
 
-ACTIVE = "ACTIVE"
-INACTIVE = "INACTIVE"
-RE_REGISTRATION = "RE_REGISTRATION"
-
-ACTIVE_STATUS_LIST = (
-    (ACTIVE, _("Active")),
-    (INACTIVE, _("Inactive")),
-    (RE_REGISTRATION, _("Reregistration"))
-)
+DEFAULT_PAGINATOR_SIZE = 50
+PAGINATOR_SIZE_LIST = [10, 25, 50, 100, 250, 500]
 
 
-ACTIVE_STATUS_LIST_FOR_FILTER = (
-    (True, _("Active")),
-    (False, _("Inactive")),
-)
+@register.inclusion_tag('templatetags/pagination_size_select.html', takes_context=True)
+def pagination_size_select(context):
+    request = context['request']
+    paginator_size = get_paginator_size(request)
+    return {
+        'path': request.get_full_path(),
+        'paginator_size_list': PAGINATOR_SIZE_LIST,
+        'current_paginator_size': paginator_size,
+        'other_params': {k: v for k, v in request.GET.items() if k != 'paginator_size'}
+    }
+
+
+def store_paginator_size(request):
+    if 'paginator_size' in request.GET:
+        request.session['paginator_size'] = request.session.setdefault('paginator_size', {})
+        request.session['paginator_size'].update({request.path: request.GET.get('paginator_size')})
+
+
+def get_paginator_size(request):
+    if 'paginator_size' in request.session and request.path in request.session['paginator_size']:
+        return request.session.get('paginator_size')[request.path]
+    elif 'paginator_size' in request.GET:
+        return request.GET.get('paginator_size')
+    else:
+        return DEFAULT_PAGINATOR_SIZE

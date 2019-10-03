@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-30 08:40+0200\n"
+"POT-Creation-Date: 2019-10-01 09:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -380,9 +380,6 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
-msgid "All"
-msgstr ""
-
 msgctxt "plural"
 msgid "All"
 msgstr ""
@@ -391,6 +388,9 @@ msgid "All the scores are encoded."
 msgstr ""
 
 msgid "Alloc. Ent."
+msgstr ""
+
+msgid "Alloc. Entity"
 msgstr ""
 
 msgid "Allocation entity"
@@ -1708,9 +1708,6 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
-msgid "Modification made"
-msgstr ""
-
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -1847,6 +1844,9 @@ msgid "Not in period to edit description fiche."
 msgstr ""
 
 msgid "Not in range of years which can be edited by you"
+msgstr ""
+
+msgid "Not modified"
 msgstr ""
 
 msgid "Not required"
@@ -3013,9 +3013,6 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
-msgid "Too many results"
-msgstr ""
-
 msgid "Training"
 msgstr ""
 
@@ -3538,6 +3535,9 @@ msgid "is a prerequisite of"
 msgstr ""
 
 msgid "is using in"
+msgstr ""
+
+msgid "items per page"
 msgstr ""
 
 #, python-format

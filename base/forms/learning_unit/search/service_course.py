@@ -23,21 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from base.business.entity import build_entity_container_prefetch
+from base.business.entity_version import SERVICE_COURSE
+from base.business.learning_unit_year_with_context import append_latest_entities
+from base.forms.learning_unit.search.simple import LearningUnitFilter
+from base.models.enums import entity_container_year_link_type
 
 
-ACTIVE = "ACTIVE"
-INACTIVE = "INACTIVE"
-RE_REGISTRATION = "RE_REGISTRATION"
+class ServiceCourseFilter(LearningUnitFilter):
 
-ACTIVE_STATUS_LIST = (
-    (ACTIVE, _("Active")),
-    (INACTIVE, _("Inactive")),
-    (RE_REGISTRATION, _("Reregistration"))
-)
+    def filter_queryset(self, queryset):
+        qs = super().filter_queryset(queryset)
+        qs = qs.prefetch_related(
+            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
+            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
+        )
 
+        for luy in qs:
+            append_latest_entities(luy, service_course_search=True)
 
-ACTIVE_STATUS_LIST_FOR_FILTER = (
-    (True, _("Active")),
-    (False, _("Inactive")),
-)
+        return qs.filter(pk__in=[lu.pk for lu in qs if lu.entities.get(SERVICE_COURSE)])

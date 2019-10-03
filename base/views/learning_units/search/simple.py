@@ -24,44 +24,48 @@
 #
 ##############################################################################
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
 
-from base.business.learning_units.xls_generator import generate_xls_teaching_material
-from base.forms.learning_unit.search_form import LearningUnitDescriptionFicheFilter
+from base.business.learning_units.xls_comparison import get_academic_year_of_reference
+from base.forms.learning_unit.comparison import SelectComparisonYears
+from base.forms.learning_unit.search.simple import LearningUnitFilter
+from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
-from base.views.common import display_warning_messages, remove_from_session
-from base.views.learning_units.search import SUMMARY_LIST
+from base.views.learning_units.search.common import SIMPLE_SEARCH, SearchMixin, \
+    RenderToExcel, _create_xls, _create_xls_comparison, _create_xls_attributions, _create_xls_with_parameters
+from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
-class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+@RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
+@RenderToExcel("xls_attributions", _create_xls_attributions)
+@RenderToExcel("xls_comparison", _create_xls_comparison)
+@RenderToExcel("xls", _create_xls)
+class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
     model = LearningUnitYear
-    paginate_by = 2000
-    template_name = "learning_units.html"
+    template_name = "learning_unit/search/simple.html"
     raise_exception = True
+    search_type = SIMPLE_SEARCH
 
-    filterset_class = LearningUnitDescriptionFicheFilter
+    filterset_class = LearningUnitFilter
     permission_required = 'base.can_access_learningunit'
-    cache_exclude_params = 'xls_status',
+    cache_exclude_params = 'xls_status'
+
+    serializer_class = LearningUnitSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.request.session['ue_search_type'] = str(_('Description fiche status'))
-        remove_from_session(self.request, 'search_url')
+        starting_ac = starting_academic_year()
         context.update({
             'form': context['filter'].form,
-            'is_faculty_manager': self.request.user.person.is_faculty_manager,
-            'search_type': SUMMARY_LIST,
-            'learning_units_count': context['paginator'].count
+            'learning_units_count': context["paginator"].count,
+            'current_academic_year': starting_ac,
+            'proposal_academic_year': starting_ac.next(),
+            'search_type': self.search_type,
+            'page_obj': context["page_obj"],
+            'items_per_page': context["paginator"].per_page,
+            "form_comparison": SelectComparisonYears(
+                academic_year=get_academic_year_of_reference(context['object_list'])
+            ),
         })
         return context
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.GET.get('xls_status') == "xls_teaching_material":
-            try:
-                return generate_xls_teaching_material(self.request.user, context['object_list'])
-            except ObjectDoesNotExist:
-                display_warning_messages(self.request, _("the list to generate is empty.").capitalize())
-        return super().render_to_response(context, **response_kwargs)

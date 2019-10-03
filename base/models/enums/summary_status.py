@@ -23,21 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
 
 
-ACTIVE = "ACTIVE"
-INACTIVE = "INACTIVE"
-RE_REGISTRATION = "RE_REGISTRATION"
-
-ACTIVE_STATUS_LIST = (
-    (ACTIVE, _("Active")),
-    (INACTIVE, _("Inactive")),
-    (RE_REGISTRATION, _("Reregistration"))
-)
-
-
-ACTIVE_STATUS_LIST_FOR_FILTER = (
-    (True, _("Active")),
-    (False, _("Inactive")),
-)
+class SummaryStatus(ChoiceEnum):
+    BLOCKED = _("Blocked")
+    MODIFIED = _("Modified")
+    NOT_MODIFIED = _("Not modified")

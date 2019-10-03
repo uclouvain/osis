@@ -1,5 +1,4 @@
-{% extends "blocks/forms/search_form.html" %}
-{% load bootstrap3 %}
+{% load i18n bootstrap3 %}
 
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -25,27 +24,18 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-{% block search_form_row_1 %}
-    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
-    {{ form.media }}
-    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
-    {% bootstrap_field form.title form_group_class="col-md-4" %}
-{% endblock %}
-
-{% block search_form_row_2 %}
-    {% bootstrap_field form.status form_group_class="col-md-1" %}
-    {% bootstrap_field form.country form_group_class="col-md-3" %}
-    {% bootstrap_field form.city form_group_class="col-md-3" %}
-    {% bootstrap_field form.campus form_group_class="col-md-3" %}
-{% endblock %}
-
-{% block search_form_buttons %}
-    <div class="col-md-2">
-        <br>
-        <div class="btn-toolbar">
-            {% bootstrap_button "" value=_('Learning unit search') button_type="submit" button_class="btn-primary" icon="search" %}
-            {% include 'blocks/button/button_filter_refresh.html' %}
-        </div>
+<form action="{{path}}" method="get" class="form-inline" id="pagination_form">
+    {% for key, value in other_params.items %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+    {% endfor %}
+    <div class="pull-right pagination form-group">
+        <select onchange="this.form.submit()" name="paginator_size" class="form-control">
+            {% for size in paginator_size_list %}
+                <option {% if size == current_paginator_size|add:0 %} selected {% endif %}>
+                    {{ size }}
+                </option>
+            {% endfor %}
+        </select>
+        <span style="margin-left: 10px;">{% trans 'items per page' %}</span>
     </div>
-{% endblock %}
+</form>

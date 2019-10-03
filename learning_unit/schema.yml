@@ -229,8 +229,18 @@ components:
         url:
           type: string
           format: uri
+        osis_url:
+          type: string
+          format: uri
         acronym:
           type: string
+        credit:
+          type: number
+          multipleOf: 0.01
+        status:
+          type: boolean
+        has_proposal:
+          type: boolean
         title:
           type: object
           required:
@@ -249,6 +259,8 @@ components:
           type: string
         requirement_entity:
           type: string
+        allocation_entity:
+          type: string
         academic_year:
           type: integer
           example: 2014
@@ -257,11 +269,6 @@ components:
         - $ref: '#/components/schemas/LearningUnit'
         - type: object
           properties:
-            credit:
-              type: number
-              multipleOf: 0.01
-            status:
-              type: boolean
             quadrimester:
               $ref: '#/components/schemas/QuadrimesterEnum'
             quadrimester_text:
@@ -290,6 +297,17 @@ components:
               type: string
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            proposal:
+              type: object
+              properties:
+                folder:
+                  type: string
+                type:
+                  type: string
+                status:
+                  type: string
+            summary_status:
+              type: string
     LearningUnitComponent:
       type: object
       properties:

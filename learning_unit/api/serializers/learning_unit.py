@@ -25,6 +25,7 @@
 ##############################################################################
 from rest_framework import serializers
 
+from base.models.enums.summary_status import SummaryStatus
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
@@ -36,8 +37,17 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='uuid',
         read_only=True
     )
+    osis_url = serializers.HyperlinkedIdentityField(
+        view_name='learning_unit',
+        lookup_url_kwarg="learning_unit_year_id",
+        read_only=True
+    )
     requirement_entity = serializers.CharField(
-        source='learning_container_year.requirement_entity_version.acronym',
+        source='entity_requirement',
+        read_only=True
+    )
+    allocation_entity = serializers.CharField(
+        source='entity_allocation',
         read_only=True
     )
     title = serializers.SerializerMethodField(read_only=True)
@@ -46,19 +56,25 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.CharField(source='learning_container_year.container_type')
     type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
+    has_proposal = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = LearningUnitYear
         fields = (
             'url',
+            'osis_url',
             'acronym',
             'academic_year',
+            'credits',
+            'status',
             'requirement_entity',
+            'allocation_entity',
             'title',
             'type',
             'type_text',
             'subtype',
-            'subtype_text'
+            'subtype_text',
+            'has_proposal'
         )
 
     def get_title(self, learning_unit_year):
@@ -66,6 +82,9 @@ class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
             'fr': getattr(learning_unit_year, 'full_title', None),
             'en': getattr(learning_unit_year, 'full_title_en', None)
         }
+
+    def get_has_proposal(self, learning_unit_year):
+        return getattr(learning_unit_year, "has_proposal", None)
 
 
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
@@ -90,12 +109,12 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
         source='get_partims_related',
         read_only=True
     )
+    proposal = serializers.SerializerMethodField(read_only=True)
+    summary_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitSerializer.Meta.fields + (
-            'credits',
-            'status',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
@@ -105,5 +124,24 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'language',
             'components',
             'parent',
-            'partims'
+            'partims',
+            'proposal',
+            'summary_status'
         )
+
+    def get_proposal(self, learning_unit_year):
+        if not hasattr(learning_unit_year, "proposallearningunit"):
+            return {}
+
+        return {
+            "folder": learning_unit_year.proposallearningunit.folder,
+            "type": learning_unit_year.proposallearningunit.get_type_display(),
+            "status": learning_unit_year.proposallearningunit.get_state_display(),
+        }
+
+    def get_summary_status(self, learning_unit_year):
+        if getattr(learning_unit_year, "summary_status", False):
+            return SummaryStatus.MODIFIED.value
+        elif learning_unit_year.summary_locked:
+            return SummaryStatus.BLOCKED.value
+        return SummaryStatus.NOT_MODIFIED.value
