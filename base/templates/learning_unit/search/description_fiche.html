@@ -165,13 +165,7 @@
                         {{ items_per_page }}, "{{ request.path }}", columnDefs);
         });
         $("#btn_teaching_material_xls").click(function (e) {
-            e.preventDefault();
-            var status = $("#xls_status");
-            status.val('xls_teaching_material');
-
-            $("#search_form").submit();
-
-            status.val('');
+            prepare_xls(e, 'xls_teaching_material');
         });
     </script>
 {% endblock %}

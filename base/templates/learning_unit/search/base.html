@@ -150,13 +150,6 @@
                         </li>
                     </ul>
                 </div>
-                <form id="download_xls" action="{{ request.path }}" method="get">
-                    {% csrf_token %}
-                    <input type="hidden" id="xls_status" name="xls_status">
-                    <input type="hidden" id="comparison_year" name="comparison_year">
-                    <input type="hidden" id="hdn_with_grp" name="with_grp">
-                    <input type="hidden" id="hdn_with_attributions" name="with_attributions">
-                </form>
 
                 <table id="table_learning_units" class="table table-striped table-hover">
                     <thead>
