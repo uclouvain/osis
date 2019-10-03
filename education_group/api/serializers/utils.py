@@ -61,3 +61,19 @@ class MiniTrainingGetUrlMixin:
 
 class MiniTrainingHyperlinkedIdentityField(MiniTrainingGetUrlMixin, serializers.HyperlinkedIdentityField):
     pass
+
+
+class GroupGetUrlMixin:
+    def __init__(self, **kwargs):
+        super().__init__(view_name='education_group_api_v1:group_read', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'partial_acronym': obj.partial_acronym,
+            'year': obj.academic_year.year
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class GroupHyperlinkedIdentityField(GroupGetUrlMixin, serializers.HyperlinkedIdentityField):
+    pass
