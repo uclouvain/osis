@@ -80,15 +80,14 @@ class MiniTrainingDetailSerializer(serializers.ModelSerializer):
         )
 
     def get_title(self, education_group_year):
-        language = self.context.get('language')
-        return getattr(
-            education_group_year,
-            'title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
-        )
+        return self._get_field(education_group_year, 'title')
 
     def get_remark(self, education_group_year):
+        return self._get_field(education_group_year, 'remark')
+
+    def _get_field(self, education_group_year, field_name):
         language = self.context.get('language')
         return getattr(
             education_group_year,
-            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            field_name + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
