@@ -29,7 +29,7 @@ from rest_framework.reverse import reverse
 
 class TrainingGetUrlMixin:
     def __init__(self, **kwargs):
-        super().__init__(view_name='education_group_api_v1:training-detail', **kwargs)
+        super().__init__(view_name='education_group_api_v1:training_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
@@ -44,4 +44,20 @@ class TrainingHyperlinkedIdentityField(TrainingGetUrlMixin, serializers.Hyperlin
 
 
 class TrainingHyperlinkedRelatedField(TrainingGetUrlMixin, serializers.HyperlinkedRelatedField):
+    pass
+
+
+class MiniTrainingGetUrlMixin:
+    def __init__(self, **kwargs):
+        super().__init__(view_name='education_group_api_v1:mini_training_read', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'partial_acronym': obj.partial_acronym,
+            'year': obj.academic_year.year
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class MiniTrainingHyperlinkedIdentityField(MiniTrainingGetUrlMixin, serializers.HyperlinkedIdentityField):
     pass
