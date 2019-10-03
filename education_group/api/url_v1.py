@@ -32,12 +32,12 @@ app_name = "education_group"
 urlpatterns = [
     url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
     url(
-        r'^trainings/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+(?:[/]?[a-zA-Z]{1,2}))$',
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2}))$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
     url(
-        r'^mini_trainings/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9]+)$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     )
