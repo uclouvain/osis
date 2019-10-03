@@ -25,11 +25,14 @@
 ##############################################################################
 from django.conf.urls import url
 
+from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingList, TrainingDetail
 
 app_name = "education_group"
+
+# FIXME: Refactor URL
 urlpatterns = [
     url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
     url(
@@ -38,13 +41,28 @@ urlpatterns = [
         name=TrainingDetail.name
     ),
     url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2})?)/tree$',
+        TrainingTreeView.as_view(),
+        name=TrainingTreeView.name
+    ),
+    url(
         r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
         MiniTrainingDetail.as_view(),
         name=MiniTrainingDetail.name
     ),
     url(
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/tree$',
+        MiniTrainingTreeView.as_view(),
+        name=MiniTrainingTreeView.name
+    ),
+    url(
         r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
         GroupDetail.as_view(),
-        name=GroupDetail .name
-    )
+        name=GroupDetail.name
+    ),
+    url(
+        r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/tree$',
+        GroupTreeView.as_view(),
+        name=GroupTreeView.name
+    ),
 ]
