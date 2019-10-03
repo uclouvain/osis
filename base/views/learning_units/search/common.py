@@ -30,6 +30,7 @@ from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
+from base.business import learning_unit_year_with_context
 from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
     create_xls_attributions
 from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
@@ -153,5 +154,7 @@ def _create_xls_proposal(view_obj, context, **response_kwargs):
 def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["filter"].qs
+    for luy in luys:
+        learning_unit_year_with_context.append_latest_entities(luy, service_course_search=False)
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_proposal_comparison(user, luys, filters)
