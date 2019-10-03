@@ -120,7 +120,8 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def clean_code_name(self):
         code_name = self.cleaned_data.pop('code_name')
-        if LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=self.luy.id).exists():
+        objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=self.luy.id)
+        if objects.exists() and self.value not in objects:
             raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
         return code_name
 
