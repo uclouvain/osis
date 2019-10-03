@@ -52,7 +52,10 @@ from webservices import business
 from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
 
-LANGUAGES = {settings.LANGUAGE_CODE_FR[:2]: settings.LANGUAGE_CODE_FR, settings.LANGUAGE_CODE_EN: settings.LANGUAGE_CODE_EN}
+LANGUAGES = {
+    settings.LANGUAGE_CODE_FR[:2]: settings.LANGUAGE_CODE_FR,
+    settings.LANGUAGE_CODE_EN: settings.LANGUAGE_CODE_EN
+}
 INTRO_PATTERN = r'intro-(?P<acronym>\w+)'
 COMMON_PATTERN = r'(?P<section_name>\w+)-commun'
 ACRONYM_PATTERN = re.compile(r'(?P<prefix>[a-z]+)(?P<cycle>[0-9]{1,3})(?P<suffix>[a-z]+)(?P<year>[0-9]?)')
