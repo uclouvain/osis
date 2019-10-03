@@ -23,18 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
-from base.models.campus import Campus
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
 
 
-class CampusDetailSerializer(serializers.ModelSerializer):
-    organization = serializers.CharField(source='organization.name', read_only=True)
+class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
+    """
+        Return the detail of the mini training
+    """
+    name = 'mini_training_read'
+    serializer_class = MiniTrainingDetailSerializer
 
-    class Meta:
-        model = Campus
-        fields = (
-            'name',
-            'is_administration',
-            'organization'
+    def get_object(self):
+        partial_acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.filter(
+                education_group_type__category=education_group_categories.MINI_TRAINING
+            ).select_related(
+                'education_group_type',
+                'academic_year',
+                'main_teaching_campus',
+            ).prefetch_related(
+                'management_entity__entityversion_set',
+            ),
+            partial_acronym__iexact=partial_acronym,
+            academic_year__year=year
         )
+        return egy

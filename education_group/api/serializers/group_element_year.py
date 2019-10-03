@@ -28,6 +28,8 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_categories import Categories
+from education_group.api.views.group import GroupDetail
+from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
@@ -52,12 +54,11 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
             }
         else:
             view_name = {
-                Categories.GROUP.name: 'education_group_api_v1:' + TrainingDetail.name,
-                Categories.MINI_TRAINING.name: 'education_group_api_v1:' + TrainingDetail.name
+                Categories.GROUP.name: 'education_group_api_v1:' + GroupDetail.name,
+                Categories.MINI_TRAINING.name: 'education_group_api_v1:' + MiniTrainingDetail.name
             }.get(obj.education_group_year.education_group_type.category)
             url_kwargs = {
-                'acronym': obj.education_group_year.partial_acronym,
-                #'partial_acronym': obj.education_group_year.partial_acronym,
+                'partial_acronym': obj.education_group_year.partial_acronym,
                 'year': obj.education_group_year.academic_year.year,
             }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)

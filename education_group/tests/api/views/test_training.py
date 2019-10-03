@@ -202,7 +202,7 @@ class GetTrainingTestCase(APITestCase):
         cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
 
         cls.user = UserFactory()
-        cls.url = reverse('education_group_api_v1:training-detail', kwargs={
+        cls.url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
@@ -217,7 +217,7 @@ class GetTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_method_not_allowed(self):
-        methods_not_allowed = ['post', 'delete', 'put']
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
 
         for method in methods_not_allowed:
             response = getattr(self.client, method)(self.url)
@@ -237,7 +237,7 @@ class GetTrainingTestCase(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_get_invalid_training_case_not_found(self):
-        invalid_url = reverse('education_group_api_v1:training-detail', kwargs={
+        invalid_url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': 'ACRO',
             'year': 2033
         })

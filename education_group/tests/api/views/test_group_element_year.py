@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import skip
-
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -119,7 +117,6 @@ class TrainingTreeViewTestCase(APITestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @skip('Need URL correction')
     def test_get_training_tree(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

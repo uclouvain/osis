@@ -34,6 +34,7 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
+from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
@@ -120,9 +121,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         })
         self.assertIn(expected_root_url, self.serializer.data['url'])
 
-        expected_group_url = reverse('education_group_api_v1:' + TrainingDetail.name, kwargs={
-            'acronym': self.common_core.partial_acronym,
-           # 'partial_acronym': self.common_core.partial_acronym,
+        expected_group_url = reverse('education_group_api_v1:' + GroupDetail.name, kwargs={
+            'partial_acronym': self.common_core.partial_acronym,
             'year': self.common_core.academic_year.year,
         })
         self.assertIn(expected_group_url, self.serializer.data['children'][0]['url'])

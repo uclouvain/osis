@@ -81,7 +81,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
         Return the detail of the training
     """
-    name = 'training-detail'
+    name = 'training_read'
     serializer_class = TrainingDetailSerializer
     pagination_class = None
     filter_backends = ()
