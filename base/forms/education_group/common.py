@@ -188,7 +188,7 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
 
         self.fields['academic_year'].queryset = \
             self.fields['academic_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
-        if self.user and not self.user.person.is_central_manager:
+        if self.user and self.user.person.is_faculty_manager:
             self.fields['academic_year'].queryset = EventPermEducationGroupEdition.get_academic_years()\
                 .filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
         self.fields['academic_year'].empty_label = None
