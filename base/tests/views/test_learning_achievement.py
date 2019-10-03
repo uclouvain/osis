@@ -396,13 +396,13 @@ class TestLearningAchievementPostponement(TestCase):
 
     def test_learning_achievement_move_up_with_postponement(self):
         self._move_achievement(achievement_code_name=2, operation=UP)
-        self.assertEqual(LearningAchievement.objects.get(code_name=1).order, 1)
-        self.assertEqual(LearningAchievement.objects.get(code_name=2).order, 0)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), 10)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
 
     def test_learning_achievement_move_down_with_postponement(self):
         self._move_achievement(achievement_code_name=1, operation=DOWN)
-        self.assertEqual(LearningAchievement.objects.get(code_name=1).order, 1)
-        self.assertEqual(LearningAchievement.objects.get(code_name=2).order, 0)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), 10)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
 
     def _create_achievements(self, code_name):
         create_first_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
