@@ -28,6 +28,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from waffle.models import Flag
@@ -66,7 +67,6 @@ class TestLearningAchievementView(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year__requirement_entity=self.person_entity.entity,
         )
-
         self.client.force_login(self.user)
         self.achievement_fr = LearningAchievementFactory(
             language=self.language_fr,
@@ -154,6 +154,12 @@ class TestLearningAchievementView(TestCase):
 
         with self.assertRaises(PermissionDenied):
             create_first(request, self.learning_unit_year.id)
+
+    def test_check_achievement_code(self):
+        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        url = reverse('achievement_check_code', args=[self.learning_unit_year.id])
+        response = self.client.get(url, data={'code': self.achievement_fr.code_name})
+        self.assertEqual(type(response), JsonResponse)
 
 
 class TestLearningAchievementActions(TestCase):
@@ -390,17 +396,13 @@ class TestLearningAchievementPostponement(TestCase):
 
     def test_learning_achievement_move_up_with_postponement(self):
         self._move_achievement(achievement_code_name=2, operation=UP)
-        for achievement in LearningAchievement.objects.filter(code_name=1):
-            self.assertEqual(achievement.order, 1)
-        for achievement in LearningAchievement.objects.filter(code_name=2):
-            self.assertEqual(achievement.order, 0)
+        self.assertEqual(LearningAchievement.objects.get(code_name=1).order, 1)
+        self.assertEqual(LearningAchievement.objects.get(code_name=2).order, 0)
 
     def test_learning_achievement_move_down_with_postponement(self):
         self._move_achievement(achievement_code_name=1, operation=DOWN)
-        for achievement in LearningAchievement.objects.filter(code_name=1):
-            self.assertEqual(achievement.order, 1)
-        for achievement in LearningAchievement.objects.filter(code_name=2):
-            self.assertEqual(achievement.order, 0)
+        self.assertEqual(LearningAchievement.objects.get(code_name=1).order, 1)
+        self.assertEqual(LearningAchievement.objects.get(code_name=2).order, 0)
 
     def _create_achievements(self, code_name):
         create_first_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])

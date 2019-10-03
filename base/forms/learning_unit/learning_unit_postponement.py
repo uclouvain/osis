@@ -305,21 +305,6 @@ class LearningUnitPostponementForm:
 
         return self.consistency_errors
 
-    def _compute_max_postponement_year(self) -> int:
-        """ Compute the maximal year for the postponement of the learning unit
-
-        If the learning unit is a partim, the max year is the max year of the full
-        """
-        if self.subtype == learning_unit_year_subtypes.PARTIM:
-            max_postponement_year = self.learning_unit_full_instance.learningunityear_set.aggregate(
-                Max('academic_year__year')
-            )['academic_year__year__max']
-        else:
-            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
-
-        end_year = self.end_postponement.year if self.end_postponement else None
-        return min(end_year, max_postponement_year) if end_year else max_postponement_year
-
     @property
     def warnings(self):
         """ Warnings can be call only after saving the forms"""

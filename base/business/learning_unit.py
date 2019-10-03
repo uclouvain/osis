@@ -40,7 +40,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
 from cms import models as mdl_cms
 from cms.enums import entity_name
-from cms.models.translated_text_label import TranslatedTextLabel
 
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
@@ -118,13 +117,6 @@ def get_cms_label_data(cms_label, user_language):
         translated_text = next((trans.label for trans in translated_labels if trans.text_label.label == label), None)
         cms_label_data[label] = translated_text
     return cms_label_data
-
-
-def get_cms_label_translated(cms_label, user_language):
-    return TranslatedTextLabel.objects.filter(
-        text_label=cms_label,
-        language=user_language
-    ).first().label
 
 
 def _learning_unit_usage(learning_unit_year):

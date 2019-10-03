@@ -42,7 +42,7 @@ from attribution.models.enums.function import Functions
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
-    get_components_identification, get_cms_label_translated
+    get_components_identification
 from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
@@ -65,6 +65,7 @@ from base.models.person import Person
 from base.views.common import display_warning_messages, display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
+from cms.models.translated_text_label import TranslatedTextLabel
 from reference.models.language import find_language_in_settings
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
@@ -150,7 +151,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         form = LearningUnitSpecificationsEditForm(request.POST)
         if form.is_valid():
             field_label, last_academic_year = form.save()
-            translated_field_label = get_cms_label_translated(field_label, get_language())
+            translated_field_label = _get_cms_label_translated(field_label, get_language())
             display_success_messages(
                 request,
                 _build_edit_specification_success_message(last_academic_year, translated_field_label)
@@ -169,6 +170,13 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         context['form'] = form
         context['text_label_translated'] = get_text_label_translated(text_lb, get_language())
         return render(request, "learning_unit/specifications_edit.html", context)
+
+
+def _get_cms_label_translated(cms_label, user_language):
+    return TranslatedTextLabel.objects.filter(
+        text_label=cms_label,
+        language=user_language
+    ).first().label
 
 
 def _build_edit_specification_success_message(last_academic_year, translated_field_label):

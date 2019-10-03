@@ -1149,12 +1149,18 @@ class LearningUnitViewTestCase(TestCase):
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
-            vars()['trans_{}'.format(language)] = [TranslatedTextFactory(
-                entity=entity_name.LEARNING_UNIT_YEAR,
-                reference=luy.id,
-                language=language,
-                text_label=label
-            ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        trans_fr_be = [TranslatedTextFactory(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=luy.id,
+            language='fr-be',
+            text_label=label
+        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        trans_en = [TranslatedTextFactory(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=luy.id,
+            language='en',
+            text_label=label
+        ) for luy in [learning_unit_year, *future_learning_unit_years]]
 
         response = self.client.post(
             reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
@@ -1162,8 +1168,8 @@ class LearningUnitViewTestCase(TestCase):
                 'trans_text_fr': 'textFR',
                 'trans_text_en': 'textEN',
                 'postpone': 1,
-                'cms_fr_id': vars()['trans_fr-be'][0].id,
-                'cms_en_id': vars()['trans_en'][0].id,
+                'cms_fr_id': trans_fr_be[0].id,
+                'cms_en_id': trans_en[0].id,
             }
         )
         self.assertEqual(response.status_code, 200)

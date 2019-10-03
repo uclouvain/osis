@@ -51,13 +51,14 @@ def update_themes_discussed_changed_field_in_cms(learning_unit_year):
 
 
 class LearningAchievementEditForm(forms.ModelForm):
-    for code, label in settings.LANGUAGES:
-        vars()['text_{}'.format(code[:2])] = forms.CharField(
-            widget=CKEditorWidget(config_name='minimal_plus_headers'),
-            required=False,
-            label=label
-        )
-        vars()['lua_{}_id'.format(code[:2])] = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    text_fr = forms.CharField(widget=CKEditorWidget(
+        config_name='minimal_plus_headers'), required=False, label=_('French')
+    )
+    text_en = forms.CharField(
+        widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False, label=_('English')
+    )
+    lua_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    lua_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     class Meta:
         model = LearningAchievement
@@ -119,9 +120,7 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def clean_code_name(self):
         code_name = self.cleaned_data.pop('code_name')
-        luy_id = self.luy.id
-        objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=luy_id)
-        if len(objects) > 0 and self.value not in objects:
+        if LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=self.luy.id).exists():
             raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
         return code_name
 

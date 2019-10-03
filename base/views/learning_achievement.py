@@ -194,13 +194,11 @@ def create_first(request, learning_unit_year_id):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 @require_http_methods(['GET'])
 @perms.can_update_learning_achievement
-def check_code(request, learning_unit_year_id, accept_postponement=True):
+def check_code(request, learning_unit_year_id):
     code = request.GET['code']
-    next_luy = LearningUnitYear.objects.select_related('academic_year').get(id=learning_unit_year_id)
-    academic_year = next_luy.academic_year
-    while next_luy.get_learning_unit_next_year():
-        next_luy = next_luy.get_learning_unit_next_year()
-        if LearningAchievement.objects.filter(learning_unit_year=next_luy.pk, code_name=code).exists():
-            accept_postponement = False
-            academic_year = next_luy.academic_year
-    return JsonResponse(data={'accept_postponement': accept_postponement, 'academic_year': academic_year.name})
+    learning_achievement = LearningAchievement.objects.filter(
+        learning_unit_year__learning_unit__learningunityear__id=learning_unit_year_id,
+        code_name=code
+    ).exclude(learning_unit_year__id=learning_unit_year_id).first()
+    academic_year = learning_achievement.learning_unit_year.academic_year if learning_achievement else None
+    return JsonResponse(data={'accept_postponement': learning_achievement is None, 'academic_year': academic_year})

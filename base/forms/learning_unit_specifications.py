@@ -55,12 +55,10 @@ class LearningUnitSpecificationsForm(forms.Form):
 
 
 class LearningUnitSpecificationsEditForm(forms.Form):
-    for code, label in settings.LANGUAGES:
-        vars()['trans_text_{}'.format(code[:2])] = forms.CharField(
-            widget=CKEditorWidget(config_name='minimal_plus_headers'),
-            required=False
-        )
-        vars()['cms_{}_id'.format(code[:2])] = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    trans_text_fr = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
+    trans_text_en = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
+    cms_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    cms_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     def __init__(self, *args, **kwargs):
         self.postponement = bool(int(args[0]['postpone'])) if args else False
