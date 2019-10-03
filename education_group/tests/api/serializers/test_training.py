@@ -96,8 +96,8 @@ class TrainingDetailSerializerTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
         )
         url = reverse('education_group_api_v1:training_read', kwargs={
-            'acronym': 'ACRONYM',
-            'year': 2033
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
         })
         cls.serializer = TrainingDetailSerializer(cls.training, context={
             'request': RequestFactory().get(url),

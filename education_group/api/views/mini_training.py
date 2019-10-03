@@ -49,10 +49,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
                 'education_group_type',
                 'academic_year',
                 'main_teaching_campus',
-                'enrollment_campus',
-                'primary_language',
             ).prefetch_related(
-                'administration_entity__entityversion_set',
                 'management_entity__entityversion_set',
             ),
             partial_acronym__iexact=partial_acronym,

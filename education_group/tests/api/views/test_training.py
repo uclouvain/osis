@@ -217,7 +217,7 @@ class GetTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_method_not_allowed(self):
-        methods_not_allowed = ['post', 'delete', 'put']
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
 
         for method in methods_not_allowed:
             response = getattr(self.client, method)(self.url)
