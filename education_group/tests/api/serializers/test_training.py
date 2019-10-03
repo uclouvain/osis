@@ -95,7 +95,7 @@ class TrainingDetailSerializerTestCase(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
         )
-        url = reverse('education_group_api_v1:training-detail', kwargs={
+        url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': 'ACRONYM',
             'year': 2033
         })

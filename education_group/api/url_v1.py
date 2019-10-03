@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf.urls import url
 
+from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingList, TrainingDetail
 
 app_name = "education_group"
@@ -34,5 +35,10 @@ urlpatterns = [
         r'^trainings/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9\W]+)$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name
+    ),
+    url(
+        r'^mini_trainings/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9\W]+)$',
+        MiniTrainingDetail.as_view(),
+        name=MiniTrainingDetail.name
     )
 ]

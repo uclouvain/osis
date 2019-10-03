@@ -23,75 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
 
 
-class TrainingFilter(filters.FilterSet):
-    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
-    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
-    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
-
-    class Meta:
-        model = EducationGroupYear
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
-
-
-class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
+class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
-       Return a list of all the training with optional filtering.
+        Return the detail of the mini training
     """
-    name = 'training-list'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.TRAINING
-    ).select_related('education_group_type', 'academic_year')\
-        .prefetch_related(
-        'administration_entity__entityversion_set',
-        'management_entity__entityversion_set'
-    ).exclude(
-        acronym__icontains='common'
-    )
-    serializer_class = TrainingListSerializer
-    filter_class = TrainingFilter
-    search_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
-    )
-    ordering_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
-    )
-    ordering = (
-        '-academic_year__year',
-        'acronym',
-    )  # Default ordering
-
-
-class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
-    """
-        Return the detail of the training
-    """
-    name = 'training_read'
-    serializer_class = TrainingDetailSerializer
-    pagination_class = None
-    filter_backends = ()
+    name = 'mini_training_read'
+    serializer_class = MiniTrainingDetailSerializer
 
     def get_object(self):
-        acronym = self.kwargs['acronym']
+        partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
         egy = get_object_or_404(
             EducationGroupYear.objects.filter(
-                education_group_type__category=education_group_categories.TRAINING
+                education_group_type__category=education_group_categories.MINI_TRAINING
             ).select_related(
                 'education_group_type',
                 'academic_year',
@@ -102,7 +55,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
                 'administration_entity__entityversion_set',
                 'management_entity__entityversion_set',
             ),
-            acronym__iexact=acronym,
+            partial_acronym__iexact=partial_acronym,
             academic_year__year=year
         )
         return egy
