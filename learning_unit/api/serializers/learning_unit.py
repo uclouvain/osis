@@ -29,44 +29,51 @@ from rest_framework import serializers
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
+from learning_unit.api.serializers.utils import LearningUnitHyperlinkedIdentityField, \
+    LearningUnitHyperlinkedRelatedField
 
 
-class LearningUnitSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid',
-        read_only=True
-    )
+class LearningUnitTitleSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = LearningUnitYear
+        fields = (
+            'title',
+        )
+
+    def get_title(self, learning_unit_year):
+        language = self.context['language']
+        return getattr(
+            learning_unit_year,
+            'full_title' + ('_' + language if language not in settings.LANGUAGE_CODE_FR else '')
+        )
+
+
+class LearningUnitSerializer(LearningUnitTitleSerializer):
+    url = LearningUnitHyperlinkedIdentityField(read_only=True)
     requirement_entity = serializers.CharField(
         source='learning_container_year.requirement_entity_version.acronym',
         read_only=True
     )
-    title = serializers.SerializerMethodField(read_only=True)
     academic_year = serializers.IntegerField(source='academic_year.year')
 
     type = serializers.CharField(source='learning_container_year.container_type')
     type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
 
-    class Meta:
+    class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
-        fields = (
+        fields = LearningUnitTitleSerializer.Meta.fields + (
             'url',
             'acronym',
             'academic_year',
             'requirement_entity',
-            'title',
             'type',
             'type_text',
             'subtype',
             'subtype_text'
         )
-
-    def get_title(self, learning_unit_year):
-        return {
-            settings.LANGUAGE_CODE_FR[:2]: getattr(learning_unit_year, 'full_title', None),
-            settings.LANGUAGE_CODE_EN: getattr(learning_unit_year, 'full_title_en', None)
-        }
 
 
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
@@ -79,18 +86,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     campus = LearningUnitCampusSerializer(read_only=True)
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
 
-    parent = serializers.HyperlinkedRelatedField(
-        view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid',
-        read_only=True
-    )
-    partims = serializers.HyperlinkedRelatedField(
-        view_name='learning_unit_api_v1:learningunits_read',
-        lookup_field='uuid',
-        many=True,
-        source='get_partims_related',
-        read_only=True
-    )
+    parent = LearningUnitHyperlinkedRelatedField(read_only=True, lookup_field='acronym')
+    partims = LearningUnitHyperlinkedRelatedField(read_only=True, many=True, source='get_partims_related')
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear

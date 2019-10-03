@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
 from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -35,8 +34,7 @@ class LearningAchievementListSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.data_to_serialize = {
-            settings.LANGUAGE_CODE_FR[:2]: 'Texte en Français',
-            settings.LANGUAGE_CODE_EN: 'Text in english',
+            'achievement': 'Texte en Français',
             'code_name': '1.',
             'dummy_field': 'XXXX'
         }
@@ -45,7 +43,6 @@ class LearningAchievementListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'code_name',
-            settings.LANGUAGE_CODE_FR[:2],
-            settings.LANGUAGE_CODE_EN
+            'achievement'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

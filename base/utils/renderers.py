@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+import bootstrap3.renderers
+import dal_select2.widgets
 
 
-class TranslatedSerializer(serializers.Serializer):
-    fr = serializers.CharField()
-    en = serializers.CharField()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, default={'fr': '', 'en': ''}, **kwargs)
+# Exclude ModelSelect2Multiple from inheriting bootstrap 3 "form_control" class.
+# Otherwise the text and the clear button were not aligned inside the input.
+class OsisBootstrap3FieldRenderer(bootstrap3.renderers.FieldRenderer):
+    WIDGETS_NO_FORM_CONTROL = bootstrap3.renderers.FieldRenderer.WIDGETS_NO_FORM_CONTROL + \
+                              (dal_select2.widgets.ModelSelect2Multiple, )

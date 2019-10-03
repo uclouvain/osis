@@ -45,6 +45,10 @@ paths:
         name: year
         schema:
           type: integer
+      - in: query
+        name: lang
+        schema:
+          type: string
       responses:
         '200':
           description: OK
@@ -60,16 +64,26 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
       - learning_units
-  /learning_units/{uuid}:
+  /learning_units/{year}/{acronym}:
     get:
       description: Return the detail of the learning unit
       operationId: learningunits_read
       parameters:
       - in: path
-        name: uuid
+        name: year
         required: true
         schema:
           description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
           type: string
       responses:
         '200':
@@ -86,16 +100,65 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{uuid}/attributions:
+  /learning_units/{year}/{acronym}/get_title:
+    get:
+      description: Return the title of the learning unit
+      operationId: learningunitstitle_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
+  /learning_units/{year}/{acronym}/attributions:
     get:
       description: Return all attributions assign to the learning unit
       operationId: learningunitattributions_read
       parameters:
       - in: path
-        name: uuid
+        name: year
         required: true
         schema:
           description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
           type: string
       responses:
         '200':
@@ -114,17 +177,27 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{uuid}/education_group_roots:
+  /learning_units/{year}/{acronym}/education_group_roots:
     get:
       description: Return all education groups root which utilize the learning unit specified
       operationId: learningunitutilization_read
       parameters:
       - in: path
-        name: uuid
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: query
+        name: lang
+        schema:
+          type: string	
       responses:
         '200':
           description: OK
@@ -142,17 +215,27 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{uuid}/achievements:
+  /learning_units/{year}/{acronym}/achievements:
     get:
       description: Return all achievement in order according of the learning unit specified.
       operationId: learningunitachievements_read
       parameters:
       - in: path
-        name: uuid
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
         required: true
         schema:
           description: ''
           type: string
+      - in: query
+        name: lang
+        schema:
+          type: string 
       responses:
         '200':
           description: OK
@@ -170,13 +253,55 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{uuid}/summary_specification:
+  /learning_units/{year}/{acronym}/summary_specification:
     get:
       description: Return all summary and specification information of the learning unit specified
       operationId: learningunitsummaryspecification_read
       parameters:
       - in: path
-        name: uuid
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningUnitSummarySpecification'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/prerequisites:
+    get:
+      description: Returns all education groups for which this learning unit year had prerequisites
+      operationId: learningunitprerequisites_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
         required: true
         schema:
           description: ''
@@ -187,7 +312,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LearningUnitSummarySpecification'
+                $ref: '#/components/schemas/LearningUnitPrerequisite'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -232,13 +357,7 @@ components:
         acronym:
           type: string
         title:
-          type: object
-          required:
-          - en
-          - fr
-          example:
-            en: Elements of biochemistry
-            fr: Eléments de biochimie
+          type: string
         type:
           $ref: '#/components/schemas/LearningUnitTypeEnum'
         type_text:
@@ -357,13 +476,7 @@ components:
           type: number
           multipleOf: 0.01
         title:
-          type: object
-          required:
-            - en
-            - fr
-          example:
-            en: Master [120] in Law
-            fr: Master [120] en droit
+          type: string
         decree_category:
           $ref: '#/components/schemas/DecreeCategoryEnum'
         decree_category_text:
@@ -388,76 +501,29 @@ components:
         codename:
           type: string
           example: '1.0'
-        fr:
-          type: string
-        en:
+        achievement:
           type: string
     LearningUnitSummarySpecification:
       type: object
       properties:
         bibliography:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         resume:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         evaluation_methods:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         other_informations:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         online_ressources:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         teaching_methods:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         themes_discussed:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         prerequisite:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
         mobility:
-          type: object
-          properties:
-            fr:
-              type: string
-            en:
-              type: string
+          type: string
       required:
         - bibliography
         - resume
@@ -468,6 +534,24 @@ components:
         - themes_discussed
         - prerequisite
         - mobility
+    LearningUnitPrerequisite:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        code:
+          type: string
+        education_group_type:
+          type: string
+        education_group_type_text:
+          type: string
+        academic_year:
+          type: integer
+        prerequisites:
+          type: string
     LearningUnitTypeEnum:
       type: string
       enum:

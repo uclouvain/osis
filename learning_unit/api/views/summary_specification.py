@@ -24,13 +24,13 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, CharField, F, Value
+from django.db.models import F, Q
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
+    CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.models.learning_unit_year import LearningUnitYear
 from cms.models.translated_text import TranslatedText
 from learning_unit.api.serializers.summary_specification import LearningUnitSummarySpecificationSerializer
@@ -41,30 +41,37 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         Return all summary and specification information of the learning unit specified
     """
     name = 'learningunitsummaryspecification_read'
-    serializer_class = LearningUnitSummarySpecificationSerializer
     filter_backends = []
     paginator = None
+    serializer_class = LearningUnitSummarySpecificationSerializer
 
     def get(self, request, *args, **kwargs):
-        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
+        learning_unit_year = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year']
+        )
+        language = self.request.LANGUAGE_CODE
         qs = TranslatedText.objects.filter(
             reference=learning_unit_year.pk,
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         ).annotate(
-            iso_code=Case(
-                When(language=LANGUAGE_CODE_FR, then=Value(settings.LANGUAGE_CODE_FR[:2])),
-                When(language=LANGUAGE_CODE_EN, then=Value(settings.LANGUAGE_CODE_EN)),
-                default=None,
-                output_field=CharField(),
-            ),
             label=F('text_label__label')
-        ).exclude(iso_code__isnull=True).values('label', 'iso_code', 'text')
-
+        ).filter(
+            Q(
+                language=settings.LANGUAGE_CODE_FR if language == settings.LANGUAGE_CODE_FR[:2] else language,
+                text_label__label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
+            )
+            |
+            Q(
+                language=settings.LANGUAGE_CODE_FR,
+                text_label__label__in=CMS_LABEL_PEDAGOGY_FR_ONLY
+            )
+        ).values('label', 'text')
         summary_specification_grouped = {}
         for translated_text in qs:
             key = translated_text['label']
-            summary_specification_grouped.setdefault(key, {settings.LANGUAGE_CODE_FR[:2]: '', settings.LANGUAGE_CODE_EN: ''})
-            summary_specification_grouped[key][translated_text['iso_code']] = translated_text['text']
-
+            summary_specification_grouped[key] = translated_text['text']
         serializer = self.get_serializer(summary_specification_grouped)
+
         return Response(serializer.data)

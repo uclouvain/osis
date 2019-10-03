@@ -220,10 +220,12 @@ class LearningUnitYearTest(TestCase):
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
     def test_can_be_updated_by_faculty_manager(self):
-        previous_academic_years = GenerateAcademicYear(start_year=self.academic_year.year - 3,
-                                                       end_year=self.academic_year.year - 1).academic_years
-        next_academic_years = GenerateAcademicYear(start_year=self.academic_year.year + 1,
-                                                   end_year=self.academic_year.year + 3).academic_years
+        start_year = AcademicYearFactory(year=self.academic_year.year - 3)
+        end_year = AcademicYearFactory(year=self.academic_year.year - 1)
+        previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        next_start_year = AcademicYearFactory(year=self.academic_year.year + 1)
+        next_end_year = AcademicYearFactory(year=self.academic_year.year + 3)
+        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
         previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
                          for ac in previous_academic_years]
         next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
@@ -320,8 +322,8 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
 class LearningUnitYearWarningsTest(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full
