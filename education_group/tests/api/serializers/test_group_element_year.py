@@ -86,7 +86,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'acronym',
             'code',
             'title',
-            'type',
+            'node_type',
             'children',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
@@ -97,7 +97,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'acronym',
             'code',
             'title',
-            'type',
+            'node_type',
             'relative_credits',
             'is_mandatory',
             'access_condition',
@@ -109,10 +109,10 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         ]
         self.assertListEqual(list(self.serializer.data['children'][0].keys()), expected_fields)
 
-    def test_ensure_type_expected(self):
-        self.assertEqual(self.serializer.data['type'], NodeType.TRAINING.name)
-        self.assertEqual(self.serializer.data['children'][0]['type'], NodeType.GROUP.name)
-        self.assertEqual(self.serializer.data['children'][0]['children'][0]['type'], NodeType.LEARNING_UNIT.name)
+    def test_ensure_node_type_expected(self):
+        self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
+        self.assertEqual(self.serializer.data['children'][0]['node_type'], NodeType.GROUP.name)
+        self.assertEqual(self.serializer.data['children'][0]['children'][0]['node_type'], NodeType.LEARNING_UNIT.name)
 
     def test_ensure_url_is_related_to_instance(self):
         expected_root_url = reverse('education_group_api_v1:' + TrainingDetail.name, kwargs={

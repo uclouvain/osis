@@ -45,7 +45,10 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
     def get_url(self, obj, view_name, request, format):
         if obj.education_group_year is None:
             view_name = 'learning_unit_api_v1:' + LearningUnitDetailed.name
-            url_kwargs = {'acronym': obj.learning_unit_year.acronym, 'year': obj.learning_unit_year.academic_year.year}
+            url_kwargs = {
+                'acronym': obj.learning_unit_year.acronym,
+                'year': obj.learning_unit_year.academic_year.year,
+            }
         elif obj.education_group_year.education_group_type.category == Categories.TRAINING.name:
             view_name = 'education_group_api_v1:' + TrainingDetail.name
             url_kwargs = {
@@ -65,25 +68,25 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
 
 
 class CommonNodeTreeSerializer(serializers.Serializer):
-    url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:training-detail')
+    url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
     acronym = serializers.SerializerMethodField()
     code = serializers.CharField(source='education_group_year.partial_acronym', read_only=True)
     title = serializers.SerializerMethodField()
-    type = serializers.SerializerMethodField()
+    node_type = serializers.SerializerMethodField()
 
-    def get_type(self, obj):
+    def get_node_type(self, obj):
         if obj.education_group_year is None:
             return NodeType.LEARNING_UNIT.name
         return obj.education_group_year.education_group_type.category
 
     def get_acronym(self, obj):
-        if self.get_type(obj) == NodeType.LEARNING_UNIT.name:
+        if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
             return obj.learning_unit_year.acronym
         return obj.education_group_year.acronym
 
     def get_title(self, obj):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
-        if self.get_type(obj) == NodeType.LEARNING_UNIT.name:
+        if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
             return getattr(obj.learning_unit_year, 'complete_title' + field_suffix)
         return getattr(obj.education_group_year, 'title' + field_suffix)
 

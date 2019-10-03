@@ -571,7 +571,7 @@ components:
           type: string
         title:
           type: string
-        type:
+        node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         relative_credits:
           type: number

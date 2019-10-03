@@ -51,7 +51,7 @@ urlpatterns = [
         name=MiniTrainingDetail.name
     ),
     url(
-        r'^mini_trainings/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9]+)/tree$',
+        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/tree$',
         MiniTrainingTreeView.as_view(),
         name=MiniTrainingTreeView.name
     ),
@@ -61,7 +61,7 @@ urlpatterns = [
         name=GroupDetail.name
     ),
     url(
-        r'^groups/(?P<year>[0-9]{4})/(?P<partial_acronym>[a-zA-Z0-9]+)/tree$',
+        r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/tree$',
         GroupTreeView.as_view(),
         name=GroupTreeView.name
     ),
