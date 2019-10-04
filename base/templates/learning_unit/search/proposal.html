@@ -54,33 +54,44 @@
                             {% trans 'Consolidate' %}
                         </button>
                     </div>
-                    <br>
-                    <strong style="margin-left:10px;color:grey;">
-                        {{ learning_units_count }} {% trans 'learning units' %}
-                    </strong>
 
-                    <div class="dropdown pull-right">
-                        <button id="dLabel" class="btn btn-default" type="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                title="{% trans 'Export' %}">
-                            <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-                            <li>
-                                <a id="btn_produce_xls_proposal"
-                                   style="margin-right:10px;" title="{% trans 'The learning units' %}">
-                                    &nbsp;{% trans 'List proposals' %}
-                                </a>
-                                <input type="hidden" id="xls_status_proposal" name="xls_status_proposal">
-                            </li>
-                            <li>
-                                <a id="btn_produce_xls_proposal_comparison"
-                                   style="margin-right:10px;" title="{% trans 'The learning units' %}">
-                                    &nbsp;{% trans 'List comparison LU / Proposal' %}
-                                </a>
-                            </li>
-                        </ul>
+                    <div class="row">
+
+                        <div class="col-md-3">
+                            <strong style="margin-left:10px;color:grey;">
+                                {{ learning_units_count }} {% trans 'learning units' %}
+                            </strong>
+                        </div>
+
+                        <div class="col-md-9">
+                            <div class="dropdown {{ dropdirection }} text-right">
+                                <button id="dLabel" class="btn btn-default" type="button"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                        style="margin-right:10px;"
+                                        title="{% trans 'Export' %}">
+                                    <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                                    <li>
+                                        <a id="btn_produce_xls_proposal"
+                                           style="margin-right:10px;" title="{% trans 'The learning units' %}">
+                                            &nbsp;{% trans 'List proposals' %}
+                                        </a>
+                                        <input type="hidden" id="xls_status_proposal" name="xls_status_proposal">
+                                    </li>
+                                    <li>
+                                        <a id="btn_produce_xls_proposal_comparison"
+                                           style="margin-right:10px;" title="{% trans 'The learning units' %}">
+                                            &nbsp;{% trans 'List comparison LU / Proposal' %}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div >
+                                {% pagination_size_select %}
+                            </div>
+                        </div>
                     </div>
 
                     <table id="table_learning_units" class="table table-striped table-hover">
@@ -97,17 +108,10 @@
                             <th id="th_8_proposal_state">{% trans 'Proposal status' %}</th>
                         </tr>
                         </thead>
-                        <tfoot>
-                            <tr>
-                                <td colspan="6">
-                                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
-                                </td>
-                                <td colspan="2">
-                                    {% pagination_size_select %}
-                                </td>
-                            </tr>
-                        </tfoot>
                     </table>
+                    <div style="text-align:center">
+                        {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                    </div>
                     {% include "learning_unit/blocks/modal/modal_force_state.html" %}
                     {% include "learning_unit/blocks/modal/modal_back_to_initial.html" %}
                     {% include "learning_unit/blocks/modal/modal_consolidate.html" %}
