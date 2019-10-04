@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 14:44+0200\n"
+"POT-Creation-Date: 2019-09-30 08:40+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -263,17 +263,11 @@ msgstr "Gestion du calendrier académique"
 msgid "Academic calendars"
 msgstr "Calendriers académique"
 
-msgid "Academic end year"
-msgstr "Anac de fin"
-
 msgid "Academic partner"
 msgstr "Partenaire académique"
 
 msgid "Academic responsible"
 msgstr "Responsable académique"
-
-msgid "Academic start year"
-msgstr "Anac de début"
 
 msgid "Academic type"
 msgstr "Nature"
@@ -350,8 +344,8 @@ msgstr "Ajouter un autre"
 msgid "Add attribution"
 msgstr "Ajouter attribution"
 
-msgid "Add current year attribution"
-msgstr "Ajouter attribution année en cours"
+msgid "Add current year teacher"
+msgstr "Ajouter enseignant année en cours"
 
 msgid "Add over the current year"
 msgstr "Ajouter sur l’année en cours"
@@ -963,7 +957,7 @@ msgid "Edit"
 msgstr "Éditer"
 
 msgid "Edit the proposal"
-msgstr "Editer la proposition"
+msgstr "Modifier la proposition"
 
 msgid "Education group"
 msgstr "Organisation de formations"
@@ -1980,7 +1974,7 @@ msgid ""
 "entity can edit."
 msgstr ""
 "Seuls les gestionnaires de programme d'organisation de formation OU les "
-"gestionnaires facultaires liées à l'entité peuvent éditer."
+"gestionnaires facultaires lié·es à l'entité peuvent modifier."
 
 msgid "Only the volume Q1 must have a value"
 msgstr "Seul le volume Q1 doit avoir une valeur"
@@ -2236,7 +2230,6 @@ msgstr "Produire Excel"
 
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
-
 
 msgid ""
 "Produce a xls of learning units with educational information and "
@@ -2607,6 +2600,9 @@ msgstr "Cahier des charges"
 msgid "Start"
 msgstr "Début"
 
+msgid "Start academic year"
+msgstr "Année académique de début"
+
 msgid "Start date"
 msgstr "Date de début"
 
@@ -2615,9 +2611,6 @@ msgstr "Les dates de début et de fin sont obligatoires"
 
 msgid "Start date must be lower than end date"
 msgstr "La date de début doit être inférieure à la date de fin"
-
-msgid "Starting year"
-msgstr "Année de départ"
 
 msgid "State"
 msgstr "État"
@@ -3394,15 +3387,6 @@ msgstr "Accueil"
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
 
-msgid "Xls"
-msgstr "Xls"
-
-msgid "Xls UE/proposals comparison"
-msgstr "Xls de comparaison UE/proposition"
-
-msgid "Xls with proposals"
-msgstr "Xls avec les propositions"
-
 msgid "Yes"
 msgstr "Oui"
 
@@ -3413,8 +3397,8 @@ msgid ""
 "You are faculty manager and the proposal state is not 'Faculty', so you "
 "can't edit"
 msgstr ""
-"Vous êtes gestionnaire facultaire et le proposition n'est pas en état "
-"'faculté' donc vous ne pouvez pas éditer"
+"Vous êtes gestionnaire facultaire et la proposition n'est pas en état "
+"'Faculté', donc vous ne pouvez pas la modifier"
 
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
@@ -3444,8 +3428,8 @@ msgid ""
 "You are not attached to initial or current requirement entity, so you can't "
 "edit proposal"
 msgstr ""
-"Vous n'êtes pas rattaché à l'entity de charges (initiale ou courante), donc "
-"vous ne pouvez pas éditer la proposition"
+"Vous n'êtes pas rattaché·e à l'entité de charge (initiale ou courante), donc "
+"vous ne pouvez pas modifier la proposition"
 
 msgid "You are not attributed to this learning unit."
 msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."

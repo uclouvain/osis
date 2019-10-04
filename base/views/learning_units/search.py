@@ -37,13 +37,15 @@ from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATT
     create_xls_attributions, create_xls
 from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference, \
     create_xls_proposal_comparison
+from base.business.learning_units.xls_educational_information_and_specifications import \
+    create_xls_educational_information_and_specifications
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
+from base.models.academic_year import get_last_academic_years, starting_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
@@ -52,9 +54,6 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
 from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages, \
     paginate_queryset, remove_from_session
-from base.business.learning_units.xls_educational_information_and_specifications import \
-    create_xls_educational_information_and_specifications
-
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2

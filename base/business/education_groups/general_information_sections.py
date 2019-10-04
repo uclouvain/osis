@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 # The key MUST be in french because it depend on Webservice (filtering)
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 
-SKILLS_AND_ACHIEVEMENTS_KEY = 'comp_acquis'
+SKILLS_AND_ACHIEVEMENTS = 'comp_acquis'
 PEDAGOGY = 'pedagogie'
 MOBILITY = 'mobilite'
 FURTHER_TRAININGS = 'formations_accessibles'
@@ -59,6 +59,7 @@ OPTIONS = 'options'
 INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
+ADMISSION_CONDITION = 'conditions_admission'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -113,18 +114,17 @@ SECTION_LIST = [
 COMMON_TYPE_ADMISSION_CONDITIONS = {
     TrainingType.BACHELOR.name:
         ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
-         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', ),
+         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales',),
     TrainingType.AGGREGATION.name:
         ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr',
-         'ca_allegement', 'ca_ouv_adultes', ),
+         'ca_allegement', 'ca_ouv_adultes',),
     TrainingType.PGRM_MASTER_120.name:
         ('alert_message', 'non_university_bachelors', 'adults_taking_up_university_training',
-         'personalized_access', 'admission_enrollment_procedures', ),
-    TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales', )
+         'personalized_access', 'admission_enrollment_procedures',),
+    TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales',)
 }
 
 MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION = 2017
-
 
 SECTIONS_PER_OFFER_TYPE = {
     TrainingType.AGGREGATION.name: {
@@ -138,8 +138,11 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_JOB,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
+            CONTACTS,
             CONTACT_INTRO,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
@@ -158,6 +161,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
         'specific': [
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             MINORS,
@@ -171,12 +175,15 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     TrainingType.CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
         'specific': [
+            CONTACTS,
             CONTACT_INTRO,
             MOBILITY,
             PEDAGOGY,
@@ -187,23 +194,32 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     TrainingType.CAPAES.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
     },
     TrainingType.RESEARCH_CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
-        'specific': [WELCOME_INTRODUCTION, EVALUATION, PEDAGOGY, DETAILED_PROGRAM, STRUCTURE, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            EVALUATION,
+            PEDAGOGY,
+            DETAILED_PROGRAM,
+            STRUCTURE,
+            ADMISSION_CONDITION,
+        ]
     },
     TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
     },
     TrainingType.PGRM_MASTER_120.name: {
         'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],
@@ -212,6 +228,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             ACCESS_TO_PROFESSIONS,
             CERTIFICATES,
+            CONTACTS,
             CONTACT_INTRO,
             PURPOSES,
             FURTHER_TRAININGS,
@@ -224,7 +241,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     TrainingType.MASTER_MA_120.name: {
@@ -257,8 +276,11 @@ SECTIONS_PER_OFFER_TYPE = {
             OPTIONS,
             PREREQUISITE,
             COMPLEMENTARY_MODULE,
+            CONTACTS,
             CONTACT_INTRO,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     TrainingType.MASTER_MA_180_240.name: {
@@ -278,6 +300,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             ACCESS_TO_PROFESSIONS,
             CERTIFICATES,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             MOBILITY,
@@ -290,13 +313,16 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             COMPLEMENTARY_MODULE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     TrainingType.MASTER_MC.name: {
         'common': [CAAP, EVALUATION, ],
         'specific': [
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             MOBILITY,
@@ -308,7 +334,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
 
@@ -317,6 +345,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -327,7 +356,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     MiniTrainingType.SOCIETY_MINOR.name: {
@@ -335,6 +366,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -345,7 +377,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     MiniTrainingType.ACCESS_MINOR.name: {
@@ -353,6 +387,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -363,7 +398,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     MiniTrainingType.OPEN_MINOR.name: {
@@ -371,6 +408,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -381,7 +419,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: {
@@ -389,6 +429,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -399,7 +440,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     MiniTrainingType.FSA_SPECIALITY.name: {
@@ -407,6 +450,7 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [
             BACHELOR_CONCERNED,
             ACCESS_TO_PROFESSIONS,
+            CONTACTS,
             CONTACT_INTRO,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
@@ -417,7 +461,9 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PATH,
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
-            SKILLS_AND_ACHIEVEMENTS_KEY
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            EVALUATION
         ]
     },
     MiniTrainingType.OPTION.name: {

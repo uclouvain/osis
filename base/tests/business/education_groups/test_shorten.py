@@ -46,8 +46,9 @@ class EducationGroupShortenContext(TestCase):
     def setUp(self):
         # Create several academic year
         self.current_academic_year = create_current_academic_year()
-        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
-                                                       self.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
+        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
         # Create small entities
         self.entity = EntityFactory(organization__type=organization_type.MAIN)
         self.entity_version = EntityVersionFactory(

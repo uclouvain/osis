@@ -616,6 +616,10 @@ class EducationGroupYear(SerializableModel):
         return self.acronym == 'common'
 
     @property
+    def is_a_master(self):
+        return any([self.is_master60, self.is_master120, self.is_master180])
+
+    @property
     def is_master120(self):
         return self.type == TrainingType.PGRM_MASTER_120.name
 
@@ -638,6 +642,10 @@ class EducationGroupYear(SerializableModel):
     @property
     def is_master180(self):
         return self.type == TrainingType.PGRM_MASTER_180_240.name
+
+    @property
+    def has_common_admission_condition(self):
+        return any([self.is_bachelor, self.is_a_master, self.is_aggregation, self.is_specialized_master])
 
     @property
     def verbose(self):
