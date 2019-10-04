@@ -89,7 +89,7 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             TrainingType.PGRM_MASTER_180_240.name: MasterAdmissionConditionsSerializer,
             TrainingType.MASTER_M1.name: MasterAdmissionConditionsSerializer
         }
-        serializer = admission_condition_serializers.get(egy.education_group_type)
+        serializer = admission_condition_serializers.get(egy.education_group_type.name)
         if serializer:
             return serializer(egy.admissioncondition, context=self.context).data
         return AdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
