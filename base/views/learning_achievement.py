@@ -200,5 +200,5 @@ def check_code(request, learning_unit_year_id):
         learning_unit_year__learning_unit__learningunityear__id=learning_unit_year_id,
         code_name=code
     ).exclude(learning_unit_year__id=learning_unit_year_id).first()
-    academic_year = learning_achievement.learning_unit_year.academic_year if learning_achievement else None
-    return JsonResponse(data={'accept_postponement': learning_achievement is None, 'academic_year': academic_year.name})
+    academic_year = learning_achievement.learning_unit_year.academic_year.name if learning_achievement else None
+    return JsonResponse(data={'accept_postponement': learning_achievement is None, 'academic_year': academic_year})
