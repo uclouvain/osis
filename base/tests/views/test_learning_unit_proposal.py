@@ -404,6 +404,7 @@ class TestLearningUnitProposalSearch(TestCase):
 class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
