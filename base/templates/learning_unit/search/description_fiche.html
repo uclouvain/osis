@@ -35,12 +35,12 @@
 
                     <div class="col-md-3">
                         <strong style="margin-left:10px;color:grey;">
-                            {{ learning_units_count }} {% trans 'learning units' %}
+                            {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=learning_units_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
                         </strong>
                     </div>
 
                     <div class="col-md-9">
-                        <div class="dropdown {{ dropdirection }} text-right">
+                        <div class="dropdown {{ dropdirection }} pull-right">
                             <button id="dLabel" class="btn btn-default" type="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                     style="margin-right:10px;"
@@ -48,7 +48,7 @@
                                 <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
                                 <span class="caret"></span>
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                            <ul class="dropdown-menu dropdown-menu-large row pull-right">
                                 <li>
                                     {% trans 'list of required teaching materials' as title_material %}
                                     <a id="btn_teaching_material_xls" title="{{ title_material|capfirst }}">
@@ -57,7 +57,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <div >
+                        <div class="pull-right" style="margin-right: 10px">
                             {% pagination_size_select %}
                         </div>
                     </div>
