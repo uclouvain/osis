@@ -3769,7 +3769,7 @@ msgid "is using in"
 msgstr "est utilisée dans"
 
 msgid "items per page"
-msgstr ""
+msgstr "éléments par page"
 
 msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr "est_prérequis_de-%(year)s-%(acronym)s"
