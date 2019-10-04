@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-01 09:16+0200\n"
+"POT-Creation-Date: 2019-10-04 15:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,6 +120,10 @@ msgid ""
 "%(prerequisite_item)s is not anymore contained in "
 "%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
 "having %(prerequisite_item)s as prerequisite is not copied."
+msgstr ""
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 
 #, python-format
@@ -1388,9 +1392,6 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
-msgstr ""
-
 msgid "Label"
 msgstr ""
 
@@ -1506,9 +1507,6 @@ msgid "List of comparison between proposals and UE"
 msgstr ""
 
 msgid "List of learning units with comparison"
-msgstr ""
-
-msgid "List of learning units with educational information and specifications"
 msgstr ""
 
 msgid "List of learning units with with one line per attribution"
@@ -2124,11 +2122,6 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
-msgstr ""
-
-msgid ""
-"Produce a xls of learning units with educational information and "
-"specifications"
 msgstr ""
 
 msgid "Produce a xls of learning units with one line per attribution"
@@ -3269,6 +3262,7 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr ""
 
+#, python-format
 msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
@@ -3537,17 +3531,14 @@ msgstr ""
 msgid "is using in"
 msgstr ""
 
-msgid "items per page"
-msgstr ""
-
 #, python-format
 msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
-msgid "learning unit year"
+msgid "items per page"
 msgstr ""
 
-msgid "learning units"
+msgid "learning unit year"
 msgstr ""
 
 msgid "list of required teaching materials"
@@ -3683,9 +3674,6 @@ msgid "text in French"
 msgstr ""
 
 msgid "the"
-msgstr ""
-
-msgid "the list to generate is empty."
 msgstr ""
 
 msgid "the program aims"

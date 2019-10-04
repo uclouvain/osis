@@ -38,7 +38,7 @@ def pagination_size_select(context):
         'path': request.get_full_path(),
         'paginator_size_list': PAGINATOR_SIZE_LIST,
         'current_paginator_size': paginator_size,
-        'other_params': {k: v for k, v in request.GET.items() if k != 'paginator_size'}
+        'other_params': {k: v for k, v in request.GET.items() if k != 'paginator_size' and k!= 'page'}
     }
 
 

@@ -30,6 +30,7 @@ from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
+from base.business import learning_unit_year_with_context
 from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
     create_xls_attributions
 from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
@@ -112,14 +113,14 @@ class RenderToExcel:
 
 def _create_xls(view_obj, context, **response_kwargs):
     user = view_obj.request.user
-    luys = context["object_list"]
+    luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls(user, luys, filters)
 
 
 def _create_xls_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
-    luys = context["object_list"]
+    luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     comparison_year = view_obj.request.POST.get('comparison_year')
     return create_xls_comparison(user, luys, filters, comparison_year)
@@ -127,7 +128,7 @@ def _create_xls_comparison(view_obj, context, **response_kwargs):
 
 def _create_xls_with_parameters(view_obj, context, **response_kwargs):
     user = view_obj.request.user
-    luys = context["object_list"]
+    luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     other_params = {
         WITH_GRP: view_obj.request.POST.get('with_grp') == 'true',
@@ -138,20 +139,22 @@ def _create_xls_with_parameters(view_obj, context, **response_kwargs):
 
 def _create_xls_attributions(view_obj, context, **response_kwargs):
     user = view_obj.request.user
-    luys = context["object_list"]
+    luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_attributions(user, luys, filters)
 
 
 def _create_xls_proposal(view_obj, context, **response_kwargs):
     user = view_obj.request.user
-    luys = context["object_list"]
+    luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_proposal(user, luys, filters)
 
 
 def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
-    luys = context["object_list"]
+    luys = context["filter"].qs
+    for luy in luys:
+        learning_unit_year_with_context.append_latest_entities(luy, service_course_search=False)
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_proposal_comparison(user, luys, filters)

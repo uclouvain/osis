@@ -28,7 +28,7 @@
     {% for key, value in other_params.items %}
         <input type="hidden" name="{{ key }}" value="{{ value }}">
     {% endfor %}
-    <div class="pull-right pagination form-group">
+    <div class="pull-right form-group">
         <select onchange="this.form.submit()" name="paginator_size" class="form-control">
             {% for size in paginator_size_list %}
                 <option {% if size == current_paginator_size|add:0 %} selected {% endif %}>
