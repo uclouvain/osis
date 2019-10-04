@@ -51,8 +51,9 @@ class LearningUnitPedagogyContextMixin(TestCase):
         self.person = PersonFactory()
         self.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
         self.current_ac = AcademicYearFactory(current=True)
-        self.ac_years_containers = GenerateAcademicYear(start_year=self.current_ac.year + 1,
-                                                        end_year=self.current_ac.year + 5)
+        start_year = AcademicYearFactory(year=self.current_ac.year + 1)
+        end_year = AcademicYearFactory(year=self.current_ac.year + 5)
+        self.ac_years_containers = GenerateAcademicYear(start_year=start_year, end_year=end_year)
         self.current_luy = LearningUnitYearFactory(
             learning_container_year__academic_year=self.current_ac,
             academic_year=self.current_ac,
@@ -133,7 +134,7 @@ class TestTeachingMaterialForm(LearningUnitPedagogyContextMixin):
     def test_save_with_postponement(self, mock_postpone_teaching_materials):
         """In this test, we ensure that if we modify UE of N+1 or N+X => The postponement until the lastest UE"""
         luy_in_future = self.luys[self.current_ac.year + 1]
-        teaching_material = TeachingMaterialFactory.build(learning_unit_year=luy_in_future)
+        teaching_material = TeachingMaterialFactory.build(learning_unit_year=luy_in_future, mandatory=True)
         post_data = _get_valid_teaching_material_form_data(teaching_material)
         teaching_material_form = TeachingMaterialModelForm(post_data)
         self.assertTrue(teaching_material_form.is_valid(), teaching_material_form.errors)

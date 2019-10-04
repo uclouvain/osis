@@ -25,8 +25,6 @@
 ##############################################################################
 from collections import OrderedDict
 
-from django.conf import settings
-from django.db.models.functions import Lower
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -46,16 +44,21 @@ class LearningAchievementList(generics.GenericAPIView):
     paginator = None
 
     def get(self, request, *args, **kwargs):
-        learning_unit_year = get_object_or_404(LearningUnitYear.objects.all(), uuid=kwargs['uuid'])
-        qs = LearningAchievement.objects.filter(learning_unit_year=learning_unit_year).order_by('order')\
-                                .annotate(iso_code=Lower('language__code')).values('code_name', 'text', 'iso_code')
-
+        language = self.request.LANGUAGE_CODE
+        learning_unit_year = get_object_or_404(
+            LearningUnitYear.objects.all(),
+            acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year']
+        )
+        qs = LearningAchievement.objects.filter(
+            learning_unit_year=learning_unit_year
+        ).order_by('order').filter(
+            language__code=language[:2].upper()
+        ).values('code_name', 'text')
         learning_achievements_grouped = OrderedDict()
         for learning_achievement in qs:
             code_name = learning_achievement['code_name']
-            learning_achievements_grouped.setdefault(code_name, {settings.LANGUAGE_CODE_FR[:2]: '', settings.LANGUAGE_CODE_EN: '', 'code_name': code_name})
-            learning_achievements_grouped[code_name][learning_achievement['iso_code']] = \
-                learning_achievement['text']
-
+            learning_achievements_grouped.setdefault(code_name, {'achievement': '', 'code_name': code_name})
+            learning_achievements_grouped[code_name]['achievement'] = learning_achievement['text']
         serializer = self.get_serializer(learning_achievements_grouped.values(), many=True)
         return Response(serializer.data)
