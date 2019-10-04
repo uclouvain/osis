@@ -3272,6 +3272,7 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr ""
 
+#, python-format
 msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 

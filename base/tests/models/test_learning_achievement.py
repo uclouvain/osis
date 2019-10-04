@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
 from django.db import IntegrityError
+from django.test import TestCase
 
 from base.models import learning_achievement
 from base.tests.factories.academic_year import create_current_academic_year
-from reference.tests.factories.language import LanguageFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-
+from reference.tests.factories.language import LanguageFactory
 
 A_CODE_NAME = 'AA 1'
 A2_CODE_NAME = 'AA 2'

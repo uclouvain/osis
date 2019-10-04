@@ -41,7 +41,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date, up
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
-from base.models.entity import find_by_id, Entity, get_by_internal_id
+from base.models.entity import find_by_id, get_by_internal_id
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
