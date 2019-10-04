@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
+from django.http import Http404
 from rest_framework import generics
 from rest_framework.response import Response
 
@@ -45,6 +46,8 @@ class CommonAdmissionCondition(generics.RetrieveAPIView):
             education_group_type__name__in=general_information_sections.COMMON_TYPE_ADMISSION_CONDITIONS.keys(),
             acronym__contains='common-'
         ).select_related('admissioncondition', 'education_group_type')
+        if not commons_qs.exists():
+            raise Http404
         language = self.kwargs['language']
         common_admission_condition = {}
         suffix_language = '' if language == settings.LANGUAGE_CODE_FR[:2] else '_en'
