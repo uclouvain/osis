@@ -38,7 +38,7 @@ from base.forms.education_group.training import TrainingForm, TrainingEducationG
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, internship_presence
+from base.models.enums import education_group_categories, internship_presence, education_group_types
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
@@ -218,7 +218,8 @@ class TestPostponementEducationGroupYear(TestCase):
             administration_entity=administration_entity_version.entity,
         )
         self.education_group_type = EducationGroupTypeFactory(
-            category=education_group_categories.TRAINING
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.BACHELOR
         )
 
         start_year = AcademicYearFactory(year=get_current_year())
