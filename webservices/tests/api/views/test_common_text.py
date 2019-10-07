@@ -34,6 +34,7 @@ from base.tests.factories.person import PersonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from webservices.api.serializers.common_text import CommonTextSerializer
+from webservices.api.views.common_text import CommonText
 
 
 class CommonTextTestCase(APITestCase):
@@ -52,7 +53,7 @@ class CommonTextTestCase(APITestCase):
                 text_label__label=section
             )
             cls.data[tt.text_label.label] = tt.text
-        cls.url = reverse('commontexts_read', kwargs={
+        cls.url = reverse(CommonText.name, kwargs={
             'year': cls.egy.academic_year.year,
             'language': cls.language
         })

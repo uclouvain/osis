@@ -36,6 +36,7 @@ from base.tests.factories.education_group_year import EducationGroupYearCommonBa
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonAgregationFactory
 from base.tests.factories.person import PersonFactory
 from webservices.api.serializers.common_admission_condition import CommonAdmissionConditionSerializer
+from webservices.api.views.common_admission_condition import CommonAdmissionCondition
 
 
 class CommonAdmissionConditionTestCase(APITestCase):
@@ -59,7 +60,7 @@ class CommonAdmissionConditionTestCase(APITestCase):
                 field: getattr(ac, 'text_{}{}'.format(field, '_en')) or None
                 for field in relevant_attr
             }
-        cls.url = reverse('commonadmissionconditions_read', kwargs={
+        cls.url = reverse(CommonAdmissionCondition.name, kwargs={
             'year': cls.anac.year,
             'language': cls.language
         })
