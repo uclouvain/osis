@@ -215,14 +215,7 @@
                         return '<a href="'+ row['osis_url'] +'">'+ data + '</a>';
                     }
                 },
-                {
-                    "name": "title",
-                    "targets": 2,
-                    "data": "title",
-                    "render": function(data, type, row, meta){
-                        return data["fr"]
-                    }
-                },
+                { "name": "title", "targets": 2, "data": "title"},
                 {"name": "type", "targets": 3,  "data": "type_text"},
                 {"name": "subtype", "targets": 4,  "data": "subtype_text"},
                 {"name": "requirement_entity", "targets": 5, "data": "requirement_entity"},

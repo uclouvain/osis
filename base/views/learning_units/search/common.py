@@ -81,7 +81,13 @@ class SearchMixin:
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.is_ajax():
-            serializer = self.serializer_class(context["page_obj"], context={'request': self.request}, many=True)
+            serializer = self.serializer_class(
+                context["page_obj"],
+                context={
+                    'request': self.request,
+                    'language': self.request.LANGUAGE_CODE
+                },
+                many=True)
             return JsonResponse({'object_list': serializer.data})
         return super().render_to_response(context, **response_kwargs)
 
