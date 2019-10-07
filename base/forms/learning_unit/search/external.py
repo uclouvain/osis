@@ -93,7 +93,7 @@ class ExternalLearningUnitFilter(FilterSet):
             ('acronym', 'acronym'),
             ('full_title', 'title'),
             ('status', 'status'),
-            ('campus', 'campus'),
+            ('campus__organization__name', 'campus'),
             ('credits', 'credits'),
         ),
         widget=forms.HiddenInput
