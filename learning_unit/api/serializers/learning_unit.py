@@ -84,12 +84,11 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
             'status',
             'requirement_entity',
             'allocation_entity',
-            'title',
             'type',
             'type_text',
             'subtype',
             'subtype_text',
-            'has_proposal'
+            'has_proposal',
         )
 
     def get_has_proposal(self, learning_unit_year):
@@ -106,6 +105,9 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
     parent = LearningUnitHyperlinkedRelatedField(read_only=True, lookup_field='acronym')
     partims = LearningUnitHyperlinkedRelatedField(read_only=True, many=True, source='get_partims_related')
+
+    proposal = serializers.SerializerMethodField(read_only=True)
+    summary_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
