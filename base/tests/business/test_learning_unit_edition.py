@@ -26,7 +26,6 @@
 from datetime import datetime
 from decimal import Decimal
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.forms import model_to_dict
 from django.test import TestCase

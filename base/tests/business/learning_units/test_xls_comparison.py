@@ -170,7 +170,10 @@ class TestPropositionComparisonXls(TestCase):
 
         self.assertEqual(data[0], _('Proposal'))
         self.assertEqual(data[1], self.learning_unit_year_1.acronym)
-        self.assertEqual(data[2], self.learning_unit_year_1.academic_year.name)
+        self.assertEqual(data[2], "{}   ({} {})".format(self.learning_unit_year_1.academic_year.name,
+                                                        _('End').lower(),
+                                                        self.learning_unit_year_1.learning_unit.end_year.name)
+                         )
         self.assertEqual(data[3], self.learning_unit_year_1.learning_container_year.get_container_type_display())
         self.assertEqual(data[4], translate_status(self.learning_unit_year_1.status))
         self.assertEqual(data[5], self.learning_unit_year_1.get_subtype_display())
