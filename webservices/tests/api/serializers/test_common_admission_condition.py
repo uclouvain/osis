@@ -73,4 +73,4 @@ class CommonAdmissionConditionSerializerTestCase(TestCase):
             expected_fields = general_information_sections.COMMON_TYPE_ADMISSION_CONDITIONS[
                 egy.education_group_type.name
             ]
-            self.assertListEqual(list(self.serializer.data[egy.acronym].keys()), list(expected_fields))
+            self.assertCountEqual(list(self.serializer.data[egy.acronym].keys()), list(expected_fields))
