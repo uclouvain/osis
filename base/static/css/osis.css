@@ -244,3 +244,10 @@ div:target{
     width: 100% !important;
     padding: 0;
 }
+
+#clipboard{
+    position: fixed;
+    bottom: 0px;
+    right: 5px;
+    z-index: 9000;
+}

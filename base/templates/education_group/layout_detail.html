@@ -98,6 +98,14 @@
         </div>
     </div>
 
+    {% if selected_element_clipboard %}
+        <div id="clipboard" class="alert alert-info alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>Élément sélectionné</strong>
+            <br>
+            {{ selected_element_clipboard }}
+        </div>
+    {% endif %}
 
     <script>
         const root_id = "{{ root_id }}";
