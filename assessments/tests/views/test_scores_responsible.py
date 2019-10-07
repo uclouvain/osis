@@ -55,7 +55,10 @@ class ScoresResponsibleSearchTestCase(TestCase):
 
         cls.tutor = TutorFactory()
         cls.user = cls.tutor.person.user
-        cls.academic_year = AcademicYearFactory(year=datetime.date.today().year, start_date=datetime.date.today())
+        cls.academic_year = AcademicYearFactory(
+            year=datetime.date.today().year,
+            start_date=datetime.date.today() - datetime.timedelta(days=5)
+        )
 
         # FIXME: Old structure model [To remove]
         cls.structure = structure.StructureFactory()
@@ -123,7 +126,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         self.client.force_login(unauthorized_user)
 
         response = self.client.get(self.url)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_case_search_without_filter_ensure_ordering(self):
         data = {

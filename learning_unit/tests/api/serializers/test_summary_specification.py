@@ -31,7 +31,18 @@ from learning_unit.api.serializers.summary_specification import LearningUnitSumm
 class LearningAchievementListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.serializer = LearningUnitSummarySpecificationSerializer({})
+        data_to_serialize = {
+            'bibliography': 'BIBLIO',
+            'resume': 'RESUME',
+            'evaluation_methods': 'EVALUATION',
+            'other_informations': 'OTHER',
+            'online_resources': 'ONLINE',
+            'teaching_methods': 'TEACHING',
+            'themes_discussed': 'THEMES',
+            'prerequisite': 'PREREQUISITES',
+            'mobility': 'MOBILITY',
+        }
+        cls.serializer = LearningUnitSummarySpecificationSerializer(data_to_serialize)
 
     def test_contains_expected_fields(self):
         expected_fields = [

@@ -23,29 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import bleach
 import html
 
+import bleach
 from django.conf import settings
 from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, Style
 from openpyxl.utils import get_column_letter
 
-from base.models.person import get_user_interface_language
-from base.views.learning_unit import get_specifications_context
+from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN
-from base.models.teaching_material import TeachingMaterial
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
-from cms.models.translated_text_label import TranslatedTextLabel
-from cms.models.text_label import TextLabel
+from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
 from base.business.learning_unit_xls import annotate_qs
 from base.business.xls import get_name_or_username
+from base.models.person import get_user_interface_language
+from base.models.teaching_material import TeachingMaterial
+from base.views.learning_unit import get_specifications_context
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from cms.models.text_label import TextLabel
+from cms.models.translated_text import TranslatedText
+from cms.models.translated_text_label import TranslatedTextLabel
 from osis_common.document import xls_build
-from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
-from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
