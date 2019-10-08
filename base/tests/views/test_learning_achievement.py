@@ -387,9 +387,10 @@ class TestLearningAchievementPostponement(TestCase):
 
     def test_learning_achievement_deletion_with_postponement(self):
         self._create_achievements(code_name=1)
+        achievement = LearningAchievement.objects.filter(language__code=FR_CODE_LANGUAGE).first()
         operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
         self.client.post(operation_url, data={
-            'achievement_id': self.achievement_id,
+            'achievement_id': achievement.id,
             'action': DELETE
         })
         self.assertFalse(LearningAchievement.objects.all().exists())
@@ -405,19 +406,11 @@ class TestLearningAchievementPostponement(TestCase):
         self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
 
     def _create_achievements(self, code_name):
-        create_first_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
-        create_first_response = self.client.post(create_first_url)
-        lua_form = create_first_response.context['form']
-        lua_fr_id = lua_form.fields['lua_fr_id'].initial
-        lua_en_id = lua_form.fields['lua_en_id'].initial
-        self.achievement_id = lua_fr_id
-        create_url = reverse('achievement_create', args=[self.learning_unit_years[0].id, lua_fr_id])
+        create_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
         create_response = self.client.post(create_url, data={
             'language_code': 'fr-be',
             'code_name': code_name,
             'text_fr': 'text',
-            'lua_fr_id': lua_fr_id,
-            'lua_en_id': lua_en_id,
             'postpone': '1'
         })
         return create_response
