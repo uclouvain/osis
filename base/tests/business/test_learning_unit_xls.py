@@ -31,6 +31,7 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.business import attribution_charge_new
+from attribution.models.enums.function import COORDINATOR
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -40,6 +41,7 @@ from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPO
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
+from base.business.learning_unit_xls import _get_col_letter
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
@@ -61,8 +63,6 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
-from attribution.models.enums.function import COORDINATOR
-from base.business.learning_unit_xls import _get_col_letter
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'

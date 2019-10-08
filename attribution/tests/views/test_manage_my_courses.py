@@ -33,7 +33,6 @@ from django.test import RequestFactory
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils import timezone
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
