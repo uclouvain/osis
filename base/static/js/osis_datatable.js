@@ -23,11 +23,13 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
         },
         "info"  : false,
         "searching" : false,
+        'processing': true,
         "language": {
             "oAria": {
-                "sSortAscending":  "{% trans 'activate to sort column ascending'%}",
-                "sSortDescending": "{% trans 'activate to sort column descending'%}"
-            }
+                "sSortAscending":  gettext("activate to sort column ascending"),
+                "sSortDescending": gettext("activate to sort column descending")
+            },
+            'processing': gettext("Loading...")
         }
     });
 }
