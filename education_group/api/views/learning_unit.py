@@ -56,7 +56,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             .select_related('education_group_type', 'academic_year')
 
 
-class LearningUnitPrerequisitesList(generics.ListAPIView):
+class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
         Returns all education groups for which this learning unit year had prerequisites
     """
