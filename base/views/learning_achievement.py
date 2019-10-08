@@ -70,7 +70,7 @@ def execute_operation(achievements, operation_str):
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
-        if not next_luy.is_past():
+        if not next_luy.is_past() and an_achievement.code_name:
             last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
     return last_academic_year
 
@@ -78,12 +78,13 @@ def execute_operation(achievements, operation_str):
 def _postpone_operation(an_achievement, next_luy, operation_str):
     while next_luy.get_learning_unit_next_year():
         next_luy = next_luy.get_learning_unit_next_year()
-        an_achievement = LearningAchievement.objects.filter(
+        next_achievement = LearningAchievement.objects.filter(
             learning_unit_year=next_luy,
             code_name=an_achievement.code_name,
             language=an_achievement.language
         ).first()
-        getattr(an_achievement, operation_str)()
+        if next_achievement:
+            getattr(next_achievement, operation_str)()
     return next_luy.academic_year
 
 
@@ -137,7 +138,6 @@ def create(request, learning_unit_year_id, learning_achievement_id):
         request.POST or None,
         luy=learning_unit_yr
     )
-
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
 
@@ -179,7 +179,6 @@ def create_first(request, learning_unit_year_id):
         request.POST or None,
         luy=learning_unit_yr
     )
-
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
 

@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.learning_unit import get_academic_year_postponement_range
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
 from reference.models import language
@@ -57,8 +58,6 @@ class LearningAchievementEditForm(forms.ModelForm):
     text_en = forms.CharField(
         widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False, label=_('English')
     )
-    lua_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
-    lua_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     class Meta:
         model = LearningAchievement
@@ -78,14 +77,15 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def load_initial(self):
         for code, label in settings.LANGUAGES:
-            self.value, _ = LearningAchievement.objects.get_or_create(
+            self.value = get_object_or_none(
+                LearningAchievement,
                 learning_unit_year_id=self.luy.id,
                 code_name=self.code,
                 language=language.find_by_code(code[:2].upper())
             )
-            self.fields['text_{}'.format(code[:2])].initial = self.value.text
-            self.fields['lua_{}_id'.format(code[:2])].initial = self.value.id
-            self.fields['code_name'].initial = self.value.code_name
+            if self.value:
+                self.fields['text_{}'.format(code[:2])].initial = self.value.text
+                self.fields['code_name'].initial = self.value.code_name
 
     def _get_code_name_disabled_status(self):
         if self.instance.pk and self.instance.language.code == EN_CODE_LANGUAGE:
@@ -96,11 +96,13 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def _save_translated_text(self):
         for code, label in settings.LANGUAGES:
-            self.text = LearningAchievement.objects.select_related(
+            self.text, _ = LearningAchievement.objects.select_related(
                 'learning_unit_year__academic_year').prefetch_related(
                 'learning_unit_year__learning_unit__learningunityear_set'
-            ).get(
-                id=self.cleaned_data['lua_{}_id'.format(code[:2])]
+            ).get_or_create(
+                learning_unit_year_id=self.luy.id,
+                code_name=self.code,
+                language=language.find_by_code(code[:2].upper())
             )
             self.old_code_name = self.text.code_name
             self.text.code_name = self.cleaned_data.get('code_name')
