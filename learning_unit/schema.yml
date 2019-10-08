@@ -540,9 +540,13 @@ components:
         url:
           type: string
           format: uri
+        title:
+          type: string
         acronym:
           type: string
         code:
+          type: string
+        credits:
           type: string
         education_group_type:
           type: string

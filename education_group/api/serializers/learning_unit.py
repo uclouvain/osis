@@ -96,15 +96,26 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     prerequisites = serializers.CharField(source='prerequisite_string')
+    title = serializers.SerializerMethodField(read_only=True)
+    credits = serializers.CharField(source='education_group_year.credits', read_only=True)
 
     class Meta:
         model = Prerequisite
         fields = (
             'url',
+            'title',
             'acronym',
             'code',
+            'credits',
             'academic_year',
             'education_group_type',
             'education_group_type_text',
             'prerequisites'
+        )
+
+    def get_title(self, prerequisite):
+        language = self.context['language']
+        return getattr(
+            prerequisite.education_group_year,
+            'title' + ('_english' if language not in settings.LANGUAGE_CODE_FR else '')
         )
