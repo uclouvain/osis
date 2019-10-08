@@ -49,9 +49,15 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Sear
         context = super().get_context_data(**kwargs)
 
         starting_ac = starting_academic_year()
+        form = context["filter"].form
+
+        select_comparison_form_academic_year = starting_ac
+        if form.is_valid():
+            select_comparison_form_academic_year = form.cleaned_data["academic_year"] or \
+                                                   select_comparison_form_academic_year
         user_person = get_object_or_404(Person, user=self.request.user)
         context.update({
-            'form': context['filter'].form,
+            'form': form,
             'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
             'can_change_proposal_state': user_person.is_faculty_manager or user_person.is_central_manager,
             'learning_units_count': context["paginator"].count,
@@ -60,9 +66,7 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Sear
             'search_type': self.search_type,
             'page_obj': context["page_obj"],
             'items_per_page': context["paginator"].per_page,
-            "form_comparison": SelectComparisonYears(
-                academic_year=get_academic_year_of_reference(context['object_list'])
-            ),
+            "form_comparison": SelectComparisonYears(academic_year=select_comparison_form_academic_year),
         })
         return context
 

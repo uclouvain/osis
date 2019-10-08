@@ -57,17 +57,21 @@ class BorrowedLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, Sear
         context = super().get_context_data(**kwargs)
 
         starting_ac = starting_academic_year()
+        form = context["filter"].form
+
+        select_comparison_form_academic_year = starting_ac
+        if form.is_valid():
+            select_comparison_form_academic_year = form.cleaned_data["academic_year"] or \
+                                                   select_comparison_form_academic_year
 
         context.update({
-            'form': context['filter'].form,
+            'form': form,
             'learning_units_count': context["paginator"].count,
             'current_academic_year': starting_ac,
             'proposal_academic_year': starting_ac.next(),
             'search_type': self.search_type,
             'page_obj': context["page_obj"],
             'items_per_page': context["paginator"].per_page,
-            "form_comparison": SelectComparisonYears(
-                academic_year=get_academic_year_of_reference(context['object_list'])
-            ),
+            "form_comparison": SelectComparisonYears(academic_year=select_comparison_form_academic_year),
         })
         return context
