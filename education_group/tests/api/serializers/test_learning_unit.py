@@ -45,7 +45,10 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
         cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
