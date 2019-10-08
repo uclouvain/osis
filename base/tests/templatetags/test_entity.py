@@ -28,11 +28,11 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 
+from base.templatetags.entity import requirement_entity, entity_last_version
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.templatetags.entity import requirement_entity, entity_last_version
-from base.tests.factories.business.learning_units import GenerateContainer
 
 ENTITY_REQUIREMENT_ACRONYM = "DRT"
 

@@ -25,8 +25,8 @@
 ##############################################################################
 from django.conf.urls import url
 
-from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
 from education_group.api.views.group import GroupDetail
+from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingList, TrainingDetail
 

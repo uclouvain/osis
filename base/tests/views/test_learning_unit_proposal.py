@@ -54,7 +54,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
 from base.tests.factories.academic_year import create_current_academic_year, \
-    get_current_year, AcademicYearFactory
+    AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
