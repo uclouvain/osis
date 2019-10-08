@@ -30,7 +30,7 @@
 
         <div style="margin-top:10px;">
 
-            {% if page_obj %}
+            {% if learning_units_count %}
                 <div class="row">
 
                     <div class="col-md-3">
@@ -111,10 +111,7 @@
                 {
                     "name": "title",
                     "targets": 2,
-                    "data": "title",
-                    "render": function(data, type, row, meta){
-                        return data["fr"]
-                    }
+                    "data": "title"
                 },
                 {"name": "type", "targets": 3,  "data": "type_text"},
                 {"name": "subtype", "targets": 4,  "data": "subtype_text"},
