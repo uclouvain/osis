@@ -26,7 +26,6 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django_filters.views import FilterView
 
-from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models.academic_year import starting_academic_year

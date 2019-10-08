@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
 from base.business import learning_unit_proposal as proposal_business
-from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm, \
     ProposalLearningUnitFilter
