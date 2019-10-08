@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-01 09:19+0200\n"
+"POT-Creation-Date: 2019-10-08 16:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,9 @@ msgstr "Code non valide"
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
 
+msgid "Loading..."
+msgstr "Chargement en cours..."
+
 msgid "Modify"
 msgstr "Modifier"
 
@@ -76,3 +79,9 @@ msgstr "Ce champ est obligatoire."
 
 msgid "You should make a selection before clicking 'ok'"
 msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"
+
+msgid "activate to sort column ascending"
+msgstr "activer pour trier la colonne par ordre croissant"
+
+msgid "activate to sort column descending"
+msgstr "activer pour trier la colonne par ordre décroissant"
