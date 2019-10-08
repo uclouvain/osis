@@ -96,12 +96,17 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
         url = reverse('learning_unit_api_v1:' + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
         cls.serializer = LearningUnitYearPrerequisitesListSerializer(
             cls.prerequisite,
-            context={'request': RequestFactory().get(url)},
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            },
+
         )
 
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'title',
             'acronym',
             'code',
             'academic_year',
