@@ -546,8 +546,6 @@ components:
           type: string
         code:
           type: string
-        credits:
-          type: string
         education_group_type:
           type: string
         education_group_type_text:

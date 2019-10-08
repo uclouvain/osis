@@ -97,7 +97,6 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
     )
     prerequisites = serializers.CharField(source='prerequisite_string')
     title = serializers.SerializerMethodField(read_only=True)
-    credits = serializers.CharField(source='education_group_year.credits', read_only=True)
 
     class Meta:
         model = Prerequisite
@@ -106,7 +105,6 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
             'title',
             'acronym',
             'code',
-            'credits',
             'academic_year',
             'education_group_type',
             'education_group_type_text',

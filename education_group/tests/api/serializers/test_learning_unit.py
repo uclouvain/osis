@@ -109,7 +109,6 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
             'title',
             'acronym',
             'code',
-            'credits',
             'academic_year',
             'education_group_type',
             'education_group_type_text',
