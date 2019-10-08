@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
@@ -32,37 +32,18 @@ from education_group.api.views.training import TrainingList, TrainingDetail
 
 app_name = "education_group"
 
-# FIXME: Refactor URL
 urlpatterns = [
     url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2})?)$',
-        TrainingDetail.as_view(),
-        name=TrainingDetail.name
-    ),
-    url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2})?)/tree$',
-        TrainingTreeView.as_view(),
-        name=TrainingTreeView.name
-    ),
-    url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
-        MiniTrainingDetail.as_view(),
-        name=MiniTrainingDetail.name
-    ),
-    url(
-        r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/tree$',
-        MiniTrainingTreeView.as_view(),
-        name=MiniTrainingTreeView.name
-    ),
-    url(
-        r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
-        GroupDetail.as_view(),
-        name=GroupDetail.name
-    ),
-    url(
-        r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/tree$',
-        GroupTreeView.as_view(),
-        name=GroupTreeView.name
-    ),
+    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2})?)/', include([
+        url(r'^$', TrainingDetail.as_view(), name=TrainingDetail.name),
+        url(r'^tree/$', TrainingTreeView.as_view(), name=TrainingTreeView.name)
+    ])),
+    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
+        url(r'^$', MiniTrainingDetail.as_view(), name=MiniTrainingDetail.name),
+        url(r'^tree/$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name)
+    ])),
+    url(r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
+        url(r'^$', GroupDetail.as_view(), name=GroupDetail.name),
+        url(r'^tree/$', GroupTreeView.as_view(), name=GroupTreeView.name)
+    ])),
 ]
