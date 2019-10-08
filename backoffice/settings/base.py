@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import logging
 import os
 import sys
 
@@ -132,6 +133,11 @@ if TESTING:
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
+
+if '--no-logs' in sys.argv:
+    print('> Disabling logging levels of ERROR and below.')
+    sys.argv.remove('--no-logs')
+    logging.disable(logging.ERROR)
 
 # Remove this sh*t! We have inconsistency between module installed and tested
 APPS_TO_TEST = (
