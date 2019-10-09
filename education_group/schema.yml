@@ -148,6 +148,45 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - trainings
+  /trainings/{year}/{acronym}/title:
+    get:
+      description: Return the title of the training
+      operationId: trainingstitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
   /groups/{year}/{partial_acronym}:
     get:
       description: Return the detail of the group
@@ -179,7 +218,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+      - groups
   /groups/{year}/{partial_acronym}/tree:
     get:
       description: Return the tree of the group
@@ -211,7 +250,46 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+      - groups
+  /groups/{year}/{partial_acronym}/title:
+    get:
+      description: Return the title of the group
+      operationId: groupstitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - groups
   /mini_trainings/{year}/{partial_acronym}:
     get:
       description: Return the detail of the mini-training
@@ -243,7 +321,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+      - mini_trainings
   /mini_trainings/{year}/{partial_acronym}/tree:
     get:
       description: Return the tree of the mini-training
@@ -275,7 +353,46 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+      - mini_trainings
+  /mini_trainings/{year}/{partial_acronym}/title:
+    get:
+      description: Return the title of the mini training
+      operationId: minitrainingstitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
 components:
   securitySchemes:
     Token:
