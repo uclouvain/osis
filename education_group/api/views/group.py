@@ -23,27 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
-from education_group.api.views.group import GroupDetail
-from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
-from education_group.api.views.mini_training import MiniTrainingDetail
-from education_group.api.views.training import TrainingList, TrainingDetail
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
+from education_group.api.serializers.group import GroupDetailSerializer
 
-app_name = "education_group"
 
-urlpatterns = [
-    url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
-    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/]?[a-zA-Z]{1,2})?)/', include([
-        url(r'^$', TrainingDetail.as_view(), name=TrainingDetail.name),
-        url(r'^tree/$', TrainingTreeView.as_view(), name=TrainingTreeView.name)
-    ])),
-    url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
-        url(r'^$', MiniTrainingDetail.as_view(), name=MiniTrainingDetail.name),
-        url(r'^tree/$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name)
-    ])),
-    url(r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
-        url(r'^$', GroupDetail.as_view(), name=GroupDetail.name),
-        url(r'^tree/$', GroupTreeView.as_view(), name=GroupTreeView.name)
-    ])),
-]
+class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
+    """
+        Return the detail of the group
+    """
+    name = 'group_read'
+    serializer_class = GroupDetailSerializer
+
+    def get_object(self):
+        partial_acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.filter(
+                education_group_type__category=education_group_categories.GROUP
+            ).select_related(
+                'education_group_type',
+                'academic_year',
+                'main_teaching_campus',
+            ).prefetch_related(
+                'management_entity__entityversion_set',
+            ),
+            partial_acronym__iexact=partial_acronym,
+            academic_year__year=year
+        )
+        return egy

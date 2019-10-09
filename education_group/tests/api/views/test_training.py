@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
 
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -90,7 +90,10 @@ class GetAllTrainingTestCase(APITestCase):
         trainings = EducationGroupYear.objects.filter(
             education_group_type__category=education_group_categories.TRAINING,
         ).order_by('-academic_year__year', 'acronym')
-        serializer = TrainingListSerializer(trainings, many=True, context={'request': RequestFactory().get(self.url)})
+        serializer = TrainingListSerializer(trainings, many=True, context={
+            'request': RequestFactory().get(self.url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_all_training_specify_ordering_field(self):
@@ -108,7 +111,10 @@ class GetAllTrainingTestCase(APITestCase):
                 serializer = TrainingListSerializer(
                     trainings,
                     many=True,
-                    context={'request': RequestFactory().get(self.url, query_string)},
+                    context={
+                        'request': RequestFactory().get(self.url, query_string),
+                        'language': settings.LANGUAGE_CODE_EN
+                    },
                 )
                 self.assertEqual(response.data['results'], serializer.data)
 
@@ -142,7 +148,10 @@ class FilterTrainingTestCase(APITestCase):
         serializer = TrainingListSerializer(
             trainings,
             many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_EN
+            },
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -160,7 +169,10 @@ class FilterTrainingTestCase(APITestCase):
         serializer = TrainingListSerializer(
             trainings,
             many=True,
-            context={'request': RequestFactory().get(self.url, query_string)},
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_EN
+            },
         )
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -190,7 +202,10 @@ class GetTrainingTestCase(APITestCase):
         cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
 
         cls.user = UserFactory()
-        cls.url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
+        cls.url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -202,7 +217,7 @@ class GetTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_method_not_allowed(self):
-        methods_not_allowed = ['post', 'delete', 'put']
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
 
         for method in methods_not_allowed:
             response = getattr(self.client, method)(self.url)
@@ -214,11 +229,17 @@ class GetTrainingTestCase(APITestCase):
 
         serializer = TrainingDetailSerializer(
             self.training,
-            context={'request': RequestFactory().get(self.url)},
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE_EN
+            },
         )
         self.assertEqual(response.data, serializer.data)
 
     def test_get_invalid_training_case_not_found(self):
-        invalid_url = reverse('education_group_api_v1:training-detail', kwargs={'uuid':  uuid.uuid4()})
+        invalid_url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': 'ACRO',
+            'year': 2033
+        })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
