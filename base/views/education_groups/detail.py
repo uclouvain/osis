@@ -90,13 +90,18 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-class CatalogGenericDetailView():
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+class CatalogGenericDetailView:
+    def get_selected_element_for_clipboard(self):
+        selected_data = ElementCache(self.request.user).cached_data
+        if selected_data and selected_data.get('modelname') == LEARNING_UNIT_YEAR:
+            return LearningUnitYear.objects.get(id=selected_data.get('id'))
+        elif selected_data and selected_data.get('modelname') == EDUCATION_GROUP_YEAR:
+            return EducationGroupYear.objects.get(id=selected_data.get('id'))
+        return None
 
 
 @method_decorator(login_required, name='dispatch')
-class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
+class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
     # DetailView
     model = EducationGroupYear
     context_object_name = "education_group_year"
@@ -168,14 +173,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         return context
-
-    def get_selected_element_for_clipboard(self):
-        selected_data = ElementCache(self.request.user).cached_data
-        if selected_data and selected_data.get('modelname') == LEARNING_UNIT_YEAR:
-            return LearningUnitYear.objects.get(id=selected_data.get('id'))
-        elif selected_data and selected_data.get('modelname') == EDUCATION_GROUP_YEAR:
-            return EducationGroupYear.objects.get(id=selected_data.get('id'))
-        return None
 
     def get(self, request, *args, **kwargs):
         default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
