@@ -376,7 +376,7 @@ components:
         - $ref: '#/components/schemas/LearningUnit'
         - type: object
           properties:
-            credit:
+            credits:
               type: number
               multipleOf: 0.01
             status:
