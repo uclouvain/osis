@@ -23,16 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.utils.translation import ugettext_lazy as _
+from osis_common.utils.enumerations import ChoiceEnum
 
 
-class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
-    bibliography = serializers.CharField()
-    resume = serializers.CharField()
-    evaluation_methods = serializers.CharField()
-    other_informations = serializers.CharField()
-    online_resources = serializers.CharField()
-    teaching_methods = serializers.CharField()
-    themes_discussed = serializers.CharField()
-    prerequisite = serializers.CharField()
-    mobility = serializers.CharField(allow_null=True)
+class NodeType(ChoiceEnum):
+    TRAINING = _("Training")
+    MINI_TRAINING = _("Mini training")
+    GROUP = _("Group")
+    LEARNING_UNIT = _("Learning unit")

@@ -169,10 +169,14 @@ class ProposalLearningUnitFilter(FilterSet):
 
     def filter_tutor(self, queryset, name, value):
         for tutor_name in value.split():
+            filter_by_first_name = Q(
+                learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
+            )
+            filter_by_last_name = Q(
+                learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name
+            )
             queryset = queryset.filter(
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=
-                  tutor_name) |
-                Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name)
+                filter_by_first_name | filter_by_last_name
             ).distinct()
         return queryset
 
