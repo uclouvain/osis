@@ -285,3 +285,10 @@ div:target{
     from { opacity: 0; }
     to   { opacity: 1; }
 }
+
+#clipboard{
+    position: fixed;
+    bottom: 0px;
+    right: 5px;
+    z-index: 1000;
+}

@@ -47,6 +47,7 @@ from base.models.person import Person
 from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages
+from base.views.education_groups.detail import CatalogGenericDetailView
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -55,7 +56,7 @@ NO_PREREQUISITES = TrainingType.finality_types() + [
 
 
 @method_decorator(login_required, name='dispatch')
-class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
+class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
     model = LearningUnitYear
     context_object_name = "learning_unit_year"
     pk_url_kwarg = 'learning_unit_year_id'
@@ -82,6 +83,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context['tree'] = json.dumps(self.hierarchy.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(root)
+        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         return context
 
     def show_prerequisites(self, education_group_year):
