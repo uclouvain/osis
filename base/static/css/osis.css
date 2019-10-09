@@ -295,3 +295,10 @@ div.dataTables_wrapper div.dataTables_processing {
     position: fixed;
     top: 50%;
 }
+
+#clipboard{
+    position: fixed;
+    bottom: 0px;
+    right: 5px;
+    z-index: 1000;
+}
