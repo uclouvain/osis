@@ -94,6 +94,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     def get_has_proposal(self, learning_unit_year):
         return getattr(learning_unit_year, "has_proposal", None)
 
+
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
     periodicity_text = serializers.CharField(source='get_periodicity_display', read_only=True)
     quadrimester_text = serializers.CharField(source='get_quadrimester_display', read_only=True)
