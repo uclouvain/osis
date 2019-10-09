@@ -195,9 +195,10 @@ def create_first(request, learning_unit_year_id):
 @perms.can_update_learning_achievement
 def check_code(request, learning_unit_year_id):
     code = request.GET['code']
+    luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
     learning_achievement = LearningAchievement.objects.filter(
         learning_unit_year__learning_unit__learningunityear__id=learning_unit_year_id,
         code_name=code
-    ).exclude(learning_unit_year__id=learning_unit_year_id).first()
+    ).exclude(learning_unit_year__academic_year__year__lte=luy.academic_year.year).first()
     academic_year = learning_achievement.learning_unit_year.academic_year.name if learning_achievement else None
     return JsonResponse(data={'accept_postponement': learning_achievement is None, 'academic_year': academic_year})
