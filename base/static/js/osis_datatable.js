@@ -3,6 +3,10 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
     let domTable = $('#' + tableId);
     domTable.DataTable(
     {
+        'createdRow': function (row, data, dataIndex) {
+            $(row).attr('data-id', data['osis_url']);
+            $(row).attr('data-value', data['acronym']);
+        },
         columnDefs: columnDefs,
         "stateSave": true,
         "paging" : false,
