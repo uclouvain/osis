@@ -290,8 +290,8 @@ div:target{
  * Datatable css overwrite
  */
 
-/* Display processing message on top on search results */
+/* Display processing message on middle of page */
 div.dataTables_wrapper div.dataTables_processing {
-    top: 0;
-    opacity: 0.7;
+    position: fixed;
+    top: 50%;
 }
