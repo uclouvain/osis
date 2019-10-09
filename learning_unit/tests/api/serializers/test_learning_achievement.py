@@ -34,8 +34,7 @@ class LearningAchievementListSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.data_to_serialize = {
-            'fr': 'Texte en Français',
-            'en': 'Text in english',
+            'achievement': 'Texte en Français',
             'code_name': '1.',
             'dummy_field': 'XXXX'
         }
@@ -44,7 +43,6 @@ class LearningAchievementListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'code_name',
-            'fr',
-            'en'
+            'achievement'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

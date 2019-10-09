@@ -27,7 +27,9 @@ import os
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
+from django.middleware.locale import LocaleMiddleware
 from django.urls import reverse_lazy
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname((os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -89,9 +91,23 @@ INSTALLED_APPS = (
     'reversion',
 )
 
+
+class CustomLocaleMiddleware(LocaleMiddleware):
+    """
+        Set default language normally except if there is a query_param equal to 'lang'
+    """
+    def process_request(self, request):
+        language = request.GET.get('lang')
+        if language:
+            translation.activate(language)
+            request.LANGUAGE_CODE = translation.get_language()
+        else:
+            super().process_request(request)
+
+
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
+    'backoffice.settings.base.CustomLocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -103,6 +119,7 @@ MIDDLEWARE = (
     'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
+
 
 INTERNAL_IPS = ()
 # check if we are testing right now
@@ -116,11 +133,14 @@ if TESTING:
         'django.contrib.auth.hashers.MD5PasswordHasher',
     ]
 
+# Remove this sh*t! We have inconsistency between module installed and tested
 APPS_TO_TEST = (
     'osis_common',
     'reference',
     'rules_management',
     'base',
+    'education_group',
+    'learning_unit',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'

@@ -39,8 +39,8 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
-    list_display_links = None
-    readonly_fields = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
+    list_display_links = ('title', 'data_year')
+    readonly_fields = ('academic_year', 'title', 'data_year')
     list_filter = ('academic_year', 'reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)

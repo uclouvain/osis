@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
-
+from django.conf import settings
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -36,8 +35,11 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
-from education_group.api.views.learning_unit import EducationGroupRootsList
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
+    LearningUnitYearPrerequisitesListSerializer
+from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
 
 
 class TrainingListViewTestCase(APITestCase):
@@ -62,10 +64,11 @@ class TrainingListViewTestCase(APITestCase):
         )
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         cls.person = PersonFactory()
-        cls.url = reverse(
-            'learning_unit_api_v1:' + EducationGroupRootsList.name,
-            kwargs={'uuid': cls.learning_unit_year.uuid}
-        )
+        url_kwargs = {
+            'acronym': cls.learning_unit_year.acronym,
+            'year': cls.learning_unit_year.academic_year.year
+        }
+        cls.url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.person.user)
@@ -84,7 +87,10 @@ class TrainingListViewTestCase(APITestCase):
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_learning_unit_year_not_found(self):
-        invalid_url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs={'uuid': uuid.uuid4()})
+        invalid_url = reverse(
+            'learning_unit_api_v1:' + EducationGroupRootsList.name,
+            kwargs={'acronym': 'ACRO', 'year': 2019}
+        )
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -95,6 +101,75 @@ class TrainingListViewTestCase(APITestCase):
         serializer = EducationGroupRootsListSerializer(
             [self.training],
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
         )
         self.assertEqual(response.data, serializer.data)
+
+
+class LearningUnitPrerequisitesViewTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+
+        cls.education_group_year = TrainingFactory(
+            acronym='DROI1BA',
+            partial_acronym='LDROI1000',
+            academic_year=cls.academic_year
+        )
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year
+        )
+        cls.prerequisite = PrerequisiteFactory(
+            learning_unit_year=cls.learning_unit_year,
+            education_group_year=cls.education_group_year
+        )
+        PrerequisiteItemFactory(prerequisite=cls.prerequisite)
+        cls.person = PersonFactory()
+        url_kwargs = {
+            'acronym': cls.learning_unit_year.acronym,
+            'year': cls.learning_unit_year.academic_year.year
+        }
+        cls.url = reverse('learning_unit_api_v1:' + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_case_learning_unit_year_not_found(self):
+        invalid_url = reverse(
+            'learning_unit_api_v1:' + LearningUnitPrerequisitesList.name,
+            kwargs={'acronym': 'ACRO', 'year': 2019}
+        )
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = LearningUnitYearPrerequisitesListSerializer(
+            [self.prerequisite],
+            many=True,
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+        self.assertEqual(response.data, serializer.data)
+
