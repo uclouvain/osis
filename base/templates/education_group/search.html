@@ -165,8 +165,13 @@
 {% block script %}
     <script>
         $(document).ready(function () {
+            setEventKeepIds('table_education_groups', 'educationGroupIds');
             let domTable = $('#table_education_groups');
             domTable.DataTable({
+                'createdRow': function (row, data, dataIndex) {
+                    $(row).attr('data-id', data['url']);
+                    $(row).attr('data-value', data['acronym']);
+                },
                 columnDefs: [
                     {"name": "academic_year", "targets": 0, "data": "academic_year"},
                     {
