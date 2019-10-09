@@ -45,7 +45,10 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
         cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -93,12 +96,17 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
         url = reverse('learning_unit_api_v1:' + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
         cls.serializer = LearningUnitYearPrerequisitesListSerializer(
             cls.prerequisite,
-            context={'request': RequestFactory().get(url)},
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            },
+
         )
 
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'title',
             'acronym',
             'code',
             'academic_year',

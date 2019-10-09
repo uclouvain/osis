@@ -52,7 +52,7 @@ if 'assessments' in settings.INSTALLED_APPS:
 if 'attribution' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^attribution/', include('attribution.urls')),)
 if 'program_management' in settings.INSTALLED_APPS:
-    urlpatterns += (url(r'^programs_management/', include('program_management.urls')),)
+    urlpatterns += (url(r'^program_management/', include('program_management.urls')),)
 if 'webservices' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^api/', include('webservices.urls')),)
 if 'partnership' in settings.INSTALLED_APPS:

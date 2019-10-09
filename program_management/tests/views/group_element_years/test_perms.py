@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import code
 
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied

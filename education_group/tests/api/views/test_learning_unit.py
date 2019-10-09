@@ -166,7 +166,10 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
         serializer = LearningUnitYearPrerequisitesListSerializer(
             [self.prerequisite],
             many=True,
-            context={'request': RequestFactory().get(self.url)}
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
         )
         self.assertEqual(response.data, serializer.data)
 

@@ -540,6 +540,8 @@ components:
         url:
           type: string
           format: uri
+        title:
+          type: string
         acronym:
           type: string
         code:

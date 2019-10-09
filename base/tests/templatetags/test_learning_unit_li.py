@@ -459,7 +459,7 @@ class LearningUnitTagLiEditTest(TestCase):
                 'data_target': ''
             }
 
-            self.assertEqual(result, expected)
+        self.assertEqual(expected, result)
 
     def test_can_modify_end_year_by_proposal_undefined_group(self):
         faculty_no_faculty_no_central = PersonFactory()
