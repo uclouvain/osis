@@ -290,5 +290,5 @@ div:target{
     position: fixed;
     bottom: 0px;
     right: 5px;
-    z-index: 9000;
+    z-index: 1000;
 }
