@@ -57,6 +57,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'code',
@@ -69,7 +70,6 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             'schedule_type',
             'schedule_type_text',
             'keywords',
-            'title',
             'credits',
             'min_constraint',
             'max_constraint',

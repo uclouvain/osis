@@ -56,12 +56,12 @@ class TrainingListSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'academic_year',
             'administration_entity',
             'management_entity',
@@ -106,12 +106,12 @@ class TrainingDetailSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'academic_year',
             'administration_entity',
             'management_entity',

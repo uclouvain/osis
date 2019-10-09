@@ -56,6 +56,7 @@ class GroupDetailSerializerTestCase(TestCase):
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
             'acronym',
             'code',
@@ -63,7 +64,6 @@ class GroupDetailSerializerTestCase(TestCase):
             'academic_year',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'credits',
             'min_constraint',
             'max_constraint',
