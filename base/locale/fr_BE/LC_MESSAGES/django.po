@@ -1014,7 +1014,6 @@ msgstr "Ouverture informations pédagoqiques"
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue des formations."
 
-
 msgid "End"
 msgstr "Fin"
 
