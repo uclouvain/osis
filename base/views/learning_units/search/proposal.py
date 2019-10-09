@@ -1,23 +1,18 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages import WARNING
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django_filters.views import FilterView
 
 from base.business import learning_unit_proposal as proposal_business
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm, \
     ProposalLearningUnitFilter
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import starting_academic_year
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.utils.cache import CacheFilterMixin
 from base.views.common import display_messages_by_level
-from base.views.learning_units.search.common import PROPOSAL_SEARCH, SearchMixin, RenderToExcel, \
-    _create_xls_proposal, _create_xls_proposal_comparison
+from base.views.learning_units.search.common import PROPOSAL_SEARCH, _create_xls_proposal, _create_xls_proposal_comparison, BaseLearningUnitSearch
+from base.utils.search import RenderToExcel
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 ACTION_BACK_TO_INITIAL = "back_to_initial"
@@ -27,16 +22,10 @@ ACTION_FORCE_STATE = "force_state"
 
 @RenderToExcel("xls", _create_xls_proposal)
 @RenderToExcel("xls_comparison", _create_xls_proposal_comparison)
-class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
-    model = LearningUnitYear
+class SearchLearningUnitProposal(BaseLearningUnitSearch):
     template_name = "learning_unit/search/proposal.html"
-    raise_exception = True
     search_type = PROPOSAL_SEARCH
-
     filterset_class = ProposalLearningUnitFilter
-    permission_required = 'base.can_access_learningunit'
-    cache_exclude_params = 'xls_status'
-
     serializer_class = LearningUnitDetailedSerializer
 
     def get_filterset_kwargs(self, filterset_class):
@@ -47,23 +36,15 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Sear
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        starting_ac = starting_academic_year()
-        form = context["filter"].form
-
-        select_comparison_form_academic_year = starting_ac
+        form = context["form"]
+        select_comparison_form_academic_year = context["proposal_academic_year"]
         if form.is_valid():
             select_comparison_form_academic_year = form.cleaned_data["academic_year"] or \
                                                    select_comparison_form_academic_year
         user_person = get_object_or_404(Person, user=self.request.user)
         context.update({
-            'form': form,
             'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
             'can_change_proposal_state': user_person.is_faculty_manager or user_person.is_central_manager,
-            'learning_units_count': context["paginator"].count,
-            'current_academic_year': starting_ac,
-            'proposal_academic_year': starting_ac.next(),
-            'search_type': self.search_type,
-            'items_per_page': context["paginator"].per_page,
             "form_comparison": SelectComparisonYears(academic_year=select_comparison_form_academic_year),
         })
         return context

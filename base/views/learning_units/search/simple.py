@@ -23,16 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django_filters.views import FilterView
 
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models.academic_year import starting_academic_year
-from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import CacheFilterMixin
-from base.views.learning_units.search.common import SIMPLE_SEARCH, SearchMixin, \
-    RenderToExcel, _create_xls, _create_xls_comparison, _create_xls_attributions, _create_xls_with_parameters
+from base.views.learning_units.search.common import SIMPLE_SEARCH, _create_xls, _create_xls_comparison, _create_xls_attributions, _create_xls_with_parameters, \
+    BaseLearningUnitSearch
+from base.utils.search import RenderToExcel
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
@@ -41,36 +37,22 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls_comparison", _create_xls_comparison)
 @RenderToExcel("xls_educational_specifications", _create_xls_comparison)
 @RenderToExcel("xls", _create_xls)
-class LearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
-    model = LearningUnitYear
+class LearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
-    raise_exception = True
     search_type = SIMPLE_SEARCH
-
     filterset_class = LearningUnitFilter
-    permission_required = 'base.can_access_learningunit'
-    cache_exclude_params = 'xls_status'
-
     serializer_class = LearningUnitSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        starting_ac = starting_academic_year()
-        form = context["filter"].form
-
-        select_comparison_form_academic_year = starting_ac
+        form = context["form"]
+        select_comparison_form_academic_year = context["proposal_academic_year"]
         if form.is_valid():
             select_comparison_form_academic_year = form.cleaned_data["academic_year"] or \
                                                    select_comparison_form_academic_year
 
         context.update({
-            'form': form,
-            'learning_units_count': context["paginator"].count,
-            'current_academic_year': starting_ac,
-            'proposal_academic_year': starting_ac.next(),
-            'search_type': self.search_type,
-            'items_per_page': context["paginator"].per_page,
             "form_comparison": SelectComparisonYears(academic_year=select_comparison_form_academic_year),
         })
         return context
