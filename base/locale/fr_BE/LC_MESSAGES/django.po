@@ -1014,10 +1014,9 @@ msgstr "Ouverture informations pédagoqiques"
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue des formations."
 
-#, fuzzy
-#| msgid "And"
+
 msgid "End"
-msgstr "Et"
+msgstr "Fin"
 
 msgid "End date"
 msgstr "Date de fin"
