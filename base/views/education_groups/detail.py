@@ -62,10 +62,11 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.group_element_year import find_learning_unit_formations, GroupElementYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.program_manager import ProgramManager
-from base.utils.cache import cache
+from base.utils.cache import cache, ElementCache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms.enums import entity_name
@@ -84,9 +85,22 @@ SECTIONS_WITH_TEXT = (
 
 NUMBER_SESSIONS = 3
 
+LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
+EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
+
+
+class CatalogGenericDetailView:
+    def get_selected_element_for_clipboard(self):
+        selected_data = ElementCache(self.request.user).cached_data
+        if selected_data and selected_data.get('modelname') == LEARNING_UNIT_YEAR:
+            return LearningUnitYear.objects.get(id=selected_data.get('id'))
+        elif selected_data and selected_data.get('modelname') == EDUCATION_GROUP_YEAR:
+            return EducationGroupYear.objects.get(id=selected_data.get('id'))
+        return None
+
 
 @method_decorator(login_required, name='dispatch')
-class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
+class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
     # DetailView
     model = EducationGroupYear
     context_object_name = "education_group_year"
@@ -159,6 +173,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         )
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
+        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         return context
 
     def get(self, request, *args, **kwargs):

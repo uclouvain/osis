@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -32,11 +31,12 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
 
 
-class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
+class TrainingListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
@@ -49,27 +49,18 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-    title = serializers.SerializerMethodField(read_only=True)
 
-    class Meta:
+    class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
-        fields = (
+        fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'academic_year',
             'administration_entity',
             'management_entity',
-        )
-
-    def get_title(self, education_group_year):
-        language = self.context.get('language')
-        return getattr(
-            education_group_year,
-            'title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
 
 
