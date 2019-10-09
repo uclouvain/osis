@@ -3980,6 +3980,3 @@ msgstr "oui"
 msgid "yes,no"
 msgstr "oui,non"
 
-#~ msgid "The education group edition period is not open."
-#~ msgstr ""
-#~ "La période de modification d'organisation de formation n'est pas ouverte."
