@@ -31,7 +31,6 @@ class ExternalLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, Sear
             'current_academic_year': starting_ac,
             'proposal_academic_year': starting_ac.next(),
             'search_type': self.search_type,
-            'page_obj': context["page_obj"],
             'items_per_page': context["paginator"].per_page,
         })
         return context

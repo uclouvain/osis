@@ -153,6 +153,12 @@
                                         &nbsp;{% trans 'List of learning units with with one line per attribution' %}
                                     </a>
                                 </li>
+                                <li>
+                                    <a id="btn_produce_xls_educational_specifications"
+                                       style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with educational information and specifications' %}">
+                                        &nbsp;{% trans 'List of learning units with educational information and specifications' %}
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                         <div class="pull-right" style="margin-right: 10px">
@@ -267,6 +273,9 @@
         });
         $("#btn_produce_xls_detailled_attributions").click(function (e) {
             prepare_xls(e, 'xls_attributions');
+        });
+        $("#btn_produce_xls_educational_specifications").click(function (e) {
+            prepare_xls(e, 'xls_educational_specifications');
         });
     </script>
 {% endblock script %}

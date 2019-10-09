@@ -418,7 +418,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'))
 
         context = response.context
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_units_count'], 0)
 
@@ -432,7 +432,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_learning_units_search_by_acronym_with_valid_regex(self):
@@ -443,7 +443,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_by_acronym_with_invalid_regex(self):
@@ -456,7 +456,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
 
     def test_learning_units_search_with_requirement_entity(self):
         self._prepare_context_learning_units_search()
@@ -467,7 +467,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_requirement_entity_and_subord(self):
@@ -478,7 +478,7 @@ class LearningUnitViewTestCase(TestCase):
             'with_entity_subordinated': True
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
 
         self.assertEqual(response.context['learning_units_count'], 6)
 
@@ -491,7 +491,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_with_requirement_and_allocation_entity(self):
@@ -503,7 +503,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_service_course_no_result(self):
@@ -548,7 +548,7 @@ class LearningUnitViewTestCase(TestCase):
         self._prepare_context_learning_units_search()
         response = self.client.get(reverse("learning_units_service_course"), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/service_course.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], number_of_results)
 
     def test_learning_units_search_quadrimester(self):
@@ -562,7 +562,7 @@ class LearningUnitViewTestCase(TestCase):
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_unit/search/simple.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_unit_read(self):

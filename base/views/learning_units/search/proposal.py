@@ -63,7 +63,6 @@ class SearchLearningUnitProposal(PermissionRequiredMixin, CacheFilterMixin, Sear
             'current_academic_year': starting_ac,
             'proposal_academic_year': starting_ac.next(),
             'search_type': self.search_type,
-            'page_obj': context["page_obj"],
             'items_per_page': context["paginator"].per_page,
             "form_comparison": SelectComparisonYears(academic_year=select_comparison_form_academic_year),
         })

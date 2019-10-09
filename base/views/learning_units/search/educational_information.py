@@ -64,7 +64,6 @@ class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMix
             'is_faculty_manager': self.request.user.person.is_faculty_manager,
             'search_type': self.search_type,
             'learning_units_count': context['paginator'].count,
-            'page_obj': context["page_obj"],
             'items_per_page': context["paginator"].per_page,
         })
         return context
