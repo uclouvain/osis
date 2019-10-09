@@ -58,6 +58,7 @@ class TestPerms(TestCase):
         self.central_manager = CentralManagerFactory('can_edit_learningunit_pedagogy')
         self.luy = LearningUnitYearFactory(
             learning_unit=self.learning_unit,
+            academic_year=self.current_academic_year,
             learning_container_year=self.lcy,
         )
         self.central_manager.linked_entities = [self.lcy.requirement_entity.id]
@@ -135,9 +136,7 @@ class TestPerms(TestCase):
 
     def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):
         administrative_manager = AdministrativeManagerFactory()
-        luy = LearningUnitYearFactory(learning_unit=self.learning_unit, learning_container_year=self.lcy,
-                                      academic_year=self.lcy.academic_year)
-        self.assertFalse(is_eligible_for_modification(luy, administrative_manager))
+        self.assertFalse(is_eligible_for_modification(self.luy, administrative_manager))
 
     @mock.patch('waffle.models.Flag.is_active_for_user', return_value=True)
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)

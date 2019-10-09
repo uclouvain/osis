@@ -23,16 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from rest_framework import serializers
 
 
-class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
-    bibliography = serializers.CharField()
-    resume = serializers.CharField()
-    evaluation_methods = serializers.CharField()
-    other_informations = serializers.CharField()
-    online_resources = serializers.CharField()
-    teaching_methods = serializers.CharField()
-    themes_discussed = serializers.CharField()
-    prerequisite = serializers.CharField()
-    mobility = serializers.CharField(allow_null=True)
+class CommonTextSerializer(serializers.Serializer):
+    agregation = serializers.CharField()
+    caap = serializers.CharField()
+    prerequis = serializers.CharField()
+    module_complementaire = serializers.CharField()
+    evaluation = serializers.CharField()
+
+    class Meta:
+        fields = (
+            'agregation',
+            'caap',
+            'prerequis',
+            'module_complementaire',
+            'evaluation',
+            'finalites_didactiques-commun'
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.update({'finalites_didactiques-commun': serializers.CharField(read_only=True)})

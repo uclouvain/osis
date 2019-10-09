@@ -23,16 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from rest_framework import serializers
 
 
-class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
-    bibliography = serializers.CharField()
-    resume = serializers.CharField()
-    evaluation_methods = serializers.CharField()
-    other_informations = serializers.CharField()
-    online_resources = serializers.CharField()
-    teaching_methods = serializers.CharField()
-    themes_discussed = serializers.CharField()
-    prerequisite = serializers.CharField()
-    mobility = serializers.CharField(allow_null=True)
+class CommonAdmissionConditionSerializer(serializers.Serializer):
+    class Meta:
+        fields = (
+            'common-1ba',
+            'common-2m',
+            'common-2mc',
+            'common-2a',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        common_fields = ['common-1ba', 'common-2m', 'common-2mc', 'common-2a']
+        for field in common_fields:
+            self.fields.update({field: serializers.DictField(read_only=True)})
