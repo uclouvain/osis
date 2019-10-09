@@ -32,8 +32,57 @@ from rest_framework.test import APITestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import GroupFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.group import GroupDetailSerializer
+
+
+class GroupTitleTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        anac = AcademicYearFactory()
+
+        cls.egy = GroupFactory(
+            academic_year=anac,
+        )
+
+        cls.person = PersonFactory()
+        cls.url = reverse('education_group_api_v1:groupstitle_read', kwargs={
+            'partial_acronym': cls.egy.partial_acronym,
+            'year': cls.egy.academic_year.year
+        })
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_case_education_group_year_not_found(self):
+        invalid_url = reverse('education_group_api_v1:groupstitle_read', kwargs={
+            'partial_acronym': 'ACRO',
+            'year': 2019
+        })
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = EducationGroupTitleSerializer(self.egy, context={'language': settings.LANGUAGE_CODE})
+        self.assertEqual(response.data, serializer.data)
 
 
 class GetGroupTestCase(APITestCase):

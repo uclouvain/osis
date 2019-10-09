@@ -100,7 +100,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{year}/{acronym}/get_title:
+  /learning_units/{year}/{acronym}/title:
     get:
       description: Return the title of the learning unit
       operationId: learningunitstitle_read
