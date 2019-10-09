@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-01 09:19+0200\n"
+"POT-Creation-Date: 2019-10-08 16:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,9 @@ msgstr ""
 msgid "Link to CDN Doc"
 msgstr ""
 
+msgid "Loading..."
+msgstr ""
+
 msgid "Modify"
 msgstr ""
 
@@ -75,4 +78,10 @@ msgid "This field is required"
 msgstr ""
 
 msgid "You should make a selection before clicking 'ok'"
+msgstr ""
+
+msgid "activate to sort column ascending"
+msgstr ""
+
+msgid "activate to sort column descending"
 msgstr ""
