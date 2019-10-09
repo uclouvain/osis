@@ -131,20 +131,6 @@ def is_eligible_to_delete_education_group_year(person, education_group_yr, raise
     return can_delete_all_education_group(person.user, education_group_yr.education_group)
 
 
-def is_education_group_edit_period_opened(education_group, raise_exception=False):
-    error_msg = None
-
-    qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
-    if not qs.exists():
-        error_msg = _("The education group edition period is not open.")
-    elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
-        error_msg = _("This education group is not editable during this period.")
-
-    result = error_msg is None
-    can_raise_exception(raise_exception, result, error_msg)
-    return result
-
-
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (check_link_to_management_entity(education_group, person, raise_exception) and
             (person.is_central_manager or EventPermEducationGroupEdition.is_open(education_group=education_group,
