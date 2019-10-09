@@ -29,14 +29,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
-from program_management.business.group_element_years import postponement
-from program_management.business.group_element_years import management
-from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import starting_academic_year
+from program_management.business.group_element_years import postponement, management
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 
 ERRORS_MSG = {

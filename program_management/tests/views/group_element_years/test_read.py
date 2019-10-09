@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -137,8 +137,7 @@ class TestReadPdfContent(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch__academic_year=cls.academic_year)
-        cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = CentralManagerFactory("can_access_education_group")
         cls.url = reverse(
             "group_content",
             kwargs={

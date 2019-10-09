@@ -98,7 +98,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     limited_by_category = None
 
-    # TODO: resolve dependency in other ways
+    # FIXME: resolve dependency in other ways
     with_tree = 'program_management' in settings.INSTALLED_APPS
 
     def get_queryset(self):
@@ -143,7 +143,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            # TODO: resolve dependency in other way
+            # FIXME: resolve dependency in other way
             from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
             education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
                                                                      tab_to_show=self.request.GET.get('tab_to_show'))
