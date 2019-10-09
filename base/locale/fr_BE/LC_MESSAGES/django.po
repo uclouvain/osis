@@ -2880,8 +2880,8 @@ msgstr "L'UE a des prérequis"
 msgid "The learning unit has prerequisites and is a prerequisite"
 msgstr "L'UE a des prérequis et est un prérequis"
 
-msgid "The learning unit have partim"
-msgstr "L'unité d'enseignement dispose de partim"
+msgid "The learning unit have partim :"
+msgstr "L'unité d'enseignement dispose de partim :"
 
 msgid "The learning unit is a prerequisite"
 msgstr "L'UE est un prérequis"

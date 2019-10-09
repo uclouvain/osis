@@ -2750,7 +2750,7 @@ msgstr ""
 msgid "The learning unit has prerequisites and is a prerequisite"
 msgstr ""
 
-msgid "The learning unit have partim"
+msgid "The learning unit have partim :"
 msgstr ""
 
 msgid "The learning unit is a prerequisite"
