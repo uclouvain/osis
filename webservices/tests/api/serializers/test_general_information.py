@@ -89,6 +89,7 @@ class GeneralInformationSerializerTestCase(TestCase):
             'acronym',
             'title',
             'year',
+            'sections'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
