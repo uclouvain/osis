@@ -38,7 +38,8 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
-from base.business.education_groups import general_information_sections, group_element_year_tree
+from base.business.education_groups import general_information_sections
+from program_management.business.group_element_years import group_element_year_tree
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear

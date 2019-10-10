@@ -29,7 +29,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
-from base.business.group_element_years import management, postponement
+from program_management.business.group_element_years import postponement, management
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear

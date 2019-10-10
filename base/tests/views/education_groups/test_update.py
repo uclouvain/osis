@@ -38,8 +38,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
-from base.business.group_element_years import management
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from program_management.business.group_element_years import management
+from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
@@ -66,8 +66,7 @@ from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.utils.cache import ElementCache
-from base.views.education_groups.update import _get_success_redirect_url, \
-    update_education_group
+from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
