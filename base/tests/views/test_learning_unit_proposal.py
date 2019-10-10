@@ -940,12 +940,6 @@ class TestLearningUnitProposalDisplay(TestCase):
             proposal_business.NO_PREVIOUS_VALUE)
         self.assertEqual(differences, proposal_business.NO_PREVIOUS_VALUE)
 
-    def test_replace_key_of_foreign_key(self):
-        changed_dict = proposal_business._replace_key_of_foreign_key(
-            {'key1{}'.format(proposal_business.END_FOREIGN_KEY_NAME): 1,
-             'key2': 2})
-        self.assertEqual(changed_dict, {'key1': 1, 'key2': 2})
-
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)
         self.assertEqual(differences, str(self.campus.name))

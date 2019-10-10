@@ -77,9 +77,6 @@ class TestComparison(TestCase):
         data = self.learning_unit_year.__dict__
         self.assertEqual(get_value(LearningUnitYear, data, 'specific_title'), TITLE)
 
-    def test_get_keys(self):
-        self.assertCountEqual(get_keys(['a1', 'c3'], ['a1', 'b2', 'c1']), ['a1', 'b2', 'c1', 'c3'])
-
 
 class LearningUnitYearComparaisonTest(TestCase):
 

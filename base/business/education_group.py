@@ -102,11 +102,6 @@ EDUCATION_GROUP_TITLES_ADMINISTRATIVE = [
     SIGNATORY_QUALIFICATION_COL,
 ]
 
-SIGNATORIES = 'signatories'
-SECRETARIES = 'secretaries'
-PRESIDENTS = 'presidents'
-NUMBER_SESSIONS = 3
-
 
 def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exception=False):
     """

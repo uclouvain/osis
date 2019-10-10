@@ -278,13 +278,6 @@ def _get_entity_to_display(entity):
     return entity.acronym if entity else EMPTY_VALUE
 
 
-def _get_academic_year(obj):
-    if isinstance(obj, LearningUnitYear):
-        return obj.academic_year
-    if isinstance(obj, (ProposalLearningUnit, ExternalLearningUnitYear)):
-        return obj.learning_unit_year.academic_year
-
-
 def _check_changes_other_than_code_and_year(first_data, second_data, line_index):
     modifications = []
     for col_index, obj in enumerate(first_data):
@@ -320,26 +313,6 @@ def _get_component_data_by_type(component, type):
         ]
     else:
         return []
-
-
-def _get_learning_unit_yr_with_component(learning_unit_years):
-    learning_unit_years = LearningUnitYear.objects.filter(
-        learning_unit_year_id__in=[luy.id for luy in learning_unit_years]
-        ).select_related(
-        'academic_year',
-        'learning_container_year',
-        'learning_container_year__academic_year'
-    ).prefetch_related(
-        get_learning_component_prefetch()
-    ).prefetch_related(
-        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
-        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
-        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
-        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
-    ).order_by('learning_unit', 'academic_year__year')
-    [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
-    [append_components(learning_unit) for learning_unit in learning_unit_years]
-    return learning_unit_years
 
 
 def prepare_xls_content_for_comparison(luy_with_proposals):
