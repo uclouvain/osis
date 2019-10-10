@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
-from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
 
 
-class DynamicChoiceField(forms.ChoiceField):
-    """ This field accepts a value even this value was not in the initial list
-        It is used for list with ajax filtering
-    """
-    def validate(self, value):
-        if self.required and not value:
-            ValidationError(self.error_messages['required'])
+class SummaryStatus(ChoiceEnum):
+    BLOCKED = _("Blocked")
+    MODIFIED = _("Modified")
+    NOT_MODIFIED = _("Not modified")

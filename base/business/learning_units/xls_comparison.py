@@ -278,14 +278,6 @@ def _get_entity_to_display(entity):
     return entity.acronym if entity else EMPTY_VALUE
 
 
-def get_academic_year_of_reference(objects):
-    """ TODO : Has to be improved because it's not optimum if the xls list is created from a search with a
-    criteria : academic_year = 'ALL' """
-    if objects:
-        return _get_academic_year(objects[0])
-    return starting_academic_year()
-
-
 def _get_academic_year(obj):
     if isinstance(obj, LearningUnitYear):
         return obj.academic_year
