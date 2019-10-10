@@ -52,8 +52,8 @@ def operation(request, learning_achievement_id, operation_str):
                                                     EN_CODE_LANGUAGE,
                                                     achievement_fr.order)
     anchor = get_anchor_reference(operation_str, achievement_fr)
-
-    last_academic_year = execute_operation([achievement_fr, achievement_en], operation_str)
+    filtered_achievements = list(filter(None, [achievement_fr, achievement_en]))
+    last_academic_year = execute_operation(filtered_achievements, operation_str)
     default_success_msg = _("Operation on learning achievement has been successfully completed")
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
         display_success_messages(request, _build_postponement_success_message(default_success_msg))
@@ -66,7 +66,7 @@ def operation(request, learning_achievement_id, operation_str):
 
 def execute_operation(achievements, operation_str):
     last_academic_year = None
-    for an_achievement in [a for a in achievements if a]:
+    for an_achievement in achievements:
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
