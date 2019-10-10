@@ -473,7 +473,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
                                                                              rec["attribution__start_year"],
                                                                              rec["attribution__function"]))
     msgs = []
-    for attribution_key, charges in charges_by_attribution:
+    for _, charges in charges_by_attribution:
         charges = list(charges)
         subtype_key = "learning_component_year__learning_unit_year__subtype"
         full_total_charges = next(

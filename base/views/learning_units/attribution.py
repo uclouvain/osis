@@ -114,9 +114,6 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
             del form_classes["practical_charge_form"]
         return form_classes
 
-    def get_attribution_form_initial(self):
-        return {"duration": self.attribution.duration}
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["attribution"] = self.attribution
@@ -141,15 +138,6 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
             "practical_charge_form": self.attribution.practical_charges[0] if self.attribution.practical_charges
             else None
         }.get(form_name)
-
-    def attribution_form_valid(self, attribution_form):
-        attribution_form.save()
-
-    def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(attribution=self.attribution)
-
-    def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(attribution=self.attribution)
 
     def get_success_message(self, forms):
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
@@ -180,14 +168,6 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
         attribution_form = forms["attribution_form"]
         attribution_form.save()
         return super().forms_valid(forms)
-
-    def lecturing_charge_form_valid(self, lecturing_charge_form):
-        attribution_form = self.instantiated_forms["attribution_form"]
-        lecturing_charge_form.save(attribution=attribution_form.instance)
-
-    def practical_charge_form_valid(self, practical_charge_form):
-        attribution_form = self.instantiated_forms["attribution_form"]
-        practical_charge_form.save(attribution=attribution_form.instance)
 
     def get_success_message(self, forms):
         attribution = forms["attribution_form"].instance

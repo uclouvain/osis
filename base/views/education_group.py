@@ -102,12 +102,6 @@ def education_group_edit_administrative_data(request, root_id, education_group_y
     return render(request, "education_group/tab_edit_administrative_data.html", locals())
 
 
-def find_root_by_name(text_label_name):
-    return TextLabel.objects.prefetch_related(
-        Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
-    ).get(label=text_label_name, parent__isnull=True)
-
-
 def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
     form = EducationGroupPedagogyEditForm(request.POST)
     redirect_url = reverse('education_group_general_informations', kwargs={

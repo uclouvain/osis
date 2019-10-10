@@ -80,16 +80,6 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
         return context
 
 
-def _manage_session_variables(request, search_type):
-    remove_from_session(request, 'search_url')
-    if search_type == 'EXTERNAL':
-        request.session['ue_search_type'] = str(_('External learning units'))
-    elif search_type == SIMPLE_SEARCH:
-        request.session['ue_search_type'] = None
-    else:
-        request.session['ue_search_type'] = str(_get_search_type_label(search_type))
-
-
 def _get_filter(form, search_type):
     criterias = itertools.chain([(_('Search type'), _get_search_type_label(search_type))], get_research_criteria(form))
     return collections.OrderedDict(criterias)
@@ -134,12 +124,6 @@ def _create_xls_attributions(view_obj, context, **response_kwargs):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_attributions(user, luys, filters)
-
-
-def _create_xls_educational_information_and_specifications(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
 
 
 def _create_xls_proposal(view_obj, context, **response_kwargs):
