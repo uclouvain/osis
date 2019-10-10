@@ -30,6 +30,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -42,13 +43,13 @@ class LearningUnitAttributionTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         tutor = TutorFactory(person=PersonFactory())
-        attribution = AttributionNewFactory(
+        cls.attribution = AttributionNewFactory(
             tutor=tutor,
             substitute=PersonFactory()
         )
         cls.luy = LearningUnitYearFactory()
-        cls.attrib = AttributionChargeNewFactory(
-            attribution=attribution,
+        cls.attribution_charge = AttributionChargeNewFactory(
+            attribution=cls.attribution,
             learning_component_year__learning_unit_year=cls.luy
         )
 
@@ -86,13 +87,13 @@ class LearningUnitAttributionTestCase(APITestCase):
     def test_get_results(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        attribution = AttributionChargeNew.objects.annotate(
-            first_name=F('attribution__tutor__person__first_name'),
-            middle_name=F('attribution__tutor__person__middle_name'),
-            last_name=F('attribution__tutor__person__last_name'),
-            email=F('attribution__tutor__person__email'),
-            global_id=F('attribution__tutor__person__global_id'),
-        ).get(id=self.attrib.id)
+        attribution = AttributionNew.objects.annotate(
+            first_name=F('tutor__person__first_name'),
+            middle_name=F('tutor__person__middle_name'),
+            last_name=F('tutor__person__last_name'),
+            email=F('tutor__person__email'),
+            global_id=F('tutor__person__global_id'),
+        ).get(id=self.attribution.pk)
 
         serializer = LearningUnitAttributionSerializer([attribution], many=True)
         self.assertEqual(response.data, serializer.data)

@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
+from django.db.models import F, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
+from attribution.models.enums.function import Functions
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.attribution import LearningUnitAttributionSerializer
 
@@ -47,18 +49,16 @@ class LearningUnitAttribution(generics.ListAPIView):
             acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
-        return AttributionChargeNew.objects.select_related(
-            'learning_component_year__learning_unit_year',
-            'attribution__tutor__person',
-            'attribution__substitute'
-        ).filter(
-            learning_component_year__learning_unit_year=luy
+        return AttributionNew.objects.filter(
+            Q(attributionchargenew__learning_component_year__learning_unit_year=luy) |
+            # Coordinator doesn't have any volume
+            Q(learning_container_year_id=luy.learning_container_year_id, function=Functions.COORDINATOR.name)
         ).distinct(
-            'attribution__tutor'
+            'tutor', 'function'
         ).annotate(
-            first_name=F('attribution__tutor__person__first_name'),
-            middle_name=F('attribution__tutor__person__middle_name'),
-            last_name=F('attribution__tutor__person__last_name'),
-            email=F('attribution__tutor__person__email'),
-            global_id=F('attribution__tutor__person__global_id'),
+            first_name=F('tutor__person__first_name'),
+            middle_name=F('tutor__person__middle_name'),
+            last_name=F('tutor__person__last_name'),
+            email=F('tutor__person__email'),
+            global_id=F('tutor__person__global_id'),
         )
