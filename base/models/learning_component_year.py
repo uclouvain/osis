@@ -157,9 +157,6 @@ class LearningComponentYear(SerializableModel):
 
         return _warnings
 
-    def get_repartition_volume(self, entity_type):
-        return self.repartition_volumes[entity_type]
-
     @cached_property
     def vol_global(self):
         return (self.hourly_volume_total_annual or Decimal(0)) * (self.planned_classes or Decimal(0))

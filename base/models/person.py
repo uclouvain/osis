@@ -102,14 +102,6 @@ class Person(SerializableModel):
             return None
         return self.user.username
 
-    def get_first_name(self):
-        if self.first_name:
-            return self.first_name
-        elif self.user:
-            return self.user.first_name
-        else:
-            return "-"
-
     @cached_property
     def is_central_manager(self):
         return self.user.groups.filter(name=CENTRAL_MANAGER_GROUP).exists()
@@ -259,7 +251,7 @@ def count_by_email(email):
     return search_by_email(email).count()
 
 
-# FIXME Returns queryset.none() in place of None
+# FIXME Returns queryset.none() in place of None And Only used in tests !!!
 # Also reuse search method and filter by employee then
 def search_employee(full_name):
     queryset = annotate_with_first_last_names()
@@ -290,5 +282,5 @@ def find_by_firstname_or_lastname(name):
     return Person.objects.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
 
 
-def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception=False):
+def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)

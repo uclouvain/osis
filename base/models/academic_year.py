@@ -159,9 +159,3 @@ def starting_academic_year():
 
 def compute_max_academic_year_adjournment():
     return starting_academic_year().year + LEARNING_UNIT_CREATION_SPAN_YEARS
-
-
-def get_last_academic_years(last_years=10):
-    today = datetime.date.today()
-    date_ten_years_before = today.replace(year=today.year - last_years)
-    return AcademicYear.objects.filter(start_date__gte=date_ten_years_before)

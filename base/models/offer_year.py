@@ -83,22 +83,6 @@ class OfferYear(SerializableModel):
     def __str__(self):
         return u"%s - %s" % (self.academic_year, self.acronym)
 
-    def related_entities(self):
-        entities = []
-        if self.entity_administration:
-            entities.append(self.entity_administration)
-
-        if self.entity_administration_fac and self.entity_administration_fac not in entities:
-            entities.append(self.entity_administration_fac)
-
-        if self.entity_management and self.entity_management not in entities:
-            entities.append(self.entity_management)
-
-        if self.entity_management_fac:
-            entities.append(self.entity_management_fac)
-
-        return set(entities)
-
     @property
     def offer_year_children(self):
         """
@@ -114,13 +98,6 @@ class OfferYear(SerializableModel):
         if self.parent:
             return OfferYear.objects.filter(parent=self.parent).exclude(id=self.id).exclude()
         return None
-
-    @property
-    def is_orientation(self):
-        if self.orientation_sibling():
-            return True
-        else:
-            return False
 
     @property
     def orientation_sibling(self):
@@ -175,10 +152,3 @@ def find_by_user(user, academic_yr=None):
     program_manager_queryset = program_manager.find_by_user(user, academic_year=academic_yr)
     offer_year_ids = program_manager_queryset.values_list('offer_year', flat=True).distinct('offer_year')
     return OfferYear.objects.filter(pk__in=offer_year_ids).order_by('acronym')
-
-
-def get_last_offer_year_by_offer(an_offer):
-    last_offer_year = an_offer.offeryear_set.order_by('-academic_year__start_date').first()
-    if last_offer_year:
-        return last_offer_year
-    return None

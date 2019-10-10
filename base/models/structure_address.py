@@ -43,7 +43,3 @@ class StructureAddress(models.Model):
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(max_length=255, blank=True, null=True)
-
-
-def find_structure_address(a_structure):
-    return StructureAddress.objects.filter(structure=a_structure).first()

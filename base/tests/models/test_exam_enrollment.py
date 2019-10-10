@@ -146,11 +146,6 @@ class ExamEnrollmentTest(TestCase):
                                    offer_enrollment=self.offer_enrollment)
         self.assertTrue(exam_enrollment.is_deadline_tutor_reached(self.exam_enrollment))
 
-    def test_find_by_student(self):
-        self.assertCountEqual(exam_enrollment.find_by_student(None), [])
-        self.exam_enrollment.save()
-        self.assertCountEqual(exam_enrollment.find_by_student(self.student), [self.exam_enrollment])
-
     def test_find_for_score_encodings_for_all_enrollement_state(self):
         self.assertCountEqual(exam_enrollment.find_for_score_encodings(
             session_exam_number=1,

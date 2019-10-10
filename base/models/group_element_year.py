@@ -282,11 +282,6 @@ class GroupElementYear(OrderedModel):
     def child(self):
         return self.child_branch or self.child_leaf
 
-    def is_deletable(self):
-        if self.child:
-            return False
-        return True
-
     def _verbose_credits(self):
         if self.relative_credits or self.child_branch.credits:
             return "{} ({} {})".format(

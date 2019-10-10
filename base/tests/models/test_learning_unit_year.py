@@ -103,25 +103,6 @@ class LearningUnitYearTest(TestCase):
 
         self.assertTrue(self.learning_unit_year.in_charge)
 
-    def test_find_gte_learning_units_year(self):
-        learning_unit = LearningUnitFactory()
-        dict_learning_unit_year = create_learning_units_year(2000, 2017, learning_unit)
-
-        selected_learning_unit_year = dict_learning_unit_year[2007]
-
-        result = list(selected_learning_unit_year.find_gte_learning_units_year().values_list('academic_year__year',
-                                                                                             flat=True))
-        self.assertListEqual(result, list(range(2007, 2018)))
-
-    def test_find_gte_learning_units_year_case_no_future(self):
-        learning_unit = LearningUnitFactory()
-        dict_learning_unit_year = create_learning_units_year(2000, 2017, learning_unit)
-
-        selected_learning_unit_year = dict_learning_unit_year[2017]
-
-        result = list(selected_learning_unit_year.find_gte_learning_units_year().values_list('academic_year__year',
-                                                                                             flat=True))
-        self.assertEqual(result, [2017])
 
     def test_find_gt_learning_unit_year(self):
         learning_unit = LearningUnitFactory()
@@ -175,21 +156,7 @@ class LearningUnitYearTest(TestCase):
         self.assertEqual(learning_unit_year.search(title=common_part)[0], luy)
         self.assertEqual(learning_unit_year.search(title=a_specific_title)[0], luy)
 
-    def test_find_max_credits_of_partims(self):
-        self.partim_1 = LearningUnitYearFactory(academic_year=self.academic_year,
-                                                learning_container_year=self.learning_unit_year.learning_container_year,
-                                                subtype=learning_unit_year_subtypes.PARTIM, credits=15)
-        self.partim_2 = LearningUnitYearFactory(academic_year=self.academic_year,
-                                                learning_container_year=self.learning_unit_year.learning_container_year,
-                                                subtype=learning_unit_year_subtypes.PARTIM, credits=20)
-        max_credits = find_max_credits_of_related_partims(self.learning_unit_year)
-        self.assertEqual(max_credits, 20)
-
-    def test_find_max_credits_of_partims_when_no_partims_related(self):
-        max_credits = find_max_credits_of_related_partims(self.learning_unit_year)
-        self.assertEqual(max_credits, None)
-
-    def test_ccomplete_title_when_no_learning_container_year(self):
+    def test_complete_title_when_no_learning_container_year(self):
         specific_title = 'part 1: Vertebrate'
 
         luy = LearningUnitYearFactory(specific_title=specific_title, learning_container_year=None)
@@ -248,13 +215,6 @@ class LearningUnitYearTest(TestCase):
     def test_is_not_external(self):
         luy = LearningUnitYearFactory()
         self.assertFalse(luy.is_external())
-
-    def test_check_if_acronym_regex_is_valid(self):
-        self.assertTrue(check_if_acronym_regex_is_valid('TEST*'))
-        self.assertTrue(check_if_acronym_regex_is_valid('TE*ST'))
-        self.assertFalse(check_if_acronym_regex_is_valid('*TEST'))
-        self.assertFalse(check_if_acronym_regex_is_valid('?TEST'))
-        self.assertFalse(check_if_acronym_regex_is_valid(self.learning_unit_year))
 
 
 class LearningUnitYearGetEntityTest(TestCase):
