@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf import settings
 
+from base.models import academic_year
 from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
@@ -33,14 +34,16 @@ from cms.models import text_label, translated_text
 def save_teaching_material(teach_material):
     teach_material.save()
     luy = teach_material.learning_unit_year
-    postpone_teaching_materials(luy)
+    if is_pedagogy_data_must_be_postponed(luy):
+        postpone_teaching_materials(luy)
     return teach_material
 
 
 def delete_teaching_material(teach_material):
     luy = teach_material.learning_unit_year
     result = teach_material.delete()
-    postpone_teaching_materials(luy)
+    if is_pedagogy_data_must_be_postponed(luy):
+        postpone_teaching_materials(luy)
     return result
 
 
@@ -82,3 +85,9 @@ def update_bibliography_changed_field_in_cms(learning_unit_year):
                 language=language[0],
                 defaults={}
             )
+
+
+def is_pedagogy_data_must_be_postponed(learning_unit_year):
+    # We must postpone pedagogy information, if we modify data form N+1
+    current_academic_year = academic_year.starting_academic_year()
+    return learning_unit_year.academic_year.year > current_academic_year.year
