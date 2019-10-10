@@ -319,6 +319,12 @@ class LearningUnitYear(SerializableModel):
             complete_title = self.complete_title_english or complete_title
         return complete_title
 
+    @property
+    def container_common_title(self):
+        if self.learning_container_year:
+            return self.learning_container_year.common_title
+        return ''
+
     def get_partims_related(self):
         if self.is_full() and self.learning_container_year:
             return self.learning_container_year.get_partims_related()

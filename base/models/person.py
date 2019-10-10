@@ -102,6 +102,14 @@ class Person(SerializableModel):
             return None
         return self.user.username
 
+    def get_first_name(self):
+        if self.first_name:
+            return self.first_name
+        elif self.user:
+            return self.user.first_name
+        else:
+            return "-"
+
     @cached_property
     def is_central_manager(self):
         return self.user.groups.filter(name=CENTRAL_MANAGER_GROUP).exists()
