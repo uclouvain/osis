@@ -202,14 +202,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             'simplified_volume_management_form': self.simplified_volume_management_form
         }
 
-    def _validate_no_empty_title(self, common_title):
-        specific_title = self.learning_unit_year_form.cleaned_data["specific_title"]
-        if not common_title and not specific_title:
-            self.learning_container_year_form.add_error(
-                "common_title", _("You must either set the common title or the specific title"))
-            return False
-        return True
-
     @property
     def learning_container_form(self):
         return self.forms.get(LearningContainerModelForm)

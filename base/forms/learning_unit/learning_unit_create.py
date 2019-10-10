@@ -153,6 +153,7 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
             raise ValidationError(_('Invalid code'))
         return acronym
 
+    # FIXME method used only in tests
     def clean_acronym(self):
         if self.external:
             self.cleaned_data["acronym"] = self.__clean_acronym_external()
@@ -176,24 +177,6 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
         self.instance.learning_unit = kwargs.pop('learning_unit')
         instance = super().save(**kwargs)
         return instance
-
-    def clean_credits(self):
-        credits_ = self.cleaned_data['credits']
-        if self.instance.id is None or self.instance.academic_year.year >= CRUCIAL_YEAR_FOR_CREDITS_VALIDATION:
-            if not float(credits_).is_integer():
-                raise ValidationError(_('The credits value should be an integer'))
-        return credits_
-
-
-class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
-    class Meta(LearningUnitYearModelForm.Meta):
-        labels = {
-            'specific_title': _('Title proper to the partim'),
-            'specific_title_english': _('English title proper to the partim')
-        }
-        field_classes = {
-            'acronym': PartimAcronymField
-        }
 
 
 class CountryEntityField(forms.ChoiceField):
