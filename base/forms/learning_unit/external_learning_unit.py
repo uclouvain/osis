@@ -58,6 +58,10 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
         self.fields['container_type'].disabled = True
         self.fields['container_type'].required = False
 
+    @staticmethod
+    def clean_container_type():
+        return EXTERNAL
+
 
 class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     country_external_institution = ModelChoiceField(

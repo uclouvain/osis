@@ -178,6 +178,13 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
         instance = super().save(**kwargs)
         return instance
 
+    def clean_credits(self):
+        credits_ = self.cleaned_data['credits']
+        if self.instance.id is None or self.instance.academic_year.year >= CRUCIAL_YEAR_FOR_CREDITS_VALIDATION:
+            if not float(credits_).is_integer():
+                raise ValidationError(_('The credits value should be an integer'))
+        return credits_
+
 
 class CountryEntityField(forms.ChoiceField):
     def __init__(self, *args, widget_attrs=None, **kwargs):
