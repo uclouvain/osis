@@ -77,13 +77,14 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def load_initial(self):
         for code, label in settings.LANGUAGES:
-            self.value = get_object_or_none(
+            value = get_object_or_none(
                 LearningAchievement,
                 learning_unit_year_id=self.luy.id,
                 code_name=self.code,
                 language=language.find_by_code(code[:2].upper())
             )
-            if self.value:
+            if value:
+                self.value = value
                 self.fields['text_{}'.format(code[:2])].initial = self.value.text
                 self.fields['code_name'].initial = self.value.code_name
 

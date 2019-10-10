@@ -66,7 +66,7 @@ def operation(request, learning_achievement_id, operation_str):
 
 def execute_operation(achievements, operation_str):
     last_academic_year = None
-    for an_achievement in achievements:
+    for an_achievement in [a for a in achievements if a]:
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
