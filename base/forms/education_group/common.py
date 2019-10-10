@@ -368,6 +368,7 @@ class EducationGroupTypeForm(forms.Form):
         return education_group_type
 
 
+# TODO: Only used in program_management/ ==> Move to it ?
 class SelectLanguage(forms.Form):
     language = forms.ChoiceField(widget=forms.RadioSelect,
                                  choices=settings.LANGUAGES,
