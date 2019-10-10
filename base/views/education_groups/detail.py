@@ -49,7 +49,6 @@ from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
-from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
@@ -113,7 +112,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     limited_by_category = None
 
-    with_tree = True
+    # FIXME: resolve dependency in other ways
+    with_tree = 'program_management' in settings.INSTALLED_APPS
 
     def get_queryset(self):
         return super().get_queryset().select_related(
@@ -157,6 +157,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
+            # FIXME: resolve dependency in other way
+            from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
             education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
                                                                      tab_to_show=self.request.GET.get('tab_to_show'))
             context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())

@@ -70,6 +70,8 @@ class LearningUnitSerializerTestCase(TestCase):
             learning_container_year__requirement_entity=requirement_entity_version.entity
         )
         cls.learning_unit_year = LearningUnitYear.objects.filter(pk=learning_unit_year.pk).annotate_full_title().get()
+        setattr(cls.learning_unit_year, "entity_requirement", "OSIS")
+        setattr(cls.learning_unit_year, "entity_allocation", "OSIS")
         url = reverse('learning_unit_api_v1:learningunits_list')
         cls.serializer = LearningUnitSerializer(cls.learning_unit_year, context={
             'request': RequestFactory().get(url),
@@ -80,13 +82,18 @@ class LearningUnitSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'osis_url',
             'acronym',
             'academic_year',
+            'credits',
+            'status',
             'requirement_entity',
+            'allocation_entity',
             'type',
             'type_text',
             'subtype',
-            'subtype_text'
+            'subtype_text',
+            'has_proposal',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -106,6 +113,8 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             learning_container_year__requirement_entity=requirement_entity
         )
         cls.luy = LearningUnitYear.objects.filter(pk=luy.pk).annotate_full_title().get()
+        setattr(cls.luy, "entity_requirement", "OSIS")
+        setattr(cls.luy, "entity_allocation", "OSIS")
         url_kwargs = {
             'acronym': cls.luy.acronym,
             'year': cls.luy.academic_year.year
@@ -120,15 +129,18 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'osis_url',
             'acronym',
             'academic_year',
+            'credits',
+            'status',
             'requirement_entity',
+            'allocation_entity',
             'type',
             'type_text',
             'subtype',
             'subtype_text',
-            'credits',
-            'status',
+            'has_proposal',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
@@ -139,5 +151,7 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'components',
             'parent',
             'partims',
+            'proposal',
+            'summary_status',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

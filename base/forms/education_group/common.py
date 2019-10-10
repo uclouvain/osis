@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import create
 from base.business.event_perms import EventPermEducationGroupEdition
-from base.business.group_element_years import management
+from program_management.business.group_element_years import management
 from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, group_element_year
