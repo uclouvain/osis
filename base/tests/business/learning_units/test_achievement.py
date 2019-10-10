@@ -26,8 +26,7 @@
 
 from django.test import TestCase
 
-from base.business.learning_units.achievement import get_code_name, get_anchor_reference, DELETE, \
-    get_previous_achievement, HTML_ANCHOR
+from base.business.learning_units.achievement import get_anchor_reference, DELETE, get_previous_achievement, HTML_ANCHOR
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory

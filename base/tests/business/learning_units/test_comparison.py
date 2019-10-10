@@ -29,8 +29,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from base.business.learning_units.comparison import get_keys, get_value, \
-    compare_learning_component_year, compare_volumes
+from base.business.learning_units.comparison import get_value, compare_learning_component_year, compare_volumes
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_subtypes
