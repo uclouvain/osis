@@ -62,6 +62,7 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         cls.academic_year = create_current_academic_year()
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = GenerateAcademicYear(
             cls.old_academic_year,
             cls.old_academic_year
@@ -167,6 +168,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
 
         cls.academic_year = create_current_academic_year()
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = GenerateAcademicYear(
             cls.old_academic_year,
             cls.old_academic_year

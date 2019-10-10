@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-04 15:08+0200\n"
+"POT-Creation-Date: 2019-10-09 16:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -957,6 +957,9 @@ msgstr ""
 msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
+msgid "End"
+msgstr ""
+
 msgid "End date"
 msgstr ""
 
@@ -1507,6 +1510,9 @@ msgid "List of comparison between proposals and UE"
 msgstr ""
 
 msgid "List of learning units with comparison"
+msgstr ""
+
+msgid "List of learning units with educational information and specifications"
 msgstr ""
 
 msgid "List of learning units with with one line per attribution"
@@ -2124,6 +2130,11 @@ msgstr ""
 msgid "Produce a customizable xls of learning units"
 msgstr ""
 
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
+msgstr ""
+
 msgid "Produce a xls of learning units with one line per attribution"
 msgstr ""
 
@@ -2631,9 +2642,6 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr ""
 
-msgid "The education group edition period is not open."
-msgstr ""
-
 msgid "The education group has been deleted."
 msgstr ""
 
@@ -2661,9 +2669,6 @@ msgstr ""
 
 #, python-format
 msgid "The event \"%(event)s\" has been deleted successfully"
-msgstr ""
-
-msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
 msgid ""

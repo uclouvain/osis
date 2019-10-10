@@ -26,7 +26,7 @@
 import collections
 import itertools
 
-from django.http import JsonResponse
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
@@ -34,9 +34,14 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
     create_xls_attributions
 from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
+from base.business.learning_units.xls_educational_information_and_specifications import \
+    create_xls_educational_information_and_specifications
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.search.search_form import get_research_criteria
-from base.templatetags import pagination
+from base.models.academic_year import starting_academic_year
+from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import CacheFilterMixin
+from base.utils.search import SearchMixin
 from base.views.common import remove_from_session
 
 SIMPLE_SEARCH = 1
@@ -45,6 +50,34 @@ PROPOSAL_SEARCH = 3
 SUMMARY_LIST = 4
 BORROWED_COURSE = 5
 EXTERNAL_SEARCH = 6
+
+
+class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
+    model = LearningUnitYear
+    template_name = None
+    raise_exception = True
+    search_type = None
+
+    filterset_class = None
+    permission_required = 'base.can_access_learningunit'
+    cache_exclude_params = 'xls_status'
+
+    serializer_class = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        starting_ac = starting_academic_year()
+
+        context.update({
+            'form': context["filter"].form,
+            'learning_units_count': context["paginator"].count,
+            'current_academic_year': starting_ac,
+            'proposal_academic_year': starting_ac.next(),
+            'search_type': self.search_type,
+            'items_per_page': context["paginator"].per_page,
+        })
+        return context
 
 
 def _manage_session_variables(request, search_type):
@@ -68,53 +101,6 @@ def _get_search_type_label(search_type):
         SERVICE_COURSES_SEARCH: _('Service courses'),
         BORROWED_COURSE: _('Borrowed courses')
     }.get(search_type, _('Learning units'))
-
-
-class SearchMixin:
-    """
-        Search Mixin to return FilterView filter result as json when request is of type ajax.
-        Also implements method to return number of items per page.
-
-        serializer_class: class used to serialize the resulting queryset
-    """
-    serializer_class = None
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = self.serializer_class(
-                context["page_obj"],
-                context={
-                    'request': self.request,
-                    'language': self.request.LANGUAGE_CODE
-                },
-                many=True)
-            return JsonResponse({'object_list': serializer.data})
-        return super().render_to_response(context, **response_kwargs)
-
-    def get_paginate_by(self, queryset):
-        pagination.store_paginator_size(self.request)
-        return pagination.get_paginator_size(self.request)
-
-
-class RenderToExcel:
-    """
-        View Mixin to generate excel when xls_status parameter is set.
-
-        name: value of xls_status so as to generate the excel
-        render_method: function to generate the excel.
-                       The function must have as signature f(view_obj, context, **response_kwargs)
-    """
-    def __init__(self, name, render_method):
-        self.name = name
-        self.render_method = render_method
-
-    def __call__(self, filter_class: FilterView):
-        class Wrapped(filter_class):
-            def render_to_response(obj, context, **response_kwargs):
-                if obj.request.GET.get('xls_status') == self.name:
-                    return self.render_method(obj, context, **response_kwargs)
-                return super().render_to_response(context, **response_kwargs)
-        return Wrapped
 
 
 def _create_xls(view_obj, context, **response_kwargs):
@@ -148,6 +134,12 @@ def _create_xls_attributions(view_obj, context, **response_kwargs):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_attributions(user, luys, filters)
+
+
+def _create_xls_educational_information_and_specifications(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["filter"].qs
+    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
 
 
 def _create_xls_proposal(view_obj, context, **response_kwargs):

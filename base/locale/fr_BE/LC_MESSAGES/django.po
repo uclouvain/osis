@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-04 15:08+0200\n"
+"POT-Creation-Date: 2019-10-09 16:14+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -145,7 +145,8 @@ msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
-msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+msgstr ""
+"%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
 
 #, python-format
 msgid "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
@@ -1013,6 +1014,9 @@ msgstr "Ouverture informations pédagoqiques"
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue des formations."
 
+msgid "End"
+msgstr "Fin"
+
 msgid "End date"
 msgstr "Date de fin"
 
@@ -1586,6 +1590,9 @@ msgstr "Liste de comparaison entre les propositions et les UE"
 
 msgid "List of learning units with comparison"
 msgstr "Comparaison entre unités d'enseignement"
+
+msgid "List of learning units with educational information and specifications"
+msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "List of learning units with with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
@@ -2229,6 +2236,12 @@ msgstr "Produire Excel"
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
 
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
+msgstr ""
+"Produire une liste des UE avec la fiche descriptive et le cahier des charges"
+
 msgid "Produce a xls of learning units with one line per attribution"
 msgstr ""
 "Produire une liste des unités d'enseignement avec le détail des attributions"
@@ -2745,10 +2758,6 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
-msgid "The education group edition period is not open."
-msgstr ""
-"La période de modification d'organisation de formation n'est pas ouverte."
-
 msgid "The education group has been deleted."
 msgstr "L'organisation de formation a été supprimée."
 
@@ -2780,9 +2789,6 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 #, python-format
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
-
-msgid "The faculty manager cannot modify admission which are lower than N"
-msgstr ""
 
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
@@ -3973,3 +3979,4 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
