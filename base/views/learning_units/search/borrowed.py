@@ -26,9 +26,10 @@
 
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
-from base.views.learning_units.search.common import BORROWED_COURSE, _create_xls_with_parameters, _create_xls_attributions, _create_xls_comparison, _create_xls, \
-    BaseLearningUnitSearch
 from base.utils.search import RenderToExcel
+from base.views.learning_units.search.common import BORROWED_COURSE, _create_xls_with_parameters, \
+    _create_xls_attributions, _create_xls_comparison, _create_xls, \
+    BaseLearningUnitSearch
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 

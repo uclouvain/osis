@@ -10,9 +10,10 @@ from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm, \
 from base.forms.search.search_form import get_research_criteria
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views.common import display_messages_by_level
-from base.views.learning_units.search.common import PROPOSAL_SEARCH, _create_xls_proposal, _create_xls_proposal_comparison, BaseLearningUnitSearch
 from base.utils.search import RenderToExcel
+from base.views.common import display_messages_by_level
+from base.views.learning_units.search.common import PROPOSAL_SEARCH, _create_xls_proposal, \
+    _create_xls_proposal_comparison, BaseLearningUnitSearch
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 ACTION_BACK_TO_INITIAL = "back_to_initial"

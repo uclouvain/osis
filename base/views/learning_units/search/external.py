@@ -9,4 +9,3 @@ class ExternalLearningUnitSearch(BaseLearningUnitSearch):
     filterset_class = ExternalLearningUnitFilter
     serializer_class = LearningUnitDetailedSerializer
     permission_required = "base.can_access_externallearningunityear"
-
