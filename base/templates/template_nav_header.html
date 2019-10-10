@@ -71,7 +71,7 @@
             }
             return undefined;
         };
-        var enableNavLink = function (domId, url, title) {
+        let enableNavLink = function (domId, url, title) {
             if (url != undefined) {
                 let elem = document.getElementById(domId);
                 elem.setAttribute('href', url);
@@ -80,7 +80,7 @@
                 elem.parentElement.classList.remove('disabled');
             }
         };
-        var setPreviousLink = function (objectIds, currentIndex) {
+        let setPreviousLink = function (objectIds, currentIndex) {
             if (currentIndex > 0) {
                 let previousObject = objectIds[currentIndex - 1];
                 let previousUrl = previousObject.id;
@@ -88,7 +88,7 @@
                 enableNavLink('previousNavLink', previousUrl, previousTitle);
             }
         };
-        var setNextLink = function (objectIds, currentIndex) {
+        let setNextLink = function (objectIds, currentIndex) {
             if (currentIndex + 1 < objectIds.length) {
                 let nextObject = objectIds[currentIndex + 1];
                 let nextUrl = nextObject.id;
@@ -99,8 +99,7 @@
         if (typeof localStorage != 'undefined') {
             let key = "{{local_storage_key|default:'undefined'}}";
             if (key && key in localStorage) {
-                objectIds = JSON.parse(localStorage.getItem(key));
-                console.log(objectIds);
+                let objectIds = JSON.parse(localStorage.getItem(key));
                 currentIndex = findCurrentIndex(objectIds);
                 if (currentIndex !== undefined) {
                     setPreviousLink(objectIds, currentIndex);
