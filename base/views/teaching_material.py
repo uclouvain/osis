@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units import perms
-from base.business.learning_units.pedagogy import delete_teaching_material
+from base.business.learning_units.pedagogy import delete_teaching_material, is_pedagogy_data_must_be_postponed
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
@@ -82,12 +82,15 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
     if request.method == 'POST':
         last_year_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last().academic_year.year
         delete_teaching_material(teach_material)
-        display_success_messages(
-            request,
-            _("The teaching material has been deleted up to %(last_year_reported)s with success") % {
-                "last_year_reported": last_year_reported
-            }
-        )
+        if is_pedagogy_data_must_be_postponed(teach_material.learning_unit_year):
+            display_success_messages(
+                request,
+                _("The teaching material has been deleted up to %(last_year_reported)s with success") % {
+                    "last_year_reported": last_year_reported
+                }
+            )
+        else:
+            display_success_messages(request, _("The teaching material has been deleted with success"))
         return JsonResponse({})
     return render(request, "learning_unit/teaching_material/modal_delete.html", {})
 
@@ -95,10 +98,13 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
 def _save_and_return_response(request, form, learning_unit_year):
     form.save(learning_unit_year=learning_unit_year)
     last_year_reported = learning_unit_year.find_gt_learning_units_year().last().academic_year.year
-    display_success_messages(
-        request,
-        _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
-            "last_year_reported": last_year_reported
-        }
-    )
+    if is_pedagogy_data_must_be_postponed(learning_unit_year):
+        display_success_messages(
+            request,
+            _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
+                "last_year_reported": last_year_reported
+            }
+        )
+    else:
+        display_success_messages(request, _("The teaching material has been saved with success"))
     return JsonResponse({})
