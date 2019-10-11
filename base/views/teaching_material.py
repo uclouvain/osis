@@ -97,7 +97,7 @@ def _save_and_return_response(request, form, learning_unit_year):
     last_year_reported = learning_unit_year.find_gt_learning_units_year().last().academic_year.year
     display_success_messages(
         request,
-        _("Teaching materials has been saved and reported up to %(last_year_reported)s with success") % {
+        _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
             "last_year_reported": last_year_reported
         }
     )
