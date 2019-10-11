@@ -75,11 +75,10 @@ class AttributionNew(models.Model):
 
 def search(*args, **kwargs):
     qs = AttributionNew.objects.all()
-
+    if "learning_container_year" in kwargs:
+        qs = filter_with_list_or_object('learning_container_year', AttributionNew, **kwargs)
     if "tutor" in kwargs:
         qs = qs.filter(tutor=kwargs['tutor'])
-    if "learning_container_year" in kwargs:
-        qs = qs.filter(filter_with_list_or_object('learning_container_year', AttributionNew, **kwargs))
     if "score_responsible" in kwargs:
         qs = qs.filter(score_responsible=kwargs['score_responsible'])
     if "global_id" in kwargs:

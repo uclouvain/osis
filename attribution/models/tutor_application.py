@@ -67,10 +67,10 @@ class TutorApplication(models.Model):
 
 def search(*args, **kwargs):
     qs = TutorApplication.objects.all()
+    if "learning_container_year" in kwargs:
+        qs = filter_with_list_or_object('learning_container_year', TutorApplication, **kwargs)
     if "tutor" in kwargs:
         qs = qs.filter(tutor=kwargs['tutor'])
-    if "learning_container_year" in kwargs:
-        qs = qs.filter(filter_with_list_or_object('learning_container_year', TutorApplication, **kwargs))
     if "global_id" in kwargs:
         if isinstance(kwargs['global_id'], list):
             qs = qs.filter(tutor__person__global_id__in=kwargs['global_id'])

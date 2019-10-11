@@ -52,10 +52,9 @@ class AttributionChargeNew(models.Model):
 
 def search(*args, **kwargs):
     qs = AttributionChargeNew.objects.all()
-
+    if "learning_component_year" in kwargs:
+        qs = filter_with_list_or_object('learning_component_year', AttributionChargeNew, **kwargs)
     if "attribution" in kwargs:
         qs = qs.filter(attribution=kwargs['attribution'])
-    if "learning_component_year" in kwargs:
-        qs = qs.filter(filter_with_list_or_object('learning_component_year', AttributionChargeNew, **kwargs))
 
     return qs.select_related('learning_component_year', 'attribution')
