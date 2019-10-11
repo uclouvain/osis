@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-11 09:06+0200\n"
+"POT-Creation-Date: 2019-10-11 10:28+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4244,13 +4244,14 @@ msgstr "Stage d’enseignement"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
-#: views/teaching_material.py:100
+#: views/teaching_material.py:104
+#, python-format
 msgid ""
 "Teaching material has been saved and reported up to %(last_year_reported)s "
 "with success"
 msgstr ""
-"Le support de cours que vous avez modifié a été sauvegardé jusqu'en %(last_year_reported)s avec "
-"succès"
+"Le support de cours que vous avez modifié a été sauvegardé jusqu'en "
+"%(last_year_reported)s avec succès"
 
 #: business/education_groups/general_information_sections.py:74
 msgid "Teaching profile"
@@ -4702,7 +4703,7 @@ msgstr ""
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
 
-#: views/learning_units/pedagogy/update.py:73
+#: views/learning_units/pedagogy/update.py:75
 #, python-format
 msgid ""
 "The section you modified have been saved and reported up to "
@@ -4710,6 +4711,11 @@ msgid ""
 msgstr ""
 "Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
 "jusqu'en %(last_year_reported)s avec succès"
+
+#: views/learning_units/pedagogy/update.py:81
+msgid "The section you modified have been saved with success."
+msgstr ""
+"Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
 
 #: business/learning_units/edition.py:123
 #: tests/business/test_learning_unit_edition.py:532
@@ -4742,7 +4748,7 @@ msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
 
-#: views/teaching_material.py:87
+#: views/teaching_material.py:88
 #, python-format
 msgid ""
 "The teaching material has been deleted up to %(last_year_reported)s with "
@@ -4750,6 +4756,16 @@ msgid ""
 msgstr ""
 "Le support de cours a été supprimé jusqu'en %(last_year_reported)s avec "
 "succès"
+
+#: views/teaching_material.py:93
+msgid "The teaching material has been deleted with success"
+msgstr ""
+"Le support de cours a été supprimé avec succès"
+
+#: views/teaching_material.py:109
+msgid "The teaching material has been saved with success"
+msgstr ""
+"Le support de cours a été modifié avec succès"
 
 #: business/education_groups/perms.py:269
 msgid "The user cannot modify data which are greater than N+1"
