@@ -100,7 +100,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{year}/{acronym}/get_title:
+  /learning_units/{year}/{acronym}/title:
     get:
       description: Return the title of the learning unit
       operationId: learningunitstitle_read
@@ -354,8 +354,18 @@ components:
         url:
           type: string
           format: uri
+        osis_url:
+          type: string
+          format: uri
         acronym:
           type: string
+        credit:
+          type: number
+          multipleOf: 0.01
+        status:
+          type: boolean
+        has_proposal:
+          type: boolean
         title:
           type: string
         type:
@@ -368,6 +378,8 @@ components:
           type: string
         requirement_entity:
           type: string
+        allocation_entity:
+          type: string
         academic_year:
           type: integer
           example: 2014
@@ -376,7 +388,7 @@ components:
         - $ref: '#/components/schemas/LearningUnit'
         - type: object
           properties:
-            credit:
+            credits:
               type: number
               multipleOf: 0.01
             status:
@@ -409,6 +421,17 @@ components:
               type: string
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            proposal:
+              type: object
+              properties:
+                folder:
+                  type: string
+                type:
+                  type: string
+                status:
+                  type: string
+            summary_status:
+              type: string
     LearningUnitComponent:
       type: object
       properties:
@@ -540,6 +563,8 @@ components:
         url:
           type: string
           format: uri
+        title:
+          type: string
         acronym:
           type: string
         code:
