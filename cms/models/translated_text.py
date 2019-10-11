@@ -88,21 +88,3 @@ def update_or_create(entity, reference, text_label, language, defaults):
         language=language,
         defaults=defaults)
     return translated_text
-
-
-def find_labels_list_by_label_entity_and_reference(an_entity_name, an_education_group_year_id):
-    return TranslatedText.objects.filter(text_label__entity=an_entity_name,
-                                         reference=an_education_group_year_id) \
-        .order_by('text_label__order') \
-        .values_list('text_label__label', flat=True)
-
-
-def find_by_reference(reference):
-    return TranslatedText.objects.filter(reference=reference)
-
-
-def build_list_of_cms_content_by_reference(reference):
-    return [
-        (translated_text.language, translated_text.text_label, translated_text.entity, translated_text.text)
-        for translated_text in find_by_reference(reference)
-    ]
