@@ -26,7 +26,7 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.utils import formats
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_calendar import AbstractCalendar

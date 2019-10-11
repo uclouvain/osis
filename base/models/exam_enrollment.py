@@ -28,7 +28,7 @@ from decimal import *
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import When, Case, Q, Sum, Count, IntegerField, F
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \

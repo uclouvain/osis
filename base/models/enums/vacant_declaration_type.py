@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
-
-from base.models.utils.utils import ChoiceEnum
+from django.utils.translation import gettext_lazy as _
 
 RESEVED_FOR_INTERNS = "RESEVED_FOR_INTERNS"
 OPEN_FOR_EXTERNS = "OPEN_FOR_EXTERNS"
