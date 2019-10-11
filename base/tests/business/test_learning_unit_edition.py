@@ -58,7 +58,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from cms.models import translated_text
+from cms.models.translated_text import TranslatedText
 from reference.tests.factories.language import LanguageFactory
 
 
@@ -690,13 +690,13 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
 
         last_luy = mdl_luy.find_latest_by_learning_unit(learning_unit_full_annual)
         last_luy_teaching_material_count = mdl_teaching_material.find_by_learning_unit_year(last_luy).count()
-        last_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(last_luy.id)
+        last_luy_educational_information = build_list_of_cms_content_by_reference(last_luy.id)
 
         edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         new_luy = mdl_luy.find_latest_by_learning_unit(learning_unit_full_annual)
         new_luy_teaching_material_count = mdl_teaching_material.find_by_learning_unit_year(new_luy).count()
-        new_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(new_luy.id)
+        new_luy_educational_information = build_list_of_cms_content_by_reference(new_luy.id)
 
         self.assertEqual(last_luy_teaching_material_count, new_luy_teaching_material_count)
         self.assertCountEqual(last_luy_educational_information, new_luy_educational_information)
@@ -763,6 +763,13 @@ def _get_list_years_learning_unit(learning_unit):
         LearningUnitYear.objects.filter(learning_unit=learning_unit
                                         ).values_list('academic_year__year', flat=True).order_by('academic_year')
     )
+
+
+def build_list_of_cms_content_by_reference(reference):
+    return [
+        (translated_text.language, translated_text.text_label, translated_text.entity, translated_text.text)
+        for translated_text in TranslatedText.objects.filter(reference=reference)
+    ]
 
 
 class TestModifyLearningUnit(TestCase, LearningUnitsMixin):

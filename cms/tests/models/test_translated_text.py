@@ -63,10 +63,3 @@ class TranslatedTextTest(TestCase):
             list(tt),
             [text_label_oy_1.label, text_label_oy_2.label, text_label_oy_3.label]
         )
-
-
-def build_list_of_cms_content_by_reference(reference):
-    return [
-        (translated_text.language, translated_text.text_label, translated_text.entity, translated_text.text)
-        for translated_text in TranslatedText.objects.filter(reference=reference)
-    ]
