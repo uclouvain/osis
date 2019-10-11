@@ -34,7 +34,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from attribution.business import attribution_charge_new
@@ -200,8 +200,8 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         'campus': [
             learning_unit_year._meta.get_field('campus').verbose_name,
             initial_learning_unit_year.campus.name,
-            learning_unit_year.campus.name] \
-            if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else [],
+            learning_unit_year.campus.name] if initial_learning_unit_year.campus.name != learning_unit_year.campus.name
+        else [],
         'entities_fields': get_all_entities_comparison_context(initial_data, learning_unit_year),
         'learning_unit_year_fields': learning_unit_year_fields,
         'components': components_list
@@ -473,7 +473,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
                                                                              rec["attribution__start_year"],
                                                                              rec["attribution__function"]))
     msgs = []
-    for _, charges in charges_by_attribution:
+    for attribution_key, charges in charges_by_attribution:
         charges = list(charges)
         subtype_key = "learning_component_year__learning_unit_year__subtype"
         full_total_charges = next(

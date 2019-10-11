@@ -143,6 +143,15 @@ class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiForm
         return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
                                                                          "function": _(self.attribution.function)}
 
+    def attribution_form_valid(self, attribution_form):
+        attribution_form.save()
+
+    def lecturing_charge_form_valid(self, lecturing_charge_form):
+        lecturing_charge_form.save(attribution=self.attribution)
+
+    def practical_charge_form_valid(self, practical_charge_form):
+        practical_charge_form.save(attribution=self.attribution)
+
 
 class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
@@ -173,6 +182,14 @@ class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSucc
         attribution = forms["attribution_form"].instance
         return _("Attribution added for %(tutor)s (%(function)s)") % {"tutor": attribution.tutor.person,
                                                                       "function": _(attribution.get_function_display())}
+
+    def lecturing_charge_form_valid(self, lecturing_charge_form):
+        attribution_form = self.instantiated_forms["attribution_form"]
+        lecturing_charge_form.save(attribution=attribution_form.instance)
+
+    def practical_charge_form_valid(self, practical_charge_form):
+        attribution_form = self.instantiated_forms["attribution_form"]
+        practical_charge_form.save(attribution=attribution_form.instance)
 
 
 class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):

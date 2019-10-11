@@ -110,3 +110,9 @@ class AddChargeRepartition(EditAttributionView):
         return _("Repartition added for %(tutor)s (%(function)s)") %\
                         {"tutor": self.attribution.tutor.person,
                          "function": _(self.attribution.get_function_display())}
+
+    def lecturing_charge_form_valid(self, lecturing_charge_form):
+        lecturing_charge_form.save(attribution=self.get_copy_attribution)
+
+    def practical_charge_form_valid(self, practical_charge_form):
+        practical_charge_form.save(attribution=self.get_copy_attribution)

@@ -211,7 +211,6 @@ def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
                 })
 
 
-# TODO :: remove unused param
 def _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
