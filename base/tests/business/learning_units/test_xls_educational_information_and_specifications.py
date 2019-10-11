@@ -31,7 +31,7 @@ from django.db.models.expressions import Subquery, OuterRef
 from django.test import RequestFactory, override_settings
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \

@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import learning_component_year_type
 
@@ -44,7 +44,7 @@ def get_keys(list1, list2):
     for k in list2:
         if k not in keys:
             keys.append(k)
-    return sorted(keys, key=ugettext_lazy)
+    return sorted(keys, key=gettext_lazy)
 
 
 def get_value(model, data, field_name):

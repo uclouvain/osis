@@ -26,7 +26,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.safestring import mark_safe
-from django.utils.translation import ngettext_lazy, ugettext_lazy as _
+from django.utils.translation import ngettext_lazy, gettext_lazy as _
 
 from base.business.education_groups import shorten
 from base.business.education_groups.shorten import _get_formated_error_msg, check_education_group_end_date

@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import delete
 

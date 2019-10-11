@@ -26,7 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
