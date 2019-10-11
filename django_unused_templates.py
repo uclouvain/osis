@@ -18,7 +18,7 @@ OSIS_MODULES = ['assessments', 'attribution', 'backoffice', 'base', 'cms', 'educ
 
 
 def _should_analyze_file(f, submodules, features=False):
-    if __is_outside_file(f, features):
+    if __is_unconcerned_file(f, features):
         return False
     for folder in submodules:
         if '\\' + folder + '\\' in f:
@@ -26,7 +26,7 @@ def _should_analyze_file(f, submodules, features=False):
     return False
 
 
-def __is_outside_file(f, features=False):
+def __is_unconcerned_file(f, features=False):
     if '\\venv' in f or '\\tests' in f or '\\Lib' in f:
         return True
     if not features and '\\features' in f:
