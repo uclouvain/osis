@@ -28,7 +28,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
@@ -37,6 +36,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 class TrainingTreeViewTestCase(APITestCase):

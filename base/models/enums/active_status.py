@@ -35,3 +35,9 @@ ACTIVE_STATUS_LIST = (
     (INACTIVE, _("Inactive")),
     (RE_REGISTRATION, _("Reregistration"))
 )
+
+
+ACTIVE_STATUS_LIST_FOR_FILTER = (
+    (True, _("Active")),
+    (False, _("Inactive")),
+)
