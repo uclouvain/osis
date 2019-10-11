@@ -76,10 +76,11 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.load_initial()
 
     def load_initial(self):
+        self.value = None
         for code, label in settings.LANGUAGES:
             value = get_object_or_none(
                 LearningAchievement,
-                learning_unit_year_id=self.luy.id,
+                learning_unit_year__id=self.luy.id,
                 code_name=self.code,
                 language=language.find_by_code(code[:2].upper())
             )
@@ -123,7 +124,10 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def clean_code_name(self):
         code_name = self.cleaned_data.pop('code_name')
-        objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=self.luy.id)
+        objects = LearningAchievement.objects.filter(
+            code_name=code_name,
+            learning_unit_year_id=self.luy.id,
+        )
         if objects.exists() and self.value not in objects:
             raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
         return code_name
