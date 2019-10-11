@@ -35,4 +35,4 @@ class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
     teaching_methods = serializers.CharField()
     themes_discussed = serializers.CharField()
     prerequisite = serializers.CharField()
-    mobility = serializers.CharField()
+    mobility = serializers.CharField(allow_null=True)

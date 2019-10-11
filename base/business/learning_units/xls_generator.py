@@ -85,9 +85,6 @@ def _filter_required_teaching_material(learning_units):
 
         result.append(_build_line(learning_unit))
 
-    if not result:
-        raise ObjectDoesNotExist
-
     return result
 
 

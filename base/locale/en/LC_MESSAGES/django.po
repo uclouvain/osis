@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-30 08:40+0200\n"
+"POT-Creation-Date: 2019-10-09 16:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -120,6 +120,10 @@ msgid ""
 "%(prerequisite_item)s is not anymore contained in "
 "%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
 "having %(prerequisite_item)s as prerequisite is not copied."
+msgstr ""
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 
 #, python-format
@@ -380,9 +384,6 @@ msgstr ""
 msgid "Alert Message"
 msgstr ""
 
-msgid "All"
-msgstr ""
-
 msgctxt "plural"
 msgid "All"
 msgstr ""
@@ -391,6 +392,9 @@ msgid "All the scores are encoded."
 msgstr ""
 
 msgid "Alloc. Ent."
+msgstr ""
+
+msgid "Alloc. Entity"
 msgstr ""
 
 msgid "Allocation entity"
@@ -953,6 +957,9 @@ msgstr ""
 msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
+msgid "End"
+msgstr ""
+
 msgid "End date"
 msgstr ""
 
@@ -1388,9 +1395,6 @@ msgstr ""
 msgid "LU"
 msgstr ""
 
-msgid "LU_ERRORS_INVALID_REGEX_SYNTAX"
-msgstr ""
-
 msgid "Label"
 msgstr ""
 
@@ -1708,9 +1712,6 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
-msgid "Modification made"
-msgstr ""
-
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -1847,6 +1848,9 @@ msgid "Not in period to edit description fiche."
 msgstr ""
 
 msgid "Not in range of years which can be edited by you"
+msgstr ""
+
+msgid "Not modified"
 msgstr ""
 
 msgid "Not required"
@@ -2638,9 +2642,6 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr ""
 
-msgid "The education group edition period is not open."
-msgstr ""
-
 msgid "The education group has been deleted."
 msgstr ""
 
@@ -2668,9 +2669,6 @@ msgstr ""
 
 #, python-format
 msgid "The event \"%(event)s\" has been deleted successfully"
-msgstr ""
-
-msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
 msgid ""
@@ -3011,9 +3009,6 @@ msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
-msgstr ""
-
-msgid "Too many results"
 msgstr ""
 
 msgid "Training"
@@ -3545,10 +3540,10 @@ msgstr ""
 msgid "is_prerequisite_of-%(year)s-%(acronym)s"
 msgstr ""
 
-msgid "learning unit year"
+msgid "items per page"
 msgstr ""
 
-msgid "learning units"
+msgid "learning unit year"
 msgstr ""
 
 msgid "list of required teaching materials"
@@ -3684,9 +3679,6 @@ msgid "text in French"
 msgstr ""
 
 msgid "the"
-msgstr ""
-
-msgid "the list to generate is empty."
 msgstr ""
 
 msgid "the program aims"
