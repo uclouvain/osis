@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.contrib import admin
+from django.db import models
+
+from base.models.utils.utils import filter_with_list_or_object
 
 
 class AttributionChargeNewAdmin(admin.ModelAdmin):
@@ -54,9 +56,6 @@ def search(*args, **kwargs):
     if "attribution" in kwargs:
         qs = qs.filter(attribution=kwargs['attribution'])
     if "learning_component_year" in kwargs:
-        if isinstance(kwargs['learning_component_year'], list):
-            qs = qs.filter(learning_component_year__in=kwargs['learning_component_year'])
-        else:
-            qs = qs.filter(learning_component_year=kwargs['learning_component_year'])
+        qs = qs.filter(filter_with_list_or_object('learning_component_year', AttributionChargeNew, **kwargs))
 
     return qs.select_related('learning_component_year', 'attribution')

@@ -67,3 +67,10 @@ def get_verbose_field_value(instance, key):
     else:
         value = getattr(instance, key, "")
     return value
+
+
+def filter_with_list_or_object(fk_name, model, **kwargs):
+    return model.objects.all().filter(**{
+        fk_name + ('_in' if isinstance(kwargs[fk_name], list) else ''):
+            kwargs[fk_name]
+    })
