@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement, \
-    find_previous_achievements
+from base.models.learning_achievement import find_previous_achievements
 
 HTML_ANCHOR = "#anchor_"
 UP = 'up'

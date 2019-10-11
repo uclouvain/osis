@@ -41,7 +41,6 @@ from base.business.xls import get_name_or_username
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
-from base.models.academic_year import starting_academic_year
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
@@ -51,9 +50,7 @@ from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
-from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_unit_year import LearningUnitYear, get_by_id
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
 

@@ -23,10 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy
 from django.utils.translation import ugettext_lazy as _
-
-from base.models.enums import learning_component_year_type
 
 FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'credits', 'periodicity',
                                           'status', 'language', 'professional_integration', 'specific_title',
