@@ -27,7 +27,6 @@ from django.db.models import F, Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
 from base.models.learning_unit_year import LearningUnitYear
@@ -49,7 +48,7 @@ class LearningUnitAttribution(generics.ListAPIView):
             acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
-        return AttributionNew.objects.filter(
+        return AttributionNew.objects.select_related('substitute').filter(
             Q(attributionchargenew__learning_component_year__learning_unit_year=luy) |
             # Coordinator doesn't have any volume
             Q(learning_container_year_id=luy.learning_container_year_id, function=Functions.COORDINATOR.name)

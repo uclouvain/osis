@@ -25,7 +25,6 @@
 ##############################################################################
 from rest_framework import serializers
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.person import Person
 
@@ -50,7 +49,7 @@ class PersonAttributionSerializer(serializers.ModelSerializer):
 
 class LearningUnitAttributionSerializer(PersonAttributionSerializer):
     function_text = serializers.CharField(source='get_function_display', read_only=True)
-    substitute = PersonAttributionSerializer()
+    substitute = PersonAttributionSerializer(read_only=True)
 
     class Meta:
         model = AttributionNew
