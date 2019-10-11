@@ -80,8 +80,12 @@ def get_or_create(entity, reference, text_label, language):
     return translated_text
 
 
+def find_by_reference(reference):
+    return TranslatedText.objects.filter(reference=reference)
+
+
 def update_or_create(entity, reference, text_label, language, defaults):
-    translated_text, created = TranslatedText.objects.update_or_create(
+    translated_text, _ = TranslatedText.objects.update_or_create(
         entity=entity,
         reference=reference,
         text_label=text_label,
