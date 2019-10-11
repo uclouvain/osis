@@ -30,6 +30,6 @@ class AssessmentsConfig(AppConfig):
     name = 'assessments'
 
     def ready(self):
-        from assessments.signals import subscribers
+        pass
         # if django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
         # ===> This exception says that there is an error in the implementation of method ready(self) !!
