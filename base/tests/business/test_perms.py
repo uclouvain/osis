@@ -32,11 +32,11 @@ from django.test import TestCase
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_create_modification_proposal, \
     FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, is_academic_year_in_range_to_create_partim, \
-    _check_proposal_edition
+    _check_proposal_edition, _can_be_updated_by_faculty_manager
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
-from base.models.enums import proposal_state, proposal_type, learning_container_year_types
+from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
@@ -98,7 +98,7 @@ class PermsTestCase(TestCase):
                                           learning_container_year=lunit_container_yr,
                                           subtype=PARTIM)
 
-            self.assertTrue(luy.can_update_by_faculty_manager())
+            self.assertTrue(_can_be_updated_by_faculty_manager(luy))
 
     def test_can_faculty_manager_modify_end_date_full(self):
         for direct_edit_permitted_container_type in TYPES_DIRECT_EDIT_PERMITTED:
@@ -108,7 +108,7 @@ class PermsTestCase(TestCase):
                                           learning_container_year=lunit_container_yr,
                                           subtype=FULL)
 
-            self.assertTrue(luy.can_update_by_faculty_manager())
+            self.assertTrue(_can_be_updated_by_faculty_manager(luy))
 
     def test_cannot_faculty_manager_modify_end_date_full(self):
         for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
@@ -177,7 +177,7 @@ class PermsTestCase(TestCase):
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr,
                                       learning_container_year=None)
-        self.assertFalse(luy.can_update_by_faculty_manager())
+        self.assertFalse(_can_be_updated_by_faculty_manager(luy))
 
     def test_can_central_manager_modify_end_date_full(self):
         a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
@@ -380,6 +380,34 @@ class PermsTestCase(TestCase):
             })
         PersonEntityFactory(person=a_person, entity=an_requirement_entity)
         self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
+
+    def test_can_be_updated_by_faculty_manager(self):
+        academic_year = create_current_academic_year()
+        luy = LearningUnitYearFactory(
+            acronym="LDROI1004",
+            specific_title="Juridic law courses",
+            academic_year=academic_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
+        start_year = AcademicYearFactory(year=academic_year.year - 3)
+        end_year = AcademicYearFactory(year=academic_year.year - 1)
+        previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        next_start_year = AcademicYearFactory(year=academic_year.year + 1)
+        next_end_year = AcademicYearFactory(year=academic_year.year + 3)
+        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
+        previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=luy.learning_unit)
+                         for ac in previous_academic_years]
+        next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=luy.learning_unit)
+                     for ac in next_academic_years]
+
+        for previous_luy in previous_luys:
+            self.assertFalse(_can_be_updated_by_faculty_manager(previous_luy))
+
+        self.assertTrue(_can_be_updated_by_faculty_manager(luy))
+        self.assertTrue(_can_be_updated_by_faculty_manager(next_luys[0]))
+        self.assertTrue(_can_be_updated_by_faculty_manager(next_luys[1]))
+
+        self.assertFalse(_can_be_updated_by_faculty_manager(next_luys[2]))
 
 
 def create_person_with_permission_and_group(group_name=None, permission_name='can_edit_learning_unit_proposal'):

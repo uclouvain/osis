@@ -219,26 +219,6 @@ class LearningUnitYearTest(TestCase):
         self.learning_unit_year.learning_container_year = None
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
-    def test_can_be_updated_by_faculty_manager(self):
-        start_year = AcademicYearFactory(year=self.academic_year.year - 3)
-        end_year = AcademicYearFactory(year=self.academic_year.year - 1)
-        previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
-        next_start_year = AcademicYearFactory(year=self.academic_year.year + 1)
-        next_end_year = AcademicYearFactory(year=self.academic_year.year + 3)
-        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
-        previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
-                         for ac in previous_academic_years]
-        next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
-                     for ac in next_academic_years]
-
-        for luy in previous_luys:
-            self.assertFalse(luy.can_update_by_faculty_manager())
-
-        self.assertTrue(self.learning_unit_year.can_update_by_faculty_manager())
-        self.assertTrue(next_luys[0].can_update_by_faculty_manager())
-        self.assertTrue(next_luys[1].can_update_by_faculty_manager())
-
-        self.assertFalse(next_luys[2].can_update_by_faculty_manager())
 
     def test_is_external(self):
         luy = LearningUnitYearFactory()

@@ -367,13 +367,22 @@ def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise
 
 
 def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
-    result = person.is_central_manager or learning_unit_year.can_update_by_faculty_manager()
+    result = person.is_central_manager or _can_be_updated_by_faculty_manager(learning_unit_year)
     can_raise_exception(
         raise_exception,
         result,
         MSG_NOT_GOOD_RANGE_OF_YEARS,
         )
     return result
+
+
+def _can_be_updated_by_faculty_manager(learning_unit_year):
+    if not learning_unit_year.learning_container_year:
+        return False
+
+    starting_year = starting_academic_year().year
+    luy_year = learning_unit_year.academic_year.year
+    return starting_year <= luy_year <= starting_year + MAX_ACADEMIC_YEAR_FACULTY
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):
