@@ -27,10 +27,8 @@ def _should_analyze_file(f, submodules, features=False):
 
 
 def __is_unconcerned_file(f, features=False):
-    if '\\venv' in f or '\\tests' in f or '\\Lib' in f:
-        return True
-    if not features and '\\features' in f:
-        return False
+    unconcerned_files = ['/venv', '/tests', '/Lib'] + ['/features'] if not features else []
+    return all(file in f for file in unconcerned_files)
 
 
 def _get_files_of_extension(file_extension, filter):
