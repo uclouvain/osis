@@ -116,22 +116,22 @@ Examples: <i>ACTU IS, SC IS/G, SC IN</i>","Sigle d’un Cours isolés est compos
 <li>2-4 lettres </li> <li> espace </li> <li> <b>IS</b> <u>OU</u> <b>IS/</b> + lettres <u>OU</u> <b>IN</b></li>
 </ul>
 Exemples: <i>ACTU IS, SC IS/G, SC IN</i>","Ex: ACTU IS,SC IS/G,SC IN"
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)([Dd])([Pp])$",,"Acronym of PhD is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)(([Dd][Pp])|([Dd]))$",,"Acronym of PhD is composed of:
 <ul>
-<li>2-4 letters + <b>3DP</b></li>
+<li>2-4 letters + <b>3DP</b> or <b>3D</b></li>
 </ul>
 Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un Doctorat est composé de:
 <ul>
-<li>2-4 lettres + <b>3DP</b></li>
+<li>2-4 lettres + <b>3DP</b> ou <b>3D</b></li>
 </ul>
 Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",Ex: ART3DP
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)([Ff])([Pp])$",,"Acronym of Formation PhD is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)((([Ff])([Pp]))|(([Ff])([Dd])))$",,"Acronym of Formation PhD is composed of:
 <ul>
-<li>2-4 letters + <b>3FP</b></li>
+<li>2-4 letters + <b>3FP</b> or <b>3FD</b></li>
 </ul>
 Examples: <i>ART3FD</i>","Sigle d’une Formation doctorale est composé de:
 <ul>
-<li>2-4 lettres + <b>3FP</b></li>
+<li>2-4 lettres + <b>3FP</b> ou <b>3FD</b></li>
 </ul>
 Exemples: <i>ART3FD</i>",Ex: ART3FD
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})[ ]([Jj])([Yy])$",,"Acronym of Junior year is composed of:
