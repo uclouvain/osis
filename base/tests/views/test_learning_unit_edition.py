@@ -479,7 +479,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         self.assertEqual(learning_component_year.repartition_volume_additional_entity_2, 0.5)
 
     @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_post_wrong_data(self, mock_render, mock_program_manager):
+    def test_learning_unit_volumes_management_post_wrong_data(self, mock_program_manager):
         mock_program_manager.return_value = True
 
         request_factory = RequestFactory()
