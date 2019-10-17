@@ -114,12 +114,14 @@
                 </li>
                 <li class="divider"></li>
                 <li>
-                    <a href="{% url "education_group_learning_units_prerequisites" education_group_year_pk=education_group_year.pk %}">
+                    <a href="{% url "education_group_learning_units_prerequisites" education_group_year_pk=education_group_year.pk %}"
+                        class="no_spinner">
                         <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
                     </a>
                 </li>
                 <li>
-                    <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}">
+                    <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}"
+                        class="no_spinner">
                         <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
                     </a>
                 </li>
