@@ -1,5 +1,8 @@
 $( document ).ready(function() {
     closeOverlaySpinner();
+    $('a, button').on('click', function (e) {
+        if ($(this).hasClass("no_spinner")) closeOverlaySpinner();
+    });
 });
 
 $( document ).on( 'keyup', function ( e ) {
@@ -9,12 +12,6 @@ $( document ).on( 'keyup', function ( e ) {
 });
 
 window.addEventListener('beforeunload', function (e) {
-    $( document ).on( 'click', function ( e ) {
-        alert(e.hasClass('no_spinner'));
-        if (e.hasClass('no_spinner')){
-            return null;
-        }
-    });
     $("#loader").show();
     document.getElementById("overlay_fadein").style.display = "block";
 });
