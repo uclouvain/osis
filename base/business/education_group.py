@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db.models import Prefetch
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from base.business.education_groups import perms
 from base.business.xls import get_name_or_username, convert_boolean

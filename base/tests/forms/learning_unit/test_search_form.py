@@ -27,7 +27,7 @@ import datetime
 
 from django.http import QueryDict
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch, filter_is_borrowed_learning_unit_year
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter

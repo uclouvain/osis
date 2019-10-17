@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from assessments.business.enrollment_state import get_line_color
 from assessments.business.score_encoding_list import sort_encodings
@@ -32,7 +32,8 @@ from assessments.models import score_sheet_address
 from assessments.models.enums.score_sheet_address_choices import *
 from attribution.models import attribution
 from base.business import entity_version as entity_version_business
-from base.models import entity as entity_model, entity_version as entity_version, person_address, session_exam_calendar, \
+from base.models import entity as entity_model, entity_version as entity_version, person_address, \
+    session_exam_calendar, \
     offer_year_entity
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.person_address_type import PersonAddressType

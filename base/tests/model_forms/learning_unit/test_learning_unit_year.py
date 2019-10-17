@@ -26,7 +26,7 @@
 import datetime
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm
 from base.forms.utils.acronym_field import PartimAcronymField, AcronymField

@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.db.models import BLANK_CHOICE_DASH, OuterRef, Exists
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.models.academic_year import AcademicYear, starting_academic_year

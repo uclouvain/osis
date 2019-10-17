@@ -30,7 +30,7 @@ from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
 from django.db import IntegrityError
 from django.forms import model_to_dict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context

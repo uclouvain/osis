@@ -25,7 +25,7 @@
 ############################################################################
 from django.http import JsonResponse
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages

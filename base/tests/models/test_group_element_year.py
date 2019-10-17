@@ -28,7 +28,7 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear

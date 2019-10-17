@@ -27,7 +27,7 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from assessments.business import score_encoding_sheet
 from assessments.models.enums import score_sheet_address_choices

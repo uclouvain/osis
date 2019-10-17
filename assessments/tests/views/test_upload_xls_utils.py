@@ -30,7 +30,7 @@ from django.contrib.auth.models import Group
 from django.http import Http404
 from django.test import TestCase, Client, TransactionTestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assessments.views.upload_xls_utils import _get_score_list_filtered_by_enrolled_state
 from attribution.tests.factories.attribution import AttributionFactory

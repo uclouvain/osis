@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.test import TestCase
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import EDUCATION_GROUP_MAX_POSTPONE_YEARS, _compute_end_year
 from base.business.utils.model import model_to_dict_fk

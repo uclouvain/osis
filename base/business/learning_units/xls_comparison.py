@@ -25,7 +25,7 @@
 ##############################################################################
 from _pydecimal import Decimal
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
 
 from base.business import learning_unit_year_with_context

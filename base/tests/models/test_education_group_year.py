@@ -26,7 +26,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import search, find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit

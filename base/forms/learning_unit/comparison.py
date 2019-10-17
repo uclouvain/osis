@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_year import AcademicYear
 from base.models.academic_year import starting_academic_year

@@ -35,7 +35,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from base.forms.education_group.group import GroupYearModelForm
