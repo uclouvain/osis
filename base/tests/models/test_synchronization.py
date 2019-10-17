@@ -62,5 +62,4 @@ class MultipleSynchronizationTest(TestCase):
 class NonExistingSynchronizationTest(TestCase):
 
     def test_find_last_synchronization_date(self):
-        with self.assertRaises(ObjectDoesNotExist):
-            synchronization.find_last_synchronization_date()
+        self.assertRaises(ObjectDoesNotExist, synchronization.find_last_synchronization_date())
