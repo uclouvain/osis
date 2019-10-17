@@ -28,7 +28,7 @@ from unittest.mock import patch
 
 from django.db.models import QuerySet
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from attribution.models import attribution
 from attribution.models.enums.function import COORDINATOR, CO_HOLDER

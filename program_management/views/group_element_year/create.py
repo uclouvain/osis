@@ -26,19 +26,19 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 
+from base.models.education_group_year import EducationGroupYear
+from base.utils.cache import ElementCache
+from base.views.common import display_warning_messages, display_error_messages
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import extract_child_from_cache
 from program_management.forms.group_element_year import GroupElementYearForm
-from base.models.education_group_year import EducationGroupYear
-from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_error_messages
 from program_management.views.group_element_year.common import GenericGroupElementYearMixin
 
 

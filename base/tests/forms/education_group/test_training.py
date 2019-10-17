@@ -29,7 +29,7 @@ from unittest.mock import patch
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.postponement import FIELD_TO_EXCLUDE_IN_SET
 from base.business.utils.model import model_to_dict_fk
