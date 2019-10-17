@@ -153,7 +153,6 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
             raise ValidationError(_('Invalid code'))
         return acronym
 
-    # FIXME method used only in tests
     def clean_acronym(self):
         if self.external:
             self.cleaned_data["acronym"] = self.__clean_acronym_external()
