@@ -547,6 +547,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_master = acronym.endswith(('2m', '2m1'))
         is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
+        is_iufc = acronym.endswith('fc')
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
@@ -568,6 +569,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
+                'is_iufc': is_iufc,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
                 'show_free_text': self._show_free_text()

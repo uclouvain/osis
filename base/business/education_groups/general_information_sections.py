@@ -147,15 +147,63 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION
+        ]
     },
     TrainingType.CERTIFICATE_OF_SUCCESS.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION
+        ]
     },
     TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION
+        ]
     },
     TrainingType.BACHELOR.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
@@ -215,11 +263,45 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            CERTIFICATES,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION
+        ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            CERTIFICATES,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION
+        ]
     },
     TrainingType.PGRM_MASTER_120.name: {
         'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],

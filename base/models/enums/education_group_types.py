@@ -91,6 +91,9 @@ class TrainingType(ChoiceEnum):
             cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
             cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
             cls.CAPAES.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.CERTIFICATE_OF_PARTICIPATION.name
         ]
 
     @classmethod
@@ -104,6 +107,11 @@ class TrainingType(ChoiceEnum):
             cls.AGGREGATION.name,
             cls.CERTIFICATE.name,
             cls.RESEARCH_CERTIFICATE.name,
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
         ]
 
 
