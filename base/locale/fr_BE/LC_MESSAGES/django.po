@@ -2651,7 +2651,7 @@ msgid "Subject"
 msgstr "Sujet"
 
 msgid "Subscribed"
-msgstr "Souscrit"
+msgstr "Inscrit"
 
 msgid "Substitute"
 msgstr "Suppléé"
@@ -2696,7 +2696,7 @@ msgid "Technologic platform"
 msgstr "Plate-forme technologique"
 
 msgid "Termination"
-msgstr "Terminaison"
+msgstr "Clôturé"
 
 msgid "Testing"
 msgstr "Essai"
