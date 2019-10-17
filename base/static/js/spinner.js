@@ -1,7 +1,9 @@
+let linkButtonNoSpinnerClicked = false;
+
 $( document ).ready(function() {
     closeOverlaySpinner();
-    $('a, button').on('click', function (e) {
-        if ($(this).hasClass("no_spinner")) closeOverlaySpinner();
+    $('a, button').on('click submit', function (e) {
+        linkButtonNoSpinnerClicked = $(this).hasClass("no_spinner");
     });
 });
 
@@ -12,8 +14,10 @@ $( document ).on( 'keyup', function ( e ) {
 });
 
 window.addEventListener('beforeunload', function (e) {
-    $("#loader").show();
-    document.getElementById("overlay_fadein").style.display = "block";
+    if (! linkButtonNoSpinnerClicked) {
+        $("#loader").show();
+        document.getElementById("overlay_fadein").style.display = "block";
+    }
 });
 
 function closeOverlaySpinner(){
