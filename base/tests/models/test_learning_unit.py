@@ -30,7 +30,7 @@ from django.contrib.messages import get_messages
 from django.db import DatabaseError
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import learning_unit_year_subtypes

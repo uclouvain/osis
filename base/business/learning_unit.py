@@ -27,7 +27,7 @@ from collections import OrderedDict
 from operator import itemgetter
 
 from django.db.models import Prefetch
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business.learning_unit_year_with_context import volume_learning_component_year

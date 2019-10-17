@@ -26,7 +26,7 @@ from collections import namedtuple
 from django import forms
 from django.core.exceptions import FieldDoesNotExist
 from django.db import Error
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.business import education_group
 from base.business.education_groups import create
