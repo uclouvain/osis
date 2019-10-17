@@ -12,16 +12,18 @@ IF YOU OVERRIDE DJANGO TEMPLATES, THEY MAY APPEAR IN THE LIST AS UNUSED.
 import os
 import sys
 
-MODULES = ['osis', 'internship', 'continuing_education', 'osis_common', 'partnership', 'dissertation', 'assistant']
+MODULES = [
+    'all', 'osis', 'internship', 'continuing_education', 'osis_common', 'partnership', 'dissertation', 'assistant'
+]
 OSIS_MODULES = ['assessments', 'attribution', 'backoffice', 'base', 'cms', 'education_group', 'learning_unit',
-                'program_management', 'reference', 'rules_management', 'osis\\templates', 'webservices']
+                'program_management', 'reference', 'rules_management', 'osis/templates', 'webservices']
 
 
 def _should_analyze_file(f, submodules, features=False):
     if __is_unconcerned_file(f, features):
         return False
     for folder in submodules:
-        if '\\' + folder + '\\' in f:
+        if '/' + folder + '/' in f:
             return True
     return False
 
@@ -34,7 +36,7 @@ def __is_unconcerned_file(f, features=False):
 def _get_files_of_extension(file_extension, filter):
     return [
         f[2:-1]
-        for f in os.popen('dir /b /s "*.' + file_extension + '" | sort').readlines()
+        for f in os.popen('find . -name "*.' + file_extension + '" | sort').readlines()
         if filter[0](f, **filter[1])
     ]
 
@@ -46,7 +48,7 @@ def _get_templates(html_files):
     for html_file in html_files:
         if html_file.find("/templates") != 0:
             try:
-                template_list.append(html_file.rsplit("templates\\")[1])
+                template_list.append(html_file.rsplit("templates/")[1])
             except IndexError:
                 # The html file is not in a template directory...
                 # don't count it as a template
@@ -55,12 +57,16 @@ def _get_templates(html_files):
     return template_list
 
 
-def get_unused_templates(module=None):
-    print("Start searching unused templates in module %s" % (module if module else 'osis'))
+def get_unused_templates(module_name=None):
+    print("Start searching unused templates in module %s" % (module_name if module_name else 'all osis'))
+    if not module_name:
+        module_name = 'all'
     modules_to_keep = {
-        module: (_should_analyze_file, {'submodules': OSIS_MODULES if module == 'osis' or None else [module]})
+        module: (_should_analyze_file, {
+            'submodules': OSIS_MODULES if module == 'osis' else MODULES + OSIS_MODULES if module == 'all' else [module]
+        })
         for module in MODULES
-    }[module if module else 'osis']
+    }[module_name if module_name else 'osis']
     html_files = _get_files_of_extension('html', modules_to_keep)
     templates = _get_templates(html_files)
     py_files = _get_files_of_extension('py', modules_to_keep)
@@ -72,7 +78,7 @@ def get_unused_templates(module=None):
         f = open(file)
         text = f.read()
         for count, template in enumerate(templates):
-            if template.replace('\\', '/') in text:
+            if template in text:
                 tl_count[count] = 1
         f.close()
 
