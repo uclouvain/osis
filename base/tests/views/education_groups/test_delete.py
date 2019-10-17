@@ -27,8 +27,8 @@
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext_lazy
-from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.education_group import EducationGroup

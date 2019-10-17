@@ -27,7 +27,7 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business import proposal_xls
 from base.business.learning_unit_year_with_context import append_latest_entities

@@ -27,7 +27,7 @@ from decimal import Decimal
 
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.models.enums.learning_unit_year_subtypes import PARTIM
