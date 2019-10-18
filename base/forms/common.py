@@ -28,7 +28,7 @@ from distutils.util import strtobool
 from django import forms
 from django.core.validators import RegexValidator
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.field_status import DISABLED, REQUIRED, ALERT, NOT_REQUIRED, FIXED
 from base.models.validation_rule import ValidationRule

@@ -27,7 +27,7 @@ import django_filters
 from django import forms
 from django.db.models import Q, Prefetch, Value, CharField, OuterRef, Subquery, When, Case
 from django.db.models.functions import Concat
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
 from attribution.models.attribution import Attribution

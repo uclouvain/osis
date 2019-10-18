@@ -27,7 +27,7 @@
 from django.db import IntegrityError, transaction, Error
 from django.db.models import F
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context

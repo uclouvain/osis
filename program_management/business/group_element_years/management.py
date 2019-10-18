@@ -28,7 +28,7 @@ from collections import Counter
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Q
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear

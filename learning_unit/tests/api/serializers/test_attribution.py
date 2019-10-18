@@ -26,7 +26,7 @@
 from django.db.models import F
 from django.test import TestCase
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.person import PersonFactory
 from learning_unit.api.serializers.attribution import PersonAttributionSerializer, LearningUnitAttributionSerializer
@@ -52,14 +52,14 @@ class PersonAttributionSerializerTestCase(TestCase):
 class LearningUnitAttributionSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.attrib = AttributionChargeNewFactory()
-        cls.attribution = AttributionChargeNew.objects.annotate(
-            first_name=F('attribution__tutor__person__first_name'),
-            middle_name=F('attribution__tutor__person__middle_name'),
-            last_name=F('attribution__tutor__person__last_name'),
-            email=F('attribution__tutor__person__email'),
-            global_id=F('attribution__tutor__person__global_id'),
-        ).get(id=cls.attrib.id)
+        cls.attribution_charge = AttributionChargeNewFactory()
+        cls.attribution = AttributionNew.objects.annotate(
+            first_name=F('tutor__person__first_name'),
+            middle_name=F('tutor__person__middle_name'),
+            last_name=F('tutor__person__last_name'),
+            email=F('tutor__person__email'),
+            global_id=F('tutor__person__global_id'),
+        ).get(id=cls.attribution_charge.attribution_id)
 
         cls.serializer = LearningUnitAttributionSerializer(cls.attribution)
 
