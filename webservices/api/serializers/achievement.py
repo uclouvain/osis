@@ -99,25 +99,24 @@ class AchievementsSerializer(serializers.ModelSerializer):
         return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_EXTRA)
 
     def _get_cms_achievement_data(self, cms_type):
-        data = TranslatedText.objects.select_related(
-            'text_label'
-        ).annotate(
-            text_or_none=Case(
-                When(text__exact='', then=None),
-                default=F('text'),
-                output_field=CharField()
+        try:
+            data = TranslatedText.objects.select_related(
+                'text_label'
+            ).annotate(
+                text_or_none=Case(
+                    When(text__exact='', then=None),
+                    default=F('text'),
+                    output_field=CharField()
+                )
+            ).get(
+                entity=OFFER_YEAR,
+                reference=self.instance.id,
+                language=self.context['lang'],
+                text_label__label=cms_type
             )
-        ).filter(
-            entity=OFFER_YEAR,
-            reference=self.instance.id,
-            text_label__label=cms_type
-        )
-
-        return next(
-            (obj.text_or_none for obj in data
-             if obj.language == self.context['lang']),
-            None
-        )
+            return data.text_or_none
+        except TranslatedText.DoesNotExist:
+            return None
 
 
 def _get_appropriate_text(eg_achievement, context):
