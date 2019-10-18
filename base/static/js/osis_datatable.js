@@ -43,14 +43,3 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
         }
     });
 }
-
-function prepare_xls(e, action_value){
-    e.preventDefault();
-    document.dispatchEvent(new CustomEvent("prepareXls:onClick", {
-        "detail": $(e.target)
-    }));
-    let status = $("#xls_status");
-    status.val(action_value);
-    $("#search_form").submit();
-    status.val('');
-}
