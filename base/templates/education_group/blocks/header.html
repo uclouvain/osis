@@ -1,7 +1,6 @@
-{% extends "blocks/panel/panel_cms_collapse.html" %}
-{% load static %}
+{% load staticfiles %}
 {% load i18n %}
-
+{% load format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -26,22 +25,20 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-{% block title_0 %}
-    {% language LANGUAGE_CODE_FR %}
-        {% trans title|capfirst %} :
-    {% endlanguage %}
-{% endblock %}
-{% block title_1 %}
-    {% language LANGUAGE_CODE_EN %}
-        {% trans title|capfirst %} :
-    {% endlanguage %}
-{% endblock %}
-
-{% block panel_body %}
-    {% for obj in body_list %}
-        <div class="col-md-6">
-            {{ obj.text | safe }}
-        </div>
-    {% endfor %}
-{% endblock %}
+{% if not disabled_nav %}
+    {% with education_group_year.academic_year|slugify as current_yr %}
+        {% with current_id=education_group_year.id local_storage_key=local_storage_key|default:"educationGroupIds" acronym=education_group_year.acronym complete_title=education_group_year.title current_yr=current_yr %}
+            {% include "template_nav_header.html" %}
+        {% endwith %}
+    {% endwith %}
+{% else %}
+    <h2>
+        {% if education_group_year.education_group_type.category == "TRAINING" %}
+            {{ education_group_year.acronym }}
+        {% else %}
+            {{ education_group_year.partial_acronym }}
+        {% endif %}
+            - {{ education_group_year.academic_year }}
+    </h2>
+    <h3>{{ education_group_year.title }}</h3>
+{% endif %}

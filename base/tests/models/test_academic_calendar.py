@@ -32,8 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from faker import Faker
 
 from base.models import academic_calendar
-from base.models.academic_calendar import is_academic_calendar_has_started, \
-    get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
+from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import EXAM_ENROLLMENTS, SCORES_EXAM_SUBMISSION
 from base.models.exceptions import StartDateHigherThanEndDateException
@@ -116,28 +115,6 @@ class TestIsAcademicCalendarHasStarted(TestCase):
             academic_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-
-    def test_is_academic_calendar_has_started_case_no_date_args(self):
-        self.assertTrue(is_academic_calendar_has_started(
-            academic_year=self.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-        ))
-
-    def test_is_academic_calendar_has_started_case_date_args_lower_than_ac_calendar_start(self):
-        lower_date = self.current_academic_calendar.start_date - datetime.timedelta(days=5)
-        self.assertFalse(is_academic_calendar_has_started(
-            academic_year=self.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-            date=lower_date
-        ))
-
-    def test_is_academic_calendar_has_started_case_date_args_higher_than_ac_calendar_start(self):
-        higher_date = self.current_academic_calendar.start_date + datetime.timedelta(days=10)
-        self.assertTrue(is_academic_calendar_has_started(
-            academic_year=self.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-            date=higher_date
-        ))
 
     def test_project_calendar_types(self):
         excepted_project_calendar_types = (

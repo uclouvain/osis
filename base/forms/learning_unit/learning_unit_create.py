@@ -185,17 +185,6 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
         return credits_
 
 
-class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
-    class Meta(LearningUnitYearModelForm.Meta):
-        labels = {
-            'specific_title': _('Title proper to the partim'),
-            'specific_title_english': _('English title proper to the partim')
-        }
-        field_classes = {
-            'acronym': PartimAcronymField
-        }
-
-
 class CountryEntityField(forms.ChoiceField):
     def __init__(self, *args, widget_attrs=None, **kwargs):
         kwargs.update(

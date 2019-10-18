@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core import serializers
 from django.db import models
 
 from osis_common.models import osis_model_admin
@@ -40,13 +39,3 @@ class Continent(models.Model):
 
     def __str__(self):
         return self.name
-
-
-def serialize_list(list_continents):
-    """
-    Serialize a list of "Contintent" objects using the json format.
-    Use to send data to osis-portal.
-    :param list_continents: a list of "Continent" objects
-    :return: the serialized list (a json)
-    """
-    return serializers.serialize("json", list_continents)

@@ -346,7 +346,7 @@ def response_for_bachelor(context):
     }
 
     if education_group_year:
-        admission_condition, created = AdmissionCondition.objects.get_or_create(
+        admission_condition, _ = AdmissionCondition.objects.get_or_create(
             education_group_year=education_group_year
         )
         get_value = functools.partial(get_value_from_ac, admission_condition=admission_condition, context=context)
@@ -470,7 +470,7 @@ def get_conditions_admissions(context):
     if common_acronym == 'common-2m1':
         common_acronym = 'common-2m'
         full_suffix = '2m'
-    admission_condition, created = AdmissionCondition.objects.get_or_create(
+    admission_condition, _ = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
     admission_condition_common = None

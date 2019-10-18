@@ -79,14 +79,6 @@ class StudentTest(TestCase):
         self.assertIsNotNone(db_student)
         self.assertEqual(db_student, tmp_student)
 
-    def test_find_by_offer(self):
-        tmp_student = StudentFactory()
-        tmp_offer_year = OfferYearFactory()
-        OfferEnrollmentFactory.create(offer_year=tmp_offer_year, student=tmp_student)
-        db_student = list(student.find_by_offer([tmp_offer_year.offer]))[0]
-        self.assertIsNotNone(db_student)
-        self.assertEqual(db_student, tmp_student)
-
     def test_find_by_offer_year(self):
         tmp_student = StudentFactory()
         tmp_offer_year = OfferYearFactory()

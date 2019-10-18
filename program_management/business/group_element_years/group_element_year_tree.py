@@ -38,7 +38,6 @@ from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMM
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
@@ -278,10 +277,6 @@ class EducationGroupHierarchy:
 
     def get_learning_unit_year_list(self):
         return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
-
-    def get_learning_unit_years(self):
-        luy_ids = [element.child_leaf.id for element in self.to_list(flat=True) if element.child_leaf]
-        return LearningUnitYear.objects.filter(id__in=luy_ids)
 
     def is_borrowed(self) -> bool:
         try:
