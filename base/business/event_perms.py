@@ -27,7 +27,7 @@ from abc import ABC, abstractmethod
 
 from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
 from base.models.academic_year import AcademicYear

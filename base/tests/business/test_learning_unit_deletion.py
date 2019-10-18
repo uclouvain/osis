@@ -28,7 +28,7 @@ import datetime
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import base.business.learning_units.perms
 from assistant.models.tutoring_learning_unit_year import TutoringLearningUnitYear
