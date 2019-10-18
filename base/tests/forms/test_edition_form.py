@@ -133,18 +133,6 @@ class TestVolumeEditionForm(TestCase):
                 entities=self.learning_unit_with_context.entities)
             self.assertTrue(form.is_valid())
 
-    def test_get_entity_fields(self):
-        for component, component_values in self.learning_unit_with_context.components.items():
-            component_values = VolumeEditionBaseFormset._clean_component_keys(component_values)
-            form = VolumeEditionForm(
-                data=_get_valid_partim_data_alter(),
-                learning_unit_year=self.learning_unit_with_context,
-                initial=component_values,
-                component=component,
-                entities=self.learning_unit_with_context.entities)
-            actual_entity_fields = form.get_entity_fields()
-            self.assertEqual(len(actual_entity_fields), 3)
-
 
 def _get_wrong_data_empty_field():
     data = _get_valid_data()

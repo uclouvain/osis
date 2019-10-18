@@ -25,8 +25,6 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from base.models.utils.utils import ChoiceEnum
-
 RESEVED_FOR_INTERNS = "RESEVED_FOR_INTERNS"
 OPEN_FOR_EXTERNS = "OPEN_FOR_EXTERNS"
 EXCEPTIONAL_PROCEDURE = "EXCEPTIONAL_PROCEDURE"
@@ -40,11 +38,3 @@ DECLARATION_TYPE = (
     (VACANT_NOT_PUBLISH, _("Vacant not publish")),
     (DO_NOT_ASSIGN, _("Do not assign"))
 )
-
-
-class VacantDeclarationType(ChoiceEnum):
-    RESEVED_FOR_INTERNS = "RESEVED_FOR_INTERNS"
-    OPEN_FOR_EXTERNS = "OPEN_FOR_EXTERNS"
-    EXCEPTIONAL_PROCEDURE = "EXCEPTIONAL_PROCEDURE"
-    VACANT_NOT_PUBLISH = "VACANT_NOT_PUBLISH"
-    DO_NOT_ASSIGN = "DO_NOT_ASSIGN"

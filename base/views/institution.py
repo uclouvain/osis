@@ -112,7 +112,7 @@ def entities_version(request, entity_version_id):
 @login_required
 def entity_diagram(request, entity_version_id):
     entity_version = mdl.entity_version.find_by_id(entity_version_id)
-    entities_version_as_json = json.dumps(entity_version.get_organogram_data())
+    entities_version_as_json = json.dumps(entity_version.get_organigram_data())
 
     return render(
         request, "entity/organogram.html",

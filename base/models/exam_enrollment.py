@@ -116,10 +116,6 @@ class ExamEnrollment(models.Model):
         return self.score_draft is not None or self.justification_draft
 
     @property
-    def is_score_missing_as_program_manager(self):
-        return not self.is_final
-
-    @property
     def to_validate_by_program_manager(self):
         sc_reencoded = None
         if self.score_reencoded is not None:
@@ -161,14 +157,6 @@ class ExamEnrollment(models.Model):
             return _(self.justification_reencoded)
         else:
             return None
-
-    @property
-    def is_score_missing_as_tutor(self):
-        return not self.is_final and not self.is_draft
-
-
-def find_by_ids(ids):
-    return ExamEnrollment.objects.filter(pk__in=ids)
 
 
 def get_session_exam_deadline(enrollment):
@@ -406,13 +394,6 @@ def find_for_score_encodings(session_exam_number,
         .select_related('session_exam') \
         .select_related('learning_unit_enrollment__offer_enrollment__student__person') \
         .select_related('learning_unit_enrollment__learning_unit_year')
-
-
-def find_by_student(a_student):
-    return ExamEnrollment.objects.filter(learning_unit_enrollment__offer_enrollment__student=a_student) \
-        .order_by('-learning_unit_enrollment__learning_unit_year__academic_year__year',
-                  'session_exam__number_session',
-                  'learning_unit_enrollment__learning_unit_year__acronym')
 
 
 def _get_enrolled_enrollments(enrollments):

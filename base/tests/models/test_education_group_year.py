@@ -144,10 +144,6 @@ class EducationGroupYearTest(TestCase):
         GroupElementYearFactory(child_branch=group, parent=self.education_group_year_2)
         self.assertIsNone(group.parent_by_training())
 
-    def test_children_group_element_years_property(self):
-        children_group_element_years = self.education_group_year_1.children_group_element_years
-        self.assertListEqual(list(children_group_element_years), [])
-
     def test_direct_parents_of_branch(self):
         GroupElementYearFactory(
             parent=self.education_group_year_2,

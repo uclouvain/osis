@@ -151,17 +151,6 @@ def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, 
     ).exists()
 
 
-def is_academic_calendar_has_started(academic_year, reference, date=None):
-    if date is None:
-        date = timezone.now()
-
-    return AcademicCalendar.objects.filter(
-            academic_year=academic_year,
-            reference=reference,
-            start_date__lte=date,
-    ).exists()
-
-
 def _list_types(calendar_types):
     return [calendar_type[0] for calendar_type in calendar_types]
 

@@ -312,7 +312,7 @@ class EntityVersion(SerializableModel):
         else:
             return False
 
-    def get_organogram_data(self, limit=3):
+    def get_organigram_data(self, limit=3):
         tree = EntityVersion.objects.get_tree([self.entity_id])
 
         nodes = OrderedDict()

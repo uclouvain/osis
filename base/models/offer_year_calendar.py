@@ -75,13 +75,6 @@ class OfferYearCalendar(AbstractCalendar):
         return u"%s - %s" % (self.academic_calendar, self.offer_year)
 
 
-def find_offer_year_events(offer_yr):
-    return OfferYearCalendar.objects.filter(offer_year=offer_yr,
-                                            start_date__isnull=False,
-                                            end_date__isnull=False).order_by('start_date',
-                                                                             'academic_calendar__title')
-
-
 def find_by_offer_year(offer_yr, academic_calendar_type=None):
     queryset = OfferYearCalendar.objects.filter(offer_year=offer_yr)
     if academic_calendar_type:
