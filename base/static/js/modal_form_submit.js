@@ -9,13 +9,17 @@ function redirect_after_success(modal, xhr) {
     }
 }
 
+function addEventOnDocument(e) {
+    document.dispatchEvent(new CustomEvent("formAjaxSubmit:onSubmit", {
+        "detail": $(e.target).find("button[type='submit']")
+    }));
+}
+
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
-        document.dispatchEvent(new CustomEvent("formAjaxSubmit:onSubmit", {
-            "detail": $(e.target).find("button[type='submit']")
-        }));
+        addEventOnDocument(e);
         $.ajax({
             type: $(this).attr('method'),
             url: $(this).attr('action'),
