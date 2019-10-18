@@ -1,9 +1,26 @@
 let linkButtonNoSpinnerClicked = false;
 
+function bindNoSpinner(elem){
+    if (elem) {
+        linkButtonNoSpinnerClicked = elem.hasClass("no_spinner");
+    } else {
+        $('a, button').on('click submit', function (e) {
+            linkButtonNoSpinnerClicked = $(this).hasClass("no_spinner");
+        });
+    }
+}
+
+function closeOverlaySpinner(){
+    $("#loader").hide();
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("overlay_fadein").style.display = "none";
+}
+
 $( document ).ready(function() {
     closeOverlaySpinner();
-    $('a, button').on('click submit', function (e) {
-        linkButtonNoSpinnerClicked = $(this).hasClass("no_spinner");
+    bindNoSpinner();
+    document.addEventListener("formAjaxSubmit:onSubmit", function( e ){
+        bindNoSpinner(e.detail);
     });
 });
 
@@ -19,9 +36,3 @@ window.addEventListener('beforeunload', function (e) {
         document.getElementById("overlay_fadein").style.display = "block";
     }
 });
-
-function closeOverlaySpinner(){
-    $("#loader").hide();
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("overlay_fadein").style.display = "none";
-}

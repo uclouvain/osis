@@ -11,9 +11,11 @@ function redirect_after_success(modal, xhr) {
 
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
-        // Added preventDefaut so as to not add anchor "href" to address bar
+        // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
-
+        document.dispatchEvent(new CustomEvent("formAjaxSubmit:onSubmit", {
+            "detail": $(e.target).find("button[type='submit']")
+        }));
         $.ajax({
             type: $(this).attr('method'),
             url: $(this).attr('action'),
