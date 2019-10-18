@@ -40,28 +40,10 @@ class EventPerm(ABC):
     def is_open(cls, *args, **kwargs):
         raise NotImplementedError
 
-    @classmethod
-    @abstractmethod
-    def __is_open_for_spec_egy(cls, *args, **kwargs):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def __is_open_other_rules(cls, *args, **kwargs):
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def get_academic_years(*args, **kwargs) -> QuerySet:
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
-        raise NotImplementedError
-
 
 class EventPermEducationGroupEdition(EventPerm):
+    QS = AcademicCalendar.objects.open_calendars().filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+
     @classmethod
     def is_open(cls, *args, **kwargs):
         if kwargs.get('education_group'):
@@ -88,11 +70,9 @@ class EventPermEducationGroupEdition(EventPerm):
     def __is_open_other_rules(cls, *args, **kwargs):
         return cls.__is_calendar_opened(*args, **kwargs)
 
-    @staticmethod
-    def __is_calendar_opened(*args, **kwargs):
-        return AcademicCalendar.objects.open_calendars()\
-            .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
-            .exists()
+    @classmethod
+    def __is_calendar_opened(cls, *args, **kwargs):
+        return cls.QS.exists()
 
     @classmethod
     def get_academic_years(cls, *args, **kwargs) -> QuerySet:
@@ -100,6 +80,4 @@ class EventPermEducationGroupEdition(EventPerm):
 
     @classmethod
     def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
-        return AcademicCalendar.objects.open_calendars()\
-            .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
-            .values_list('data_year', flat=True)
+        return cls.QS.values_list('data_year', flat=True)
