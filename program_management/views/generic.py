@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,26 +25,58 @@
 ##############################################################################
 import json
 
-from django.contrib.admin.utils import flatten
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, DetailView
 
-from base.forms.prerequisite import LearningUnitPrerequisiteForm
-from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.models.prerequisite import Prerequisite
 from base.views.education_groups import perms
-from base.views.mixins import RulesRequiredMixin
+from base.views.education_groups.detail import CatalogGenericDetailView
+from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+
+NO_PREREQUISITES = TrainingType.finality_types() + [
+    MiniTrainingType.OPTION.name,
+    MiniTrainingType.MOBILITY_PARTNERSHIP.name,
+] + GroupType.get_names()
+
+
+@method_decorator(login_required, name='dispatch')
+class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
+    model = GroupElementYear
+    context_object_name = "group_element_year"
+    pk_url_kwarg = "group_element_year_id"
+
+    # FlagMixin
+    flag = "education_group_update"
+
+    # RulesRequiredMixin
+    raise_exception = True
+    rules = [perms.can_change_education_group]
+
+    def _call_rule(self, rule):
+        """ The permission is computed from the education_group_year """
+        return rule(self.request.user, self.education_group_year)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['root'] = self.kwargs["root_id"]
+        return context
+
+    @property
+    def education_group_year(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
+
+    def get_root(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -83,54 +115,36 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
         return context
 
 
-class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
-    template_name = "learning_unit/tab_prerequisite_update.html"
-    form_class = LearningUnitPrerequisiteForm
+@method_decorator(login_required, name='dispatch')
+class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
+    model = LearningUnitYear
+    context_object_name = "learning_unit_year"
+    pk_url_kwarg = 'learning_unit_year_id'
 
-    def get_form_kwargs(self):
-        form_kwargs = super().get_form_kwargs()
-        try:
-            instance = Prerequisite.objects.get(education_group_year=self.kwargs["root_id"],
-                                                learning_unit_year=self.kwargs["learning_unit_year_id"])
-        except Prerequisite.DoesNotExist:
-            instance = Prerequisite(
-                education_group_year=self.get_root(),
-                learning_unit_year=self.object
-            )
-        leaf_children = self.education_group_year_hierarchy.to_list(flat=True)
-        luys_contained_in_formation = set(grp.child_leaf for grp in leaf_children if grp.child_leaf)
-        form_kwargs["instance"] = instance
-        form_kwargs["luys_that_can_be_prerequisite"] = luys_contained_in_formation
-        return form_kwargs
+    permission_required = 'base.can_access_education_group'
+    raise_exception = True
+
+    def get_person(self):
+        return get_object_or_404(Person, user=self.request.user)
+
+    def get_root(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data()
+        context = super().get_context_data(**kwargs)
 
-        learning_unit_year = context["learning_unit_year"]
-        education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
-
-        formations = group_element_year.find_learning_unit_formations(
-            [learning_unit_year],
-            parents_as_instances=True,
-            with_parents_of_parents=True
-        )
-
-        formations_set = set(flatten([parents for child_id, parents in formations.items()]))
-
-        if education_group_year_root not in formations_set:
-            raise PermissionDenied(
-                _("You must be in the context of a training to modify the prerequisites to a learning unit "
-                    "(current context: %(partial_acronym)s - %(acronym)s)") % {
-                        'acronym': education_group_year_root.acronym,
-                        'partial_acronym': education_group_year_root.partial_acronym
-                    }
-            )
-
+        root = self.get_root()
+        self.hierarchy = EducationGroupHierarchy(root, tab_to_show=self.request.GET.get("tab_to_show"))
+        # TODO remove parent in context
+        context['person'] = self.get_person()
+        context['root'] = root
+        context['root_id'] = root.pk
+        context['parent'] = root
+        context['tree'] = json.dumps(self.hierarchy.to_json())
+        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['show_prerequisites'] = self.show_prerequisites(root)
+        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         return context
 
-    def get_success_message(self, cleaned_data):
-        return _("Prerequisites saved.")
-
-    def get_success_url(self):
-        return reverse("learning_unit_prerequisite", args=[self.kwargs["root_id"],
-                                                           self.kwargs["learning_unit_year_id"]])
+    def show_prerequisites(self, education_group_year):
+        return education_group_year.education_group_type.name not in NO_PREREQUISITES

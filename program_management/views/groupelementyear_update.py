@@ -45,8 +45,8 @@ from base.views.education_groups.select import build_success_message, build_succ
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from program_management.forms.group_element_year import GroupElementYearForm
-from program_management.views.group_element_year import perms as group_element_year_perms
-from program_management.views.group_element_year.common import GenericGroupElementYearMixin
+from program_management.views import perms as group_element_year_perms
+from program_management.views.generic import GenericGroupElementYearMixin
 
 
 @login_required
