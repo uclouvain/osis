@@ -9,7 +9,7 @@ function redirect_after_success(modal, xhr) {
     }
 }
 
-function addEventOnDocument(e) {
+function addDispatchEventOnSubmitAjaxForm(e) {
     document.dispatchEvent(new CustomEvent("formAjaxSubmit:onSubmit", {
         "detail": $(e.target).find("button[type='submit']")
     }));
@@ -19,7 +19,7 @@ var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
-        addEventOnDocument(e);
+        addDispatchEventOnSubmitAjaxForm(e);
         $.ajax({
             type: $(this).attr('method'),
             url: $(this).attr('action'),
