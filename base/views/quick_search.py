@@ -31,6 +31,7 @@ from django_filters.views import FilterView
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.utils.cache import CacheFilterMixin
 from base.views.mixins import AjaxTemplateMixin
@@ -61,8 +62,19 @@ class QuickEducationGroupYearFilter(FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
+
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
         if not self.data:
-            self.queryset = EducationGroupYear.objects.none()
+            return EducationGroupYear.objects.none()
+        queryset = EducationGroupYear.objects.filter(
+            education_group_type__category__in=[
+                education_group_categories.Categories.GROUP.name,
+                education_group_categories.Categories.MINI_TRAINING.name,
+            ]
+        )
+        return queryset
 
 
 class QuickLearningUnitYearFilter(FilterSet):
