@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 08:31+0200\n"
+"POT-Creation-Date: 2019-10-21 13:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -370,9 +370,6 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure to change the state from"
-msgstr ""
-
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr ""
@@ -486,9 +483,6 @@ msgstr ""
 msgid "CAPAES"
 msgstr ""
 
-msgid "Calendar of the annual program"
-msgstr ""
-
 msgid "Campus"
 msgstr ""
 
@@ -542,9 +536,6 @@ msgid "City"
 msgstr ""
 
 msgid "City of institution"
-msgstr ""
-
-msgid "Classe"
 msgstr ""
 
 msgid "Classes"
@@ -637,9 +628,6 @@ msgid "Content"
 msgstr ""
 
 msgid "Coordinator"
-msgstr ""
-
-msgid "Coorganization"
 msgstr ""
 
 msgid "Copy Reddot data from previous academic year."
@@ -882,6 +870,9 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English comment"
+msgstr ""
+
 msgid "English title proper"
 msgstr ""
 
@@ -1010,9 +1001,6 @@ msgid "Fixed"
 msgstr ""
 
 msgid "Fixed-line phone"
-msgstr ""
-
-msgid "Focuses"
 msgstr ""
 
 msgid "Folder"
@@ -1275,9 +1263,6 @@ msgid "Jury members"
 msgstr ""
 
 msgid "Keywords"
-msgstr ""
-
-msgid "LECTURING"
 msgstr ""
 
 msgid "LU"
@@ -1658,9 +1643,6 @@ msgid "No additional fees"
 msgstr ""
 
 msgid "No attributions exist for the parent learning unit"
-msgstr ""
-
-msgid "No change made"
 msgstr ""
 
 msgid "No data"
@@ -2725,9 +2707,6 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-msgid "This learning unit is not eligible for proposal creation/modification"
-msgstr ""
-
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
@@ -2859,9 +2838,6 @@ msgstr ""
 msgid "Update for teacher unlocked"
 msgstr ""
 
-msgid "Used by learning unit"
-msgstr ""
-
 msgid "User"
 msgstr ""
 
@@ -2983,9 +2959,6 @@ msgid "You are not attributed to this learning unit."
 msgstr ""
 
 msgid "You are not eligible to cancel proposal"
-msgstr ""
-
-msgid "You are not eligible to consolidate proposal"
 msgstr ""
 
 msgid "You are not eligible to create/modify proposal"
@@ -3420,9 +3393,6 @@ msgid "volume declared vacant"
 msgstr ""
 
 msgid "volume requirement entity"
-msgstr ""
-
-msgid "volume total global"
 msgstr ""
 
 msgid "volume total requirement entities"
