@@ -521,7 +521,7 @@ components:
     LearningUnitAchievement:
       type: object
       properties:
-        codename:
+        code_name:
           type: string
           example: '1.0'
         achievement:
