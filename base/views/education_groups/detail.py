@@ -38,7 +38,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import DetailView
 from reversion.models import Version
@@ -484,19 +484,6 @@ def get_sessions_dates(education_group_year):
                 offer_year_calendars[0]
 
     return sessions_dates_by_calendar_type
-
-
-def get_dates(an_academic_calendar_type, an_education_group_year):
-    try:
-        dates = OfferYearCalendar.objects.get(
-            education_group_year=an_education_group_year,
-            academic_calendar__reference=an_academic_calendar_type,
-            academic_calendar__academic_year=an_education_group_year.academic_year
-        )
-    except OfferYearCalendar.DoesNotExist:
-        dates = None
-
-    return {"dates": dates} if dates else {}
 
 
 class EducationGroupContent(EducationGroupGenericDetailView):

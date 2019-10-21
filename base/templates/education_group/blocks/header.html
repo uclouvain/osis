@@ -1,5 +1,6 @@
-{% load staticfiles i18n bootstrap3 static %}
-
+{% load staticfiles %}
+{% load i18n %}
+{% load format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -23,34 +24,21 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% if request.is_ajax %}
-<div class="modal-content" id="form-modal-content">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h4>{% trans 'Coorganization' %}</h4>
-    </div>
 
-    <div id="form-modal-body" class="modal-body">
-{% endif %}
-
-
-<form id="coorganization-form" role="form" method="POST" action="{{ request.path }}">
-    {% csrf_token %}
-    {% bootstrap_form_errors form %}
-    {% bootstrap_form form %}
-
-    {% if not request.is_ajax %}
-        <button type="submit" class="btn" data-dismiss="modal">{% trans 'Save' %} </button>
-    {% endif %}
-</form>
-{{ form.media }}
-
-{% if request.is_ajax %}
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
-               onclick="$('#coorganization-form').submit();"/>
-    </div>
-</div>
+{% if not disabled_nav %}
+    {% with education_group_year.academic_year|slugify as current_yr %}
+        {% with current_id=education_group_year.id local_storage_key=local_storage_key|default:"educationGroupIds" acronym=education_group_year.acronym complete_title=education_group_year.title current_yr=current_yr %}
+            {% include "template_nav_header.html" %}
+        {% endwith %}
+    {% endwith %}
+{% else %}
+    <h2>
+        {% if education_group_year.education_group_type.category == "TRAINING" %}
+            {{ education_group_year.acronym }}
+        {% else %}
+            {{ education_group_year.partial_acronym }}
+        {% endif %}
+            - {{ education_group_year.academic_year }}
+    </h2>
+    <h3>{{ education_group_year.title }}</h3>
 {% endif %}

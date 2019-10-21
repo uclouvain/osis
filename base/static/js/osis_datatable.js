@@ -4,7 +4,13 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
     domTable.DataTable(
     {
         'createdRow': function (row, data, dataIndex) {
-            $(row).attr('data-id', data['osis_url']);
+            let url = "";
+            if (data['osis_url']) {
+                url = data['osis_url'];
+            } else {
+                url = data['url'];
+            }
+            $(row).attr('data-id', url);
             $(row).attr('data-value', data['acronym']);
         },
         columnDefs: columnDefs,
@@ -36,12 +42,4 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
             'processing': gettext("Loading...")
         }
     });
-}
-
-function prepare_xls(e, action_value){
-    e.preventDefault();
-    var status = $("#xls_status");
-    status.val(action_value);
-    $("#search_form").submit();
-    status.val('');
 }

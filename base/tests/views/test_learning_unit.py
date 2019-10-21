@@ -37,7 +37,7 @@ from django.http import HttpResponseRedirect
 from django.test import TestCase, RequestFactory, Client
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 import base.business.learning_unit
@@ -64,7 +64,6 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
-from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group

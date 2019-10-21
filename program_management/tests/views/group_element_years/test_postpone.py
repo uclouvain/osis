@@ -27,7 +27,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory

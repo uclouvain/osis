@@ -27,7 +27,7 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _get_learning_unit_yrs_on_2_different_years, translate_status, create_xls_comparison, \

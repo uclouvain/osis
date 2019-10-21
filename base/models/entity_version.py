@@ -32,7 +32,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
@@ -312,7 +312,7 @@ class EntityVersion(SerializableModel):
         else:
             return False
 
-    def get_organogram_data(self, limit=3):
+    def get_organigram_data(self, limit=3):
         tree = EntityVersion.objects.get_tree([self.entity_id])
 
         nodes = OrderedDict()

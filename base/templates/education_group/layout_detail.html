@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load education_group format i18n staticfiles %}
+{% load education_group format i18n static %}
 
 {% block title %}
     <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
@@ -17,15 +17,9 @@
 
 {% block header_content %}
     <div class="page-header">
-        <h2>
-            {% if education_group_year.education_group_type.category == "TRAINING" %}
-                {{ education_group_year.acronym }}
-            {% else %}
-                {{ education_group_year.partial_acronym }}
-            {% endif %}
-                - {{ education_group_year.academic_year }}
-        </h2>
-    <h3>{{ education_group_year.title }}</h3>
+    {% with disabled_nav=False %}
+        {% include "education_group/blocks/header.html" %}
+    {% endwith %}
     </div>
 {% endblock %}
 

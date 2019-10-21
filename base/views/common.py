@@ -34,7 +34,7 @@ from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.utils import translation
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl
 from base.models.utils import native

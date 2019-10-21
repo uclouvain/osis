@@ -29,7 +29,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
 from base.enums.component_detail import COMPONENT_DETAILS

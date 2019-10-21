@@ -1,5 +1,5 @@
 <!doctype html>
-{% load staticfiles i18n %}
+{% load static i18n %}
 {% load statici18n analytical hijack_tags %}
 
 {% comment "License" %}
@@ -72,6 +72,7 @@
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/spinner.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/prepareXls.js' %}"></script>
     <script>
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
         $.widget.bridge('uibutton', $.ui.button);

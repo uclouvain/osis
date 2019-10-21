@@ -25,7 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from reversion.admin import VersionAdmin
 
 from base.models import academic_year
@@ -148,17 +148,6 @@ def get_by_reference_and_academic_year(a_reference, an_academic_year):
 def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, a_reference):
     return AcademicCalendar.objects.open_calendars().filter(
         academic_year=an_academic_year_id, reference=a_reference
-    ).exists()
-
-
-def is_academic_calendar_has_started(academic_year, reference, date=None):
-    if date is None:
-        date = timezone.now()
-
-    return AcademicCalendar.objects.filter(
-            academic_year=academic_year,
-            reference=reference,
-            start_date__lte=date,
     ).exists()
 
 
