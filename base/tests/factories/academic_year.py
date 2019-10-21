@@ -80,4 +80,4 @@ class AcademicYearFactory(DjangoModelFactory):
     @staticmethod
     def produce(base_year=None, number_past=1, number_future=1):
         current_year = base_year or get_current_year()
-        return [AcademicYearFactory.build(year=current_year+i) for i in range(-number_past, number_future+1)]
+        return [AcademicYearFactory(year=current_year+i) for i in range(-number_past, number_future+1)]
