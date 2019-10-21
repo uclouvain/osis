@@ -189,24 +189,19 @@
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
-        // FIXME to use with prepare_xls(e, action_value) from prepareXls.js
         $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
-            e.preventDefault();
-            addOnClickEventOnPrepareXls(e);
+            let table = $('#table_education_groups').DataTable();
+            let order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+
             let action_value;
             if ($(this).attr('id') === 'btn_produce_xls') {
                 action_value = 'xls';
             } else if ( $(this).attr('id') === 'btn_produce_xls_administrative_data' ) {
                 action_value = 'xls_administrative';
             }
-            let status = $("#xls_status");
-            status.val(action_value);
-            let table = $('#table_education_groups').DataTable();
-            let order = table.order();
-            $("#xls_order_col").val(get_ordering_column(order));
-            $("#xls_order").val(order[0][1]);
-            $("#search_form").submit();
-            status.val('');
+            prepare_xls(e, action_value);
             $("#xls_order").val('');
             $("#xls_order_col").val('');
         });
