@@ -119,6 +119,7 @@
                             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                                 <li>
                                     <a id="btn_produce_xls"
+                                       class="no_spinner"
                                        style="margin-right:10px;"
                                        title="{% trans 'Produce xls with a list of trainings' %}">
                                         &nbsp;{% trans 'List of trainings' %}
@@ -126,6 +127,7 @@
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_administrative_data"
+                                       class="no_spinner"
                                        style="margin-right:10px;"
                                        title="{% trans 'Produce xls of trainings with administrative data' %}">
                                         &nbsp;{% trans 'List of trainings with administrative data' %}
@@ -134,7 +136,7 @@
                             </ul>
                             <form id="download_xls" action="{{ request.path }}" method="post">
                                 {% csrf_token %}
-                                <input type="hidden" id="xls_status" name="xls_status">
+                                <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
                         </div>
                     </div>
@@ -187,31 +189,19 @@
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
-        $("#btn_produce_xls").click(function (e) {
-            e.preventDefault();
-            let status = $("#xls_status");
-            status.val('xls');
+        $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
             let table = $('#table_education_groups').DataTable();
             let order = table.order();
             $("#xls_order_col").val(get_ordering_column(order));
             $("#xls_order").val(order[0][1]);
-            $("#search_form").submit();
-            status.val('');
-            $("#xls_order").val('');
-            $("#xls_order_col").val('');
-        });
 
-         // FIXME remove xls_order_col / xls_order ==> USE ordering params
-        $("#btn_produce_xls_administrative_data").click(function (e) {
-            e.preventDefault();
-            let status = $("#xls_status");
-            status.val('xls_administrative');
-            let table = $('#table_education_groups').DataTable();
-            let order = table.order();
-            $("#xls_order_col").val(get_ordering_column(order));
-            $("#xls_order").val(order[0][1]);
-            $("#search_form").submit();
-            status.val('');
+            let action_value;
+            if ($(this).attr('id') === 'btn_produce_xls') {
+                action_value = 'xls';
+            } else if ( $(this).attr('id') === 'btn_produce_xls_administrative_data' ) {
+                action_value = 'xls_administrative';
+            }
+            prepare_xls(e, action_value);
             $("#xls_order").val('');
             $("#xls_order_col").val('');
         });
