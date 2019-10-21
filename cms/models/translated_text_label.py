@@ -55,10 +55,6 @@ class TranslatedTextLabel(models.Model):
         return self.label
 
 
-def find_by_id(id):
-    return TranslatedTextLabel.objects.get(pk=id)
-
-
 def search(text_entity, labels=None, language=None):
     queryset = TranslatedTextLabel.objects.filter(text_label__entity=text_entity)
     if labels:

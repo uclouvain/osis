@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
@@ -272,12 +271,6 @@ class LearningUnitYear(SerializableModel):
             ).get()
         return None
 
-    @property
-    def same_container_learning_unit_years(self):
-        return LearningUnitYear.objects.filter(
-            learning_container_year=self.learning_container_year
-        ).order_by('acronym')
-
     @cached_property
     def allocation_entity(self):
         return self.get_entity(entity_container_year_link_type.ALLOCATION_ENTITY)
@@ -386,19 +379,10 @@ class LearningUnitYear(SerializableModel):
         return self.get_internship_subtype_display()
 
     @property
-    def get_previous_acronym(self):
-        return find_lt_learning_unit_year_with_different_acronym(self)
-
-    @property
     def periodicity_verbose(self):
         if self.periodicity:
             return _(self.periodicity)
         return None
-
-    def find_gte_learning_units_year(self):
-        return LearningUnitYear.objects.filter(learning_unit=self.learning_unit,
-                                               academic_year__year__gte=self.academic_year.year) \
-            .order_by('academic_year__year')
 
     def find_gt_learning_units_year(self):
         return LearningUnitYear.objects.filter(learning_unit=self.learning_unit,
@@ -646,17 +630,6 @@ def find_gte_year_acronym(academic_yr, acronym):
 def find_lt_year_acronym(academic_yr, acronym):
     return LearningUnitYear.objects.filter(academic_year__year__lt=academic_yr.year,
                                            acronym__iexact=acronym).order_by('academic_year')
-
-
-def check_if_acronym_regex_is_valid(acronym):
-    return isinstance(acronym, str) and \
-           not acronym.startswith('*') and \
-           not acronym.startswith('+') and \
-           re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper()) is not None
-
-
-def find_max_credits_of_related_partims(a_learning_unit_year):
-    return a_learning_unit_year.get_partims_related().aggregate(max_credits=models.Max("credits"))["max_credits"]
 
 
 def find_partims_with_active_status(a_learning_unit_year):

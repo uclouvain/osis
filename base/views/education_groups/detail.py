@@ -486,19 +486,6 @@ def get_sessions_dates(education_group_year):
     return sessions_dates_by_calendar_type
 
 
-def get_dates(an_academic_calendar_type, an_education_group_year):
-    try:
-        dates = OfferYearCalendar.objects.get(
-            education_group_year=an_education_group_year,
-            academic_calendar__reference=an_academic_calendar_type,
-            academic_calendar__academic_year=an_education_group_year.academic_year
-        )
-    except OfferYearCalendar.DoesNotExist:
-        dates = None
-
-    return {"dates": dates} if dates else {}
-
-
 class EducationGroupContent(EducationGroupGenericDetailView):
     template_name = "education_group/tab_content.html"
 

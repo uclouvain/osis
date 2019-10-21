@@ -34,15 +34,12 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
     create_xls_attributions
 from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
-from base.business.learning_units.xls_educational_information_and_specifications import \
-    create_xls_educational_information_and_specifications
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
-from base.views.common import remove_from_session
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -78,16 +75,6 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
             'items_per_page': context["paginator"].per_page,
         })
         return context
-
-
-def _manage_session_variables(request, search_type):
-    remove_from_session(request, 'search_url')
-    if search_type == 'EXTERNAL':
-        request.session['ue_search_type'] = str(_('External learning units'))
-    elif search_type == SIMPLE_SEARCH:
-        request.session['ue_search_type'] = None
-    else:
-        request.session['ue_search_type'] = str(_get_search_type_label(search_type))
 
 
 def _get_filter(form, search_type):
@@ -134,12 +121,6 @@ def _create_xls_attributions(view_obj, context, **response_kwargs):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_attributions(user, luys, filters)
-
-
-def _create_xls_educational_information_and_specifications(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
 
 
 def _create_xls_proposal(view_obj, context, **response_kwargs):

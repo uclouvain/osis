@@ -91,11 +91,6 @@ def find_by_person(a_person):
         return None
 
 
-def find_by_offer(offers):
-    return Student.objects.filter(offerenrollment__offer_year__offer__in=offers)\
-                          .order_by('person__last_name', 'person__first_name').distinct()
-
-
 def find_by_offer_year(offer_y):
     return Student.objects.filter(offerenrollment__offer_year=offer_y)
 

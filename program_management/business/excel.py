@@ -270,11 +270,6 @@ def _merge_cells(excel_lines, workbook: Workbook, end_column):
             worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=end_column)
 
 
-def _readjust_worksheet_columns_width(workbook: Workbook):
-    worksheet = workbook.worksheets[0]
-    worksheet.column_dimensions['B'].width = 6
-
-
 def _add_hyperlink(excel_lines, workbook: Workbook, year):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
