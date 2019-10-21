@@ -4,6 +4,7 @@
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h4 class="modal-title">{% trans "Search" %}</h4>
 </div>
+
 <div class="modal-body">
     <div id="message_info_modal" class="alert alert-info" role="alert" style="visibility: hidden; display: none;"></div>
 
@@ -24,11 +25,11 @@
     <br>
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane {% if request.path == quick_search_eg %}active{% endif %}" id="eg_search">
-            {% include "base/blocks/quick_search_egy.html" %}
+            {% include "base/blocks/quick_search_egy.html" with form_id="form-modal-eg-search" form_url=quick_search_eg select_url="education_group_select" form=eg_form object_list=eg_object_list%}
         </div>
 
         <div role="tabpanel" class="tab-pane {% if request.path == quick_search_lu %}active{% endif %}" id="lu_search">
-            {% include "base/blocks/quick_search_luy.html" %}
+            {% include "base/blocks/quick_search_luy.html" with form_id="form-modal-lu-search" form_url=quick_search_lu select_url="learning_unit_select" form=lu_form object_list=lu_object_list %}
         </div>
 </div>
 
