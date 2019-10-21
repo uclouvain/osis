@@ -45,7 +45,7 @@ class LearningAchievementListTestCase(APITestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        for label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
+        for label in CMS_LABEL_PEDAGOGY:
             TranslatedTextFactory(
                 reference=cls.learning_unit_year.pk,
                 text_label__label=label,
