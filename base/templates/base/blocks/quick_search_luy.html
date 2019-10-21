@@ -6,3 +6,10 @@
     {% bootstrap_field form.acronym form_group_class="col-md-2" %}
     {% bootstrap_field form.title form_group_class="col-md-6" %}
 {% endblock %}
+
+{% block  table_header %}
+    <th></th>
+    <th>{% trans 'Ac yr.' %}</th>
+    <th>{% trans 'Code' %}</th>
+    <th>{% trans 'Title' %}</th>
+{% endblock %}

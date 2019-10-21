@@ -17,6 +17,13 @@
 </form>
 <br>
 <table class="table table-striped table-responsive">
+    <thead>
+        <tr>
+            {% block table_header %}
+
+            {% endblock table_header %}
+        </tr>
+    </thead>
     <tbody>
     {% for object in object_list %}
         <tr>
@@ -25,6 +32,7 @@
 {#                    <i class="fas fa-file-import"></i>#}
 {#                </button>#}
             </td>
+            <th>{{ object.academic_year }}</th>
             <td><a href="{{ object.get_absolute_url }}">{{ object.acronym }}</a></td>
             <td>{{ object.complete_title }}</td>
         </tr>
