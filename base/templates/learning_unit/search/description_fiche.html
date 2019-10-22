@@ -51,7 +51,9 @@
                             <ul class="dropdown-menu dropdown-menu-large row pull-right">
                                 <li>
                                     {% trans 'list of required teaching materials' as title_material %}
-                                    <a id="btn_teaching_material_xls" title="{{ title_material|capfirst }}">
+                                    <a id="btn_teaching_material_xls"
+                                       class="no_spinner"
+                                       title="{{ title_material|capfirst }}">
                                         {{ title_material|capfirst }}
                                     </a>
                                 </li>

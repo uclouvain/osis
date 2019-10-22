@@ -39,7 +39,7 @@ from program_management.business.group_element_years.detach import DetachEducati
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import extract_child_from_cache
 from program_management.forms.group_element_year import GroupElementYearForm
-from program_management.views.group_element_year.common import GenericGroupElementYearMixin
+from program_management.views.generic import GenericGroupElementYearMixin
 
 
 class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):

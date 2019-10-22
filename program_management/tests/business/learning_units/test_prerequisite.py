@@ -39,7 +39,7 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.user import UserFactory
 from program_management.business.learning_units import prerequisite
-from program_management.views.learning_unit.detail import NO_PREREQUISITES
+from program_management.views.generic import NO_PREREQUISITES
 
 
 class TestLearningUnitsAcronymsFromPrerequisite(TestCase):

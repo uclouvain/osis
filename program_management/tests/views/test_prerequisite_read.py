@@ -23,69 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
 from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
-from base.tests.factories.user import UserFactory
-
-
-class TestDetail(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.person = PersonFactory()
-        cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
-        cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
-        cls.learning_component_year_1 = LearningComponentYearFactory(
-            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
-            hourly_volume_partial_q2=10)
-        cls.learning_component_year_2 = LearningComponentYearFactory(
-            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
-            hourly_volume_partial_q2=10)
-        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
-                                                           child_branch=cls.education_group_year_2)
-        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_2,
-                                                           child_branch=None,
-                                                           child_leaf=cls.learning_unit_year_1)
-        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year_1,
-                                                           child_branch=cls.education_group_year_3)
-        cls.group_element_year_4 = GroupElementYearFactory(parent=cls.education_group_year_3,
-                                                           child_branch=None,
-                                                           child_leaf=cls.learning_unit_year_2)
-        cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-
-        cls.url = reverse(
-            "learning_unit_utilization",
-            args=[
-                cls.education_group_year_1.id,
-                cls.learning_unit_year_1.id,
-            ]
-        )
-
-    def test_education_group_using_template_use(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertTemplateUsed(response, 'learning_unit/tab_utilization.html')
-
-    def test_education_group_using_check_parent_list_with_group(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        self.assertEqual(list(response.context_data['group_element_years']),
-                         [self.group_element_year_2])
 
 
 class TestLearningUnitPrerequisite(TestCase):
