@@ -69,12 +69,12 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
         if form.is_valid():
             form.save()
             if is_pedagogy_data_must_be_postponed(form.luys[0]):
-                last_year_reported = form.luys[-1].academic_year.year
+                last_academic_year_reported = form.luys[-1].academic_year
                 display_success_messages(
                     request,
                     _("The section you modified have been saved and "
                       "reported up to %(last_year_reported)s with success.") % {
-                        "last_year_reported": last_year_reported
+                        "last_year_reported": str(last_academic_year_reported)
                     }
                 )
             else:

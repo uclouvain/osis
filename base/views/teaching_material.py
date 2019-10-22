@@ -80,13 +80,14 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
     teach_material = get_object_or_404(TeachingMaterial, pk=teaching_material_id,
                                        learning_unit_year_id=learning_unit_year_id)
     if request.method == 'POST':
-        last_year_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last().academic_year.year
+        last_academic_year_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last().\
+            academic_year
         delete_teaching_material(teach_material)
         if is_pedagogy_data_must_be_postponed(teach_material.learning_unit_year):
             display_success_messages(
                 request,
                 _("The teaching material has been deleted up to %(last_year_reported)s with success") % {
-                    "last_year_reported": last_year_reported
+                    "last_year_reported": str(last_academic_year_reported)
                 }
             )
         else:
@@ -97,12 +98,12 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
 
 def _save_and_return_response(request, form, learning_unit_year):
     form.save(learning_unit_year=learning_unit_year)
-    last_year_reported = learning_unit_year.find_gt_learning_units_year().last().academic_year.year
+    last_academic_year_reported = learning_unit_year.find_gt_learning_units_year().last().academic_year
     if is_pedagogy_data_must_be_postponed(learning_unit_year):
         display_success_messages(
             request,
             _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
-                "last_year_reported": last_year_reported
+                "last_year_reported": str(last_academic_year_reported)
             }
         )
     else:
