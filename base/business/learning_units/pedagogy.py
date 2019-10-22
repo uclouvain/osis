@@ -88,4 +88,4 @@ def update_bibliography_changed_field_in_cms(learning_unit_year):
 
 
 def is_pedagogy_data_must_be_postponed(learning_unit_year):
-    return learning_unit_year.academic_year.year >= academic_year.starting_academic_year()
+    return learning_unit_year.academic_year.year >= academic_year.starting_academic_year().year
