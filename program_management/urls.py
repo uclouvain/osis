@@ -39,13 +39,15 @@ urlpatterns = [
                 name='education_group_attach'),
             url(u'^create/$', create.CreateGroupElementYearView.as_view(),
                 name='group_element_year_create'),
+            url(r'^update_all/$', update.UpdateGroupElementYearFormset.as_view(),
+                name="group_element_year_update_all"),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
                 url(r'^move/$', create.MoveGroupElementYearView.as_view(),
                     name='group_element_year_move'),
                 url(r'^update/$', update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_update")
+                    name="group_element_year_update"),
             ]))
         ])),
         url(r'^group_content/', read.ReadEducationGroupTypeView.as_view(), name="group_content"),

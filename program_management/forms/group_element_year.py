@@ -25,6 +25,7 @@
 ##############################################################################
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms import modelformset_factory
 
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
@@ -129,3 +130,11 @@ class GroupElementYearForm(forms.ModelForm):
     @staticmethod
     def _is_education_group_year_a_minor_major_option_list_choice(egy):
         return egy.is_minor_major_option_list_choice if egy else False
+
+
+GroupElementYearFormset = modelformset_factory(
+    model=GroupElementYear,
+    form=GroupElementYearForm,
+    extra=0,
+    can_delete=True
+)

@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, FormView
 from waffle.decorators import waffle_flag
 
 from base.models.education_group_year import EducationGroupYear
@@ -44,7 +45,7 @@ from base.views.education_groups.perms import can_change_education_group
 from base.views.education_groups.select import build_success_message, build_success_json_response
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError
-from program_management.forms.group_element_year import GroupElementYearForm
+from program_management.forms.group_element_year import GroupElementYearForm, GroupElementYearFormset
 from program_management.views.group_element_year import perms as group_element_year_perms
 from program_management.views.group_element_year.common import GenericGroupElementYearMixin
 
@@ -136,6 +137,57 @@ def _get_action_method(request):
     if action not in available_actions.keys():
         raise AttributeError('Action should be {}'.format(','.join(available_actions.keys())))
     return available_actions[action]
+
+
+class UpdateGroupElementYearFormset(GenericGroupElementYearMixin, FormView):
+    template_name = "group_element_year/group_element_year_comment_inner.html"
+    form_class = GroupElementYearFormset
+
+    # rules = [group_element_year_perms.can_update_group_element_year]
+
+    def get_success_url(self):
+        # We can just reload the page
+        return
+
+    def get_context_data(self, **kwargs):
+        data = super(UpdateGroupElementYearFormset, self).get_context_data(**kwargs)
+        egy = EducationGroupYear.objects.filter(id=self.kwargs.get('education_group_year_id')).prefetch_related(
+            Prefetch(
+                'groupelementyear_set',
+                queryset=GroupElementYear.objects.select_related(
+                    'child_leaf__learning_container_year',
+                    'child_branch'
+                )
+            )
+        ).get()
+
+        if self.request.POST:
+            data['group_element_years'] = GroupElementYearFormset(
+                self.request.POST,
+                queryset=egy.groupelementyear_set.all()
+            )
+        else:
+            data['group_element_years'] = GroupElementYearFormset(
+                self.request.GET or None,
+                queryset=egy.groupelementyear_set.all()
+            )
+        data['root'] = egy
+        print(egy)
+        print(egy.groupelementyear_set.all())
+        print(data)
+        print(type(self))
+        print(vars(self))
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        group_element_years = context['group_element_years']
+
+        if group_element_years.is_valid():
+            group_element_years.instance = self.object
+            group_element_years.save()
+
+        return super(UpdateGroupElementYearFormset, self).form_valid(form)
 
 
 class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
