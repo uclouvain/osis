@@ -143,8 +143,6 @@ class UpdateGroupElementYearFormset(GenericGroupElementYearMixin, FormView):
     template_name = "group_element_year/group_element_year_comment_inner.html"
     form_class = GroupElementYearFormset
 
-    # rules = [group_element_year_perms.can_update_group_element_year]
-
     def get_success_url(self):
         # We can just reload the page
         return
