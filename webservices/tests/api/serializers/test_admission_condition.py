@@ -155,27 +155,38 @@ class MasterAdmissionConditionsSerializerTestCase(TestCase):
 
 
 class ContinuingEducationTrainingAdmissionConditionsSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+    def test_contains_expected_fields_in_certificate(self):
         egy_type = random.choice([
             TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE,
             TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE,
+        ])
+        serializer = self._get_serializer(egy_type)
+        expected_fields = [
+            'free_text',
+            'admission_enrollment_procedures',
+            'personalized_access',
+        ]
+        self.assertListEqual(list(serializer.data.keys()), expected_fields)
+
+    def test_contains_expected_fields_in_attestation(self):
+        egy_type = random.choice([
             TrainingType.CERTIFICATE_OF_HOLDING_CREDITS,
             TrainingType.CERTIFICATE_OF_SUCCESS,
             TrainingType.CERTIFICATE_OF_PARTICIPATION
         ])
-        cls.egy = EducationGroupYearFactory(education_group_type__name=egy_type.name)
-        cls.ac = AdmissionConditionFactory(education_group_year=cls.egy)
-        cls.serializer = ContinuingEducationTrainingAdmissionConditionsSerializer(cls.ac, context={
-            'lang': settings.LANGUAGE_CODE_EN,
-            'egy': cls.egy
-        })
-
-    def test_contains_expected_fields(self):
+        serializer = self._get_serializer(egy_type)
         expected_fields = [
             'admission_enrollment_procedures',
             'personalized_access',
         ]
-        if not self.egy.is_attestation:
-            expected_fields = ['free_text'] + expected_fields
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertListEqual(list(serializer.data.keys()), expected_fields)
+
+    @staticmethod
+    def _get_serializer(egy_type):
+        egy = EducationGroupYearFactory(education_group_type__name=egy_type.name)
+        ac = AdmissionConditionFactory(education_group_year=egy)
+        serializer = ContinuingEducationTrainingAdmissionConditionsSerializer(ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
+            'egy': egy
+        })
+        return serializer
