@@ -66,6 +66,14 @@ class TrainingType(ChoiceEnum):
         ]
 
     @classmethod
+    def attestation_types(cls):
+        return [
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
+        ]
+
+    @classmethod
     def root_master_2m_types(cls):
         return [cls.PGRM_MASTER_120.name, cls.PGRM_MASTER_180_240.name]
 
@@ -91,9 +99,6 @@ class TrainingType(ChoiceEnum):
             cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
             cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
             cls.CAPAES.name,
-            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
-            cls.CERTIFICATE_OF_SUCCESS.name,
-            cls.CERTIFICATE_OF_PARTICIPATION.name
         ]
 
     @classmethod

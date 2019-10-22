@@ -162,7 +162,8 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION
+            ADMISSION_CONDITION,
+            STRUCTURE
         ]
     },
     TrainingType.CERTIFICATE_OF_SUCCESS.name: {
@@ -182,7 +183,8 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION
+            ADMISSION_CONDITION,
+            STRUCTURE
         ]
     },
     TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: {
@@ -202,7 +204,8 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION
+            ADMISSION_CONDITION,
+            STRUCTURE
         ]
     },
     TrainingType.BACHELOR.name: {
@@ -279,7 +282,8 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION
+            ADMISSION_CONDITION,
+            STRUCTURE
         ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
@@ -300,7 +304,8 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION
+            ADMISSION_CONDITION,
+            STRUCTURE
         ]
     },
     TrainingType.PGRM_MASTER_120.name: {
@@ -418,7 +423,8 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
+            OPTIONS
         ]
     },
 
