@@ -3580,39 +3580,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Are you sure to change the state from"
-#~ msgstr "Êtes-vous sûr de vouloir changer l'état de"
-
-#~ msgid "Calendar of the annual program"
-#~ msgstr "Calendrier des programmes"
-
-#~ msgid "Classe"
-#~ msgstr "Classe"
-
-#~ msgid "Coorganization"
-#~ msgstr "Co-organisation"
-
-#~ msgid "Focuses"
-#~ msgstr "Finalités"
-
-#~ msgid "LECTURING"
-#~ msgstr "Partie magistrale"
-
-#~ msgid "No change made"
-#~ msgstr "Pas de modification apportée"
-
-#~ msgid ""
-#~ "This learning unit is not eligible for proposal creation/modification"
-#~ msgstr ""
-#~ "Cette unité d'enseignement n'est pas éligible pour une création/"
-#~ "modification de proposition"
-
-#~ msgid "Used by learning unit"
-#~ msgstr "Utilisation par l'unité d'enseignement"
-
-#~ msgid "You are not eligible to consolidate proposal"
-#~ msgstr "Vous ne pouvez pas consolider les propositions"
-
-#~ msgid "volume total global"
-#~ msgstr "volume total global"

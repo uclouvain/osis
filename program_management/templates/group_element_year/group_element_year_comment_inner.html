@@ -22,7 +22,6 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{{ group_element_years.media }}
 <div class="modal-content" id="form-modal-content" data-formset-prefix="{{ group_element_years.prefix }}">
     {# We do not display the form if those are warnings or errors #}
     {% if not messages %}
@@ -31,99 +30,103 @@
         </div>
 
         <div id="form-modal-body" class="modal-body">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
-                    <th>{% trans 'Code' %}</th>
-                    <th>{% trans "Title" %}</th>
-                    <th></th>
-                    <th>{% trans 'Block' %}</th>
-                    <th>{% trans 'Link type' %}</th>
-                    <th>{% trans 'Comment' %}</th>
-                    <th>{% trans 'English comment' %}</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody data-formset-body id="group_element_year-form">
-                <tr data-formset-form id="form_template" style="display:none" class="link-formset">
-                    {% for field in group_element_years.empty_form %}
-                        {% if not forloop.last %}
-                            <td>
-                                {% bootstrap_field field show_label=False %}
-                            </td>
-                        {% endif %}
-                    {% endfor %}
-                    <td></td>
-                </tr>
+            <form method="post" id="form_comment_update" action="{{ request.path }}">
+                {{ group_element_years.media }}
 
-                {% for formset in group_element_years.forms %}
-                    {% if forloop.first %}
-                        {{ formset.media }}
-                    {% endif %}
-                    <tr class="link-formset" data-formset-form id="{{ formset.prefix }}">
-                        {{ formset.id }}
-                        {% with formset.instance as group %}
-                            {% if  group.child_branch %}
-                                <td style="width:10%">{{ group.child_branch.acronym }}</td>
-                                <td>
-                                    <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
-                                       id="lnk_education_group_{{ group.pk }}">{{ group.child_branch.partial_acronym }}</a>
-                                </td>
-                                <td style="width:25%">
-                                    {{ group.child_branch.title }}
-                                </td>
-                            {% else %}
-                                <td style="width:10%"></td>
-                                <td>
-                                    <a href="{% url 'learning_unit' group.child_leaf.pk %}"
-                                       id="lnk_learning_unit_{{ group.pk }}">{{ group.child_leaf.acronym }}</a>
-                                </td>
-                                <td style="width:25%">
-                                    {{ group.child_leaf.complete_title }}
-                                </td>
-                            {% endif %}
-                        {% endwith %}
-
-                        <td style="width:5%">
-                            {% if formset.is_mandatory %}
-                                {% bootstrap_field formset.is_mandatory show_label=False %}
-                            {% endif %}
-                        </td>
-
-                        <td style="width:6%">
-                            {% bootstrap_field formset.block show_label=False %}
-                        </td>
-
-                        <td style="width:10%">
-                            {% if formset.link_type %}
-                                {% bootstrap_field formset.link_type show_label=False %}
-                            {% endif %}
-                        </td>
-                        <td style="width:20%">
-                            {% if formset.comment %}
-                                {% bootstrap_field formset.comment show_label=False %}
-                            {% endif %}
-                        </td>
-                        <td style="width:20%">
-                            {% if formset.link_type %}
-                                {% bootstrap_field formset.comment_english show_label=False %}
-                            {% endif %}
-                        </td>
-                        <td style="width:4%">
-                            {% if formset.instance.pk %}{{ formset.DELETE }}{% endif %}
-                        </td>
+                {% csrf_token %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                        <th>{% trans 'Code' %}</th>
+                        <th>{% trans "Title" %}</th>
+                        <th></th>
+                        <th>{% trans 'Block' %}</th>
+                        <th>{% trans 'Link type' %}</th>
+                        <th>{% trans 'Comment' %}</th>
+                        <th>{% trans 'English comment' %}</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
+                    </thead>
+                    <tbody data-formset-body id="group_element_year-form">
+                    <tr data-formset-form id="form_template" style="display:none" class="link-formset">
+                        {% for field in group_element_years.empty_form %}
+                            {% if not forloop.last %}
+                                <td>
+                                    {% bootstrap_field field show_label=False %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                        <td></td>
+                    </tr>
 
-                </tbody>
-            </table>
-            {{ group_element_years.management_form }}
+                    {% for formset in group_element_years.forms %}
+                        {% if forloop.first %}
+                            {{ formset.media }}
+                        {% endif %}
+                        <tr class="link-formset" data-formset-form id="{{ formset.prefix }}">
+                            {{ formset.id }}
+                            {% with formset.instance as group %}
+                                {% if  group.child_branch %}
+                                    <td style="width:10%">{{ group.child_branch.acronym }}</td>
+                                    <td>
+                                        <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
+                                           id="lnk_education_group_{{ group.pk }}">{{ group.child_branch.partial_acronym }}</a>
+                                    </td>
+                                    <td style="width:25%">
+                                        {{ group.child_branch.title }}
+                                    </td>
+                                {% else %}
+                                    <td style="width:10%"></td>
+                                    <td>
+                                        <a href="{% url 'learning_unit' group.child_leaf.pk %}"
+                                           id="lnk_learning_unit_{{ group.pk }}">{{ group.child_leaf.acronym }}</a>
+                                    </td>
+                                    <td style="width:25%">
+                                        {{ group.child_leaf.complete_title }}
+                                    </td>
+                                {% endif %}
+                            {% endwith %}
+
+                            <td style="width:5%">
+                                {% if formset.is_mandatory %}
+                                    {% bootstrap_field formset.is_mandatory show_label=False %}
+                                {% endif %}
+                            </td>
+
+                            <td style="width:6%">
+                                {% bootstrap_field formset.block show_label=False %}
+                            </td>
+
+                            <td style="width:10%">
+                                {% if formset.link_type %}
+                                    {% bootstrap_field formset.link_type show_label=False %}
+                                {% endif %}
+                            </td>
+                            <td style="width:20%">
+                                {% if formset.comment %}
+                                    {% bootstrap_field formset.comment show_label=False %}
+                                {% endif %}
+                            </td>
+                            <td style="width:20%">
+                                {% if formset.link_type %}
+                                    {% bootstrap_field formset.comment_english show_label=False %}
+                                {% endif %}
+                            </td>
+                            <td style="width:4%">
+                                {% if formset.instance.pk %}{{ formset.DELETE }}{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+                {{ group_element_years.management_form }}
+            </form>
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+        <input type="submit" value="Submit data" class="btn btn-primary">
             <button type="submit" onclick="$('#form_comment_update').submit();"
                     class="btn btn-primary pull-right">
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
@@ -143,7 +146,7 @@
 <script>
     $('.link-formset').formset({
         deleteText: '<span class="fas fa-trash-alt"></span>',
-        prefix: '{{ form_coorganization.prefix }}',
+        prefix: '{{ group_element_years.prefix }}',
         formTemplate: '#form_template',
         addText: ''
 

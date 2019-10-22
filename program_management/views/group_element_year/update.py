@@ -172,21 +172,13 @@ class UpdateGroupElementYearFormset(GenericGroupElementYearMixin, FormView):
                 queryset=egy.groupelementyear_set.all()
             )
         data['root'] = egy
-        print(egy)
-        print(egy.groupelementyear_set.all())
-        print(data)
-        print(type(self))
-        print(vars(self))
         return data
 
     def form_valid(self, form):
         context = self.get_context_data()
         group_element_years = context['group_element_years']
-
         if group_element_years.is_valid():
-            group_element_years.instance = self.object
             group_element_years.save()
-
         return super(UpdateGroupElementYearFormset, self).form_valid(form)
 
 
