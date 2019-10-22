@@ -164,16 +164,18 @@ class ContinuingEducationTrainingAdmissionConditionsSerializerTestCase(TestCase)
             TrainingType.CERTIFICATE_OF_SUCCESS,
             TrainingType.CERTIFICATE_OF_PARTICIPATION
         ])
-        egy = EducationGroupYearFactory(education_group_type__name=egy_type.name)
-        cls.ac = AdmissionConditionFactory(education_group_year=egy)
+        cls.egy = EducationGroupYearFactory(education_group_type__name=egy_type.name)
+        cls.ac = AdmissionConditionFactory(education_group_year=cls.egy)
         cls.serializer = ContinuingEducationTrainingAdmissionConditionsSerializer(cls.ac, context={
             'lang': settings.LANGUAGE_CODE_EN,
+            'egy': cls.egy
         })
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'free_text',
             'admission_enrollment_procedures',
             'personalized_access',
         ]
+        if not self.egy.is_attestation:
+            expected_fields = ['free_text'] + expected_fields
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
