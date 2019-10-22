@@ -60,7 +60,7 @@ class LearningUnitPedagogyEditForm(forms.Form):
 
         reference_ids = [start_luy.id]
         if is_pedagogy_data_must_be_postponed(start_luy):
-            reference_ids += [luy.id for luy in self.luys]
+            reference_ids = [luy.id for luy in self.luys]
 
         for reference_id in reference_ids:
             if trans_text.text_label.label in CMS_LABEL_PEDAGOGY_FR_ONLY:
