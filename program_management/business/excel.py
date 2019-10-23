@@ -127,7 +127,10 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
 
 
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
-    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": egy.academic_year.year, "acronym": egy.acronym}
+    worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {
+        "year": egy.academic_year.year,
+        "acronym": egy.acronym.replace("/", "_")  # worksheet title does not accept slash present in some acronyms
+    }
     workbook = Workbook(encoding='utf-8')
 
     excel_lines = _build_excel_lines(egy, prerequisites_qs)
