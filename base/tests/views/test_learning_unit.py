@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import json
+import random
 from decimal import Decimal
 from unittest import mock
 
@@ -65,6 +66,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -433,6 +435,18 @@ class LearningUnitViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_learning_units_search_with_type_filtering(self):
+        lcy_type = random.choice(learning_container_year_types.LearningContainerYearType.get_names())
+        self._prepare_context_learning_units_search()
+        filter_data = {
+            'container_type': lcy_type,
+        }
+        response = self.client.get(reverse('learning_units'), data=filter_data)
+
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
+        expected_count = LearningUnitYear.objects.filter(learning_container_year__container_type=lcy_type).count()
+        self.assertEqual(len(response.context['page_obj']), expected_count)
 
     def test_learning_units_search_by_acronym_with_valid_regex(self):
         self._prepare_context_learning_units_search()
