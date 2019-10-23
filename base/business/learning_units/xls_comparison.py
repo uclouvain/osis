@@ -25,7 +25,7 @@
 ##############################################################################
 from _pydecimal import Decimal
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
 
 from base.business import learning_unit_year_with_context
@@ -41,7 +41,6 @@ from base.business.xls import get_name_or_username
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
-from base.models.academic_year import starting_academic_year
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
@@ -51,9 +50,7 @@ from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
-from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_unit_year import LearningUnitYear, get_by_id
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
 
@@ -278,21 +275,6 @@ def _get_entity_to_display(entity):
     return entity.acronym if entity else EMPTY_VALUE
 
 
-def get_academic_year_of_reference(objects):
-    """ TODO : Has to be improved because it's not optimum if the xls list is created from a search with a
-    criteria : academic_year = 'ALL' """
-    if objects:
-        return _get_academic_year(objects[0])
-    return starting_academic_year()
-
-
-def _get_academic_year(obj):
-    if isinstance(obj, LearningUnitYear):
-        return obj.academic_year
-    if isinstance(obj, (ProposalLearningUnit, ExternalLearningUnitYear)):
-        return obj.learning_unit_year.academic_year
-
-
 def _check_changes_other_than_code_and_year(first_data, second_data, line_index):
     modifications = []
     for col_index, obj in enumerate(first_data):
@@ -328,26 +310,6 @@ def _get_component_data_by_type(component, type):
         ]
     else:
         return []
-
-
-def _get_learning_unit_yr_with_component(learning_unit_years):
-    learning_unit_years = LearningUnitYear.objects.filter(
-        learning_unit_year_id__in=[luy.id for luy in learning_unit_years]
-        ).select_related(
-        'academic_year',
-        'learning_container_year',
-        'learning_container_year__academic_year'
-    ).prefetch_related(
-        get_learning_component_prefetch()
-    ).prefetch_related(
-        build_entity_container_prefetch(entity_types.ALLOCATION_ENTITY),
-        build_entity_container_prefetch(entity_types.REQUIREMENT_ENTITY),
-        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
-        build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
-    ).order_by('learning_unit', 'academic_year__year')
-    [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
-    [append_components(learning_unit) for learning_unit in learning_unit_years]
-    return learning_unit_years
 
 
 def prepare_xls_content_for_comparison(luy_with_proposals):

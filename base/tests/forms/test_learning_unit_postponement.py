@@ -28,7 +28,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.test import TestCase
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm

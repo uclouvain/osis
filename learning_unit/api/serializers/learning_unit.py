@@ -26,6 +26,7 @@
 from django.conf import settings
 from rest_framework import serializers
 
+from base.models.enums.summary_status import SummaryStatus
 from base.models.learning_unit_year import LearningUnitYear
 from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
 from learning_unit.api.serializers.component import LearningUnitComponentSerializer
@@ -52,8 +53,17 @@ class LearningUnitTitleSerializer(serializers.ModelSerializer):
 
 class LearningUnitSerializer(LearningUnitTitleSerializer):
     url = LearningUnitHyperlinkedIdentityField(read_only=True)
+    osis_url = serializers.HyperlinkedIdentityField(
+        view_name='learning_unit',
+        lookup_url_kwarg="learning_unit_year_id",
+        read_only=True
+    )
     requirement_entity = serializers.CharField(
-        source='learning_container_year.requirement_entity_version.acronym',
+        source='entity_requirement',
+        read_only=True
+    )
+    allocation_entity = serializers.CharField(
+        source='entity_allocation',
         read_only=True
     )
     academic_year = serializers.IntegerField(source='academic_year.year')
@@ -61,19 +71,28 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     type = serializers.CharField(source='learning_container_year.container_type')
     type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
+    has_proposal = serializers.SerializerMethodField(read_only=True)
 
     class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitTitleSerializer.Meta.fields + (
             'url',
+            'osis_url',
             'acronym',
             'academic_year',
+            'credits',
+            'status',
             'requirement_entity',
+            'allocation_entity',
             'type',
             'type_text',
             'subtype',
-            'subtype_text'
+            'subtype_text',
+            'has_proposal',
         )
+
+    def get_has_proposal(self, learning_unit_year):
+        return getattr(learning_unit_year, "has_proposal", None)
 
 
 class LearningUnitDetailedSerializer(LearningUnitSerializer):
@@ -85,15 +104,15 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
 
     campus = LearningUnitCampusSerializer(read_only=True)
     components = LearningUnitComponentSerializer(many=True, source='learningcomponentyear_set', read_only=True)
-
     parent = LearningUnitHyperlinkedRelatedField(read_only=True, lookup_field='acronym')
     partims = LearningUnitHyperlinkedRelatedField(read_only=True, many=True, source='get_partims_related')
+
+    proposal = serializers.SerializerMethodField(read_only=True)
+    summary_status = serializers.SerializerMethodField(read_only=True)
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitSerializer.Meta.fields + (
-            'credits',
-            'status',
             'quadrimester',
             'quadrimester_text',
             'periodicity',
@@ -103,5 +122,24 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'language',
             'components',
             'parent',
-            'partims'
+            'partims',
+            'proposal',
+            'summary_status'
         )
+
+    def get_proposal(self, learning_unit_year):
+        if not hasattr(learning_unit_year, "proposallearningunit"):
+            return {}
+
+        return {
+            "folder": learning_unit_year.proposallearningunit.folder,
+            "type": learning_unit_year.proposallearningunit.get_type_display(),
+            "status": learning_unit_year.proposallearningunit.get_state_display(),
+        }
+
+    def get_summary_status(self, learning_unit_year):
+        if getattr(learning_unit_year, "summary_status", False):
+            return SummaryStatus.MODIFIED.value
+        elif learning_unit_year.summary_locked:
+            return SummaryStatus.BLOCKED.value
+        return SummaryStatus.NOT_MODIFIED.value

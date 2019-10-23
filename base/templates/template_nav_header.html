@@ -53,56 +53,55 @@
     </div>
 
     <script type="text/javascript">
-        var removeNavButtons = function () {
-            var previousElem = document.getElementById("previousNavLink")
+        let removeNavButtons = function () {
+            let previousElem = document.getElementById("previousNavLink");
             previousElem.style.display = "none";
-            var nextElem = document.getElementById("nextNavLink")
+            let nextElem = document.getElementById("nextNavLink");
             nextElem.style.display = "none";
-        }
-        var findCurrentIndex = function (objectIds) {
-            var currentId =
-            {{ current_id|default:'undefined' }}
+        };
+        let findCurrentIndex = function (objectIds) {
+            let currentId = {{ current_id|default:'undefined' }};
             if (currentId && objectIds) {
-                currentId = parseInt(currentId)
-                for (var i = 0, len = objectIds.length; i < len; i++) {
-                    if (parseInt(objectIds[i].id) === currentId) {
+                currentId = parseInt(currentId);
+                for (let  i = 0, len = objectIds.length; i < len; i++) {
+                    if (getIdFromUrl(objectIds[i].id) === currentId) {
                         return i;
                     }
                 }
             }
             return undefined;
-        }
-        var enableNavLink = function (domId, url, title) {
+        };
+        let enableNavLink = function (domId, url, title) {
             if (url != undefined) {
-                var elem = document.getElementById(domId);
-                elem.setAttribute('href', url)
-                elem.setAttribute('title', title)
+                let elem = document.getElementById(domId);
+                elem.setAttribute('href', url);
+                elem.setAttribute('title', title);
                 //Remove disabled property
                 elem.parentElement.classList.remove('disabled');
             }
-        }
-        var setPreviousLink = function (objectIds, currentIndex) {
+        };
+        let setPreviousLink = function (objectIds, currentIndex) {
             if (currentIndex > 0) {
-                previousObject = objectIds[currentIndex - 1];
-                previousUrl = "{{request.path}}".replace(objectIds[currentIndex].id, previousObject.id);
-                previousTitle = previousObject.value;
+                let previousObject = objectIds[currentIndex - 1];
+                let previousUrl = previousObject.id;
+                let previousTitle = previousObject.value;
                 enableNavLink('previousNavLink', previousUrl, previousTitle);
             }
-        }
-        var setNextLink = function (objectIds, currentIndex) {
+        };
+        let setNextLink = function (objectIds, currentIndex) {
             if (currentIndex + 1 < objectIds.length) {
-                nextObject = objectIds[currentIndex + 1];
-                nextUrl = "{{request.path}}".replace(objectIds[currentIndex].id, nextObject.id);
-                nextTitle = nextObject.value;
+                let nextObject = objectIds[currentIndex + 1];
+                let nextUrl = nextObject.id;
+                let nextTitle = nextObject.value;
                 enableNavLink('nextNavLink', nextUrl, nextTitle);
             }
-        }
+        };
         if (typeof localStorage != 'undefined') {
-            var key = "{{local_storage_key|default:'undefined'}}";
+            let key = "{{local_storage_key|default:'undefined'}}";
             if (key && key in localStorage) {
-                objectIds = JSON.parse(localStorage.getItem(key));
+                let objectIds = JSON.parse(localStorage.getItem(key));
                 currentIndex = findCurrentIndex(objectIds);
-                if (currentIndex != undefined) {
+                if (currentIndex !== undefined) {
                     setPreviousLink(objectIds, currentIndex);
                     setNextLink(objectIds, currentIndex);
                 }
@@ -113,6 +112,16 @@
         } else {
             //localstorage not supported by navigator
             removeNavButtons();
+        }
+
+        function getIdFromUrl(url){
+            let split = url.split("/");
+            for(let i=split.length-1; i--; i >= 0){
+                if(!isNaN(split[i])){
+                    return parseInt(split[i]);
+                }
+            }
+            return NaN;
         }
     </script>
 

@@ -71,8 +71,6 @@ WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
-COLUMNS_REFERENCE_WITH_ATTRIBUTIONS = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
-
 
 def learning_unit_titles_part1():
     return [

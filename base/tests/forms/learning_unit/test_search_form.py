@@ -27,11 +27,12 @@ import datetime
 
 from django.http import QueryDict
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
-from base.forms.common import TooManyResultsException
-from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, LearningUnitSearchForm, \
-    LearningUnitYearForm, ExternalLearningUnitYearForm
+from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch, filter_is_borrowed_learning_unit_year
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
+from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
+from base.forms.learning_unit.search.simple import LearningUnitFilter, MOBILITY
 from base.forms.search.search_form import get_research_criteria
 from base.models.enums import entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
@@ -65,11 +66,11 @@ class TestSearchForm(TestCase):
     def test_get_research_criteria(self):
         data = QueryDict(mutable=True)
         data.update({
-            "requirement_entity_acronym": "INFO",
+            "requirement_entity": "INFO",
             "tutor": "Jean Marcel",
-            "academic_year_id": str(self.academic_years[0].id),
+            "academic_year": str(self.academic_years[0].id),
         })
-        form = LearningUnitSearchForm(data)
+        form = LearningUnitFilter(data).form
         self.assertTrue(form.is_valid())
         expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
                                       (_('Req. Entity'), "INFO"),
@@ -80,10 +81,10 @@ class TestSearchForm(TestCase):
     def test_get_research_criteria_with_choice_field(self):
         data = QueryDict(mutable=True)
         data.update({
-            "academic_year_id": str(self.academic_years[0].id),
+            "academic_year": str(self.academic_years[0].id),
             "container_type": learning_container_year_types.COURSE
         })
-        form = LearningUnitYearForm(data)
+        form = LearningUnitFilter(data).form
         self.assertTrue(form.is_valid())
         expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
                                       (_('Type'), _("Course"))]
@@ -95,7 +96,7 @@ class TestSearchForm(TestCase):
         academic_year = self.academic_years[0]
         data.update({
             "academic_year_id": str(academic_year.id),
-            "container_type": LearningUnitSearchForm.MOBILITY
+            "container_type": MOBILITY
         })
         ExternalLearningUnitYearFactory(
             learning_unit_year__academic_year=academic_year,
@@ -103,7 +104,7 @@ class TestSearchForm(TestCase):
             mobility=True,
             co_graduation=False,
         )
-        form = LearningUnitYearForm(data)
+        form = LearningUnitFilter(data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.get_queryset().count(), 1)
 
@@ -126,34 +127,9 @@ class TestSearchForm(TestCase):
             mobility=False,
             co_graduation=True,
         )
-        form = LearningUnitYearForm(data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(form.get_queryset().count(), 1)
-
-    def test_search_too_many_results(self):
-        random_luy = LearningUnitYearFactory()
-
-        form = LearningUnitYearForm(data={
-            'acronym': random_luy.acronym,
-            'academic_year_id': random_luy.academic_year.pk
-        })
-        form.MAX_RECORDS = 0
-        self.assertTrue(form.is_valid())
-
-        with self.assertRaises(TooManyResultsException):
-            form.get_learning_units()
-
-    def test_search_too_many_results_is_not_raised_when_borrowed_course_search(self):
-        random_luy = LearningUnitYearFactory(academic_year=self.academic_years[0])
-
-        form = LearningUnitYearForm(data={
-            'acronym': random_luy.acronym,
-            'academic_year_id': random_luy.academic_year.pk
-        }, borrowed_course_search=True)
-        form.MAX_RECORDS = 0
-
-        self.assertTrue(form.is_valid())
-        form.get_learning_units()
+        learning_unit_filter = LearningUnitFilter(data)
+        self.assertTrue(learning_unit_filter.is_valid())
+        self.assertEqual(learning_unit_filter.qs.count(), 1)
 
     def test_dropdown_init(self):
 
@@ -172,15 +148,15 @@ class TestSearchForm(TestCase):
         campus_2 = CampusFactory(organization=organization_1)
         campus_3 = CampusFactory(organization=organization_2)
 
-        form = ExternalLearningUnitYearForm({'city': NAMUR, 'country': country, "campus": campus_2})
-        form._init_dropdown_list()
+        form = ExternalLearningUnitFilter({'city': NAMUR, 'country': country, "campus": campus_2}).form
+        campus_form_choices = list(form.fields["campus"].choices)
+        self.assertEqual(campus_form_choices[0], ('', '---------'))
+        self.assertEqual(campus_form_choices[1][1], 'organization 1')
+        self.assertEqual(campus_form_choices[2], (campus_3.id, 'organization 2'))
 
-        self.assertEqual(form.fields['campus'].choices[0], (None, '---------'))
-        self.assertEqual(form.fields['campus'].choices[1][1], 'organization 1')
-        self.assertEqual(form.fields['campus'].choices[2], (campus_3.id, 'organization 2'))
-
-        self.assertEqual(form.fields['city'].choices,
-                         [(None, '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
+        city_form_choices = list(form.fields['city'].choices)
+        self.assertEqual(city_form_choices,
+                         [('', '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
@@ -232,6 +208,7 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         qs = LearningUnitYear.objects.filter(
             pk__in=[luy.pk for luy in self.luys_in_different_faculty_than_education_group]
         )
+
         group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
         entity = OfferYearEntity.objects.get(education_group_year=group.parent).entity
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,
@@ -239,28 +216,28 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         self.assertCountEqual(result, [obj.id for obj in self.luys_in_different_faculty_than_education_group[:1]])
         
         data = {
-            "academic_year_id": self.academic_year.id,
+            "academic_year": self.academic_year.id,
             "faculty_borrowing_acronym": entity.most_recent_acronym
         }
 
-        form = LearningUnitYearForm(data,   borrowed_course_search=True)
+        borrowed_filter = BorrowedLearningUnitSearch(data)
 
-        form.is_valid()
-        results = list(form.get_activity_learning_units())
+        borrowed_filter.is_valid()
+        results = list(borrowed_filter.qs)
 
         self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
 
     def test_with_faculty_borrowing_set_and_no_entity_version(self):
         group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
         data = {
-            "academic_year_id": self.academic_year.id,
+            "academic_year": self.academic_year.id,
             "faculty_borrowing_acronym": group.parent.acronym
         }
 
-        form = LearningUnitYearForm(data, borrowed_course_search=True)
+        borrowed_filter = BorrowedLearningUnitSearch(data)
 
-        form.is_valid()
-        result = list(form.get_activity_learning_units())
+        borrowed_filter.is_valid()
+        result = list(borrowed_filter.qs)
         self.assertEqual(result, [])
 
     def assert_filter_borrowed_luys_returns_empty_qs(self, learning_unit_years):
@@ -297,7 +274,5 @@ def generate_learning_unit_year_with_associated_education_group(academic_year, s
 
 class TestFilterDescriptiveficheLearningUnitYear(TestCase):
     def test_init_with_entity_subordinated_search_form(self):
-        form = LearningUnitYearForm(
-            None,
-        )
+        form = LearningUnitDescriptionFicheFilter(None).form
         self.assertTrue(form.fields['with_entity_subordinated'].initial)
