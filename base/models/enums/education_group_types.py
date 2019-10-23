@@ -99,6 +99,9 @@ class TrainingType(ChoiceEnum):
             cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
             cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
             cls.CAPAES.name,
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name
         ]
 
     @classmethod
