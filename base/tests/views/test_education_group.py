@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import json
+import random
 import urllib
 from http import HTTPStatus
 from itertools import product
@@ -35,9 +36,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
-from django.urls import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from waffle.testutils import override_flag
 
 from base.business.education_groups.general_information import PublishException
@@ -1179,3 +1180,15 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, self.special_master_adm_cond)
+
+    def test_not_show_free_text_for_attestations(self):
+        egy_type = random.choice(TrainingType.attestation_types())
+
+        egy = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=egy_type,
+        )
+        url = reverse("education_group_year_admission_condition_edit", args=[egy.pk, egy.pk])
+        response = self.client.get(url)
+
+        self.assertFalse(response.context['info']['show_free_text'])
