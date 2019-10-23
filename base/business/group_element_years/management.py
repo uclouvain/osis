@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 from collections import Counter
 
 from django.core.exceptions import ObjectDoesNotExist
