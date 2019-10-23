@@ -140,7 +140,7 @@ def _get_action_method(request):
 
 
 class UpdateGroupElementYearFormset(GenericGroupElementYearMixin, FormView):
-    template_name = "group_element_year/group_element_year_comment_inner.html"
+    template_name = "education_group/blocks/form/group_element_year_comment_inner.html"
     form_class = GroupElementYearFormset
 
     def get_success_url(self):
@@ -153,7 +153,6 @@ class UpdateGroupElementYearFormset(GenericGroupElementYearMixin, FormView):
             Prefetch(
                 'groupelementyear_set',
                 queryset=GroupElementYear.objects.select_related(
-                    'child_leaf__learning_container_year',
                     'child_branch'
                 )
             )

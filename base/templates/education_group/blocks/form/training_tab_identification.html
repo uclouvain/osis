@@ -26,15 +26,23 @@
 {% endcomment %}
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation"
-        {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates' %}class="active"{% endif %}>
+        {% if not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}class="active"{% endif %}>
         <a data-toggle="tab" href="#tab_identification" role="tab">
             {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
         </a>
     </li>
     <li role="presentation"
         {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}class="active"{% endif %}>
-        <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats" name="test">
+        <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats">
             {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
+        </a>
+
+    </li>
+
+    <li role="presentation"
+        {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
+        <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
+            {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
         </a>
 
     </li>
@@ -43,7 +51,7 @@
 <div class="tab-content">
 
     <div id="tab_identification"
-         class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates' %}active{% else %}fade{% endif %}">
+         class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}active{% else %}fade{% endif %}">
         <div class="row">
             <div class="col-md-7">
                 <div class="panel panel-default">
@@ -191,7 +199,12 @@
     </div>
 
     <div id="tab_diploma"
-         class="tab-pane {% if request.GET.tab_to_show or request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
+         class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
         {% include "education_group/blocks/form/training_tab_diploma.html" %}
+    </div>
+
+    <div id="tab_content"
+         class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
+        {% include "education_group/blocks/form/group_element_year_comment_inner.html" %}
     </div>
 </div>
