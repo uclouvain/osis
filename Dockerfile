@@ -1,5 +1,4 @@
 FROM python:3.5
-RUN apt-get update && apt-get upgrade -y && apt-get install gettext -y
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
