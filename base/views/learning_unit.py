@@ -34,7 +34,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from attribution.business import attribution_charge_new
@@ -200,8 +200,8 @@ def learning_unit_proposal_comparison(request, learning_unit_year_id):
         'campus': [
             learning_unit_year._meta.get_field('campus').verbose_name,
             initial_learning_unit_year.campus.name,
-            learning_unit_year.campus.name] \
-            if initial_learning_unit_year.campus.name != learning_unit_year.campus.name else [],
+            learning_unit_year.campus.name] if initial_learning_unit_year.campus.name != learning_unit_year.campus.name
+        else [],
         'entities_fields': get_all_entities_comparison_context(initial_data, learning_unit_year),
         'learning_unit_year_fields': learning_unit_year_fields,
         'components': components_list
