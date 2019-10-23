@@ -68,7 +68,7 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
         form = LearningUnitPedagogyEditForm(request.POST)
         if form.is_valid():
             form.save()
-            last_academic_year_reported = form.luys[-1].academic_year if len(form.luys) > 2 else None
+            last_academic_year_reported = form.luys[-1].academic_year if len(form.luys) >= 2 else None
             if last_academic_year_reported and is_pedagogy_data_must_be_postponed(form.luys[0]):
                 display_success_messages(
                     request,

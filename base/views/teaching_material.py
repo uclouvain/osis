@@ -102,7 +102,7 @@ def _save_and_return_response(request, form, learning_unit_year):
         display_success_messages(
             request,
             _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
-                "last_year_reported": str(last_luy_reported.last_academic_year_reported)
+                "last_year_reported": str(last_luy_reported.academic_year)
             }
         )
     else:
