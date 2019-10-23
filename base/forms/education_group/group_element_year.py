@@ -99,8 +99,11 @@ class GroupElementYearForm(forms.ModelForm):
         if not self.instance.child_branch:
             return data_cleaned
 
-        new_link = GroupElementYear(child_branch=self.instance.child_branch, link_type=data_cleaned)
-        check = CheckAuthorizedRelationshipAttach(self.instance.parent, link_to_attach=new_link)
+        link = GroupElementYear(pk=self.instance.pk, child_branch=self.instance.child_branch, link_type=data_cleaned)
+        check = CheckAuthorizedRelationshipAttach(
+            self.instance.parent,
+            link_to_attach=link,
+        )
         if not check.is_valid():
             raise ValidationError(check.errors)
         return data_cleaned
