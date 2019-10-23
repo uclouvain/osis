@@ -435,8 +435,6 @@ components:
         - $ref: '#/components/schemas/LearningUnitDetailed'
         - type: object
           properties:
-            reference_institution:
-              type: string
             local_code:
               type: string
             local_url:
