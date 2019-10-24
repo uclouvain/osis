@@ -124,7 +124,11 @@ class CheckAuthorizedRelationship:
         children_type_count_after_attach_and_detach = self._children_type_count.copy()
         children_type_count_after_attach_and_detach.subtract(self._detach_link_children_type_count)
         children_type_count_after_attach_and_detach.update(self._attach_link_children_type_count)
-
+        if self.link_to_attach and self.link_to_attach.pk and not self.link_to_attach.link_type:
+            # We should avoid to count the elem that we are updating (pk exist on link_to_attach)
+            children_type_count_after_attach_and_detach.subtract({
+                self.link_to_attach.child_branch.education_group_type.name: 1
+            })
         children_type_count_impacted = Counter(
             dict(
                 (key, count) for key, count in children_type_count_after_attach_and_detach.items()
