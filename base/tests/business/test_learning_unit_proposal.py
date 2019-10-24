@@ -37,6 +37,7 @@ from base import models as mdl_base
 from base.business import learning_unit_proposal as lu_proposal_business
 from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
+from base.business.learning_units.edition import update_partim_acronym
 from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.enums import learning_component_year_type
@@ -51,7 +52,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -331,11 +332,11 @@ class TestConsolidateProposal(TestCase):
     def test_when_proposal_of_type_modification_and_accepted(self, mock_update_learning_unit_with_report):
         old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorContainer = GenerateContainer(old_academic_year, current_academic_year)
+        generatorcontainer = GenerateContainer(old_academic_year, current_academic_year)
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.MODIFICATION.name,
-            learning_unit_year=generatorContainer.generated_container_years[0].learning_unit_year_full,
+            learning_unit_year=generatorcontainer.generated_container_years[0].learning_unit_year_full,
             initial_data={
                 "learning_unit": {},
                 "learning_unit_year": {},
@@ -345,6 +346,29 @@ class TestConsolidateProposal(TestCase):
 
         consolidate_proposal(proposal)
         self.assertTrue(mock_update_learning_unit_with_report.called)
+
+    def test_when_proposal_of_type_modification_and_accepted_with_partim(self):
+        old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
+        current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generator_container = GenerateContainer(old_academic_year, current_academic_year)
+        LearningUnitYearPartimFactory(
+            learning_container_year=
+            generator_container.generated_container_years[0].learning_unit_year_full.learning_container_year,
+            academic_year=generator_container.generated_container_years[0].learning_unit_year_full.academic_year
+        )
+        proposal = ProposalLearningUnitFactory(
+            state=proposal_state.ProposalState.ACCEPTED.name,
+            type=proposal_type.ProposalType.MODIFICATION.name,
+            learning_unit_year=generator_container.generated_container_years[0].learning_unit_year_full,
+            initial_data={
+                "learning_unit": {},
+                "learning_unit_year": {},
+                "learning_container_year": {}
+            }
+        )
+        consolidate_proposal(proposal)
+        partim = proposal.learning_unit_year.get_partims_related()
+        self.assertEqual(proposal.learning_unit_year.acronym, partim[0].acronym[:-1])
 
 
 class TestModifyProposalState(TestCase):

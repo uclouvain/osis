@@ -346,7 +346,9 @@ def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, ent
             fields_to_update,
             exclude=fields_to_exclude
         )
-        update_partim_acronym(luy_to_update)
+        acronym_full = fields_to_update.get("acronym")
+        if acronym_full:
+            update_partim_acronym(acronym_full, luy_to_update)
     update_instance_model_from_data(luy_to_update, fields_to_update,
                                     exclude=fields_to_exclude + ("in_charge",))
 
@@ -599,8 +601,9 @@ def create_learning_unit_year_creation_message(learning_unit_year_created):
                                         'academic_year': learning_unit_year_created.academic_year}
 
 
-def update_partim_acronym(luy_to_update):
+def update_partim_acronym(acronym_full, luy_to_update):
     partims = luy_to_update.get_partims_related()
-    for partim in partims:
-        partim.acronym = luy_to_update.acronym + str(partim.acronym[-1])
-        partim.save()
+    if partims:
+        for partim in partims:
+            partim.acronym = acronym_full + str(partim.acronym[-1])
+            partim.save()
