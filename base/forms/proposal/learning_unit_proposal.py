@@ -74,7 +74,8 @@ class ProposalLearningUnitFilter(FilterSet):
     with_entity_subordinated = filters.BooleanFilter(
         method=lambda queryset, *args, **kwargs: queryset,
         label=_('Include subordinate entities'),
-        widget=forms.CheckboxInput
+        widget=forms.CheckboxInput,
+        initial='True'
     )
     tutor = filters.CharFilter(
         method="filter_tutor",
