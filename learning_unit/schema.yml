@@ -623,7 +623,7 @@ components:
           title:
             type: string
           mandatory:
-            type: string
+            type: boolean
     LearningUnitTypeEnum:
       type: string
       enum:
