@@ -69,18 +69,12 @@ def update_education_group(request, root_id, education_group_year_id):
         ),
         pk=education_group_year_id
     )
-    if request.POST:
-        groupelementyear_formset = GroupElementYearFormset(
-            request.POST,
-            prefix='group_element_year',
-            queryset=education_group_year.groupelementyear_set.all()
-        )
+    groupelementyear_formset = GroupElementYearFormset(
+        request.POST or None,
+        prefix='group_element_year_formset',
+        queryset=education_group_year.groupelementyear_set.all()
+    )
 
-    else:
-        groupelementyear_formset = GroupElementYearFormset(
-            prefix='group_element_year',
-            queryset=education_group_year.groupelementyear_set.all()
-        )
     # Store root in the instance to avoid to pass the root in methods
     # it will be used in the templates.
     education_group_year.root = root_id
@@ -190,13 +184,16 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
 
-    if form_education_group_year.is_valid():
+    if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
+        for formset in groupelementyear_formset:
+            formset.save()
         return _common_success_redirect(request, form_education_group_year, root)
 
     return render(request, html_page, {
         "education_group_year": education_group_year,
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
-        "form_education_group": form_education_group_year.forms[EducationGroupModelForm]
+        "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
+        'group_element_years': groupelementyear_formset
     })
 
 
@@ -217,14 +214,22 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
             coorganization_formset.is_valid(),
             groupelementyear_formset.is_valid()
         ]):
-            print(vars(groupelementyear_formset))
             coorganization_formset.save()
-            groupelementyear_formset.save()
+            for form in groupelementyear_formset:
+                form.save()
             return _common_success_redirect(request, form_education_group_year, root)
     else:
         if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
-            print(vars(groupelementyear_formset))
-            groupelementyear_formset.is_valid()
+            # groupelementyear_formset.save(commit=False)
+            # for obj in groupelementyear_formset.deleted_forms:
+            #     instance = obj.instance
+            #     strategy_class = DetachEducationGroupYearStrategy if instance.child_branch else DetachLearningUnitYearStrategy
+            #     temp = strategy_class(instance)
+            #     if not temp.is_valid():
+            #         return JsonResponse({"error": True})
+            #     temp.post_valid()
+            for form in groupelementyear_formset:
+                form.save()
             return _common_success_redirect(request, form_education_group_year, root)
 
     return render(request, "education_group/update_trainings.html", {
