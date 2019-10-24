@@ -362,7 +362,7 @@ def _consolidate_suppression_proposal_accepted(proposal):
 
 
 def _consolidate_modification_proposal_accepted(proposal):
-    update_partim_acronym(proposal.learning_unit_year.acronym, proposal.learning_unit_year)
+    update_partim_acronym(proposal.learning_unit_year)
     next_luy = proposal.learning_unit_year.get_learning_unit_next_year()
     if next_luy:
         fields_to_update = {}
