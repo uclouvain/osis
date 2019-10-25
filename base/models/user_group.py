@@ -23,16 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
-
-# class StudentAdmin(SerializableModelAdmin):
-#     list_display = ('person', 'registration_id', 'changed',)
-#     list_filter = ('person__gender', 'person__language',)
-#     search_fields = ['person__first_name', 'person__last_name', 'registration_id']
 
 
 class UserGroup(models.Model):
@@ -45,4 +36,3 @@ class UserGroup(models.Model):
     class Meta:
         managed = False
         db_table = 'auth_user_groups'
-
