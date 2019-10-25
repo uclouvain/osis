@@ -321,6 +321,44 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
+  /learning_units/{year}/{acronym}/teaching_materials:
+    get:
+      description: Return all teaching materials of the learning unit
+      operationId: learningunitteachingmaterials_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitTeachingMaterial'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
 components:
   securitySchemes:
     Token:
@@ -577,6 +615,15 @@ components:
           type: integer
         prerequisites:
           type: string
+    LearningUnitTeachingMaterial:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          mandatory:
+            type: boolean
     LearningUnitTypeEnum:
       type: string
       enum:
@@ -694,6 +741,11 @@ components:
         - MASTER_M1
         - MASTER_MC
         - INTERNSHIP
+        - DEEPENING
+        - SOCIETY_MINOR
+        - ACCESS_MINOR
+        - OPEN_MINOR
+        - DISCIPLINARY_COMPLEMENT_MINOR
     Error:
       type: object
       properties:
