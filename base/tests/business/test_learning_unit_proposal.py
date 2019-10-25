@@ -332,11 +332,11 @@ class TestConsolidateProposal(TestCase):
     def test_when_proposal_of_type_modification_and_accepted(self, mock_update_learning_unit_with_report):
         old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorcontainer = GenerateContainer(old_academic_year, current_academic_year)
+        generator_container = GenerateContainer(old_academic_year, current_academic_year)
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.MODIFICATION.name,
-            learning_unit_year=generatorcontainer.generated_container_years[0].learning_unit_year_full,
+            learning_unit_year=generator_container.generated_container_years[0].learning_unit_year_full,
             initial_data={
                 "learning_unit": {},
                 "learning_unit_year": {},
@@ -347,7 +347,8 @@ class TestConsolidateProposal(TestCase):
         consolidate_proposal(proposal)
         self.assertTrue(mock_update_learning_unit_with_report.called)
 
-    def test_when_proposal_of_type_modification_and_accepted_with_partim(self):
+    @mock.patch("base.business.learning_unit_proposal.update_learning_unit_year_with_report")
+    def test_when_proposal_of_type_modification_and_accepted_with_partim(self, mock_update_learning_unit_with_report):
         old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
         generator_container = GenerateContainer(old_academic_year, current_academic_year)
@@ -366,7 +367,9 @@ class TestConsolidateProposal(TestCase):
                 "learning_container_year": {}
             }
         )
+
         consolidate_proposal(proposal)
+        self.assertTrue(mock_update_learning_unit_with_report.called)
         partim = proposal.learning_unit_year.get_partims_related()
         self.assertEqual(proposal.learning_unit_year.acronym, partim[0].acronym[:-1])
 
