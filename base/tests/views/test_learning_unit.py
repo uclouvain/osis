@@ -32,12 +32,12 @@ from unittest import mock
 import factory.fuzzy
 import reversion
 from django.contrib.auth.models import Permission
-from django.urls import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.test import TestCase, RequestFactory, Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -52,7 +52,6 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLAN
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
-from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, education_group_categories, \
@@ -65,12 +64,11 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
-from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -85,6 +83,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -100,10 +99,11 @@ from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
@@ -1149,9 +1149,10 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_specifications_save_with_postponement(self):
         year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
         learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year(),
-            learning_unit=LearningUnitFactory(start_year=get_current_year(), end_year=get_current_year()+year_range)
+            learning_unit=LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
         )
         future_learning_unit_years = [LearningUnitYearFactory(
             academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
