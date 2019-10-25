@@ -84,6 +84,7 @@ LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
@@ -258,6 +259,7 @@ class TestLearningUnitModificationProposal(TestCase):
 class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
@@ -349,6 +351,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
 class TestLearningUnitProposalSearch(TestCase):
     def setUp(self):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         self.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         ac_years = AcademicYearFactory.produce_in_future(quantity=3)
         self.an_entity = EntityFactory()
@@ -398,6 +401,7 @@ class TestLearningUnitProposalSearch(TestCase):
 class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
