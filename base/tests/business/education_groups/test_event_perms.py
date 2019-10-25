@@ -28,10 +28,12 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestEventPermEducationGroupEditionPerms(TestCase):
@@ -70,3 +72,15 @@ class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
 
     def test_is_not_open_other_rules(self):
         self.assertFalse(EventPermEducationGroupEdition().is_open())
+
+
+class TestEventPermInit(TestCase):
+    def test_init_obj_matches_model(self):
+        egy = TrainingFactory()
+        EventPermEducationGroupEdition(obj=egy, raise_exception=False)
+
+    def test_init_obj_dont_match_model(self):
+        luy = LearningUnitYearFactory()
+        expected_exception_message = "The provided obj must be a {}".format(EducationGroupYear.__name__)
+        with self.assertRaisesMessage(AttributeError, expected_exception_message):
+            EventPermEducationGroupEdition(obj=luy, raise_exception=False)

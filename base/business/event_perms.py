@@ -46,7 +46,7 @@ class EventPerm(ABC):
 
     def __init__(self, obj=None, raise_exception=True):
         if self.model and obj and not isinstance(obj, self.model):
-            raise Exception()
+            raise AttributeError("The provided obj must be a {}".format(self.model.__name__))
         self.obj = obj
         self.raise_exception = raise_exception
 
