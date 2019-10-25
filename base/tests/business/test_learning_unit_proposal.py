@@ -357,13 +357,16 @@ class TestConsolidateProposal(TestCase):
             generator_container.generated_container_years[0].learning_unit_year_full.learning_container_year,
             academic_year=generator_container.generated_container_years[0].learning_unit_year_full.academic_year
         )
+
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.MODIFICATION.name,
             learning_unit_year=generator_container.generated_container_years[0].learning_unit_year_full,
             initial_data={
                 "learning_unit": {},
-                "learning_unit_year": {},
+                'learning_unit_year': {
+                    'acronym': generator_container.generated_container_years[0].learning_unit_year_full.acronym
+                },
                 "learning_container_year": {}
             }
         )
