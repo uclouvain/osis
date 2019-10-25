@@ -81,31 +81,35 @@ class TestPerms(TestCase):
                                         management_entity=entity,
                                         administration_entity=entity),
              'person': person,
-             'raise_exception': False,
              'expected_result': False
              },
             {'edy': GroupFactory(academic_year=self.current_academic_year,
                                  management_entity=entity,
                                  administration_entity=entity),
              'person': person,
-             'raise_exception': False,
              'expected_result': False
              },
             {'edy': TrainingFactory(academic_year=self.current_academic_year,
                                     management_entity=entity,
                                     administration_entity=entity),
              'person': person,
-             'raise_exception': False,
              'expected_result': True
              },
         )
 
         for case in test_cases:
-            with self.subTest(msg=case['edy'].education_group_type.category):
-                print(case['edy'].management_entity in case['person'].managed_entities.all())
+            with self.subTest(msg="{} with raise_exception False".format(case['edy'].education_group_type.category)):
                 self.assertEqual(case['expected_result'], perms._is_eligible_certificate_aims(case['person'],
                                                                                               case['edy'],
-                                                                                              case['raise_exception']))
+                                                                                              False))
+
+        for case in test_cases[:-1]:
+            with self.subTest(msg="{} with raise_exception True".format(case['edy'].education_group_type.category)):
+                self.assertRaises(PermissionDenied,
+                                  perms._is_eligible_certificate_aims,
+                                  case['person'],
+                                  case['edy'],
+                                  True)
 
     def test_is_education_group_edit_period_opened_case_period_closed(self):
         today = datetime.date.today()
