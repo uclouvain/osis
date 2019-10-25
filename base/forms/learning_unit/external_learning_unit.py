@@ -30,7 +30,7 @@ from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.forms import ModelChoiceField
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \

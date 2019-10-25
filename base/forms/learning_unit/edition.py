@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.edition import filter_biennial, edit_learning_unit_end_date
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY

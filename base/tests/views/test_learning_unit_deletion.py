@@ -32,7 +32,7 @@ from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory, AttributionNewFactory

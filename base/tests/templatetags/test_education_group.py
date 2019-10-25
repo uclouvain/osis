@@ -29,7 +29,7 @@ from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils.translation import gettext_lazy as _, pgettext
 from waffle.testutils import override_switch
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION

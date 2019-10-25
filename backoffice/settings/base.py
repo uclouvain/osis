@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'base',
     'education_group',
     'learning_unit',
+    'program_management',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
@@ -141,6 +142,7 @@ APPS_TO_TEST = (
     'base',
     'education_group',
     'learning_unit',
+    'program_management',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'

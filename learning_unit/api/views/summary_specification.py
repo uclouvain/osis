@@ -68,7 +68,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
                 text_label__label__in=CMS_LABEL_PEDAGOGY_FR_ONLY
             )
         ).values('label', 'text')
-        summary_specification_grouped = {}
+        summary_specification_grouped = dict.fromkeys(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS, '')
         for translated_text in qs:
             key = translated_text['label']
             summary_specification_grouped[key] = translated_text['text']

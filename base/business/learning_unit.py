@@ -27,7 +27,7 @@ from collections import OrderedDict
 from operator import itemgetter
 
 from django.db.models import Prefetch
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business.learning_unit_year_with_context import volume_learning_component_year
@@ -48,8 +48,6 @@ CMS_LABEL_PEDAGOGY_FR_ONLY = ['bibliography', 'mobility']
 CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
 
 CMS_LABEL_SUMMARY = ['resume']
-
-COLORED = 'COLORED_ROW'
 
 
 def get_same_container_year_components(learning_unit_year):
@@ -146,10 +144,6 @@ def get_components_identification(learning_unit_yr):
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
     return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
-
-
-def get_entity_acronym(an_entity):
-    return an_entity.acronym if an_entity else None
 
 
 def is_summary_submission_opened():

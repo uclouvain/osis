@@ -100,7 +100,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
-  /learning_units/{year}/{acronym}/get_title:
+  /learning_units/{year}/{acronym}/title:
     get:
       description: Return the title of the learning unit
       operationId: learningunitstitle_read
@@ -321,6 +321,44 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
+  /learning_units/{year}/{acronym}/teaching_materials:
+    get:
+      description: Return all teaching materials of the learning unit
+      operationId: learningunitteachingmaterials_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitTeachingMaterial'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
 components:
   securitySchemes:
     Token:
@@ -354,8 +392,18 @@ components:
         url:
           type: string
           format: uri
+        osis_url:
+          type: string
+          format: uri
         acronym:
           type: string
+        credit:
+          type: number
+          multipleOf: 0.01
+        status:
+          type: boolean
+        has_proposal:
+          type: boolean
         title:
           type: string
         type:
@@ -368,6 +416,8 @@ components:
           type: string
         requirement_entity:
           type: string
+        allocation_entity:
+          type: string
         academic_year:
           type: integer
           example: 2014
@@ -376,7 +426,7 @@ components:
         - $ref: '#/components/schemas/LearningUnit'
         - type: object
           properties:
-            credit:
+            credits:
               type: number
               multipleOf: 0.01
             status:
@@ -409,6 +459,17 @@ components:
               type: string
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            proposal:
+              type: object
+              properties:
+                folder:
+                  type: string
+                type:
+                  type: string
+                status:
+                  type: string
+            summary_status:
+              type: string
     LearningUnitComponent:
       type: object
       properties:
@@ -498,7 +559,7 @@ components:
     LearningUnitAchievement:
       type: object
       properties:
-        codename:
+        code_name:
           type: string
           example: '1.0'
         achievement:
@@ -554,6 +615,15 @@ components:
           type: integer
         prerequisites:
           type: string
+    LearningUnitTeachingMaterial:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          mandatory:
+            type: boolean
     LearningUnitTypeEnum:
       type: string
       enum:
@@ -671,6 +741,11 @@ components:
         - MASTER_M1
         - MASTER_MC
         - INTERNSHIP
+        - DEEPENING
+        - SOCIETY_MINOR
+        - ACCESS_MINOR
+        - OPEN_MINOR
+        - DISCIPLINARY_COMPLEMENT_MINOR
     Error:
       type: object
       properties:

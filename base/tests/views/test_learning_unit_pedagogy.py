@@ -27,12 +27,11 @@ import datetime
 from io import BytesIO
 from unittest.mock import patch
 
-from django.contrib.messages import get_messages
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
@@ -48,7 +47,7 @@ from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_units.search import SUMMARY_LIST
+from base.views.learning_units.search.common import SUMMARY_LIST
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
@@ -62,6 +61,7 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         cls.academic_year = create_current_academic_year()
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = GenerateAcademicYear(
             cls.old_academic_year,
             cls.old_academic_year
@@ -112,7 +112,7 @@ class LearningUnitPedagogyTestCase(TestCase):
     def test_learning_units_summary_list_filter_academic_year(self):
         response = self.client.get(self.url, data={'academic_year': self.learning_unit_year.academic_year.pk})
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/description_fiche.html')
         self.assertTrue(response.context['is_faculty_manager'])
         self.assertEqual(response.context['search_type'], SUMMARY_LIST)
         self.assertEqual(response.context['learning_units_count'], 1)
@@ -167,6 +167,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
 
         cls.academic_year = create_current_academic_year()
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = GenerateAcademicYear(
             cls.old_academic_year,
             cls.old_academic_year
@@ -292,16 +293,11 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
     def test_learning_units_summary_list_by_client_xls_empty(self):
         response = self.client.get(self.url, data={
             'acronym': self.learning_unit_year_without_mandatory_teaching_materials.acronym,
+            'academic_year': self.academic_year,
             'xls_status': 'xls_teaching_material'
         })
 
-        # OK, the server will stay in the page
         self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        # A warning message should be generated
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), _("the list to generate is empty.").capitalize())
 
 
 class LearningUnitPedagogyEditTestCase(TestCase):
