@@ -42,7 +42,7 @@ class EventPerm(ABC):
     event_reference = None  # To instantiate == ex : academic_calendar_type.EDUCATION_GROUP_EDITION
     obj = None  # To instantiate
     raise_exception = True
-    error_msg = _("This object is not editable during this period.")
+    error_msg = ""  # To instantiate == ex : _("This education group is not editable during this period.")
 
     def __init__(self, obj=None, raise_exception=True):
         if self.model and obj and not isinstance(obj, self.model):
