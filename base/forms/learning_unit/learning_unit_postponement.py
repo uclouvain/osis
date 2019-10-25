@@ -31,6 +31,7 @@ from django.db.models import Max
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
+from base.business.learning_unit import compute_max_postponement_year
 from base.business.learning_units.edition import duplicate_learning_unit_year
 from base.forms.learning_unit.external_learning_unit import ExternalPartimForm, ExternalLearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
@@ -107,21 +108,6 @@ class LearningUnitPostponementForm:
                 end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_full_instance.end_year)
         return end_postponement
 
-    def _compute_max_postponement_year(self) -> int:
-        """ Compute the maximal year for the postponement of the learning unit
-
-        If the learning unit is a partim, the max year is the max year of the full
-        """
-        if self.subtype == learning_unit_year_subtypes.PARTIM:
-            max_postponement_year = self.learning_unit_full_instance.learningunityear_set.aggregate(
-                Max('academic_year__year')
-            )['academic_year__year__max']
-        else:
-            max_postponement_year = academic_year.compute_max_academic_year_adjournment()
-
-        end_year = self.end_postponement.year if self.end_postponement else None
-        return min(end_year, max_postponement_year) if end_year else max_postponement_year
-
     def _compute_forms_to_insert_update_delete(self, data):
         if self._has_proposal(self.learning_unit_instance) and \
                 (self.person.is_faculty_manager and not self.person.is_central_manager):
@@ -141,7 +127,11 @@ class LearningUnitPostponementForm:
                 .select_related('learning_container_year', 'learning_unit', 'academic_year') \
                 .order_by('academic_year__year')
         else:
-            max_postponement_year = self._compute_max_postponement_year()
+            max_postponement_year = compute_max_postponement_year(
+                self.learning_unit_full_instance,
+                self.subtype,
+                self.end_postponement
+            )
             ac_year_postponement_range = AcademicYear.objects.min_max_years(
                 self.start_postponement.year,
                 max_postponement_year
@@ -206,7 +196,6 @@ class LearningUnitPostponementForm:
         else:
             data_to_postpone = self._get_data_to_postpone(luy_to_update, data)
             self._update_form_set_data(data_to_postpone, luy_to_update)
-
         return self._get_learning_unit_base_form(
             luy_to_update.academic_year,
             learning_unit_instance=luy_to_update.learning_unit,
@@ -217,7 +206,7 @@ class LearningUnitPostponementForm:
     def _update_form_set_data(data_to_postpone, luy_to_update):
         learning_component_years = LearningComponentYear.objects.filter(learning_unit_year=luy_to_update)
         for learning_component_year in learning_component_years:
-            if learning_component_year.type == LECTURING:
+            if learning_component_year.type in (LECTURING, None):
                 data_to_postpone['component-0-id'] = learning_component_year.id
             else:
                 data_to_postpone['component-1-id'] = learning_component_year.id
@@ -296,7 +285,11 @@ class LearningUnitPostponementForm:
         current_form = self._get_learning_unit_base_form(self.start_postponement, **form_kwargs)
         if self._has_proposal(self.learning_unit_instance) and \
                 (self.person.is_faculty_manager and not self.person.is_central_manager):
-            max_postponement_year = self._compute_max_postponement_year()
+            max_postponement_year = compute_max_postponement_year(
+                self.learning_unit_full_instance,
+                self.subtype,
+                self.end_postponement
+            )
             academic_years = academic_year.find_academic_years(start_year=self.start_postponement.year,
                                                                end_year=max_postponement_year)
         else:
