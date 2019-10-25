@@ -35,6 +35,15 @@ from base.models.enums import academic_calendar_type
 
 
 class EventPerm(ABC):
+    event_reference = None  # To instantiate == ex : academic_calendar_type.EDUCATION_GROUP_EDITION
+
+    @classmethod
+    def get_queryset(cls):
+        qs = AcademicCalendar.objects.open_calendars()
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+        return qs
+
     @classmethod
     @abstractmethod
     def is_open(cls, *args, **kwargs):
@@ -42,7 +51,7 @@ class EventPerm(ABC):
 
 
 class EventPermEducationGroupEdition(EventPerm):
-    QS = AcademicCalendar.objects.open_calendars().filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+    event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
 
     @classmethod
     def is_open(cls, *args, **kwargs):
@@ -68,7 +77,7 @@ class EventPermEducationGroupEdition(EventPerm):
 
     @classmethod
     def _is_calendar_opened(cls, *args, **kwargs):
-        return cls.QS.exists()
+        return cls.get_queryset().exists()
 
     @classmethod
     def get_academic_years(cls, *args, **kwargs) -> QuerySet:
@@ -76,4 +85,4 @@ class EventPermEducationGroupEdition(EventPerm):
 
     @classmethod
     def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
-        return cls.QS.values_list('data_year', flat=True)
+        return cls.get_queryset().values_list('data_year', flat=True)
