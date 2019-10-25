@@ -91,10 +91,14 @@ def _get_search_type_label(search_type):
 
 
 def _create_xls(view_obj, context, **response_kwargs):
+    return __create(context, view_obj, create_xls)
+
+
+def __create(context, view_obj, method):
     user = view_obj.request.user
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
-    return create_xls(user, luys, filters)
+    return method(user, luys, filters)
 
 
 def _create_xls_comparison(view_obj, context, **response_kwargs):
@@ -117,17 +121,11 @@ def _create_xls_with_parameters(view_obj, context, **response_kwargs):
 
 
 def _create_xls_attributions(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    filters = _get_filter(context["form"], view_obj.search_type)
-    return create_xls_attributions(user, luys, filters)
+    return __create(context, view_obj, create_xls_attributions)
 
 
 def _create_xls_proposal(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    filters = _get_filter(context["form"], view_obj.search_type)
-    return create_xls_proposal(user, luys, filters)
+    return __create(context, view_obj, create_xls_proposal)
 
 
 def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
