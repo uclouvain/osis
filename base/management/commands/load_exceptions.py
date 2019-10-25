@@ -63,15 +63,39 @@ class Command(BaseCommand):
             column_name: row[idx].value for idx, column_name in headers
         }
         object_dict_with_relations = {
-            fk_field_name: value_as_obj
+            fk_field_name: self._convert_boolean_cell_value(value_as_obj)
             for fk_field_name, value_as_obj in [
                 self._find_object_trough_foreign_keys(model_class, col_name, value)
                 for col_name, value in object_as_dict.items()
             ]
         }
-        obj, created = model_class.objects.get_or_create(**object_dict_with_relations)
+        unique_values = {
+            self._clean_header_from_special_chars(col_name): value
+            for col_name, value in object_dict_with_relations.items()
+            if '**' in col_name
+        }
+        defaults = {
+            col_name: value
+            for col_name, value in object_dict_with_relations.items()
+            if '**' not in col_name
+        }
+        obj, created = model_class.objects.update_or_create(**unique_values, defaults=defaults)
         print('    SUCCESS : Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
         return obj, created
+
+    @staticmethod
+    def _clean_header_from_special_chars(header):
+        """Special chars are used to know if the field compose the unique constraint for update_or_create"""
+        # FIXME :: should use the natural_key when Osis-portal will be removed (actually using UUID as natural key)
+        return header.replace("**", "")
+
+    @staticmethod
+    def _convert_boolean_cell_value(value):
+        if value == 'True':
+            return True
+        elif value == 'False':
+            return False
+        return value
 
     def _find_object_trough_foreign_keys(self, model_class, col_name, value, recur=0) -> object:
         foreign_key_field = col_name
@@ -92,4 +116,5 @@ class Command(BaseCommand):
                 foreign_key_field = col_name
         if recur == 0:
             return foreign_key_field, value
-        return foreign_key_field, model_class.objects.get(**{foreign_key_field: value})
+        kwargs = {self._clean_header_from_special_chars(foreign_key_field): value}
+        return foreign_key_field, model_class.objects.get(**kwargs)
