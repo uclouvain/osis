@@ -285,8 +285,10 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
+        'contentsCss': ["body {font-family: 'monospace';}"],  # FIXME :: choose correct font
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
+            ['Format', 'Styles'],  # FIXME :: Is this sufficient to say that the richText is the same in UE than OF?
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
@@ -321,11 +323,13 @@ CKEDITOR_CONFIGS = {
         'autoParagraph': False
     },
     'minimal': {
+        'contentsCss': ["body {font-family: 'monospace';}"],  # FIXME :: choose correct font
         'toolbar': 'Custom',
         'extraPlugins': '',
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
+            ['Format', 'Styles'],  # FIXME :: Is this sufficient to say that the richText is the same in UE than OF?
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
@@ -334,6 +338,7 @@ CKEDITOR_CONFIGS = {
         'allowedContent': True,
     },
     'minimal_plus_headers': {
+        'contentsCss': ["body {font-family: 'monospace';}"],  # FIXME :: choose correct font
         'toolbar': 'Custom',
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar_Custom': [
