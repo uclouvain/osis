@@ -47,11 +47,11 @@ class EventPermEducationGroupEdition(EventPerm):
     @classmethod
     def is_open(cls, *args, **kwargs):
         if kwargs.get('education_group'):
-            return cls.__is_open_for_spec_egy(*args, **kwargs)
-        return cls.__is_open_other_rules(*args, **kwargs)
+            return cls._is_open_for_spec_egy(*args, **kwargs)
+        return cls._is_calendar_opened(*args, **kwargs)
 
     @classmethod
-    def __is_open_for_spec_egy(cls, *args, **kwargs):
+    def _is_open_for_spec_egy(cls, *args, **kwargs):
         aca_year = kwargs.get('education_group').academic_year
         academic_calendar = get_academic_calendar_by_date_and_reference_and_data_year(
             aca_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
@@ -67,11 +67,7 @@ class EventPermEducationGroupEdition(EventPerm):
         return result
 
     @classmethod
-    def __is_open_other_rules(cls, *args, **kwargs):
-        return cls.__is_calendar_opened(*args, **kwargs)
-
-    @classmethod
-    def __is_calendar_opened(cls, *args, **kwargs):
+    def _is_calendar_opened(cls, *args, **kwargs):
         return cls.QS.exists()
 
     @classmethod
