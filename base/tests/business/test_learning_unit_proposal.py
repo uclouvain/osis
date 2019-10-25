@@ -35,7 +35,8 @@ from factory import fuzzy
 
 from base import models as mdl_base
 from base.business import learning_unit_proposal as lu_proposal_business
-from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state
+from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state, \
+    copy_learning_unit_data
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
 from base.business.learning_units.edition import update_partim_acronym
 from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
@@ -347,11 +348,11 @@ class TestConsolidateProposal(TestCase):
         consolidate_proposal(proposal)
         self.assertTrue(mock_update_learning_unit_with_report.called)
 
-    @mock.patch("base.business.learning_unit_proposal.update_learning_unit_year_with_report")
-    def test_when_proposal_of_type_modification_and_accepted_with_partim(self, mock_update_learning_unit_with_report):
+    def test_when_proposal_of_type_modification_and_accepted_with_partim(self):
         old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
         generator_container = GenerateContainer(old_academic_year, current_academic_year)
+        generator_container.generated_container_years[0].learning_unit_year_full.learning_unit.end_year = None
         LearningUnitYearPartimFactory(
             learning_container_year=
             generator_container.generated_container_years[0].learning_unit_year_full.learning_container_year,
@@ -362,17 +363,12 @@ class TestConsolidateProposal(TestCase):
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.MODIFICATION.name,
             learning_unit_year=generator_container.generated_container_years[0].learning_unit_year_full,
-            initial_data={
-                "learning_unit": {},
-                'learning_unit_year': {
-                    'acronym': generator_container.generated_container_years[0].learning_unit_year_full.acronym
-                },
-                "learning_container_year": {}
-            }
+            initial_data=copy_learning_unit_data(
+                generator_container.generated_container_years[0].learning_unit_year_full
+            )
         )
 
         consolidate_proposal(proposal)
-        self.assertTrue(mock_update_learning_unit_with_report.called)
         partim = proposal.learning_unit_year.get_partims_related()
         self.assertEqual(proposal.learning_unit_year.acronym, partim[0].acronym[:-1])
 
