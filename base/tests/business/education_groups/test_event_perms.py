@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import PermissionDenied
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
@@ -44,11 +46,11 @@ class TestEventPermEducationGroupEditionPerms(TestCase):
                                     data_year__year=cls.current_academic_year.year + 1)
 
     def test_is_open_for_spec_egy(self):
-        edy = TrainingFactory(academic_year=self.current_academic_year)
-        self.assertTrue(EventPermEducationGroupEdition.is_open(education_group=edy))
+        egy = TrainingFactory(academic_year=self.current_academic_year)
+        self.assertTrue(EventPermEducationGroupEdition(obj=egy).is_open())
 
     def test_is_open_other_rules(self):
-        self.assertTrue(EventPermEducationGroupEdition.is_open())
+        self.assertTrue(EventPermEducationGroupEdition().is_open())
 
 
 class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
@@ -56,9 +58,15 @@ class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
-    def test_is_open_for_spec_egy(self):
-        edy = TrainingFactory(academic_year=self.current_academic_year)
-        self.assertFalse(EventPermEducationGroupEdition.is_open(education_group=edy))
+    def test_is_not_open_for_spec_egy_without_exception_raise(self):
+        egy = TrainingFactory(academic_year=self.current_academic_year)
+        self.assertFalse(EventPermEducationGroupEdition(obj=egy, raise_exception=False).is_open())
 
-    def test_is_open_other_rules(self):
-        self.assertFalse(EventPermEducationGroupEdition.is_open())
+    def test_is_not_open_for_spec_egy_with_exception_raise(self):
+        egy = TrainingFactory(academic_year=self.current_academic_year)
+        expected_exception_message = str(_("This education group is not editable during this period."))
+        with self.assertRaisesMessage(PermissionDenied, expected_exception_message):
+            EventPermEducationGroupEdition(obj=egy, raise_exception=True).is_open()
+
+    def test_is_not_open_other_rules(self):
+        self.assertFalse(EventPermEducationGroupEdition().is_open())
