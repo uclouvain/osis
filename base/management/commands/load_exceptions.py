@@ -34,25 +34,41 @@ class Command(BaseCommand):
         apps.clear_cache()
         workbook = load_workbook("fixtures_to_load.xlsx", read_only=True, data_only=True)
         for ws in workbook.worksheets:
-            app_name = ws.title.split('.')[0]
-            model_name = ws.title.split('.')[1]
-            model_class = apps.get_model(app_name, model_name)
+            model_class = self._get_model_class_from_worksheet_title(ws)
             xls_rows = list(ws.rows)
+            print('Number of records : {}'.format(len(xls_rows)))
             headers = [(idx, cell.value) for idx, cell in enumerate(xls_rows[0])]
-            for row in xls_rows[1:]:
-                object_as_dict = {
-                    column_name: row[idx].value for idx, column_name in headers
-                }
-                object_dict_with_relations = {
-                    fk_field_name: value_as_obj
-                    for fk_field_name, value_as_obj in [
-                        self.recur(model_class, col_name, value) for col_name, value in object_as_dict.items()
-                    ]
-                }
-                obj, created = model_class.objects.get_or_create(**object_dict_with_relations)
-                print('Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
+            for line_index, row in enumerate(xls_rows[1:]):
+                try:
+                    self._save_in_database(row, model_class, headers)
+                except Exception as e:
+                    print('    ERROR at line {} :: {}'.format(line_index+1, e))
 
-    def recur(self, model_class, col_name, value, recur=0) -> object:
+    @staticmethod
+    def _get_model_class_from_worksheet_title(xls_worksheet):
+        ws_title = xls_worksheet.title
+        app_name = ws_title.split('.')[0]
+        model_name = ws_title.split('.')[1]
+        print()
+        print('Working on {}...'.format(ws_title))
+        return apps.get_model(app_name, model_name)
+
+    def _save_in_database(self, row, model_class, headers):
+        object_as_dict = {
+            column_name: row[idx].value for idx, column_name in headers
+        }
+        object_dict_with_relations = {
+            fk_field_name: value_as_obj
+            for fk_field_name, value_as_obj in [
+                self._find_object_trough_foreign_keys(model_class, col_name, value)
+                for col_name, value in object_as_dict.items()
+            ]
+        }
+        obj, created = model_class.objects.get_or_create(**object_dict_with_relations)
+        print('    SUCCESS : Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
+        return obj, created
+
+    def _find_object_trough_foreign_keys(self, model_class, col_name, value, recur=0) -> object:
         foreign_key_field = col_name
         if '__' in col_name:
             splitted_col_name = col_name.split('__')
@@ -60,7 +76,7 @@ class Command(BaseCommand):
             if foreign_key_field in [f.name for f in model_class._meta.fields]:
                 field = model_class._meta.get_field(foreign_key_field)
                 if field.is_relation:
-                    _, related_obj = self.recur(
+                    _, related_obj = self._find_object_trough_foreign_keys(
                         field.related_model,
                         '__'.join(splitted_col_name[1:]),
                         value,
