@@ -23,11 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Group, User
 from django.core.management import BaseCommand
-from django.core.management.commands import loaddata
-from django.core.serializers.base import build_instance
-from django.db.models import ForeignKey
 from openpyxl import load_workbook
 from django.apps import apps
 
@@ -35,9 +31,6 @@ from django.apps import apps
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        User()
-        Group()
-        # super(Command, self).handle(*args, **options)
         apps.clear_cache()
         workbook = load_workbook("fixtures_to_load.xlsx", read_only=True, data_only=True)
         for ws in workbook.worksheets:
@@ -56,34 +49,17 @@ class Command(BaseCommand):
                         self.recur(model_class, col_name, value) for col_name, value in object_as_dict.items()
                     ]
                 }
-                # import pdb; pdb.set_trace()
                 obj, created = model_class.objects.get_or_create(**object_dict_with_relations)
                 print('Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
-                # obj = build_instance(model_class, object_as_dict, database)
-                # obj.save()
-                # ModelClass.objects.update_or_create(**natural_keys, defaults=object_as_dict)
-
-    # def _get_foreign_key_field_name(self, column_name):
-    #     foreign_key_field = column_name
-    #     if '__' in column_name:
-    #         try:
-    #             index_fk = column_name.index('__')
-    #             foreign_key_field = column_name[0:index_fk]
-    #         except ValueError:
-    #             pass
-    #     return foreign_key_field
 
     def recur(self, model_class, col_name, value, recur=0) -> object:
         foreign_key_field = col_name
         if '__' in col_name:
             splitted_col_name = col_name.split('__')
-            # index_fk = col_name.index('__')
             foreign_key_field = splitted_col_name[0]
-            # print('foreign_key_field : {}'.format(foreign_key_field))
             if foreign_key_field in [f.name for f in model_class._meta.fields]:
                 field = model_class._meta.get_field(foreign_key_field)
                 if field.is_relation:
-                    # print("Field {} is_relation TRUE".format(foreign_key_field))
                     _, related_obj = self.recur(
                         field.related_model,
                         '__'.join(splitted_col_name[1:]),
@@ -93,10 +69,6 @@ class Command(BaseCommand):
                     value = related_obj
             else:
                 foreign_key_field = col_name
-        # print()
-        # print("{}.objects.get({}={})".format(model_class, foreign_key_field, value.__class__))
-        # print()
-        # import pdb; pdb.set_trace()
         if recur == 0:
             return foreign_key_field, value
         return foreign_key_field, model_class.objects.get(**{foreign_key_field: value})
