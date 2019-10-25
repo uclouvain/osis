@@ -128,7 +128,7 @@ class TestTeachingMaterialForm(LearningUnitPedagogyContextMixin):
         post_data = _get_valid_teaching_material_form_data(teaching_material)
         teaching_material_form = TeachingMaterialModelForm(post_data)
         self.assertTrue(teaching_material_form.is_valid(), teaching_material_form.errors)
-        teaching_material_form.save(learning_unit_year=self.current_luy)
+        teaching_material_form.save(learning_unit_year=luy_in_past)
         self.assertFalse(mock_postpone_teaching_materials.called)
 
     @patch('base.business.learning_units.pedagogy.postpone_teaching_materials', side_effect=lambda *args: None)
