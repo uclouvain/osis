@@ -27,6 +27,7 @@ from abc import ABC
 
 from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
@@ -61,13 +62,13 @@ class EventPerm(ABC):
             qs = qs.filter(reference=cls.event_reference)
         return qs
 
-    # @cached_property
-    def get_open_academic_calendars_for_specific_object(self) -> list:
+    @cached_property
+    def open_academic_calendars_for_specific_object(self) -> list:
         obj_ac_year = getattr(self.obj, self.academic_year_field)
         return list(self.get_open_academic_calendars_queryset().filter(data_year=obj_ac_year))
 
     def _is_open_for_specific_object(self) -> bool:
-        if not self.get_open_academic_calendars_for_specific_object():
+        if not self.open_academic_calendars_for_specific_object:
             if self.raise_exception:
                 raise PermissionDenied(_(self.error_msg).capitalize())
             return False
