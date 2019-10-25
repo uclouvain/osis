@@ -34,7 +34,7 @@ from django.test import TestCase, RequestFactory, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.tests.views.test_upload_xls_utils import generate_exam_enrollments

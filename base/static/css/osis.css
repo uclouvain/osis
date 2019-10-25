@@ -285,3 +285,20 @@ div:target{
     from { opacity: 0; }
     to   { opacity: 1; }
 }
+
+/*
+ * Datatable css overwrite
+ */
+
+/* Display processing message on middle of page */
+div.dataTables_wrapper div.dataTables_processing {
+    position: fixed;
+    top: 50%;
+}
+
+#clipboard{
+    position: fixed;
+    bottom: 0px;
+    right: 5px;
+    z-index: 1000;
+}

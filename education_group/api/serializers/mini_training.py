@@ -32,10 +32,11 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
 
 
-class MiniTrainingDetailSerializer(serializers.ModelSerializer):
+class MiniTrainingDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym', read_only=True)
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
@@ -44,7 +45,6 @@ class MiniTrainingDetailSerializer(serializers.ModelSerializer):
         queryset=EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING),
     )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
-    title = serializers.SerializerMethodField(read_only=True)
     remark = serializers.SerializerMethodField(read_only=True)
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
@@ -54,9 +54,9 @@ class MiniTrainingDetailSerializer(serializers.ModelSerializer):
     active_text = serializers.CharField(source='get_active_display', read_only=True)
     schedule_type_text = serializers.CharField(source='get_schedule_type_display', read_only=True)
 
-    class Meta:
+    class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
-        fields = (
+        fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
             'acronym',
             'code',
@@ -69,7 +69,6 @@ class MiniTrainingDetailSerializer(serializers.ModelSerializer):
             'schedule_type',
             'schedule_type_text',
             'keywords',
-            'title',
             'credits',
             'min_constraint',
             'max_constraint',
@@ -79,15 +78,9 @@ class MiniTrainingDetailSerializer(serializers.ModelSerializer):
             'campus',
         )
 
-    def get_title(self, education_group_year):
-        return self._get_field(education_group_year, 'title')
-
     def get_remark(self, education_group_year):
-        return self._get_field(education_group_year, 'remark')
-
-    def _get_field(self, education_group_year, field_name):
         language = self.context.get('language')
         return getattr(
             education_group_year,
-            field_name + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )

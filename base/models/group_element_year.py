@@ -33,7 +33,7 @@ from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
@@ -281,11 +281,6 @@ class GroupElementYear(OrderedModel):
     @cached_property
     def child(self):
         return self.child_branch or self.child_leaf
-
-    def is_deletable(self):
-        if self.child:
-            return False
-        return True
 
     def _verbose_credits(self):
         if self.relative_credits or self.child_branch.credits:

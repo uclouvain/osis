@@ -30,7 +30,7 @@ from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
 from django.db import IntegrityError
 from django.forms import model_to_dict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context
@@ -56,7 +56,6 @@ FOREIGN_KEY_NAME = (
     'language', 'campus', 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
 )
 
-APP_BASE_LABEL = 'base'
 END_FOREIGN_KEY_NAME = "_id"
 NO_PREVIOUS_VALUE = '-'
 # TODO : VALUES_WHICH_NEED_TRANSLATION ?
@@ -147,10 +146,6 @@ def get_difference_of_proposal(proposal, learning_unit_year):
     return _get_differences_of_proposal_components(differences, proposal)
 
 
-def _replace_key_of_foreign_key(data):
-    return {key_name.replace(END_FOREIGN_KEY_NAME, ''): data[key_name] for key_name in data.keys()}
-
-
 def _get_the_old_value(key, current_data, initial_data):
     initial_value = initial_data.get(key) or NO_PREVIOUS_VALUE
 
@@ -207,14 +202,6 @@ def _get_old_value_when_not_foreign_key(initial_value, key):
             old_value = _('No')
 
     return old_value
-
-
-def _get_rid_of_blank_value(data):
-    clean_data = data.copy()
-    for key, value in clean_data.items():
-        if value == '':
-            clean_data[key] = None
-    return clean_data
 
 
 def force_state_of_proposals(proposals, author, new_state):

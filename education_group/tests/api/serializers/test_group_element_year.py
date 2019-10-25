@@ -27,7 +27,6 @@ from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
-from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
@@ -39,6 +38,7 @@ from education_group.api.views.group_element_year import TrainingTreeView
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 class EducationGroupTreeSerializerTestCase(TestCase):

@@ -30,7 +30,7 @@ from unittest.mock import patch
 from django.contrib.messages import INFO
 from django.contrib.messages import SUCCESS, ERROR
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from factory import fuzzy
 
 from base import models as mdl_base

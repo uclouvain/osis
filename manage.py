@@ -2,6 +2,7 @@
 import logging
 import os
 import sys
+
 import dotenv
 
 if __name__ == "__main__":

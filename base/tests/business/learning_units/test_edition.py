@@ -29,7 +29,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
 from base.enums.component_detail import COMPONENT_DETAILS
@@ -37,6 +37,7 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLU
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.component_type import COMPONENT_TYPES, LECTURING
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -406,7 +407,7 @@ class LearningUnitEditionTestCase(TestCase):
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
-                                      'component_type': _(learning_component_year_type.LECTURING),
+                                      'component_type': _(dict(COMPONENT_TYPES)[LECTURING]),
                                       'year': self.learning_container_year.academic_year,
                                       'value': test.get('value'),
                                       'next_year': another_learning_container_year.academic_year,

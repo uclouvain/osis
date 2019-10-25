@@ -38,7 +38,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
-from base.business.education_groups import general_information_sections, group_element_year_tree
+from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
@@ -48,6 +48,7 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.business.group_element_years import group_element_year_tree
 from webservices import business
 from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict
@@ -345,7 +346,7 @@ def response_for_bachelor(context):
     }
 
     if education_group_year:
-        admission_condition, created = AdmissionCondition.objects.get_or_create(
+        admission_condition, _ = AdmissionCondition.objects.get_or_create(
             education_group_year=education_group_year
         )
         get_value = functools.partial(get_value_from_ac, admission_condition=admission_condition, context=context)
@@ -469,7 +470,7 @@ def get_conditions_admissions(context):
     if common_acronym == 'common-2m1':
         common_acronym = 'common-2m'
         full_suffix = '2m'
-    admission_condition, created = AdmissionCondition.objects.get_or_create(
+    admission_condition, _ = AdmissionCondition.objects.get_or_create(
         education_group_year=context.education_group_year
     )
     admission_condition_common = None

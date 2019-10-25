@@ -745,20 +745,6 @@ class EducationGroupYear(SerializableModel):
         return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
 
     @cached_property
-    def children_group_element_years(self):
-        """ Return groupelementyears with a child_branch """
-        return self.children.exclude(child_leaf__isnull=False)
-
-    @cached_property
-    def group_element_year_branches(self):
-        return self.groupelementyear_set.filter(child_branch__isnull=False).select_related("child_branch")
-
-    @cached_property
-    def group_element_year_leaves(self):
-        return self.groupelementyear_set.filter(child_leaf__isnull=False). \
-            select_related("child_leaf", "child_leaf__learning_container_year")
-
-    @cached_property
     def coorganizations(self):
         return self.educationgrouporganization_set.all().order_by('all_students')
 

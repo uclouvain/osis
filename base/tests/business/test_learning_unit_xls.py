@@ -28,7 +28,7 @@ import datetime
 from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
