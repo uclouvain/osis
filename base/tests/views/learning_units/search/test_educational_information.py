@@ -37,7 +37,7 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_years = AcademicYearFactory.produce()
-        cls.luys = LearningUnitYearFactory.create_batch(4)
+        cls.luys = LearningUnitYearFactory.create_batch(4, academic_year__current=True)
         cls.url = reverse("learning_units_summary")
         cls.get_data = {
             "academic_year": str(cls.luys[0].academic_year.id),
