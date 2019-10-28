@@ -91,7 +91,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LearningUnitDetailed'
+                oneOf:
+                  - $ref: '#/components/schemas/LearningUnitDetailed'
+                  - $ref: '#/components/schemas/ExternalLearningUnit'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
