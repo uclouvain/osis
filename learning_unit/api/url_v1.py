@@ -31,6 +31,7 @@ from learning_unit.api.views.attribution import LearningUnitAttribution
 from learning_unit.api.views.learning_achievement import LearningAchievementList
 from learning_unit.api.views.learning_unit import LearningUnitDetailed, LearningUnitList, LearningUnitTitle
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
+from learning_unit.api.views.teaching_materials import LearningUnitTeachingMaterials
 
 app_name = "learning_unit"
 
@@ -42,14 +43,15 @@ urlpatterns = [
         name=LearningUnitDetailed.name
     ),
     url(r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/', include([
-            url(r'^title$', LearningUnitTitle.as_view(), name=LearningUnitTitle.name),
-            url(r'^attributions$', LearningUnitAttribution.as_view(), name=LearningUnitAttribution.name),
-            url(r'^achievements$', LearningAchievementList.as_view(), name=LearningAchievementList.name),
-            url(
-                r'^summary_specification$',
-                LearningUnitSummarySpecification.as_view(),
-                name=LearningUnitSummarySpecification.name
-            ),
+        url(r'^title$', LearningUnitTitle.as_view(), name=LearningUnitTitle.name),
+        url(r'^attributions$', LearningUnitAttribution.as_view(), name=LearningUnitAttribution.name),
+        url(r'^achievements$', LearningAchievementList.as_view(), name=LearningAchievementList.name),
+        url(r'^teaching_materials$', LearningUnitTeachingMaterials.as_view(), name=LearningUnitTeachingMaterials.name),
+        url(
+            r'^summary_specification$',
+            LearningUnitSummarySpecification.as_view(),
+            name=LearningUnitSummarySpecification.name
+        ),
     ])),
 ]
 
@@ -57,14 +59,14 @@ if 'education_group' in settings.INSTALLED_APPS:
     from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
 
     urlpatterns += (
-      url(
-        r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/education_group_roots$',
-        EducationGroupRootsList.as_view(),
-        name=EducationGroupRootsList.name
-      ),
-      url(
-          r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/prerequisites$',
-          LearningUnitPrerequisitesList.as_view(),
-          name=LearningUnitPrerequisitesList.name
-      ),
+        url(
+            r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/education_group_roots$',
+            EducationGroupRootsList.as_view(),
+            name=EducationGroupRootsList.name
+        ),
+        url(
+            r'^learning_units/(?P<year>[0-9]{4})/(?P<acronym>[a-zA-Z0-9]+)/prerequisites$',
+            LearningUnitPrerequisitesList.as_view(),
+            name=LearningUnitPrerequisitesList.name
+        ),
     )

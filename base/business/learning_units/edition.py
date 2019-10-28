@@ -168,7 +168,7 @@ def _duplicate_external(old_learning_unit_year, new_learning_unit_year):
 
 def _duplicate_learning_container_year(new_learn_unit_year, new_academic_year, old_learn_unit_year):
     duplicated_lcy = _get_or_create_container_year(new_learn_unit_year, new_academic_year)
-    _duplicate_learning_component_year(duplicated_lcy, new_learn_unit_year, old_learn_unit_year)
+    _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year)
     duplicated_lcy.save()
     return duplicated_lcy
 
@@ -211,8 +211,7 @@ def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
                 })
 
 
-# TODO :: remove unused param
-def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
+def _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
         new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)

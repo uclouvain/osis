@@ -40,7 +40,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
     list_display_links = ('title', 'data_year')
-    readonly_fields = ('academic_year', 'title', 'data_year')
+    readonly_fields = ('academic_year', 'title')
     list_filter = ('academic_year', 'reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
@@ -148,17 +148,6 @@ def get_by_reference_and_academic_year(a_reference, an_academic_year):
 def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, a_reference):
     return AcademicCalendar.objects.open_calendars().filter(
         academic_year=an_academic_year_id, reference=a_reference
-    ).exists()
-
-
-def is_academic_calendar_has_started(academic_year, reference, date=None):
-    if date is None:
-        date = timezone.now()
-
-    return AcademicCalendar.objects.filter(
-            academic_year=academic_year,
-            reference=reference,
-            start_date__lte=date,
     ).exists()
 
 

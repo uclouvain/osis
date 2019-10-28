@@ -67,6 +67,8 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        self._save_search_type_in_session()
+
         starting_ac = starting_academic_year()
 
         context.update({
@@ -79,15 +81,14 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
         })
         return context
 
-
-def _manage_session_variables(request, search_type):
-    remove_from_session(request, 'search_url')
-    if search_type == 'EXTERNAL':
-        request.session['ue_search_type'] = str(_('External learning units'))
-    elif search_type == SIMPLE_SEARCH:
-        request.session['ue_search_type'] = None
-    else:
-        request.session['ue_search_type'] = str(_get_search_type_label(search_type))
+    def _save_search_type_in_session(self):
+        remove_from_session(self.request, 'search_url')
+        if self.search_type == EXTERNAL_SEARCH:
+            self.request.session['ue_search_type'] = str(_('External learning units'))
+        elif self.search_type == SIMPLE_SEARCH:
+            self.request.session['ue_search_type'] = None
+        else:
+            self.request.session['ue_search_type'] = str(_get_search_type_label(self.search_type))
 
 
 def _get_filter(form, search_type):
@@ -104,17 +105,27 @@ def _get_search_type_label(search_type):
 
 
 def _create_xls(view_obj, context, **response_kwargs):
+    return __create(context, view_obj, create_xls)
+
+
+def __create(context, view_obj, method):
     user = view_obj.request.user
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
-    return create_xls(user, luys, filters)
+    return method(user, luys, filters)
+
+
+def _create_xls_educational_specifications(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["filter"].qs
+    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
 
 
 def _create_xls_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
-    comparison_year = view_obj.request.POST.get('comparison_year')
+    comparison_year = view_obj.request.GET.get('comparison_year')
     return create_xls_comparison(user, luys, filters, comparison_year)
 
 
@@ -123,30 +134,18 @@ def _create_xls_with_parameters(view_obj, context, **response_kwargs):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     other_params = {
-        WITH_GRP: view_obj.request.POST.get('with_grp') == 'true',
-        WITH_ATTRIBUTIONS: view_obj.request.POST.get('with_attributions') == 'true'
+        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
+        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
     }
     return create_xls_with_parameters(user, luys, filters, other_params)
 
 
 def _create_xls_attributions(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    filters = _get_filter(context["form"], view_obj.search_type)
-    return create_xls_attributions(user, luys, filters)
-
-
-def _create_xls_educational_information_and_specifications(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
+    return __create(context, view_obj, create_xls_attributions)
 
 
 def _create_xls_proposal(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    filters = _get_filter(context["form"], view_obj.search_type)
-    return create_xls_proposal(user, luys, filters)
+    return __create(context, view_obj, create_xls_proposal)
 
 
 def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):

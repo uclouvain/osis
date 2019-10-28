@@ -84,6 +84,7 @@ LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
@@ -258,6 +259,7 @@ class TestLearningUnitModificationProposal(TestCase):
 class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
@@ -349,6 +351,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
 class TestLearningUnitProposalSearch(TestCase):
     def setUp(self):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         self.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         ac_years = AcademicYearFactory.produce_in_future(quantity=3)
         self.an_entity = EntityFactory()
@@ -398,6 +401,7 @@ class TestLearningUnitProposalSearch(TestCase):
 class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
@@ -937,12 +941,6 @@ class TestLearningUnitProposalDisplay(TestCase):
             'campus',
             proposal_business.NO_PREVIOUS_VALUE)
         self.assertEqual(differences, proposal_business.NO_PREVIOUS_VALUE)
-
-    def test_replace_key_of_foreign_key(self):
-        changed_dict = proposal_business._replace_key_of_foreign_key(
-            {'key1{}'.format(proposal_business.END_FOREIGN_KEY_NAME): 1,
-             'key2': 2})
-        self.assertEqual(changed_dict, {'key1': 1, 'key2': 2})
 
     def test_get_old_value_of_foreign_key_for_campus(self):
         differences = proposal_business._get_old_value_of_foreign_key('campus', self.campus.id)

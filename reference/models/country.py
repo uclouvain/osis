@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core import serializers
 from django.db import models
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
@@ -61,25 +60,3 @@ def find_all():
 
 def find_by_id(country_id):
     return Country.objects.get(pk=country_id)
-
-
-def find_all_for_sync():
-    """
-    :return: All records in the 'Country' model (table). Used to synchronize date from Osis to Osis-portal.
-    """
-    print("Retrieving data from " + str(Country) + "...")
-    # Necessary fields for Osis-portal
-    fields = ['id', 'iso_code', 'name', 'nationality', 'european_union', 'dialing_code', 'cref_code']
-    # list() to force the evaluation of the queryset
-    return list(Country.objects.values(*fields).order_by('name'))
-
-
-def serialize_list(list_countries):
-    """
-    Serialize a list of "Country" objects using the json format.
-    Use to send data to osis-portal.
-    :param list_countries: a list of "Country" objects
-    :return: the serialized list (a json)
-    """
-    fields = ('id', 'iso_code', 'name', 'nationality', 'european_union', 'dialing_code', 'cref_code')
-    return serializers.serialize("json", list_countries, fields=fields)
