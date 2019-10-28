@@ -42,6 +42,7 @@ from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
+from base.views.common import remove_from_session
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -66,6 +67,8 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        self._save_search_type_in_session()
+
         starting_ac = starting_academic_year()
 
         context.update({
@@ -77,6 +80,15 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
             'items_per_page': context["paginator"].per_page,
         })
         return context
+
+    def _save_search_type_in_session(self):
+        remove_from_session(self.request, 'search_url')
+        if self.search_type == EXTERNAL_SEARCH:
+            self.request.session['ue_search_type'] = str(_('External learning units'))
+        elif self.search_type == SIMPLE_SEARCH:
+            self.request.session['ue_search_type'] = None
+        else:
+            self.request.session['ue_search_type'] = str(_get_search_type_label(self.search_type))
 
 
 def _get_filter(form, search_type):
