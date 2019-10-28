@@ -74,6 +74,17 @@ class TrainingType(ChoiceEnum):
         ]
 
     @classmethod
+    def university_certificate_types(cls):
+        return [
+            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
+        ]
+
+    @classmethod
+    def continuing_education_types(cls):
+        return cls.attestation_types() + cls.university_certificate_types()
+
+    @classmethod
     def root_master_2m_types(cls):
         return [cls.PGRM_MASTER_120.name, cls.PGRM_MASTER_180_240.name]
 

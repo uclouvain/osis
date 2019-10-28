@@ -586,9 +586,11 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         return context
 
     def _show_free_text(self):
-        concerned_training_types = set(TrainingType.with_admission_condition()) - set(TrainingType.attestation_types())
+        concerned_training_types = list(
+            set(TrainingType.with_admission_condition()) - set(TrainingType.continuing_education_types())
+        )
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
-            list(concerned_training_types),
+            concerned_training_types,
             MiniTrainingType.with_admission_condition(),
         )
 
