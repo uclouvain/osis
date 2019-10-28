@@ -1217,7 +1217,10 @@ class TestCreateXls(TestCase):
         xls_data = [[self.learning_unit_year.academic_year.name, self.learning_unit_year.acronym,
                      self.learning_unit_year.complete_title,
                      xls_build.translate(self.learning_unit_year.learning_container_year.container_type),
-                     xls_build.translate(self.learning_unit_year.subtype), None, None, self.learning_unit_year.credits,
+                     xls_build.translate(self.learning_unit_year.subtype),
+                     self.learning_unit_year.learning_container_year.allocation_entity,
+                     self.learning_unit_year.learning_container_year.requirement_entity,
+                     self.learning_unit_year.credits,
                      xls_build.translate(self.learning_unit_year.status)]]
         expected_argument = _generate_xls_build_parameter(xls_data, self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)
