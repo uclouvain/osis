@@ -29,7 +29,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
@@ -203,7 +203,10 @@ class LearningUnitDetailedTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title()
+        luy_with_full_title = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(
+            luy_with_full_title
+        ).get()
         serializer = LearningUnitDetailedSerializer(
             luy_with_full_title,
             context={
@@ -218,7 +221,10 @@ class LearningUnitDetailedTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title()
+        luy_with_full_title = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(
+            luy_with_full_title
+        ).get()
         serializer = ExternalLearningUnitDetailedSerializer(
             luy_with_full_title,
             context={
