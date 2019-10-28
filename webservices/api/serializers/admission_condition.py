@@ -147,17 +147,10 @@ class ContinuingEducationTrainingAdmissionConditionsSerializer(AdmissionConditio
     admission_enrollment_procedures = serializers.CharField(read_only=True)
     personalized_access = serializers.CharField(read_only=True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        egy = self.context.get('egy')
-        if egy.is_attestation:
-            self.fields.pop('free_text')
-
     class Meta:
         model = AdmissionCondition
 
         fields = (
-            'free_text',
             'alert_message',
             'admission_enrollment_procedures',
             'personalized_access',
