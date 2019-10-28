@@ -1,5 +1,6 @@
 {% extends "base/blocks/quick_search_base.html" %}
-{% load bootstrap3 i18n %}
+{% load static i18n %}
+{% load bootstrap3 %}
 
 {% block form_fields %}
     {% bootstrap_field form.acronym form_group_class="col-md-3" %}
@@ -7,9 +8,41 @@
 {% endblock %}
 
 {% block table_header%}
-    <th></th>
-    <th>{% trans 'Ac yr.' %}</th>
-    <th>{% trans 'Acronym/Short title' %}</th>
-    <th>{% trans 'Title' %}</th>
-    <th></th>
+    <th id="th_0_temp">{% trans 'Ac yr.' %}</th>
+    <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
+    <th id="th_2_acronym">{% trans 'Acronym/Short title' %}</th>
+    <th id="th_3_title">{% trans 'Title' %}</th>
 {% endblock %}
+
+{% block script %}
+<script src="{% static "js/osis_datatable.js" %}"></script>
+<script>
+    $(document).ready(function()
+    {
+        columnDefs = [
+            {
+                "name": "temp",
+                "targets": 0,
+                "data": "academic_year"
+            },
+            {
+                "name": "academic_year",
+                "targets": 1,
+                "data": "academic_year"
+            },
+            {
+                "name": "acronym",
+                "targets": 2,
+                "data": "acronym",
+                "render": function ( data, type, row, meta ) {
+                    return '<a href="'+ row['osis_url'] +'">'+ data + '</a>';
+                }
+            },
+            { "name": "title", "targets": 3, "data": "title"},
+        ];
+        initializeDataTable("table_education_groups", "educationGroupsLightIds", 1,
+            10, "{{ form_url }}", columnDefs);
+
+    });
+</script>
+{% endblock script %}

@@ -1,5 +1,6 @@
 {% load bootstrap3 i18n %}
-
+{% url 'quick_search_learning_unit' as quick_search_lu %}
+{% url 'quick_search_education_group' as quick_search_eg %}
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h4 class="modal-title">{% trans "Search" %}</h4>
@@ -9,34 +10,28 @@
     <div id="message_info_modal" class="alert alert-info" role="alert" style="visibility: hidden; display: none;"></div>
 
     <ul class="nav nav-tabs" role="tablist">
-        {% url 'quick_search_education_group' as quick_search_eg %}
-        <li {% if request.path == quick_search_eg %} class="active" {% endif %}>
-            <a href="#eg_search" role="tab" data-toggle="tab">
-                {% trans 'Trainings' %}
-            </a>
+        <li class="active">
+            <a href="#eg_search" role="tab" data-toggle="tab">{% trans 'Trainings' %}</a>
         </li>
-        {% url 'quick_search_learning_unit' as quick_search_lu %}
-        <li {% if request.path == quick_search_lu %} class="active" {% endif %}>
-            <a href="#lu_search" role="tab" data-toggle="tab">
-                {% trans 'Learning units' %}
-            </a>
+
+        <li>
+            <a href="#lu_search" role="tab" data-toggle="tab">{% trans 'Learning units' %}</a>
         </li>
     </ul>
+
     <br>
+
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane {% if request.path == quick_search_eg %}active{% endif %}" id="eg_search">
-            {% include "base/blocks/quick_search_egy.html" with form_id="form-modal-eg-search" form_url=quick_search_eg select_url="education_group_select" form=eg_form object_list=eg_object_list%}
+        <div role="tabpanel" class="tab-pane active" id="eg_search">
+            {% include "base/blocks/quick_search_egy.html" with form_id="search_form" form_url=quick_search_eg select_url="education_group_select" form=eg_form object_list=eg_object_list%}
         </div>
 
-        <div role="tabpanel" class="tab-pane {% if request.path == quick_search_lu %}active{% endif %}" id="lu_search">
+        <div role="tabpanel" class="tab-pane" id="lu_search">
             {% include "base/blocks/quick_search_luy.html" with form_id="form-modal-lu-search" form_url=quick_search_lu select_url="learning_unit_select" form=lu_form object_list=lu_object_list %}
         </div>
 </div>
 
 <script>
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-      bind_trigger_modal();
-    });
 
     function submit_with_page(page) {
         $("input[name='page']").val(page);

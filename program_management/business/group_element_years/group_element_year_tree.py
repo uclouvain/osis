@@ -181,7 +181,7 @@ class EducationGroupHierarchy:
                 'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
                 'modification_disabled': not self.modification_perm.is_permitted(),
                 'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
-                'search_url': reverse('quick_search_education_group')+'?academic_year={}'.format(
+                'search_url': reverse('quick_search')+'?academic_year={}'.format(
                     self.education_group_year.academic_year.pk
                 ),
             },

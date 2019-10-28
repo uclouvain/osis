@@ -22,10 +22,10 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 
-from django import forms
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django.views.generic import TemplateView
 from django_filters import FilterSet, filters
 from django_filters.views import FilterView
 
@@ -34,7 +34,9 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.utils.cache import CacheFilterMixin
+from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
+from education_group.api.serializers.education_group import EducationGroupSerializer
 
 
 class QuickEducationGroupYearFilter(FilterSet):
@@ -121,13 +123,21 @@ class QuickLearningUnitYearFilter(FilterSet):
         return queryset
 
 
-class QuickSearchForm(forms.Form):
-    academic_year = forms.ModelChoiceField(AcademicYear.objects.all(), required=True)
-    search_text = forms.CharField(required=False)
+class QuickSearch(PermissionRequiredMixin, AjaxTemplateMixin, TemplateView):
+    """ Quick search view for learning units and education group year """
+    template_name = 'base/quick_search_inner.html'
+    permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['lu_form'] = QuickLearningUnitYearFilter().form
+        context['eg_form'] = QuickEducationGroupYearFilter().form
+        context['academic_year'] = kwargs.get('academic_year')
+        return context
 
 
 # FIXME List should be empty
-class QuickSearchGenericView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
+class QuickSearchGenericView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin, FilterView):
     """ Quick search generic view for learning units and education group year """
     paginate_by = "12"
     ordering = 'academic_year', 'acronym',
@@ -157,14 +167,10 @@ class QuickSearchEducationGroupYearView(QuickSearchGenericView):
     permission_required = 'base.can_access_education_group'
 
     filterset_class = QuickEducationGroupYearFilter
-    context_object_name = 'eg_object_list'
+    serializer_class = EducationGroupSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['eg_form'] = context["filter"].form
-        context['lu_form'] = QuickLearningUnitYearFilter().form
-
         return context
 
 
@@ -173,12 +179,7 @@ class QuickSearchLearningUnitYearView(QuickSearchGenericView):
     permission_required = 'base.can_access_learningunit'
 
     filterset_class = QuickLearningUnitYearFilter
-    context_object_name = 'lu_object_list'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['lu_form'] = context["filter"].form
-        context['eg_form'] = QuickEducationGroupYearFilter().form
-
         return context

@@ -43,3 +43,8 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
         }
     });
 }
+
+
+function reloadSearchResult(){
+    $('#table_education_groups').DataTable().ajax.reload();
+}
