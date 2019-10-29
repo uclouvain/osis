@@ -214,6 +214,7 @@ class TestPostponementEducationGroupYear(TestCase):
 
         self.education_group_year = TrainingFactory(
             academic_year=create_current_academic_year(),
+            education_group_type__name=education_group_types.TrainingType.AGGREGATION,
             management_entity=management_entity_version.entity,
             administration_entity=administration_entity_version.entity,
         )
