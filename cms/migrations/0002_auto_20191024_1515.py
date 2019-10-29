@@ -14,4 +14,8 @@ class Migration(migrations.Migration):
             name='translatedtext',
             unique_together={('entity', 'reference', 'text_label', 'language')},
         ),
+        migrations.AlterUniqueTogether(
+            name='translatedtextlabel',
+            unique_together={('language', 'text_label')},
+        ),
     ]
