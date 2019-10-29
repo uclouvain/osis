@@ -30,7 +30,6 @@ from unittest import mock
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
-
 from base.business.education_groups import perms
 from base.business.education_groups.perms import check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
@@ -46,8 +45,8 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory, MiniTrainingFactory, GroupFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
-    FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
+    SICFactory, FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
