@@ -145,7 +145,9 @@ class QuickSearch(PermissionRequiredMixin, AjaxTemplateMixin, TemplateView):
         initial_data = {'academic_year': self.request.GET.get('academic_year')}
         context['lu_form'] = QuickLearningUnitYearFilter(initial=initial_data).form
         context['eg_form'] = QuickEducationGroupYearFilter(initial=initial_data).form
-        context['academic_year'] = kwargs.get('academic_year')
+        context['academic_year'] = self.request.GET.get('academic_year')
+        context['root'] = self.request.GET.get('root')
+        context['education_group_year'] = self.request.GET.get('education_group_year')
         return context
 
 

@@ -85,12 +85,24 @@
                 data: {'element_id': egy_id},
                 dataType: 'json',
                 success: function (jsonResponse) {
-                    console.log(jsonResponse);
                     displayInfoMessage(jsonResponse, 'clipboard');
                 }
             });
         }
 
+        $("#button_attach_modal").click(function() {
+            document.getElementById("modal_dialog_id").classList.add("modal-lg");
+            let root = "{{ root }}";
+            let education_group_year = "{{ education_group_year }}";
+            const url = `/program_management/${root}/${education_group_year}/content/attach/`;
+            $('#form-modal-ajax-content').load(url, function (response, status, xhr) {
+                if (status === "success") {
+                    let form = $(this).find('form').first();
+                    formAjaxSubmit(form, '#form-ajax-modal');
+                }
+
+            });
+        });
     });
 </script>
 {% endblock script %}
