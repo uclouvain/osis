@@ -40,6 +40,12 @@ from education_group.api.serializers.education_group import EducationGroupSerial
 
 
 class QuickEducationGroupYearFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        required=False,
+        label=_('Ac yr.'),
+        empty_label=pgettext_lazy("plural", "All"),
+    )
     acronym = filters.CharFilter(
         field_name="acronym",
         lookup_expr='icontains',
@@ -60,11 +66,15 @@ class QuickEducationGroupYearFilter(FilterSet):
         fields = [
             'acronym',
             'title',
+            'academic_year'
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, initial=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
+        # TODO generalize this logic dynamically
+        if initial:
+            self.form.fields["academic_year"].initial = initial["academic_year"]
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
@@ -108,9 +118,11 @@ class QuickLearningUnitYearFilter(FilterSet):
             "title",
         ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, initial=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
+        if initial:
+            self.form.fields["academic_year"].initial = initial["academic_year"]
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
@@ -130,8 +142,9 @@ class QuickSearch(PermissionRequiredMixin, AjaxTemplateMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['lu_form'] = QuickLearningUnitYearFilter().form
-        context['eg_form'] = QuickEducationGroupYearFilter().form
+        initial_data = {'academic_year': self.request.GET.get('academic_year')}
+        context['lu_form'] = QuickLearningUnitYearFilter(initial=initial_data).form
+        context['eg_form'] = QuickEducationGroupYearFilter(initial=initial_data).form
         context['academic_year'] = kwargs.get('academic_year')
         return context
 

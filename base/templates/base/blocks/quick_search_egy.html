@@ -3,6 +3,7 @@
 {% load bootstrap3 %}
 
 {% block form_fields %}
+    {% bootstrap_field form.academic_year form_group_class="hidden" %}
     {% bootstrap_field form.acronym form_group_class="col-md-3" %}
     {% bootstrap_field form.title form_group_class="col-md-6" %}
 {% endblock %}
