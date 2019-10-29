@@ -37,16 +37,4 @@
         $("input[name='page']").val(page);
         $('#form-modal-eg-search').submit();
     }
-
-    function select(url_select, data) {
-        $.ajax({
-            url: url_select,
-            dataType: 'json',
-            type: 'POST',
-            data: data,
-            success: function (jsonResponse) {
-                displayInfoMessage(jsonResponse, 'clipboard');
-            }
-        });
-    }
 </script>

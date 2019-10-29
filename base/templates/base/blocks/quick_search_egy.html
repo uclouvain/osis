@@ -24,7 +24,15 @@
             {
                 "name": "temp",
                 "targets": 0,
-                "data": "academic_year"
+                "data": "acronym",
+                "render": function(data, type, row, meta) {
+                    let input = document.createElement("input");
+                    input.type = 'radio';
+                    input.name = 'selected_item';
+                    input.value = data;
+                    input.setAttribute('data-url', row['url']);
+                    return input.outerHTML;
+                }
             },
             {
                 "name": "academic_year",
@@ -41,8 +49,47 @@
             },
             { "name": "title", "targets": 3, "data": "title"},
         ];
-        initializeDataTable("table_education_groups", "educationGroupsLightIds", 1,
+        var table = initializeDataTable("table_education_groups", "educationGroupsLightIds", 1,
             10, "{{ form_url }}", columnDefs);
+
+        table.on('draw', function(){
+            $("input[name=selected_item]").each(function(index, element){
+                element.addEventListener('click', function(e){
+                    const url = e.target.getAttribute('data-url');
+                    select_element_from_url(url);
+                })
+            });
+        });
+
+
+        function select_element_from_url(url){
+            let egy_id = getIdFromUrl(url);
+            select_element(egy_id);
+        }
+
+        // FIXME This method is copy pasted Refactor
+        function getIdFromUrl(url){
+            let split = url.split("/");
+            for(let i=split.length-1; i--; i >= 0){
+                if(!isNaN(split[i])){
+                    return parseInt(split[i]);
+                }
+            }
+            return NaN;
+        }
+
+        function select_element(egy_id) {
+            $.ajax({
+                type: "POST",
+                url: "/educationgroups/"+ egy_id + "/" + egy_id + "/select/",
+                data: {'element_id': egy_id},
+                dataType: 'json',
+                success: function (jsonResponse) {
+                    console.log(jsonResponse);
+                    displayInfoMessage(jsonResponse, 'clipboard');
+                }
+            });
+        }
 
     });
 </script>

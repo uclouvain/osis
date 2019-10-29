@@ -1,7 +1,7 @@
 function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
     setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
-    domTable.DataTable(
+    return domTable.DataTable(
     {
         'createdRow': function (row, data, dataIndex) {
             let url = "";

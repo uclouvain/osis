@@ -195,7 +195,6 @@ function collapseWarnings() {
 
 function getDataAjaxTable(domTable, d, pageNumber) {
     let formdata = $('#search_form').serializeArray();
-    console.log(formdata);
     let queryString = {};
     $(formdata).each(function(index, obj){
         if (!queryString.hasOwnProperty(obj.name)){
