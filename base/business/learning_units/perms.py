@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
+from base.business.event_perms import EventPermLearningUnitFacultyManagerEdition
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
@@ -376,10 +377,7 @@ def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, r
 def _can_be_updated_by_faculty_manager(learning_unit_year):
     if not learning_unit_year.learning_container_year:
         return False
-
-    starting_year = starting_academic_year().year
-    luy_year = learning_unit_year.academic_year.year
-    return starting_year <= luy_year <= starting_year + MAX_ACADEMIC_YEAR_FACULTY
+    return EventPermLearningUnitFacultyManagerEdition(obj=learning_unit_year, raise_exception=False).is_open()
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):

@@ -63,12 +63,14 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -332,6 +334,13 @@ class LearningUnitViewTestCase(TestCase):
 
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
+
+        AcademicCalendarFactory(
+            data_year=cls.current_academic_year,
+            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
 
         cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
 

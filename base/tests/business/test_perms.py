@@ -37,12 +37,14 @@ from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes
+from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
@@ -70,25 +72,39 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 
 class PermsTestCase(TestCase):
     def setUp(self):
-        today = datetime.date.today()
-        self.academic_yr = AcademicYearFactory(start_date=today,
-                                               end_date=today.replace(year=today.year + 1),
-                                               year=today.year)
-        self.academic_yr_1 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 1),
-                                                       end_date=today.replace(year=today.year + 2),
-                                                       year=today.year + 1)
+        self.academic_yr = create_current_academic_year()
+        self.academic_yr_1 = AcademicYearFactory.build(year=self.academic_yr.year + 1)
         super(AcademicYear, self.academic_yr_1).save()
-        self.academic_year_6 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 6),
-                                                         end_date=today.replace(year=today.year + 7),
-                                                         year=today.year + 6)
-        super(AcademicYear, self.academic_year_6).save()
+        self.academic_yr_2 = AcademicYearFactory.build(year=self.academic_yr.year + 2)
+        super(AcademicYear, self.academic_yr_2).save()
+        self.academic_yr_6 = AcademicYearFactory.build(year=self.academic_yr.year + 6)
+        super(AcademicYear, self.academic_yr_6).save()
 
         self.lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
-        lu = LearningUnitFactory(end_year=self.academic_yr)
-        self.luy = LearningUnitYearFactory(academic_year=self.academic_yr,
-                                           learning_container_year=self.lunit_container_yr,
-                                           subtype=FULL,
-                                           learning_unit=lu)
+        self.luy = LearningUnitYearFactory(
+            academic_year=self.academic_yr,
+            learning_container_year=self.lunit_container_yr,
+            subtype=FULL,
+            learning_unit=LearningUnitFactory(end_year=self.academic_yr)
+        )
+        AcademicCalendarFactory(
+            data_year=self.academic_yr,
+            start_date=datetime.datetime(self.academic_yr.year - 2, 9, 15),
+            end_date=datetime.datetime(self.academic_yr.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+        AcademicCalendarFactory(
+            data_year=self.academic_yr_1,
+            start_date=datetime.datetime(self.academic_yr.year - 1, 9, 15),
+            end_date=datetime.datetime(self.academic_yr.year + 2, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+        AcademicCalendarFactory(
+            data_year=self.academic_yr_2,
+            start_date=datetime.datetime(self.academic_yr.year, 9, 15),
+            end_date=datetime.datetime(self.academic_yr.year + 3, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in ALL_TYPES:
@@ -128,9 +144,9 @@ class PermsTestCase(TestCase):
 
     def test_cannot_faculty_manager_modify_full(self):
         for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
-            lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_year_6,
+            lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr_6,
                                                               container_type=proposal_needed_container_type)
-            luy = LearningUnitYearFactory(academic_year=self.academic_year_6,
+            luy = LearningUnitYearFactory(academic_year=self.academic_yr_6,
                                           learning_container_year=lunit_container_yr,
                                           subtype=FULL)
 
@@ -382,19 +398,17 @@ class PermsTestCase(TestCase):
         self.assertTrue(perms.is_eligible_for_cancel_of_proposal(a_proposal, a_person))
 
     def test_can_be_updated_by_faculty_manager(self):
-        academic_year = create_current_academic_year()
         luy = LearningUnitYearFactory(
             acronym="LDROI1004",
             specific_title="Juridic law courses",
-            academic_year=academic_year,
+            academic_year=self.academic_yr,
             subtype=learning_unit_year_subtypes.FULL
         )
-        start_year = AcademicYearFactory(year=academic_year.year - 3)
-        end_year = AcademicYearFactory(year=academic_year.year - 1)
+        start_year = AcademicYearFactory(year=self.academic_yr.year - 3)
+        end_year = AcademicYearFactory(year=self.academic_yr.year - 1)
         previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
-        next_start_year = AcademicYearFactory(year=academic_year.year + 1)
-        next_end_year = AcademicYearFactory(year=academic_year.year + 3)
-        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
+        next_academic_years = GenerateAcademicYear(
+            start_year=self.academic_yr_1, end_year=self.academic_yr_6).academic_years
         previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=luy.learning_unit)
                          for ac in previous_academic_years]
         next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=luy.learning_unit)
@@ -408,6 +422,8 @@ class PermsTestCase(TestCase):
         self.assertTrue(_can_be_updated_by_faculty_manager(next_luys[1]))
 
         self.assertFalse(_can_be_updated_by_faculty_manager(next_luys[2]))
+        self.assertFalse(_can_be_updated_by_faculty_manager(next_luys[3]))
+        self.assertFalse(_can_be_updated_by_faculty_manager(next_luys[4]))
 
 
 def create_person_with_permission_and_group(group_name=None, permission_name='can_edit_learning_unit_proposal'):

@@ -34,6 +34,7 @@ from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
+from base.models.learning_unit_year import LearningUnitYear
 
 
 class EventPerm(ABC):
@@ -91,3 +92,9 @@ class EventPermEducationGroupEdition(EventPerm):
     model = EducationGroupYear
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
     error_msg = _("This education group is not editable during this period.")
+
+
+class EventPermLearningUnitFacultyManagerEdition(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+    error_msg = _("This learning unit is not editable by faculty managers during this period.")
