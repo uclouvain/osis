@@ -128,6 +128,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
 
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": egy.academic_year.year, "acronym": egy.acronym}
+    worksheet_title = _clean_worksheet_title(worksheet_title)
     workbook = Workbook(encoding='utf-8')
 
     excel_lines = _build_excel_lines(egy, prerequisites_qs)
@@ -332,10 +333,9 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
 
 def generate_ue_is_prerequisite_for_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet,
                                              learning_unit_years_parent):
-    # Max 31 characters in worksheet_title "{} - {}".format(current_worksheet_num, worksheet_titles)
     worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {"year": egy.academic_year.year,
                                                                       "acronym": egy.acronym}
-    worksheet_title = worksheet_title[:25]
+    worksheet_title = _clean_worksheet_title(worksheet_title)
     workbook = Workbook()
 
     excel_lines = _build_excel_lines_prerequisited(
@@ -428,3 +428,8 @@ def _get_blocks_prerequisite_of(gey):
             block_in_array
         )
     return ''
+
+
+def _clean_worksheet_title(title):
+    # Worksheet title is max 25 chars (31 chars with sheet number) + does not accept slash present in acronyms
+    return title[:25].replace("/", "_")

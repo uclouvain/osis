@@ -158,6 +158,10 @@ class TestSearchForm(TestCase):
         self.assertEqual(city_form_choices,
                          [('', '---------'), (CINEY, CINEY), (NAMUR, NAMUR)])
 
+    def test_initial_value_learning_unit_filter_with_entity_subordinated(self):
+        lu_filter = LearningUnitFilter()
+        self.assertTrue(lu_filter.form.fields['with_entity_subordinated'].initial)
+
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
     @classmethod

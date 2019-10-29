@@ -164,14 +164,12 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         now = datetime.datetime.now()
+        cls.academic_years = AcademicYearFactory.produce(number_past=5, number_future=5)
 
-        cls.academic_year = create_current_academic_year()
-        cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
-        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.previous_academic_year = GenerateAcademicYear(
-            cls.old_academic_year,
-            cls.old_academic_year
-        ).academic_years[0]
+        cls.academic_year = cls.academic_years[5]
+        cls.old_academic_year = cls.academic_years[4]
+        cls.next_academic_year = cls.academic_years[5]
+        cls.previous_academic_year = cls.academic_years[4]
         AcademicCalendarFactory(
             academic_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
