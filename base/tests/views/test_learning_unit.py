@@ -38,7 +38,7 @@ from django.http import HttpResponseRedirect
 from django.test import TestCase, RequestFactory, Client
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 import base.business.learning_unit
@@ -52,7 +52,6 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLAN
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
-from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, education_group_categories, \
@@ -71,7 +70,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -103,8 +102,11 @@ from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from learning_unit.api.views.learning_unit import LearningUnitFilter
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
@@ -1148,12 +1150,55 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_specifications_save(self):
         learning_unit_year = LearningUnitYearFactory()
-        response = self.client.post(reverse('learning_unit_specifications_edit',
-                                            kwargs={'learning_unit_year_id': learning_unit_year.id}))
+        response = self.client.post(
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            data={'postpone': 0}
+        )
+        self.assertEqual(response.status_code, 200)
 
-        expected_redirection = reverse("learning_unit_specifications",
-                                       kwargs={'learning_unit_year_id': learning_unit_year.id})
-        self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
+    def test_learning_unit_specifications_save_with_postponement(self):
+        year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_year = LearningUnitYearFactory(
+            academic_year=create_current_academic_year(),
+            learning_unit=LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
+        )
+        future_learning_unit_years = [LearningUnitYearFactory(
+            academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
+            learning_unit=learning_unit_year.learning_unit,
+            acronym=learning_unit_year.acronym
+        ) for i in range(1, year_range)]
+        label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
+        for language in ['fr-be', 'en']:
+            TranslatedTextLabelFactory(text_label=label, language=language)
+        trans_fr_be = [TranslatedTextFactory(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=luy.id,
+            language='fr-be',
+            text_label=label
+        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        trans_en = [TranslatedTextFactory(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=luy.id,
+            language='en',
+            text_label=label
+        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+
+        response = self.client.post(
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            data={
+                'trans_text_fr': 'textFR',
+                'trans_text_en': 'textEN',
+                'postpone': 1,
+                'cms_fr_id': trans_fr_be[0].id,
+                'cms_en_id': trans_en[0].id,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        for translated_text in TranslatedText.objects.filter(language='fr-be'):
+            self.assertEqual(translated_text.text, 'textFR')
+        for translated_text in TranslatedText.objects.filter(language='en'):
+            self.assertEqual(translated_text.text, 'textEN')
 
 
 class TestCreateXls(TestCase):
@@ -1181,7 +1226,10 @@ class TestCreateXls(TestCase):
         xls_data = [[self.learning_unit_year.academic_year.name, self.learning_unit_year.acronym,
                      self.learning_unit_year.complete_title,
                      xls_build.translate(self.learning_unit_year.learning_container_year.container_type),
-                     xls_build.translate(self.learning_unit_year.subtype), None, None, self.learning_unit_year.credits,
+                     xls_build.translate(self.learning_unit_year.subtype),
+                     self.learning_unit_year.learning_container_year.allocation_entity,
+                     self.learning_unit_year.learning_container_year.requirement_entity,
+                     self.learning_unit_year.credits,
                      xls_build.translate(self.learning_unit_year.status)]]
         expected_argument = _generate_xls_build_parameter(xls_data, self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)

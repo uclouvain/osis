@@ -28,9 +28,9 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
-    LearningUnitTitleSerializer
+    LearningUnitTitleSerializer, ExternalLearningUnitDetailedSerializer
 
 
 class LearningUnitFilter(filters.FilterSet):
@@ -68,25 +68,31 @@ class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIV
         Return the detail of the learning unit
     """
     name = 'learningunits_read'
-    serializer_class = LearningUnitDetailedSerializer
 
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
+        queryset = LearningUnitYear.objects.all().select_related(
+            'language',
+            'campus',
+            'academic_year',
+            'learning_container_year',
+            'externallearningunityear'
+        ).prefetch_related(
+            'learning_container_year__requirement_entity__entityversion_set',
+            'learningcomponentyear_set',
+        ).annotate_full_title()
         luy = get_object_or_404(
-            LearningUnitYear.objects.all().select_related(
-                'language',
-                'campus',
-                'academic_year',
-                'learning_container_year'
-            ).prefetch_related(
-                'learning_container_year__requirement_entity__entityversion_set',
-                'learningcomponentyear_set'
-            ).annotate_full_title(),
+            LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset),
             acronym__iexact=acronym,
             academic_year__year=year
         )
         return luy
+
+    def get_serializer_class(self):
+        if self.get_object().is_external():
+            return ExternalLearningUnitDetailedSerializer
+        return LearningUnitDetailedSerializer
 
 
 class LearningUnitTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):

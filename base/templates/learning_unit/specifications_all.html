@@ -159,7 +159,7 @@
                             <div class="col-md-1">
                                 {{ achievement.code_name }}
                                 {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
-                                    <a class="trigger_modal pull-right"
+                                    <a class="trigger_modal pull-right" href="#"
                                        data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
                                        data-modal_class="modal-lg"
                                        title="{% trans 'Edit' %}">
