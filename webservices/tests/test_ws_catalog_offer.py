@@ -206,16 +206,15 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
 
     def test_without_any_sections(self):
         text_label = TextLabelFactory(entity=OFFER_YEAR)
-
         for iso_language, language in [
             (self.iso_language, self.language),
             (settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_EN)
         ]:
             with self.subTest(iso_language=self.iso_language, language=language):
                 TranslatedTextLabelFactory(text_label=text_label,
-                                           language=self.iso_language)
+                                           language=iso_language)
                 TranslatedTextRandomFactory(text_label=text_label,
-                                            language=self.iso_language,
+                                            language=iso_language,
                                             reference=self.common_education_group_year.id,
                                             entity=text_label.entity)
                 message = {

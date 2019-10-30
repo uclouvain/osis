@@ -66,7 +66,8 @@ class LearningUnitFilter(FilterSet):
     with_entity_subordinated = filters.BooleanFilter(
         method=lambda queryset, *args, **kwargs: queryset,
         label=_('Include subordinate entities'),
-        widget=forms.CheckboxInput
+        widget=forms.CheckboxInput,
+        initial='True'
     )
     tutor = filters.CharFilter(
         method="filter_tutor",
@@ -160,7 +161,7 @@ class LearningUnitFilter(FilterSet):
             return queryset.filter(externallearningunityear__mobility=True)
         elif value == learning_container_year_types.EXTERNAL:
             return queryset.filter(externallearningunityear__co_graduation=True)
-        return queryset.filter(name=value)
+        return queryset.filter(learning_container_year__container_type=value)
 
     def filter_entity(self, queryset, name, value):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']
