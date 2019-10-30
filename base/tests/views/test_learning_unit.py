@@ -244,16 +244,24 @@ class LearningUnitViewCreateFullTestCase(TestCase):
 class LearningUnitViewCreatePartimTestCase(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
+
+        AcademicCalendarFactory(
+            data_year=self.current_academic_year,
+            start_date=datetime.datetime(self.current_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(self.current_academic_year.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+
         self.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             learning_container_year__academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
         self.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': self.learning_unit_year_full.id})
-        self.user = UserFactory()
+        faculty_manager = FacultyManagerFactory()
+        self.user = faculty_manager.user
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        PersonFactory(user=self.user)
         self.client.force_login(self.user)
 
     def test_create_partim_form_when_user_not_logged(self):

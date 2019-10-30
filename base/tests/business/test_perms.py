@@ -584,6 +584,25 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         cls.academic_years[LEARNING_UNIT_CREATION_SPAN_YEARS] = cls.current_acy
         cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
 
+        AcademicCalendarFactory(
+            data_year=cls.current_acy,
+            start_date=datetime.datetime(cls.current_acy.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.current_acy.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+        AcademicCalendarFactory(
+            data_year=AcademicYear.objects.get(year=cls.current_acy.year + 1),
+            start_date=datetime.datetime(cls.current_acy.year - 1, 9, 15),
+            end_date=datetime.datetime(cls.current_acy.year + 2, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+        AcademicCalendarFactory(
+            data_year=AcademicYear.objects.get(year=cls.current_acy.year + 2),
+            start_date=datetime.datetime(cls.current_acy.year, 9, 15),
+            end_date=datetime.datetime(cls.current_acy.year + 3, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+
         cls.faculty_manager = FacultyManagerFactory()
         cls.central_manager = CentralManagerFactory()
         cls.faculty_manager_for_ue = UEFacultyManagerFactory()
