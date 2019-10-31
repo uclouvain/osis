@@ -1351,10 +1351,8 @@ msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
 
-#, fuzzy
-#| msgid "Learning unit %(acronym)s successfully updated."
 msgid "Learning achievement content has been successfully saved"
-msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
+msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
@@ -1827,10 +1825,8 @@ msgstr "Ouverture aux adultes"
 msgid "Operation"
 msgstr "Opération"
 
-#, fuzzy
-#| msgid "The administrative data has been successfully modified"
 msgid "Operation on learning achievement has been successfully completed"
-msgstr "Les données administratives ont été sauvées avec succès"
+msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
 
 msgid "Option"
 msgstr "Option"
@@ -2293,10 +2289,8 @@ msgstr "Enregistrer"
 msgid "Save and do not postpone changes"
 msgstr ""
 
-#, fuzzy
-#| msgid "date and time"
 msgid "Save and postpone"
-msgstr "Date et heure"
+msgstr "Enregistrer et reporter"
 
 msgid "Save and postpone changes on next years"
 msgstr ""
@@ -2502,10 +2496,8 @@ msgstr "Essai"
 msgid "The"
 msgstr "Le"
 
-#, fuzzy, python-format
-#| msgid "The administrative data has been successfully modified"
 msgid "The '%(field)s' field content has been successfully saved"
-msgstr "Les données administratives ont été sauvées avec succès"
+msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
