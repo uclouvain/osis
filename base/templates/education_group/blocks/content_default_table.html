@@ -68,6 +68,9 @@
             <td style="width:11%">{{ group.comment | default_if_none:'-' }}</td>
             <td style="width:11%">{{ group.comment_english | default_if_none:'-' }}</td>
 
+            <td style="width:10%">
+                {% include "education_group/blocks/content_actions.html" %}
+            </td>
         </tr>
         {% with nb_col_spanned=10 %}
             <tr>
