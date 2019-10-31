@@ -54,9 +54,8 @@ class Command(BaseCommand):
         app_name_aliases = {
             'part': 'partnership',
         }
-        app_name = ws_title.split('.')[0]
+        app_name, model_name = ws_title.split('.')
         app_name = app_name_aliases.get(app_name) or app_name
-        model_name = ws_title.split('.')[1]
         print()
         print('Working on {}...'.format(ws_title))
         return apps.get_model(app_name, model_name)
