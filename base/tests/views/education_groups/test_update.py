@@ -169,7 +169,7 @@ class TestUpdate(TestCase):
         )
         PersonEntityFactory(person=self.person, entity=self.training_education_group_year.management_entity)
 
-        self.domains = [DomainFactory() for x in range(10)]
+        self.domains = [DomainFactory() for _ in range(10)]
 
         self.a_mini_training_education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.MINI_TRAINING)
@@ -229,6 +229,8 @@ class TestUpdate(TestCase):
             'main_teaching_campus': "",
             'academic_year': self.education_group_year.academic_year.pk,
             "constraint_type": "",
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.url, data=data)
 
@@ -317,6 +319,8 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
             'form-INITIAL_FORMS': 0,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.training_url, data=data)
         self.assertEqual(response.status_code, 302)
@@ -366,7 +370,9 @@ class TestUpdate(TestCase):
             'form-INITIAL_FORMS': 0,
             'form-0-country': address.country.pk,
             'form-0-organization': organization.pk,
-            'form-0-diploma': diploma_choice
+            'form-0-diploma': diploma_choice,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
 
         url = reverse(update_education_group, args=[egy.pk, egy.pk])
@@ -418,7 +424,9 @@ class TestUpdate(TestCase):
             'form-0-organization': orga.pk,
             'form-0-diploma': diploma_choice,
             'form-0-DELETE': 'on',
-            'form-0-id': egy_organization.pk
+            'form-0-id': egy_organization.pk,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
 
         url = reverse(update_education_group, args=[egy.pk, egy.pk])
@@ -454,6 +462,8 @@ class TestUpdate(TestCase):
             "start_year": self.academic_year_2010,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.mini_training_url, data=data)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
@@ -491,6 +501,8 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
             'form-INITIAL_FORMS': 0,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.training_url, data=data)
         messages = [m.message for m in get_messages(response.wsgi_request)]
@@ -803,7 +815,7 @@ class TestSelectAttach(TestCase):
         ).exists()
         self.assertFalse(expected_absent_group_element_year)
 
-        data_cached = ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
+        ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
 
         response = self.client.post(
             reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),
