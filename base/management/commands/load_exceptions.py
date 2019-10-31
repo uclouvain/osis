@@ -68,7 +68,7 @@ class Command(BaseCommand):
         object_dict_with_relations = {
             fk_field_name: self._convert_boolean_cell_value(value_as_obj)
             for fk_field_name, value_as_obj in [
-                self._find_object_trough_foreign_keys(model_class, col_name, value)
+                self._find_object_through_foreign_keys(model_class, col_name, value)
                 for col_name, value in object_as_dict.items()
             ]
         }
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             return False
         return value
 
-    def _find_object_trough_foreign_keys(self, model_class, col_name, value, recur=0) -> object:
+    def _find_object_through_foreign_keys(self, model_class, col_name, value, recur=0) -> object:
         foreign_key_field = col_name
         if '__' in col_name:
             splitted_col_name = col_name.split('__')
@@ -108,7 +108,7 @@ class Command(BaseCommand):
             if foreign_key_field in [f.name for f in model_class._meta.fields]:
                 field = model_class._meta.get_field(foreign_key_field)
                 if field.is_relation:
-                    _, related_obj = self._find_object_trough_foreign_keys(
+                    _, related_obj = self._find_object_through_foreign_keys(
                         field.related_model,
                         '__'.join(splitted_col_name[1:]),
                         value,
