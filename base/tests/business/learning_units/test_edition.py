@@ -406,7 +406,7 @@ class LearningUnitEditionTestCase(TestCase):
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
-                                      'component_type': _(learning_component_year_type.LECTURING),
+                                      'component_type': _(learning_component_year_type.LECTURING.title()),
                                       'year': self.learning_container_year.academic_year,
                                       'value': test.get('value'),
                                       'next_year': another_learning_container_year.academic_year,
