@@ -30,13 +30,6 @@
 <form method="post" id="UpdateMiniTrainingForm"
       class="education_group_form"
       data-validate-url="
-
-
-
-
-
-
-
               {% if educatoin_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
