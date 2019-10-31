@@ -80,8 +80,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         elif initial.get("campus"):
             self.fields["country_external_institution"].initial = initial["campus"].organization.country and\
                                                                   initial["campus"].organization.country.pk
-        if not instance:
-            self.data['acronym_0'] = LearningUnitExternalSite.E.value
+
+        self.data['acronym_0'] = LearningUnitExternalSite.E.value
 
         if not self.instance.pk:
             self.fields['academic_year'].queryset = AcademicYear.objects.filter(
