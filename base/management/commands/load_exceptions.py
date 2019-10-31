@@ -28,6 +28,9 @@ from openpyxl import load_workbook
 from django.apps import apps
 
 
+NATURAL_KEY_IDENTIFIER = '**'
+
+
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
@@ -72,12 +75,12 @@ class Command(BaseCommand):
         unique_values = {
             self._clean_header_from_special_chars(col_name): value
             for col_name, value in object_dict_with_relations.items()
-            if '**' in col_name
+            if NATURAL_KEY_IDENTIFIER in col_name
         }
         defaults = {
             col_name: value
             for col_name, value in object_dict_with_relations.items()
-            if '**' not in col_name
+            if NATURAL_KEY_IDENTIFIER not in col_name
         }
         obj, created = model_class.objects.update_or_create(**unique_values, defaults=defaults)
         print('    SUCCESS : Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
@@ -87,7 +90,7 @@ class Command(BaseCommand):
     def _clean_header_from_special_chars(header):
         """Special chars are used to know if the field compose the unique constraint for update_or_create"""
         # FIXME :: should use the natural_key when Osis-portal will be removed (actually using UUID as natural key)
-        return header.replace("**", "")
+        return header.replace(NATURAL_KEY_IDENTIFIER, "")
 
     @staticmethod
     def _convert_boolean_cell_value(value):
