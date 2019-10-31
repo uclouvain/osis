@@ -5509,7 +5509,7 @@ msgstr ""
 msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
-"Vous n'êtes pas autorisé de copier le contenu de ce type d'organisation de "
+"Vous n'êtes pas autorisé à copier le contenu de ce type d'organisation de "
 "formation."
 
 #: models/group_element_year.py:265
