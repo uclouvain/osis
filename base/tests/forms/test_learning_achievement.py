@@ -40,24 +40,36 @@ class TestLearningAchievementForm(TestCase):
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year()
         )
-
-    def test_should_raise_validation_error_case_existing_code(self):
-        LearningAchievementFactory(
+        self.learning_achievement = LearningAchievementFactory(
             learning_unit_year=self.learning_unit_year,
             language=self.language_fr,
             code_name='TEST'
         )
 
+    def test_should_not_raise_validation_error_case_update_same_achievement(self):
+        text = 'text_edited'
         data = {
-            'code_name': 'TEST',
-            'lua_fr_id': 1,
-            'lua_en_id': 2
+            'code_name': self.learning_achievement.code_name,
+            'postpone': 0,
+            'text_fr': text,
         }
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
-            data=data
+            data=data,
+            code=self.learning_achievement.code_name
         )
-        form.load_initial()
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertTrue(self.learning_achievement.text, text)
+
+    def test_should_raise_validation_error_case_existing_code(self):
+        data = {
+            'code_name': self.learning_achievement.code_name,
+            'postpone': 0,
+        }
+        form = LearningAchievementEditForm(
+            luy=self.learning_unit_year,
+            data=data,
+        )
         self.assertFalse(form.is_valid(), form.errors)
         self.assertDictEqual(
             form.errors,

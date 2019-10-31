@@ -128,7 +128,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             entity_type=entity_type.SCHOOL,
             parent=self.requirement_entity_version.entity
         )
-        another_learning_unit_year = LearningUnitYearFactory(
+        LearningUnitYearFactory(
             acronym="LDROI1500",
             academic_year=self.academic_year,
             learning_container_year__academic_year=self.academic_year,
@@ -164,14 +164,12 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         now = datetime.datetime.now()
+        cls.academic_years = AcademicYearFactory.produce(number_past=5, number_future=5)
 
-        cls.academic_year = create_current_academic_year()
-        cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
-        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.previous_academic_year = GenerateAcademicYear(
-            cls.old_academic_year,
-            cls.old_academic_year
-        ).academic_years[0]
+        cls.academic_year = cls.academic_years[5]
+        cls.old_academic_year = cls.academic_years[4]
+        cls.next_academic_year = cls.academic_years[5]
+        cls.previous_academic_year = cls.academic_years[4]
         AcademicCalendarFactory(
             academic_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
@@ -226,21 +224,21 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         self.client.force_login(self.faculty_person.user)
 
     def test_learning_units_summary_list_by_client_xls(self):
-        bibliography = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='bibliography'),
             entity=LEARNING_UNIT_YEAR,
             text="<ul><li>Test</li></ul>",
             reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='fr-be'
         )
-        online_resources = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL</a>",
             reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='fr-be'
         )
-        online_resources_en = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL EN</a>",

@@ -91,7 +91,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LearningUnitDetailed'
+                oneOf:
+                  - $ref: '#/components/schemas/LearningUnitDetailed'
+                  - $ref: '#/components/schemas/ExternalLearningUnit'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -321,6 +323,44 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - learning_units
+  /learning_units/{year}/{acronym}/teaching_materials:
+    get:
+      description: Return all teaching materials of the learning unit
+      operationId: learningunitteachingmaterials_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitTeachingMaterial'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
 components:
   securitySchemes:
     Token:
@@ -391,8 +431,6 @@ components:
             credits:
               type: number
               multipleOf: 0.01
-            status:
-              type: boolean
             quadrimester:
               $ref: '#/components/schemas/QuadrimesterEnum'
             quadrimester_text:
@@ -432,6 +470,16 @@ components:
                   type: string
             summary_status:
               type: string
+    ExternalLearningUnit:
+      allOf:
+        - $ref: '#/components/schemas/LearningUnitDetailed'
+        - type: object
+          properties:
+            local_code:
+              type: string
+            local_url:
+              type: string
+              format: uri
     LearningUnitComponent:
       type: object
       properties:
@@ -537,7 +585,7 @@ components:
           type: string
         other_informations:
           type: string
-        online_ressources:
+        online_resources:
           type: string
         teaching_methods:
           type: string
@@ -552,7 +600,7 @@ components:
         - resume
         - evaluation_methods
         - other_informations
-        - online_ressources
+        - online_resources
         - teaching_methods
         - themes_discussed
         - prerequisite
@@ -577,6 +625,15 @@ components:
           type: integer
         prerequisites:
           type: string
+    LearningUnitTeachingMaterial:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          mandatory:
+            type: boolean
     LearningUnitTypeEnum:
       type: string
       enum:
@@ -694,6 +751,11 @@ components:
         - MASTER_M1
         - MASTER_MC
         - INTERNSHIP
+        - DEEPENING
+        - SOCIETY_MINOR
+        - ACCESS_MINOR
+        - OPEN_MINOR
+        - DISCIPLINARY_COMPLEMENT_MINOR
     Error:
       type: object
       properties:

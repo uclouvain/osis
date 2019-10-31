@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-21 13:56+0200\n"
+"POT-Creation-Date: 2019-10-30 14:45+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1127,10 +1127,10 @@ msgid "Generate pdf"
 msgstr "Générer le pdf"
 
 msgid "Generate xls of learning units that are prerequisites for"
-msgstr "Générer xls des cours qui sont des prérequis"
+msgstr "Liste des UE qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
-msgstr "Générer xls des cours qui ont des prérequis"
+msgstr "Liste des UE qui ont des prérequis"
 
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
@@ -1347,6 +1347,11 @@ msgid ""
 msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
+
+#, fuzzy
+#| msgid "Learning unit %(acronym)s successfully updated."
+msgid "Learning achievement content has been successfully saved"
+msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
@@ -1819,6 +1824,11 @@ msgstr "Ouverture aux adultes"
 msgid "Operation"
 msgstr "Opération"
 
+#, fuzzy
+#| msgid "The administrative data has been successfully modified"
+msgid "Operation on learning achievement has been successfully completed"
+msgstr "Les données administratives ont été sauvées avec succès"
+
 msgid "Option"
 msgstr "Option"
 
@@ -1971,6 +1981,11 @@ msgstr "Pôle"
 
 msgid "Postal code"
 msgstr "Code postal"
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
+msgstr ""
 
 msgid "Practical exercises"
 msgstr "Partie pratique"
@@ -2272,6 +2287,17 @@ msgstr "Commande SQL"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Save and do not postpone changes"
+msgstr ""
+
+#, fuzzy
+#| msgid "date and time"
+msgid "Save and postpone"
+msgstr "Date et heure"
+
+msgid "Save and postpone changes on next years"
+msgstr ""
+
 msgid "Schedule type"
 msgstr "Type horaire"
 
@@ -2472,6 +2498,11 @@ msgstr "Essai"
 
 msgid "The"
 msgstr "Le"
+
+#, fuzzy, python-format
+#| msgid "The administrative data has been successfully modified"
+msgid "The '%(field)s' field content has been successfully saved"
+msgstr "Les données administratives ont été sauvées avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
@@ -3257,6 +3288,10 @@ msgstr "accords"
 
 msgid "aim number"
 msgstr "numéro de l'attendu"
+
+#, python-format
+msgid "and postponed until %(year)s"
+msgstr ""
 
 msgid "at"
 msgstr "à"

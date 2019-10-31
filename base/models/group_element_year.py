@@ -165,7 +165,7 @@ class GroupElementYear(OrderedModel):
     )
 
     is_mandatory = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_("Mandatory"),
     )
 

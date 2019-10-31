@@ -29,6 +29,7 @@
       id="UpdateGroupForm"
       class="education_group_form"
       data-validate-url="
+
               {% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
@@ -117,10 +118,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="tab_content"
-                 class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
-                {% include "education_group/blocks/form/training_tab_content.html" %}
+                <div id="tab_content"
+                     class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
+                    {% include "education_group/blocks/form/training_tab_content.html" %}
+                </div>
             </div>
         </div>
         <div class="panel-footer text-right">
@@ -133,10 +134,10 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        let tab_identification = document.getElementById('tab_identification');
-        let tab_content = document.getElementById('tab_content');
-        let spn_identification_errors = $("#spn_identification_errors");
-        let spn_content_errors = $("#spn_content_errors");
+        var tab_identification = document.getElementById('tab_identification');
+        var tab_content = document.getElementById('tab_content');
+        var spn_identification_errors = $("#spn_identification_errors");
+        var spn_content_errors = $("#spn_content_errors");
         spn_identification_errors.empty();
         spn_content_errors.empty();
         if (tab_identification.getElementsByClassName('has-error').length > 0) {
@@ -148,5 +149,4 @@
             spn_content_errors.append('<i class="fa fa-circle" aria-hidden="true"></i>');
         }
     });
-
 </script>

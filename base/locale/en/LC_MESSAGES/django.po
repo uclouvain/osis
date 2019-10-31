@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-21 13:56+0200\n"
+"POT-Creation-Date: 2019-10-30 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1298,6 +1298,9 @@ msgid ""
 "successfuly created."
 msgstr ""
 
+msgid "Learning achievement content has been successfully saved"
+msgstr ""
+
 msgid "Learning achievements"
 msgstr ""
 
@@ -1753,6 +1756,9 @@ msgstr ""
 msgid "Operation"
 msgstr ""
 
+msgid "Operation on learning achievement has been successfully completed"
+msgstr ""
+
 msgid "Option"
 msgstr ""
 
@@ -1900,6 +1906,11 @@ msgid "Pole"
 msgstr ""
 
 msgid "Postal code"
+msgstr ""
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
 msgstr ""
 
 msgid "Practical exercises"
@@ -2196,6 +2207,15 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Save and do not postpone changes"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr ""
+
+msgid "Save and postpone changes on next years"
+msgstr ""
+
 msgid "Schedule type"
 msgstr ""
 
@@ -2395,6 +2415,10 @@ msgid "Testing"
 msgstr ""
 
 msgid "The"
+msgstr ""
+
+#, python-format
+msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
 
 msgid "The acronym <b>already exists</b>."
@@ -3089,6 +3113,10 @@ msgid "agreements"
 msgstr ""
 
 msgid "aim number"
+msgstr ""
+
+#, python-format
+msgid "and postponed until %(year)s"
 msgstr ""
 
 msgid "at"

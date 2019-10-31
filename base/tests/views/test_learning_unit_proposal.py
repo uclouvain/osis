@@ -84,6 +84,7 @@ LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
@@ -258,6 +259,7 @@ class TestLearningUnitModificationProposal(TestCase):
 class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
@@ -349,6 +351,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
 class TestLearningUnitProposalSearch(TestCase):
     def setUp(self):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         self.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         ac_years = AcademicYearFactory.produce_in_future(quantity=3)
         self.an_entity = EntityFactory()
@@ -398,6 +401,7 @@ class TestLearningUnitProposalSearch(TestCase):
 class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
+        AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
@@ -449,7 +453,7 @@ class TestGroupActionsOnProposals(TestCase):
             "action": ACTION_FORCE_STATE,
             "selected_action": [self.proposals[0].learning_unit_year.acronym]
         }
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         self.assertFalse(mock_force_state.called)
 
@@ -871,6 +875,12 @@ class TestLearningUnitProposalDisplay(TestCase):
         end_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year, end_year=end_year)
         cls.l_container_year_with_entities = cls.generator_learning_container.generated_container_years[0]
+        organization_main = OrganizationFactory(type=organization_type.MAIN)
+        cls.entity_from_main_organization = EntityFactory(organization=organization_main)
+        cls.entity_version = EntityVersionFactory(entity=cls.entity_from_main_organization)
+        organization_not_main = OrganizationFactory(type=organization_type.ACADEMIC_PARTNER)
+        cls.entity_from_not_main_organization = EntityFactory(organization=organization_not_main)
+        cls.entity_version_not_main = EntityVersionFactory(entity=cls.entity_from_not_main_organization)
 
     def test_is_foreign_key(self):
         current_data = {"language{}".format(proposal_business.END_FOREIGN_KEY_NAME): self.language_it.pk}
@@ -945,6 +955,16 @@ class TestLearningUnitProposalDisplay(TestCase):
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)
         self.assertEqual(differences, str(self.language_it))
+
+    def test_get_old_value_of_foreign_key_for_additional_requirement_entity_main_organization(self):
+        differences = proposal_business._get_old_value_of_foreign_key('ADDITIONAL_REQUIREMENT_ENTITY_1',
+                                                                      self.entity_from_main_organization.pk)
+        self.assertEqual(differences, str(self.entity_from_main_organization.most_recent_entity_version.acronym))
+
+    def test_get_old_value_of_foreign_key_for_additional_requirement_entity_not_main_organization(self):
+        differences = proposal_business._get_old_value_of_foreign_key('ADDITIONAL_REQUIREMENT_ENTITY_1',
+                                                                      self.entity_from_not_main_organization.pk)
+        self.assertEqual(differences, str(self.entity_from_not_main_organization.most_recent_entity_version.title))
 
     def test_get_status_initial_value(self):
         self.assertEqual(proposal_business._get_status_initial_value(True),

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,12 +24,9 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse
+from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
 from base.models.education_group_year import EducationGroupYear
@@ -37,16 +34,9 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from base.utils.cache import ElementCache
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages
+from base.views.common import display_success_messages
 from base.views.education_groups import perms
-from base.views.education_groups.detail import EducationGroupGenericDetailView
-from base.views.education_groups.perms import can_change_education_group
 from base.views.education_groups.select import build_success_message, build_success_json_response
-from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
-from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError
-from program_management.forms.group_element_year import GroupElementYearForm
-from program_management.views.group_element_year import perms as group_element_year_perms
-from program_management.views.group_element_year.common import GenericGroupElementYearMixin
 
 
 @login_required
@@ -136,64 +126,3 @@ def _get_action_method(request):
     if action not in available_actions.keys():
         raise AttributeError('Action should be {}'.format(','.join(available_actions.keys())))
     return available_actions[action]
-
-
-class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
-    # UpdateView
-    form_class = GroupElementYearForm
-    template_name = "group_element_year/group_element_year_comment_inner.html"
-
-    rules = [group_element_year_perms.can_update_group_element_year]
-
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_object())
-
-    # SuccessMessageMixin
-    def get_success_message(self, cleaned_data):
-        return _("The link of %(acronym)s has been updated") % {'acronym': self.object.child}
-
-    def get_success_url(self):
-        # We can just reload the page
-        return
-
-
-class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, EducationGroupGenericDetailView):
-    template_name = "group_element_year/confirm_postpone_content_inner.html"
-
-    # FlagMixin
-    flag = "education_group_update"
-
-    # RulesRequiredMixin
-    rules = [can_change_education_group]
-
-    with_tree = False
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["warning_message"] = _("Are you sure you want to postpone the content in %(root)s?") % {
-            "root": self.root
-        }
-        return context
-
-    def post(self, request, **kwargs):
-        try:
-            postponer = PostponeContent(self.root.previous_year())
-            postponer.postpone()
-            success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
-                'count_elements': postponer.number_elements_created,
-                'count_links': postponer.number_links_created
-            }
-            display_success_messages(request, success)
-            display_warning_messages(request, postponer.warnings)
-
-        except NotPostponeError as e:
-            display_error_messages(request, str(e))
-
-        return JsonResponse({
-            'success_url': reverse(
-                "education_group_read",
-                args=[
-                    kwargs["root_id"],
-                    kwargs["education_group_year_id"]
-                ]
-            )})

@@ -26,51 +26,51 @@
 from django.conf.urls import url
 from django.urls import include
 
-from program_management.views.excel import get_learning_unit_prerequisites_excel, \
-    get_learning_units_is_prerequisite_for_excel
-from program_management.views.group_element_year import update, create, delete, read
-from program_management.views.learning_unit import detail as learning_unit_detail, update as learning_unit_update
+from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
+    groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
+    groupelementyear_management, excel
 
 urlpatterns = [
-    url(r'^management/$', update.management, name='education_groups_management'),
+    url(r'^management/$', groupelementyear_management.management, name='education_groups_management'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
-            url(u'^attach/', create.AttachTypeDialogView.as_view(),
+            url(u'^attach/', groupelementyear_create.AttachTypeDialogView.as_view(),
                 name='education_group_attach'),
-            url(u'^create/$', create.CreateGroupElementYearView.as_view(),
+            url(u'^create/$', groupelementyear_create.CreateGroupElementYearView.as_view(),
                 name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
-                url(r'^delete/$', delete.DetachGroupElementYearView.as_view(),
+                url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
-                url(r'^move/$', create.MoveGroupElementYearView.as_view(),
+                url(r'^move/$', groupelementyear_create.MoveGroupElementYearView.as_view(),
                     name='group_element_year_move'),
-                url(r'^update/$', update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_update"),
+                url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
+                    name="group_element_year_update")
             ]))
         ])),
-        url(r'^group_content/', read.ReadEducationGroupTypeView.as_view(), name="group_content"),
-        url(r'^pdf_content/(?P<language>[a-z\-]+)', read.pdf_content, name="pdf_content"),
-        url(r'^postpone/', update.PostponeGroupElementYearView.as_view(), name="postpone_education_group"),
+        url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
+        url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
+        url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
+            name="postpone_education_group"),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
-            learning_unit_detail.LearningUnitUtilization.as_view(),
+            element_utilization.LearningUnitUtilization.as_view(),
             name='learning_unit_utilization'),
         url(r'^prerequisite/$',
-            learning_unit_detail.LearningUnitPrerequisite.as_view(),
+            prerequisite_read.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite'),
         url(r'^prerequisite/update/$',
-            learning_unit_update.LearningUnitPrerequisite.as_view(),
+            prerequisite_update.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite_update'),
     ])),
     url(
         r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
-        get_learning_unit_prerequisites_excel,
+        excel.get_learning_unit_prerequisites_excel,
         name="education_group_learning_units_prerequisites"
     ),
     url(
         r'reporting/(?P<education_group_year_pk>[0-9]+)/is_prerequisite_of/$',
-        get_learning_units_is_prerequisite_for_excel,
+        excel.get_learning_units_is_prerequisite_for_excel,
         name="education_group_learning_units_is_prerequisite_for"
     )
 ]

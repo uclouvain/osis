@@ -39,7 +39,7 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from program_management.views.group_element_year.perms import can_update_group_element_year, \
+from program_management.views.perms import can_update_group_element_year, \
     can_detach_group_element_year
 
 

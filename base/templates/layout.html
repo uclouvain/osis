@@ -72,6 +72,7 @@
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/spinner.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/prepareXls.js' %}"></script>
     <script>
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
         $.widget.bridge('uibutton', $.ui.button);
@@ -141,7 +142,7 @@
 
 {% if subject %}
     <div class="container-fluid p0-50">
-        <div class="alert alert-warning" role="alert"><b>{{ subject|safe }}</b><br>{{ notice|safe }}</div>
+        <div class="alert alert-warning" role="alert"><strong>{{ subject|safe }}</strong><br>{{ notice|safe }}</div>
     </div>
 {% endif %}
 

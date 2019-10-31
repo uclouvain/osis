@@ -60,7 +60,8 @@ STYLE_FONT_RED = Style(font=Font(color=RED))
 STYLE_FONT_GREEN = Style(font=Font(color=GREEN))
 FONT_HYPERLINK = Font(underline='single', color='0563C1')
 
-HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title'])
+HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title', 'code_header', 'title_header', 'credits_header',
+                                       'block_header', 'mandatory_header'])
 OfficialTextLine = namedtuple('OfficialTextLine', ['text'])
 LearningUnitYearLine = namedtuple('LearningUnitYearLine', ['luy_acronym', 'luy_title'])
 PrerequisiteItemLine = namedtuple(
@@ -128,6 +129,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
 
 def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet):
     worksheet_title = _("prerequisites-%(year)s-%(acronym)s") % {"year": egy.academic_year.year, "acronym": egy.acronym}
+    worksheet_title = _clean_worksheet_title(worksheet_title)
     workbook = Workbook(encoding='utf-8')
 
     excel_lines = _build_excel_lines(egy, prerequisites_qs)
@@ -136,7 +138,15 @@ def generate_prerequisites_workbook(egy: EducationGroupYear, prerequisites_qs: Q
 
 
 def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
-    content = _first_line_content(HeaderLine(egy_acronym=egy.acronym, egy_title=egy.title))
+    content = _first_line_content(
+        HeaderLine(egy_acronym=egy.acronym,
+                   egy_title=egy.title,
+                   code_header=_('Code'),
+                   title_header=_('Title'),
+                   credits_header=_('Cred. rel./abs.'),
+                   block_header=_('Block'),
+                   mandatory_header=_('Mandatory'))
+    )
 
     for prerequisite in prerequisite_qs:
         luy = prerequisite.learning_unit_year
@@ -155,7 +165,7 @@ def _build_excel_lines(egy: EducationGroupYear, prerequisite_qs: QuerySet):
 
 
 def _first_line_content(header_line):
-    content = []
+    content = list()
     content.append(
         header_line
     )
@@ -224,6 +234,11 @@ def _get_style_to_apply(excel_lines: list):
         if isinstance(row, HeaderLine):
             style_to_apply_dict[STYLE_NO_GRAY].append("A{index}".format(index=index))
             style_to_apply_dict[STYLE_NO_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("C{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("D{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("E{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("F{index}".format(index=index))
+            style_to_apply_dict[STYLE_NO_GRAY].append("G{index}".format(index=index))
 
         elif isinstance(row, OfficialTextLine):
             style_to_apply_dict[STYLE_BORDER_BOTTOM].append("A{index}".format(index=index))
@@ -264,8 +279,6 @@ def _get_style_to_apply(excel_lines: list):
 def _merge_cells(excel_lines, workbook: Workbook, end_column):
     worksheet = workbook.worksheets[0]
     for index, row in enumerate(excel_lines, 1):
-        if isinstance(row, HeaderLine):
-            worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=end_column)
         if isinstance(row, LearningUnitYearLine):
             worksheet.merge_cells(start_row=index, end_row=index, start_column=2, end_column=end_column)
 
@@ -332,10 +345,9 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
 
 def generate_ue_is_prerequisite_for_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet,
                                              learning_unit_years_parent):
-    # Max 31 characters in worksheet_title "{} - {}".format(current_worksheet_num, worksheet_titles)
     worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {"year": egy.academic_year.year,
                                                                       "acronym": egy.acronym}
-    worksheet_title = worksheet_title[:25]
+    worksheet_title = _clean_worksheet_title(worksheet_title)
     workbook = Workbook()
 
     excel_lines = _build_excel_lines_prerequisited(
@@ -428,3 +440,8 @@ def _get_blocks_prerequisite_of(gey):
             block_in_array
         )
     return ''
+
+
+def _clean_worksheet_title(title):
+    # Worksheet title is max 25 chars (31 chars with sheet number) + does not accept slash present in acronyms
+    return title[:25].replace("/", "_")

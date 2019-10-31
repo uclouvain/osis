@@ -31,8 +31,9 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from program_management.business.group_element_years.management import _compute_number_children_by_education_group_type, \
-    CheckAuthorizedRelationshipDetach, CheckAuthorizedRelationshipAttach
+from program_management.business.group_element_years.management import \
+    _compute_number_children_by_education_group_type, CheckAuthorizedRelationshipDetach, \
+    CheckAuthorizedRelationshipAttach
 
 
 class TestAuthorizedRelationshipCheck(TestCase):
@@ -112,6 +113,14 @@ class TestAuthorizedRelationshipCheck(TestCase):
             link_to_attach=link_to_attach
         )
         self.assertFalse(check.is_valid())
+
+    def test_when_update_an_existing_instance(self):
+        link_to_attach = self.grp_type_1
+        check = CheckAuthorizedRelationshipAttach(
+            self.parent_egy,
+            link_to_attach=link_to_attach
+        )
+        self.assertTrue(check.is_valid())
 
     def test_when_child_not_authorized_for_attach(self):
         link_to_attach = GroupElementYearFactory.build(
