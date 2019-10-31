@@ -30,6 +30,11 @@ from django.apps import apps
 
 NATURAL_KEY_IDENTIFIER = '**'
 
+# Need to use aliases because worksheet title is limited to max 31 chars
+APP_NAME_ALIASES = {
+    'part': 'partnership',
+}
+
 
 class Command(BaseCommand):
 
@@ -50,12 +55,8 @@ class Command(BaseCommand):
     @staticmethod
     def _get_model_class_from_worksheet_title(xls_worksheet):
         ws_title = xls_worksheet.title
-        # Need to use alias because worksheet title is limited to max 31 chars
-        app_name_aliases = {
-            'part': 'partnership',
-        }
         app_name, model_name = ws_title.split('.')
-        app_name = app_name_aliases.get(app_name) or app_name
+        app_name = APP_NAME_ALIASES.get(app_name, app_name)
         print()
         print('Working on {}...'.format(ws_title))
         return apps.get_model(app_name, model_name)
