@@ -26,7 +26,6 @@
 {{ group_element_years.management_form }}
 {{ group_element_years.media }}
 <div class="panel panel-default">
-
     {# We do not display the form if those are warnings or errors #}
     {% if not messages %}
         <div class="panel-body" id="div_tab_content" data-formset-prefix="{{ group_element_years.prefix }}">
@@ -72,7 +71,6 @@
                                 </td>
                             {% endif %}
                         {% endwith %}
-
                         <td style="width:5%">
                             {% if formset.is_mandatory %}
                                 {% bootstrap_field formset.is_mandatory show_label=False %}
@@ -82,28 +80,23 @@
                         <td style="width:6%">
                             {% bootstrap_field formset.block show_label=False %}
                         </td>
-
                         <td style="width:10%">
                             {% if formset.link_type %}
                                 {% bootstrap_field formset.link_type show_label=False %}
                             {% endif %}
                         </td>
-                        <td style="width:20%">
+                        <td style="width:22%">
                             {% if formset.comment %}
                                 {% bootstrap_field formset.comment show_label=False %}
                             {% endif %}
                         </td>
-                        <td style="width:20%">
+                        <td style="width:22%">
                             {% if formset.link_type %}
                                 {% bootstrap_field formset.comment_english show_label=False %}
                             {% endif %}
                         </td>
-                        <td style="width:4%">
-                            {% if formset.instance.pk %}{{ formset.DELETE }}{% endif %}
-                        </td>
                     </tr>
                 {% endfor %}
-
                 </tbody>
             </table>
         </div>
@@ -118,7 +111,6 @@
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <script>
     $('.link-formset').formset({
-        deleteText: '<span class="fas fa-trash-alt" title={% trans "Detach" %}></span>',
         prefix: '{{ group_element_years.prefix }}',
         addText: ''
     });

@@ -136,5 +136,4 @@ GroupElementYearFormset = modelformset_factory(
     model=GroupElementYear,
     form=GroupElementYearForm,
     extra=0,
-    can_delete=True
 )

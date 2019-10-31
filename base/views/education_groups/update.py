@@ -220,14 +220,6 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
             return _common_success_redirect(request, form_education_group_year, root)
     else:
         if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
-            # groupelementyear_formset.save(commit=False)
-            # for obj in groupelementyear_formset.deleted_forms:
-            #     instance = obj.instance
-            #     strategy_class = DetachEducationGroupYearStrategy if instance.child_branch else DetachLearningUnitYearStrategy
-            #     temp = strategy_class(instance)
-            #     if not temp.is_valid():
-            #         return JsonResponse({"error": True})
-            #     temp.post_valid()
             for form in groupelementyear_formset:
                 form.save()
             return _common_success_redirect(request, form_education_group_year, root)

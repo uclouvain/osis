@@ -58,7 +58,7 @@
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-md-6">
-                                {% bootstrap_label form_education_group_year.acronym.label %}<b>*</b>
+                                {% bootstrap_label form_education_group_year.acronym.label %}<strong>*</strong>
                                 <abbr title="{{ form_education_group_year.acronym.help_text | safe }}"
                                       data-toggle='tooltip' data-html='true'>
                                     <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
@@ -66,7 +66,7 @@
                                 {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
                             </div>
                             <div class="col-md-6">
-                                {% bootstrap_label form_education_group_year.partial_acronym.label %}<b>*</b>
+                                {% bootstrap_label form_education_group_year.partial_acronym.label %}<strong>*</strong>
                                 <abbr title="{{ form_education_group_year.partial_acronym.help_text | safe }}"
                                       data-toggle='tooltip' data-html='true'>
                                     <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
@@ -205,6 +205,6 @@
 
     <div id="tab_content"
          class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
-        {% include "education_group/blocks/form/group_element_year_comment_inner.html" %}
+        {% include "education_group/blocks/form/training_tab_content.html" %}
     </div>
 </div>
