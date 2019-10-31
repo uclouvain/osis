@@ -58,12 +58,13 @@ from program_management.forms.group_element_year import GroupElementYearFormset
 @waffle_flag("education_group_update")
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(
-        EducationGroupYear.objects.prefetch_related(
+        EducationGroupYear.objects.select_related('education_group_type').prefetch_related(
             Prefetch(
                 'groupelementyear_set',
                 queryset=GroupElementYear.objects.select_related(
                     'child_leaf__learning_container_year',
-                    'child_branch'
+                    'child_branch__education_group_type',
+                    'parent__education_group_type'
                 )
             )
         ),
