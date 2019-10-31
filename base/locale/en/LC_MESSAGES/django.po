@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-31 09:02+0100\n"
+"POT-Creation-Date: 2019-10-31 09:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5545,12 +5545,16 @@ msgstr ""
 "Subdivision with one character"
 
 #: templates/education_group/identification_training_details.html:140
-#: templates/education_group/search.html:221 templates/learning_units.html:123
+#: templates/education_group/search.html:221
+#: templates/education_group/tab_content.html:57
+#: templates/learning_units.html:123
 msgid "activate to sort column ascending"
 msgstr ""
 
 #: templates/education_group/identification_training_details.html:141
-#: templates/education_group/search.html:222 templates/learning_units.html:124
+#: templates/education_group/search.html:222
+#: templates/education_group/tab_content.html:58
+#: templates/learning_units.html:124
 msgid "activate to sort column descending"
 msgstr ""
 
@@ -5698,14 +5702,6 @@ msgstr ""
 #: tests/views/education_groups/group_element_year/test_read.py:96
 #: tests/views/education_groups/group_element_year/test_read.py:110
 msgid "credits"
-msgstr ""
-
-#: templates/education_group/tab_content.html:57
-msgid "datatable_sortascending"
-msgstr ""
-
-#: templates/education_group/tab_content.html:58
-msgid "datatable_sortdescending"
 msgstr ""
 
 #: templates/education_group/tab_edit_administrative_data.html:68

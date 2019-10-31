@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-31 09:02+0100\n"
+"POT-Creation-Date: 2019-10-31 09:48+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -5778,12 +5778,16 @@ msgstr ""
 "partie numérique: 4 chiffres"
 
 #: templates/education_group/identification_training_details.html:140
-#: templates/education_group/search.html:221 templates/learning_units.html:123
+#: templates/education_group/search.html:221
+#: templates/education_group/tab_content.html:57
+#: templates/learning_units.html:123
 msgid "activate to sort column ascending"
 msgstr "activer pour trier la colonne par ordre croissant"
 
 #: templates/education_group/identification_training_details.html:141
-#: templates/education_group/search.html:222 templates/learning_units.html:124
+#: templates/education_group/search.html:222
+#: templates/education_group/tab_content.html:58
+#: templates/learning_units.html:124
 msgid "activate to sort column descending"
 msgstr "activer pour trier la colonne par ordre décroissant"
 
@@ -5932,18 +5936,6 @@ msgstr "confirmer"
 #: tests/views/education_groups/group_element_year/test_read.py:110
 msgid "credits"
 msgstr "crédits"
-
-#: templates/education_group/tab_content.html:57
-#, fuzzy
-#| msgid "activate to sort column ascending"
-msgid "datatable_sortascending"
-msgstr "activer pour trier la colonne par ordre croissant"
-
-#: templates/education_group/tab_content.html:58
-#, fuzzy
-#| msgid "activate to sort column descending"
-msgid "datatable_sortdescending"
-msgstr "activer pour trier la colonne par ordre décroissant"
 
 #: templates/education_group/tab_edit_administrative_data.html:68
 msgid "date and time"
