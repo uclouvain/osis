@@ -94,47 +94,14 @@
             },
             { "name": "title", "targets": 3, "data": "title"},
         ];
-        var table = initializeDataTable("form-eg-quick-search", "table-education-group", "educationGroupsLightIds", 1,
+        let $table = initializeDataTable("form-eg-quick-search", "table-education-group", "educationGroupsLightIds", 1,
             10, "{{ quick_search_url }}", columnDefs);
-
-        table.on('draw', function(){
-            $("input[name=selected_item]").each(function(index, element){
-                element.addEventListener('click', function(e){
-                    const url = e.target.getAttribute('data-url');
-                    select_element_from_url(url);
-                })
-            });
-        });
+        $table.on('draw', onDraw);
 
 
-        function select_element_from_url(url){
-            let egy_id = getIdFromUrl(url);
-            console.log("selected");
-        }
-
-        // FIXME This method is copy pasted Refactor
-        function getIdFromUrl(url){
-            let split = url.split("/");
-            for(let i=split.length-1; i--; i >= 0){
-                if(!isNaN(split[i])){
-                    return parseInt(split[i]);
-                }
-            }
-            return NaN;
-        }
-
-        $("#button_attach_modal").click(function() {
-            document.getElementById("modal_dialog_id").classList.add("modal-lg");
-            let root = "{{ root }}";
-            let education_group_year = "{{ education_group_year }}";
-            const url = `/program_management/${root}/${education_group_year}/content/attach/`;
-            $('#form-modal-ajax-content').load(url, function (response, status, xhr) {
-                if (status === "success") {
-                    let form = $(this).find('form').first();
-                    formAjaxSubmit(form, '#form-ajax-modal');
-                }
-
-            });
-        });
+        let root = "{{ root }}";
+        let education_group_year = "{{ education_group_year }}";
+        let url = `/program_management/${root}/${education_group_year}/content/attach/`;
+        $("#button_attach_modal").click(attachModal(url));
     });
 </script>

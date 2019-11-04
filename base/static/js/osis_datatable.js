@@ -44,6 +44,44 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
     });
 }
 
+function select_element_from_url(url){
+    let egy_id = getIdFromUrl(url);
+    console.log("selected");
+}
+
+// FIXME This method is copy pasted Refactor
+function getIdFromUrl(url){
+    let split = url.split("/");
+    for(let i=split.length-1; i--; i >= 0){
+        if(!isNaN(split[i])){
+            return parseInt(split[i]);
+        }
+    }
+    return NaN;
+}
+
+function onDraw(){
+    $("input[name=selected-item]").each(function(index, element){
+        element.addEventListener('click', function(e){
+            const url = e.target.getAttribute('data-url');
+            select_element_from_url(url);
+        })
+    });
+};
+
+function attachModal(url){
+    return function(){
+        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+        $('#form-modal-ajax-content').load(url, function (response, status, xhr) {
+            if (status === "success") {
+                let form = $(this).find('form').first();
+                formAjaxSubmit(form, '#form-ajax-modal');
+            }
+
+        });
+    };
+}
+
 
 function reloadEducationGroupSearchResult(tableId){
     $('#table-education-group').DataTable().ajax.reload();
