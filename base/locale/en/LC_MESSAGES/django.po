@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 08:31+0200\n"
+"POT-Creation-Date: 2019-11-04 11:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -370,9 +370,6 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure to change the state from"
-msgstr ""
-
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr ""
@@ -486,9 +483,6 @@ msgstr ""
 msgid "CAPAES"
 msgstr ""
 
-msgid "Calendar of the annual program"
-msgstr ""
-
 msgid "Campus"
 msgstr ""
 
@@ -542,9 +536,6 @@ msgid "City"
 msgstr ""
 
 msgid "City of institution"
-msgstr ""
-
-msgid "Classe"
 msgstr ""
 
 msgid "Classes"
@@ -639,9 +630,6 @@ msgstr ""
 msgid "Coordinator"
 msgstr ""
 
-msgid "Coorganization"
-msgstr ""
-
 msgid "Copy Reddot data from previous academic year."
 msgstr ""
 
@@ -728,9 +716,6 @@ msgid "Description fiche"
 msgstr ""
 
 msgid "Description fiche status"
-msgstr ""
-
-msgid "Description fiche submission dates updated"
 msgstr ""
 
 msgid "Detach"
@@ -1012,9 +997,6 @@ msgstr ""
 msgid "Fixed-line phone"
 msgstr ""
 
-msgid "Focuses"
-msgstr ""
-
 msgid "Folder"
 msgstr ""
 
@@ -1277,9 +1259,6 @@ msgstr ""
 msgid "Keywords"
 msgstr ""
 
-msgid "LECTURING"
-msgstr ""
-
 msgid "LU"
 msgstr ""
 
@@ -1311,6 +1290,9 @@ msgstr ""
 msgid ""
 "Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfuly created."
+msgstr ""
+
+msgid "Learning achievement content has been successfully saved"
 msgstr ""
 
 msgid "Learning achievements"
@@ -1660,9 +1642,6 @@ msgstr ""
 msgid "No attributions exist for the parent learning unit"
 msgstr ""
 
-msgid "No change made"
-msgstr ""
-
 msgid "No data"
 msgstr ""
 
@@ -1769,6 +1748,9 @@ msgid "Opening to Adults"
 msgstr ""
 
 msgid "Operation"
+msgstr ""
+
+msgid "Operation on learning achievement has been successfully completed"
 msgstr ""
 
 msgid "Option"
@@ -1918,6 +1900,11 @@ msgid "Pole"
 msgstr ""
 
 msgid "Postal code"
+msgstr ""
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
 msgstr ""
 
 msgid "Practical exercises"
@@ -2214,6 +2201,15 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Save and do not postpone changes"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr ""
+
+msgid "Save and postpone changes on next years"
+msgstr ""
+
 msgid "Schedule type"
 msgstr ""
 
@@ -2413,6 +2409,10 @@ msgid "Testing"
 msgstr ""
 
 msgid "The"
+msgstr ""
+
+#, python-format
+msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
 
 msgid "The acronym <b>already exists</b>."
@@ -2725,9 +2725,6 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-msgid "This learning unit is not eligible for proposal creation/modification"
-msgstr ""
-
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
@@ -2859,9 +2856,6 @@ msgstr ""
 msgid "Update for teacher unlocked"
 msgstr ""
 
-msgid "Used by learning unit"
-msgstr ""
-
 msgid "User"
 msgstr ""
 
@@ -2985,9 +2979,6 @@ msgstr ""
 msgid "You are not eligible to cancel proposal"
 msgstr ""
 
-msgid "You are not eligible to consolidate proposal"
-msgstr ""
-
 msgid "You are not eligible to create/modify proposal"
 msgstr ""
 
@@ -3050,6 +3041,9 @@ msgstr ""
 msgid ""
 "You cannot delete a learning unit which is prerequisite or has "
 "prerequisite(s)"
+msgstr ""
+
+msgid "You cannot have a specific summary course submission event."
 msgstr ""
 
 msgid "You don't have the rights to consolidate"
@@ -3116,6 +3110,10 @@ msgid "agreements"
 msgstr ""
 
 msgid "aim number"
+msgstr ""
+
+#, python-format
+msgid "and postponed until %(year)s"
 msgstr ""
 
 msgid "at"
@@ -3420,9 +3418,6 @@ msgid "volume declared vacant"
 msgstr ""
 
 msgid "volume requirement entity"
-msgstr ""
-
-msgid "volume total global"
 msgstr ""
 
 msgid "volume total requirement entities"
