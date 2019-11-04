@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 11:56+0100\n"
+"POT-Creation-Date: 2019-11-04 09:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -718,6 +718,9 @@ msgstr ""
 msgid "Description fiche status"
 msgstr ""
 
+msgid "Description fiche submission dates updated"
+msgstr ""
+
 msgid "Detach"
 msgstr ""
 
@@ -1094,6 +1097,12 @@ msgid "Global ID"
 msgstr ""
 
 msgid "Go"
+msgstr ""
+
+msgid "Go down"
+msgstr ""
+
+msgid "Go up"
 msgstr ""
 
 msgid "Graduates"
@@ -2393,6 +2402,12 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+
 msgid "Teaching profile"
 msgstr ""
 
@@ -2605,6 +2620,15 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The section you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+
+msgid "The section you modified have been saved with success."
+msgstr ""
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2620,6 +2644,18 @@ msgstr ""
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
 "the volume of parent learning unit for this professor"
+msgstr ""
+
+#, python-format
+msgid ""
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+
+msgid "The teaching material has been deleted with success"
+msgstr ""
+
+msgid "The teaching material has been saved with success"
 msgstr ""
 
 msgid "The user cannot modify data which are greater than N+1"
