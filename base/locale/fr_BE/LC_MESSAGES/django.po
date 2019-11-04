@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-29 10:31+0100\n"
+"POT-Creation-Date: 2019-11-04 09:18+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1138,6 +1138,12 @@ msgstr "Matricule FGS"
 msgid "Go"
 msgstr "Continuer"
 
+msgid "Go down"
+msgstr "Descendre"
+
+msgid "Go up"
+msgstr "Monter"
+
 msgid "Graduates"
 msgstr "Diplômés"
 
@@ -1819,7 +1825,6 @@ msgstr "Ouverture aux adultes"
 msgid "Operation"
 msgstr "Opération"
 
-
 msgid "Operation on learning achievement has been successfully completed"
 msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
 
@@ -1980,6 +1985,8 @@ msgid ""
 "Postponement will not be possible as the chosen code already exists for "
 "future academic years"
 msgstr ""
+"Le report ne sera pas possible car le code choisi existe déjà pour les "
+"années académiques futures"
 
 msgid "Practical exercises"
 msgstr "Partie pratique"
@@ -2282,13 +2289,13 @@ msgid "Save"
 msgstr "Enregistrer"
 
 msgid "Save and do not postpone changes"
-msgstr ""
+msgstr "Enregistrer sans reporter les changements"
 
 msgid "Save and postpone"
 msgstr "Enregistrer et reporter"
 
 msgid "Save and postpone changes on next years"
-msgstr ""
+msgstr "Enregistrer et reporter les changements sur les années futures"
 
 msgid "Schedule type"
 msgstr "Type horaire"
@@ -2499,6 +2506,7 @@ msgstr "Essai"
 msgid "The"
 msgstr "Le"
 
+#, python-format
 msgid "The '%(field)s' field content has been successfully saved"
 msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
@@ -3314,7 +3322,7 @@ msgstr "numéro de l'attendu"
 
 #, python-format
 msgid "and postponed until %(year)s"
-msgstr ""
+msgstr "et reporté jusque %(year)s"
 
 msgid "at"
 msgstr "à"
