@@ -29,15 +29,16 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
-    LearningUnitTitleSerializer
+    LearningUnitTitleSerializer, ExternalLearningUnitDetailedSerializer
 from learning_unit.api.views.learning_unit import LearningUnitList
 
 
@@ -202,8 +203,29 @@ class LearningUnitDetailedTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title().get()
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title()
+        luy_with_full_title = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(
+            luy_with_full_title
+        ).get()
         serializer = LearningUnitDetailedSerializer(
+            luy_with_full_title,
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
+        )
+        self.assertEqual(response.data, serializer.data)
+
+    def test_get_results_external_ue(self):
+        ExternalLearningUnitYearFactory(learning_unit_year=self.luy)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title()
+        luy_with_full_title = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(
+            luy_with_full_title
+        ).get()
+        serializer = ExternalLearningUnitDetailedSerializer(
             luy_with_full_title,
             context={
                 'request': RequestFactory().get(self.url),

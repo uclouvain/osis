@@ -373,8 +373,8 @@ def extract_xls_data_from_learning_unit(learning_unit_yr):
         # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
         xls_build.translate(learning_unit_yr.subtype),
-        learning_unit_yr.entity_allocation,
-        learning_unit_yr.entity_requirement,
+        learning_unit_yr.allocation_entity,
+        learning_unit_yr.requirement_entity,
         learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
     ]
 

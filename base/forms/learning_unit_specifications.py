@@ -25,10 +25,14 @@
 ##############################################################################
 from ckeditor.widgets import CKEditorWidget
 from django import forms
+from django.conf import settings
 
+from base.business.learning_unit import get_academic_year_postponement_range
 from base.forms.common import set_trans_txt
+from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
 from cms.models import translated_text
+from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitSpecificationsForm(forms.Form):
@@ -57,33 +61,59 @@ class LearningUnitSpecificationsEditForm(forms.Form):
     cms_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     def __init__(self, *args, **kwargs):
+        self.postponement = bool(int(args[0]['postpone'])) if args else False
         self.learning_unit_year = kwargs.pop('learning_unit_year', None)
         self.text_label = kwargs.pop('text_label', None)
         super(LearningUnitSpecificationsEditForm, self).__init__(*args, **kwargs)
 
     def load_initial(self):
-        value_fr = translated_text.get_or_create(
+        for code, label in settings.LANGUAGES:
+            value = self._get_or_create_translated_text(code)
+            vars()['value_{}'.format(code[:2])] = value
+            self.fields['cms_{}_id'.format(code[:2])].initial = value.id
+            self.fields['trans_text_{}'.format(code[:2])].initial = value.text
+
+    def _get_or_create_translated_text(self, language):
+        return translated_text.get_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.learning_unit_year.id,
-            language='fr-be',
+            language=language,
             text_label=self.text_label
         )
-        value_en = translated_text.get_or_create(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.learning_unit_year.id,
-            language='en',
-            text_label=self.text_label
-        )
-        self.fields['cms_fr_id'].initial = value_fr.id
-        self.fields['trans_text_fr'].initial = value_fr.text
-        self.fields['cms_en_id'].initial = value_en.id
-        self.fields['trans_text_en'].initial = value_en.text
 
     def save(self):
-        self._save_text_language('fr')
-        self._save_text_language('en')
+        self._save_translated_text()
+        return self.text_label, self.last_postponed_academic_year
 
-    def _save_text_language(self, language):
-        trans_text = translated_text.find_by_id(self.cleaned_data['cms_' + language + '_id'])
-        trans_text.text = self.cleaned_data.get('trans_text_' + language)
-        trans_text.save()
+    def _save_translated_text(self):
+        for code, label in settings.LANGUAGES:
+            self.trans_text = translated_text.find_by_id(self.cleaned_data['cms_{}_id'.format(code[:2])])
+            self.trans_text.text = self.cleaned_data.get('trans_text_{}'.format(code[:2]))
+            self.text_label = self.trans_text.text_label
+            self.trans_text.save()
+
+            self.learning_unit_year = LearningUnitYear.objects.select_related(
+                'academic_year').prefetch_related(
+                'learning_unit__learningunityear_set'
+            ).get(id=self.trans_text.reference)
+
+            self.last_postponed_academic_year = None
+            if not self.learning_unit_year.academic_year.is_past and self.postponement:
+                ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
+                self.last_postponed_academic_year = ac_year_postponement_range.last()
+                self._update_future_luy(ac_year_postponement_range, self.learning_unit_year)
+
+    def _update_future_luy(self, ac_year_postponement_range, luy):
+        for ac in ac_year_postponement_range:
+            next_luy, created = LearningUnitYear.objects.get_or_create(
+                academic_year=ac,
+                acronym=luy.acronym,
+                learning_unit=luy.learning_unit
+            )
+            TranslatedText.objects.update_or_create(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=next_luy.id,
+                language=self.trans_text.language,
+                text_label=self.text_label,
+                defaults={'text': self.trans_text.text}
+            )

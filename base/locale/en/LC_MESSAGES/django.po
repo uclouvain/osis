@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 08:31+0200\n"
+"POT-Creation-Date: 2019-11-04 09:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -370,9 +370,6 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure to change the state from"
-msgstr ""
-
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr ""
@@ -486,9 +483,6 @@ msgstr ""
 msgid "CAPAES"
 msgstr ""
 
-msgid "Calendar of the annual program"
-msgstr ""
-
 msgid "Campus"
 msgstr ""
 
@@ -542,9 +536,6 @@ msgid "City"
 msgstr ""
 
 msgid "City of institution"
-msgstr ""
-
-msgid "Classe"
 msgstr ""
 
 msgid "Classes"
@@ -637,9 +628,6 @@ msgid "Content"
 msgstr ""
 
 msgid "Coordinator"
-msgstr ""
-
-msgid "Coorganization"
 msgstr ""
 
 msgid "Copy Reddot data from previous academic year."
@@ -1012,9 +1000,6 @@ msgstr ""
 msgid "Fixed-line phone"
 msgstr ""
 
-msgid "Focuses"
-msgstr ""
-
 msgid "Folder"
 msgstr ""
 
@@ -1112,6 +1097,12 @@ msgid "Global ID"
 msgstr ""
 
 msgid "Go"
+msgstr ""
+
+msgid "Go down"
+msgstr ""
+
+msgid "Go up"
 msgstr ""
 
 msgid "Graduates"
@@ -1277,9 +1268,6 @@ msgstr ""
 msgid "Keywords"
 msgstr ""
 
-msgid "LECTURING"
-msgstr ""
-
 msgid "LU"
 msgstr ""
 
@@ -1311,6 +1299,9 @@ msgstr ""
 msgid ""
 "Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfuly created."
+msgstr ""
+
+msgid "Learning achievement content has been successfully saved"
 msgstr ""
 
 msgid "Learning achievements"
@@ -1660,9 +1651,6 @@ msgstr ""
 msgid "No attributions exist for the parent learning unit"
 msgstr ""
 
-msgid "No change made"
-msgstr ""
-
 msgid "No data"
 msgstr ""
 
@@ -1769,6 +1757,9 @@ msgid "Opening to Adults"
 msgstr ""
 
 msgid "Operation"
+msgstr ""
+
+msgid "Operation on learning achievement has been successfully completed"
 msgstr ""
 
 msgid "Option"
@@ -1918,6 +1909,11 @@ msgid "Pole"
 msgstr ""
 
 msgid "Postal code"
+msgstr ""
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
 msgstr ""
 
 msgid "Practical exercises"
@@ -2214,6 +2210,15 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "Save and do not postpone changes"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr ""
+
+msgid "Save and postpone changes on next years"
+msgstr ""
+
 msgid "Schedule type"
 msgstr ""
 
@@ -2397,6 +2402,12 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+
 msgid "Teaching profile"
 msgstr ""
 
@@ -2413,6 +2424,10 @@ msgid "Testing"
 msgstr ""
 
 msgid "The"
+msgstr ""
+
+#, python-format
+msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
 
 msgid "The acronym <b>already exists</b>."
@@ -2605,6 +2620,15 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The section you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+
+msgid "The section you modified have been saved with success."
+msgstr ""
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2620,6 +2644,18 @@ msgstr ""
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
 "the volume of parent learning unit for this professor"
+msgstr ""
+
+#, python-format
+msgid ""
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+
+msgid "The teaching material has been deleted with success"
+msgstr ""
+
+msgid "The teaching material has been saved with success"
 msgstr ""
 
 msgid "The user cannot modify data which are greater than N+1"
@@ -2723,9 +2759,6 @@ msgstr ""
 
 #, python-format
 msgid "This label %s does not exist"
-msgstr ""
-
-msgid "This learning unit is not eligible for proposal creation/modification"
 msgstr ""
 
 msgid "This learning unit isn't eligible for modification because of it's type"
@@ -2859,9 +2892,6 @@ msgstr ""
 msgid "Update for teacher unlocked"
 msgstr ""
 
-msgid "Used by learning unit"
-msgstr ""
-
 msgid "User"
 msgstr ""
 
@@ -2983,9 +3013,6 @@ msgid "You are not attributed to this learning unit."
 msgstr ""
 
 msgid "You are not eligible to cancel proposal"
-msgstr ""
-
-msgid "You are not eligible to consolidate proposal"
 msgstr ""
 
 msgid "You are not eligible to create/modify proposal"
@@ -3116,6 +3143,10 @@ msgid "agreements"
 msgstr ""
 
 msgid "aim number"
+msgstr ""
+
+#, python-format
+msgid "and postponed until %(year)s"
 msgstr ""
 
 msgid "at"
@@ -3420,9 +3451,6 @@ msgid "volume declared vacant"
 msgstr ""
 
 msgid "volume requirement entity"
-msgstr ""
-
-msgid "volume total global"
 msgstr ""
 
 msgid "volume total requirement entities"
