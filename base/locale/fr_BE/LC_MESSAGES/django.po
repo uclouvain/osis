@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-31 13:29+0100\n"
+"POT-Creation-Date: 2019-11-04 09:18+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1985,6 +1985,8 @@ msgid ""
 "Postponement will not be possible as the chosen code already exists for "
 "future academic years"
 msgstr ""
+"Le report ne sera pas possible car le code choisi existe déjà pour les "
+"années académiques futures"
 
 msgid "Practical exercises"
 msgstr "Partie pratique"
@@ -2287,13 +2289,13 @@ msgid "Save"
 msgstr "Enregistrer"
 
 msgid "Save and do not postpone changes"
-msgstr ""
+msgstr "Enregistrer sans reporter les changements"
 
 msgid "Save and postpone"
 msgstr "Enregistrer et reporter"
 
 msgid "Save and postpone changes on next years"
-msgstr ""
+msgstr "Enregistrer et reporter les changements sur les années futures"
 
 msgid "Schedule type"
 msgstr "Type horaire"
@@ -2478,6 +2480,14 @@ msgstr "Stage d’enseignement"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+"Le support de cours que vous avez modifié a été sauvegardé jusqu'en "
+"%(last_year_reported)s avec succès"
+
 msgid "Teaching profile"
 msgstr "Profil d'enseignement"
 
@@ -2496,6 +2506,7 @@ msgstr "Essai"
 msgid "The"
 msgstr "Le"
 
+#, python-format
 msgid "The '%(field)s' field content has been successfully saved"
 msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
@@ -2717,6 +2728,17 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The section you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+"Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
+"jusqu'en %(last_year_reported)s avec succès"
+
+msgid "The section you modified have been saved with success."
+msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2739,6 +2761,20 @@ msgid ""
 msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
+
+#, python-format
+msgid ""
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+"Le support de cours a été supprimé jusqu'en %(last_year_reported)s avec "
+"succès"
+
+msgid "The teaching material has been deleted with success"
+msgstr "Le support de cours a été supprimé avec succès"
+
+msgid "The teaching material has been saved with success"
+msgstr "Le support de cours a été modifié avec succès"
 
 msgid "The user cannot modify data which are greater than N+1"
 msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
@@ -3286,7 +3322,7 @@ msgstr "numéro de l'attendu"
 
 #, python-format
 msgid "and postponed until %(year)s"
-msgstr ""
+msgstr "et reporté jusque %(year)s"
 
 msgid "at"
 msgstr "à"
