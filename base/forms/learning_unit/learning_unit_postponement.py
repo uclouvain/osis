@@ -27,7 +27,6 @@ import operator
 from collections import OrderedDict
 
 from django.db import transaction
-from django.db.models import Max
 from django.http import QueryDict
 from django.utils.translation import gettext as _
 

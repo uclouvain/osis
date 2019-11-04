@@ -30,6 +30,8 @@
 <form method="post" id="UpdateMiniTrainingForm"
       class="education_group_form"
       data-validate-url="
+
+
               {% if educatoin_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
@@ -37,80 +39,107 @@
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
         <div class="panel-body">
-            <div class="row">
-                <div class="col-md-7">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    {% bootstrap_label form_education_group_year.acronym.label %}<b>*</b>
-                                    {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation"
+                    {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'content' %}class="active"{% endif %}>
+                    <a data-toggle="tab" href="#tab_identification" role="tab">
+                        {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
+                    </a>
+                </li>
+                <li role="presentation"
+                    {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
+                    <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
+                        {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
+                    </a>
+
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="tab_identification"
+                     class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'content' %}active{% else %}fade{% endif %}">
+                    <div class="row">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                {% bootstrap_label form_education_group_year.acronym.label %}<strong>*</strong>
+                                                {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                {% bootstrap_label form_education_group_year.partial_acronym.label %}<strong>*</strong>
+                                                <abbr title="{{ form_education_group_year.partial_acronym.help_text }}"
+                                                      data-toggle='tooltip' data-html='true'>
+                                                    <span class="glyphicon glyphicon-question-sign"
+                                                          style="font-size: 14pt;"></span>
+                                                </abbr>
+                                                {% bootstrap_field form_education_group_year.partial_acronym show_label=False show_help=False %}
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>{% trans 'Category' %}</label><br>
+                                                <input value="{{ form_education_group_year.category_text }}"
+                                                       disabled class="form-control"
+                                                       title="{% trans 'The field can contain only one value.' %}">
+                                            </div>
+                                            {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            {% bootstrap_field form_education_group_year.active form_group_class="col-md-6" %}
+                                            {% bootstrap_field form_education_group_year.schedule_type form_group_class="col-md-6" %}
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            {% bootstrap_field form_education_group_year.credits form_group_class="col-md-6" %}
+                                            {% bootstrap_field form_education_group_year.constraint_type form_group_class="col-md-6" %}
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            {% bootstrap_field form_education_group_year.min_constraint form_group_class="col-md-6" %}
+                                            {% bootstrap_field form_education_group_year.max_constraint form_group_class="col-md-6" %}
+                                        </div>
+                                        <br>
+                                        {% bootstrap_field form_education_group_year.title %}
+                                        {% bootstrap_field form_education_group_year.title_english %}
+                                        {% bootstrap_field form_education_group_year.keywords %}
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    {% bootstrap_label form_education_group_year.partial_acronym.label %}<b>*</b>
-                                    <abbr title="{{ form_education_group_year.partial_acronym.help_text }}"
-                                          data-toggle='tooltip' data-html='true'>
-                                        <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
-                                    </abbr>
-                                    {% bootstrap_field form_education_group_year.partial_acronym show_label=False show_help=False %}
+                            </div>
+                            <div class="col-md-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        {% bootstrap_field form_education_group_year.management_entity %}
+                                        {% bootstrap_field form_education_group_year.academic_year %}
+                                        {{ form_education_group_year.media }}
+                                        {% if form_education_group.start_year.is_hidden %}
+                                            {% bootstrap_field form_education_group.end_year %}
+                                        {% else %}
+                                            <div class="row">
+                                                {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
+                                                {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
+                                            </div>
+                                            <br>
+                                        {% endif %}
+                                        {% bootstrap_field form_education_group_year.main_teaching_campus %}
+                                    </div>
                                 </div>
                             </div>
-                            <br>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label>{% trans 'Category' %}</label><br>
-                                    <input value="{{ form_education_group_year.category_text }}"
-                                           disabled class="form-control"
-                                           title="{% trans 'The field can contain only one value.' %}">
-                                </div>
-                                {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                {% bootstrap_field form_education_group_year.remark %}
+                                {% bootstrap_field form_education_group_year.remark_english %}
                             </div>
-                            <br>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.active form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.schedule_type form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.credits form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.constraint_type form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.min_constraint form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.max_constraint form_group_class="col-md-6" %}
-                            </div>
-                            <br>
-                            {% bootstrap_field form_education_group_year.title %}
-                            {% bootstrap_field form_education_group_year.title_english %}
-                            {% bootstrap_field form_education_group_year.keywords %}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-5">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.management_entity %}
-                            {% bootstrap_field form_education_group_year.academic_year %}
-                            {{ form_education_group_year.media }}
-                            {% if form_education_group.start_year.is_hidden %}
-                                {% bootstrap_field form_education_group.end_year %}
-                            {% else %}
-                                <div class="row">
-                                    {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
-                                    {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
-                                </div>
-                            <br>
-                            {% endif %}
-                            {% bootstrap_field form_education_group_year.main_teaching_campus %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    {% bootstrap_field form_education_group_year.remark %}
-                    {% bootstrap_field form_education_group_year.remark_english %}
+                <div id="tab_content"
+                     class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
+                    {% include "education_group/blocks/form/training_tab_content.html" %}
                 </div>
             </div>
         </div>
@@ -121,3 +150,5 @@
     <script type="text/javascript" src="{% static 'js/education_group/validation.js' %}"></script>
     {% include "blocks/modal/confirmation_modal.html" %}
 </form>
+
+<script type="text/javascript" src="{% static 'js/education_group/update_training_errors.js' %}"></script>

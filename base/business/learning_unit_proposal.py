@@ -42,6 +42,7 @@ from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
 from base.models.entity import find_by_id, get_by_internal_id
+from base.models.enums import entity_container_year_link_type
 from base.models.enums import organization_type
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
@@ -50,7 +51,6 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
 from reference.models import language
-from base.models.enums import entity_container_year_link_type
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (

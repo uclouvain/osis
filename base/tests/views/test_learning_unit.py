@@ -35,7 +35,7 @@ from django.contrib.auth.models import Permission
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
-from django.test import TestCase, RequestFactory, Client
+from django.test import TestCase, Client
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -499,7 +499,6 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_with_allocation_entity(self):
         self._prepare_context_learning_units_search()
-        request_factory = RequestFactory()
         filter_data = {
             'academic_year': self.current_academic_year.id,
             'allocation_entity': 'AGES'
