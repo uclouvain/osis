@@ -98,13 +98,6 @@ class EntityViewTestCase(APITestCase):
         context = response.context
         self.assertIsInstance(context["form"], EntityCalendarEducationalInformationForm)
 
-    def test_entity_read_with_post_when_no_sufficient_right(self):
-        self.client.force_login(self.user)
-        url = reverse('entity_read', args=[self.entity_version.id])
-        response = self.client.post(url)
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
     def test_entity_diagram(self):
         self.client.force_login(self.user)
         url = reverse('entity_diagram', args=[self.entity_version.id])

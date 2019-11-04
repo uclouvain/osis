@@ -45,17 +45,3 @@ class TestEntityCalendarEducationalInformationForm(TestCase):
         expected_fields = ["start_date", "end_date"]
         actual_fields = list(form.fields.keys())
         self.assertListEqual(expected_fields, actual_fields)
-
-    def test_save_entity_calendar(self):
-        entity_version = EntityVersionFactory()
-        entity_version.refresh_from_db()
-        entity = entity_version.entity
-
-        form = EntityCalendarEducationalInformationForm(entity_version, {"start_date": "05/03/2018", "end_date": "06/03/2018"})
-
-        self.assertTrue(form.is_valid())
-        self.assertFalse(EntityCalendar.objects.all().exists())
-
-        form.save_entity_calendar(entity)
-
-        self.assertTrue(EntityCalendar.objects.get(entity=entity, academic_calendar=self.academic_calendar))
