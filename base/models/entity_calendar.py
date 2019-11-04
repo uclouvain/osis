@@ -46,9 +46,6 @@ class EntityCalendar(AbstractCalendar):
 
     class Meta:
         unique_together = ('academic_calendar', 'entity')
-        # constraints = [
-        #     models.CheckConstraint(check=models.Q(academic_calendar.reference != academic_calendar_type.SUMMARY_COURSE_SUBMISSION))
-        # ]
 
     def __str__(self):
         return "{} - {}".format(self.academic_calendar, self.entity)
