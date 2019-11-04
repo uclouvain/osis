@@ -280,15 +280,14 @@ LOCALE_PATHS = ()
 CDN_URL = os.environ.get("CDN_URL", "")
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
-    'reddot': {
-        "removePlugins": "stylesheetparser",
+    'minimal': {
         'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'contentsCss': ["body {font-family: 'monospace';}"],  # FIXME :: choose correct font
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
-            ['Format', 'Styles'],  # FIXME :: Is this sufficient to say that the richText is the same in UE than OF?
+            ['Format', 'Styles'],
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
@@ -322,35 +321,10 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False
     },
-    'minimal': {
-        'contentsCss': ["body {font-family: 'monospace';}"],  # FIXME :: choose correct font
-        'toolbar': 'Custom',
-        'extraPlugins': '',
-        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
-        'toolbar_Custom': [
-            {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
-            ['Format', 'Styles'],  # FIXME :: Is this sufficient to say that the richText is the same in UE than OF?
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink'],
-        ],
-        'autoParagraph': False,
-        'allowedContent': True,
-    },
-    'minimal_plus_headers': {
-        'contentsCss': ["body {font-family: 'monospace';}"],  # FIXME :: choose correct font
-        'toolbar': 'Custom',
-        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
-        'toolbar_Custom': [
-            {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
-            ['Format', 'Styles'],
-            ['Bold', 'Italic', 'Underline'],
-            ['Link', 'Unlink'],
-            ['NumberedList', 'BulletedList']
-        ],
-        'autoParagraph': False
-    },
 }
+
+CKEDITOR_CONFIGS['reddot'] = dict(CKEDITOR_CONFIGS['minimal'])
+
 if CDN_URL:
     for config_name in ['reddot', 'minimal']:
         CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
