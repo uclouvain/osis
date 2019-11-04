@@ -44,13 +44,13 @@ ACTION_CHOICES = [
 
 class EducationGroupAchievementForm(forms.ModelForm):
     french_text = forms.CharField(
-        widget=CKEditorWidget(config_name='reddot'),
+        widget=CKEditorWidget(config_name='education_group_pedagogy'),
         required=False,
         label=_('French')
     )
 
     english_text = forms.CharField(
-        widget=CKEditorWidget(config_name='reddot'),
+        widget=CKEditorWidget(config_name='education_group_pedagogy'),
         required=False,
         label=_('English')
     )
@@ -74,13 +74,13 @@ class EducationGroupAchievementCMSForm(forms.Form):
     cms_text_label = None
 
     text_french = forms.CharField(
-        widget=CKEditorWidget(config_name='reddot'),
+        widget=CKEditorWidget(config_name='education_group_pedagogy'),
         required=False,
         label=_('French')
     )
 
     text_english = forms.CharField(
-        widget=CKEditorWidget(config_name='reddot'),
+        widget=CKEditorWidget(config_name='education_group_pedagogy'),
         required=False,
         label=_('English')
     )

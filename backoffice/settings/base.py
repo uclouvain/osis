@@ -323,10 +323,10 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-CKEDITOR_CONFIGS['reddot'] = dict(CKEDITOR_CONFIGS['minimal'])
+CKEDITOR_CONFIGS['education_group_pedagogy'] = dict(CKEDITOR_CONFIGS['minimal'])
 
 if CDN_URL:
-    for config_name in ['reddot']:
+    for config_name in ['education_group_pedagogy']:
         CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
         CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
         CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
