@@ -1,21 +1,65 @@
-{% extends "base/blocks/quick_search_base.html" %}
 {% load static i18n %}
 {% load bootstrap3 %}
 
-{% block form_fields %}
-    {% bootstrap_field form.academic_year form_group_class="hidden" %}
-    {% bootstrap_field form.acronym form_group_class="col-md-3" %}
-    {% bootstrap_field form.title form_group_class="col-md-6" %}
-{% endblock %}
+{% url 'quick_search_education_group' as quick_search_url %}
 
-{% block table_header%}
-    <th id="th_0_temp">{% trans 'Ac yr.' %}</th>
-    <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
-    <th id="th_2_acronym">{% trans 'Acronym/Short title' %}</th>
-    <th id="th_3_title">{% trans 'Title' %}</th>
-{% endblock %}
+<form method="get" id="form-eg-quick-search">
+    <input type="hidden" name="page" value="{{ page_obj.number }}">
+    <div class="row">
+        {% bootstrap_field eg_form.academic_year form_group_class="hidden" %}
+        {% bootstrap_field eg_form.acronym form_group_class="col-md-3" %}
+        {% bootstrap_field eg_form.title form_group_class="col-md-6" %}
+        <div class="col-md-2">
+            <button type="button" onclick="reloadEducationGroupSearchResult();" class="btn btn-primary" name="search-eg" title="search">
+                <em class="fa fa-search"></em>
+            </button>
+        </div>
+    </div>
+</form>
 
-{% block script %}
+<div class="row">
+    <div class="cold-md-3 pull-right">
+        <button class="btn btn-primary" id="button_attach_modal">{% trans 'Attach' %}</button>
+    </div>
+</div>
+
+<table id="table-education-group" class="table table-striped table-responsive" style="width: 100%;">
+    <thead>
+    <tr>
+        <th id="th_0_temp"></th>
+        <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
+        <th id="th_2_acronym">{% trans 'Acronym/Short title' %}</th>
+        <th id="th_3_title">{% trans 'Title' %}</th>
+    </tr>
+    </thead>
+</table>
+
+<div class="text-center">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+            <li><a href="#" onclick="submit_with_page('{{ page_obj.previous_page_number }}')">&laquo;</a>
+            </li>
+        {% else %}
+            <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in page_obj.paginator.page_range %}
+            {% if i <= page_obj.number|add:5 and i >= page_obj.number|add:-5 %}
+
+                {% if page_obj.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                {% else %}
+                    <li><a href="#" onclick="submit_with_page('{{ i }}')">{{ i }}</a></li>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <li><a href="#" onclick="submit_with_page('{{ page_obj.next_page_number }}')">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+    </ul>
+</div>
+
 <script src="{% static "js/osis_datatable.js" %}"></script>
 <script>
     $(document).ready(function()
@@ -25,10 +69,11 @@
                 "name": "temp",
                 "targets": 0,
                 "data": "acronym",
+                "orderable": false,
                 "render": function(data, type, row, meta) {
                     let input = document.createElement("input");
                     input.type = 'radio';
-                    input.name = 'selected_item';
+                    input.name = 'selected-item';
                     input.value = data;
                     input.setAttribute('data-url', row['url']);
                     return input.outerHTML;
@@ -49,8 +94,8 @@
             },
             { "name": "title", "targets": 3, "data": "title"},
         ];
-        var table = initializeDataTable("table_education_groups", "educationGroupsLightIds", 1,
-            10, "{{ form_url }}", columnDefs);
+        var table = initializeDataTable("form-eg-quick-search", "table-education-group", "educationGroupsLightIds", 1,
+            10, "{{ quick_search_url }}", columnDefs);
 
         table.on('draw', function(){
             $("input[name=selected_item]").each(function(index, element){
@@ -64,7 +109,7 @@
 
         function select_element_from_url(url){
             let egy_id = getIdFromUrl(url);
-            select_element(egy_id);
+            console.log("selected");
         }
 
         // FIXME This method is copy pasted Refactor
@@ -76,18 +121,6 @@
                 }
             }
             return NaN;
-        }
-
-        function select_element(egy_id) {
-            $.ajax({
-                type: "POST",
-                url: "/educationgroups/"+ egy_id + "/" + egy_id + "/select/",
-                data: {'element_id': egy_id},
-                dataType: 'json',
-                success: function (jsonResponse) {
-                    displayInfoMessage(jsonResponse, 'clipboard');
-                }
-            });
         }
 
         $("#button_attach_modal").click(function() {
@@ -105,4 +138,3 @@
         });
     });
 </script>
-{% endblock script %}

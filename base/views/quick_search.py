@@ -37,6 +37,7 @@ from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
+from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
 class QuickEducationGroupYearFilter(FilterSet):
@@ -194,6 +195,7 @@ class QuickSearchLearningUnitYearView(QuickSearchGenericView):
     permission_required = 'base.can_access_learningunit'
 
     filterset_class = QuickLearningUnitYearFilter
+    serializer_class = LearningUnitSerializer
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

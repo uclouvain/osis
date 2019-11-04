@@ -1,4 +1,4 @@
-function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
+function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
     setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
     return domTable.DataTable(
@@ -25,7 +25,7 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
             "type": "GET",
             "dataSrc": "object_list",
             "data": function (d){
-                let querystring = getDataAjaxTable(domTable, d, pageNumber);
+                let querystring = getDataAjaxTable(formId, domTable, d, pageNumber);
                 querystring["paginator_size"] = itemsPerPage;
                 return querystring;
             },
@@ -45,6 +45,10 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
 }
 
 
-function reloadSearchResult(){
-    $('#table_education_groups').DataTable().ajax.reload();
+function reloadEducationGroupSearchResult(tableId){
+    $('#table-education-group').DataTable().ajax.reload();
+}
+
+function reloadLearningUnitSearchResult(tableId){
+    $('#table-learning-unit').DataTable().ajax.reload();
 }
