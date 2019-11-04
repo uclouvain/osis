@@ -27,7 +27,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
@@ -36,7 +36,7 @@ from base.tests.views.learning_units.search.search_test_mixin import TestRenderT
 class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = AcademicYearFactory.produce(base_year=get_current_year() - 1)
+        cls.academic_years = AcademicYearFactory.produce()
         cls.luys = LearningUnitYearFactory.create_batch(4)
         cls.url = reverse("learning_units_summary")
         cls.get_data = {
