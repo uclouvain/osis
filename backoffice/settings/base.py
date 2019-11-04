@@ -326,7 +326,7 @@ CKEDITOR_CONFIGS = {
 CKEDITOR_CONFIGS['reddot'] = dict(CKEDITOR_CONFIGS['minimal'])
 
 if CDN_URL:
-    for config_name in ['reddot', 'minimal']:
+    for config_name in ['reddot']:
         CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
         CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
         CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
