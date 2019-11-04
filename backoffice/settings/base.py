@@ -291,7 +291,6 @@ CKEDITOR_CONFIGS = {
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
-            ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
         ],
         'autoParagraph': False,
