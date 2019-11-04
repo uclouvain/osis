@@ -32,9 +32,9 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
+from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
-from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
 from base.models import entity_version as entity_version_mdl
 from base.models.entity_version import EntityVersion
 from base.views.common import paginate_queryset
@@ -82,7 +82,7 @@ def entity_read(request, entity_version_id):
     entity_parent = entity_version.get_parent_version()
     descendants = entity_version.descendants
 
-    form = EntityCalendarEducationalInformationForm(entity_version, request.POST or None)
+    calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(entity_version)
 
     # TODO Remove locals
     return render(request, "entity/identification.html", locals())

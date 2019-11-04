@@ -86,12 +86,12 @@
 
                     <div class="row">
                         <dl class="col-md-4">
-                            <dt>{{ form.start_date.label }}</dt>
-                            <dd>{{ form.start_date.initial|date:"d/m/Y"|default:"-" }}</dd>
+                            <dt>{% trans "Educational information opening" %}</dt>
+                            <dd>{{ calendar_summary_course_submission.start_date|date:"d/m/Y"|default:"-" }}</dd>
                         </dl>
                         <dl class="col-md-4">
-                            <dt>{{ form.end_date.label }}</dt>
-                            <dd>{{ form.end_date.initial|date:"d/m/Y"|default:"-" }}</dd>
+                            <dt>{% trans "Educational information ending" %}</dt>
+                            <dd>{{ calendar_summary_course_submission.end_date|date:"d/m/Y"|default:"-" }}</dd>
                         </dl>
                     </div>
 
