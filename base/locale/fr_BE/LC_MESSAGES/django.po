@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 08:31+0200\n"
+"POT-Creation-Date: 2019-10-31 13:29+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -396,9 +396,6 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-msgid "Are you sure to change the state from"
-msgstr "Êtes-vous sûr de vouloir changer l'état de"
-
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
@@ -514,9 +511,6 @@ msgstr "Par"
 msgid "CAPAES"
 msgstr "CAPAES"
 
-msgid "Calendar of the annual program"
-msgstr "Calendrier des programmes"
-
 msgid "Campus"
 msgstr "Campus"
 
@@ -572,9 +566,6 @@ msgstr "Ville"
 
 msgid "City of institution"
 msgstr "Ville de l'institution"
-
-msgid "Classe"
-msgstr "Classe"
 
 msgid "Classes"
 msgstr "Classes"
@@ -667,9 +658,6 @@ msgstr "Contenu"
 
 msgid "Coordinator"
 msgstr "Coordinateur"
-
-msgid "Coorganization"
-msgstr "Co-organisation"
 
 msgid "Copy Reddot data from previous academic year."
 msgstr "Copier les données Reddot de l’année précédente."
@@ -1051,9 +1039,6 @@ msgstr "Fixé"
 msgid "Fixed-line phone"
 msgstr "Téléphone fixe"
 
-msgid "Focuses"
-msgstr "Finalités"
-
 msgid "Folder"
 msgstr "Dossier"
 
@@ -1152,6 +1137,12 @@ msgstr "Matricule FGS"
 
 msgid "Go"
 msgstr "Continuer"
+
+msgid "Go down"
+msgstr "Descendre"
+
+msgid "Go up"
+msgstr "Monter"
 
 msgid "Graduates"
 msgstr "Diplômés"
@@ -1325,9 +1316,6 @@ msgstr "Membres du jury"
 msgid "Keywords"
 msgstr "Mots clés"
 
-msgid "LECTURING"
-msgstr "Partie magistrale"
-
 msgid "LU"
 msgstr "UE"
 
@@ -1362,6 +1350,9 @@ msgid ""
 msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
+
+msgid "Learning achievement content has been successfully saved"
+msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
@@ -1718,9 +1709,6 @@ msgstr "Pas de frais supplémentaires"
 msgid "No attributions exist for the parent learning unit"
 msgstr "Aucune attribution n'existe pour l'UE parent"
 
-msgid "No change made"
-msgstr "Pas de modification apportée"
-
 msgid "No data"
 msgstr "Pas de données"
 
@@ -1836,6 +1824,9 @@ msgstr "Ouverture aux adultes"
 
 msgid "Operation"
 msgstr "Opération"
+
+msgid "Operation on learning achievement has been successfully completed"
+msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
 
 msgid "Option"
 msgstr "Option"
@@ -1989,6 +1980,11 @@ msgstr "Pôle"
 
 msgid "Postal code"
 msgstr "Code postal"
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
+msgstr ""
 
 msgid "Practical exercises"
 msgstr "Partie pratique"
@@ -2290,6 +2286,15 @@ msgstr "Commande SQL"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Save and do not postpone changes"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr "Enregistrer et reporter"
+
+msgid "Save and postpone changes on next years"
+msgstr ""
+
 msgid "Schedule type"
 msgstr "Type horaire"
 
@@ -2490,6 +2495,9 @@ msgstr "Essai"
 
 msgid "The"
 msgstr "Le"
+
+msgid "The '%(field)s' field content has been successfully saved"
+msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
@@ -2850,11 +2858,6 @@ msgstr "Ce champ est obligatoire."
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-msgid "This learning unit is not eligible for proposal creation/modification"
-msgstr ""
-"Cette unité d'enseignement n'est pas éligible pour une création/modification "
-"de proposition"
-
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
@@ -2988,9 +2991,6 @@ msgstr "Mise-à-jour bloquée pour l'enseignant"
 msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
 
-msgid "Used by learning unit"
-msgstr "Utilisation par l'unité d'enseignement"
-
 msgid "User"
 msgstr "Utilisateur"
 
@@ -3120,9 +3120,6 @@ msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
 
 msgid "You are not eligible to cancel proposal"
 msgstr "Vous ne pouvez pas annuler les propositions"
-
-msgid "You are not eligible to consolidate proposal"
-msgstr "Vous ne pouvez pas consolider les propositions"
 
 msgid "You are not eligible to create/modify proposal"
 msgstr "Vous ne pouvez pas créer/modifier les propositions"
@@ -3286,6 +3283,10 @@ msgstr "accords"
 
 msgid "aim number"
 msgstr "numéro de l'attendu"
+
+#, python-format
+msgid "and postponed until %(year)s"
+msgstr ""
 
 msgid "at"
 msgstr "à"
@@ -3600,9 +3601,6 @@ msgstr "volume déclaré vacant"
 
 msgid "volume requirement entity"
 msgstr "vol. ent. charge"
-
-msgid "volume total global"
-msgstr "volume total global"
 
 msgid "volume total requirement entities"
 msgstr "vol. tot. ent. charge"
