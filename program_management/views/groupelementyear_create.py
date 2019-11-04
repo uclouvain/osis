@@ -37,7 +37,7 @@ from program_management.business.group_element_years.attach import AttachEducati
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
-from program_management.business.group_element_years.management import extract_child_from_cache
+from program_management.business.group_element_years.management import extract_child
 from program_management.forms.group_element_year import GroupElementYearForm
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -48,10 +48,11 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
-            child = cached_data['child_branch'] if cached_data.get('child_branch') else cached_data.get('child_leaf')
+            data = extract_child(self.education_group_year, self.request)
+            child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
+
             context['object_to_attach'] = child
-            context['source_link'] = cached_data.get('source_link')
+            context['source_link'] = data.get('source_link')
             context['education_group_year_parent'] = self.education_group_year
 
         except ObjectDoesNotExist:
@@ -70,11 +71,11 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         kwargs = super().get_form_kwargs()
 
         try:
-            cached_data = extract_child_from_cache(self.education_group_year, self.request.user)
+            data = data = extract_child(self.education_group_year, self.request)
             kwargs.update({
                 'parent': self.education_group_year,
-                'child_branch': cached_data.get('child_branch'),
-                'child_leaf': cached_data.get('child_leaf')
+                'child_branch': data.get('child_branch'),
+                'child_leaf': data.get('child_leaf')
             })
 
             child = kwargs['child_branch'] if kwargs['child_branch'] else kwargs['child_leaf']

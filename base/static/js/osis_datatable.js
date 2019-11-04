@@ -45,8 +45,14 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
 }
 
 function select_element_from_url(url){
-    let egy_id = getIdFromUrl(url);
-    console.log("selected");
+    var contentType = "undefined";
+    if (url.includes("learning_units")){
+        contentType = "base_learningunityear";
+    }else if(url.includes("educationgroups")){
+        contentType = "base_educationgroupyear";
+    }
+    let object_id = getIdFromUrl(url).toString();
+    localStorage.setItem("quickSearchSelection", JSON.stringify({"id": object_id, "content_type": contentType}));
 }
 
 // FIXME This method is copy pasted Refactor
@@ -71,8 +77,12 @@ function onDraw(){
 
 function attachModal(url){
     return function(){
+        const parameters = JSON.parse(localStorage.getItem("quickSearchSelection"));
+        const paramString = new URLSearchParams(parameters);
+        const urlWithParameters = `${url}?${paramString.toString()}`;
+
         document.getElementById("modal_dialog_id").classList.add("modal-lg");
-        $('#form-modal-ajax-content').load(url, function (response, status, xhr) {
+        $('#form-modal-ajax-content').load(urlWithParameters, function (response, status, xhr) {
             if (status === "success") {
                 let form = $(this).find('form').first();
                 formAjaxSubmit(form, '#form-ajax-modal');

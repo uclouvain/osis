@@ -19,7 +19,7 @@
 
 <div class="row">
     <div class="cold-md-3 pull-right">
-        <button class="btn btn-primary" id="button_attach_modal">{% trans 'Attach' %}</button>
+        <button class="btn btn-primary" id="button-attach-eg">{% trans 'Attach' %}</button>
     </div>
 </div>
 
@@ -102,6 +102,6 @@
         let root = "{{ root }}";
         let education_group_year = "{{ education_group_year }}";
         let url = `/program_management/${root}/${education_group_year}/content/attach/`;
-        $("#button_attach_modal").click(attachModal(url));
+        $("#button-attach-eg").click(attachModal(url));
     });
 </script>
