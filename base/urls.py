@@ -42,7 +42,8 @@ import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
-from base.views import learning_achievement, search, education_groups, user_list
+from base.views.education_groups import urls
+from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
@@ -275,7 +276,7 @@ urlpatterns = [
         url(r'^search$', offer.offers_search, name='offers_search'),
     ])),
 
-    url(r'^educationgroups/', include(education_groups.urls.urlpatterns)),
+    url(r'^educationgroups/', include(urls.urlpatterns)),
 
     url(r'^organizations/', include([
         url(r'^$', organization.OrganizationSearch.as_view(), name='organizations'),
