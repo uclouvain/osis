@@ -24,6 +24,7 @@
 
 
                     {% endblock form_field %}
+                    <br>
                     <div class="col-md-2">
                         <button type="button" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-eg" title="search">
                             <em class="fa fa-search"></em>
@@ -32,15 +33,18 @@
                 </div>
             </form>
 
-            <div class="row">
-                <div class="cold-md-3 pull-right">
-                    <button class="btn btn-primary" id="button-attach">{% trans 'Attach' %}</button>
-                </div>
-            </div>
             {% if paginator.count %}
-                <strong style="margin-left:10px;color:grey;">
-                    {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=paginator.count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
-                </strong>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong style="color:grey;">
+                            {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=paginator.count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
+                        </strong>
+                    </div>
+                    <div class="cold-md-3 pull-right">
+                        <button class="btn btn-primary" id="button-attach">{% trans 'Attach' %}</button>
+                    </div>
+                </div>
+
                 <table id="table-objects" class="table table-striped table-responsive" style="width: 100%;">
                     <thead>
                     <tr>
