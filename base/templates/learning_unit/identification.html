@@ -72,7 +72,7 @@
                                 {% else %}
                                     <div class="col-md-3">
                                         {# FIXME Use dl_tooltip for all label/span #}
-                                        <label {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label><br>
+                                        <label class="d-block" {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label>
                                         <span {{ differences|get_difference_css:'acronym' }}
                                                 id="id_acronym">{{ learning_unit_year.acronym }}</span>
                                     </div>
