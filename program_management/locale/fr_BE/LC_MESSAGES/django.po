@@ -77,10 +77,8 @@ msgstr ""
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 
-#, fuzzy, python-format
-#| msgid "The learning unit has prerequisites and is a prerequisite"
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
-msgstr "L'UE a des prérequis et est un prérequis"
+msgstr "Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
 
 msgid "Ac yr."
 msgstr ""
