@@ -45,6 +45,9 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
 }
 
 function select_element_from_url(url){
+    if (url == null){
+        return {"id": "", "content_type": ""};
+    }
     var contentType = "undefined";
     if (url.includes("learning_units")){
         contentType = "base_learningunityear";
@@ -67,18 +70,30 @@ function getIdFromUrl(url){
 }
 
 
-function attachModal(url){
+function attachModal(checkUrl, attachUrl){
     return function(){
         const elementUrl = $("input[name=selected-item]:checked").attr("data-url");
         const parameters = select_element_from_url(elementUrl);
         const paramString = new URLSearchParams(parameters);
-        const urlWithParameters = `${url}?${paramString.toString()}`;
 
-        document.getElementById("modal_dialog_id").classList.add("modal-lg");
-        $('#form-modal-ajax-content').load(urlWithParameters, function (response, status, xhr) {
-            if (status === "success") {
-                let form = $(this).find('form').first();
-                formAjaxSubmit(form, '#form-ajax-modal');
+        $.ajax({
+            url: `${checkUrl}?${paramString.toString()}`,
+        }).done(function(jsonResponse){
+            const error_messages = jsonResponse["error_messages"];
+            if (error_messages.length > 0){
+                const $span_messages = $("#message_info_modal");
+                $span_messages.removeAttr("style");
+                error_messages.forEach(function(message){
+                    $span_messages.append(`<p>${message}</p>`);
+                });
+            } else {
+                document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
+                    if (status === "success") {
+                        let form = $(this).find('form').first();
+                        formAjaxSubmit(form, '#form-ajax-modal');
+                    }
+                });
             }
         });
     };

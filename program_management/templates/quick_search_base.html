@@ -12,6 +12,7 @@
 
     {% block navbar %}
 
+
     {% endblock navbar %}
 
     <div class="tab-content">
@@ -20,6 +21,7 @@
                 <input type="hidden" name="page" value="{{ page_obj.number }}">
                 <div class="row">
                     {% block form_field %}
+
 
                     {% endblock form_field %}
                     <div class="col-md-2">
@@ -32,7 +34,7 @@
 
             <div class="row">
                 <div class="cold-md-3 pull-right">
-                    <button class="btn btn-primary" id="button-attach-eg">{% trans 'Attach' %}</button>
+                    <button class="btn btn-primary" id="button-attach">{% trans 'Attach' %}</button>
                 </div>
             </div>
             {% if paginator.count %}
@@ -43,6 +45,7 @@
                     <thead>
                     <tr>
                         {% block table_header %}
+
 
                         {% endblock table_header %}
                     </tr>
@@ -57,6 +60,7 @@
 </div>
 
 {% block script %}
+    {# Define column_def variable in js and also quick_search_url #}
 <script src="{% static "js/osis_datatable.js" %}"></script>
 <script>
     $(document).ready(function()
@@ -66,10 +70,9 @@
         initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
             {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
 
-        let root_id = "{{ root_id }}";
-        let education_group_year_id = "{{ education_group_year_id }}";
-        let url = `/program_management/${root_id}/${education_group_year_id}/content/attach/`;
-        $("#button-attach-eg").click(attachModal(url));
+        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
+        let attachUrl = "{% url "education_group_attach" root_id education_group_year_id %}";
+        $("#button-attach").click(attachModal(checkUrl, attachUrl));
         $("#search-pagination li a[href]").each(function(index, element){
             element.removeAttribute("href");
             const page = element.innerText;

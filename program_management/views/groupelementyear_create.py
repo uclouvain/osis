@@ -25,6 +25,7 @@
 ############################################################################
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
@@ -40,6 +41,35 @@ from program_management.business.group_element_years.detach import DetachEducati
 from program_management.business.group_element_years.management import extract_child
 from program_management.forms.group_element_year import GroupElementYearForm
 from program_management.views.generic import GenericGroupElementYearMixin
+
+
+class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
+    template_name = "group_element_year/group_element_year_attach_type_dialog_inner.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["messages"] = []
+        try:
+            data = extract_child(self.education_group_year, self.request)
+            child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
+            strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                AttachLearningUnitYearStrategy
+            strategy(parent=self.education_group_year, child=child).is_valid()
+
+            context['object_to_attach'] = child
+            context['source_link'] = data.get('source_link')
+            context['education_group_year_parent'] = self.education_group_year
+
+        except ObjectDoesNotExist:
+            warning_msg = _("Please select an item before attach it")
+            context["messages"].append(warning_msg)
+        except ValidationError as e:
+            context["messages"].append(e.messages)
+
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        return JsonResponse({"error_messages": context["messages"]})
 
 
 class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
@@ -71,7 +101,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         kwargs = super().get_form_kwargs()
 
         try:
-            data = data = extract_child(self.education_group_year, self.request)
+            data = extract_child(self.education_group_year, self.request)
             kwargs.update({
                 'parent': self.education_group_year,
                 'child_branch': data.get('child_branch'),

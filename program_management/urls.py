@@ -38,6 +38,8 @@ urlpatterns = [
         url(r'^content/', include([
             url(u'^attach/', groupelementyear_create.AttachTypeDialogView.as_view(),
                 name='education_group_attach'),
+            url(r'^check_attach/', groupelementyear_create.AttachCheckView.as_view(),
+                name="check_education_group_attach"),
             url(u'^create/$', groupelementyear_create.CreateGroupElementYearView.as_view(),
                 name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
