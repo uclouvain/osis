@@ -76,6 +76,7 @@
                     input.name = 'selected-item';
                     input.value = data;
                     input.setAttribute('data-url', row['url']);
+                    input.setAttribute('data-name', `${row['academic_year']} - ${row['acronym']}`);
                     return input.outerHTML;
                 }
             },

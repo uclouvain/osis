@@ -44,7 +44,6 @@
         {% endif %}
         {% for i in page_obj.paginator.page_range %}
             {% if i <= page_obj.number|add:5 and i >= page_obj.number|add:-5 %}
-
                 {% if page_obj.number == i %}
                     <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
                 {% else %}
@@ -76,6 +75,7 @@
                     input.name = 'selected-item';
                     input.value = data;
                     input.setAttribute('data-url', row['osis_url']);
+                    input.setAttribute('data-name', `${row['academic_year']} - ${row['acronym']}`);
                     return input.outerHTML;
                 }
             },

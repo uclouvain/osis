@@ -69,6 +69,13 @@ function getIdFromUrl(url){
 function onDraw(){
     $("input[name=selected-item]").each(function(index, element){
         element.addEventListener('click', function(e){
+            const elementName = e.target.getAttribute('data-name');
+            const d = {
+                element_name: elementName
+            };
+            const fmt = gettext("Element selected \"%(element_name)s\": You cannot attach the same child multiple times.");
+            const s = interpolate(fmt, d, true);
+            $("#message_info_modal").attr("style", "").text(s);
             const url = e.target.getAttribute('data-url');
             select_element_from_url(url);
         })
