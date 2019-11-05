@@ -64,7 +64,7 @@
 </div>
 
 {% block script %}
-    {# Define column_def variable in js and also quick_search_url #}
+    {# Must define column_def variable in js and also quick_search_url #}
 <script src="{% static "js/osis_datatable.js" %}"></script>
 <script>
     $(document).ready(function()
@@ -76,14 +76,77 @@
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
         let attachUrl = "{% url "education_group_attach" root_id education_group_year_id %}";
-        $("#button-attach").click(attachModal(checkUrl, attachUrl));
-        $("#search-pagination li a[href]").each(function(index, element){
-            element.removeAttribute("href");
-            const page = element.innerText;
-            element.addEventListener('click', function(e){
-                submit_with_page(page);
+
+        $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
+
+        $("#search-pagination li a[href]").each(function(index, paginationAnchor){
+            paginationAnchor.addEventListener('click', function submitWithPage(e){
+                e.preventDefault();
+                const paginationHref = paginationAnchor.getAttribute("href");
+                const searchParams = new URLSearchParams(paginationHref);
+                const page = searchParams.get("page");
+                $("input[name='page']").val(page);
+                $('#form-modal').submit();
             });
         });
+
+        function attachElementSelected(checkUrl, attachUrl){
+            return function(){
+                const elementUrl = $("input[name=selected-item]:checked").attr("data-url");
+                const parameters = extract_id_and_content_type_parameters(elementUrl);
+                const paramString = new URLSearchParams(parameters);
+
+                $.ajax({
+                    url: `${checkUrl}?${paramString.toString()}`,
+                }).done(function(jsonResponse){
+                    const error_messages = jsonResponse["error_messages"];
+                    if (error_messages.length > 0){
+                        const $span_messages = $("#message_info_modal");
+                        $span_messages.removeAttr("style");
+                        error_messages.forEach(function(message){
+                            $span_messages.append(`<p>${message}</p>`);
+                        });
+                    } else {
+                        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                        $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
+                            if (status === "success") {
+                                let form = $(this).find('form').first();
+                                formAjaxSubmit(form, '#form-ajax-modal');
+                            }
+                        });
+                    }
+                });
+            };
+        }
+
+        function extract_id_and_content_type_parameters(url){
+            if (url == null){
+                return {"id": "", "content_type": ""};
+            }
+
+            let contentType = "undefined";
+            if (url.includes("learning_units")){
+                contentType = "base_learningunityear";
+            }else if(url.includes("educationgroups")){
+                contentType = "base_educationgroupyear";
+            }
+
+            let object_id = getIdFromUrl(url).toString();
+
+            return {"id": object_id, "content_type": contentType};
+        }
+
+        // FIXME This method is copy pasted. Should be extracted in a common file.
+        function getIdFromUrl(url){
+            let split = url.split("/");
+            for(let i=split.length-1; i--; i >= 0){
+                if(!isNaN(split[i])){
+                    return parseInt(split[i]);
+                }
+            }
+            return NaN;
+        }
+
         bind_trigger_modal();
     });
 </script>

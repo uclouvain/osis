@@ -54,6 +54,7 @@ class QuickEducationGroupYearFilter(FilterSet):
 
     ordering = OrderingFilter(
         fields=(
+            ('academic_year__year', 'academic_year'),
             ('acronym', 'acronym'),
             ('title', 'title'),
         ),
