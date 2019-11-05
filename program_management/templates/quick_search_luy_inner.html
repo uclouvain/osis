@@ -28,7 +28,7 @@
                     {% bootstrap_field form.acronym form_group_class="col-md-2" %}
                     {% bootstrap_field form.title form_group_class="col-md-6" %}
                     <div class="col-md-2">
-                        <button type="button" onclick="reloadLearningUnitSearchResult();" class="btn btn-primary" name="search-lu" title="search">
+                        <button type="button" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-lu" title="search">
                             <em class="fa fa-search"></em>
                         </button>
                     </div>
@@ -40,7 +40,10 @@
                     <button class="btn btn-primary" id="button-attach-lu">{% trans 'Attach' %}</button>
                 </div>
             </div>
-
+            {% if paginator.count %}
+            <strong style="margin-left:10px;color:grey;">
+                {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=paginator.count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
+            </strong>
             <table id="table-learning-unit" class="table table-striped table-responsive" style="width: 100%;">
                 <thead>
                 <tr>
@@ -51,31 +54,10 @@
                 </tr>
                 </thead>
             </table>
-
-            <div class="text-center">
-                <ul class="pagination">
-                    {% if page_obj.has_previous %}
-                        <li><a href="#" onclick="submit_with_page('{{ page_obj.previous_page_number }}')">&laquo;</a>
-                        </li>
-                    {% else %}
-                        <li class="disabled"><span>&laquo;</span></li>
-                    {% endif %}
-                    {% for i in page_obj.paginator.page_range %}
-                        {% if i <= page_obj.number|add:5 and i >= page_obj.number|add:-5 %}
-                            {% if page_obj.number == i %}
-                                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-                            {% else %}
-                                <li><a href="#" onclick="submit_with_page('{{ i }}')">{{ i }}</a></li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    {% if page_obj.has_next %}
-                        <li><a href="#" onclick="submit_with_page('{{ page_obj.next_page_number }}')">&raquo;</a></li>
-                    {% else %}
-                        <li class="disabled"><span>&raquo;</span></li>
-                    {% endif %}
-                </ul>
+            <div style="text-align:center" id="search-pagination">
+                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -118,8 +100,6 @@
         ];
         let $table = initializeDataTable("form-modal", "table-learning-unit", "learningUnitsLightIds", 1,
             10, "{{ quick_search_lu }}", columnDefs);
-        $table.on('draw', onDraw);
-
 
         let root_id = "{{ root_id }}";
         let education_group_year_id = "{{ education_group_year_id }}";

@@ -52,7 +52,7 @@ function select_element_from_url(url){
         contentType = "base_educationgroupyear";
     }
     let object_id = getIdFromUrl(url).toString();
-    localStorage.setItem("quickSearchSelection", JSON.stringify({"id": object_id, "content_type": contentType}));
+    return {"id": object_id, "content_type": contentType};
 }
 
 // FIXME This method is copy pasted Refactor
@@ -66,22 +66,11 @@ function getIdFromUrl(url){
     return NaN;
 }
 
-function onDraw(){
-    $("input[name=selected-item]").each(function(index, element){
-        element.addEventListener('click', function(e){
-            const elementName = e.target.getAttribute('data-name');
-            const d = {
-                element_name: elementName
-            };
-            const url = e.target.getAttribute('data-url');
-            select_element_from_url(url);
-        })
-    });
-};
 
 function attachModal(url){
     return function(){
-        const parameters = JSON.parse(localStorage.getItem("quickSearchSelection"));
+        const elementUrl = $("input[name=selected-item]:checked").attr("data-url");
+        const parameters = select_element_from_url(elementUrl);
         const paramString = new URLSearchParams(parameters);
         const urlWithParameters = `${url}?${paramString.toString()}`;
 
