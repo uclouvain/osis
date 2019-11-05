@@ -21,11 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
+from django import forms
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
-from django_filters import FilterSet, filters
+from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
 
 from base.models.academic_year import AcademicYear
@@ -61,6 +61,14 @@ class QuickEducationGroupYearFilter(FilterSet):
         label=_('Title')
     )
 
+    ordering = OrderingFilter(
+        fields=(
+            ('acronym', 'acronym'),
+            ('title', 'title'),
+        ),
+        widget=forms.HiddenInput
+    )
+
     class Meta:
         model = EducationGroupYear
         fields = [
@@ -72,7 +80,6 @@ class QuickEducationGroupYearFilter(FilterSet):
     def __init__(self, *args, initial=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
-        # TODO generalize this logic dynamically
         if initial:
             self.form.fields["academic_year"].initial = initial["academic_year"]
 
@@ -108,6 +115,15 @@ class QuickLearningUnitYearFilter(FilterSet):
         lookup_expr="icontains",
         max_length=40,
         label=_('Title'),
+    )
+
+    ordering = OrderingFilter(
+        fields=(
+            ('academic_year__year', 'academic_year'),
+            ('acronym', 'acronym'),
+            ('full_title', 'title'),
+        ),
+        widget=forms.HiddenInput
     )
 
     class Meta:
