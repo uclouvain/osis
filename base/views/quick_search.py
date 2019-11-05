@@ -23,9 +23,7 @@
 # ############################################################################
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.http import Http404
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
-from django.views.generic import TemplateView
 from django_filters import FilterSet, filters
 from django_filters.views import FilterView
 
@@ -136,67 +134,57 @@ class QuickLearningUnitYearFilter(FilterSet):
         return queryset
 
 
-class QuickSearch(PermissionRequiredMixin, AjaxTemplateMixin, TemplateView):
-    """ Quick search view for learning units and education group year """
-    template_name = 'base/quick_search_inner.html'
+class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
+    model = EducationGroupYear
+    template_name = 'base/blocks/quick_search_egy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+
+    filterset_class = QuickEducationGroupYearFilter
+    cache_exclude_params = 'page',
+    paginate_by = "12"
+    ordering = 'academic_year', 'acronym',
+
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = super().get_filterset_kwargs(filterset_class)
+        kwargs["initial"] = {'academic_year': self.request.GET.get('academic_year')}
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        initial_data = {'academic_year': self.request.GET.get('academic_year')}
-        context['lu_form'] = QuickLearningUnitYearFilter(initial=initial_data).form
-        context['eg_form'] = QuickEducationGroupYearFilter(initial=initial_data).form
+        context['form'] = context["filter"].form
         context['academic_year'] = self.request.GET.get('academic_year')
         context['root'] = self.request.GET.get('root')
         context['education_group_year'] = self.request.GET.get('education_group_year')
         return context
 
 
-# FIXME List should be empty
-class QuickSearchGenericView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin, FilterView):
-    """ Quick search generic view for learning units and education group year """
-    paginate_by = "12"
-    ordering = 'academic_year', 'acronym',
-    template_name = 'base/quick_search_inner.html'
-    cache_exclude_params = 'page',
-
-    def paginate_queryset(self, queryset, page_size):
-        """ The cache can store a wrong page number,
-        In that case, we return to the first page.
-        """
-        try:
-            return super().paginate_queryset(queryset, page_size)
-        except Http404:
-            self.kwargs['page'] = 1
-
-        return super().paginate_queryset(queryset, page_size)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Save in session the last model used in the quick search.
-        self.request.session['quick_search_model'] = self.model.__name__
-        return context
-
-
-class QuickSearchEducationGroupYearView(QuickSearchGenericView):
-    model = EducationGroupYear
-    permission_required = 'base.can_access_education_group'
-
-    filterset_class = QuickEducationGroupYearFilter
+class QuickSearchEducationGroupYearSerializer(SearchMixin, QuickSearchEducationGroupYearView):
     serializer_class = EducationGroupSerializer
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
-
-class QuickSearchLearningUnitYearView(QuickSearchGenericView):
+class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
     model = LearningUnitYear
-    permission_required = 'base.can_access_learningunit'
+    template_name = 'base/blocks/quick_search_luy_inner.html'
+    permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
 
     filterset_class = QuickLearningUnitYearFilter
-    serializer_class = LearningUnitSerializer
+    cache_exclude_params = 'page',
+    paginate_by = "12"
+    ordering = 'academic_year', 'acronym',
+
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = super().get_filterset_kwargs(filterset_class)
+        kwargs["initial"] = {'academic_year': self.request.GET.get('academic_year')}
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['form'] = context["filter"].form
+        context['academic_year'] = self.request.GET.get('academic_year')
+        context['root'] = self.request.GET.get('root')
+        context['education_group_year'] = self.request.GET.get('education_group_year')
         return context
+
+
+class QuickSearchLearningUnitYearSerializer(SearchMixin, QuickSearchLearningUnitYearView):
+    serializer_class = LearningUnitSerializer

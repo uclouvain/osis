@@ -46,7 +46,7 @@ class TestQuickSearchView(TestCase):
 
     def test_learning_unit_search_text_filter(self):
         response = self.client.get(reverse('quick_search_learning_unit'), data={'search_text': 'dead'})
-        self.assertTemplateUsed(response, 'base/quick_search_inner.html')
+        self.assertTemplateUsed(response, 'base/blocks/quick_search_luy_inner.html')
         self.assertIn(self.luy_to_find, response.context['object_list'])
 
         response = self.client.get(reverse('quick_search_learning_unit'), data={'search_text': 'asgard'})
@@ -65,7 +65,7 @@ class TestQuickSearchView(TestCase):
 
     def test_education_group_search_text_filter(self):
         response = self.client.get(reverse('quick_search_education_group'), data={'search_text': 'Rav'})
-        self.assertTemplateUsed(response, 'base/quick_search_inner.html')
+        self.assertTemplateUsed(response, 'base/blocks/quick_search_egy_inner.html')
         self.assertIn(self.egy_to_find, response.context['object_list'])
 
         response = self.client.get(reverse('quick_search_education_group'), data={'search_text': 'Yggdrasil'})

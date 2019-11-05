@@ -99,11 +99,15 @@ function attachModal(url){
     };
 }
 
-
 function reloadEducationGroupSearchResult(tableId){
     $('#table-education-group').DataTable().ajax.reload();
 }
 
 function reloadLearningUnitSearchResult(tableId){
     $('#table-learning-unit').DataTable().ajax.reload();
+}
+
+function submit_with_page(page) {
+    $("input[name='page']").val(page);
+    $('#form-modal').submit();
 }
