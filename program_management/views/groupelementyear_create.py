@@ -64,7 +64,15 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
             warning_msg = _("Please select an item before attach it")
             context["messages"].append(warning_msg)
         except ValidationError as e:
-            context["messages"].append(e.messages)
+            error_messages = []
+            for msg in e.messages:
+                msg_prefix = _("Element selected %(element)s") % {
+                    "element": "{} - {}".format(child.academic_year, child.acronym)
+                }
+                error_messages.append(
+                    "{}: {}".format(msg_prefix, msg)
+                )
+            context["messages"].append(error_messages)
 
         return context
 

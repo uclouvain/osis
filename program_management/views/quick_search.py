@@ -189,5 +189,3 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
 class QuickSearchLearningUnitYearSerializer(SearchMixin, QuickSearchLearningUnitYearView):
     serializer_class = LearningUnitSerializer
-
-

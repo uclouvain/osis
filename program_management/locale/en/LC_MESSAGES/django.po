@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-09 08:35+0200\n"
+"POT-Creation-Date: 2019-11-05 19:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -58,16 +58,34 @@ msgid ""
 "having %(prerequisite_item)s as prerequisite is not copied."
 msgstr ""
 
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
+msgstr ""
+
+#, python-format
+msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
+msgstr ""
+
+msgid "Ac yr."
+msgstr ""
+
 msgid "Academic year"
 msgstr ""
 
 msgid "Acronym"
 msgstr ""
 
+msgid "Acronym/Short title"
+msgstr ""
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr ""
 
 msgid "Add potential courses"
+msgstr ""
+
+msgctxt "plural"
+msgid "All"
 msgstr ""
 
 #, python-format
@@ -115,6 +133,9 @@ msgstr ""
 msgid "Cannot perform modification action on root."
 msgstr ""
 
+msgid "Code"
+msgstr ""
+
 msgid "Copy"
 msgstr ""
 
@@ -131,6 +152,10 @@ msgstr ""
 #, python-format
 msgid ""
 "Do you want to copy or to move %(object_acronym)s from %(parent_acronym)s ?"
+msgstr ""
+
+#, python-format
+msgid "Element selected %(element)s"
 msgstr ""
 
 #, python-format
@@ -159,6 +184,9 @@ msgid ""
 "%(learning_unit_academic_year)s."
 msgstr ""
 
+msgid "Learning units"
+msgstr ""
+
 msgid "Legend"
 msgstr ""
 
@@ -184,6 +212,10 @@ msgid "Name of the teacher responsible"
 msgstr ""
 
 msgid "No"
+msgstr ""
+
+#, python-format
+msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
 
 msgid "Official"
@@ -236,6 +268,9 @@ msgid "Required"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Search"
 msgstr ""
 
 msgid "Student's contact information"
