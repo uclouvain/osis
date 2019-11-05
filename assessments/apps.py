@@ -28,3 +28,6 @@ from django.apps import AppConfig
 
 class AssessmentsConfig(AppConfig):
     name = 'assessments'
+
+    def ready(self):
+        from assessments.signals import subscribers
