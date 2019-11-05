@@ -1,7 +1,7 @@
 {% load static i18n %}
 {% load bootstrap3 %}
+{% url 'quick_search_education_group_serializer' root_id education_group_year_id as quick_search_url %}
 
-{% url 'quick_search_learning_unit_serializer' as quick_search_lu %}
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
     <h4 class="modal-title">{% trans "Search" %}</h4>
@@ -11,11 +11,9 @@
     <div id="message_info_modal" class="alert alert-danger" role="alert" style="visibility: hidden; display: none;"></div>
 
     <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#">{% trans 'Trainings' %}</a></li>
         <li role="presentation">
-            <a class="trigger_modal" data-url="{% url "quick_search_education_group" %}?root={{ root }}&education_group_year={{ education_group_year }}&academic_year={{ academic_year }}">{% trans 'Trainings' %}</a>
-        </li>
-        <li role="presentation" class="active">
-            <a href=#">{% trans 'Learning units' %}</a>
+            <a href="#" class="trigger_modal" data-url="{% url "quick_search_learning_unit" root_id education_group_year_id %}">{% trans 'Learning units' %}</a>
         </li>
     </ul>
 
@@ -24,11 +22,11 @@
             <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal">
                 <input type="hidden" name="page" value="{{ page_obj.number }}">
                 <div class="row">
-                    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
-                    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
+                    {% bootstrap_field form.academic_year form_group_class="hidden" %}
+                    {% bootstrap_field form.acronym form_group_class="col-md-3" %}
                     {% bootstrap_field form.title form_group_class="col-md-6" %}
                     <div class="col-md-2">
-                        <button type="button" onclick="reloadLearningUnitSearchResult();" class="btn btn-primary" name="search-lu" title="search">
+                        <button type="button" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-eg" title="search">
                             <em class="fa fa-search"></em>
                         </button>
                     </div>
@@ -37,16 +35,16 @@
 
             <div class="row">
                 <div class="cold-md-3 pull-right">
-                    <button class="btn btn-primary" id="button-attach-lu">{% trans 'Attach' %}</button>
+                    <button class="btn btn-primary" id="button-attach-eg">{% trans 'Attach' %}</button>
                 </div>
             </div>
 
-            <table id="table-learning-unit" class="table table-striped table-responsive" style="width: 100%;">
+            <table id="table-education-group" class="table table-striped table-responsive" style="width: 100%;">
                 <thead>
                 <tr>
                     <th id="th_0_temp"></th>
                     <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
-                    <th id="th_2_acronym">{% trans 'Code' %}</th>
+                    <th id="th_2_acronym">{% trans 'Acronym/Short title' %}</th>
                     <th id="th_3_title">{% trans 'Title' %}</th>
                 </tr>
                 </thead>
@@ -62,6 +60,7 @@
                     {% endif %}
                     {% for i in page_obj.paginator.page_range %}
                         {% if i <= page_obj.number|add:5 and i >= page_obj.number|add:-5 %}
+
                             {% if page_obj.number == i %}
                                 <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
                             {% else %}
@@ -96,7 +95,7 @@
                     input.type = 'radio';
                     input.name = 'selected-item';
                     input.value = data;
-                    input.setAttribute('data-url', row['osis_url']);
+                    input.setAttribute('data-url', row['url']);
                     input.setAttribute('data-name', `${row['academic_year']} - ${row['acronym']}`);
                     return input.outerHTML;
                 }
@@ -116,16 +115,17 @@
             },
             { "name": "title", "targets": 3, "data": "title"},
         ];
-        let $table = initializeDataTable("form-modal", "table-learning-unit", "learningUnitsLightIds", 1,
-            10, "{{ quick_search_lu }}", columnDefs);
+        let $table = initializeDataTable("form-modal", "table-education-group", "educationGroupsLightIds", 1,
+            10, "{{ quick_search_url }}", columnDefs);
         $table.on('draw', onDraw);
 
 
-        let root = "{{ root }}";
-        let education_group_year = "{{ education_group_year }}";
-        let url = `/program_management/${root}/${education_group_year}/content/attach/`;
-        $("#button-attach-lu").click(attachModal(url));
+        let root_id = "{{ root_id }}";
+        let education_group_year_id = "{{ education_group_year_id }}";
+        let url = `/program_management/${root_id}/${education_group_year_id}/content/attach/`;
+        $("#button-attach-eg").click(attachModal(url));
 
         bind_trigger_modal();
     });
 </script>
+

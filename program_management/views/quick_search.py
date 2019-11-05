@@ -23,6 +23,7 @@
 # ############################################################################
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters
 from django_filters.views import FilterView
@@ -136,7 +137,7 @@ class QuickLearningUnitYearFilter(FilterSet):
 
 class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
     model = EducationGroupYear
-    template_name = 'base/blocks/quick_search_egy_inner.html'
+    template_name = 'quick_search_egy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
 
     filterset_class = QuickEducationGroupYearFilter
@@ -146,15 +147,15 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        kwargs["initial"] = {'academic_year': self.request.GET.get('academic_year')}
+        egy = get_object_or_404(EducationGroupYear, id=self.kwargs['education_group_year_id'])
+        kwargs["initial"] = {'academic_year': egy.academic_year_id}
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['academic_year'] = self.request.GET.get('academic_year')
-        context['root'] = self.request.GET.get('root')
-        context['education_group_year'] = self.request.GET.get('education_group_year')
+        context['root_id'] = self.kwargs['root_id']
+        context['education_group_year_id'] = self.kwargs['education_group_year_id']
         return context
 
 
@@ -164,7 +165,7 @@ class QuickSearchEducationGroupYearSerializer(SearchMixin, QuickSearchEducationG
 
 class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
     model = LearningUnitYear
-    template_name = 'base/blocks/quick_search_luy_inner.html'
+    template_name = 'quick_search_luy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
 
     filterset_class = QuickLearningUnitYearFilter
@@ -174,15 +175,15 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        kwargs["initial"] = {'academic_year': self.request.GET.get('academic_year')}
+        egy = get_object_or_404(EducationGroupYear, id=self.kwargs['education_group_year_id'])
+        kwargs["initial"] = {'academic_year': egy.academic_year_id}
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['academic_year'] = self.request.GET.get('academic_year')
-        context['root'] = self.request.GET.get('root')
-        context['education_group_year'] = self.request.GET.get('education_group_year')
+        context['root_id'] = self.kwargs['root_id']
+        context['education_group_year_id'] = self.kwargs['education_group_year_id']
         return context
 
 

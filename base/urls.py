@@ -58,8 +58,6 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 from base.views.person import EmployeeAutocomplete
-from base.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView, \
-    QuickSearchEducationGroupYearSerializer, QuickSearchLearningUnitYearSerializer
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -313,14 +311,6 @@ urlpatterns = [
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
         url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
     ])),
-    url(r'^quick_search_learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
-        name="quick_search_learning_unit"),
-    url(r'^quick_search_learning_unit_serializer/$', QuickSearchLearningUnitYearSerializer.as_view(),
-        name="quick_search_learning_unit_serializer"),
-    url(r'^quick_search_education_group/$', QuickSearchEducationGroupYearView.as_view(),
-        name="quick_search_education_group"),
-    url(r'^quick_search_education_group_serializer/$', QuickSearchEducationGroupYearSerializer.as_view(),
-        name="quick_search_education_group_serializer"),
 
 ]
 
