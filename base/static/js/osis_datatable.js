@@ -80,17 +80,8 @@ function attachModal(url){
                 let form = $(this).find('form').first();
                 formAjaxSubmit(form, '#form-ajax-modal');
             }
-
         });
     };
-}
-
-function reloadEducationGroupSearchResult(tableId){
-    $('#table-education-group').DataTable().ajax.reload();
-}
-
-function reloadLearningUnitSearchResult(tableId){
-    $('#table-learning-unit').DataTable().ajax.reload();
 }
 
 function submit_with_page(page) {

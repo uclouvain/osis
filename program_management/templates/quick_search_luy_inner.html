@@ -1,15 +1,9 @@
+{% extends "quick_search_base.html" %}
+
 {% load static i18n %}
 {% load bootstrap3 %}
 
-{% url 'quick_search_learning_unit_serializer' root_id education_group_year_id as quick_search_lu %}
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title">{% trans "Search" %}</h4>
-</div>
-
-<div class="modal-body">
-    <div id="message_info_modal" class="alert alert-danger" role="alert" style="visibility: hidden; display: none;"></div>
-
+{% block navbar %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation">
             <a class="trigger_modal" data-url="{% url "quick_search_education_group" root_id education_group_year_id%}">{% trans 'Trainings' %}</a>
@@ -18,55 +12,24 @@
             <a href=#">{% trans 'Learning units' %}</a>
         </li>
     </ul>
+{% endblock navbar %}
 
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active">
-            <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal">
-                <input type="hidden" name="page" value="{{ page_obj.number }}">
-                <div class="row">
-                    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
-                    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
-                    {% bootstrap_field form.title form_group_class="col-md-6" %}
-                    <div class="col-md-2">
-                        <button type="button" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-lu" title="search">
-                            <em class="fa fa-search"></em>
-                        </button>
-                    </div>
-                </div>
-            </form>
+{% block form_field %}
+    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
+    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
+    {% bootstrap_field form.title form_group_class="col-md-6" %}
+{% endblock form_field %}
 
-            <div class="row">
-                <div class="cold-md-3 pull-right">
-                    <button class="btn btn-primary" id="button-attach-lu">{% trans 'Attach' %}</button>
-                </div>
-            </div>
-            {% if paginator.count %}
-            <strong style="margin-left:10px;color:grey;">
-                {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=paginator.count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
-            </strong>
-            <table id="table-learning-unit" class="table table-striped table-responsive" style="width: 100%;">
-                <thead>
-                <tr>
-                    <th id="th_0_temp"></th>
-                    <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
-                    <th id="th_2_acronym">{% trans 'Code' %}</th>
-                    <th id="th_3_title">{% trans 'Title' %}</th>
-                </tr>
-                </thead>
-            </table>
-            <div style="text-align:center" id="search-pagination">
-                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
+{% block table_header %}
+    <th id="th_0_temp"></th>
+    <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
+    <th id="th_2_acronym">{% trans 'Code' %}</th>
+    <th id="th_3_title">{% trans 'Title' %}</th>
+{% endblock table_header %}
 
-<script src="{% static "js/osis_datatable.js" %}"></script>
-<script>
-    $(document).ready(function()
-    {
-        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+{% block script %}
+    {% url 'quick_search_learning_unit_serializer' root_id education_group_year_id as quick_search_url %}
+    <script>
         columnDefs = [
             {
                 "name": "temp",
@@ -98,14 +61,6 @@
             },
             { "name": "title", "targets": 3, "data": "title"},
         ];
-        let $table = initializeDataTable("form-modal", "table-learning-unit", "learningUnitsLightIds", 1,
-            10, "{{ quick_search_lu }}", columnDefs);
-
-        let root_id = "{{ root_id }}";
-        let education_group_year_id = "{{ education_group_year_id }}";
-        let url = `/program_management/${root_id}/${education_group_year_id}/content/attach/`;
-        $("#button-attach-lu").click(attachModal(url));
-
-        bind_trigger_modal();
-    });
-</script>
+    </script>
+    {{ block.super }}
+{% endblock script %}
