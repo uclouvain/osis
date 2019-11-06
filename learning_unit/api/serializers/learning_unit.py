@@ -143,3 +143,15 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
         elif learning_unit_year.summary_locked:
             return SummaryStatus.BLOCKED.value
         return SummaryStatus.NOT_MODIFIED.value
+
+
+class ExternalLearningUnitDetailedSerializer(LearningUnitDetailedSerializer):
+    local_url = serializers.CharField(source='externallearningunityear.url')
+    local_code = serializers.CharField(source='externallearningunityear.external_acronym')
+
+    class Meta(LearningUnitDetailedSerializer.Meta):
+        model = LearningUnitYear
+        fields = LearningUnitDetailedSerializer.Meta.fields + (
+            'local_code',
+            'local_url'
+        )

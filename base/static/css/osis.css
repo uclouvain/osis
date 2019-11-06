@@ -306,8 +306,7 @@ div.dataTables_wrapper div.dataTables_processing {
 
 #clipboard {
     position: fixed;
-    bottom: 0px;
-    right: 5px;
+    bottom: 0;
     z-index: 1000;
 }
 
