@@ -840,16 +840,8 @@ class TestEditProposal(TestCase):
     def test_edit_suppression_proposal_wrong_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
         self.proposal.save()
-
-        request_factory = RequestFactory()
-        request = request_factory.post(self.url, data={"academic_year": self.academic_years[3].id,
-                                                       "entity": self.entity_version.id})
-
-        request.user = self.person.user
-        request.session = 'session'
-        request._messages = FallbackStorage(request)
-
-        self.assertRaises(ValidationError, update_learning_unit_proposal, request, self.learning_unit_year.id)
+        response = self.client.get(self.url)
+        self.assertEqual(self.url, response.request['PATH_INFO'])
 
 
 class TestLearningUnitProposalDisplay(TestCase):
