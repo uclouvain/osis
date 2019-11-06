@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 09:18+0100\n"
+"POT-Creation-Date: 2019-11-06 11:47+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -747,9 +747,6 @@ msgstr "Fiche descriptive"
 msgid "Description fiche status"
 msgstr "Statut des fiches descriptives"
 
-msgid "Description fiche submission dates updated"
-msgstr "Date de soumission des fiches descriptives mis à jour"
-
 msgid "Detach"
 msgstr "Détacher"
 
@@ -957,6 +954,9 @@ msgstr "Entités de charges"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Evaluations"
 msgstr "Évaluations"
@@ -3651,3 +3651,6 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Description fiche submission dates updated"
+#~ msgstr "Date de soumission des fiches descriptives mis à jour"

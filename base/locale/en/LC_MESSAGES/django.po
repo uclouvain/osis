@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 09:18+0100\n"
+"POT-Creation-Date: 2019-11-06 11:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -718,9 +718,6 @@ msgstr ""
 msgid "Description fiche status"
 msgstr ""
 
-msgid "Description fiche submission dates updated"
-msgstr ""
-
 msgid "Detach"
 msgstr ""
 
@@ -917,6 +914,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluations"
