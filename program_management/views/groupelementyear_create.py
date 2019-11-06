@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.utils.functional import cached_property
@@ -41,14 +41,22 @@ from program_management.business.group_element_years.detach import DetachEducati
 from program_management.business.group_element_years.management import extract_child
 from program_management.forms.group_element_year import GroupElementYearForm
 from program_management.views.generic import GenericGroupElementYearMixin
+from base.views.education_groups import perms
 
 
 class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
     template_name = "group_element_year/group_element_year_attach_type_dialog_inner.html"
+    rules = []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["messages"] = []
+
+        try:
+            perms.can_change_education_group(self.request.user, self.education_group_year)
+        except PermissionDenied as e:
+            context["messages"].append(str(e))
+
         try:
             data = extract_child(self.education_group_year, self.request)
             child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
