@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-05 19:13+0100\n"
+"POT-Creation-Date: 2019-11-06 08:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,6 +63,10 @@ msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 
 #, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
+msgstr ""
+
+#, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
 
@@ -82,10 +86,6 @@ msgid "Activities with prerequisites (in preparation)"
 msgstr ""
 
 msgid "Add potential courses"
-msgstr ""
-
-msgctxt "plural"
-msgid "All"
 msgstr ""
 
 #, python-format

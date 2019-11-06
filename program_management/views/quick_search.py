@@ -36,10 +36,14 @@ from education_group.api.serializers.education_group import EducationGroupSerial
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
+CACHE_TIMEOUT = 60
+
+
 class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
     model = EducationGroupYear
     template_name = 'quick_search_egy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+    timeout = CACHE_TIMEOUT
 
     filterset_class = QuickEducationGroupYearFilter
     cache_exclude_params = 'page',
@@ -68,6 +72,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
     model = LearningUnitYear
     template_name = 'quick_search_luy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+    timeout = CACHE_TIMEOUT
 
     filterset_class = QuickLearningUnitYearFilter
     cache_exclude_params = 'page',

@@ -36,9 +36,9 @@
             {% if paginator.count %}
                 <div class="row">
                     <div class="col-md-6">
-                        <strong style="color:grey;">
-                            {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=paginator.count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
-                        </strong>
+                    {% block count_message %}
+
+                    {% endblock count_message %}
                     </div>
                     <div class="cold-md-3 pull-right">
                         <button class="btn btn-primary" id="button-attach">{% trans 'Attach' %}</button>
