@@ -1903,11 +1903,6 @@
                 "scoresencoding"
             ],
             [
-                "can_access_academic_calendar",
-                "base",
-                "academiccalendar"
-            ],
-            [
                 "can_access_academicyear",
                 "base",
                 "academicyear"
