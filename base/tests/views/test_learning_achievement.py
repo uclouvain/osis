@@ -420,7 +420,7 @@ class TestLearningAchievementPostponement(TestCase):
         self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), self.max_la_number)
         self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), self.max_la_number)
 
-    def test_learning_unit_years_consistence_after_postponement(self):
+    def test_learning_unit_year_created_after_postponement(self):
         luy_to_delete = self.learning_unit_years.pop()
         luy_to_delete.learning_container_year.delete()
         luy_to_delete.delete()
