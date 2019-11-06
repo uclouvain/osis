@@ -146,7 +146,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer le gestionnaire suivant ?"
 #: templates/scores_encoding_by_learning_unit.html:32
 #: templates/scores_encoding_by_specific_criteria.html:37
 msgid "By learning unit"
-msgstr "Par unité d'apprentissage"
+msgstr "Par unité d'enseignement"
 
 #: templates/scores_encoding_by_learning_unit.html:33
 #: templates/scores_encoding_by_specific_criteria.html:38
