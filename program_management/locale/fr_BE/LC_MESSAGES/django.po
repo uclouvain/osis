@@ -87,7 +87,7 @@ msgstr ""
 "Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
 
 msgid "Ac yr."
-msgstr ""
+msgstr "Anac."
 
 msgid "Academic year"
 msgstr "Année académique"
@@ -96,7 +96,7 @@ msgid "Acronym"
 msgstr "Sigle"
 
 msgid "Acronym/Short title"
-msgstr ""
+msgstr "Sigle/Intitulé abrégé"
 
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
@@ -157,10 +157,10 @@ msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
 
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 msgid "Copy"
-msgstr ""
+msgstr "Copier"
 
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
@@ -216,7 +216,7 @@ msgstr ""
 "référence %(learning_unit_academic_year)s."
 
 msgid "Learning units"
-msgstr ""
+msgstr "Unités d'enseignement"
 
 msgid "Legend"
 msgstr "Légende"
@@ -248,6 +248,8 @@ msgstr "Non"
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
+"Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
+"%(acronym)s"
 
 msgid "Official"
 msgstr "Officiel"
@@ -310,7 +312,7 @@ msgid "Save"
 msgstr "Enregistrer"
 
 msgid "Search"
-msgstr ""
+msgstr "Recherche"
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
