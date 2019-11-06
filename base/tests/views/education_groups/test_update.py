@@ -253,7 +253,7 @@ class TestUpdate(TestCase):
             'title': 'Cours au choix',
             'title_english': 'deaze',
             'education_group_type': self.education_group_year.education_group_type.id,
-            'credits': None,
+            'credits': '',
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
             'management_entity': new_entity_version.pk,
@@ -315,7 +315,7 @@ class TestUpdate(TestCase):
             management_entity=self.training_education_group_year.management_entity,
             administration_entity=self.training_education_group_year.administration_entity,
             academic_year=self.current_academic_year,
-            education_group__start_year=1968
+            education_group__start_year=self.start_academic_year
         )
         EducationGroupYearDomainFactory(
             education_group_year=egy,
@@ -377,7 +377,7 @@ class TestUpdate(TestCase):
             management_entity=self.training_education_group_year.management_entity,
             administration_entity=self.training_education_group_year.administration_entity,
             academic_year=self.current_academic_year,
-            education_group__start_year=1968
+            education_group__start_year=self.start_academic_year
         )
         EducationGroupYearDomainFactory(
             education_group_year=egy,
@@ -393,7 +393,7 @@ class TestUpdate(TestCase):
             'title': 'Cours au choix',
             'title_english': 'deaze',
             'education_group_type': self.education_group_type_pgrm_master_120.pk,
-            'credits': None,
+            'credits': '',
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
             'management_entity': new_entity_version.pk,
@@ -595,7 +595,7 @@ class TestUpdate(TestCase):
             'title': 'Cours au choix',
             'title_english': 'deaze',
             'education_group_type': self.a_mini_training_education_group_type.pk,
-            'credits': None,
+            'credits': '',
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
             'management_entity': new_entity_version.pk,

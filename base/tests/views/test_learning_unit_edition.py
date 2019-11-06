@@ -313,7 +313,7 @@ class TestEditLearningUnit(TestCase):
         self.assertEqual(self.learning_unit_year.credits, credits)
 
     def test_invalid_post_request(self):
-        credits = None
+        credits = ''
         form_data = self._get_valid_form_data()
         form_data['credits'] = credits
         form_data['container_type'] = learning_container_year_types.COURSE
