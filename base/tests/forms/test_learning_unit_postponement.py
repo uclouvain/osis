@@ -172,6 +172,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.learn_unit_structure.learning_unit_partim.end_year = self.current_academic_year
         self.learn_unit_structure.learning_unit_partim.save()
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_partim, self.person)
+
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_partim.academic_year,
                                               learning_unit_instance=instance_luy_base_form.learning_unit_instance,
                                               learning_unit_full_instance=self.learning_unit_year_full.learning_unit,
@@ -695,6 +696,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
 def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
     container_year = learning_unit_year_instance.learning_container_year
     learning_unit_instance = learning_unit_year_instance.learning_unit
+
     if learning_unit_year_instance.subtype == learning_unit_year_subtypes.FULL:
         form = FullForm
         learning_unit_full_instance = None
@@ -718,7 +720,6 @@ def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
             'component-1-hourly_volume_partial_q2': 10,
             'component-0-planned_classes': 1,
             'component-1-planned_classes': 1,
-
             'acronym': learning_unit_year_instance.acronym,
             'acronym_0': learning_unit_year_instance.acronym[0],
             'acronym_1': learning_unit_year_instance.acronym[1:],

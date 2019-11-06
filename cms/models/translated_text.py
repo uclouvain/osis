@@ -56,6 +56,9 @@ class TranslatedText(models.Model):
     def __str__(self):
         return self.entity
 
+    class Meta:
+        unique_together = ('entity', 'reference', 'text_label', 'language')
+
 
 def find_by_id(id):
     return TranslatedText.objects.get(pk=id)

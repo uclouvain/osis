@@ -1358,7 +1358,7 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fi
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,Ex: PARTENARIATS
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,Ex: TPCHOIX
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Partie de base,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Contenu:,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_majorlistchoice,REQUIRED,Liste au choix Majeures,,,,,
@@ -1505,11 +1505,11 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fs
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_option,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_deepening,REQUIRED,Approfondissement en,^(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_openminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_disciplinarycomplementminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_fsaspeciality,REQUIRED,Majeure en ,^(Majeure en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_openminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_disciplinarycomplementminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_fsaspeciality,REQUIRED,Majeure en,^(Majeure en)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_option,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.credits.osis.education_group_type_deepening,REQUIRED,30,,,,,

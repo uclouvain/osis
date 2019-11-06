@@ -31,9 +31,10 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer, LearningUnitSerializer, \
-    LearningUnitTitleSerializer
+    LearningUnitTitleSerializer, ExternalLearningUnitDetailedSerializer
 
 
 class LearningUnitTitleSerializerTestCase(TestCase):
@@ -153,5 +154,67 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'partims',
             'proposal',
             'summary_status',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        anac = AcademicYearFactory()
+        requirement_entity = EntityFactory()
+        EntityVersionFactory(
+            start_date=AcademicYearFactory(year=anac.year - 1).start_date,
+            end_date=AcademicYearFactory(year=anac.year + 1).end_date,
+            entity=requirement_entity
+        )
+        luy = LearningUnitYearFactory(
+            academic_year=anac,
+            learning_container_year__requirement_entity=requirement_entity
+        )
+        ExternalLearningUnitYearFactory(learning_unit_year=luy)
+        cls.luy = LearningUnitYear.objects.filter(pk=luy.pk).annotate_full_title().get()
+        setattr(cls.luy, "entity_requirement", "OSIS")
+        setattr(cls.luy, "entity_allocation", "OSIS")
+        url_kwargs = {
+            'acronym': cls.luy.acronym,
+            'year': cls.luy.academic_year.year
+        }
+        url = reverse('learning_unit_api_v1:learningunits_read', kwargs=url_kwargs)
+        cls.serializer = ExternalLearningUnitDetailedSerializer(cls.luy, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'title',
+            'url',
+            'osis_url',
+            'acronym',
+            'academic_year',
+            'credits',
+            'status',
+            'requirement_entity',
+            'allocation_entity',
+            'type',
+            'type_text',
+            'subtype',
+            'subtype_text',
+            'has_proposal',
+            'quadrimester',
+            'quadrimester_text',
+            'periodicity',
+            'periodicity_text',
+            'campus',
+            'team',
+            'language',
+            'components',
+            'parent',
+            'partims',
+            'proposal',
+            'summary_status',
+            'local_code',
+            'local_url'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

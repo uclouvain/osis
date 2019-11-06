@@ -12,8 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='programmanager',
-            options={'permissions': (('view_programmanager', 'Can view program manager'),)},
-        ),
+        # Hack pour permettre le déploiement sur DB prod : view_programmanager existait,
+        # a été suprimmé et ensuite recréé lors du passage à Django 2
+        # migrations.AlterModelOptions(
+        #     name='programmanager',
+        #     options={'permissions': (('view_programmanager', 'Can view program manager'),)},
+        # ),
     ]

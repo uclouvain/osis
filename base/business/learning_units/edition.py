@@ -607,5 +607,4 @@ def update_partim_acronym(acronym_full, luy_to_update):
         for partim in partims:
             new_acronym = acronym_full + str(partim.acronym[-1])
             partim.acronym = new_acronym
-            partim.learning_container_year.acronym = acronym_full
             partim.save()
