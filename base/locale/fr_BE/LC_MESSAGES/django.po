@@ -1923,6 +1923,12 @@ msgstr "Mot de passe"
 msgid "Pending"
 msgstr "En attente"
 
+msgid "Periodic courses not taught"
+msgstr "Activité cyclique non dispensée en"
+
+msgid "Periodic courses taught during"
+msgstr "Activité cyclique dispensée en"
+
 msgid "Periodicity"
 msgstr "Périodicité"
 
@@ -2718,6 +2724,9 @@ msgstr "Le programme %(acronym)s sera publié sous peu"
 msgid "The program aim has been updated"
 msgstr "L’objectif du programme a été mis à jour"
 
+msgid "The registration form is available at the Secretariat of"
+msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
+
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -2726,9 +2735,10 @@ msgstr ""
 "La répartition de volume de %(col_name)s a déjà été modifiée. (%(new_value)s "
 "à la place de %(current_value)s)"
 
+
 #, python-format
 msgid ""
-"The section you modified have been saved and reported up to "
+"The sections you modified have been saved and reported up to "
 "%(last_year_reported)s with success."
 msgstr ""
 "Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
@@ -3350,6 +3360,9 @@ msgstr "bisannuelle impaire"
 msgid "blocked update for tutor"
 msgstr "mise-à-jour bloquée pour l'enseignant"
 
+msgid "cancel"
+msgstr "annuler"
+
 msgid "cannot be canceled"
 msgstr "ne peut pas être annulé"
 
@@ -3553,6 +3566,9 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
+
+msgid "save"
+msgstr "enregistrer"
 
 msgid "score(s) saved"
 msgstr "note(s) enregistrée(s)"
