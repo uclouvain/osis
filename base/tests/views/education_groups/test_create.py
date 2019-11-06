@@ -222,7 +222,6 @@ class TestCreateForm(TestCase):
                                                    self.education_group_types[1].id])
         data = {
             'acronym': 'YOLO1BA',
-            'partial_acronym': 'LYOLO1B',
             'active': 'ACTIVE',
             'schedule_type': 'DAILY',
             'title': 'Bachelier en',
