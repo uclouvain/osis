@@ -103,6 +103,7 @@
                     if (error_messages.length > 0){
                         const $span_messages = $("#message_info_modal");
                         $span_messages.removeAttr("style");
+                        $span_messages.text("");
                         error_messages.forEach(function(message){
                             $span_messages.append(`<p>${message}</p>`);
                         });
