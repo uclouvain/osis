@@ -604,7 +604,6 @@ def create_learning_unit_year_creation_message(learning_unit_year_created):
 def update_partim_acronym(acronym_full, luy_to_update):
     partims = luy_to_update.get_partims_related()
     if partims:
-        partims[0].learning_container_year.acronym = acronym_full
         for partim in partims:
             new_acronym = acronym_full + str(partim.acronym[-1])
             partim.acronym = new_acronym
