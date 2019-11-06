@@ -56,7 +56,12 @@
             {
                 "name": "academic_year",
                 "targets": 1,
-                "data": "academic_year"
+                "data": "academic_year",
+                "render": function(data, type, row, meta){
+                    let year = data;
+                    let nextYear = data + 1;
+                    return `${year}-${nextYear.toString().slice(2)}`;
+                }
             },
             {
                 "name": "acronym",
