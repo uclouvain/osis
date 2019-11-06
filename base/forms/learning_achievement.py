@@ -29,8 +29,8 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_unit import get_academic_year_postponement_range
+from base.business.learning_units.edition import get_or_duplicate_luy
 from base.models.learning_achievement import LearningAchievement
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
@@ -134,15 +134,13 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def _update_future_luy(self, ac_year_postponement_range, text):
         for ac in ac_year_postponement_range:
+            luy = text.learning_unit_year
+            next_luy = get_or_duplicate_luy(ac, luy)
+
             # For sync purpose, we need to trigger for the following years
             # an update of the THEMES_DISCUSSED cms when we update learning achievement
-            update_themes_discussed_changed_field_in_cms(text.learning_unit_year)
-            luy = text.learning_unit_year
-            next_luy, created = LearningUnitYear.objects.get_or_create(
-                academic_year=ac,
-                acronym=luy.acronym,
-                learning_unit=luy.learning_unit
-            )
+            update_themes_discussed_changed_field_in_cms(next_luy)
+
             LearningAchievement.objects.update_or_create(
                 code_name=self.old_code_name,
                 language=text.language,

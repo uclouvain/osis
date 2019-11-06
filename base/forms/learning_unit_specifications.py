@@ -28,6 +28,7 @@ from django import forms
 from django.conf import settings
 
 from base.business.learning_unit import get_academic_year_postponement_range
+from base.business.learning_units.edition import get_or_duplicate_luy
 from base.forms.common import set_trans_txt
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
@@ -105,11 +106,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
 
     def _update_future_luy(self, ac_year_postponement_range, luy):
         for ac in ac_year_postponement_range:
-            next_luy, created = LearningUnitYear.objects.get_or_create(
-                academic_year=ac,
-                acronym=luy.acronym,
-                learning_unit=luy.learning_unit
-            )
+            next_luy = get_or_duplicate_luy(ac, luy)
             TranslatedText.objects.update_or_create(
                 entity=entity_name.LEARNING_UNIT_YEAR,
                 reference=next_luy.id,

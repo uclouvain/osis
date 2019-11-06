@@ -38,8 +38,13 @@ from base.business.learning_units.achievement import DELETE, DOWN, UP
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_container import LearningContainerFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -366,15 +371,25 @@ class TestLearningAchievementPostponement(TestCase):
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
         self.person = PersonFactory(user=self.user)
         self.person_entity = PersonEntityFactory(person=self.person)
+        EntityVersionFactory(entity=self.person_entity.entity)
         self.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]
+        self.max_la_number = 2*len(self.academic_years)
         self.learning_unit = LearningUnitFactory(start_year=get_current_year(), end_year=get_current_year()+5)
+        self.learning_container = LearningContainerFactory()
         self.learning_unit_years = [LearningUnitYearFactory(
             academic_year=academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_container_year__requirement_entity=self.person_entity.entity,
+            learning_container_year=LearningContainerYearFactory(
+                academic_year=academic_year,
+                learning_container=self.learning_container,
+                requirement_entity=self.person_entity.entity
+            ),
             learning_unit=self.learning_unit,
             acronym="TEST0000"
         ) for academic_year in self.academic_years]
+        self.learning_component_years = [LearningComponentYearFactory(
+            learning_unit_year=luy,
+        ) for luy in self.learning_unit_years]
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -397,13 +412,28 @@ class TestLearningAchievementPostponement(TestCase):
 
     def test_learning_achievement_move_up_with_postponement(self):
         self._move_achievement(achievement_code_name=2, operation=UP)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), 10)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), self.max_la_number)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), self.max_la_number)
 
     def test_learning_achievement_move_down_with_postponement(self):
         self._move_achievement(achievement_code_name=1, operation=DOWN)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), 10)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), self.max_la_number)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), self.max_la_number)
+
+    def test_learning_unit_years_consistence_after_postponement(self):
+        luy_to_delete = self.learning_unit_years.pop()
+        luy_to_delete.learning_container_year.delete()
+        luy_to_delete.delete()
+        self.learning_component_years.pop().delete()
+        create_response = self._create_achievements(code_name=1)
+        self.assertEqual(create_response.status_code, 200)
+        luy = self.learning_unit_years[-1]
+        last_luy = LearningUnitYear.objects.get(acronym=luy.acronym, academic_year=self.academic_years[-1])
+        self.assertEqual(
+            last_luy.learning_container_year.learning_container,
+            luy.learning_container_year.learning_container
+        )
+        self.assertTrue(last_luy.learningcomponentyear_set.all())
 
     def _create_achievements(self, code_name):
         create_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
