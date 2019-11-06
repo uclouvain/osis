@@ -3625,6 +3625,16 @@
                     "can_read_persons_roles",
                     "base",
                     "person"
+                ],
+                [
+                    "can_access_academicyear",
+                    "base",
+                    "academicyear"
+                ],
+                [
+                    "can_access_academic_calendar",
+                    "base",
+                    "academiccalendar"
                 ]
             ]
         }
