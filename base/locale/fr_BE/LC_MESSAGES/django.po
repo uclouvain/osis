@@ -3651,6 +3651,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Description fiche submission dates updated"
-#~ msgstr "Date de soumission des fiches descriptives mis à jour"

@@ -36,9 +36,11 @@ from waffle.testutils import override_flag
 from base.forms.education_group.group import GroupYearModelForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm
 from base.forms.education_group.training import TrainingEducationGroupYearForm
-from base.models.enums import education_group_categories, organization_type
+from base.models.enums import education_group_categories, organization_type, internship_presence
+from base.models.enums.active_status import ACTIVE
 from base.models.enums.education_group_categories import TRAINING, Categories
 from base.models.enums.entity_type import FACULTY
+from base.models.enums.schedule_type import DAILY
 from base.models.exceptions import ValidationWarning
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -222,13 +224,13 @@ class TestCreateForm(TestCase):
                                                    self.education_group_types[1].id])
         data = {
             'acronym': 'YOLO1BA',
-            'active': 'ACTIVE',
-            'schedule_type': 'DAILY',
+            'active': ACTIVE,
+            'schedule_type': DAILY,
             'title': 'Bachelier en',
             'academic_year': self.current_academic_year.id,
             'management_entity': self.entity_version.id,
             'administration_entity': self.entity_version.id,
-            'internship': ['NO'],
+            'internship': internship_presence.NO,
             'primary_language': self.language.id,
             'diploma_printing_title': "title",
         }
