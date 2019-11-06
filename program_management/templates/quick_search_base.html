@@ -75,7 +75,7 @@
             {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url "education_group_attach" root_id education_group_year_id %}";
+        let attachUrl = "{% url 'education_group_attach' root_id education_group_year_id %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
@@ -92,7 +92,7 @@
 
         function attachElementSelected(checkUrl, attachUrl){
             return function(){
-                const elementUrl = $("input[name=selected-item]:checked").attr("data-url");
+                const elementUrl = $("input[name=selected-item]:checked").attr("data-url") || "";
                 const parameters = extract_id_and_content_type_parameters(elementUrl);
                 const paramString = new URLSearchParams(parameters);
 
@@ -120,11 +120,7 @@
         }
 
         function extract_id_and_content_type_parameters(url){
-            if (url == null){
-                return {"id": "", "content_type": ""};
-            }
-
-            let contentType = "undefined";
+            let contentType = "";
             if (url.includes("learning_units")){
                 contentType = "base_learningunityear";
             }else if(url.includes("educationgroups")){
@@ -137,6 +133,7 @@
         }
 
         // FIXME This method is copy pasted. Should be extracted in a common file.
+        // Also will be suppressed when we will slugify urls.
         function getIdFromUrl(url){
             let split = url.split("/");
             for(let i=split.length-1; i--; i >= 0){

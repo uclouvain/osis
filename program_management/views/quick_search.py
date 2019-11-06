@@ -48,7 +48,7 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
     filterset_class = QuickEducationGroupYearFilter
     cache_exclude_params = 'page',
     paginate_by = "12"
-    ordering = 'academic_year', 'acronym',
+    ordering = ('academic_year', 'acronym')
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
@@ -64,6 +64,7 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
         return context
 
 
+# FIXME Use content-type to determine if serializer use or not
 class QuickSearchEducationGroupYearSerializer(SearchMixin, QuickSearchEducationGroupYearView):
     serializer_class = EducationGroupSerializer
 
@@ -77,7 +78,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
     filterset_class = QuickLearningUnitYearFilter
     cache_exclude_params = 'page',
     paginate_by = "12"
-    ordering = 'academic_year', 'acronym',
+    ordering = ('academic_year', 'acronym')
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
@@ -93,5 +94,6 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         return context
 
 
+# FIXME Use content-type to determine if serializer use or not
 class QuickSearchLearningUnitYearSerializer(SearchMixin, QuickSearchLearningUnitYearView):
     serializer_class = LearningUnitSerializer
