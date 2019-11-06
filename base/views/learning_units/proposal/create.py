@@ -48,7 +48,8 @@ def get_proposal_learning_unit_creation_form(request, academic_year):
         if proposal_form.is_valid():
             proposal = proposal_form.save()
             success_msg = _(
-                "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created.") % {
+                "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created.")\
+                % {
                     'link': reverse("learning_unit", kwargs={'learning_unit_year_id': proposal.learning_unit_year.id}),
                     'acronym': proposal.learning_unit_year.acronym,
                     'academic_year': proposal.learning_unit_year.academic_year

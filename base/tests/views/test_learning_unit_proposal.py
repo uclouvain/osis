@@ -840,7 +840,8 @@ class TestEditProposal(TestCase):
     def test_edit_suppression_proposal_wrong_post(self):
         self.proposal.type = ProposalType.SUPPRESSION.name
         self.proposal.save()
-        response = self.client.get(self.url)
+        response = self.client.post(self.url, data={"academic_year": self.academic_years[3].id,
+                                                    "entity": self.entity_version.id})
         self.assertEqual(self.url, response.request['PATH_INFO'])
 
 
