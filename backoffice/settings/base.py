@@ -284,7 +284,6 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
-        'contentsCss': ["body {font-family: 'montserrat';}"],
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Format', 'Styles'],
