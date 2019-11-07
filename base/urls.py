@@ -58,7 +58,6 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 from base.views.person import EmployeeAutocomplete
-from base.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -227,6 +226,8 @@ urlpatterns = [
 
                 url(r'^(?P<learning_achievement_id>[0-9]+)/create/', learning_achievement.create,
                     name="achievement_create"),
+                url(r'^check_code/', learning_achievement.check_code,
+                    name="achievement_check_code"),
 
             ])),
             url(r'^teaching_materials/', include([
@@ -312,9 +313,7 @@ urlpatterns = [
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
         url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
     ])),
-    url(r'^quick_search_learning_unit/$', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
-    url(r'^quick_search_education_group/$', QuickSearchEducationGroupYearView.as_view(),
-        name="quick_search_education_group"),
+
 ]
 
 if settings.DEBUG:

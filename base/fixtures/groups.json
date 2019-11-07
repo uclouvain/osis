@@ -1903,11 +1903,6 @@
                 "scoresencoding"
             ],
             [
-                "can_access_academic_calendar",
-                "base",
-                "academiccalendar"
-            ],
-            [
                 "can_access_academicyear",
                 "base",
                 "academicyear"
@@ -2727,49 +2722,6 @@
                 "is_institution_administrator",
                 "base",
                 "person"
-            ]
-        ]
-    }
-},
-{
-    "model": "auth.group",
-    "fields": {
-        "name": "expert_users",
-        "permissions": [
-            [
-                "can_access_learningclassyear",
-                "base",
-                "learningclassyear"
-            ],
-            [
-                "can_access_learningunitcomponentyear",
-                "base",
-                "learningcomponentyear"
-            ],
-            [
-                "can_access_learningcontaineryear",
-                "base",
-                "learningcontaineryear"
-            ],
-            [
-                "can_access_learningunit",
-                "base",
-                "learningunit"
-            ],
-            [
-                "can_access_externallearningunityear",
-                "base",
-                "externallearningunityear"
-            ],
-            [
-                "can_access_learningunitcomponentclass",
-                "base",
-                "learningunitcomponentclass"
-            ],
-            [
-                "can_access_catalog",
-                "base",
-                "offer"
             ]
         ]
     }
@@ -3668,6 +3620,16 @@
                     "can_read_persons_roles",
                     "base",
                     "person"
+                ],
+                [
+                    "can_access_academicyear",
+                    "base",
+                    "academicyear"
+                ],
+                [
+                    "can_access_academic_calendar",
+                    "base",
+                    "academiccalendar"
                 ]
             ]
         }
