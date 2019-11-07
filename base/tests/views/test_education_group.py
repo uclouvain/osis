@@ -456,16 +456,9 @@ class EducationGroupAdministrativedata(TestCase):
         self.person.user.user_permissions.add(self.permission_edit)
 
         self.education_group_year = EducationGroupYearFactory()
-        offer = OfferYearFactory(academic_year=self.education_group_year.academic_year)
         self.program_manager = ProgramManagerFactory(
             person=self.person,
             education_group=self.education_group_year.education_group,
-            offer_year=offer
-        )
-        ProgramManagerFactory(
-            person=self.person,
-            education_group=self.education_group_year.education_group,
-            offer_year=OfferYearFactory(academic_year__year=self.education_group_year.academic_year.year - 1)
         )
 
         self.url = reverse('education_group_administrative', args=[
@@ -548,17 +541,6 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
 
         self.assertTrue(response.context["can_edit_administrative_data"])
-
-    def test_get_good_program_managers(self):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
-        pgm_mgrs = ProgramManager.objects.filter(
-            education_group=self.education_group_year.education_group,
-            offer_year__academic_year=self.education_group_year.academic_year
-        ).order_by("person__last_name", "person__first_name")
-        self.assertQuerysetEqual(pgm_mgrs, response.context["pgm_mgrs"], transform=lambda x: x)
 
     def test_get_good_mandataries(self):
         ed = EducationGroupFactory()
