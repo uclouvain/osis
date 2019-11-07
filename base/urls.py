@@ -46,7 +46,7 @@ from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
-from base.views.education_groups import urls
+from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
@@ -276,7 +276,7 @@ urlpatterns = [
         url(r'^search$', offer.offers_search, name='offers_search'),
     ])),
 
-    url(r'^educationgroups/', include(urls.urlpatterns)),
+    url(r'^educationgroups/', include(education_groups_urls.urlpatterns)),
 
     url(r'^organizations/', include([
         url(r'^$', organization.OrganizationSearch.as_view(), name='organizations'),
