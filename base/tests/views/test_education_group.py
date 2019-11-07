@@ -46,6 +46,7 @@ from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditF
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_types import TrainingType
+from base.models.program_manager import ProgramManager
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group import EducationGroupFactory
@@ -55,6 +56,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
+from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
@@ -454,8 +456,17 @@ class EducationGroupAdministrativedata(TestCase):
         self.person.user.user_permissions.add(self.permission_edit)
 
         self.education_group_year = EducationGroupYearFactory()
-        self.program_manager = ProgramManagerFactory(person=self.person,
-                                                     education_group=self.education_group_year.education_group)
+        offer = OfferYearFactory(academic_year=self.education_group_year.academic_year)
+        self.program_manager = ProgramManagerFactory(
+            person=self.person,
+            education_group=self.education_group_year.education_group,
+            offer_year=offer
+        )
+        ProgramManagerFactory(
+            person=self.person,
+            education_group=self.education_group_year.education_group,
+            offer_year=OfferYearFactory(academic_year__year=self.education_group_year.academic_year.year - 1)
+        )
 
         self.url = reverse('education_group_administrative', args=[
             self.education_group_year.id, self.education_group_year.id
@@ -537,6 +548,17 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
 
         self.assertTrue(response.context["can_edit_administrative_data"])
+
+    def test_get_good_program_managers(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        pgm_mgrs = ProgramManager.objects.filter(
+            education_group=self.education_group_year.education_group,
+            offer_year__academic_year=self.education_group_year.academic_year
+        ).order_by("person__last_name", "person__first_name")
+        self.assertQuerysetEqual(pgm_mgrs, response.context["pgm_mgrs"], transform=lambda x: x)
 
     def test_get_good_mandataries(self):
         ed = EducationGroupFactory()

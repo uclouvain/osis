@@ -413,7 +413,8 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         pgm_mgrs = ProgramManager.objects.filter(
-            education_group=self.object.education_group
+            education_group=self.object.education_group,
+            offer_year__academic_year=self.object.academic_year
         ).order_by("person__last_name", "person__first_name")
 
         mandataries = Mandatary.objects.filter(
