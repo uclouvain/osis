@@ -420,21 +420,6 @@ class TestLearningAchievementPostponement(TestCase):
         self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), self.max_la_number)
         self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), self.max_la_number)
 
-    def test_learning_unit_year_created_after_postponement(self):
-        luy_to_delete = self.learning_unit_years.pop()
-        luy_to_delete.learning_container_year.delete()
-        luy_to_delete.delete()
-        self.learning_component_years.pop().delete()
-        create_response = self._create_achievements(code_name=1)
-        self.assertEqual(create_response.status_code, 200)
-        luy = self.learning_unit_years[-1]
-        last_luy = LearningUnitYear.objects.get(acronym=luy.acronym, academic_year=self.academic_years[-1])
-        self.assertEqual(
-            last_luy.learning_container_year.learning_container,
-            luy.learning_container_year.learning_container
-        )
-        self.assertTrue(last_luy.learningcomponentyear_set.all())
-
     def _create_achievements(self, code_name):
         create_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
         create_response = self.client.post(create_url, data={

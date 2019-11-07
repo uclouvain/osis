@@ -153,17 +153,6 @@ def duplicate_learning_unit_year(old_learn_unit_year, new_academic_year):
     return duplicated_luy
 
 
-def get_or_duplicate_luy(ac, luy):
-    try:
-        return LearningUnitYear.objects.get(
-            academic_year=ac,
-            acronym=luy.acronym,
-            learning_unit=luy.learning_unit
-        )
-    except LearningUnitYear.DoesNotExist:
-        return duplicate_learning_unit_year(luy, ac)
-
-
 def _duplicate_external(old_learning_unit_year, new_learning_unit_year):
     if old_learning_unit_year.is_external():
         try:
