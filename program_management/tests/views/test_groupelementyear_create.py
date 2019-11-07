@@ -70,6 +70,13 @@ class TestAttachCheckView(TestCase):
             {"error_messages": [_("Please select an item before attach it")]}
         )
 
+    def test_when_all_parameters_not_set(self):
+        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": ""})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": [_("Please select an item before attach it")]}
+        )
+
     def test_when_element_selected_and_error(self):
         response = self.client.get(self.url, data={"id": self.egy.id, "content_type": EDUCATION_GROUP_YEAR})
         data = json.loads(response.content.decode('utf-8'))

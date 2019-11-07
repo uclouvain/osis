@@ -21,20 +21,22 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django_filters.views import FilterView
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.education_group.search.quick_search import QuickEducationGroupYearFilter
 from base.forms.learning_unit.search.quick_search import QuickLearningUnitYearFilter
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
-
 
 CACHE_TIMEOUT = 60
 
@@ -61,7 +63,16 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
         context['form'] = context["filter"].form
         context['root_id'] = self.kwargs['root_id']
         context['education_group_year_id'] = self.kwargs['education_group_year_id']
+        context['display_quick_search_luy_link'] = EducationGroupYear.objects.filter(
+            id=self.kwargs['education_group_year_id'],
+            education_group_type__category=education_group_categories.Categories.GROUP.name
+        ).exists()
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if context["form"].is_valid() and not context["paginator"].count:
+            messages.add_message(self.request, messages.WARNING, _('No result!'))
+        return super().render_to_response(context, **response_kwargs)
 
 
 # FIXME Use content-type to determine if serializer use or not
@@ -92,6 +103,11 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         context['root_id'] = self.kwargs['root_id']
         context['education_group_year_id'] = self.kwargs['education_group_year_id']
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if context["form"].is_valid() and not context["paginator"].count:
+            messages.add_message(self.request, messages.WARNING, _('No result!'))
+        return super().render_to_response(context, **response_kwargs)
 
 
 # FIXME Use content-type to determine if serializer use or not

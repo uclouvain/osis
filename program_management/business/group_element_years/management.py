@@ -47,6 +47,8 @@ def extract_child(parent, request):
     content_type = request.GET.get("content_type")
     if object_id and content_type:
         selected_data = {"id": object_id, "modelname": content_type}
+    elif object_id or content_type:
+        selected_data = {}
     else:
         selected_data = ElementCache(request.user).cached_data
 
