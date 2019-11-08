@@ -60,6 +60,7 @@ INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
 ADMISSION_CONDITION = 'conditions_admission'
+TUITION_FEES = 'tuition_fees'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -106,6 +107,7 @@ SECTION_LIST = [
     Section(title=_('In practice'),
             labels=[
                 PRACTICAL_INFO,
+                TUITION_FEES,
                 CONTACT_INTRO,
             ]),
 ]
@@ -160,6 +162,7 @@ SECTIONS_PER_OFFER_TYPE = {
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -181,6 +184,7 @@ SECTIONS_PER_OFFER_TYPE = {
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -202,6 +206,7 @@ SECTIONS_PER_OFFER_TYPE = {
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -280,6 +285,7 @@ SECTIONS_PER_OFFER_TYPE = {
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -302,6 +308,7 @@ SECTIONS_PER_OFFER_TYPE = {
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
