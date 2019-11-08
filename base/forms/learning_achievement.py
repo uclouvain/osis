@@ -114,7 +114,6 @@ class LearningAchievementEditForm(forms.ModelForm):
             self.last_postponed_academic_year = None
             if not self.text.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.text.learning_unit_year)
-                self.last_postponed_academic_year = ac_year_postponement_range.last()
                 self._update_future_luy(ac_year_postponement_range, self.text)
 
         # For sync purpose, we need to trigger for the first year
@@ -154,3 +153,4 @@ class LearningAchievementEditForm(forms.ModelForm):
                 learning_unit_year=next_luy,
                 defaults={'text': text.text, 'code_name': self.cleaned_data.get('code_name')}
             )
+            self.last_postponed_academic_year = ac
