@@ -124,12 +124,7 @@ def login(request):
 
 @login_required
 def home(request):
-    academic_yr = mdl.academic_year.current_academic_year()
-    calendar_events = None
-    if academic_yr:
-        calendar_events = mdl.academic_calendar.find_academic_calendar_by_academic_year_with_dates(academic_yr.id)
     return render(request, "home.html", {
-        'academic_calendar': calendar_events,
         'highlights': mdl.academic_calendar.find_highlight_academic_calendar()
     })
 
