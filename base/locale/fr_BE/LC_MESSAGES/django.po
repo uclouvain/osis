@@ -2495,7 +2495,7 @@ msgstr "Le"
 
 #, python-format
 msgid "The '%(field)s' field content has been successfully saved"
-msgstr "Le contenu du champ '%(field)s a été enregistrer avec succès"
+msgstr "Le contenu du champ '%(field)s a été enregistré avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
