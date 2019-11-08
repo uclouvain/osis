@@ -60,7 +60,7 @@ INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
 ADMISSION_CONDITION = 'conditions_admission'
-TUITION_FEES = 'droits_inscription'
+TUITION_FEES = 'tuition_fees'
 
 Section = namedtuple('Section', 'title labels')
 
