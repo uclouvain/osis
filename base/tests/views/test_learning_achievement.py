@@ -374,7 +374,7 @@ class TestLearningAchievementPostponement(TestCase):
         EntityVersionFactory(entity=self.person_entity.entity)
         self.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]
         self.max_la_number = 2*len(self.academic_years)
-        self.learning_unit = LearningUnitFactory(start_year=get_current_year(), end_year=get_current_year()+5)
+        self.learning_unit = LearningUnitFactory(start_year=self.academic_years[0], end_year=self.academic_years[-1])
         self.learning_container = LearningContainerFactory()
         self.learning_unit_years = [LearningUnitYearFactory(
             academic_year=academic_year,
