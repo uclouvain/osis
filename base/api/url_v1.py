@@ -26,8 +26,10 @@
 from django.conf.urls import url
 
 from base.api.views.person import PersonRoles
+from base.api.views.user import current_user
 
 app_name = "base"
 urlpatterns = [
     url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
+    url(r'^person/whoami$', current_user, name="whoami")
 ]
