@@ -110,6 +110,7 @@ class CustomLocaleMiddleware(LocaleMiddleware):
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'backoffice.settings.base.CustomLocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -121,8 +122,6 @@ MIDDLEWARE = (
     'base.middlewares.notification_middleware.NotificationMiddleware',
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 INTERNAL_IPS = ()
 # check if we are testing right now
@@ -497,3 +496,5 @@ YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
 LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
+
+CORS_ORIGIN_ALLOW_ALL = os.environ.get('CORS_ORIGIN_ALLOW_ALL', "True").lower() == 'true'
