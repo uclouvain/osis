@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'compat',
     'hijack_admin',
     'reversion',
+    'corsheaders'
 )
 
 
@@ -121,6 +122,7 @@ MIDDLEWARE = (
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 INTERNAL_IPS = ()
 # check if we are testing right now
