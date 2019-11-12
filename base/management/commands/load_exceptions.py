@@ -37,6 +37,17 @@ APP_NAME_ALIASES = {
 
 
 class Command(BaseCommand):
+    """
+    Command to load data in DB from a structured xls file where :
+    - The worksheet title is the <app>.<model> name (e.g. base.Student)
+    - The first row of the worksheet is the header
+    - Each value in the header is a column of the model (e.g. registration_id, person__user__username)
+    - Each row (after the header) is a record of the Model
+    - Each value in a row is the value for the model field specified in the header
+
+    Use '**' at the end of the header cell value to force a natural key for the model of your worksheet.
+
+    """
 
     def handle(self, *args, **options):
         apps.clear_cache()
