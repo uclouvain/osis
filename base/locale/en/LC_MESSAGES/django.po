@@ -916,6 +916,9 @@ msgstr ""
 msgid "Entity managers"
 msgstr ""
 
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+
 msgid "Evaluations"
 msgstr ""
 

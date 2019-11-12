@@ -955,6 +955,9 @@ msgstr "Entités de charges"
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
 
+msgid "Error(s) in form: The modifications are not saved"
+msgstr "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
+
 msgid "Evaluations"
 msgstr "Évaluations"
 
