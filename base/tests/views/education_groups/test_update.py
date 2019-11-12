@@ -115,9 +115,6 @@ class TestUpdate(TestCase):
         self.client.force_login(self.person.user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.person.user.user_permissions.add(permission)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_certificate_aims",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
 
         self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         self.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
@@ -200,9 +197,6 @@ class TestUpdate(TestCase):
             entity=self.mini_training_education_group_year.administration_entity,
             start_date=self.education_group_year.academic_year.start_date
         )
-
-    def tearDown(self):
-        self.perm_patcher.stop()
 
     def test_login_required(self):
         self.client.logout()

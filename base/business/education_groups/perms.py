@@ -136,16 +136,6 @@ def _is_eligible_education_group(person, education_group, raise_exception):
             )
 
 
-def _is_eligible_certificate_aims(person, education_group, raise_exception):
-    result = check_link_to_management_entity(education_group, person, raise_exception)
-    if education_group.education_group_type.category != TRAINING:
-        if raise_exception:
-            raise PermissionDenied(_("This education group is not editable during this period.").capitalize())
-        return False
-
-    return result
-
-
 def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):
     # TRAINING/MINI_TRAINING can only be added by central managers | Faculty manager must make a proposition of creation
     # based on US OSIS-2592, Faculty manager can add a MINI-TRAINING
@@ -353,9 +343,11 @@ class CertificateAimsPerms(CommonEducationGroupStrategyPerms):
     Certification aims can only be modified by program manager no matter the program edition period
     """
     def _is_eligible(self):
+        if self.education_group_year.education_group_type.category != TRAINING:
+            raise PermissionDenied(_("The education group is not a training type"))
+
         if self.user.is_superuser:
             return True
-
         if not program_manager.is_program_manager(self.user, education_group=self.education_group_year.education_group):
             raise PermissionDenied(_("The user is not the program manager of the education group"))
         return True

@@ -25,7 +25,6 @@
 ##############################################################################
 import waffle
 from django import template
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -34,7 +33,7 @@ from django.utils.translation import gettext as _
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
-    _is_eligible_certificate_aims, is_eligible_to_delete_education_group_year
+    is_eligible_to_delete_education_group_year
 from base.models.academic_year import AcademicYear
 from base.models.utils.utils import get_verbose_field_value
 
