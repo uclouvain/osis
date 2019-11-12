@@ -29,10 +29,12 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
+from base.models import program_manager
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from base.models.program_manager import ProgramManager
 from program_management.business.group_element_years import postponement, management
 
 ERRORS_MSG = {
@@ -235,6 +237,11 @@ def is_eligible_to_edit_admission_condition(person, education_group_year, raise_
     return perm.is_eligible(raise_exception)
 
 
+def is_eligible_to_edit_certificate_aims(person, education_group_year, raise_exception=False):
+    perm = CertificateAimsPerms(person.user, education_group_year)
+    return perm.is_eligible(raise_exception)
+
+
 class CommonEducationGroupStrategyPerms(object):
     def __init__(self, user, education_group_year):
         self.user = user
@@ -339,3 +346,16 @@ def can_delete_all_education_group(user, education_group: EducationGroup):
         if not is_eligible_to_delete_education_group(user.person, education_group_yr, raise_exception=True):
             raise PermissionDenied
     return True
+
+
+class CertificateAimsPerms(CommonEducationGroupStrategyPerms):
+    """
+    Certification aims can only be modified by program manager no matter the program edition period
+    """
+    def _is_eligible(self):
+        if self.user.is_superuser:
+            return True
+
+        if not program_manager.is_program_manager(self.user, education_group=self.education_group_year.education_group):
+            raise PermissionDenied(_("The user is not the program manager of the education group"))
+        return True

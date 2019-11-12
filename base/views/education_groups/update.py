@@ -41,6 +41,7 @@ from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm, CertificateAimsForm
+from base.models import program_manager
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
@@ -52,19 +53,22 @@ from base.views.education_groups.perms import can_change_education_group
 @waffle_flag("education_group_update")
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    person = request.user.person
 
     # Store root in the instance to avoid to pass the root in methods
     # it will be used in the templates.
     education_group_year.root = root_id
 
-    # Proctect the view
-    can_change_education_group(request.user, education_group_year)
-    return update_education_group_year(request, root_id, education_group_year)
+    if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
+       and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
+        return _update_certificate_aims(request, root_id, education_group_year)
+
+    return _update_education_group_year(request, root_id, education_group_year)
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_certificate_aims(request, root_id, education_group_year):
+def _update_certificate_aims(request, root_id, education_group_year):
+    perms.is_eligible_to_edit_certificate_aims(request.user.person, education_group_year, raise_exception=True)
+
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
     if form_certificate_aims.is_valid():
@@ -78,9 +82,10 @@ def update_certificate_aims(request, root_id, education_group_year):
     })
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_education_group_year(request, root_id, education_group_year):
+def _update_education_group_year(request, root_id, education_group_year):
+    # Protect the view
+    can_change_education_group(request.user, education_group_year)
+
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     view_function = _get_view(education_group_year.education_group_type.category)
     return view_function(request, education_group_year, root)

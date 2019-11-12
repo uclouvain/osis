@@ -34,7 +34,7 @@ from base.business.education_groups import perms
 from base.business.education_groups.perms import check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
-    _is_eligible_to_add_education_group_with_category
+    _is_eligible_to_add_education_group_with_category, CertificateAimsPerms
 from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year
 from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
@@ -48,7 +48,8 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
     SICFactory, FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.user import UserFactory, SuperUserFactory
 
 
 class TestPerms(TestCase):
@@ -542,3 +543,30 @@ class TestAdmissionConditionPerms(TestCase):
         perm = AdmissionConditionPerms(person.user, self.training)
         with self.assertRaises(PermissionDenied):
             perm._is_eligible()
+
+
+class TestCertificateAimsPerms(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2019)
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+
+    def test_user_is_not_program_manager(self):
+        person = PersonFactory()
+        perm = CertificateAimsPerms(user=person.user, education_group_year=self.training)
+        self.assertFalse(perm.is_eligible())
+
+    def test_user_is_program_manager_but_not_of_the_education_group_year(self):
+        program_manager = ProgramManagerFactory()
+        perm = CertificateAimsPerms(user=program_manager.person.user, education_group_year=self.training)
+        self.assertFalse(perm.is_eligible())
+
+    def test_user_is_program_manager_of_the_education_group_year(self):
+        program_manager = ProgramManagerFactory(education_group=self.training.education_group)
+        perm = CertificateAimsPerms(user=program_manager.person.user, education_group_year=self.training)
+        self.assertTrue(perm.is_eligible())
+
+    def test_user_is_super_user(self):
+        super_user = SuperUserFactory()
+        perm = CertificateAimsPerms(user=super_user, education_group_year=self.training)
+        self.assertTrue(perm.is_eligible())
