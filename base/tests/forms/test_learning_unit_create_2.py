@@ -600,15 +600,13 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(learning_component_year.type, None)
 
     def _assert_correctly_create_records_in_all_learning_unit_structure(self, initial_counts):
-        # NUMBER_OF_POSTPONMENTS = 7
-        NUMBER_OF_ENTITIES_BY_CONTAINER = 2
-        NUMBER_OF_COMPONENTS = 2  # container_type == COURSE ==> 1 TP / 1 CM
+        number_of_components = 2  # container_type == COURSE ==> 1 TP / 1 CM
         self.assertEqual(self._count_records(LearningContainer), initial_counts[LearningContainer] + 1)
         self.assertEqual(self._count_records(LearningContainerYear), initial_counts[LearningContainerYear] + 1)
         self.assertEqual(self._count_records(LearningUnit), initial_counts[LearningUnit] + 1)
         self.assertEqual(self._count_records(LearningUnitYear), initial_counts[LearningUnitYear] + 1)
         self.assertEqual(self._count_records(LearningComponentYear),
-                         initial_counts[LearningComponentYear] + NUMBER_OF_COMPONENTS)
+                         initial_counts[LearningComponentYear] + number_of_components)
 
     @staticmethod
     def _count_records(model_class):
