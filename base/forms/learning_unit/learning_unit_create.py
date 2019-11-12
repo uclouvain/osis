@@ -31,6 +31,7 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import lazy, cached_property
 from django.utils.translation import gettext_lazy as _
 
+from base.business.learning_units.edition import update_partim_acronym
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices, \
     EntitiesVersionChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
@@ -175,6 +176,7 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
         self.instance.academic_year = self.instance.learning_container_year.academic_year
         self.instance.learning_unit = kwargs.pop('learning_unit')
         instance = super().save(**kwargs)
+        update_partim_acronym(instance.acronym, instance)
         return instance
 
     def clean_credits(self):
