@@ -907,7 +907,7 @@ msgid "English"
 msgstr "Anglais"
 
 msgid "English comment"
-msgstr "Commentaire anglais"
+msgstr "Commentaire en anglais"
 
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
