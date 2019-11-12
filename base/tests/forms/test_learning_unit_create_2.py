@@ -328,23 +328,17 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
                               'type_declaration_vacant', 'team', 'is_vacant']
         self._assert_equal_values(form_instance.instance, self.post_data, fields_to_validate)
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_creation_case_wrong_learning_unit_data(self, mock_is_valid):
+    def test_creation_case_wrong_learning_unit_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_creation_case_wrong_learning_unit_year_data(self, mock_is_valid):
+    def test_creation_case_wrong_learning_unit_year_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningContainerYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_creation_case_wrong_learning_container_year_data(self, mock_is_valid):
+    def test_creation_case_wrong_learning_container_year_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
@@ -384,23 +378,17 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
                                  learning_unit_instance=self.learning_unit_year.learning_unit, person=self.person)
         self.assertTrue(form.is_valid(), form.errors)
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_update_case_wrong_learning_unit_data(self, mock_is_valid):
+    def test_update_case_wrong_learning_unit_data(self):
         form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_update_case_wrong_learning_unit_year_data(self, mock_is_valid):
+    def test_update_case_wrong_learning_unit_year_data(self):
         form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningContainerYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_update_case_wrong_learning_container_year_data(self, mock_is_valid):
+    def test_update_case_wrong_learning_container_year_data(self):
         form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid())
