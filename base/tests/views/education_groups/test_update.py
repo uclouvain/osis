@@ -40,10 +40,11 @@ from waffle.testutils import override_flag
 
 from base.forms.education_group.group import GroupYearModelForm
 from base.forms.education_group.training import CertificateAimsForm
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -176,7 +177,9 @@ class TestUpdate(TestCase):
         self.domains = [DomainFactory() for x in range(10)]
 
         self.a_mini_training_education_group_type = EducationGroupTypeFactory(
-            category=education_group_categories.MINI_TRAINING)
+            category=education_group_categories.MINI_TRAINING,
+            name=MiniTrainingType.DEEPENING.name
+        )
 
         self.mini_training_education_group_year = MiniTrainingFactory(
             academic_year=self.current_academic_year,
@@ -191,6 +194,10 @@ class TestUpdate(TestCase):
 
         EntityVersionFactory(
             entity=self.mini_training_education_group_year.management_entity,
+            start_date=self.education_group_year.academic_year.start_date
+        )
+        EntityVersionFactory(
+            entity=self.mini_training_education_group_year.administration_entity,
             start_date=self.education_group_year.academic_year.start_date
         )
 
@@ -471,7 +478,7 @@ class TestUpdate(TestCase):
             diploma=diploma_choice
         )
 
-        self.assertEqual(egy.coorganizations.count(), 1)
+        self.assertEqual(EducationGroupOrganization.objects.filter(education_group_year=egy).count(), 1)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -499,9 +506,7 @@ class TestUpdate(TestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 302)
 
-        egy.refresh_from_db()
-        coorganizations = egy.coorganizations
-        self.assertEqual(coorganizations.count(), 0)
+        self.assertEqual(EducationGroupOrganization.objects.filter(education_group_year=egy).count(), 0)
 
     def test_post_mini_training(self):
         old_domain = DomainFactory()
