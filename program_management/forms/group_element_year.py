@@ -145,10 +145,7 @@ class BaseGroupElementYearFormset(BaseModelFormSet):
         ]
 
     def is_valid(self):
-        for f in self.changed_forms():
-            if not f.is_valid():
-                return False
-        return True
+        return all([f.is_valid() for f in self.changed_forms()])
 
     def save(self, commit=True):
         for f in self.changed_forms():
