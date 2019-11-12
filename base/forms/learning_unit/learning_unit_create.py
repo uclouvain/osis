@@ -40,7 +40,8 @@ from base.models.campus import find_main_campuses
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL, \
+    LCY_TYPES_WITH_FIXED_ACRONYM
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_WITHOUT_EXTERNAL, INTERNSHIP
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
@@ -176,7 +177,8 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
         self.instance.academic_year = self.instance.learning_container_year.academic_year
         self.instance.learning_unit = kwargs.pop('learning_unit')
         instance = super().save(**kwargs)
-        update_partim_acronym(instance.acronym, instance)
+        if self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
+            update_partim_acronym(instance.acronym, instance)
         return instance
 
     def clean_credits(self):
