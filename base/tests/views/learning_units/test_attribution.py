@@ -45,6 +45,57 @@ from base.tests.factories.tutor import TutorFactory
 from base.views.mixins import RulesRequiredMixin
 
 
+class TestViewAttributions(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+
+        cls.luy_without_attribution = LearningUnitYearFullFactory()
+
+        cls.luy = LearningUnitYearFullFactory()
+
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.luy)
+        cls.practical_component = PracticalLearningComponentYearFactory(
+            learning_unit_year=cls.luy)
+        cls.attribution = AttributionNewFactory(
+            learning_container_year=cls.luy.learning_container_year
+        )
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution,
+            learning_component_year=cls.lecturing_component
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution,
+            learning_component_year=cls.practical_component
+        )
+
+    def setUp(self) -> None:
+        self.client.force_login(self.person.user)
+
+    def test_when_no_attributions_for_learning_unit(self):
+        url = reverse("learning_unit_attributions", args=[self.luy_without_attribution.id])
+
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "learning_unit/attributions.html")
+
+        context = response.context
+        self.assertQuerysetEqual(context["attributions"], [])
+        self.assertFalse(context["can_manage_charge_repartition"])
+        self.assertFalse(context["can_manage_attribution"])
+        self.assertEqual(context["learning_unit_year"], self.luy_without_attribution)
+
+    def test_when_attributions_for_learning_unit(self):
+        url = reverse("learning_unit_attributions", args=[self.luy.id])
+
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "learning_unit/attributions.html")
+
+        context = response.context
+        self.assertQuerysetEqual(context["attributions"], [self.attribution], transform=lambda obj: obj)
+        self.assertEqual(context["learning_unit_year"], self.luy)
+
+
 class TestEditAttribution(TestCase):
     @classmethod
     def setUpTestData(cls):

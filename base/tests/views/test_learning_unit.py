@@ -1116,12 +1116,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertCountEqual(response.context['achievements_FR'], [learning_unit_achievements_fr])
         self.assertCountEqual(response.context['achievements_EN'], [learning_unit_achievements_en])
 
-    def test_learning_unit_attributions(self):
-        learning_unit_yr = LearningUnitYearFactory()
-
-        response = self.client.get(reverse(learning_unit_attributions, args=[learning_unit_yr.id]))
-
-        self.assertTemplateUsed(response, 'learning_unit/attributions.html')
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
