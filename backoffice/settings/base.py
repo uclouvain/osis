@@ -90,7 +90,8 @@ INSTALLED_APPS = (
     'compat',
     'hijack_admin',
     'reversion',
-    'corsheaders'
+    'corsheaders',
+    'gunicorn'
 )
 
 
@@ -497,4 +498,9 @@ STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
 LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
 
-CORS_ORIGIN_ALLOW_ALL = os.environ.get('CORS_ORIGIN_ALLOW_ALL', "True").lower() == 'true'
+# CORS_ORIGIN_ALLOW_ALL = os.environ.get('CORS_ORIGIN_ALLOW_ALL', "True").lower() == 'true'
+CORS_ORIGIN_WHITELIST = [
+    "null",
+    "http://localhost",
+    "http://127.0.0.1"
+]

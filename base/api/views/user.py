@@ -13,5 +13,4 @@ def current_user(request):
         'fgs': person.global_id
     }
     resp = JsonResponse(results)
-    resp['Access-Control-Allow-Origin'] = '*'
     return resp
