@@ -41,7 +41,7 @@
     <tbody>
     {% for group in object.groupelementyear_set.all %}
         <tr>
-            {% if  group.child_branch %}
+            {% if group.child_branch %}
                 <td style="width:8%">{{ group.child_branch.acronym }}</td>
                 <td>
                     <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
@@ -72,7 +72,7 @@
                             {{ comment | truncatechars:40 }}
                         </span>
                     {% else %}
-                         {{ comment }}
+                        {{ comment }}
                     {% endif %}
                 {% endwith %}
             </td>
@@ -83,7 +83,7 @@
                             {{ comment_english | truncatechars:40 }}
                         </span>
                     {% else %}
-                         {{ comment_english }}
+                        {{ comment_english }}
                     {% endif %}
                 {% endwith %}
             </td>
