@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,18 +22,16 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
+############################################################################
 from dal import autocomplete
 from django import forms
-from django.db.models import Q
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.forms.repartition_charge import AttributionChargeForm
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
-from base.models.enums import learning_component_year_type, learning_container_year_types
-from base.models.learning_component_year import LearningComponentYear
+from base.models.enums import learning_container_year_types, learning_component_year_type
 from base.models.person import Person
 from base.models.tutor import Tutor
 
@@ -97,35 +95,6 @@ class AttributionCreationForm(AttributionForm):
         if commit:
             instance.save()
         return instance
-
-
-class AttributionChargeForm(forms.ModelForm):
-    component_type = None
-
-    class Meta:
-        model = AttributionChargeNew
-        fields = ["allocation_charge"]
-        widgets = {
-            'allocation_charge': forms.TextInput(),
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.learning_unit_year = kwargs.pop("learning_unit_year")
-        super().__init__(*args, **kwargs)
-
-    def save(self, commit=True, **kwargs):
-        attribution_new_obj = kwargs.pop("attribution")
-        learning_component_year = LearningComponentYear.objects.get(
-            Q(type=self.component_type) | Q(type__isnull=True),
-            learning_unit_year=self.learning_unit_year
-        )
-
-        attribution_charge_obj = super().save(commit=False)
-        attribution_charge_obj.attribution = attribution_new_obj
-        attribution_charge_obj.learning_component_year = learning_component_year
-        if commit:
-            attribution_charge_obj.save()
-        return attribution_charge_obj
 
 
 def _get_formatted_label(label, abbr):

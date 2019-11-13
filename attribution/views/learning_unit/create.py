@@ -25,10 +25,11 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+
 from attribution.views.learning_unit.common import AttributionBaseViewMixin
 from base.business.learning_units import perms
-from base.forms.learning_unit.attribution_charge_repartition import AttributionCreationForm, \
-    LecturingAttributionChargeForm, PracticalAttributionChargeForm
+from attribution.forms.attributions import AttributionCreationForm, LecturingAttributionChargeForm, \
+    PracticalAttributionChargeForm
 from base.models.learning_component_year import LearningComponentYear
 from base.views.mixins import AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView
 
@@ -49,6 +50,7 @@ class CreateAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsS
 
     def get_form_classes(self):
         form_classes = self.form_classes.copy()
+        # FIXME This condition should be removed when learning component year will have a mandatory type value
         if LearningComponentYear.objects.filter(learning_unit_year=self.luy, type=None).exists():
             del form_classes["practical_charge_form"]
         return form_classes

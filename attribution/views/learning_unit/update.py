@@ -27,7 +27,7 @@ from django.utils.translation import gettext_lazy as _
 
 from attribution.views.learning_unit.common import AttributionBaseViewMixin
 from base.business.learning_units import perms
-from base.forms.learning_unit.attribution_charge_repartition import AttributionForm, LecturingAttributionChargeForm, \
+from attribution.forms.attributions import AttributionForm, LecturingAttributionChargeForm, \
     PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear

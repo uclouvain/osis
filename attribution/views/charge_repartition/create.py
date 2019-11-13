@@ -34,8 +34,7 @@ from attribution.models.attribution_new import AttributionNew
 from attribution.views.learning_unit.common import AttributionBaseViewMixin
 from attribution.views.learning_unit.update import UpdateAttributionView
 from base.business.learning_units import perms
-from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
-    PracticalAttributionChargeForm
+from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
 
 

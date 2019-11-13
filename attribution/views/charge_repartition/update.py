@@ -27,8 +27,7 @@ from django.utils.translation import gettext_lazy as _
 
 from attribution.views.learning_unit.update import UpdateAttributionView
 from base.business.learning_units import perms
-from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
-    PracticalAttributionChargeForm
+from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
 
 
 class EditChargeRepartition(UpdateAttributionView):
