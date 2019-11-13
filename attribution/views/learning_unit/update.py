@@ -60,8 +60,8 @@ class UpdateAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFo
 
         if self.luy.is_partim():
             qs_partim = self.luy.learningcomponentyear_set.all()
-            context['partim_vol1'] = qs_partim.filter(type=learning_component_year_type.LECTURING).first()
-            context['partim_vol2'] = qs_partim.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).first()
+            context['partim_vol1'] = qs_partim.filter(type=learning_component_year_type.LECTURING).get()
+            context['partim_vol2'] = qs_partim.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).get()
 
         return context
 
@@ -80,8 +80,10 @@ class UpdateAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFo
         }.get(form_name)
 
     def get_success_message(self, forms):
-        return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
-                                                                         "function": _(self.attribution.function)}
+        return _("Attribution modified for %(tutor)s (%(function)s)") % {
+            "tutor": self.attribution.tutor.person,
+            "function": self.attribution.get_function_display()
+        }
 
     def attribution_form_valid(self, attribution_form):
         attribution_form.save()

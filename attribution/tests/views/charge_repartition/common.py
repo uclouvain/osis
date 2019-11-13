@@ -85,9 +85,7 @@ class TestChargeRepartitionMixin:
 
         self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
-
-    def tearDown(self):
-        self.patcher.stop()
+        self.addCleanup(self.patcher.stop)
 
     def clean_partim_charges(self):
         self.charge_practical.delete()
