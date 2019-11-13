@@ -101,8 +101,14 @@ class TestConvertBooleanVellValue(TestCase):
         result = load_exceptions.Command._convert_boolean_cell_value(True)
         self.assertTrue(result)
 
+        result = load_exceptions.Command._convert_boolean_cell_value("True")
+        self.assertTrue(result)
+
     def test_when_value_is_false(self):
         result = load_exceptions.Command._convert_boolean_cell_value(False)
+        self.assertFalse(result)
+
+        result = load_exceptions.Command._convert_boolean_cell_value("False")
         self.assertFalse(result)
 
     def test_when_value_is_no_boolean(self):

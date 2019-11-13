@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
+from django.apps import apps
 from django.core.management import BaseCommand
 from openpyxl import load_workbook
-from django.apps import apps
-
 
 NATURAL_KEY_IDENTIFIER = '**'
 
