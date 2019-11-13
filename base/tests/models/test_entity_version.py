@@ -259,9 +259,8 @@ class EntityVersionTest(TestCase):
         self.assertEqual(entity_v.entity, result)
 
     def test_find_parent_of_type_first_parent(self):
-        entity = EntityFactory()
-        EntityVersionFactory(entity=entity, entity_type=FACULTY)
-        entity_v = EntityVersionFactory(parent=entity)
+        parent_version = EntityVersionFactory(entity_type=FACULTY)
+        entity_v = EntityVersionFactory(parent=parent_version.entity)
         result = find_parent_of_type_into_entity_structure(
             entity_v,
             build_current_entity_version_structure_in_memory(timezone.now().date()),
