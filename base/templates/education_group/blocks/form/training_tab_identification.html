@@ -36,20 +36,18 @@
         <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats">
             {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
         </a>
-
     </li>
-
-    <li role="presentation"
-        {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
-        <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
-            {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
-        </a>
-
-    </li>
+    {% if 'new' not in request.path %}
+        <li role="presentation"
+            {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
+            <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
+                {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
+            </a>
+        </li>
+    {% endif %}
 </ul>
 
 <div class="tab-content">
-
     <div id="tab_identification"
          class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}active{% else %}fade{% endif %}">
         <div class="row">
@@ -154,7 +152,7 @@
                                 {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
                                 {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
                             </div>
-                        <br>
+                            <br>
                         {% endif %}
                         {% bootstrap_field form_education_group_year.enrollment_campus %}
                         {% bootstrap_field form_education_group_year.main_teaching_campus %}
@@ -168,7 +166,6 @@
                         {% bootstrap_field form_education_group_year.funding_cud %}
                         {% bootstrap_field form_education_group_year.funding_direction_cud %}
                     </div>
-
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -176,7 +173,6 @@
                         {% bootstrap_field form_education_group_year.remark_english %}
                     </div>
                 </div>
-
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -203,8 +199,10 @@
         {% include "education_group/blocks/form/training_tab_diploma.html" %}
     </div>
 
-    <div id="tab_content"
-         class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
-        {% include "education_group/blocks/form/training_tab_content.html" %}
-    </div>
+    {% if 'new' not in request.path %}
+        <div id="tab_content"
+             class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
+            {% include "education_group/blocks/form/training_tab_content.html" %}
+        </div>
+    {% endif %}
 </div>
