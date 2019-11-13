@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 14:51+0100\n"
+"POT-Creation-Date: 2019-11-13 15:46+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2628,9 +2628,9 @@ msgstr ""
 "L'unité d'enseignement %(acronym)s a été supprimée avec succès pour toutes "
 "les années."
 
+#, python-format
 msgid ""
-"The learning unit %(acronym)s is included\n"
-"                        in the following education groups"
+"The learning unit %(acronym)s is included in the following education groups"
 msgstr ""
 "L'unité d'enseignement %(acronym)s est incluse dans les groupements suivants"
 
@@ -2638,9 +2638,8 @@ msgstr ""
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
-msgid ""
-"The learning unit %(acronym)s is not included in\n"
-"                any education group"
+#, python-format
+msgid "The learning unit %(acronym)s is not included in any education group"
 msgstr "L'unité d'enseignement %(acronym)s n'est incluse dans aucun groupement"
 
 #, python-format
