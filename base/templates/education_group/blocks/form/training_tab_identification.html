@@ -36,16 +36,15 @@
         <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats">
             {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
         </a>
-
     </li>
-
-    <li role="presentation"
-        {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
-        <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
-            {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
-        </a>
-
-    </li>
+    {% if 'new' not in request.path %}
+        <li role="presentation"
+            {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
+            <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
+                {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
+            </a>
+        </li>
+    {% endif %}
 </ul>
 
 <div class="tab-content">
@@ -154,7 +153,7 @@
                                 {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
                                 {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
                             </div>
-                        <br>
+                            <br>
                         {% endif %}
                         {% bootstrap_field form_education_group_year.enrollment_campus %}
                         {% bootstrap_field form_education_group_year.main_teaching_campus %}
@@ -202,9 +201,10 @@
          class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
         {% include "education_group/blocks/form/training_tab_diploma.html" %}
     </div>
-
-    <div id="tab_content"
-         class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
-        {% include "education_group/blocks/form/training_tab_content.html" %}
-    </div>
+    {% if 'new' not in request.path %}
+        <div id="tab_content"
+             class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
+            {% include "education_group/blocks/form/training_tab_content.html" %}
+        </div>
+    {% endif %}
 </div>
