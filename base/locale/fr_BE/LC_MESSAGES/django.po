@@ -2628,10 +2628,6 @@ msgstr ""
 "L'unité d'enseignement %(acronym)s a été supprimée avec succès pour toutes "
 "les années."
 
-#, fuzzy, python-format
-#| msgid ""
-#| "The learning unit %(acronym)s is included in the following education "
-#| "groups"
 msgid ""
 "The learning unit %(acronym)s is included\n"
 "                        in the following education groups"
@@ -2642,8 +2638,6 @@ msgstr ""
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
-#, fuzzy, python-format
-#| msgid "The learning unit %(acronym)s is not included in any education group"
 msgid ""
 "The learning unit %(acronym)s is not included in\n"
 "                any education group"
@@ -2742,8 +2736,6 @@ msgstr ""
 "Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
 "jusqu'en %(last_year_reported)s avec succès"
 
-#, fuzzy
-#| msgid "The section you modified have been saved with success."
 msgid "The sections you modified have been saved with success."
 msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
 
