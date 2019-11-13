@@ -30,8 +30,6 @@ import factory.fuzzy
 from django.utils import timezone
 from factory.django import DjangoModelFactory
 
-from base.models.academic_year import AcademicYear
-
 
 def create_current_academic_year():
     return AcademicYearFactory(year=get_current_year())
@@ -45,6 +43,11 @@ def get_current_year():
     else:
         start_date = datetime.date(now.year, 9, 15)
     return start_date.year
+
+
+def create_editable_academic_year():
+    now = datetime.datetime.now()
+    return AcademicYearFactory(year=now.year)
 
 
 class AcademicYearFactory(DjangoModelFactory):
@@ -72,11 +75,9 @@ class AcademicYearFactory(DjangoModelFactory):
     @staticmethod
     def produce_in_future(current_year=None, quantity=10):
         current_year = current_year or get_current_year()
-        academic_years = [AcademicYearFactory.build(year=current_year + i) for i in range(quantity)]
-        return AcademicYear.objects.bulk_create(academic_years)
+        return [AcademicYearFactory(year=current_year + i) for i in range(quantity)]
 
     @staticmethod
     def produce(base_year=None, number_past=1, number_future=1):
         current_year = base_year or get_current_year()
-        acys = [AcademicYearFactory.build(year=current_year+i) for i in range(-number_past, number_future+1)]
-        return AcademicYear.objects.bulk_create(acys)
+        return [AcademicYearFactory(year=current_year+i) for i in range(-number_past, number_future+1)]

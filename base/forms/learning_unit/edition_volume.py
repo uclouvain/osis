@@ -28,7 +28,7 @@ from collections import OrderedDict
 from django import forms
 from django.db import transaction
 from django.forms import formset_factory, modelformset_factory
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.volume_strategy import VolumeEditionNoFacultyStrategy, \
     CompleteVolumeEditionFacultyStrategy, SimpleVolumeEditionFacultyStrategy
@@ -101,9 +101,6 @@ class VolumeEditionForm(forms.Form):
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
-        help_volume_global = "{} = {} * {}".format(_('volume total global'),
-                                                   _('Volume total annual'),
-                                                   _('Planned classes'))
 
         # Append dynamic fields
         entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
@@ -160,11 +157,6 @@ class VolumeEditionForm(forms.Form):
         strategy[self.is_faculty_manager](self, input_names).is_valid()
 
         return cleaned_data
-
-    def get_entity_fields(self):
-        entity_keys = [self.requirement_entity_key, self.additional_requirement_entity_1_key,
-                       self.additional_requirement_entity_2_key]
-        return [self.fields[key] for key in entity_keys if key in self.fields]
 
     def save(self, postponement):
         if not self.changed_data:
@@ -379,12 +371,11 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
     def save(self, commit=True):
         if self.need_to_create_untyped_component():
-            self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[None]
-            self.instance.type = None
             # In case of untyped component, we just need to create only 1 component (not more)
             if self.index != 0:
                 return None
-
+            self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[None]
+            self.instance.type = None
         self.instance.learning_unit_year = self._learning_unit_year
         self._assert_repartition_volumes_consistency()
         return super().save(commit)

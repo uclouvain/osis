@@ -70,7 +70,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         self.client.force_login(self.user)
 
         self.setup_academic_years()
-        self.learning_unit = self.setup_learning_unit(self.starting_academic_year.year)
+        self.learning_unit = self.setup_learning_unit(self.starting_academic_year)
         self.learning_container_year = self.setup_learning_container_year(
             academic_year=self.starting_academic_year,
             container_type=learning_container_year_types.COURSE
@@ -312,6 +312,15 @@ class TestEditLearningUnit(TestCase):
         self.learning_unit_year.refresh_from_db()
         self.assertEqual(self.learning_unit_year.credits, credits)
 
+    def test_invalid_post_request(self):
+        credits = ''
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        response = self.client.post(self.url, data=form_data)
+
+        self.assertEqual(self.url, response.request['PATH_INFO'])
+
     def _get_valid_form_data(self):
         form_data = {
             "acronym_0": self.learning_unit_year.acronym[0],
@@ -345,8 +354,10 @@ class TestEditLearningUnit(TestCase):
 @override_flag('learning_unit_update', active=True)
 class TestLearningUnitVolumesManagement(TestCase):
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(start_year=get_current_year(), end_year=get_current_year() + 10)
-        self.generate_container = GenerateContainer(start_year=get_current_year(), end_year=get_current_year() + 10)
+        start_year = AcademicYearFactory(year=get_current_year())
+        end_year = AcademicYearFactory(year=get_current_year() + 10)
+        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        self.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
         self.generated_container_year = self.generate_container.generated_container_years[0]
 
         self.container_year = self.generated_container_year.learning_container_year

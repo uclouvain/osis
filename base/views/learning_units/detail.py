@@ -27,7 +27,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
 from reversion.models import Version
 
@@ -63,7 +63,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         self.object = self.get_object()
 
         # Change template and permissions for external learning units and co_graduation is false.
-        if self.object.is_external_mobility():
+        if self.object.is_external_of_mobility():
             self.template_name = "learning_unit/external/read.html"
         if self.object.is_external():
             self.permission_required = "base.can_access_externallearningunityear"
@@ -133,7 +133,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()
-        context["has_partim"] = self.object.get_partims_related().exists()
+        context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
 
         return context
 
