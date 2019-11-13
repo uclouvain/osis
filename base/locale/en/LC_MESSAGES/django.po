@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-06 11:47+0100\n"
+"POT-Creation-Date: 2019-11-13 10:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,15 +264,6 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add attribution"
-msgstr ""
-
-msgid "Add current year teacher"
-msgstr ""
-
-msgid "Add over the current year"
-msgstr ""
-
 msgid "Add the English content of this paragraph"
 msgstr ""
 
@@ -417,22 +408,10 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Attribution duration"
 msgstr ""
 
 msgid "Attribution entity"
-msgstr ""
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Attributions"
@@ -1448,9 +1427,6 @@ msgstr ""
 msgid "Male"
 msgstr ""
 
-msgid "Manage repartition"
-msgstr ""
-
 msgid "Manage volumes"
 msgstr ""
 
@@ -1648,9 +1624,6 @@ msgstr ""
 msgid "No additional fees"
 msgstr ""
 
-msgid "No attributions exist for the parent learning unit"
-msgstr ""
-
 msgid "No data"
 msgstr ""
 
@@ -1822,6 +1795,9 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
+msgid "Parent"
+msgstr ""
+
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
@@ -1855,12 +1831,6 @@ msgid "Password"
 msgstr ""
 
 msgid "Pending"
-msgstr ""
-
-msgid "Periodic courses not taught"
-msgstr ""
-
-msgid "Periodic courses taught during"
 msgstr ""
 
 msgid "Periodicity"
@@ -2166,14 +2136,6 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Req. Entities"
 msgstr ""
 
@@ -2432,9 +2394,6 @@ msgstr ""
 msgid "The"
 msgstr ""
 
-msgid "The %(acronym)s has been moved"
-msgstr ""
-
 #, python-format
 msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
@@ -2621,10 +2580,6 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:62
-msgid "The registration form is available at the Secretariat of"
-msgstr ""
-
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -2637,7 +2592,7 @@ msgid ""
 "%(last_year_reported)s with success."
 msgstr ""
 
-msgid "The section you modified have been saved with success."
+msgid "The sections you modified have been saved with success."
 msgstr ""
 
 #, python-format
@@ -2651,12 +2606,6 @@ msgstr ""
 
 msgid ""
 "The sum of the volumes of the entities must be equal to the global volume"
-msgstr ""
-
-#, python-format
-msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
 msgstr ""
 
 #, python-format
@@ -2834,9 +2783,6 @@ msgid "Trimester"
 msgstr ""
 
 msgid "Tutor"
-msgstr ""
-
-msgid "Tutor for parent LU"
 msgstr ""
 
 msgid "Tutors"
@@ -3092,6 +3038,9 @@ msgid ""
 "prerequisite(s)"
 msgstr ""
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr ""
 
@@ -3181,9 +3130,6 @@ msgid "biennial odd"
 msgstr ""
 
 msgid "blocked update for tutor"
-msgstr ""
-
-msgid "cancel"
 msgstr ""
 
 msgid "cannot be canceled"
@@ -3380,9 +3326,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "save"
 msgstr ""
 
 msgid "score(s) saved"
