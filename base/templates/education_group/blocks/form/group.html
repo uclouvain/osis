@@ -31,6 +31,7 @@
       data-validate-url="
 
 
+
               {% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
@@ -45,13 +46,14 @@
                         {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
                     </a>
                 </li>
-                <li role="presentation"
-                    {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
-                    <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
-                        {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
-                    </a>
-
-                </li>
+                {% if 'new' not in request.path %}
+                    <li role="presentation"
+                        {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
+                        <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
+                            {% trans 'Content' %} <span id="spn_content_errors" class="error"></span>
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
             <div class="tab-content">
                 <div id="tab_identification"
@@ -119,10 +121,12 @@
                         </div>
                     </div>
                 </div>
-                <div id="tab_content"
-                     class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
-                    {% include "education_group/blocks/form/training_tab_content.html" %}
-                </div>
+                {% if 'new' not in request.path %}
+                    <div id="tab_content"
+                         class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
+                        {% include "education_group/blocks/form/training_tab_content.html" %}
+                    </div>
+                {% endif %}
             </div>
         </div>
         <div class="panel-footer text-right">

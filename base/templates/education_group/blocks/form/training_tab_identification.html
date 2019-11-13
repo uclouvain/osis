@@ -48,7 +48,6 @@
 </ul>
 
 <div class="tab-content">
-
     <div id="tab_identification"
          class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}active{% else %}fade{% endif %}">
         <div class="row">
@@ -167,7 +166,6 @@
                         {% bootstrap_field form_education_group_year.funding_cud %}
                         {% bootstrap_field form_education_group_year.funding_direction_cud %}
                     </div>
-
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -175,7 +173,6 @@
                         {% bootstrap_field form_education_group_year.remark_english %}
                     </div>
                 </div>
-
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
@@ -201,6 +198,7 @@
          class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
         {% include "education_group/blocks/form/training_tab_diploma.html" %}
     </div>
+
     {% if 'new' not in request.path %}
         <div id="tab_content"
              class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
