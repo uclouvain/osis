@@ -271,14 +271,6 @@ def get_next_academic_years(learning_unit_to_edit, year):
     return AcademicYear.objects.filter(year__in=range_years).order_by('year')
 
 
-def filter_biennial(queryset, periodicity):
-    result = queryset
-    if periodicity != learning_unit_year_periodicity.ANNUAL:
-        is_odd = periodicity == learning_unit_year_periodicity.BIENNIAL_ODD
-        result = queryset.annotate(odd=F('year') % 2).filter(odd=is_odd)
-    return result
-
-
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
 def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entities_by_type_to_update, **kwargs):
     with_report = kwargs.get('with_report', True)
