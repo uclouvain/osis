@@ -28,7 +28,7 @@ import random
 from unittest import mock
 
 from django.core.exceptions import PermissionDenied
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from base.business.education_groups import perms
 from base.business.education_groups.perms import check_permission, \
@@ -531,3 +531,9 @@ class TestCertificateAimsPerms(TestCase):
             with self.subTest(education_group_year=education_group_year):
                 perm = CertificateAimsPerms(user=SuperUserFactory(), education_group_year=education_group_year)
                 self.assertFalse(perm.is_eligible())
+
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2020)
+    def test_education_group_year_is_lower_than_modification_settings(self):
+        super_user = SuperUserFactory()
+        perm = CertificateAimsPerms(user=super_user, education_group_year=self.training)
+        self.assertFalse(perm.is_eligible())

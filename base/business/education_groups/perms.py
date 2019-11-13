@@ -345,6 +345,10 @@ class CertificateAimsPerms(CommonEducationGroupStrategyPerms):
     def _is_eligible(self):
         if self.education_group_year.education_group_type.category != TRAINING:
             raise PermissionDenied(_("The education group is not a training type"))
+        if self.education_group_year.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+            raise PermissionDenied(_("You cannot change a education group before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+            })
 
         if self.user.is_superuser:
             return True
