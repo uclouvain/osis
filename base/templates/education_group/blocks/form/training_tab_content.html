@@ -77,10 +77,9 @@
                                 {{ group.child_leaf.complete_title }}
                             </td>
                             <td style="width:6%">
-                                <div class="input-group">
-                                    {% bootstrap_field formset.relative_credits show_label=False %}
-                                    <span class="input-group-addon">/ {{ group.child.credits|floatformat:-2 | default_if_none:'-' }}</span>
-                                </div>
+                                {% with group.child.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
+                                    {% bootstrap_field formset.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
+                                {% endwith %}
                             </td>
                         {% endif %}
                     {% endwith %}
