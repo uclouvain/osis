@@ -105,11 +105,8 @@ class AutomaticPostponementToN6(AutomaticPostponement):
     def __init__(self, queryset=None):
         # Fetch the N and N+6 academic_years
         self.last_academic_year = AcademicYear.objects.max_adjournment()
-        self.current_year = AcademicYear.objects.current()
 
         super().__init__(queryset)
-
-        self.queryset = self.get_queryset(queryset)
 
     def postpone(self):
         # send statistics to the managers
@@ -135,7 +132,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
                         copied_objs.append(new_obj)
 
                     self.post_extend(obj_to_copy, copied_objs)
-                    self.result.extend(copied_objs)
+                self.result.extend(obj)
 
             # General catch to be sure to not stop the rest of the duplication
             except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
