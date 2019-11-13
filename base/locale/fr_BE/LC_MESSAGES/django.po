@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 08:31+0200\n"
+"POT-Creation-Date: 2019-11-07 16:19+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -396,9 +396,6 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-msgid "Are you sure to change the state from"
-msgstr "Êtes-vous sûr de vouloir changer l'état de"
-
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
@@ -514,9 +511,6 @@ msgstr "Par"
 msgid "CAPAES"
 msgstr "CAPAES"
 
-msgid "Calendar of the annual program"
-msgstr "Calendrier des programmes"
-
 msgid "Campus"
 msgstr "Campus"
 
@@ -572,9 +566,6 @@ msgstr "Ville"
 
 msgid "City of institution"
 msgstr "Ville de l'institution"
-
-msgid "Classe"
-msgstr "Classe"
 
 msgid "Classes"
 msgstr "Classes"
@@ -668,9 +659,6 @@ msgstr "Contenu"
 msgid "Coordinator"
 msgstr "Coordinateur"
 
-msgid "Coorganization"
-msgstr "Co-organisation"
-
 msgid "Copy Reddot data from previous academic year."
 msgstr "Copier les données Reddot de l’année précédente."
 
@@ -758,9 +746,6 @@ msgstr "Fiche descriptive"
 
 msgid "Description fiche status"
 msgstr "Statut des fiches descriptives"
-
-msgid "Description fiche submission dates updated"
-msgstr "Date de soumission des fiches descriptives mis à jour"
 
 msgid "Detach"
 msgstr "Détacher"
@@ -970,6 +955,9 @@ msgstr "Entités de charges"
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
 
+msgid "Error(s) in form: The modifications are not saved"
+msgstr "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
+
 msgid "Evaluations"
 msgstr "Évaluations"
 
@@ -1050,9 +1038,6 @@ msgstr "Fixé"
 
 msgid "Fixed-line phone"
 msgstr "Téléphone fixe"
-
-msgid "Focuses"
-msgstr "Finalités"
 
 msgid "Folder"
 msgstr "Dossier"
@@ -1152,6 +1137,12 @@ msgstr "Matricule FGS"
 
 msgid "Go"
 msgstr "Continuer"
+
+msgid "Go down"
+msgstr "Descendre"
+
+msgid "Go up"
+msgstr "Monter"
 
 msgid "Graduates"
 msgstr "Diplômés"
@@ -1325,9 +1316,6 @@ msgstr "Membres du jury"
 msgid "Keywords"
 msgstr "Mots clés"
 
-msgid "LECTURING"
-msgstr "Partie magistrale"
-
 msgid "LU"
 msgstr "UE"
 
@@ -1362,6 +1350,9 @@ msgid ""
 msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
+
+msgid "Learning achievement content has been successfully saved"
+msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
@@ -1718,9 +1709,6 @@ msgstr "Pas de frais supplémentaires"
 msgid "No attributions exist for the parent learning unit"
 msgstr "Aucune attribution n'existe pour l'UE parent"
 
-msgid "No change made"
-msgstr "Pas de modification apportée"
-
 msgid "No data"
 msgstr "Pas de données"
 
@@ -1836,6 +1824,9 @@ msgstr "Ouverture aux adultes"
 
 msgid "Operation"
 msgstr "Opération"
+
+msgid "Operation on learning achievement has been successfully completed"
+msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
 
 msgid "Option"
 msgstr "Option"
@@ -1989,6 +1980,13 @@ msgstr "Pôle"
 
 msgid "Postal code"
 msgstr "Code postal"
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
+msgstr ""
+"Le report ne sera pas possible car le code choisi existe déjà pour les "
+"années académiques futures"
 
 msgid "Practical exercises"
 msgstr "Partie pratique"
@@ -2290,6 +2288,15 @@ msgstr "Commande SQL"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Save and do not postpone changes"
+msgstr "Enregistrer sans reporter les changements"
+
+msgid "Save and postpone"
+msgstr "Enregistrer et reporter"
+
+msgid "Save and postpone changes on next years"
+msgstr "Enregistrer et reporter les changements sur les années futures"
+
 msgid "Schedule type"
 msgstr "Type horaire"
 
@@ -2473,6 +2480,14 @@ msgstr "Stage d’enseignement"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+"Le support de cours que vous avez modifié a été sauvegardé jusqu'en "
+"%(last_year_reported)s avec succès"
+
 msgid "Teaching profile"
 msgstr "Profil d'enseignement"
 
@@ -2490,6 +2505,10 @@ msgstr "Essai"
 
 msgid "The"
 msgstr "Le"
+
+#, python-format
+msgid "The '%(field)s' field content has been successfully saved"
+msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
@@ -2709,6 +2728,17 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The sections you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+"Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
+"jusqu'en %(last_year_reported)s avec succès"
+
+msgid "The sections you modified have been saved with success."
+msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2731,6 +2761,20 @@ msgid ""
 msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
+
+#, python-format
+msgid ""
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+"Le support de cours a été supprimé jusqu'en %(last_year_reported)s avec "
+"succès"
+
+msgid "The teaching material has been deleted with success"
+msgstr "Le support de cours a été supprimé avec succès"
+
+msgid "The teaching material has been saved with success"
+msgstr "Le support de cours a été modifié avec succès"
 
 msgid "The user cannot modify data which are greater than N+1"
 msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
@@ -2850,11 +2894,6 @@ msgstr "Ce champ est obligatoire."
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-msgid "This learning unit is not eligible for proposal creation/modification"
-msgstr ""
-"Cette unité d'enseignement n'est pas éligible pour une création/modification "
-"de proposition"
-
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
@@ -2943,6 +2982,9 @@ msgstr "Bacheliers UCL"
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
 
+msgid "UE full"
+msgstr "UE complète"
+
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
 
@@ -2987,9 +3029,6 @@ msgstr "Mise-à-jour bloquée pour l'enseignant"
 
 msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
-
-msgid "Used by learning unit"
-msgstr "Utilisation par l'unité d'enseignement"
 
 msgid "User"
 msgstr "Utilisateur"
@@ -3121,9 +3160,6 @@ msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
 msgid "You are not eligible to cancel proposal"
 msgstr "Vous ne pouvez pas annuler les propositions"
 
-msgid "You are not eligible to consolidate proposal"
-msgstr "Vous ne pouvez pas consolider les propositions"
-
 msgid "You are not eligible to create/modify proposal"
 msgstr "Vous ne pouvez pas créer/modifier les propositions"
 
@@ -3212,6 +3248,9 @@ msgstr ""
 "Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
 "qui est prérequis."
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
@@ -3286,6 +3325,10 @@ msgstr "accords"
 
 msgid "aim number"
 msgstr "numéro de l'attendu"
+
+#, python-format
+msgid "and postponed until %(year)s"
+msgstr "et reporté jusque %(year)s"
 
 msgid "at"
 msgstr "à"
@@ -3600,9 +3643,6 @@ msgstr "volume déclaré vacant"
 
 msgid "volume requirement entity"
 msgstr "vol. ent. charge"
-
-msgid "volume total global"
-msgstr "volume total global"
 
 msgid "volume total requirement entities"
 msgstr "vol. tot. ent. charge"

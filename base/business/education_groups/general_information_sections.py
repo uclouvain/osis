@@ -60,6 +60,7 @@ INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
 ADMISSION_CONDITION = 'conditions_admission'
+TUITION_FEES = 'tuition_fees'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -106,6 +107,7 @@ SECTION_LIST = [
     Section(title=_('In practice'),
             labels=[
                 PRACTICAL_INFO,
+                TUITION_FEES,
                 CONTACT_INTRO,
             ]),
 ]
@@ -147,15 +149,69 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     TrainingType.CERTIFICATE_OF_PARTICIPATION.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            TUITION_FEES,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            STRUCTURE
+        ]
     },
     TrainingType.CERTIFICATE_OF_SUCCESS.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            TUITION_FEES,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            STRUCTURE
+        ]
     },
     TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            TUITION_FEES,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            STRUCTURE
+        ]
     },
     TrainingType.BACHELOR.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
@@ -215,11 +271,49 @@ SECTIONS_PER_OFFER_TYPE = {
     },
     TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            CERTIFICATES,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            TUITION_FEES,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            STRUCTURE
+        ]
     },
     TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, ]
+        'specific': [
+            WELCOME_INTRODUCTION,
+            WELCOME_PROFIL,
+            WELCOME_PROGRAM,
+            WELCOME_PATH,
+            DETAILED_PROGRAM,
+            PREREQUISITE,
+            CERTIFICATES,
+            ACCESS_TO_PROFESSIONS,
+            PEDAGOGY,
+            EVALUATION,
+            FURTHER_TRAININGS,
+            PRACTICAL_INFO,
+            CONTACTS,
+            TUITION_FEES,
+            CONTACT_INTRO,
+            SKILLS_AND_ACHIEVEMENTS,
+            ADMISSION_CONDITION,
+            STRUCTURE
+        ]
     },
     TrainingType.PGRM_MASTER_120.name: {
         'common': [CAAP, EVALUATION, COMPLEMENTARY_MODULE, PREREQUISITE, ],
@@ -336,7 +430,8 @@ SECTIONS_PER_OFFER_TYPE = {
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
-            EVALUATION
+            EVALUATION,
+            OPTIONS
         ]
     },
 
