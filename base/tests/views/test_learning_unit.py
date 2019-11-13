@@ -64,6 +64,7 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
@@ -1150,15 +1151,15 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_specifications_save_with_postponement(self):
         year_range = 5
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
-        learning_unit_year = LearningUnitYearFactory(
-            academic_year=create_current_academic_year(),
-            learning_unit=LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
-        )
-        future_learning_unit_years = [LearningUnitYearFactory(
-            academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
-            learning_unit=learning_unit_year.learning_unit,
-            acronym=learning_unit_year.acronym
-        ) for i in range(1, year_range)]
+        learning_unit = LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
+        learning_unit_years = [LearningUnitYearFactory(
+            academic_year=ac,
+            learning_unit=learning_unit,
+            acronym=learning_unit.acronym,
+            subtype=FULL,
+        ) for ac in academic_years]
+        # delete last learning unit year to ensure luy is not created
+        learning_unit_years.pop().delete()
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
@@ -1167,16 +1168,16 @@ class LearningUnitViewTestCase(TestCase):
             reference=luy.id,
             language='fr-be',
             text_label=label
-        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        ) for luy in learning_unit_years]
         trans_en = [TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=luy.id,
             language='en',
             text_label=label
-        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        ) for luy in learning_unit_years]
 
         response = self.client.post(
-            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_years[0].id}),
             data={
                 'trans_text_fr': 'textFR',
                 'trans_text_en': 'textEN',
