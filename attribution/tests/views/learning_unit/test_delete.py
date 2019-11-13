@@ -57,7 +57,7 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
         self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/remove_charge_repartition_confirmation_inner.html")
+        self.assertTemplateUsed(response, "attribution/learning_unit/remove_charge_repartition_confirmation_inner.html")
 
     def test_delete_data(self):
         response = self.client.delete(self.url)

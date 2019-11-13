@@ -99,7 +99,7 @@ class TestViewAttributions(TestCase):
         url = reverse("learning_unit_attributions", args=[self.luy_without_attribution.id])
 
         response = self.client.get(url)
-        self.assertTemplateUsed(response, "learning_unit/attributions.html")
+        self.assertTemplateUsed(response, "attribution/attributions.html")
 
         context = response.context
         self.assertQuerysetEqual(context["attributions"], [])
@@ -111,7 +111,7 @@ class TestViewAttributions(TestCase):
         url = reverse("learning_unit_attributions", args=[self.luy.id])
 
         response = self.client.get(url)
-        self.assertTemplateUsed(response, "learning_unit/attributions.html")
+        self.assertTemplateUsed(response, "attribution/attributions.html")
 
         context = response.context
         self.assertQuerysetEqual(context["attributions"], [self.attribution], transform=lambda obj: obj)

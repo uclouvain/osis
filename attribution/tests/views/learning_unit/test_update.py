@@ -91,7 +91,7 @@ class TestEditAttribution(TestCase):
 
         self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/attribution_inner.html")
+        self.assertTemplateUsed(response, "attribution/learning_unit/attribution_inner.html")
 
     def test_post(self):
         data = {

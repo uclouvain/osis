@@ -58,7 +58,7 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
 
         self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/select_attribution.html")
+        self.assertTemplateUsed(response, "attribution/charge_repartition/select_attribution.html")
 
     def test_should_give_all_attributions_of_parent_if_no_attribution_in_child(self):
         response = self.client.get(self.url)
@@ -110,7 +110,7 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
 
         self.assertTrue(self.mocked_permission_function.called)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "learning_unit/add_charge_repartition_inner.html")
+        self.assertTemplateUsed(response, "attribution/charge_repartition/add_charge_repartition_inner.html")
 
     def test_post(self):
         data = {
