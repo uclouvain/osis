@@ -91,7 +91,11 @@ def learning_unit_formations(request, learning_unit_year_id):
     context['group_elements_years'] = group_elements_years
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
-
+    context['total_formation_enrollments'] = 0
+    context['total_learning_unit_enrollments'] = 0
+    for root_formation in context['root_formations']:
+        context['total_formation_enrollments'] += root_formation.count_formation_enrollments
+        context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments
     return render(request, "learning_unit/formations.html", context)
 
 

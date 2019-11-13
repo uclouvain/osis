@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-06 11:47+0100\n"
+"POT-Creation-Date: 2019-11-13 15:46+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -927,9 +927,6 @@ msgstr "Inscriptible"
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
 
-msgid "Enrollments to training"
-msgstr "Inscrits à la formation"
-
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -956,7 +953,8 @@ msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
 
 msgid "Error(s) in form: The modifications are not saved"
-msgstr "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Evaluations"
 msgstr "Évaluations"
@@ -1888,6 +1886,9 @@ msgstr "P."
 msgid "Page not found."
 msgstr "Page inexistante."
 
+msgid "Parent"
+msgstr ""
+
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr "Sigle déjà existant en %(academic_year)s"
@@ -1922,12 +1923,6 @@ msgstr "Mot de passe"
 
 msgid "Pending"
 msgstr "En attente"
-
-msgid "Periodic courses not taught"
-msgstr "Activité cyclique non dispensée en"
-
-msgid "Periodic courses taught during"
-msgstr "Activité cyclique dispensée en"
 
 msgid "Periodicity"
 msgstr "Périodicité"
@@ -2724,9 +2719,6 @@ msgstr "Le programme %(acronym)s sera publié sous peu"
 msgid "The program aim has been updated"
 msgstr "L’objectif du programme a été mis à jour"
 
-msgid "The registration form is available at the Secretariat of"
-msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
-
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -2734,7 +2726,6 @@ msgid ""
 msgstr ""
 "La répartition de volume de %(col_name)s a déjà été modifiée. (%(new_value)s "
 "à la place de %(current_value)s)"
-
 
 #, python-format
 msgid ""
@@ -2744,7 +2735,7 @@ msgstr ""
 "Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
 "jusqu'en %(last_year_reported)s avec succès"
 
-msgid "The section you modified have been saved with success."
+msgid "The sections you modified have been saved with success."
 msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
 
 #, python-format
@@ -2937,6 +2928,12 @@ msgstr "Intitulé propre au partim"
 
 msgid "To complete"
 msgstr "A compléter"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Total enrollments to training"
+msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"
@@ -3255,6 +3252,9 @@ msgstr ""
 "Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
 "qui est prérequis."
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
@@ -3354,9 +3354,6 @@ msgstr "bisannuelle impaire"
 
 msgid "blocked update for tutor"
 msgstr "mise-à-jour bloquée pour l'enseignant"
-
-msgid "cancel"
-msgstr "annuler"
 
 msgid "cannot be canceled"
 msgstr "ne peut pas être annulé"
@@ -3561,9 +3558,6 @@ msgstr "rôle (anglais)"
 
 msgid "role (french)"
 msgstr "rôle (français)"
-
-msgid "save"
-msgstr "enregistrer"
 
 msgid "score(s) saved"
 msgstr "note(s) enregistrée(s)"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-06 11:47+0100\n"
+"POT-Creation-Date: 2019-11-13 15:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -889,9 +889,6 @@ msgid "Enrollment enabled"
 msgstr ""
 
 msgid "Enrollments to learning unit"
-msgstr ""
-
-msgid "Enrollments to training"
 msgstr ""
 
 #, python-format
@@ -1822,6 +1819,9 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
+msgid "Parent"
+msgstr ""
+
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
@@ -1855,12 +1855,6 @@ msgid "Password"
 msgstr ""
 
 msgid "Pending"
-msgstr ""
-
-msgid "Periodic courses not taught"
-msgstr ""
-
-msgid "Periodic courses taught during"
 msgstr ""
 
 msgid "Periodicity"
@@ -2432,9 +2426,6 @@ msgstr ""
 msgid "The"
 msgstr ""
 
-msgid "The %(acronym)s has been moved"
-msgstr ""
-
 #, python-format
 msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
@@ -2621,10 +2612,6 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:62
-msgid "The registration form is available at the Secretariat of"
-msgstr ""
-
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -2637,7 +2624,7 @@ msgid ""
 "%(last_year_reported)s with success."
 msgstr ""
 
-msgid "The section you modified have been saved with success."
+msgid "The sections you modified have been saved with success."
 msgstr ""
 
 #, python-format
@@ -2804,6 +2791,12 @@ msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"
@@ -3092,6 +3085,9 @@ msgid ""
 "prerequisite(s)"
 msgstr ""
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr ""
 
@@ -3181,9 +3177,6 @@ msgid "biennial odd"
 msgstr ""
 
 msgid "blocked update for tutor"
-msgstr ""
-
-msgid "cancel"
 msgstr ""
 
 msgid "cannot be canceled"
@@ -3380,9 +3373,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "save"
 msgstr ""
 
 msgid "score(s) saved"
