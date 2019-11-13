@@ -4221,7 +4221,11 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": []
+            "groups": [
+                [
+                    "program_managers"
+                ]
+            ]
         },
         "model": "rules_management.fieldreference"
     },

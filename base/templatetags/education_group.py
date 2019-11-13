@@ -25,7 +25,6 @@
 ##############################################################################
 import waffle
 from django import template
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -34,7 +33,7 @@ from django.utils.translation import gettext as _
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
-    _is_eligible_certificate_aims, is_eligible_to_delete_education_group_year
+    is_eligible_to_delete_education_group_year, is_eligible_to_edit_certificate_aims
 from base.models.academic_year import AcademicYear
 from base.models.utils.utils import get_verbose_field_value
 
@@ -55,6 +54,12 @@ def li_with_deletion_perm(context, url, message, url_id="link_delete"):
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_update_perm(context, url, message, url_id="link_update"):
+    person = context['person']
+
+    if person.is_program_manager and \
+            not any((person.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
+        return li_with_permission(context, is_eligible_to_edit_certificate_aims, url, message, url_id, load_modal=True)
+
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 
 

@@ -32,17 +32,19 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from base.forms.education_group.group import GroupYearModelForm
+from base.forms.education_group.training import CertificateAimsForm
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -62,6 +64,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
@@ -112,9 +115,6 @@ class TestUpdate(TestCase):
         self.client.force_login(self.person.user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.person.user.user_permissions.add(permission)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_certificate_aims",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
 
         self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         self.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
@@ -174,7 +174,9 @@ class TestUpdate(TestCase):
         self.domains = [DomainFactory() for x in range(10)]
 
         self.a_mini_training_education_group_type = EducationGroupTypeFactory(
-            category=education_group_categories.MINI_TRAINING)
+            category=education_group_categories.MINI_TRAINING,
+            name=MiniTrainingType.DEEPENING.name
+        )
 
         self.mini_training_education_group_year = MiniTrainingFactory(
             academic_year=self.current_academic_year,
@@ -191,9 +193,10 @@ class TestUpdate(TestCase):
             entity=self.mini_training_education_group_year.management_entity,
             start_date=self.education_group_year.academic_year.start_date
         )
-
-    def tearDown(self):
-        self.perm_patcher.stop()
+        EntityVersionFactory(
+            entity=self.mini_training_education_group_year.administration_entity,
+            start_date=self.education_group_year.academic_year.start_date
+        )
 
     def test_login_required(self):
         self.client.logout()
@@ -469,7 +472,7 @@ class TestUpdate(TestCase):
             diploma=diploma_choice
         )
 
-        self.assertEqual(egy.coorganizations.count(), 1)
+        self.assertEqual(EducationGroupOrganization.objects.filter(education_group_year=egy).count(), 1)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -497,9 +500,7 @@ class TestUpdate(TestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 302)
 
-        egy.refresh_from_db()
-        coorganizations = egy.coorganizations
-        self.assertEqual(coorganizations.count(), 0)
+        self.assertEqual(EducationGroupOrganization.objects.filter(education_group_year=egy).count(), 0)
 
     def test_post_mini_training(self):
         old_domain = DomainFactory()
@@ -998,3 +999,62 @@ class TestCertificateAimAutocomplete(TestCase):
         results = json.loads(json_response)['results']
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], str(self.certificate_aim.id))
+
+
+@override_flag('education_group_update', active=True)
+class TestCertificateAimView(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.academic_year = AcademicYearFactory(year=2019)
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+
+        cls.program_manager = ProgramManagerFactory(education_group=cls.training.education_group)
+        read_permission = Permission.objects.get(codename='can_access_education_group')
+        cls.program_manager.person.user.user_permissions.add(read_permission)
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("update_education_group", kwargs={
+            "root_id": self.training.pk,
+            "education_group_year_id": self.training.pk
+        })
+        self.client.force_login(user=self.program_manager.person.user)
+
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_user_is_not_program_manager_of_training(self):
+        training_without_pgrm_manager = TrainingFactory(academic_year=self.academic_year)
+        url = reverse("update_education_group", kwargs={
+            "root_id": training_without_pgrm_manager.pk,
+            "education_group_year_id": training_without_pgrm_manager.pk
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
+    def test_use_certificate_aims_template(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
+
+    def test_ensure_context_kwargs(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.context['education_group_year'], self.training)
+        self.assertIsInstance(response.context['form_certificate_aims'], CertificateAimsForm)
+
+    @mock.patch('base.views.education_groups.update.CertificateAimsForm')
+    def test_post_method_ensure_data_is_correctly_save(self, mock_form):
+        mock_form.is_valid.return_value = True
+        mock_form.save.return_value = None
+
+        response = self.client.post(self.url, data={'dummy_key': 'dummy'})
+        excepted_url = reverse("education_group_read", args=[self.training.pk, self.training.pk])
+        self.assertRedirects(response, excepted_url)
