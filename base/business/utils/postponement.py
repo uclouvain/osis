@@ -132,7 +132,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
                         copied_objs.append(new_obj)
 
                     self.post_extend(obj_to_copy, copied_objs)
-                self.result.extend(obj)
+                    self.result.extend(copied_objs)
 
             # General catch to be sure to not stop the rest of the duplication
             except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
