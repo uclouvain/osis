@@ -32,7 +32,8 @@ from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import shorten
-from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
+from base.business.education_groups.postponement import PostponementEducationGroupYearMixin, \
+    PostponementCertificateAimsMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm, PermissionFieldTrainingMixin
 from base.forms.utils.choice_field import add_blank
@@ -255,7 +256,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             )
 
 
-class CertificateAimsForm(forms.ModelForm):
+class CertificateAimsForm(PostponementCertificateAimsMixin, forms.ModelForm):
     section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
 
     class Meta:

@@ -73,12 +73,12 @@ def _compute_end_year(education_group):
     return max(max_postponement_end_year, latest_egy.academic_year.year)
 
 
-def _postpone_m2m(education_group_year, postponed_egy, hops_values):
-    fields_to_exclude = []
-
+def _postpone_m2m(education_group_year, postponed_egy, hops_values, exclude=None, include=None):
     opts = education_group_year._meta
     for f in opts.many_to_many:
-        if f.name in fields_to_exclude:
+        if include and f.name not in include:
+            continue
+        if exclude and f.name in exclude:
             continue
         m2m_cls = f.remote_field.through
 
@@ -94,11 +94,14 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
         _postpone_hops(hops_values, postponed_egy)
 
 
-def duplicate_education_group_year(old_education_group_year, new_academic_year, initial_dicts=None, hops_values=None):
+def duplicate_education_group_year(old_education_group_year, new_academic_year,
+                                   initial_dicts=None, hops_values=None, field_to_exclude=None, field_to_include=None):
     if initial_dicts is None:
         initial_dicts = {}
+    if field_to_exclude is None:
+        field_to_exclude = FIELD_TO_EXCLUDE
 
-    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=FIELD_TO_EXCLUDE)
+    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=field_to_exclude, include=field_to_include)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
 
@@ -116,7 +119,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year, 
 
     # During the update, we need to check if the postponed object has been modify
     else:
-        dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=FIELD_TO_EXCLUDE)
+        dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=field_to_exclude, include=field_to_include)
         differences = compare_objects(initial_dicts['dict_initial_egy'], dict_postponed_egy) \
             if initial_dicts['dict_initial_egy'] and dict_postponed_egy else {}
 
@@ -216,8 +219,11 @@ class PostponementEducationGroupYearMixin:
     This mixin will report the modification to the futures years.
 
     If one of the future year is already modified, it will stop the postponement and append a warning message
+    but it will not take account of certificate_aims because it is the business of program_manager and will be
+    treated on another mixin
     """
-    field_to_exclude = FIELD_TO_EXCLUDE
+    field_to_exclude = FIELD_TO_EXCLUDE + ['certificate_aims']
+    field_to_include = None
     dict_initial_egy = {}
     initial_dicts = {
         'educationgrouporganization_set': {}
@@ -234,7 +240,7 @@ class PostponementEducationGroupYearMixin:
 
         if not self._is_creation():
             self.dict_initial_egy = model_to_dict_fk(
-                self.forms[forms.ModelForm].instance, exclude=self.field_to_exclude
+                self.forms[forms.ModelForm].instance, exclude=self.field_to_exclude, include=self.field_to_include
             )
             self.initial_dicts['educationgrouporganization_set'] = {
                 coorganization.organization.id: model_to_dict_fk(coorganization, exclude=FIELD_TO_EXCLUDE_IN_SET)
@@ -260,6 +266,8 @@ class PostponementEducationGroupYearMixin:
                         education_group_year,
                         academic_year,
                         {'dict_initial_egy': self.dict_initial_egy},
+                        field_to_exclude=self.field_to_exclude,
+                        field_to_include=self.field_to_include
                     )
                 else:
                     postponed_egy = duplicate_education_group_year(
@@ -267,6 +275,8 @@ class PostponementEducationGroupYearMixin:
                         academic_year,
                         {'dict_initial_egy': self.dict_initial_egy, 'initial_sets_dict': self.initial_dicts},
                         self.hops_form.data,
+                        field_to_exclude=self.field_to_exclude,
+                        field_to_include=self.field_to_include
                     )
                 self.education_group_year_postponed.append(postponed_egy)
 
@@ -304,3 +314,19 @@ class PostponementEducationGroupYearMixin:
                         'error': error
                     }
                 )
+
+
+class PostponementCertificateAimsMixin(PostponementEducationGroupYearMixin):
+    """
+     This mixin will report the modification to certificate aims.
+     This class is used on the context of program manager
+    """
+    field_to_exclude = []
+    field_to_include = ['certificate_aims']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_dicts = {}
+
+    def _is_creation(self):
+        return True
