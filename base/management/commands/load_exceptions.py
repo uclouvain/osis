@@ -54,14 +54,15 @@ class Command(BaseCommand):
         workbook = load_workbook("fixtures_to_load.xlsx", read_only=True, data_only=True)
         for ws in workbook.worksheets:
             model_class = self._get_model_class_from_worksheet_title(ws)
-            xls_rows = list(ws.rows)
-            print('Number of records : {}'.format(len(xls_rows)))
-            headers = [(idx, cell.value) for idx, cell in enumerate(xls_rows[0])]
-            for line_index, row in enumerate(xls_rows[1:]):
-                try:
-                    self._save_in_database(row, model_class, headers)
-                except Exception as e:
-                    print('    ERROR at line {} :: {}'.format(line_index+1, e))
+            if model_class:
+                xls_rows = list(ws.rows)
+                print('Number of records : {}'.format(len(xls_rows)))
+                headers = [(idx, cell.value) for idx, cell in enumerate(xls_rows[0])]
+                for line_index, row in enumerate(xls_rows[1:]):
+                    try:
+                        self._save_in_database(row, model_class, headers)
+                    except Exception as e:
+                        print('    ERROR at line {} :: {}'.format(line_index+1, e))
 
     @staticmethod
     def _get_model_class_from_worksheet_title(xls_worksheet):
@@ -70,7 +71,12 @@ class Command(BaseCommand):
         app_name = APP_NAME_ALIASES.get(app_name, app_name)
         print()
         print('Working on {}...'.format(ws_title))
-        return apps.get_model(app_name, model_name)
+        try:
+            return apps.get_model(app_name, model_name)
+        except LookupError as e:
+            print('ERROR :: {}'.format(e))
+            print('ERROR :: Ignoring data from worksheet named "{}"'.format(ws_title))
+            return None
 
     def _save_in_database(self, row, model_class, headers):
         object_as_dict = {

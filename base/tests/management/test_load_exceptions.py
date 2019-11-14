@@ -45,6 +45,11 @@ class TestGetModelClassFromWorksheetTitle(TestCase):
         result = load_exceptions.Command._get_model_class_from_worksheet_title(worksheet)
         self.assertEqual(result, PersonEntity)
 
+    def test_when_app_does_not_exist(self):
+        worksheet = Mock(title='inexisting_app.InexistingModel')
+        result = load_exceptions.Command._get_model_class_from_worksheet_title(worksheet)
+        self.assertIsNone(result)
+
 
 class TestSaveInDatabase(TestCase):
     """Unit tests on _save_in_database()"""
