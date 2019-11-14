@@ -60,6 +60,7 @@ INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
 ADMISSION_CONDITION = 'conditions_admission'
+CAREER_DEVELOPMENT = 'career_development'
 TUITION_FEES = 'tuition_fees'
 
 Section = namedtuple('Section', 'title labels')
@@ -101,6 +102,7 @@ SECTION_LIST = [
                 PEDAGOGY,
                 EVALUATION,
                 MOBILITY,
+                CAREER_DEVELOPMENT,
                 FURTHER_TRAININGS,
                 CERTIFICATES,
             ]),
@@ -159,6 +161,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
@@ -181,6 +184,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
@@ -203,6 +207,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
@@ -282,6 +287,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
@@ -305,6 +311,7 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
