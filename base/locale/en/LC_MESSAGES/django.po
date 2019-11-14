@@ -2806,6 +2806,9 @@ msgstr ""
 msgid "UCL Diploma"
 msgstr ""
 
+msgid "UE full"
+msgstr ""
+
 msgid "URL of the learning unit"
 msgstr ""
 

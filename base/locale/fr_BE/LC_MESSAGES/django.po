@@ -2940,6 +2940,9 @@ msgstr "Bacheliers UCL"
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
 
+msgid "UE full"
+msgstr "UE complète"
+
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
 
