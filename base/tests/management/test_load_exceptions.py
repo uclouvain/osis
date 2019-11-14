@@ -94,6 +94,26 @@ class TestSaveInDatabase(TestCase):
         self.assertFalse(created)
 
 
+class TestFindObjectTroughForeignKeys(TestSaveInDatabase):
+    """Unit tests on _find_object_through_foreign_keys()"""
+
+    def setUp(self):
+        super(TestFindObjectTroughForeignKeys, self).setUp()
+        self.field = self.headers[1][1]  # 'person__user__username'
+        self.value = self.person.user.username
+
+    def test_classic_usage(self):
+        result = self.command_instance._find_object_through_foreign_keys(PersonEntity, self.field, self.value)
+        expected_result = ('person', self.person)
+        self.assertEqual(result, expected_result)
+
+    def test_when_field_is_natural_key(self):
+        field_as_natural_key = self.field + load_exceptions.NATURAL_KEY_IDENTIFIER
+        result = self.command_instance._find_object_through_foreign_keys(PersonEntity, field_as_natural_key, self.value)
+        expected_result = ('person**', self.person)
+        self.assertEqual(result, expected_result)
+
+
 class TestConvertBooleanVellValue(TestCase):
     """Unit tests on _convert_boolean_cell_value()"""
 

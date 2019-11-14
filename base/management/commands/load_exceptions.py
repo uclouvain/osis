@@ -112,6 +112,7 @@ class Command(BaseCommand):
         return value
 
     def _find_object_through_foreign_keys(self, model_class, col_name, value, recur=0) -> object:
+        is_natural_key_field = NATURAL_KEY_IDENTIFIER in col_name
         foreign_key_field = col_name
         if '__' in col_name:
             splitted_col_name = col_name.split('__')
@@ -128,7 +129,13 @@ class Command(BaseCommand):
                     value = related_obj
             else:
                 foreign_key_field = col_name
+
+        if is_natural_key_field:
+            foreign_key_field += NATURAL_KEY_IDENTIFIER
+
         if recur == 0:
             return foreign_key_field, value
+
         kwargs = {self._clean_header_from_special_chars(foreign_key_field): value}
+
         return foreign_key_field, model_class.objects.get(**kwargs)
