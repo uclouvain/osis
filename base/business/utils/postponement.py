@@ -157,7 +157,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
     def get_to_not_duplicated(self):
         """ We cannot postpone an education_group in the past """
         return self.queryset.filter(
-            Q(last_year__lt=self.current_year.year) | Q(end_year__lt=self.last_academic_year.year)
+            Q(last_year__lt=self.current_year.year) | Q(end_year__year__lt=self.last_academic_year.year)
         )
 
     def get_ending_on_max_adjournment(self):
