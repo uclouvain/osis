@@ -28,6 +28,8 @@ from django.apps import apps
 from django.core.management import BaseCommand
 from openpyxl import load_workbook
 
+from base.models.person_entity import PersonEntity
+
 NATURAL_KEY_IDENTIFIER = '**'
 
 # Need to use aliases because worksheet title is limited to max 31 chars
@@ -80,7 +82,7 @@ class Command(BaseCommand):
 
     def _save_in_database(self, row, model_class, headers):
         object_as_dict = {
-            column_name: row[idx].value for idx, column_name in headers
+            column_name: row[idx].value for idx, column_name in headers if column_name
         }
         object_dict_with_relations = {
             fk_field_name: self._convert_boolean_cell_value(value_as_obj)
