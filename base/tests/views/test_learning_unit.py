@@ -1199,7 +1199,7 @@ class LearningUnitViewTestCase(TestCase):
         # Count Education Group Year link to Learning Unit Year
         self.assertEqual(len(response.context["root_formations"]), 2)
         # Count Student link to Formation
-        self.assertEqual(len(response.context["total_formation_enrollments"]), 4)
+        self.assertEqual(response.context["total_formation_enrollments"], 4)
 
 
 class TestCreateXls(TestCase):
