@@ -1184,11 +1184,22 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit(self):
         learning_unit_year = LearningUnitYearFactory()
-        LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year)
-
+        education_group_year_1 = EducationGroupYearFactory()
+        education_group_year_2 = EducationGroupYearFactory()
+        LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,
+                                      learning_unit_year=learning_unit_year)
+        LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,
+                                      learning_unit_year=learning_unit_year)
+        LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_2,
+                                      learning_unit_year=learning_unit_year)
+        LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_2,
+                                      learning_unit_year=learning_unit_year)
         response = self.client.get(reverse(learning_unit_formations, args=[learning_unit_year.pk]))
-
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
+        # Count Education Group Year link to Learning Unit Year
+        self.assertEqual(len(response.context["root_formations"]), 2)
+        # Count Student link to Formation
+        self.assertEqual(len(response.context["total_formation_enrollments"]), 4)
 
 
 class TestCreateXls(TestCase):
