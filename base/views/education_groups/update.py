@@ -149,18 +149,16 @@ def _common_success_redirect(request, form, root, groupelementyear_form):
             success_msgs += ["{} : <ul><li>{}</li></ul>".format(
                 _("The following links has been updated"),
                 "</li><li>".join([
-                    gey.instance.child_branch.partial_acronym + " - " + gey.instance.child_branch.acronym + " - " + anac
-                    if gey.instance.child_branch
-                    else gey.instance.child_leaf.acronym + " - " + anac
+                    " - ".join([gey.instance.child_branch.partial_acronym, gey.instance.child_branch.acronym, anac])
+                    if gey.instance.child_branch else " - ".join([gey.instance.child_leaf.acronym, anac])
                     for gey in groupelementyear_changed
                 ])
             )]
         else:
             gey = groupelementyear_changed[0].instance
             success_msgs += [_("The link of %(acronym)s has been updated") % {
-                'acronym': gey.child_branch.partial_acronym + " - " + gey.child_branch.acronym + " - " + anac
-                if gey.child_branch
-                else gey.child_leaf.acronym + " - " + anac
+                'acronym': " - ".join([gey.child_branch.partial_acronym, gey.child_branch.acronym, anac])
+                if gey.child_branch else " - ".join([gey.child_leaf.acronym, anac])
             }]
     url = _get_success_redirect_url(root, education_group_year)
     display_success_messages(request, success_msgs, extra_tags='safe')

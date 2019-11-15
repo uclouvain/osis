@@ -569,6 +569,15 @@ class TestUpdate(TestCase):
         self.assertTrue(group.is_mandatory)
         self.assertEqual(group.comment, 'COMMENT_TEST')
         self.assertEqual(group.link_type, LinkTypes.REFERENCE.name)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[3],
+            _("The link of %(acronym)s has been updated") % {
+                'acronym': " - ".join([
+                    group.child_branch.partial_acronym, group.child_branch.acronym, str(group.parent.academic_year)
+                ])
+            }
+        )
 
 
 class TestGetSuccessRedirectUrl(TestCase):
