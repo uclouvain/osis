@@ -22,7 +22,6 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from collections import namedtuple
-from itertools import tee
 
 from django import forms
 from django.core.exceptions import FieldDoesNotExist
@@ -74,12 +73,11 @@ def _compute_end_year(education_group):
     return max(max_postponement_end_year, latest_egy.academic_year.year)
 
 
-def _postpone_m2m(education_group_year, postponed_egy, hops_values, exclude=None, include=None):
+def _postpone_m2m(education_group_year, postponed_egy, hops_values):
+    fields_to_exclude = []
     opts = education_group_year._meta
     for f in opts.many_to_many:
-        if include and f.name not in include:
-            continue
-        if exclude and f.name in exclude:
+        if f.name in fields_to_exclude:
             continue
         m2m_cls = f.remote_field.through
 
