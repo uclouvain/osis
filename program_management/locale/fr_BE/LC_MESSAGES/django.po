@@ -142,10 +142,10 @@ msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
 
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 msgid "Copy"
-msgstr ""
+msgstr "Copier"
 
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
@@ -226,6 +226,8 @@ msgstr "Non"
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
+"Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
+"%(acronym)s"
 
 msgid "Official"
 msgstr "Officiel"
