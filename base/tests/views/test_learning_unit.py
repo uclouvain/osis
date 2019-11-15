@@ -80,8 +80,10 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory, \
     LearningUnitYearFakerFactory
+from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
     UEFacultyManagerFactory
@@ -90,7 +92,7 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_components, learning_unit_specifications, \
     learning_unit_comparison, \
-    learning_unit_proposal_comparison
+    learning_unit_proposal_comparison, learning_unit_formations
 from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.detail import SEARCH_URL_PART
@@ -1179,6 +1181,14 @@ class LearningUnitViewTestCase(TestCase):
             self.assertEqual(translated_text.text, 'textFR')
         for translated_text in TranslatedText.objects.filter(language='en'):
             self.assertEqual(translated_text.text, 'textEN')
+
+    def test_learning_unit(self):
+        learning_unit_year = LearningUnitYearFactory()
+        LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year)
+
+        response = self.client.get(reverse(learning_unit_formations, args=[learning_unit_year.pk]))
+
+        self.assertTemplateUsed(response, 'learning_unit/formations.html')
 
 
 class TestCreateXls(TestCase):
