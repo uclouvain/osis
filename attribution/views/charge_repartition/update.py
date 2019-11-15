@@ -23,11 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import shortcuts
+from django.utils.translation import gettext_lazy as _
 
-from osis_common.decorators.deprecated import deprecated
+from attribution.views.learning_unit.update import UpdateAttributionView
+from base.business.learning_units import perms
+from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
 
 
-@deprecated
-def render(request, template, values):
-    return shortcuts.render(request, template, values)
+class EditChargeRepartition(UpdateAttributionView):
+    rules = [perms.is_eligible_to_manage_charge_repartition]
+    template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
+    form_classes = {
+        "lecturing_charge_form": LecturingAttributionChargeForm,
+        "practical_charge_form": PracticalAttributionChargeForm
+    }
+
+    def get_success_message(self, forms):
+        return _("Repartition modified for %(tutor)s (%(function)s)") %\
+                        {"tutor": self.attribution.tutor.person,
+                         "function": _(self.attribution.get_function_display())}
