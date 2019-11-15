@@ -293,7 +293,6 @@ CKEDITOR_CONFIGS = {
             {'name': 'insert', 'items': ['Table']},
         ],
         'autoParagraph': False,
-        'allowedContent': True,
     },
     'default': {
         "removePlugins": "stylesheetparser",
