@@ -3633,5 +3633,28 @@
                 ]
             ]
         }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "student_update_UE_AA",
+            "permissions": [
+                [
+                    "can_access_learningunit",
+                    "base",
+                    "learningunit"
+                ],
+                [
+                    "can_edit_learningunit_pedagogy",
+                    "base",
+                    "learningunit"
+                ],
+                [
+                    "can_edit_learningunit_specification",
+                    "base",
+                    "learningunit"
+                ]
+            ]
+        }
     }
 ]

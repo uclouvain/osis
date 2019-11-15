@@ -264,15 +264,6 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add attribution"
-msgstr ""
-
-msgid "Add current year teacher"
-msgstr ""
-
-msgid "Add over the current year"
-msgstr ""
-
 msgid "Add the English content of this paragraph"
 msgstr ""
 
@@ -417,22 +408,10 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Attribution duration"
 msgstr ""
 
 msgid "Attribution entity"
-msgstr ""
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Attributions"
@@ -1445,9 +1424,6 @@ msgstr ""
 msgid "Male"
 msgstr ""
 
-msgid "Manage repartition"
-msgstr ""
-
 msgid "Manage volumes"
 msgstr ""
 
@@ -1643,9 +1619,6 @@ msgid "No Messages"
 msgstr ""
 
 msgid "No additional fees"
-msgstr ""
-
-msgid "No attributions exist for the parent learning unit"
 msgstr ""
 
 msgid "No data"
@@ -2160,14 +2133,6 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Req. Entities"
 msgstr ""
 
@@ -2642,12 +2607,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
-msgstr ""
-
-#, python-format
-msgid ""
 "The teaching material has been deleted up to %(last_year_reported)s with "
 "success"
 msgstr ""
@@ -2829,9 +2788,6 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for parent LU"
-msgstr ""
-
 msgid "Tutors"
 msgstr ""
 
@@ -2851,6 +2807,9 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
