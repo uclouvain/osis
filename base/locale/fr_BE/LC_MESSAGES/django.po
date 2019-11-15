@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 10:35+0100\n"
+"POT-Creation-Date: 2019-11-13 15:46+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -905,9 +905,6 @@ msgstr "Inscriptible"
 
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
-
-msgid "Enrollments to training"
-msgstr "Inscrits à la formation"
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
@@ -2888,6 +2885,12 @@ msgstr "Intitulé propre au partim"
 
 msgid "To complete"
 msgstr "A compléter"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Total enrollments to training"
+msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"

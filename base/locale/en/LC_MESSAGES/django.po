@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 10:35+0100\n"
+"POT-Creation-Date: 2019-11-13 15:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -868,9 +868,6 @@ msgid "Enrollment enabled"
 msgstr ""
 
 msgid "Enrollments to learning unit"
-msgstr ""
-
-msgid "Enrollments to training"
 msgstr ""
 
 #, python-format
@@ -2753,6 +2750,12 @@ msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"
