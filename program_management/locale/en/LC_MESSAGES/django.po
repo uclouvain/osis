@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-09 08:35+0200\n"
+"POT-Creation-Date: 2019-11-15 10:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,10 @@ msgid ""
 "%(prerequisite_item)s is not anymore contained in "
 "%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
 "having %(prerequisite_item)s as prerequisite is not copied."
+msgstr ""
+
+#, python-format
+msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
 
 msgid "Academic year"
@@ -113,6 +117,9 @@ msgid "Cannot perform detach action on root."
 msgstr ""
 
 msgid "Cannot perform modification action on root."
+msgstr ""
+
+msgid "Code"
 msgstr ""
 
 msgid "Copy"
@@ -184,6 +191,10 @@ msgid "Name of the teacher responsible"
 msgstr ""
 
 msgid "No"
+msgstr ""
+
+#, python-format
+msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
 
 msgid "Official"

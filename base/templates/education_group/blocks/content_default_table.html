@@ -80,7 +80,7 @@
             <td style="width:20%">
                 {% with comment_english=group.comment_english|default_if_none:'-' %}
                     {% if comment_english|length > 40 %}
-                        <span data-toggle="tooltip" title='{{ comment }}'>
+                        <span data-toggle="tooltip" title='{{ comment_english }}'>
                             {{ comment_english | truncatechars:40 }}
                         </span>
                     {% else %}

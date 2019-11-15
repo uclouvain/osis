@@ -59,7 +59,7 @@
                                    id="lnk_education_group_{{ group.pk }}">{{ group.child_branch.partial_acronym }}</a>
                             </td>
                             <td {% if education_group_year.is_minor_major_option_list_choice %}style="width:55%"
-                                {% else %}style="width:25%"{% endif %}>
+                                {% else %}style="width:24%"{% endif %}>
                                 {{ group.child_branch.title }}
                             </td>
                             <td style="width:6%">
@@ -73,7 +73,7 @@
                                    id="lnk_learning_unit_{{ group.pk }}">{{ group.child_leaf.acronym }}</a>
                             </td>
                             <td {% if education_group_year.is_minor_major_option_list_choice %}style="width:55%"
-                                {% else %}style="width:25%"{% endif %}>
+                                {% else %}style="width:24%"{% endif %}>
                                 {{ group.child_leaf.complete_title }}
                             </td>
                             <td style="width:6%">
@@ -95,7 +95,7 @@
                         <td style="width:3%">
                             {% bootstrap_field formset.block show_label=False %}
                         </td>
-                        <td style="width:6%">
+                        <td style="width:8%">
                             {% if formset.link_type %}
                                 {% bootstrap_field formset.link_type show_label=False|default_if_none:'-' %}
                             {% endif %}
