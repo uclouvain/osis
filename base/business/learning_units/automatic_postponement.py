@@ -42,18 +42,18 @@ class LearningUnitAutomaticPostponementToN6(AutomaticPostponementToN6):
     msg_result = _("%(number_extended)s learning unit(s) extended and %(number_error)s error(s)")
 
     def get_queryset(self, queryset=None):
-        learning_unit_year_without_containers = LearningUnitYear.objects.filter(
+        learning_unit_year_with_containers = LearningUnitYear.objects.filter(
             learning_unit=OuterRef("pk"),
-            learning_container_year__isnull=True
+            learning_container_year__isnull=False
         )
         external_learning_unit_year_that_are_not_mobility = LearningUnitYear.objects.filter(
             learning_unit=OuterRef("pk"),
             externallearningunityear__mobility=True
         )
         return super().get_queryset(queryset).annotate(
-            has_not_container=Exists(learning_unit_year_without_containers),
+            has_container=Exists(learning_unit_year_with_containers),
             is_mobility=Exists(external_learning_unit_year_that_are_not_mobility)
         ).filter(
-         has_not_container=False,
+         has_container=True,
          is_mobility=False
         )
