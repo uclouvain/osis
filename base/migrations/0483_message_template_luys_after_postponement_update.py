@@ -19,29 +19,7 @@ class Migration(migrations.Migration):
              <p>Bonjour,</p>
              <p>Ceci est un message automatique g\u00e9n\u00e9r\u00e9 par le serveur OSIS – Merci de ne pas y r\u00e9pondre.</p>
              <p>Rapport d\u0027ex\u00e9cution de la proc\u00e9dure annuelle de copie des unit\u00e9s d\u0027enseignement pour l\u0027ann\u00e9e acad\u00e9mique {{ end_academic_year }}.</p>
-             
-             <p>{{ luys_postponed }} UE copi\u00e9es de {{ academic_year }} en {{ end_academic_year }}.</p>
-             {% if luys_postponed %}
-             <div class="w3-responsive">
-             <table cellpadding="10" class="w3-table w3-striped w3-hoverable">
-                 <thead>
-                     <tr>
-                         <th align="left">Code</th>
-                         <th align="left">Intitul&eacute;</th>
-                     </tr>
-                 </thead>
-                  <tbody>
-                 {% for luy in luys_postponed_qs %}
-                     <tr>
-                         <td align="left">{{ luy.acronym|default:"" }}</td>
-                         <td align="left">{{ luy.complete_title }}</td>
-                     </tr>
-                 {% endfor %}
-                 </tbody>
-             </table>
-             </div>
-             {% endif %}
-                    
+            
              <p>{{ luys_ending_this_year }} UE avec une fin d\u0027enseignement en {{ academic_year }}.</p>
              {% if luys_ending_this_year %}    
              <div class="w3-responsive">
@@ -65,7 +43,7 @@ class Migration(migrations.Migration):
              </table>
              </div>
              {% endif %}
-                    
+             
              <p><strong>{{ luys_already_existing }} UE existant pr\u00e9alablement en {{ end_academic_year }}.</strong></p>
              {% if luys_already_existing %}          
              <div class="w3-responsive">
@@ -84,6 +62,28 @@ class Migration(migrations.Migration):
                          <td align="left">{{ luy.complete_title }}</td>
                      </tr>
                      {% endwith %}
+                 {% endfor %}
+                 </tbody>
+             </table>
+             </div>
+             {% endif %}
+             
+             <p>{{ luys_postponed }} UE copi\u00e9es de {{ academic_year }} en {{ end_academic_year }}.</p>
+             {% if luys_postponed %}
+             <div class="w3-responsive">
+             <table cellpadding="10" class="w3-table w3-striped w3-hoverable">
+                 <thead>
+                     <tr>
+                         <th align="left">Code</th>
+                         <th align="left">Intitul&eacute;</th>
+                     </tr>
+                 </thead>
+                  <tbody>
+                 {% for luy in luys_postponed_qs %}
+                     <tr>
+                         <td align="left">{{ luy.acronym|default:"" }}</td>
+                         <td align="left">{{ luy.complete_title }}</td>
+                     </tr>
                  {% endfor %}
                  </tbody>
              </table>
@@ -125,14 +125,6 @@ class Migration(migrations.Migration):
              <p>Ceci est un message automatique g\u00e9n\u00e9r\u00e9 par le serveur OSIS – Merci de ne pas y r\u00e9pondre.</p>
              <p>Rapport d\u0027ex\u00e9cution de la proc\u00e9dure annuelle de copie des unit\u00e9s d\u0027enseignement pour l\u0027ann\u00e9e acad\u00e9mique {{ end_academic_year }}.</p>
              
-             <p>{{ luys_postponed }} UE copi\u00e9es de {{ academic_year }} en {{ end_academic_year }}.</p>
-             {% if luys_postponed %}
-             <strong>Code - Intitul&eacute;</strong><br/>
-                 {% for luy in luys_postponed_qs %}
-                     {{ luy.acronym|default:"" }} - {{ luy.complete_title }}<br/>
-                 {% endfor %}
-             {% endif %}
-                    
              <p>{{ luys_ending_this_year }} UE avec une fin d\u0027enseignement en {{ academic_year }}.</p>
              {% if luys_ending_this_year %}                    
              <strong>Code - Intitul&eacute;</strong><br/>
@@ -152,6 +144,14 @@ class Migration(migrations.Migration):
                         {% endwith %}
                     {% endfor %}
              {% endif %}
+             
+             <p>{{ luys_postponed }} UE copi\u00e9es de {{ academic_year }} en {{ end_academic_year }}.</p>
+             {% if luys_postponed %}
+             <strong>Code - Intitul&eacute;</strong><br/>
+                 {% for luy in luys_postponed_qs %}
+                     {{ luy.acronym|default:"" }} - {{ luy.complete_title }}<br/>
+                 {% endfor %}
+             {% endif %}                       
              
              {% if luys_with_errors %}
                  <p>Les unit\u00e9s d\u0027enseignement suivantes n\u0027ont pas \u00e9t\u00e9 recopi\u00e9es :</p>
@@ -176,28 +176,6 @@ class Migration(migrations.Migration):
              <p>This is an automatic message generated by the OSIS server – Please do not reply to this message.</p>
              <p>Report of the annual procedure of copy of the learning units for the academic year {{ end_academic_year }}.</p>
              
-             <p>{ luys_postponed }} LU copied from {{ academic_year }} to {{ end_academic_year }}.</p>
-             {% if luys_postponed %}
-             <div class="w3-responsive">
-             <table cellpadding="10" class="w3-table w3-striped w3-hoverable">
-                 <thead>
-                     <tr>
-                         <th align="left">Code</th>
-                         <th align="left">Title</th>
-                     </tr>
-                 </thead>
-                  <tbody>
-                 {% for luy in luys_postponed_qs %}
-                     <tr>
-                         <td align="left">{{ luy.acronym|default:"" }}</td>
-                         <td align="left">{{ luy.complete_title }}</td>
-                     </tr>
-                 {% endfor %}
-                 </tbody>
-             </table>
-             </div>
-             {% endif %}
-                    
              <p>{{ luys_ending_this_year }} LU ending in {{ academic_year }}.</p>
              {% if luys_ending_this_year %}                    
              <div class="w3-responsive">
@@ -246,6 +224,28 @@ class Migration(migrations.Migration):
              </div>
              {% endif %}
              
+             <p>{ luys_postponed }} LU copied from {{ academic_year }} to {{ end_academic_year }}.</p>
+             {% if luys_postponed %}
+             <div class="w3-responsive">
+             <table cellpadding="10" class="w3-table w3-striped w3-hoverable">
+                 <thead>
+                     <tr>
+                         <th align="left">Code</th>
+                         <th align="left">Title</th>
+                     </tr>
+                 </thead>
+                  <tbody>
+                 {% for luy in luys_postponed_qs %}
+                     <tr>
+                         <td align="left">{{ luy.acronym|default:"" }}</td>
+                         <td align="left">{{ luy.complete_title }}</td>
+                     </tr>
+                 {% endfor %}
+                 </tbody>
+             </table>
+             </div>
+             {% endif %}                  
+             
              {% if luys_with_errors %}
              <p>Errors occured with the following learning units :</p>
              <div class="w3-responsive">
@@ -282,14 +282,6 @@ class Migration(migrations.Migration):
              <p>This is an automatic message generated by the OSIS server – Please do not reply to this message.</p>
              <p>Report of the annual procedure of copy of the learning units for the academic year {{ end_academic_year }}.</p>
              
-             <p>{ luys_postponed }} LU copied from {{ academic_year }} to {{ end_academic_year }}.</p>
-             {% if luys_postponed %}
-             <strong>Code - Title</strong><br/>
-                 {% for luy in luys_postponed_qs %}
-                     {{ luy.acronym|default:"" }} - {{ luy.complete_title }}<br/>
-                 {% endfor %}
-             {% endif %}
-                    
              <p>{{ luys_ending_this_year }} LU ending in {{ academic_year }}.</p>
              {% if luys_ending_this_year %}                    
              <strong>Code - Title</strong><br/>
@@ -309,6 +301,14 @@ class Migration(migrations.Migration):
                         {% endwith %}
                     {% endfor %}
              {% endif %}
+             
+             <p>{ luys_postponed }} LU copied from {{ academic_year }} to {{ end_academic_year }}.</p>
+             {% if luys_postponed %}
+             <strong>Code - Title</strong><br/>
+                 {% for luy in luys_postponed_qs %}
+                     {{ luy.acronym|default:"" }} - {{ luy.complete_title }}<br/>
+                 {% endfor %}
+             {% endif %}                             
              
              {% if luys_with_errors %}
                  <p>Errors occured with the following learning units :</p>
