@@ -122,14 +122,17 @@ def _get_view(category):
     }[category]
 
 
-def _common_success_redirect(request, form, root):
+def _common_success_redirect(request, form, root, groupelementyear_form):
+    groupelementyear_form.save()
     education_group_year = form.save()
 
+    groupelementyear_changed = groupelementyear_form.changed_forms()
+
     success_msgs = []
+
     if not education_group_year.education_group.end_year or \
             education_group_year.education_group.end_year.year >= education_group_year.academic_year.year:
         success_msgs = [_get_success_message_for_update_education_group_year(root.pk, education_group_year)]
-
     if hasattr(form, 'education_group_year_postponed'):
         success_msgs += [
             _get_success_message_for_update_education_group_year(egy.id, egy)
@@ -140,7 +143,25 @@ def _common_success_redirect(request, form, root):
             _get_success_message_for_deleted_education_group_year(egy)
             for egy in form.education_group_year_deleted
         ]
-
+    if groupelementyear_changed:
+        anac = str(education_group_year.academic_year)
+        if len(groupelementyear_changed) > 1:
+            success_msgs += ["{} : <ul><li>{}</li></ul>".format(
+                _("The following links has been updated"),
+                "</li><li>".join([
+                    gey.instance.child_branch.partial_acronym + " - " + gey.instance.child_branch.acronym + " - " + anac
+                    if gey.instance.child_branch
+                    else gey.instance.child_leaf.acronym + " - " + anac
+                    for gey in groupelementyear_changed
+                ])
+            )]
+        else:
+            gey = groupelementyear_changed[0].instance
+            success_msgs += [_("The link of %(acronym)s has been updated") % {
+                'acronym': gey.child_branch.partial_acronym + " - " + gey.child_branch.acronym + " - " + anac
+                if gey.child_branch
+                else gey.child_leaf.acronym + " - " + anac
+            }]
     url = _get_success_redirect_url(root, education_group_year)
     display_success_messages(request, success_msgs, extra_tags='safe')
 
@@ -185,8 +206,7 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
     if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
-        groupelementyear_formset.save()
-        return _common_success_redirect(request, form_education_group_year, root)
+        return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
 
     return render(request, html_page, {
         "education_group_year": education_group_year,
@@ -213,8 +233,7 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
     if forms_valid:
         if has_coorganization(education_group_year):
             coorganization_formset.save()
-        groupelementyear_formset.save()
-        return _common_success_redirect(request, form_education_group_year, root)
+        return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
 
     return render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
@@ -259,8 +278,7 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
     # TODO :: IMPORTANT :: Need to upodate form to filter on list of parents, not only on the first direct parent
     form = MiniTrainingForm(request.POST or None, instance=education_group_year, user=request.user)
     if form.is_valid() and groupelementyear_formset.is_valid():
-        groupelementyear_formset.save()
-        return _common_success_redirect(request, form, root)
+        return _common_success_redirect(request, form, root, groupelementyear_formset)
 
     return render(request, "education_group/update_minitrainings.html", {
         "form_education_group_year": form.forms[forms.ModelForm],

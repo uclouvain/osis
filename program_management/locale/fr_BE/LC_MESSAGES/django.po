@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-09 08:35+0200\n"
+"POT-Creation-Date: 2019-11-15 10:39+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -73,6 +73,11 @@ msgstr ""
 "prérequis de %(learning_unit_year)s contenant %(prerequisite_item)s n'est "
 "pas copié."
 
+#, fuzzy, python-format
+#| msgid "The learning unit has prerequisites and is a prerequisite"
+msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
+msgstr "L'UE a des prérequis et est un prérequis"
+
 msgid "Academic year"
 msgstr "Année académique"
 
@@ -136,6 +141,9 @@ msgstr "Interdit de détacher la racine."
 
 msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
+
+msgid "Code"
+msgstr ""
 
 msgid "Copy"
 msgstr ""
@@ -215,6 +223,10 @@ msgstr "Nom du professeur responsable de programme"
 
 msgid "No"
 msgstr "Non"
+
+#, python-format
+msgid "No match has been found for this learning unit :  %(acronym)s"
+msgstr ""
 
 msgid "Official"
 msgstr "Officiel"
@@ -304,11 +316,11 @@ msgstr "L'UE est un prérequis"
 
 #, python-format
 msgid "The link of %(acronym)s has been created"
-msgstr "Le lien de %(acronym)s ont été mis à jour"
+msgstr "Le lien de %(acronym)s a été créé"
 
 #, python-format
 msgid "The link of %(acronym)s has been updated"
-msgstr "Le lien de %(acronym)s ont été mis à jour"
+msgstr "Le lien de %(acronym)s a été mis à jour"
 
 #, python-format
 msgid ""
