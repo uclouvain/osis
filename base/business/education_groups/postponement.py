@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from collections import namedtuple
+from itertools import tee
 
 from django import forms
 from django.core.exceptions import FieldDoesNotExist
@@ -95,13 +96,12 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values, exclude=None
 
 
 def duplicate_education_group_year(old_education_group_year, new_academic_year,
-                                   initial_dicts=None, hops_values=None, field_to_exclude=None, field_to_include=None):
+                                   initial_dicts=None, hops_values=None, field_to_exclude=None):
     if initial_dicts is None:
         initial_dicts = {}
     if field_to_exclude is None:
         field_to_exclude = FIELD_TO_EXCLUDE
-
-    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=field_to_exclude, include=field_to_include)
+    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=field_to_exclude)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
 
@@ -119,7 +119,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year,
 
     # During the update, we need to check if the postponed object has been modify
     else:
-        dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=field_to_exclude, include=field_to_include)
+        dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=field_to_exclude)
         differences = compare_objects(initial_dicts['dict_initial_egy'], dict_postponed_egy) \
             if initial_dicts['dict_initial_egy'] and dict_postponed_egy else {}
 
@@ -214,6 +214,7 @@ def _postpone_hops(hops_values, postponed_egy):
                                             'ares_ability': hops_values['ares_ability']})
 
 
+# TODO: Split the concept of checking consistency with the concept of duplicate education_group_year
 class PostponementEducationGroupYearMixin:
     """
     This mixin will report the modification to the futures years.
@@ -223,7 +224,6 @@ class PostponementEducationGroupYearMixin:
     treated on another mixin
     """
     field_to_exclude = FIELD_TO_EXCLUDE + ['certificate_aims']
-    field_to_include = None
     dict_initial_egy = {}
     initial_dicts = {
         'educationgrouporganization_set': {}
@@ -240,7 +240,7 @@ class PostponementEducationGroupYearMixin:
 
         if not self._is_creation():
             self.dict_initial_egy = model_to_dict_fk(
-                self.forms[forms.ModelForm].instance, exclude=self.field_to_exclude, include=self.field_to_include
+                self.forms[forms.ModelForm].instance, exclude=self.field_to_exclude
             )
             self.initial_dicts['educationgrouporganization_set'] = {
                 coorganization.organization.id: model_to_dict_fk(coorganization, exclude=FIELD_TO_EXCLUDE_IN_SET)
@@ -267,7 +267,6 @@ class PostponementEducationGroupYearMixin:
                         academic_year,
                         {'dict_initial_egy': self.dict_initial_egy},
                         field_to_exclude=self.field_to_exclude,
-                        field_to_include=self.field_to_include
                     )
                 else:
                     postponed_egy = duplicate_education_group_year(
@@ -276,7 +275,6 @@ class PostponementEducationGroupYearMixin:
                         {'dict_initial_egy': self.dict_initial_egy, 'initial_sets_dict': self.initial_dicts},
                         self.hops_form.data,
                         field_to_exclude=self.field_to_exclude,
-                        field_to_include=self.field_to_include
                     )
                 self.education_group_year_postponed.append(postponed_egy)
 
@@ -316,17 +314,51 @@ class PostponementEducationGroupYearMixin:
                 )
 
 
-class PostponementCertificateAimsMixin(PostponementEducationGroupYearMixin):
+# TODO: Abstract this mixin and reuse in context of UE/OF. This use the principle of single responsability
+class CheckConsistencyCertificateAimsMixin:
     """
-     This mixin will report the modification to certificate aims.
-     This class is used on the context of program manager
+    This mixin will check the consistency between two object and raise a consistency error if differences found
     """
-    field_to_exclude = []
-    field_to_include = ['certificate_aims']
+    instance = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.initial_dicts = {}
+        self.consistency_errors = []
+        self.instances_valid = set()
 
-    def _is_creation(self):
-        return True
+    def check_consistency(self):
+        self.instances_valid = {self.instance}
+
+        qs = self._get_consistency_queryset().order_by('academic_year__year')
+        for egy, egy_next in zip(qs, qs[1:]):
+            egy_certificate_aims_ids = {certificate_aims.pk for certificate_aims in egy.certificate_aims.all()}
+            egy_next_certificate_aims_ids = {
+                certificate_aims.pk for certificate_aims in egy_next.certificate_aims.all()
+            }
+            if egy_certificate_aims_ids.symmetric_difference(egy_next_certificate_aims_ids):
+                error = _("%(col_name)s has been already modified.") % {
+                    "col_name": _(EducationGroupYear._meta.get_field('certificate_aims').verbose_name).title(),
+                }
+                self.consistency_errors.append(
+                    _("Consistency error in %(academic_year)s with %(model)s: %(error)s") % {
+                        'academic_year': egy_next.academic_year,
+                        'model': EducationGroupYear._meta.verbose_name.title(),
+                        'error': error
+                    }
+                )
+            else:
+                self.instances_valid.add(egy_next)
+
+    def get_valid_instances(self):
+        return self.instances_valid
+
+    def _get_consistency_queryset(self):
+        filter_kwargs = {
+            'education_group': self.instance.education_group,
+            'academic_year__year__gte': self.instance.academic_year.year
+        }
+
+        return EducationGroupYear.objects.filter(**filter_kwargs)\
+            .prefetch_related('certificate_aims')\
+            .select_related('academic_year')\
+            .order_by('academic_year__year')

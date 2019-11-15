@@ -33,7 +33,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin, \
-    PostponementCertificateAimsMixin
+    CheckConsistencyCertificateAimsMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm, PermissionFieldTrainingMixin
 from base.forms.utils.choice_field import add_blank
@@ -256,7 +256,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             )
 
 
-class CertificateAimsForm(PostponementCertificateAimsMixin, forms.ModelForm):
+class CertificateAimsForm(CheckConsistencyCertificateAimsMixin, forms.ModelForm):
     section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
 
     class Meta:
@@ -278,12 +278,18 @@ class CertificateAimsForm(PostponementCertificateAimsMixin, forms.ModelForm):
         return EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
 
     def save(self, commit=True):
-        self.instance.certificate_aims.clear()
-        for certificate_aim in self.cleaned_data.get("certificate_aims", []):
-            EducationGroupCertificateAim.objects.get_or_create(
-                education_group_year=self.instance,
-                certificate_aim=certificate_aim,
-            )
+        self.check_consistency()
+
+        for egy in self.get_valid_instances():
+            for certificate_aim in self.cleaned_data.get("certificate_aims", []):
+                EducationGroupCertificateAim.objects.get_or_create(
+                    education_group_year=egy,
+                    certificate_aim=certificate_aim,
+                )
+
+    @property
+    def warnings(self):
+        return getattr(self, 'consistency_errors', [])
 
 
 class TrainingModelForm(EducationGroupModelForm):

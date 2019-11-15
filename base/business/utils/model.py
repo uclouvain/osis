@@ -62,7 +62,7 @@ def merge_two_dicts(dict_a, dict_b):
     return form_data
 
 
-def model_to_dict_fk(instance, include=None, exclude=None):
+def model_to_dict_fk(instance, exclude=None):
     """
     It allows to transform an instance to a dict.
       - for each FK, it add '_id'
@@ -70,7 +70,7 @@ def model_to_dict_fk(instance, include=None, exclude=None):
 
     This function is based on model_to_dict implementation.
     """
-    data = model_to_dict(instance, fields=include, exclude=exclude)
+    data = model_to_dict(instance, exclude=exclude)
 
     opts = instance._meta
     for fk_field in filter(lambda field: field.is_relation, opts.concrete_fields):
