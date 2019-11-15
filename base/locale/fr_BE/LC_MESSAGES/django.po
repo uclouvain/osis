@@ -2669,10 +2669,8 @@ msgstr ""
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
-#, fuzzy, python-format
-#| msgid "The program aim has been updated"
 msgid "The link of %(acronym)s has been updated"
-msgstr "L’objectif du programme a été mis à jour"
+msgstr "Le lien de %(acronym)s a été mis à jour"
 
 #, python-format
 msgid ""
