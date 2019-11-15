@@ -73,10 +73,9 @@ msgstr ""
 "prérequis de %(learning_unit_year)s contenant %(prerequisite_item)s n'est "
 "pas copié."
 
-#, fuzzy, python-format
-#| msgid "The learning unit has prerequisites and is a prerequisite"
+#, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
-msgstr "L'UE a des prérequis et est un prérequis"
+msgstr "Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
 
 msgid "Academic year"
 msgstr "Année académique"
