@@ -94,12 +94,12 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
 
 
 def duplicate_education_group_year(old_education_group_year, new_academic_year,
-                                   initial_dicts=None, hops_values=None, field_to_exclude=None):
+                                   initial_dicts=None, hops_values=None, fields_to_exclude=None):
     if initial_dicts is None:
         initial_dicts = {}
-    if field_to_exclude is None:
-        field_to_exclude = FIELD_TO_EXCLUDE
-    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=field_to_exclude)
+    if fields_to_exclude is None:
+        fields_to_exclude = FIELD_TO_EXCLUDE
+    dict_new_value = model_to_dict_fk(old_education_group_year, exclude=fields_to_exclude)
 
     defaults_values = {x: v for x, v in dict_new_value.items() if not isinstance(v, list)}
 
@@ -117,7 +117,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year,
 
     # During the update, we need to check if the postponed object has been modify
     else:
-        dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=field_to_exclude)
+        dict_postponed_egy = model_to_dict_fk(postponed_egy, exclude=fields_to_exclude)
         differences = compare_objects(initial_dicts['dict_initial_egy'], dict_postponed_egy) \
             if initial_dicts['dict_initial_egy'] and dict_postponed_egy else {}
 
@@ -264,7 +264,7 @@ class PostponementEducationGroupYearMixin:
                         education_group_year,
                         academic_year,
                         {'dict_initial_egy': self.dict_initial_egy},
-                        field_to_exclude=self.field_to_exclude,
+                        fields_to_exclude=self.field_to_exclude,
                     )
                 else:
                     postponed_egy = duplicate_education_group_year(
@@ -272,7 +272,7 @@ class PostponementEducationGroupYearMixin:
                         academic_year,
                         {'dict_initial_egy': self.dict_initial_egy, 'initial_sets_dict': self.initial_dicts},
                         self.hops_form.data,
-                        field_to_exclude=self.field_to_exclude,
+                        fields_to_exclude=self.field_to_exclude,
                     )
                 self.education_group_year_postponed.append(postponed_egy)
 

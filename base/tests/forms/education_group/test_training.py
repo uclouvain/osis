@@ -568,7 +568,7 @@ class TestPostponeCertificateAims(TestCase):
         self.qs_training_futures = EducationGroupYear.objects.filter(
             education_group=self.training.education_group,
             academic_year__year__gt=self.training.academic_year.year
-        ).all()
+        )
 
     def test_save_with_postponement_on_training_which_have_property_different_in_future(self):
         """
