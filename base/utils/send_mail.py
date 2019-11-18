@@ -130,7 +130,6 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    print(luys_with_errors)
     distinct_luys_postponed = [luy for luy in luys_postponed
                                if luy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
     template_base_data = {
@@ -139,7 +138,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
 
         # Use len instead of count() (it's buggy when a queryset is built with a difference())
         'luys_postponed': len(distinct_luys_postponed),
-        'luys_postponed_qs': distinct_luys_postponed,
+        'luys_postponed_qs': sorted(distinct_luys_postponed, key=lambda luy: luy.acronym),
         'luys_already_existing': statistics_context['already_duplicated'].count(),
         'luys_already_existing_qs': statistics_context['already_duplicated'].order_by("learningunityear__acronym"),
         'luys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
