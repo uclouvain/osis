@@ -1,4 +1,5 @@
 {% load i18n static perms %}
+{% load waffle_tags %}
 
 <nav class="navbar navbar-default navbar-fixed-top  justify-content-start flex-nowrap">
     <div class="container-fluid ">
@@ -241,9 +242,11 @@
                             </li>
                         </ul>
                     </li>
+                    {% flag "notifications_bell" %}
                     <li>
                         {% include "blocks/notifications.html" %}
                     </li>
+                    {% endflag %}
                     <li>
                         <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}">
                             <span class="glyphicon glyphicon-question-sign"></span>
