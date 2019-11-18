@@ -84,6 +84,37 @@ WITH RECURSIVE group_element_year_parent AS (
 SELECT * FROM group_element_year_parent ;
 """
 
+SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD = """
+WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
+    SELECT  gey.id,
+            gey.child_branch_id,
+            gey.child_leaf_id,
+            gey.parent_id,
+            edyc.academic_year_id,
+            0 AS level
+    FROM base_groupelementyear gey
+    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+    WHERE child_leaf_id = %(child_leaf_id)s
+    
+    UNION ALL
+    
+    SELECT 	parent.id,
+            parent.child_branch_id,
+            parent.child_leaf_id,
+            parent.parent_id,
+            edyp.academic_year_id,
+            child.level + 1
+    FROM base_groupelementyear AS parent
+    INNER JOIN group_element_year_parent_from_child_leaf AS child on parent.child_branch_id = child.parent_id
+    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+)
+
+SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level
+FROM group_element_year_parent_from_child_leaf
+WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
+ORDER BY level DESC, id;
+"""
+
 
 def validate_block_value(value):
     max_authorized_value = 6
@@ -430,6 +461,24 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
 def fetch_row_sql(root_ids):
     with connection.cursor() as cursor:
         cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
+        return [
+            {
+                'id': row[0],
+                'child_branch_id': row[1],
+                'child_leaf_id': row[2],
+                'parent_id': row[3],
+                'level': row[4],
+            } for row in cursor.fetchall()
+        ]
+
+
+def fetch_row_sql_tree_from_child(child_leaf_id, academic_year_id=None):
+    parameters = {
+        "child_leaf_id": child_leaf_id,
+        "academic_year_id": academic_year_id
+    }
+    with connection.cursor() as cursor:
+        cursor.execute(SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD, parameters)
         return [
             {
                 'id': row[0],
