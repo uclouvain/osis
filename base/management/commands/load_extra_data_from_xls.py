@@ -39,7 +39,7 @@ APP_NAME_ALIASES = {
 
 
 class Command(BaseCommand):
-    """
+    help = """
     Command to load data in DB from a structured xls file where :
     - The worksheet title is the <app>.<model> name (e.g. base.Student)
     - The first row of the worksheet is the header
