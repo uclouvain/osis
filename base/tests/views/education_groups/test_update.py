@@ -412,6 +412,8 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
             'form-INITIAL_FORMS': 0,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(training_url, data=data)
         self.assertEqual(training_url, response.request['PATH_INFO'])
@@ -481,7 +483,9 @@ class TestUpdate(TestCase):
             'form-INITIAL_FORMS': 0,
             'form-0-country': address.country.pk,
             'form-0-organization': organization.pk,
-            'form-0-diploma': diploma_choice
+            'form-0-diploma': diploma_choice,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
 
         url = reverse(update_education_group, args=[egy.pk, egy.pk])
