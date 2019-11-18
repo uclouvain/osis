@@ -280,7 +280,7 @@ class CertificateAimsForm(CheckConsistencyCertificateAimsMixin, forms.ModelForm)
     def save(self, commit=True):
         self.check_consistency()
 
-        for egy in self.get_valid_instances():
+        for egy in self.get_instances_valid():
             for certificate_aim in self.cleaned_data.get("certificate_aims", []):
                 EducationGroupCertificateAim.objects.get_or_create(
                     education_group_year=egy,

@@ -347,7 +347,7 @@ class CheckConsistencyCertificateAimsMixin:
             else:
                 self.instances_valid.add(egy_next)
 
-    def get_valid_instances(self):
+    def get_instances_valid(self):
         return self.instances_valid
 
     def _get_consistency_queryset(self):
