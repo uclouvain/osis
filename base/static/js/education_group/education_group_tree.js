@@ -67,7 +67,7 @@ $(document).ready(function () {
             "state": {
                 // the key is important if you have multiple trees in the same domain
                 // The key includes the root_id
-                "key": location.pathname.split('/', 3).join('/'),
+                "key": "program_tree_state/" + location.pathname.split('/', 3)[2],
                 "opened": true,
                 "selected": false,
             },
