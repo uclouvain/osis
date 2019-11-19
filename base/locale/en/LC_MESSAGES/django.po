@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 15:46+0100\n"
+"POT-Creation-Date: 2019-11-15 10:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -844,6 +844,9 @@ msgid "Ending of exam registration"
 msgstr ""
 
 msgid "English"
+msgstr ""
+
+msgid "English comment"
 msgstr ""
 
 msgid "English title proper"
@@ -2482,6 +2485,9 @@ msgstr ""
 msgid "The following learning units ended with error"
 msgstr ""
 
+msgid "The following links has been updated"
+msgstr ""
+
 msgid "The format of the range date is not valid"
 msgstr ""
 
@@ -2541,6 +2547,10 @@ msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 msgid "The learning units"
+msgstr ""
+
+#, python-format
+msgid "The link of %(acronym)s has been updated"
 msgstr ""
 
 #, python-format
