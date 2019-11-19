@@ -80,7 +80,7 @@
 
                 {% flag "education_group_update" %}
                     {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
-                    {% if tab_to_show %}
+                    {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
                         {% with update_url|add:"?tab_to_show="|add:tab_to_show as update_url %}
                             {% li_with_update_perm update_url _('Modify') %}
                         {% endwith %}
@@ -105,9 +105,9 @@
                     {% link_pdf_content_education_group pdf_generate_url %}
                 {% endflag %}
                 <li class="divider"></li>
-                {% url 'quick_search_education_group' as quick_search_url %}
+
                 <li>
-                    <a class="trigger_modal" id="quick-search-menu" data-url="{{ quick_search_url }}"
+                    <a class="trigger_modal" data-url="{% url 'quick_search_education_group' root_id=parent.id education_group_year_id=education_group_year.id %}"
                        data-modal_class="modal-lg" title="{% trans 'Search' %}">
                         <span>{% trans 'Search' %}</span>
                     </a>
@@ -133,6 +133,7 @@
 
 {% block script %}
     <script>
+        // FIXME move this method to common file
         function select_education_group() {
             $.ajax({
                 type: "POST",
