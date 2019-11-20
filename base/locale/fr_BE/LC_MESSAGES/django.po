@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 10:35+0100\n"
+"POT-Creation-Date: 2019-11-15 10:38+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -882,6 +882,9 @@ msgstr "Fin inscription aux examens"
 msgid "English"
 msgstr "Anglais"
 
+msgid "English comment"
+msgstr "Commentaire en anglais"
+
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
 
@@ -905,9 +908,6 @@ msgstr "Inscriptible"
 
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
-
-msgid "Enrollments to training"
-msgstr "Inscrits à la formation"
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
@@ -2575,6 +2575,9 @@ msgstr "Les groupement suivants se sont terminés par une erreur"
 msgid "The following learning units ended with error"
 msgstr "Les unités d'enseignement suivantes se sont terminées par une erreur"
 
+msgid "The following links has been updated"
+msgstr "Les liens suivants ont été mis à jour"
+
 msgid "The format of the range date is not valid"
 msgstr "Le format de la plage de dates n'est pas valide"
 
@@ -2646,6 +2649,9 @@ msgstr ""
 
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
+
+msgid "The link of %(acronym)s has been updated"
+msgstr "Le lien de %(acronym)s a été mis à jour"
 
 #, python-format
 msgid ""
@@ -2888,6 +2894,12 @@ msgstr "Intitulé propre au partim"
 
 msgid "To complete"
 msgstr "A compléter"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Total enrollments to training"
+msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"

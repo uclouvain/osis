@@ -28,7 +28,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from base.management.commands import load_exceptions
+from base.management.commands import load_extra_data_from_xls
 from base.models.entity import Entity
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
@@ -42,12 +42,12 @@ class TestGetModelClassFromWorksheetTitle(TestCase):
 
     def test_without_alias(self):
         worksheet = Mock(title='base.PersonEntity')
-        result = load_exceptions.Command._get_model_class_from_worksheet_title(worksheet)
+        result = load_extra_data_from_xls.Command._get_model_class_from_worksheet_title(worksheet)
         self.assertEqual(result, PersonEntity)
 
     def test_when_app_does_not_exist(self):
         worksheet = Mock(title='inexisting_app.InexistingModel')
-        result = load_exceptions.Command._get_model_class_from_worksheet_title(worksheet)
+        result = load_extra_data_from_xls.Command._get_model_class_from_worksheet_title(worksheet)
         self.assertIsNone(result)
 
 
@@ -55,7 +55,7 @@ class TestSaveInDatabase(TestCase):
     """Unit tests on _save_in_database()"""
 
     def setUp(self):
-        self.command_instance = load_exceptions.Command()
+        self.command_instance = load_extra_data_from_xls.Command()
         self.headers = [
             (0, 'entity__entityversion__acronym',),
             (1, 'person__user__username',),
@@ -113,7 +113,7 @@ class TestFindObjectTroughForeignKeys(TestSaveInDatabase):
         self.assertEqual(result, expected_result)
 
     def test_when_field_is_natural_key(self):
-        field_as_natural_key = self.field + load_exceptions.NATURAL_KEY_IDENTIFIER
+        field_as_natural_key = self.field + load_extra_data_from_xls.NATURAL_KEY_IDENTIFIER
         result = self.command_instance._find_object_through_foreign_keys(PersonEntity, field_as_natural_key, self.value)
         expected_result = ('person**', self.person)
         self.assertEqual(result, expected_result)
@@ -123,21 +123,21 @@ class TestConvertBooleanVellValue(TestCase):
     """Unit tests on _convert_boolean_cell_value()"""
 
     def test_when_value_is_true(self):
-        result = load_exceptions.Command._convert_boolean_cell_value(True)
+        result = load_extra_data_from_xls.Command._convert_boolean_cell_value(True)
         self.assertTrue(result)
 
-        result = load_exceptions.Command._convert_boolean_cell_value("True")
+        result = load_extra_data_from_xls.Command._convert_boolean_cell_value("True")
         self.assertTrue(result)
 
     def test_when_value_is_false(self):
-        result = load_exceptions.Command._convert_boolean_cell_value(False)
+        result = load_extra_data_from_xls.Command._convert_boolean_cell_value(False)
         self.assertFalse(result)
 
-        result = load_exceptions.Command._convert_boolean_cell_value("False")
+        result = load_extra_data_from_xls.Command._convert_boolean_cell_value("False")
         self.assertFalse(result)
 
     def test_when_value_is_no_boolean(self):
-        result = load_exceptions.Command._convert_boolean_cell_value("something else")
+        result = load_extra_data_from_xls.Command._convert_boolean_cell_value("something else")
         self.assertFalse(isinstance(result, bool))
 
 
@@ -146,5 +146,5 @@ class TestCleanHeaderFromSpecialChars(TestCase):
 
     def test(self):
         col_name = "i_am_field_composing_natural_key**"
-        result = load_exceptions.Command._clean_header_from_special_chars(col_name)
+        result = load_extra_data_from_xls.Command._clean_header_from_special_chars(col_name)
         self.assertEqual(result, "i_am_field_composing_natural_key")
