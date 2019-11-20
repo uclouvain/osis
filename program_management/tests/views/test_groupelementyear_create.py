@@ -60,7 +60,13 @@ class TestAttachCheckView(TestCase):
                                        return_value=True)
         self.mocked_perm = self.perm_patcher.start()
 
+        self.attach_strategy_patcher = mock.patch(
+            "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
+        )
+        self.mocked_attach_strategy = self.attach_strategy_patcher.start()
+
         self.addCleanup(self.perm_patcher.stop)
+        self.addCleanup(self.attach_strategy_patcher.stop)
         self.addCleanup(cache.clear)
 
     def test_when_no_element_selected(self):
@@ -77,10 +83,37 @@ class TestAttachCheckView(TestCase):
             {"error_messages": [_("Please select an item before attach it")]}
         )
 
-    def test_when_element_selected_and_error(self):
+    def test_when_element_selected_and_no_error(self):
         response = self.client.get(self.url, data={"id": self.egy.id, "content_type": EDUCATION_GROUP_YEAR})
-        data = json.loads(response.content.decode('utf-8'))
-        self.assertEqual(len(data), 1)
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": []}
+        )
+
+        self.assertEqual(
+            self.mocked_attach_strategy.call_args_list,
+            [
+                ({"parent": self.egy, "child": self.egy}, )
+            ]
+        )
+
+    def test_when_multiple_element_selected(self):
+        other_egy = EducationGroupYearFactory()
+        response = self.client.get(self.url, data={
+            "id": [self.egy.id, other_egy.id],
+            "content_type": EDUCATION_GROUP_YEAR
+        })
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": []}
+        )
+        self.assertEqual(
+            self.mocked_attach_strategy.call_args_list,
+            [
+                ({"parent": self.egy, "child": self.egy}, ),
+                ({"parent": self.egy, "child": other_egy}, )
+            ]
+        )
 
 
 @override_flag('education_group_update', active=True)

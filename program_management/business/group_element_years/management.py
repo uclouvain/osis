@@ -42,31 +42,34 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-def extract_child(parent, request):
-    object_id = request.GET.get("id")
+def extract_childs(parent, request):
+    object_ids = request.GET.getlist("id", [])
     content_type = request.GET.get("content_type")
-    if object_id and content_type:
-        selected_data = {"id": object_id, "modelname": content_type}
-    elif object_id or content_type:
-        selected_data = {}
+    if object_ids and content_type:
+        selected_data = [{"id": object_id, "modelname": content_type} for object_id in object_ids]
+    elif object_ids or content_type:
+        selected_data = []
     else:
-        selected_data = ElementCache(request.user).cached_data
+        cached_data = ElementCache(request.user).cached_data
+        selected_data = [cached_data] if cached_data else []
 
     if not selected_data:
         raise ObjectDoesNotExist
 
-    kwargs = {'parent': parent}
-    if selected_data['modelname'] == LEARNING_UNIT_YEAR:
-        kwargs['child_leaf'] = LearningUnitYear.objects.get(pk=selected_data['id'])
+    kwargs_list = []
+    for selected_element in selected_data:
+        kwargs = {'parent': parent}
+        if selected_element['modelname'] == LEARNING_UNIT_YEAR:
+            kwargs['child_leaf'] = LearningUnitYear.objects.get(pk=selected_element['id'])
 
-    elif selected_data['modelname'] == EDUCATION_GROUP_YEAR:
-        kwargs['child_branch'] = EducationGroupYear.objects.get(pk=selected_data['id'])
+        elif selected_element['modelname'] == EDUCATION_GROUP_YEAR:
+            kwargs['child_branch'] = EducationGroupYear.objects.get(pk=selected_element['id'])
 
-    if selected_data.get('source_link_id'):
-        kwargs['source_link'] = GroupElementYear.objects.select_related('parent') \
-            .get(pk=selected_data['source_link_id'])
-
-    return kwargs
+        if selected_element.get('source_link_id'):
+            kwargs['source_link'] = GroupElementYear.objects.select_related('parent') \
+                .get(pk=selected_element['source_link_id'])
+        kwargs_list.append(kwargs)
+    return kwargs_list
 
 
 def is_max_child_reached(parent, child_education_group_type):

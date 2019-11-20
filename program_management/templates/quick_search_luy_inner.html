@@ -44,7 +44,7 @@
                 "orderable": false,
                 "render": function(data, type, row, meta) {
                     let input = document.createElement("input");
-                    input.type = 'radio';
+                    input.type = 'checkbox';
                     input.name = 'selected-item';
                     input.value = data;
                     // FIXME Use uuid in the future when implemented in place of data-url

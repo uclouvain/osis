@@ -38,12 +38,13 @@ from program_management.business.group_element_years.attach import AttachEducati
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
-from program_management.business.group_element_years.management import extract_child
+from program_management.business.group_element_years.management import extract_childs
 from program_management.forms.group_element_year import GroupElementYearForm
 from program_management.views.generic import GenericGroupElementYearMixin
 from base.views.education_groups import perms
 
 
+# FIXME Discard TemplateView inheritage as it only returns json
 class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
     template_name = "group_element_year/group_element_year_attach_type_dialog_inner.html"
     rules = []
@@ -58,27 +59,30 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
             context["messages"].append(str(e))
 
         try:
-            data = extract_child(self.education_group_year, self.request)
-            child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
-            strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
-                AttachLearningUnitYearStrategy
-            strategy(parent=self.education_group_year, child=child).is_valid()
-
-            context['object_to_attach'] = child
-            context['source_link'] = data.get('source_link')
-            context['education_group_year_parent'] = self.education_group_year
-
+            datas = extract_childs(self.education_group_year, self.request)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             context["messages"].append(warning_msg)
-        except ValidationError as e:
-            error_messages = []
-            for msg in e.messages:
-                msg_prefix = _("Element selected %(element)s") % {
-                    "element": "{} - {}".format(child.academic_year, child.acronym)
-                }
-                error_messages.append("{}: {}".format(msg_prefix, msg))
-            context["messages"].append(error_messages)
+            datas = []
+
+        for data in datas:
+            try:
+                child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
+                strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                    AttachLearningUnitYearStrategy
+                strategy(parent=self.education_group_year, child=child).is_valid()
+
+                context['object_to_attach'] = child
+                context['source_link'] = data.get('source_link')
+                context['education_group_year_parent'] = self.education_group_year
+            except ValidationError as e:
+                error_messages = []
+                for msg in e.messages:
+                    msg_prefix = _("Element selected %(element)s") % {
+                        "element": "{} - {}".format(child.academic_year, child.acronym)
+                    }
+                    error_messages.append("{}: {}".format(msg_prefix, msg))
+                context["messages"].append(error_messages)
 
         return context
 
@@ -92,7 +96,7 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            data = extract_child(self.education_group_year, self.request)
+            data = extract_childs(self.education_group_year, self.request)
             child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
 
             context['object_to_attach'] = child
@@ -115,7 +119,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         kwargs = super().get_form_kwargs()
 
         try:
-            data = extract_child(self.education_group_year, self.request)
+            data = extract_childs(self.education_group_year, self.request)
             kwargs.update({
                 'parent': self.education_group_year,
                 'child_branch': data.get('child_branch'),
