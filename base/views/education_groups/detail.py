@@ -538,7 +538,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
-            text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
+            text_field = forms.CharField(widget=CKEditorWidget(config_name='education_group_pedagogy'))
 
         admission_condition_form = AdmissionConditionForm()
         admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=self.object)
