@@ -56,6 +56,7 @@ ACADEMIC_CALENDAR_TYPES = (
     (TEACHING_CHARGE_APPLICATION, _("Teaching charge application")),
     (COURSE_ENROLLMENT, _("Course enrollment")),
     (SUMMARY_COURSE_SUBMISSION, _("Summary course submission")),
+    (EDUCATION_GROUP_EDITION, _("Education group edition")),
     (LEARNING_UNIT_EDITION_FACULTY_MANAGERS, _("Learning unit edition by faculty managers")),
 )
 
