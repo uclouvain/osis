@@ -480,6 +480,9 @@ components:
             local_url:
               type: string
               format: uri
+            organization_url:
+              type: string
+              format: uri
     LearningUnitComponent:
       type: object
       properties:
