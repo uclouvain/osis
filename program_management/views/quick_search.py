@@ -50,7 +50,7 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
     filterset_class = QuickEducationGroupYearFilter
     cache_exclude_params = 'page',
     paginate_by = "12"
-    ordering = ('academic_year', 'acronym')
+    ordering = ('academic_year', 'acronym', 'partial_acronym')
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)

@@ -44,6 +44,13 @@ class QuickEducationGroupYearFilter(FilterSet):
         required=False,
         label=_('Acronym/Short title'),
     )
+    partial_acronym = filters.CharFilter(
+        field_name="partial_acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
     title = filters.CharFilter(
         field_name="title",
         lookup_expr='icontains',
@@ -56,6 +63,7 @@ class QuickEducationGroupYearFilter(FilterSet):
         fields=(
             ('academic_year__year', 'academic_year'),
             ('acronym', 'acronym'),
+            ('partial_acronym', 'partial_acronym'),
             ('title', 'title'),
         ),
         widget=forms.HiddenInput
@@ -66,7 +74,8 @@ class QuickEducationGroupYearFilter(FilterSet):
         fields = [
             'acronym',
             'title',
-            'academic_year'
+            'academic_year',
+            'partial_acronym'
         ]
 
     def __init__(self, *args, initial=None, **kwargs):
