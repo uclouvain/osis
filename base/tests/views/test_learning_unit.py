@@ -83,7 +83,6 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory, \
     LearningUnitYearFakerFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
     UEFacultyManagerFactory
@@ -968,13 +967,6 @@ class LearningUnitViewTestCase(TestCase):
         data['internship_subtype'] = internship_subtypes.TEACHING_INTERNSHIP
         return data
 
-    def get_base_partim_form_data(self, original_learning_unit_year):
-        data = self.get_common_data()
-        data.update(self.get_partim_data(original_learning_unit_year))
-        data['specific_title'] = "Partim partial title"
-        data['status'] = original_learning_unit_year.status
-        return data
-
     def get_common_data(self):
         return {
             "container_type": learning_container_year_types.COURSE,
@@ -1009,58 +1001,6 @@ class LearningUnitViewTestCase(TestCase):
     def get_valid_data(self):
         return self.get_base_form_data()
 
-    def get_faulty_acronym(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["acronym"] = "TA200"
-        return faulty_dict
-
-    def get_existing_acronym(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["acronym_1"] = "DRT2018"
-        return faulty_dict
-
-    def get_empty_internship_subtype(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["container_type"] = learning_container_year_types.INTERNSHIP
-        faulty_dict["internship_subtype"] = ""
-        return faulty_dict
-
-    def get_empty_acronym(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["acronym"] = ""
-        return faulty_dict
-
-    def get_faulty_requirement_entity(self):
-        """We will create an entity + entity version that user cannot create on it"""
-        entity = EntityFactory(country=self.country, organization=self.organization)
-        entity_version = EntityVersionFactory(entity=entity, entity_type=entity_type.SCHOOL, end_date=None,
-                                              start_date=datetime.date.today())
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict['requirement_entity'] = entity_version.id
-        return faulty_dict
-
-    def _get_volumes_data(self, learning_units_year):
-        if not isinstance(learning_units_year, list):
-            learning_units_year = [learning_units_year]
-        data = {}
-        for learning_unit_year in learning_units_year:
-            data['VOLUME_TOTAL_REQUIREMENT_ENTITIES_{}_{}'.format(learning_unit_year.id,
-                                                                  self.learning_component_yr.id)] = [60]
-            data['VOLUME_Q1_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [10]
-            data['VOLUME_Q2_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [20]
-            data['VOLUME_TOTAL_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [30]
-            data['PLANNED_CLASSES_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [2]
-        return data
-
-    @staticmethod
-    def _get_volumes_wrong_data(learning_unit_year, learning_component_year):
-        return {
-            'VOLUME_TOTAL_REQUIREMENT_ENTITIES_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [60],
-            'VOLUME_Q1_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [15],
-            'VOLUME_Q2_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [20],
-            'VOLUME_TOTAL_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [30],
-            'PLANNED_CLASSES_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [2]
-        }
 
     def test_get_username_with_no_person(self):
         a_username = 'dupontm'
