@@ -87,7 +87,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
 
     def _save_translated_text(self):
         for code, label in settings.LANGUAGES:
-            self.trans_text = translated_text.find_by_id(self.cleaned_data['cms_{}_id'.format(code[:2])])
+            self.trans_text = TranslatedText.objects.get(pk=self.cleaned_data['cms_{}_id'.format(code[:2])])
             self.trans_text.text = self.cleaned_data.get('trans_text_{}'.format(code[:2]))
             self.text_label = self.trans_text.text_label
             self.trans_text.save()
