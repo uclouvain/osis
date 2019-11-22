@@ -106,17 +106,15 @@
         const tree = JSON.parse('{{ tree | escapejs }}');
         const management_url = "{% url "education_groups_management" %}";
         const clear_clipboard_url = "{% url "education_group_clear_clipboard" %}";
-        /*
-        * Custom alert close function.
-        * Can't use Bootstrap's default which removes alert from DOM and prohibit to re-display it on item selection.
-        */
         let clear_clipboard = document.getElementById("clear_clipboard");
         clear_clipboard.addEventListener("click", function(){
             $.ajax({
                 url: clear_clipboard_url,
                 type: 'POST',
+                success: function () {
+                    $("#clipboard").hide();
+                }
             });
-            $("#clipboard").hide();
         });
     </script>
     <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
