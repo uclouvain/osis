@@ -23,10 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
-
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.views.decorators.http import require_POST
 
 from base.utils.cache import ElementCache
@@ -38,5 +36,5 @@ from base.utils.cache import ElementCache
 def clear_clipboard(request):
     if request.is_ajax():
         ElementCache(request.user).clear()
-        return HttpResponse(json.dumps({'result': 'Done'}), content_type='application/json')
+        return JsonResponse({}, content_type='application/json')
     return HttpResponseBadRequest()
