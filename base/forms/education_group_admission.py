@@ -28,7 +28,7 @@ from django import forms
 
 from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
 
-PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='minimal')
+PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='education_group_pedagogy')
 
 
 class UpdateLineForm(forms.Form):

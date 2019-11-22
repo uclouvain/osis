@@ -27,7 +27,6 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_achievement import LearningAchievementEditForm
-from base.models.learning_achievement import LearningAchievement
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory

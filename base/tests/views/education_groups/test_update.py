@@ -28,7 +28,7 @@ import random
 from http import HTTPStatus
 from unittest import mock
 
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -40,11 +40,11 @@ from waffle.testutils import override_flag
 
 from base.forms.education_group.group import GroupYearModelForm
 from base.forms.education_group.training import CertificateAimsForm
-from base.models.education_group_organization import EducationGroupOrganization
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -65,7 +65,7 @@ from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.user import SuperUserFactory, UserFactory
+from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from program_management.business.group_element_years import management
@@ -171,7 +171,7 @@ class TestUpdate(TestCase):
         )
         PersonEntityFactory(person=self.person, entity=self.training_education_group_year.management_entity)
 
-        self.domains = [DomainFactory() for x in range(10)]
+        self.domains = [DomainFactory() for _ in range(10)]
 
         self.a_mini_training_education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.MINI_TRAINING,
@@ -191,10 +191,6 @@ class TestUpdate(TestCase):
 
         EntityVersionFactory(
             entity=self.mini_training_education_group_year.management_entity,
-            start_date=self.education_group_year.academic_year.start_date
-        )
-        EntityVersionFactory(
-            entity=self.mini_training_education_group_year.administration_entity,
             start_date=self.education_group_year.academic_year.start_date
         )
 
@@ -234,6 +230,8 @@ class TestUpdate(TestCase):
             'main_teaching_campus': "",
             'academic_year': self.education_group_year.academic_year.pk,
             "constraint_type": "",
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.url, data=data)
 
@@ -313,6 +311,8 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
             'form-INITIAL_FORMS': 0,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(training_url, data=data)
         self.assertEqual(response.status_code, 302)
@@ -372,22 +372,16 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
             'form-INITIAL_FORMS': 0,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(training_url, data=data)
         self.assertEqual(training_url, response.request['PATH_INFO'])
 
     def test_post_training_with_a_coorganization(self):
-        new_entity_version = MainEntityVersionFactory()
-        egy = TrainingFactory(
-            education_group_type__name=TrainingType.AGGREGATION.name,
-            management_entity=new_entity_version.entity,
-            administration_entity=new_entity_version.entity
-        )
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
-        organization = OrganizationFactory()
-        address = OrganizationAddressFactory(organization=organization, is_main=True)
-        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+        egy, new_entity_version, organization = self._prepare_training_and_organization()
         self.assertEqual(egy.coorganizations.count(), 0)
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -404,9 +398,11 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
-            'form-0-country': address.country.pk,
+            'form-0-country': OrganizationAddressFactory(organization=organization, is_main=True).country.pk,
             'form-0-organization': organization.pk,
-            'form-0-diploma': diploma_choice
+            'form-0-diploma': diploma_choice,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
 
         url = reverse(update_education_group, args=[egy.pk, egy.pk])
@@ -447,7 +443,9 @@ class TestUpdate(TestCase):
             'form-INITIAL_FORMS': 0,
             'form-0-country': address.country.pk,
             'form-0-organization': organization.pk,
-            'form-0-diploma': diploma_choice
+            'form-0-diploma': diploma_choice,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
 
         url = reverse(update_education_group, args=[egy.pk, egy.pk])
@@ -455,24 +453,15 @@ class TestUpdate(TestCase):
         self.assertEqual(url, response.request['PATH_INFO'])
 
     def test_post_training_removing_coorganization(self):
-        new_entity_version = MainEntityVersionFactory()
-        egy = TrainingFactory(
-            education_group_type__name=TrainingType.AGGREGATION.name,
-            management_entity=new_entity_version.entity,
-            administration_entity=new_entity_version.entity
-        )
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
-        orga = OrganizationFactory()
-        address = OrganizationAddressFactory(organization=orga, is_main=True)
-
+        egy, new_entity_version, organization = self._prepare_training_and_organization()
         diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
         egy_organization = EducationGroupOrganizationFactory(
-            organization=orga,
+            organization=organization,
             education_group_year=egy,
             diploma=diploma_choice
         )
 
-        self.assertEqual(EducationGroupOrganization.objects.filter(education_group_year=egy).count(), 1)
+        self.assertEqual(egy.coorganizations.count(), 1)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -489,18 +478,33 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
-            'form-0-country': address.country.pk,
-            'form-0-organization': orga.pk,
+            'form-0-country': OrganizationAddressFactory(organization=organization, is_main=True).country.pk,
+            'form-0-organization': organization.pk,
             'form-0-diploma': diploma_choice,
             'form-0-DELETE': 'on',
-            'form-0-id': egy_organization.pk
+            'form-0-id': egy_organization.pk,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
 
         url = reverse(update_education_group, args=[egy.pk, egy.pk])
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 302)
 
-        self.assertEqual(EducationGroupOrganization.objects.filter(education_group_year=egy).count(), 0)
+        egy.refresh_from_db()
+        coorganizations = egy.coorganizations
+        self.assertEqual(coorganizations.count(), 0)
+
+    def _prepare_training_and_organization(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = TrainingFactory(
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        organization = OrganizationFactory()
+        return egy, new_entity_version, organization
 
     def test_post_mini_training(self):
         old_domain = DomainFactory()
@@ -527,6 +531,8 @@ class TestUpdate(TestCase):
             "start_year": self.academic_year_2010,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.mini_training_url, data=data)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
@@ -591,6 +597,8 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
             'form-INITIAL_FORMS': 0,
+            'group_element_year_formset-TOTAL_FORMS': 0,
+            'group_element_year_formset-INITIAL_FORMS': 0,
         }
         response = self.client.post(self.training_url, data=data)
         messages = [m.message for m in get_messages(response.wsgi_request)]
@@ -605,6 +613,70 @@ class TestUpdate(TestCase):
             messages[2], _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
                 "acronym": self.training_education_group_year_2.acronym,
                 "academic_year": self.training_education_group_year_2.academic_year,
+            }
+        )
+
+    def test_post_with_edited_content(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = TrainingFactory(
+            academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        sub_egy = TrainingFactory(
+            academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        group = GroupElementYearFactory(
+            parent=egy,
+            child_branch=sub_egy
+        )
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': egy.education_group_type.pk,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'administration_entity': new_entity_version.pk,
+            'management_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': egy.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "primary_language": LanguageFactory().pk,
+            "start_year": self.academic_year_2010,
+            "constraint_type": "",
+            "internship": internship_presence.NO,
+            "diploma_printing_title": "Diploma Title",
+            'group_element_year_formset-TOTAL_FORMS': 1,
+            'group_element_year_formset-INITIAL_FORMS': 1,
+            'group_element_year_formset-0-block': 1,
+            'group_element_year_formset-0-is_mandatory': True,
+            'group_element_year_formset-0-comment': "COMMENT_TEST",
+            'group_element_year_formset-0-link_type': LinkTypes.REFERENCE.name,
+            'group_element_year_formset-0-id': group.pk,
+        }
+        url = reverse(update_education_group, args=[egy.pk, egy.pk])
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+        group.refresh_from_db()
+        self.assertEqual(group.block, 1)
+        self.assertTrue(group.is_mandatory)
+        self.assertEqual(group.comment, 'COMMENT_TEST')
+        self.assertEqual(group.link_type, LinkTypes.REFERENCE.name)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[3],
+            _("The link of %(acronym)s has been updated") % {
+                'acronym': " - ".join([
+                    group.child_branch.partial_acronym, group.child_branch.acronym, str(group.parent.academic_year)
+                ])
             }
         )
 
@@ -903,7 +975,7 @@ class TestSelectAttach(TestCase):
         ).exists()
         self.assertFalse(expected_absent_group_element_year)
 
-        data_cached = ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
+        ElementCache(self.person.user).save_element_selected(self.learning_unit_year)
 
         response = self.client.post(
             reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),

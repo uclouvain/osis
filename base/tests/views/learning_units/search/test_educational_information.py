@@ -27,7 +27,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
@@ -40,7 +40,7 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
         cls.luys = LearningUnitYearFactory.create_batch(4, academic_year__current=True)
         cls.url = reverse("learning_units_summary")
         cls.get_data = {
-            "academic_year": str(cls.luys[0].academic_year.id),
+            "academic_year": get_current_year(),
         }
         cls.tuples_xls_status_value_with_xls_method_function = (
             ("xls_teaching_material",

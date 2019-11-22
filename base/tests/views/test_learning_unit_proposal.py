@@ -454,7 +454,7 @@ class TestGroupActionsOnProposals(TestCase):
             "action": ACTION_FORCE_STATE,
             "selected_action": [self.proposals[0].learning_unit_year.acronym]
         }
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         self.assertFalse(mock_force_state.called)
 

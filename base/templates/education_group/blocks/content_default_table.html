@@ -34,37 +34,61 @@
         <th>{% trans 'Mandatory' %}</th>
         <th>{% trans 'Block' %}</th>
         <th>{% trans 'Link type' %}</th>
-        <th></th>
+        <th>{% trans 'Comment' %}</th>
+        <th>{% trans 'English comment' %}</th>
+        <th style="min-width: 70px;"></th>
     </tr>
     </thead>
     <tbody>
     {% for group in object.groupelementyear_set.all %}
         <tr>
-            {% if  group.child_branch %}
-                <td width="10%">{{ group.child_branch.acronym }}</td>
+            {% if group.child_branch %}
+                <td style="width:8%">{{ group.child_branch.acronym }}</td>
                 <td>
                     <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
                        id="lnk_education_group_{{ group.pk }}">{{ group.child_branch.partial_acronym }}</a>
                 </td>
-                <td width="30%">
+                <td style="width:25%">
                     {{ group.child_branch.title }}
                 </td>
             {% else %}
-                <td width="10%"></td>
+                <td style="width:8%"></td>
                 <td>
                     <a href="{% url 'learning_unit' group.child_leaf.pk %}"
                        id="lnk_learning_unit_{{ group.pk }}">{{ group.child_leaf.acronym }}</a>
                 </td>
-                <td width="30%">
+                <td style="width:25%">
                     {{ group.child_leaf.complete_title }}
                 </td>
             {% endif %}
-            <td width="12%">{{ group.relative_credits | default_if_none:'-' }}
+            <td style="width:6%">{{ group.relative_credits | default_if_none:'-' }}
                 / {{ group.child.credits|floatformat:-2 | default_if_none:'-' }}</td>
-            <td width="6%">{{ group.is_mandatory | yesno }}</td>
-            <td width="6%">{{ group.block | default_if_none:'-' }}</td>
-            <td width="14%">{{ group.get_link_type_display|default_if_none:'-' }}</td>
-            <td width="10%">
+            <td style="width:6%">{{ group.is_mandatory | yesno }}</td>
+            <td style="width:3%">{{ group.block | default_if_none:'-' }}</td>
+            <td style="width:6%">{{ group.get_link_type_display|default_if_none:'-' }}</td>
+            <td style="width:20%">
+                {% with comment=group.comment|default_if_none:'-' %}
+                    {% if comment|length > 40 %}
+                        <span data-toggle="tooltip" title='{{ comment }}'>
+                            {{ comment | truncatechars:40 }}
+                        </span>
+                    {% else %}
+                        {{ comment }}
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td style="width:20%">
+                {% with comment_english=group.comment_english|default_if_none:'-' %}
+                    {% if comment_english|length > 40 %}
+                        <span data-toggle="tooltip" title='{{ comment_english }}'>
+                            {{ comment_english | truncatechars:40 }}
+                        </span>
+                    {% else %}
+                        {{ comment_english }}
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td style="width:6%">
                 {% include "education_group/blocks/content_actions.html" %}
             </td>
         </tr>
@@ -77,26 +101,7 @@
                     {% endif %}
                 </td>
             </tr>
-            {% if group.comment %}
-                <tr style="border-spacing: 100px">
-                    <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
-                        {% if group.comment %}
-                            <label>{% trans 'Comment' %}</label> :&nbsp;
-                            {{ group.comment }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endif %}
-            {% if group.comment_english %}
-                <tr>
-                    <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
-                        {% if group.comment_english %}
-                            <label>{% trans 'english comment'|capfirst %}</label> :&nbsp;
-                            {{ group.comment_english }}
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endif %}
+
         {% endwith %}
     {% endfor %}
     </tbody>
