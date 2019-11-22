@@ -30,5 +30,5 @@ from django.forms import HiddenInput
 
 class EducationGroupPedagogyEditForm(forms.Form):
     label = forms.CharField(widget=HiddenInput())
-    text_english = RichTextFormField(required=False, config_name='reddot')
-    text_french = RichTextFormField(required=False, config_name='reddot')
+    text_english = RichTextFormField(required=False, config_name='education_group_pedagogy')
+    text_french = RichTextFormField(required=False, config_name='education_group_pedagogy')

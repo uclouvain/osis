@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-07 16:19+0100\n"
+"POT-Creation-Date: 2019-11-15 10:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,15 +264,6 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add attribution"
-msgstr ""
-
-msgid "Add current year teacher"
-msgstr ""
-
-msgid "Add over the current year"
-msgstr ""
-
 msgid "Add the English content of this paragraph"
 msgstr ""
 
@@ -417,22 +408,10 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Attribution duration"
 msgstr ""
 
 msgid "Attribution entity"
-msgstr ""
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Attributions"
@@ -867,6 +846,9 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English comment"
+msgstr ""
+
 msgid "English title proper"
 msgstr ""
 
@@ -891,9 +873,6 @@ msgstr ""
 msgid "Enrollments to learning unit"
 msgstr ""
 
-msgid "Enrollments to training"
-msgstr ""
-
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -914,6 +893,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluations"
@@ -1445,9 +1427,6 @@ msgstr ""
 msgid "Male"
 msgstr ""
 
-msgid "Manage repartition"
-msgstr ""
-
 msgid "Manage volumes"
 msgstr ""
 
@@ -1645,9 +1624,6 @@ msgstr ""
 msgid "No additional fees"
 msgstr ""
 
-msgid "No attributions exist for the parent learning unit"
-msgstr ""
-
 msgid "No data"
 msgstr ""
 
@@ -1817,6 +1793,9 @@ msgid "P."
 msgstr ""
 
 msgid "Page not found."
+msgstr ""
+
+msgid "Parent"
 msgstr ""
 
 #, python-format
@@ -2155,14 +2134,6 @@ msgid "Release"
 msgstr ""
 
 msgid "Remarks"
-msgstr ""
-
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Req. Entities"
@@ -2514,6 +2485,9 @@ msgstr ""
 msgid "The following learning units ended with error"
 msgstr ""
 
+msgid "The following links has been updated"
+msgstr ""
+
 msgid "The format of the range date is not valid"
 msgstr ""
 
@@ -2576,6 +2550,10 @@ msgid "The learning units"
 msgstr ""
 
 #, python-format
+msgid "The link of %(acronym)s has been updated"
+msgstr ""
+
+#, python-format
 msgid ""
 "The linked %(entity)s does not exist at the start date of the academic year "
 "linked to this learning unit"
@@ -2635,12 +2613,6 @@ msgstr ""
 
 msgid ""
 "The sum of the volumes of the entities must be equal to the global volume"
-msgstr ""
-
-#, python-format
-msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
 msgstr ""
 
 #, python-format
@@ -2790,6 +2762,12 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
+msgid "Total"
+msgstr ""
+
+msgid "Total enrollments to training"
+msgstr ""
+
 msgid "Training"
 msgstr ""
 
@@ -2818,9 +2796,6 @@ msgid "Trimester"
 msgstr ""
 
 msgid "Tutor"
-msgstr ""
-
-msgid "Tutor for parent LU"
 msgstr ""
 
 msgid "Tutors"
