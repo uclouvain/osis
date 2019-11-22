@@ -26,12 +26,6 @@
 from unittest import mock
 
 from django.http import HttpResponse
-from django.test import TestCase
-from django.urls import reverse
-
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
 
 
 class TestRenderToExcelMixin:

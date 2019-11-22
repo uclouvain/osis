@@ -29,7 +29,6 @@ from django.db import models
 
 from base.models.utils.utils import filter_with_list_or_object
 
-
 MIN_ALLOCATION_CHARGE = 0
 
 

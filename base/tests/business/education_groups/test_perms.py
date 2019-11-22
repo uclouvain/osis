@@ -93,7 +93,7 @@ class TestPerms(TestCase):
 
     def test_is_education_group_edit_period_opened_case_period_opened_but_not_same_academic_year(self):
         today = datetime.date.today()
-        education_group_year = EducationGroupYearFactory(academic_year__year=self.current_academic_year.year + 1)
+        EducationGroupYearFactory(academic_year__year=self.current_academic_year.year + 1)
 
         AcademicCalendarFactory(
             start_date=today - datetime.timedelta(days=1),
@@ -168,7 +168,7 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
                                     academic_year__year=cls.current_academic_year.year + 1,
                                     data_year=AcademicYearFactory(year=cls.current_academic_year.year + 1))
         for year in range(cls.current_academic_year.year - 10, cls.current_academic_year.year + 10):
-            aca_year = AcademicYearFactory(year=year)
+            AcademicYearFactory(year=year)
 
     def test_person_property(self):
         person = PersonWithPermissionsFactory()

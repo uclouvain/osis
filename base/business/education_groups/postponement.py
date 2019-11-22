@@ -131,7 +131,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year,
         # Postpone the m2m [languages / secondary_domains]
         _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
 
-    if education_group.show_coorganization(old_education_group_year):
+    if education_group.has_coorganization(old_education_group_year):
         duplicate_set(old_education_group_year, postponed_egy, initial_dicts.get('initial_sets_dict'))
     return postponed_egy
 

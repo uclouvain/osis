@@ -80,7 +80,7 @@
 
                 {% flag "education_group_update" %}
                     {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
-                    {% if tab_to_show %}
+                    {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
                         {% with update_url|add:"?tab_to_show="|add:tab_to_show as update_url %}
                             {% li_with_update_perm update_url _('Modify') %}
                         {% endwith %}
