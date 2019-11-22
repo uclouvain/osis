@@ -36,5 +36,5 @@ from base.utils.cache import ElementCache
 def clear_clipboard(request):
     if request.is_ajax():
         ElementCache(request.user).clear()
-        return JsonResponse({}, content_type='application/json')
+        return JsonResponse({})
     return HttpResponseBadRequest()
