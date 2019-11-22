@@ -803,7 +803,7 @@ msgid "Duration"
 msgstr "Durée"
 
 msgid "Edit"
-msgstr "Éditer"
+msgstr "Modifier"
 
 msgid "Edit the proposal"
 msgstr "Modifier la proposition"
