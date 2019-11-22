@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 08:31+0200\n"
+"POT-Creation-Date: 2019-11-15 10:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,15 +264,6 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add attribution"
-msgstr ""
-
-msgid "Add current year teacher"
-msgstr ""
-
-msgid "Add over the current year"
-msgstr ""
-
 msgid "Add the English content of this paragraph"
 msgstr ""
 
@@ -370,9 +361,6 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure to change the state from"
-msgstr ""
-
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
 msgstr ""
@@ -420,22 +408,10 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Attribution duration"
 msgstr ""
 
 msgid "Attribution entity"
-msgstr ""
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Attributions"
@@ -484,9 +460,6 @@ msgid "By"
 msgstr ""
 
 msgid "CAPAES"
-msgstr ""
-
-msgid "Calendar of the annual program"
 msgstr ""
 
 msgid "Campus"
@@ -542,9 +515,6 @@ msgid "City"
 msgstr ""
 
 msgid "City of institution"
-msgstr ""
-
-msgid "Classe"
 msgstr ""
 
 msgid "Classes"
@@ -639,9 +609,6 @@ msgstr ""
 msgid "Coordinator"
 msgstr ""
 
-msgid "Coorganization"
-msgstr ""
-
 msgid "Copy Reddot data from previous academic year."
 msgstr ""
 
@@ -728,9 +695,6 @@ msgid "Description fiche"
 msgstr ""
 
 msgid "Description fiche status"
-msgstr ""
-
-msgid "Description fiche submission dates updated"
 msgstr ""
 
 msgid "Detach"
@@ -882,6 +846,9 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English comment"
+msgstr ""
+
 msgid "English title proper"
 msgstr ""
 
@@ -906,9 +873,6 @@ msgstr ""
 msgid "Enrollments to learning unit"
 msgstr ""
 
-msgid "Enrollments to training"
-msgstr ""
-
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -929,6 +893,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluations"
@@ -1010,9 +977,6 @@ msgid "Fixed"
 msgstr ""
 
 msgid "Fixed-line phone"
-msgstr ""
-
-msgid "Focuses"
 msgstr ""
 
 msgid "Folder"
@@ -1112,6 +1076,12 @@ msgid "Global ID"
 msgstr ""
 
 msgid "Go"
+msgstr ""
+
+msgid "Go down"
+msgstr ""
+
+msgid "Go up"
 msgstr ""
 
 msgid "Graduates"
@@ -1277,9 +1247,6 @@ msgstr ""
 msgid "Keywords"
 msgstr ""
 
-msgid "LECTURING"
-msgstr ""
-
 msgid "LU"
 msgstr ""
 
@@ -1311,6 +1278,9 @@ msgstr ""
 msgid ""
 "Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfuly created."
+msgstr ""
+
+msgid "Learning achievement content has been successfully saved"
 msgstr ""
 
 msgid "Learning achievements"
@@ -1455,9 +1425,6 @@ msgid "Major list choice"
 msgstr ""
 
 msgid "Male"
-msgstr ""
-
-msgid "Manage repartition"
 msgstr ""
 
 msgid "Manage volumes"
@@ -1657,12 +1624,6 @@ msgstr ""
 msgid "No additional fees"
 msgstr ""
 
-msgid "No attributions exist for the parent learning unit"
-msgstr ""
-
-msgid "No change made"
-msgstr ""
-
 msgid "No data"
 msgstr ""
 
@@ -1771,6 +1732,9 @@ msgstr ""
 msgid "Operation"
 msgstr ""
 
+msgid "Operation on learning achievement has been successfully completed"
+msgstr ""
+
 msgid "Option"
 msgstr ""
 
@@ -1829,6 +1793,9 @@ msgid "P."
 msgstr ""
 
 msgid "Page not found."
+msgstr ""
+
+msgid "Parent"
 msgstr ""
 
 #, python-format
@@ -1918,6 +1885,11 @@ msgid "Pole"
 msgstr ""
 
 msgid "Postal code"
+msgstr ""
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
 msgstr ""
 
 msgid "Practical exercises"
@@ -2164,14 +2136,6 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Req. Entities"
 msgstr ""
 
@@ -2212,6 +2176,15 @@ msgid "SQL command"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Save and do not postpone changes"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr ""
+
+msgid "Save and postpone changes on next years"
 msgstr ""
 
 msgid "Schedule type"
@@ -2397,6 +2370,12 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+
 msgid "Teaching profile"
 msgstr ""
 
@@ -2413,6 +2392,10 @@ msgid "Testing"
 msgstr ""
 
 msgid "The"
+msgstr ""
+
+#, python-format
+msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
 
 msgid "The acronym <b>already exists</b>."
@@ -2502,6 +2485,9 @@ msgstr ""
 msgid "The following learning units ended with error"
 msgstr ""
 
+msgid "The following links has been updated"
+msgstr ""
+
 msgid "The format of the range date is not valid"
 msgstr ""
 
@@ -2564,6 +2550,10 @@ msgid "The learning units"
 msgstr ""
 
 #, python-format
+msgid "The link of %(acronym)s has been updated"
+msgstr ""
+
+#, python-format
 msgid ""
 "The linked %(entity)s does not exist at the start date of the academic year "
 "linked to this learning unit"
@@ -2605,6 +2595,15 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The sections you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+
+msgid "The sections you modified have been saved with success."
+msgstr ""
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2618,8 +2617,14 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+
+msgid "The teaching material has been deleted with success"
+msgstr ""
+
+msgid "The teaching material has been saved with success"
 msgstr ""
 
 msgid "The user cannot modify data which are greater than N+1"
@@ -2725,9 +2730,6 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-msgid "This learning unit is not eligible for proposal creation/modification"
-msgstr ""
-
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
@@ -2760,6 +2762,12 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
+msgid "Total"
+msgstr ""
+
+msgid "Total enrollments to training"
+msgstr ""
+
 msgid "Training"
 msgstr ""
 
@@ -2790,9 +2798,6 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for parent LU"
-msgstr ""
-
 msgid "Tutors"
 msgstr ""
 
@@ -2812,6 +2817,9 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
@@ -2857,9 +2865,6 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
-msgstr ""
-
-msgid "Used by learning unit"
 msgstr ""
 
 msgid "User"
@@ -2985,9 +2990,6 @@ msgstr ""
 msgid "You are not eligible to cancel proposal"
 msgstr ""
 
-msgid "You are not eligible to consolidate proposal"
-msgstr ""
-
 msgid "You are not eligible to create/modify proposal"
 msgstr ""
 
@@ -3050,6 +3052,9 @@ msgstr ""
 msgid ""
 "You cannot delete a learning unit which is prerequisite or has "
 "prerequisite(s)"
+msgstr ""
+
+msgid "You cannot have a specific summary course submission event."
 msgstr ""
 
 msgid "You don't have the rights to consolidate"
@@ -3116,6 +3121,10 @@ msgid "agreements"
 msgstr ""
 
 msgid "aim number"
+msgstr ""
+
+#, python-format
+msgid "and postponed until %(year)s"
 msgstr ""
 
 msgid "at"
@@ -3420,9 +3429,6 @@ msgid "volume declared vacant"
 msgstr ""
 
 msgid "volume requirement entity"
-msgstr ""
-
-msgid "volume total global"
 msgstr ""
 
 msgid "volume total requirement entities"

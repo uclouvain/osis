@@ -53,12 +53,12 @@ def update_themes_discussed_changed_field_in_cms(learning_unit_year):
 
 class LearningAchievementEditForm(forms.ModelForm):
     text_fr = forms.CharField(
-        widget=CKEditorWidget(config_name='minimal_plus_headers'),
+        widget=CKEditorWidget(config_name='minimal'),
         required=False,
         label=_('French')
     )
     text_en = forms.CharField(
-        widget=CKEditorWidget(config_name='minimal_plus_headers'),
+        widget=CKEditorWidget(config_name='minimal'),
         required=False,
         label=_('English')
     )

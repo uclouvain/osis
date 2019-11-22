@@ -58,7 +58,7 @@
                 <thead>
                     <tr>
                         <th>{% trans 'Entity' %}</th>
-                        <th>{% trans 'Acronym' %}</th>
+                        <th>{% trans 'Code' %}</th>
                         <th>{% trans 'Learning unit title' %}</th>
                         <th>{% trans 'Tutor' %}</th>
                         <th></th>
@@ -132,7 +132,7 @@
                     "dataSrc": "object_list",
                     "data": function(d) {
                         let pageNumber = {{ page_obj.number }};
-                        return getDataAjaxTable(domTable, d, pageNumber);
+                        return getDataAjaxTable("search_form", domTable, d, pageNumber);
                     },
                     "traditional": true
                 },
