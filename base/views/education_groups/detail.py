@@ -30,7 +30,7 @@ from collections import namedtuple, defaultdict
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
@@ -39,7 +39,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.views.generic import DetailView
 from reversion.models import Version
 
@@ -599,3 +599,11 @@ def get_appropriate_common_admission_condition(edy):
         common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
         return common_admission_condition
     return None
+
+
+@login_required
+@require_POST
+@permission_required('base.can_access_education_group', raise_exception=True)
+def clear_clipboard(request):
+    if request.is_ajax():
+        ElementCache(request.user).clear()
