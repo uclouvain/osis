@@ -27,6 +27,7 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -92,9 +93,8 @@ def _update_certificate_aims(request, root_id, education_group_year):
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
     if form_certificate_aims.is_valid():
-        form_certificate_aims.save()
-        url = _get_success_redirect_url(root, education_group_year)
-        return redirect(url)
+        url_redirect = _common_success_redirect(request, form_certificate_aims, root, None)
+        return JsonResponse({'success_url': url_redirect.url})
 
     return render(request, "education_group/blocks/form/training_certificate.html", {
         "education_group_year": education_group_year,
@@ -119,12 +119,13 @@ def _get_view(category):
     }[category]
 
 
-def _common_success_redirect(request, form, root, groupelementyear_form):
-    groupelementyear_form.save()
+def _common_success_redirect(request, form, root, groupelementyear_form=None):
+    groupelementyear_changed = []
+    if groupelementyear_form:
+        groupelementyear_form.save()
+        groupelementyear_changed = groupelementyear_form.changed_forms()
+
     education_group_year = form.save()
-
-    groupelementyear_changed = groupelementyear_form.changed_forms()
-
     success_msgs = []
     if not education_group_year.education_group.end_year or \
             education_group_year.education_group.end_year.year >= education_group_year.academic_year.year:

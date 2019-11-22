@@ -281,15 +281,21 @@ class CertificateAimsForm(CheckConsistencyCertificateAimsMixin, forms.ModelForm)
         self.check_consistency()
 
         for egy in self.get_instances_valid():
+            egy.certificate_aims.clear()
             for certificate_aim in self.cleaned_data.get("certificate_aims", []):
                 EducationGroupCertificateAim.objects.get_or_create(
                     education_group_year=egy,
                     certificate_aim=certificate_aim,
                 )
+        return self.instance
 
     @property
     def warnings(self):
         return getattr(self, 'consistency_errors', [])
+
+    @property
+    def education_group_year_postponed(self):
+        return [egy for egy in self.get_instances_valid() if egy.pk != self.instance.pk]
 
 
 class TrainingModelForm(EducationGroupModelForm):

@@ -586,6 +586,11 @@ class TestPostponeCertificateAims(TestCase):
         form.save()
         self.assertFalse(form.warnings, form.warnings)
 
+        self.assertEqual(
+            form.get_instances_valid(),
+            [self.training] + list(self.qs_training_futures.order_by('academic_year__year')),
+            msg="The instance must be ordered in order to be compare year by year in sliding way"
+        )
         for education_group_year in self.qs_training_futures.all():
             error_test_msg = "Certificate aims not reported on year {}".format(education_group_year.academic_year.year)
             self.assertEqual(education_group_year.certificate_aims.count(), 2, msg=error_test_msg)
@@ -619,6 +624,12 @@ class TestPostponeCertificateAims(TestCase):
             }
         ]
         self.assertEqual(form.warnings, warnings_expected, form.warnings)
+
+        edgy_postponed_expected = list(
+            self.qs_training_futures.exclude(pk=training_in_future.pk)
+                                    .order_by('academic_year__year')
+        )
+        self.assertEqual(form.education_group_year_postponed, edgy_postponed_expected)
 
 
 class TestPermissionField(TestCase):
