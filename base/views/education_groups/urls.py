@@ -26,7 +26,7 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
-from base.views.education_groups.detail import clear_clipboard
+from base.views.education_groups.clear_clipboard import clear_clipboard
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
