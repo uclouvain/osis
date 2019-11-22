@@ -93,7 +93,7 @@ def _update_certificate_aims(request, root_id, education_group_year):
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
     if form_certificate_aims.is_valid():
-        url_redirect = _common_success_redirect(request, form_certificate_aims, root, None)
+        url_redirect = _common_success_redirect(request, form_certificate_aims, root)
         return JsonResponse({'success_url': url_redirect.url})
 
     return render(request, "education_group/blocks/form/training_certificate.html", {
