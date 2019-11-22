@@ -39,7 +39,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
     acronym = django_filters.CharFilter(
         field_name='acronym',
         lookup_expr='icontains',
-        label=_('Acronym'),
+        label=_('Code'),
     )
     learning_unit_title = django_filters.CharFilter(
         field_name='full_title',
