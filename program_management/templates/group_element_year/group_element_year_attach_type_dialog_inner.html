@@ -29,15 +29,15 @@
     {% if not messages %}
         <div class="modal-header">
              <button type="button" class="close" data-dismiss="modal">×</button>
-             <h4>{% trans 'Attach' %} {{ object_to_attach.acronym }}</h4>
+             <h4>{% trans 'Attach' %}</h4>
         </div>
 
         <div id="form-modal-body" class="modal-body">
            <div id="attach_info">
             {% if source_link %}
-                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
+                {% blocktrans with object_acronym=acronyms parent_acronym=source_link.parent.acronym%}Do you want to copy or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
             {% else %}
-                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to attach {{ object_acronym }} ?{% endblocktrans %}
+                {% blocktrans with object_acronym=acronyms parent_acronym=source_link.parent.acronym%}Do you want to attach {{ object_acronym }} ?{% endblocktrans %}
             {% endif %}
            </div>
         </div>

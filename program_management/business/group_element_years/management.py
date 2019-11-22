@@ -42,15 +42,15 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-def extract_childs(parent, request):
-    object_ids = request.GET.getlist("id", [])
-    content_type = request.GET.get("content_type")
+def extract_childs(parent, request_parameters, user):
+    object_ids = request_parameters.getlist("id", [])
+    content_type = request_parameters.get("content_type")
     if object_ids and content_type:
         selected_data = [{"id": object_id, "modelname": content_type} for object_id in object_ids]
     elif object_ids or content_type:
         selected_data = []
     else:
-        cached_data = ElementCache(request.user).cached_data
+        cached_data = ElementCache(user).cached_data
         selected_data = [cached_data] if cached_data else []
 
     if not selected_data:

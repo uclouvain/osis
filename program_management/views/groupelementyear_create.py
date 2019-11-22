@@ -32,6 +32,7 @@ from django.views.generic import CreateView
 from django.views.generic.base import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.group_element_year import GroupElementYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
@@ -39,7 +40,7 @@ from program_management.business.group_element_years.attach import AttachEducati
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import extract_childs
-from program_management.forms.group_element_year import GroupElementYearForm
+from program_management.forms.group_element_year import GroupElementYearForm, GroupElementYearFormset
 from program_management.views.generic import GenericGroupElementYearMixin
 from base.views.education_groups import perms
 
@@ -59,7 +60,7 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
             context["messages"].append(str(e))
 
         try:
-            datas = extract_childs(self.education_group_year, self.request)
+            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             context["messages"].append(warning_msg)
@@ -96,49 +97,65 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            data = extract_childs(self.education_group_year, self.request)
-            child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
-
-            context['object_to_attach'] = child
-            context['source_link'] = data.get('source_link')
-            context['education_group_year_parent'] = self.education_group_year
-
+            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)
+            datas = []
+
+        context['objects_to_attach'] = []
+        for data in datas:
+            child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
+            context['objects_to_attach'].append(child)
+            context['source_link'] = data.get('source_link')
+
+        context["acronyms"] = ", ".join([obj.acronym for obj in context["objects_to_attach"]])
+
+        context['education_group_year_parent'] = self.education_group_year
         return context
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     # CreateView
-    form_class = GroupElementYearForm
+    form_class = GroupElementYearFormset
     template_name = "group_element_year/group_element_year_comment_inner.html"
 
     def get_form_kwargs(self):
         """ For the creation, the group_element_year needs a parent and a child """
         kwargs = super().get_form_kwargs()
-
+        # Formset don't use instance parameter
+        if "instance" in kwargs:
+            del kwargs["instance"]
+        kwargs_form_kwargs = []
         try:
-            data = extract_childs(self.education_group_year, self.request)
-            kwargs.update({
-                'parent': self.education_group_year,
-                'child_branch': data.get('child_branch'),
-                'child_leaf': data.get('child_leaf')
-            })
-
-            child = kwargs['child_branch'] if kwargs['child_branch'] else kwargs['child_leaf']
-            strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
-                AttachLearningUnitYearStrategy
-            strategy(parent=self.education_group_year, child=child).is_valid()
+            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)
-        except ValidationError as e:
-            display_error_messages(self.request, e.messages)
-        except IntegrityError as e:
-            warning_msg = str(e)
-            display_warning_messages(self.request, warning_msg)
+            datas = []
 
+        for data in datas:
+            try:
+                child_branch = data.get('child_branch')
+                child_leaf = data.get('child_leaf')
+                kwargs_form_kwargs.append({
+                    'parent': self.education_group_year,
+                    'child_branch': child_branch,
+                    'child_leaf': child_leaf
+                })
+
+                child = child_branch or child_leaf
+                strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                    AttachLearningUnitYearStrategy
+                strategy(parent=self.education_group_year, child=child).is_valid()
+            except ValidationError as e:
+                display_error_messages(self.request, e.messages)
+            except IntegrityError as e:
+                warning_msg = str(e)
+                display_warning_messages(self.request, warning_msg)
+        kwargs["form_kwargs"] = kwargs_form_kwargs
+        kwargs["initial"] = [{} for f in kwargs_form_kwargs]
+        kwargs["queryset"] = GroupElementYear.objects.none()
         return kwargs
 
     def form_valid(self, form):
@@ -149,9 +166,15 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         ElementCache(self.request.user).clear()
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['group_element_years'] = context["form"]
+        return context
+
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
-        return _("The link of %(acronym)s has been created") % {'acronym': self.object.child}
+        return "Success"
+        # return _("The link of %(acronym)s has been created") % {'acronym': self.object.child}
 
     def get_success_url(self):
         """ We'll reload the page """
