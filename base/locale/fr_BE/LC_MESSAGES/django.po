@@ -2523,12 +2523,8 @@ msgstr "La valeur du champ crédits doit être un entier"
 msgid "The education group has been deleted."
 msgstr "L'organisation de formation a été supprimée."
 
-#, fuzzy
-#| msgid "This education group is not editable during this period."
 msgid "The education group is not a training type"
-msgstr ""
-"La période de modification d'organisation de formation n'est pas ouverte "
-"durant cette période."
+msgstr "L'organisation de formation n'est pas de type formation"
 
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
