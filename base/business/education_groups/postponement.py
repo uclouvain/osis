@@ -322,10 +322,10 @@ class CheckConsistencyCertificateAimsMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.consistency_errors = []
-        self.instances_valid = set()
+        self.instances_valid = []
 
     def check_consistency(self):
-        self.instances_valid = {self.instance}
+        self.instances_valid = [self.instance]
 
         qs = self._get_consistency_queryset().order_by('academic_year__year')
         for egy, egy_next in zip(qs, qs[1:]):
@@ -344,8 +344,9 @@ class CheckConsistencyCertificateAimsMixin:
                         'error': error
                     }
                 )
+                break
             else:
-                self.instances_valid.add(egy_next)
+                self.instances_valid.append(egy_next)
 
     def get_instances_valid(self):
         return self.instances_valid

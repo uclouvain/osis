@@ -1124,9 +1124,14 @@ class TestCertificateAimView(TestCase):
 
     @mock.patch('base.views.education_groups.update.CertificateAimsForm')
     def test_post_method_ensure_data_is_correctly_save(self, mock_form):
-        mock_form.is_valid.return_value = True
-        mock_form.save.return_value = None
+        mock_form.return_value.is_valid.return_value = True
+        mock_form.return_value.save.return_value = self.training
 
         response = self.client.post(self.url, data={'dummy_key': 'dummy'})
         excepted_url = reverse("education_group_read", args=[self.training.pk, self.training.pk])
-        self.assertRedirects(response, excepted_url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'success_url': excepted_url}
+        )
