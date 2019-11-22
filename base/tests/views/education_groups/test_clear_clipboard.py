@@ -37,6 +37,7 @@ from base.utils.cache import ElementCache
 class TestClearClipboard(TestCase):
     def setUp(self):
         self.url = reverse("education_group_clear_clipboard")
+        self.central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
 
     def test_when_not_logged(self):
         response = self.client.post(self.url)
@@ -51,31 +52,27 @@ class TestClearClipboard(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_user_with_permission_get_method(self):
-        central_manager = CentralManagerFactory()
-        self.client.force_login(central_manager.user)
+        self.client.force_login(self.central_manager.user)
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, "method_not_allowed.html")
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
     def test_user_with_permission_post_method_not_ajax(self):
-        central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
-        self.client.force_login(central_manager.user)
+        self.client.force_login(self.central_manager.user)
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_user_with_permission_post_method_ajax(self):
-        central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
-        self.client.force_login(central_manager.user)
+        self.client.force_login(self.central_manager.user)
         response = self.client.post(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, JsonResponse.status_code)
 
     def test_clipboard_is_cleared(self):
-        central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
-        self.client.force_login(central_manager.user)
+        self.client.force_login(self.central_manager.user)
         luy = LearningUnitYearFactory()
 
-        element_cache = ElementCache(central_manager.user)
+        element_cache = ElementCache(self.central_manager.user)
         element_cache.save_element_selected(luy)
         self.assertDictEqual(
             element_cache.cached_data,
