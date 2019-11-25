@@ -23,11 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.apps import AppConfig
+from django.test import TestCase
+
+from base.tests.factories.person import PersonFactory
+from webservices.api.serializers.user import UserSerializer
 
 
-class AssessmentsConfig(AppConfig):
-    name = 'assessments'
+class UserSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.serializer = UserSerializer(cls.person.user)
 
-    def ready(self):
-        from assessments.signals import subscribers
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'username',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

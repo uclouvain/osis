@@ -63,7 +63,7 @@ class TestQuickSearchEducationGroupView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_egy = EducationGroupYearFactory()
-        cls.egy_to_find = GroupFactory(acronym='RAV', title='The Ravenlord')
+        cls.egy_to_find = GroupFactory(acronym='RAV', title='The Ravenlord', partial_acronym="RV")
         cls.user = SuperUserFactory()
         cls.url = reverse('quick_search_education_group', args=[cls.root_egy.id, cls.root_egy.id])
 
@@ -81,4 +81,10 @@ class TestQuickSearchEducationGroupView(TestCase):
         self.assertIn(self.egy_to_find, response.context['page_obj'])
 
         response = self.client.get(self.url, data={'title': 'Yggdrasil'})
+        self.assertNotIn(self.egy_to_find, response.context['page_obj'])
+
+        response = self.client.get(self.url, data={'partial_acronym': 'RV'})
+        self.assertIn(self.egy_to_find, response.context['page_obj'])
+
+        response = self.client.get(self.url, data={'partial_acronym': 'RB'})
         self.assertNotIn(self.egy_to_find, response.context['page_obj'])
