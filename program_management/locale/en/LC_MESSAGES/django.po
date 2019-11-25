@@ -18,7 +18,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr ""
+msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
 msgid ""
@@ -90,7 +90,7 @@ msgstr ""
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
-msgstr ""
+msgstr "Are you sure you want to remove %(acronym)s ?"
 
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
@@ -109,26 +109,30 @@ msgid "Cannot attach element to learning unit"
 msgstr ""
 
 msgid "Cannot detach due to prerequisites."
-msgstr ""
+msgstr "Cannot remove link due to prerequisites."
 
 #, python-format
 msgid ""
 "Cannot detach education group year %(acronym)s as the following learning "
 "units are prerequisite in %(formation)s: %(learning_units)s"
 msgstr ""
+"Cannot remove education group year %(acronym)s as the following learning "
+"units are prerequisite in %(formation)s: %(learning_units)s"
 
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
 "prerequisite."
 msgstr ""
+"Cannot remove learning unit %(acronym)s as it has a prerequisite or it is a "
+"prerequisite."
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
 
 msgid "Cannot perform detach action on root."
-msgstr ""
+msgstr "Cannot perform remove action on root."
 
 msgid "Cannot perform modification action on root."
 msgstr ""
@@ -229,7 +233,11 @@ msgid_plural ""
 "Options \"%(acronym)s\" cannot be detach because they are contained in "
 "%(finality_acronym)s program."
 msgstr[0] ""
+"Option \"%(acronym)s\" cannot be removed because it is contained in "
+"%(finality_acronym)s program."
 msgstr[1] ""
+"Options \"%(acronym)s\" cannot be removed because they are contained in "
+"%(finality_acronym)s program."
 
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."

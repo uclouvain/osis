@@ -27,7 +27,7 @@ msgid "Copy"
 msgstr "Copier"
 
 msgid "Detach"
-msgstr "Détacher"
+msgstr "Retirer"
 
 msgid "Existed code for "
 msgstr "Code a déjà existé pour "

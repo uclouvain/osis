@@ -704,7 +704,7 @@ msgid "Description fiche status"
 msgstr ""
 
 msgid "Detach"
-msgstr ""
+msgstr "Remove"
 
 msgid "Detailed program"
 msgstr ""
@@ -1220,7 +1220,7 @@ msgid "It is not possible to %(action)s the root element."
 msgstr ""
 
 msgid "It is not possible to detach the root element."
-msgstr ""
+msgstr "It is not possible to remove the root element."
 
 msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "

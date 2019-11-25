@@ -109,7 +109,7 @@ def step_impl(context, parent, action, acronym):
         context.current_page = context.current_page.attach_node_tree(acronym, parent)
     elif action.lower() == 'sélectionner':
         context.current_page.select_node_tree(acronym, parent)
-    elif action.lower() == 'détacher':
+    elif action.lower() == 'retirer':
         context.current_page = context.current_page.detach_node_tree(acronym, parent)
     else:
         raise Exception("Unknown action")
