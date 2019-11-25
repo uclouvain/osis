@@ -78,6 +78,7 @@ INSTALLED_APPS = (
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'bootstrap3',
     'ordered_model',
     'waffle',
@@ -109,6 +110,7 @@ class CustomLocaleMiddleware(LocaleMiddleware):
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'backoffice.settings.base.CustomLocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -118,7 +120,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.notification_middleware.NotificationMiddleware',
-    'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
+    'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
 )
 
 
@@ -388,6 +390,8 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
+CORS_ORIGIN_WHITELIST = os.environ['CORS_ORIGIN_WHITELIST'].split()
+CORS_ALLOW_CREDENTIALS = os.environ.get('CORS_ALLOW_CREDENTIALS', 'False').lower() == 'true'
 
 # ESB Configuration
 ESB_API_URL = os.environ.get('ESB_API_URL')
