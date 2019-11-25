@@ -49,10 +49,10 @@
                     <li class="divider"></li>
                 {% endflag %}
 
-                {% flag "education_group_select" %}
+                {% flag "copy_education_group_to_cache" %}
                     <li id='select_li'>
                         <a href="#" onclick="select_education_group()" >
-                            {% trans 'Select' %}
+                            {% trans 'Copy' %}
                         </a>
                     </li>
                     <li class="divider"></li>
@@ -137,7 +137,7 @@
         function select_education_group() {
             $.ajax({
                 type: "POST",
-                url: "{% url "education_group_select" parent.pk education_group_year.pk %}",
+                url: "{% url "copy_education_group_to_cache" parent.pk education_group_year.pk %}",
                 data: {'element_id': {{ education_group_year.id }}},
                 dataType: 'json',
                 success: function (jsonResponse) {

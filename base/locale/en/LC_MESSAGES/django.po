@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 10:38+0100\n"
+"POT-Creation-Date: 2019-11-25 14:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -609,6 +609,12 @@ msgstr ""
 msgid "Coordinator"
 msgstr ""
 
+msgid "Copied element"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
 msgid "Copy Reddot data from previous academic year."
 msgstr ""
 
@@ -1144,9 +1150,6 @@ msgid "Include subordinate entities"
 msgstr ""
 
 msgid "Included in"
-msgstr ""
-
-msgid "Indicate the name or the FGS"
 msgstr ""
 
 msgid "Industrial partner"
@@ -1795,9 +1798,6 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
-msgid "Parent"
-msgstr ""
-
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
@@ -1878,8 +1878,8 @@ msgstr ""
 msgid "Please select an academic year lower than %(academic_year_max)d."
 msgstr ""
 
-msgid "Please select an item before attach it"
-msgstr ""
+msgid "Please cut or copy an item before attach it"
+msgstr "Please cut or copy an item before attach it"
 
 msgid "Pole"
 msgstr ""
@@ -2232,9 +2232,6 @@ msgstr ""
 msgid "Sector"
 msgstr ""
 
-msgid "Select"
-msgstr ""
-
 msgid "Select a language"
 msgstr ""
 
@@ -2242,9 +2239,6 @@ msgid "Select action to execute"
 msgstr ""
 
 msgid "Select all the messages"
-msgstr ""
-
-msgid "Selected element"
 msgstr ""
 
 msgid "Separate"
@@ -3439,3 +3433,6 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+
+#~ msgid "Select"
+#~ msgstr "Copy"

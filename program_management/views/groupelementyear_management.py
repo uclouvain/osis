@@ -107,7 +107,7 @@ def _down(request, group_element_year, *args, **kwargs):
 
 
 @require_http_methods(['POST'])
-def _select(request, group_element_year, *args, **kwargs):
+def _copy_to_cache(request, group_element_year, *args, **kwargs):
     element = kwargs['element']
     group_element_year_pk = group_element_year.pk if group_element_year else None
     ElementCache(request.user).save_element_selected(element, source_link_id=group_element_year_pk)
@@ -119,7 +119,7 @@ def _get_action_method(request):
     available_actions = {
         'up': _up,
         'down': _down,
-        'select': _select,
+        'copy': _copy_to_cache,
     }
     data = getattr(request, request.method, {})
     action = data.get('action')

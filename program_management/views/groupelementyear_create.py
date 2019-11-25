@@ -69,7 +69,7 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
             context['education_group_year_parent'] = self.education_group_year
 
         except ObjectDoesNotExist:
-            warning_msg = _("Please select an item before attach it")
+            warning_msg = _("Please cut or copy an item before attach it")
             context["messages"].append(warning_msg)
         except ValidationError as e:
             error_messages = []
@@ -100,7 +100,7 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
             context['education_group_year_parent'] = self.education_group_year
 
         except ObjectDoesNotExist:
-            warning_msg = _("Please select an item before attach it")
+            warning_msg = _("Please cut or copy an item before attach it")
             display_warning_messages(self.request, warning_msg)
         return context
 
@@ -127,7 +127,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
                 AttachLearningUnitYearStrategy
             strategy(parent=self.education_group_year, child=child).is_valid()
         except ObjectDoesNotExist:
-            warning_msg = _("Please select an item before attach it")
+            warning_msg = _("Please cut or copy an item before attach it")
             display_warning_messages(self.request, warning_msg)
         except ValidationError as e:
             display_error_messages(self.request, e.messages)
