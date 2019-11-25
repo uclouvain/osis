@@ -82,9 +82,3 @@ class TestQuickSearchEducationGroupView(TestCase):
 
         response = self.client.get(self.url, data={'title': 'Yggdrasil'})
         self.assertNotIn(self.egy_to_find, response.context['page_obj'])
-
-    def test_do_not_display_trainings(self):
-        training = TrainingFactory(title='The happy')
-        response = self.client.get(self.url, data={'title': 'happy'})
-        self.assertTemplateUsed(response, 'quick_search_egy_inner.html')
-        self.assertNotIn(training, response.context['page_obj'])
