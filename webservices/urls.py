@@ -41,7 +41,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 url_api_v1 = [
     url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
-    url(r'^users/current/$', CurrentUser.as_view(), name=CurrentUser.name)
+    url(r'^users/current$', CurrentUser.as_view(), name=CurrentUser.name)
 ]
 
 webservice_apps = [
