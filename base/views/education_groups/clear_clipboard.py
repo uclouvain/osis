@@ -23,25 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
-from django import forms
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.views.decorators.http import require_POST
 
-from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
-
-PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='education_group_pedagogy')
-
-
-class UpdateLineForm(forms.Form):
-    admission_condition_line = forms.IntegerField(widget=forms.HiddenInput())
-    section = forms.CharField(widget=forms.HiddenInput())
-    language = forms.CharField(widget=forms.HiddenInput())
-    diploma = forms.CharField(widget=forms.Textarea, required=False)
-    conditions = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    access = forms.ChoiceField(choices=CONDITION_ADMISSION_ACCESSES, required=False)
-    remarks = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
+from base.utils.cache import ElementCache
 
 
-class UpdateTextForm(forms.Form):
-    text_fr = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    text_en = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    section = forms.CharField(widget=forms.HiddenInput())
+@login_required
+@require_POST
+@permission_required('base.can_access_education_group', raise_exception=True)
+def clear_clipboard(request):
+    if request.is_ajax():
+        ElementCache(request.user).clear()
+        return JsonResponse({})
+    return HttpResponseBadRequest()

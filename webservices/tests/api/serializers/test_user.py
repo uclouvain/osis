@@ -23,25 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
-from django import forms
+from django.test import TestCase
 
-from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
-
-PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='education_group_pedagogy')
+from base.tests.factories.person import PersonFactory
+from webservices.api.serializers.user import UserSerializer
 
 
-class UpdateLineForm(forms.Form):
-    admission_condition_line = forms.IntegerField(widget=forms.HiddenInput())
-    section = forms.CharField(widget=forms.HiddenInput())
-    language = forms.CharField(widget=forms.HiddenInput())
-    diploma = forms.CharField(widget=forms.Textarea, required=False)
-    conditions = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    access = forms.ChoiceField(choices=CONDITION_ADMISSION_ACCESSES, required=False)
-    remarks = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
+class UserSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.serializer = UserSerializer(cls.person.user)
 
-
-class UpdateTextForm(forms.Form):
-    text_fr = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    text_en = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    section = forms.CharField(widget=forms.HiddenInput())
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'username',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

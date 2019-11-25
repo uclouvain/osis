@@ -23,25 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
-from django import forms
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
-from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
-
-PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='education_group_pedagogy')
-
-
-class UpdateLineForm(forms.Form):
-    admission_condition_line = forms.IntegerField(widget=forms.HiddenInput())
-    section = forms.CharField(widget=forms.HiddenInput())
-    language = forms.CharField(widget=forms.HiddenInput())
-    diploma = forms.CharField(widget=forms.Textarea, required=False)
-    conditions = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    access = forms.ChoiceField(choices=CONDITION_ADMISSION_ACCESSES, required=False)
-    remarks = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
+from webservices.api.serializers.user import UserSerializer
 
 
-class UpdateTextForm(forms.Form):
-    text_fr = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    text_en = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    section = forms.CharField(widget=forms.HiddenInput())
+class CurrentUser(APIView):
+    name = 'current_user'
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [SessionAuthentication]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

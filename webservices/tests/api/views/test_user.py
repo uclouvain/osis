@@ -23,25 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
-from django import forms
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
 
-from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
-
-PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='education_group_pedagogy')
-
-
-class UpdateLineForm(forms.Form):
-    admission_condition_line = forms.IntegerField(widget=forms.HiddenInput())
-    section = forms.CharField(widget=forms.HiddenInput())
-    language = forms.CharField(widget=forms.HiddenInput())
-    diploma = forms.CharField(widget=forms.Textarea, required=False)
-    conditions = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    access = forms.ChoiceField(choices=CONDITION_ADMISSION_ACCESSES, required=False)
-    remarks = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
+from base.tests.factories.user import UserFactory
+from webservices.api.views.user import CurrentUser
+from rest_framework import authentication
 
 
-class UpdateTextForm(forms.Form):
-    text_fr = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    text_en = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    section = forms.CharField(widget=forms.HiddenInput())
+class CurrentUserTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.url = reverse(CurrentUser.name)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_auth_token_without_credentials(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_auth_token_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_ensure_authentication_classes_have_session(self):
+        self.assertIn(authentication.SessionAuthentication, CurrentUser.authentication_classes)

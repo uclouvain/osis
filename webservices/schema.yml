@@ -1,6 +1,6 @@
 openapi: 3.0.0
 servers:
- - url: https://{environment}.osis.uclouvain.be/api/v1/auth/
+ - url: https://{environment}.osis.uclouvain.be/api/v1
    variables:
      environment:
        default: dev
@@ -8,7 +8,7 @@ servers:
          - dev # Development server
          - qa # Staging server
          - test # Test server
- - url: https://osis.uclouvain.be/api/v1/auth/
+ - url: https://osis.uclouvain.be/api/v1
    description: Production server
 info:
   version: '1'
@@ -16,7 +16,7 @@ info:
   description: |-
     A set of API endpoints that allow you to get a token.
 paths:
-  /token:
+  /auth/token:
     post:
       description: Return a token linked to the username. Only Admin can access to this endpoint
       operationId: token_create
@@ -51,6 +51,23 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
       - auth
+  /users/current:
+    get:
+      description: Return basic information of the connected user
+      operationId: user_get
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - users
 components:
   securitySchemes:
     Token:
@@ -72,6 +89,20 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+        email:
+          type: string
+          format: email
     Error:
       type: object
       properties:

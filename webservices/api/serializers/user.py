@@ -23,25 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
-from django import forms
-
-from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
-
-PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='education_group_pedagogy')
+from django.contrib.auth.models import User
+from rest_framework import serializers
 
 
-class UpdateLineForm(forms.Form):
-    admission_condition_line = forms.IntegerField(widget=forms.HiddenInput())
-    section = forms.CharField(widget=forms.HiddenInput())
-    language = forms.CharField(widget=forms.HiddenInput())
-    diploma = forms.CharField(widget=forms.Textarea, required=False)
-    conditions = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    access = forms.ChoiceField(choices=CONDITION_ADMISSION_ACCESSES, required=False)
-    remarks = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(source='person.first_name', read_only=True)
+    middle_name = serializers.CharField(source='person.middle_name', read_only=True)
+    last_name = serializers.CharField(source='person.last_name', read_only=True)
+    email = serializers.CharField(source='person.email', read_only=True)
 
-
-class UpdateTextForm(forms.Form):
-    text_fr = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    text_en = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    section = forms.CharField(widget=forms.HiddenInput())
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+        ]
