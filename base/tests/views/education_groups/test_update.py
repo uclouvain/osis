@@ -810,14 +810,17 @@ class TestSelectAttach(TestCase):
         )
 
         self.url_management = reverse("education_groups_management")
-        self.select_data = {
+        select_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": self.child_education_group_year.id,
             "group_element_year_id": self.initial_group_element_year.id,
-            "action": "select",
+        }
+        self.copy_action_data = {
+            **select_data,
+            **{'action': 'copy'}
         }
         self.root = group_above_new_parent.parent
-        self.attach_data = {
+        self.attach_action_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": self.new_parent_education_group_year.id,
             "group_element_year_id": group_above_new_parent.id,
@@ -836,8 +839,12 @@ class TestSelectAttach(TestCase):
         # Clean cache state
         self.addCleanup(cache.clear)
 
-    def test_select_case_education_group(self):
-        response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    def test_copy_case_education_group(self):
+        response = self.client.post(
+            self.url_management,
+            data=self.copy_action_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
         data_cached = ElementCache(self.person.user).cached_data
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -890,13 +897,13 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.select_data)
+        self.client.post(self.url_management, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
             reverse("group_element_year_create",
-                    args=[self.attach_data["root_id"],
-                          self.attach_data["element_id"]]),
+                    args=[self.attach_action_data["root_id"],
+                          self.attach_action_data["element_id"]]),
         )
 
         expected_group_element_year_existing = GroupElementYear.objects.filter(
@@ -922,13 +929,13 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.select_data)
+        self.client.post(self.url_management, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
             reverse("group_element_year_create",
-                    args=[self.attach_data["root_id"],
-                          self.attach_data["element_id"]]),
+                    args=[self.attach_action_data["root_id"],
+                          self.attach_action_data["element_id"]]),
         )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
@@ -991,7 +998,7 @@ class TestSelectAttach(TestCase):
         # Select :
         self.client.post(
             self.url_management,
-            data=self.select_data
+            data=self.copy_action_data
         )
 
         # Create link :

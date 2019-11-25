@@ -75,7 +75,7 @@ $(document).ready(function () {
                 "select_node": false,
                 "items": function($node){
                     return {
-                        "select": {
+                        "copy": {
                             "label": gettext("Copy"),
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);
@@ -87,7 +87,7 @@ $(document).ready(function () {
                                     data: {
                                         'element_id': element_id,
                                         'group_element_year_id': group_element_year_id,
-                                        'action': 'select'
+                                        'action': 'copy'
                                     },
                                     type: 'POST',
                                     success: function (jsonResponse) {
