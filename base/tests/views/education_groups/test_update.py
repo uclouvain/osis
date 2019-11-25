@@ -755,7 +755,7 @@ class TestGetSuccessRedirectUrl(TestCase):
 
 
 @override_flag('education_group_attach', active=True)
-@override_flag('education_group_select', active=True)
+@override_flag('copy_education_group_to_cache', active=True)
 @override_flag('education_group_update', active=True)
 class TestSelectAttach(TestCase):
     @classmethod
@@ -793,8 +793,8 @@ class TestSelectAttach(TestCase):
             child_leaf=self.learning_unit_year
         )
 
-        self.url_select_education_group = reverse(
-            "education_group_select",
+        self.url_copy_education_group = reverse(
+            "copy_education_group_to_cache",
             args=[
                 self.initial_parent_education_group_year.id,
                 self.child_education_group_year.id,
@@ -952,7 +952,7 @@ class TestSelectAttach(TestCase):
 
         # Select :
         self.client.post(
-            self.url_select_education_group,
+            self.url_copy_education_group,
             data={'element_id': self.new_parent_education_group_year.id}
         )
 

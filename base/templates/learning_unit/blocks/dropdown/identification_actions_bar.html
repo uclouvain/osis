@@ -54,7 +54,7 @@
                         {% endflag %}
 
                         {# This feature is used for managing tree in education group context #}
-                        {% flag "education_group_select" %}
+                        {% flag "copy_education_group_to_cache" %}
                             <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
                                 <a {% if "base.can_edit_learningunit" in perms %} href="#"
                                                                                   onclick="javascript:select()" {% endif %}>

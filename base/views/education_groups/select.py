@@ -38,8 +38,8 @@ from base.utils.cache import ElementCache
 
 
 @login_required
-@waffle_flag("education_group_select")
-def education_group_select(request, root_id=None, education_group_year_id=None):
+@waffle_flag("copy_education_group_to_cache")
+def copy_education_group_to_cache(request, root_id=None, education_group_year_id=None):
     education_group_year = get_object_or_404(EducationGroupYear, pk=request.POST['element_id'])
     redirect_to = reverse(
         'education_group_read',
@@ -52,7 +52,7 @@ def education_group_select(request, root_id=None, education_group_year_id=None):
 
 
 @login_required
-@waffle_flag("education_group_select")
+@waffle_flag("copy_education_group_to_cache")
 @require_http_methods(['POST'])
 def learning_unit_select(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
