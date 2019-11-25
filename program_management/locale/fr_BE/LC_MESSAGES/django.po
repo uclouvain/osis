@@ -288,7 +288,7 @@ msgstr "Activité cyclique non dispensée en"
 msgid "Periodic courses taught during"
 msgstr "Activité cyclique dispensée en"
 
-msgid "Please select an item before attach it"
+msgid "Please cut or copy an item before attach it"
 msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
 
 msgid "Prerequisite"

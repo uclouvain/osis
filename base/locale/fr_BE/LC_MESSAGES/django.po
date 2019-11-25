@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 10:38+0100\n"
+"POT-Creation-Date: 2019-11-25 14:21+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -638,6 +638,12 @@ msgstr "Contenu"
 msgid "Coordinator"
 msgstr "Coordinateur"
 
+msgid "Copied element"
+msgstr "Élément copié"
+
+msgid "Copy"
+msgstr "Copier"
+
 msgid "Copy Reddot data from previous academic year."
 msgstr "Copier les données Reddot de l’année précédente."
 
@@ -1187,9 +1193,6 @@ msgstr "Inclure les entités subordonnées"
 
 msgid "Included in"
 msgstr "Inclus dans"
-
-msgid "Indicate the name or the FGS"
-msgstr "Indiquer le nom ou le FGS"
 
 msgid "Industrial partner"
 msgstr "Partenaire industriel"
@@ -1862,9 +1865,6 @@ msgstr "P."
 msgid "Page not found."
 msgstr "Page inexistante."
 
-msgid "Parent"
-msgstr ""
-
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr "Sigle déjà existant en %(academic_year)s"
@@ -1949,8 +1949,8 @@ msgstr ""
 "Impossible de créer une UE dont l'année académique est supérieure à "
 "%(academic_year_max)d."
 
-msgid "Please select an item before attach it"
-msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
+msgid "Please cut or copy an item before attach it"
+msgstr "Veuillez copier ou couper un élément avant de coller"
 
 msgid "Pole"
 msgstr "Pôle"
@@ -2311,9 +2311,6 @@ msgstr "Secrétaire"
 msgid "Sector"
 msgstr "Secteur"
 
-msgid "Select"
-msgstr "Sélectionner"
-
 msgid "Select a language"
 msgstr "Sélectionnez une langue"
 
@@ -2322,9 +2319,6 @@ msgstr "Sélectionner l'action à exécuter"
 
 msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
-
-msgid "Selected element"
-msgstr "Élément sélectionné"
 
 msgid "Separate"
 msgstr "Séparer"
@@ -2650,6 +2644,7 @@ msgstr ""
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
+#, python-format
 msgid "The link of %(acronym)s has been updated"
 msgstr "Le lien de %(acronym)s a été mis à jour"
 

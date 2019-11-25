@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-08 16:18+0200\n"
+"POT-Creation-Date: 2019-11-25 14:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,6 +21,9 @@ msgid "Close all"
 msgstr ""
 
 msgid "Collapse"
+msgstr ""
+
+msgid "Copy"
 msgstr ""
 
 msgid "Detach"
@@ -66,9 +69,6 @@ msgid "Please enter a value that is a multiple of 0.5."
 msgstr ""
 
 msgid "Search"
-msgstr ""
-
-msgid "Select"
 msgstr ""
 
 msgid "Selection of target files"

@@ -76,7 +76,7 @@ $(document).ready(function () {
                 "items": function($node){
                     return {
                         "select": {
-                            "label": gettext("Select"),
+                            "label": gettext("Copy"),
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);
                                 let element_id = __ret.element_id;

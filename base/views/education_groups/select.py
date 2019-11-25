@@ -75,7 +75,7 @@ def _cache_object_and_redirect(request, object_to_cache, redirect_to):
 
 def build_success_message(obj):
     return "<strong>{}</strong><br>{}".format(
-        _("Selected element"),
+        _("Copied element"),
         str(obj)
     )
 

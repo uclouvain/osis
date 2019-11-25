@@ -247,7 +247,7 @@ msgstr ""
 msgid "Periodic courses taught during"
 msgstr ""
 
-msgid "Please select an item before attach it"
+msgid "Please cut or copy an item before attach it"
 msgstr ""
 
 msgid "Prerequisite"

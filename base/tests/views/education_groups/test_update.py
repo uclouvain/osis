@@ -1049,7 +1049,7 @@ class TestSelectAttach(TestCase):
         messages = list(get_messages(response.wsgi_request))
 
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), _("Please select an item before attach it"))
+        self.assertEqual(str(messages[0]), _("Please cut or copy an item before attach it"))
 
     @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
     def test_attach_a_not_valid_case(self, mock_attach_strategy):
