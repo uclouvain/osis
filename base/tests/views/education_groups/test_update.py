@@ -846,7 +846,8 @@ class TestSelectAttach(TestCase):
             {
                 'modelname': management.EDUCATION_GROUP_YEAR,
                 'id': self.child_education_group_year.id,
-                'source_link_id': self.initial_group_element_year.pk
+                'source_link_id': self.initial_group_element_year.pk,
+                'action': ElementCache.ElementCacheAction.COPY.value,
             }
         )
 
@@ -862,7 +863,8 @@ class TestSelectAttach(TestCase):
             data_cached,
             {
                 'modelname': management.LEARNING_UNIT_YEAR,
-                'id': self.learning_unit_year.id
+                'id': self.learning_unit_year.id,
+                'action': ElementCache.ElementCacheAction.COPY.value,
             }
         )
 
