@@ -54,13 +54,13 @@ def copy_education_group_to_cache(request, root_id=None, education_group_year_id
 @login_required
 @waffle_flag("copy_education_group_to_cache")
 @require_http_methods(['POST'])
-def learning_unit_select(request, learning_unit_year_id):
+def copy_learning_unit_to_cache(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     redirect_to = reverse(
         'learning_unit',
         args=[learning_unit_year_id]
     )
-    _cache_object_and_redirect(request, learning_unit_year, redirect_to=redirect_to)
+    return _cache_object_and_redirect(request, learning_unit_year, redirect_to=redirect_to)
 
 
 def _cache_object_and_redirect(request, object_to_cache, redirect_to):

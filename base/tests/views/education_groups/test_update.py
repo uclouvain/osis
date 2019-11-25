@@ -801,7 +801,7 @@ class TestSelectAttach(TestCase):
             ]
         )
         self.url_select_learning_unit = reverse(
-            "learning_unit_select",
+            "copy_learning_unit_to_cache",
             args=[self.learning_unit_year.id]
         )
         group_above_new_parent = GroupElementYearFactory(
