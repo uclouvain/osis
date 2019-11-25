@@ -41,19 +41,14 @@ from base.utils.cache import ElementCache
 @waffle_flag("education_group_select")
 def education_group_select(request, root_id=None, education_group_year_id=None):
     education_group_year = get_object_or_404(EducationGroupYear, pk=request.POST['element_id'])
-    ElementCache(request.user).save_element_selected(education_group_year)
-    success_message = build_success_message(education_group_year)
-    if request.is_ajax():
-        return build_success_json_response(success_message)
-    else:
-        messages.add_message(request, messages.INFO, success_message)
-        return redirect(reverse(
-            'education_group_read',
-            args=[
-                root_id,
-                education_group_year_id,
-            ]
-        ))
+    redirect_to = reverse(
+        'education_group_read',
+        args=[
+            root_id,
+            education_group_year_id,
+        ]
+    )
+    return _cache_object_and_redirect(request, education_group_year, redirect_to=redirect_to)
 
 
 @login_required
@@ -61,16 +56,21 @@ def education_group_select(request, root_id=None, education_group_year_id=None):
 @require_http_methods(['POST'])
 def learning_unit_select(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    ElementCache(request.user).save_element_selected(learning_unit_year)
-    success_message = build_success_message(learning_unit_year)
+    redirect_to = reverse(
+        'learning_unit',
+        args=[learning_unit_year_id]
+    )
+    _cache_object_and_redirect(request, learning_unit_year, redirect_to=redirect_to)
+
+
+def _cache_object_and_redirect(request, object_to_cache, redirect_to):
+    ElementCache(request.user).save_element_selected(object_to_cache)
+    success_message = build_success_message(object_to_cache)
     if request.is_ajax():
         return build_success_json_response(success_message)
     else:
         messages.add_message(request, messages.INFO, success_message)
-        return redirect(reverse(
-            'learning_unit',
-            args=[learning_unit_year_id]
-        ))
+        return redirect(redirect_to)
 
 
 def build_success_message(obj):
