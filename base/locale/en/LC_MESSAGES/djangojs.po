@@ -24,7 +24,7 @@ msgid "Collapse"
 msgstr ""
 
 msgid "Detach"
-msgstr ""
+msgstr "Remove"
 
 msgid "Existed code for "
 msgstr ""
