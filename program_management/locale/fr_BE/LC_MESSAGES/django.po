@@ -20,7 +20,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
+msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
 msgid ""
@@ -106,7 +106,7 @@ msgstr "Ajouts de cours éventuels"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
-msgstr "Êtes-vous sûr·e de vouloir détacher %(acronym)s ?"
+msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
@@ -125,7 +125,7 @@ msgid "Cannot attach element to learning unit"
 msgstr "Interdit d'attacher des élèments à une UE"
 
 msgid "Cannot detach due to prerequisites."
-msgstr "Interdit de détacher à cause des prérequis."
+msgstr "Interdit de retirer à cause des prérequis."
 
 #, python-format
 msgid ""
@@ -133,7 +133,7 @@ msgid ""
 "units are prerequisite in %(formation)s: %(learning_units)s"
 msgstr ""
 "L'organisation de formations annualisée %(acronym)s ne peut pas être "
-"détachée car les unités d'enseignement suivantes sont des prérequis dans "
+"retirée car les unités d'enseignement suivantes sont des prérequis dans "
 "%(formation)s: %(learning_units)s"
 
 #, python-format
@@ -142,7 +142,7 @@ msgid ""
 "prerequisite."
 msgstr ""
 "L'unité d'enseignement %(acronym)s dispose de prérequis ou est prerequis et "
-"ne peut pas être détachée."
+"ne peut pas être retirée."
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -151,7 +151,7 @@ msgstr ""
 "antérieure à %(limit_year)s"
 
 msgid "Cannot perform detach action on root."
-msgstr "Interdit de détacher la racine."
+msgstr "Interdit de retirer la racine."
 
 msgid "Cannot perform modification action on root."
 msgstr "Interdit de modifier la racine."
@@ -262,10 +262,10 @@ msgid_plural ""
 "Options \"%(acronym)s\" cannot be detach because they are contained in "
 "%(finality_acronym)s program."
 msgstr[0] ""
-"L'option \"%(acronym)s\" ne peut pas être détachée car elle est présente "
+"L'option \"%(acronym)s\" ne peut pas être retirée car elle est présente "
 "dans le programme %(finality_acronym)s."
 msgstr[1] ""
-"Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
+"Les options \"%(acronym)s\" ne peuvent pas être retirées car elles sont "
 "présentes dans le programme %(finality_acronym)s."
 
 #, python-format

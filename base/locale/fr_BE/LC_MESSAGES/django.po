@@ -727,7 +727,7 @@ msgid "Description fiche status"
 msgstr "Statut des fiches descriptives"
 
 msgid "Detach"
-msgstr "Détacher"
+msgstr "Retirer"
 
 msgid "Detailed program"
 msgstr "Programme détaillé"
@@ -1262,7 +1262,7 @@ msgid "It is not possible to %(action)s the root element."
 msgstr "Il n'est pas possible de %(action)s l'élément racine."
 
 msgid "It is not possible to detach the root element."
-msgstr "Il n'est pas possible de détacher l'élément racine."
+msgstr "Il n'est pas possible de retirer l'élément racine."
 
 msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "
