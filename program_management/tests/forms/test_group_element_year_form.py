@@ -172,3 +172,13 @@ class TestGroupElementYearForm(TestCase):
                  'parent_type': self.parent.education_group_type,
              }]
         )
+
+    def test_initial_value_relative_credits(self):
+        form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
+        self.assertEqual(form.initial['relative_credits'], self.child_branch.credits)
+
+        form = GroupElementYearForm(parent=self.parent, child_leaf=self.child_leaf)
+        self.assertEqual(form.initial['relative_credits'], self.child_leaf.credits)
+
+        form = GroupElementYearForm(parent=self.parent)
+        self.assertEqual(form.initial['relative_credits'], None)
