@@ -390,7 +390,7 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
-CORS_ORIGIN_WHITELIST = os.environ['CORS_ORIGIN_WHITELIST'].split()
+CORS_ORIGIN_WHITELIST = os.environ.get('CORS_ORIGIN_WHITELIST', '').split()
 CORS_ALLOW_CREDENTIALS = os.environ.get('CORS_ALLOW_CREDENTIALS', 'False').lower() == 'true'
 
 # ESB Configuration
