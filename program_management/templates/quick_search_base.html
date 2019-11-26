@@ -86,7 +86,7 @@
             {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'education_group_attach' root_id education_group_year_id %}";
+        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 

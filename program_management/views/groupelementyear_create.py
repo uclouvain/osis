@@ -25,6 +25,7 @@
 ############################################################################
 from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import IntegrityError
+from django.forms import modelformset_factory
 from django.http import JsonResponse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -40,7 +41,8 @@ from program_management.business.group_element_years.attach import AttachEducati
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import extract_childs
-from program_management.forms.group_element_year import GroupElementYearForm, GroupElementYearFormset
+from program_management.forms.group_element_year import GroupElementYearForm, GroupElementYearFormset, \
+    BaseGroupElementYearFormset
 from program_management.views.generic import GenericGroupElementYearMixin
 from base.views.education_groups import perms
 
@@ -117,8 +119,22 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     # CreateView
-    form_class = GroupElementYearFormset
     template_name = "group_element_year/group_element_year_comment_inner.html"
+
+    def get_form_class(self):
+        try:
+            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
+        except ObjectDoesNotExist:
+            warning_msg = _("Please select an item before attach it")
+            display_warning_messages(self.request, warning_msg)
+            datas = []
+        extra = len(datas)
+        return modelformset_factory(
+            model=GroupElementYear,
+            form=GroupElementYearForm,
+            formset=BaseGroupElementYearFormset,
+            extra=extra,
+        )
 
     def get_form_kwargs(self):
         """ For the creation, the group_element_year needs a parent and a child """
@@ -168,7 +184,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['group_element_years'] = context["form"]
+        context['formset'] = context["form"]
         return context
 
     # SuccessMessageMixin
