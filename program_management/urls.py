@@ -23,14 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.views.quick_search import QuickSearchLearningUnitYearView, \
-    QuickSearchLearningUnitYearSerializer, QuickSearchEducationGroupYearView, QuickSearchEducationGroupYearSerializer
 from django.conf.urls import url
 from django.urls import include
 
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
     groupelementyear_management, excel
+from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
     url(r'^management/$', groupelementyear_management.management, name='education_groups_management'),
@@ -58,12 +57,8 @@ urlpatterns = [
         url(r'^quick_search/', include([
             url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
                 name="quick_search_learning_unit"),
-            url(r'^learning_unit_serializer/$', QuickSearchLearningUnitYearSerializer.as_view(),
-                name="quick_search_learning_unit_serializer"),
             url(r'^education_group/$', QuickSearchEducationGroupYearView.as_view(),
                 name="quick_search_education_group"),
-            url(r'^education_group_serializer/$', QuickSearchEducationGroupYearSerializer.as_view(),
-                name="quick_search_education_group_serializer"),
         ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([

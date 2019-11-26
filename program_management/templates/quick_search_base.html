@@ -83,7 +83,7 @@
         document.getElementById("modal_dialog_id").classList.add("modal-lg");
 
         initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
-            {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
+            {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
         let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
