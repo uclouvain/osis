@@ -67,7 +67,6 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
             warning_msg = _("Please select an item before attach it")
             context["messages"].append(warning_msg)
             datas = []
-
         for data in datas:
             try:
                 child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
@@ -185,12 +184,14 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['formset'] = context["form"]
+        context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
         return context
 
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
-        return "Success"
-        # return _("The link of %(acronym)s has been created") % {'acronym': self.object.child}
+        return _("The content of %(acronym)s has been updated." % {
+            "acronym": self.education_group_year.verbose
+        })
 
     def get_success_url(self):
         """ We'll reload the page """
