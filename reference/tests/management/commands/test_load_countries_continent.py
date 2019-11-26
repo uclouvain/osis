@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+import io
+from contextlib import redirect_stdout
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -37,6 +39,8 @@ class CommandsTestCase(TestCase):
         CountryFactory(iso_code='BE', name='Belgium')
         args = []
         opts = {}
-        call_command('load_countries_continent', *args, **opts)
+        text_trap = io.StringIO()
+        with redirect_stdout(text_trap):
+            call_command('load_countries_continent', *args, **opts)
         self.assertTrue(Country.objects.filter(iso_code='BE').get().continent)
         self.assertEqual(Country.objects.all().count(), 1)  # assert doesn't create any Country

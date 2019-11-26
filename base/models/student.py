@@ -45,6 +45,7 @@ class Student(SerializableModel):
         return u"%s (%s)" % (self.person, self.registration_id)
 
     class Meta:
+        ordering = ("person__last_name", "person__first_name")
         permissions = (
             ("can_access_student", "Can access student"),
         )
