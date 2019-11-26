@@ -60,10 +60,9 @@ def extract_childs(parent, request_parameters, user):
     for selected_element in selected_data:
         kwargs = {'parent': parent}
         if selected_element['modelname'] == LEARNING_UNIT_YEAR:
-            kwargs['child_leaf'] = LearningUnitYear.objects.get(pk=selected_element['id'])
-
+            kwargs['child'] = LearningUnitYear.objects.get(pk=selected_element['id'])
         elif selected_element['modelname'] == EDUCATION_GROUP_YEAR:
-            kwargs['child_branch'] = EducationGroupYear.objects.get(pk=selected_element['id'])
+            kwargs['child'] = EducationGroupYear.objects.get(pk=selected_element['id'])
 
         if selected_element.get('source_link_id'):
             kwargs['source_link'] = GroupElementYear.objects.select_related('parent') \

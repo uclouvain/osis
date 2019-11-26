@@ -152,7 +152,6 @@ class TestCreateGroupElementYearView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertFalse(response.context["form"].is_valid())
 
         msgs = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please select an item before attach it")])
@@ -245,7 +244,7 @@ class TestAttachTypeDialogView(TestCase):
         response = self.client.get(self.url)
         context = response.context
 
-        self.assertEqual(context["object_to_attach"], self.selected_egy)
+        self.assertEqual(context["objects_to_attach"], [self.selected_egy])
         self.assertEqual(context["source_link"], self.group_element_year)
         self.assertEqual(context["education_group_year_parent"], self.group_element_year.child_branch)
 

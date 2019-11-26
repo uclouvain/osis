@@ -34,17 +34,17 @@ from django.views.generic.base import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
+from base.views.education_groups import perms
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import extract_childs
-from program_management.forms.group_element_year import GroupElementYearForm, GroupElementYearFormset, \
-    BaseGroupElementYearFormset
+from program_management.forms.group_element_year import GroupElementYearForm, BaseGroupElementYearFormset
 from program_management.views.generic import GenericGroupElementYearMixin
-from base.views.education_groups import perms
 
 
 # FIXME Discard TemplateView inheritage as it only returns json
@@ -62,14 +62,14 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
             context["messages"].append(str(e))
 
         try:
-            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
+            children = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             context["messages"].append(warning_msg)
-            datas = []
-        for data in datas:
+            children = []
+        for data in children:
             try:
-                child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
+                child = data['child']
                 strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
                     AttachLearningUnitYearStrategy
                 strategy(parent=self.education_group_year, child=child).is_valid()
@@ -98,15 +98,15 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
+            children = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)
-            datas = []
+            children = []
 
         context['objects_to_attach'] = []
-        for data in datas:
-            child = data['child_branch'] if data.get('child_branch') else data.get('child_leaf')
+        for data in children:
+            child = data['child']
             context['objects_to_attach'].append(child)
             context['source_link'] = data.get('source_link')
 
@@ -122,12 +122,12 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 
     def get_form_class(self):
         try:
-            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
+            children = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
             warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)
-            datas = []
-        extra = len(datas)
+            children = []
+        extra = len(children)
         return modelformset_factory(
             model=GroupElementYear,
             form=GroupElementYearForm,
@@ -143,23 +143,19 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
             del kwargs["instance"]
         kwargs_form_kwargs = []
         try:
-            datas = extract_childs(self.education_group_year, self.request.GET, self.request.user)
+            children = extract_childs(self.education_group_year, self.request.GET, self.request.user)
         except ObjectDoesNotExist:
-            warning_msg = _("Please select an item before attach it")
-            display_warning_messages(self.request, warning_msg)
-            datas = []
+            children = []
 
-        for data in datas:
+        for data in children:
             try:
-                child_branch = data.get('child_branch')
-                child_leaf = data.get('child_leaf')
+                child = data.get('child')
                 kwargs_form_kwargs.append({
                     'parent': self.education_group_year,
-                    'child_branch': child_branch,
-                    'child_leaf': child_leaf
+                    'child_branch': child if isinstance(child, EducationGroupYear) else None,
+                    'child_leaf': child if isinstance(child, LearningUnitYear) else None
                 })
 
-                child = child_branch or child_leaf
                 strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
                     AttachLearningUnitYearStrategy
                 strategy(parent=self.education_group_year, child=child).is_valid()
@@ -184,7 +180,8 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['formset'] = context["form"]
-        context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
+        if len(context["formset"]) > 0:
+            context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
         return context
 
     # SuccessMessageMixin
@@ -202,6 +199,9 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
     form_class = GroupElementYearForm
     template_name = "group_element_year/group_element_year_comment_inner.html"
 
+    def get_form_class(self):
+        return GroupElementYearForm
+
     @cached_property
     def strategy(self):
         obj = self.get_object()
@@ -209,10 +209,32 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
         return strategy_class(obj)
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+        kwargs = super(CreateGroupElementYearView, self).get_form_kwargs()
 
         if not self.strategy.is_valid():
             display_error_messages(self.request, self.strategy.errors)
+
+        try:
+            children = extract_childs(self.education_group_year, self.request.GET, self.request.user)
+        except ObjectDoesNotExist:
+            children = []
+        for data in children:
+            try:
+                child = data.get('child')
+                kwargs.update({
+                    'parent': self.education_group_year,
+                    'child_branch': child if isinstance(child, EducationGroupYear) else None,
+                    'child_leaf': child if isinstance(child, LearningUnitYear) else None
+                })
+
+                strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+                    AttachLearningUnitYearStrategy
+                strategy(parent=self.education_group_year, child=child).is_valid()
+            except ValidationError as e:
+                display_error_messages(self.request, e.messages)
+            except IntegrityError as e:
+                warning_msg = str(e)
+                display_warning_messages(self.request, warning_msg)
 
         return kwargs
 
