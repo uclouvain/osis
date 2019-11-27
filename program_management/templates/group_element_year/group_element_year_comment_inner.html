@@ -39,17 +39,17 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th class="col-md-1">{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
-                                <th class="col-md-1">{% trans 'Code' %}</th>
-                                <th class="col-md-2">{% trans 'Title' %}</th>
+                                <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                                <th>{% trans 'Code' %}</th>
+                                <th>{% trans 'Title' %}</th>
                                 {% if education_group_year.is_minor_major_option_list_choice %}
                                 <th>{% trans 'Access condition' %}</th>
                                 {% else %}
-                                <th class="col-md-1">{% trans 'Mandatory' %}</th>
-                                <th class="col-md-1">{% trans 'Block' %}</th>
-                                <th class="col-md-2">{% trans 'Link type' %}</th>
-                                <th class="col-md-1">{% trans 'Comment' %}</th>
-                                <th class="col-md-1">{% trans 'English comment' %}</th>
+                                <th>{% trans 'Mandatory' %}</th>
+                                <th>{% trans 'Block' %}</th>
+                                <th>{% trans 'Link type' %}</th>
+                                <th>{% trans 'Comment' %}</th>
+                                <th>{% trans 'English comment' %}</th>
                                 {% endif %}
                             </tr>
                         </thead>
@@ -59,7 +59,7 @@
                                 {{ form.media }}
                             {% endif %}
                             <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
-                                <td>{{ form.instance.child_branch.acronym }}</td>
+                                <td style="word-wrap: break-word; min-width: 30px;max-width: 30px;">{{ form.instance.child_branch.acronym }}</td>
                                 <td>{{ form.instance.child_branch.partial_acronym }}</td>
                                 <td>{{ form.instance.child_branch.complete_title }}</td>
                                 {% if education_group_year.is_minor_major_option_list_choice %}
@@ -79,13 +79,13 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th class="col-md-1">{% trans 'Code' %}</th>
-                            <th class="col-md-2">{% trans 'Title' %}</th>
-                            <th class="col-md-2">{% trans 'Cred. rel./abs.' %}</th>
-                            <th class="col-md-1">{% trans 'Mandatory' %}</th>
-                            <th class="col-md-2">{% trans 'Block' %}</th>
-                            <th class="col-md-2">{% trans 'Comment' %}</th>
-                            <th class="col-md-2">{% trans 'English comment' %}</th>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Title' %}</th>
+                            <th>{% trans 'Cred. rel./abs.' %}</th>
+                            <th>{% trans 'Mandatory' %}</th>
+                            <th>{% trans 'Block' %}</th>
+                            <th>{% trans 'Comment' %}</th>
+                            <th>{% trans 'English comment' %}</th>
                         </tr>
                         </thead>
                         <tbody data-formset-body id="group_element_year-form">
@@ -94,7 +94,7 @@
                                 {{ form.media }}
                             {% endif %}
                             <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
-                                <td>{{ form.instance.child_leaf.acronym }}</td>
+                                <td >{{ form.instance.child_leaf.acronym }}</td>
                                 <td>{{ form.instance.child_leaf.complete_title }}</td>
                                 <td>
                                     {% with form.instance.child.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}

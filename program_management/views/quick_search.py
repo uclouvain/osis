@@ -77,6 +77,9 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 
+    def get_paginate_by(self, queryset):
+        return self.paginate_by
+
 
 class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
                                       FilterView):
@@ -109,3 +112,6 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
         if context["form"].is_valid() and not context["paginator"].count:
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
+
+    def get_paginate_by(self, queryset):
+        return self.paginate_by
