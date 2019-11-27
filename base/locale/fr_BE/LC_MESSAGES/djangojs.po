@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 12:15+0100\n"
+"POT-Creation-Date: 2019-11-27 14:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,9 +13,6 @@ msgstr ""
 
 msgid ": "
 msgstr ""
-
-msgid "Attach"
-msgstr "Attacher"
 
 msgid "Close all"
 msgstr "Fermer tout"
@@ -58,6 +55,9 @@ msgstr "Ouvrir"
 
 msgid "Open all"
 msgstr "Ouvrir tout"
+
+msgid "Paste"
+msgstr "Coller"
 
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."

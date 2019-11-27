@@ -95,9 +95,9 @@ def step_impl(context):
 
 @step("Dans l'arbre, cliquer sur {action} sur {acronym}.")
 def step_impl(context, action, acronym):
-    if action.lower() == 'attacher':
+    if action.lower() == 'coller':
         context.current_page = context.current_page.attach_node_tree(acronym)
-    elif action.lower() == 'sélectionner':
+    elif action.lower() == 'copier':
         context.current_page.select_node_tree(acronym)
     else:
         raise Exception("Unknown action")
@@ -105,9 +105,9 @@ def step_impl(context, action, acronym):
 
 @step("Dans l'arbre et dans {parent}, cliquer sur {action} sur {acronym}.")
 def step_impl(context, parent, action, acronym):
-    if action.lower() == 'attacher':
+    if action.lower() == 'coller':
         context.current_page = context.current_page.attach_node_tree(acronym, parent)
-    elif action.lower() == 'sélectionner':
+    elif action.lower() == 'copier':
         context.current_page.select_node_tree(acronym, parent)
     elif action.lower() == 'retirer':
         context.current_page = context.current_page.detach_node_tree(acronym, parent)

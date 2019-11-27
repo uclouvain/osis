@@ -131,8 +131,8 @@ $(document).ready(function () {
                             }
                         },
 
-                        "attach": {
-                            "label": gettext("Attach"),
+                        "paste": {
+                            "label": gettext("Paste"),
                             "separator_before": true,
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);

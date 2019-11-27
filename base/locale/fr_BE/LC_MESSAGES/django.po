@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 12:14+0100\n"
+"POT-Creation-Date: 2019-11-27 14:31+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -420,9 +420,6 @@ msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
 msgstr "A la fin de cette unité d'enseignement, l'étudiant est capable de:"
-
-msgid "Attach"
-msgstr "Attacher"
 
 msgid "Attached entities"
 msgstr "Entités attachées"
@@ -1254,7 +1251,7 @@ msgstr "Il est interdit d’attacher un élément à lui-même."
 
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
-"Il est interdit d'attacher un élement à un autre élement y étant inclus."
+"Il est interdit de coller un élement sur un autre élement y étant inclus."
 
 msgid ""
 "It is forbidden to save a GroupElementYear with a child branch and a child "
@@ -1277,8 +1274,8 @@ msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "
 "of another academic year."
 msgstr ""
-"Il est interdit d'attacher un groupement, une mini-formation ou une "
-"formation à un élément d'une autre année académique."
+"Il est interdit de coller un groupement, une mini-formation ou une formation "
+"sur un élément d'une autre année académique."
 
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
@@ -1902,6 +1899,11 @@ msgstr "Partenariats"
 
 msgid "Password"
 msgstr "Mot de passe"
+
+#, fuzzy
+#| msgid "Master"
+msgid "Paste"
+msgstr "Master"
 
 msgid "Pending"
 msgstr "En attente"
@@ -3623,3 +3625,6 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Attach"
+#~ msgstr "Attacher"

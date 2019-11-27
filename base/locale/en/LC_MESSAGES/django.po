@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 12:14+0100\n"
+"POT-Creation-Date: 2019-11-27 14:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -391,9 +391,6 @@ msgid ""
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
-msgstr ""
-
-msgid "Attach"
 msgstr ""
 
 msgid "Attached entities"
@@ -1836,6 +1833,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Paste"
+msgstr ""
+
 msgid "Pending"
 msgstr ""
 
@@ -1868,7 +1868,7 @@ msgid "Platform"
 msgstr ""
 
 msgid "Please cut or copy an item before attach it"
-msgstr "Please cut or copy an item before attach it"
+msgstr ""
 
 #, python-format
 msgid ""
