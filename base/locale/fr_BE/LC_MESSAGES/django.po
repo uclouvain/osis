@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-25 14:21+0100\n"
+"POT-Creation-Date: 2019-11-27 12:14+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -674,6 +674,9 @@ msgstr "Créd. rel./abs."
 
 msgid "Credits"
 msgstr "Crédits"
+
+msgid "Cut element"
+msgstr "Élément coupé"
 
 msgid "Daily"
 msgstr "Horaire de jour"
@@ -1928,6 +1931,9 @@ msgstr "Classes prévues"
 msgid "Platform"
 msgstr "Plateforme"
 
+msgid "Please cut or copy an item before attach it"
+msgstr "Veuillez copier ou couper un élément avant de coller"
+
 #, python-format
 msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
@@ -1948,9 +1954,6 @@ msgid "Please select an academic year lower than %(academic_year_max)d."
 msgstr ""
 "Impossible de créer une UE dont l'année académique est supérieure à "
 "%(academic_year_max)d."
-
-msgid "Please cut or copy an item before attach it"
-msgstr "Veuillez copier ou couper un élément avant de coller"
 
 msgid "Pole"
 msgstr "Pôle"
