@@ -41,7 +41,8 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 CACHE_TIMEOUT = 60
 
 
-class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
+class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
+                                        FilterView):
     model = EducationGroupYear
     template_name = 'quick_search_egy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
@@ -51,6 +52,8 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
     cache_exclude_params = 'page',
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')
+
+    serializer_class = EducationGroupSerializer
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
@@ -74,13 +77,12 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 
-
-# FIXME Use content-type to determine if serializer use or not
-class QuickSearchEducationGroupYearSerializer(SearchMixin, QuickSearchEducationGroupYearView):
-    serializer_class = EducationGroupSerializer
+    def get_paginate_by(self, queryset):
+        return self.paginate_by
 
 
-class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, FilterView):
+class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin, AjaxTemplateMixin, SearchMixin,
+                                      FilterView):
     model = LearningUnitYear
     template_name = 'quick_search_luy_inner.html'
     permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
@@ -90,6 +92,8 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
     cache_exclude_params = 'page',
     paginate_by = "12"
     ordering = ('academic_year', 'acronym')
+
+    serializer_class = LearningUnitSerializer
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
@@ -109,7 +113,5 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         return super().render_to_response(context, **response_kwargs)
 
-
-# FIXME Use content-type to determine if serializer use or not
-class QuickSearchLearningUnitYearSerializer(SearchMixin, QuickSearchLearningUnitYearView):
-    serializer_class = LearningUnitSerializer
+    def get_paginate_by(self, queryset):
+        return self.paginate_by

@@ -55,7 +55,6 @@ class GroupElementYearForm(forms.ModelForm):
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
         super().__init__(*args, **kwargs)
-
         # No need to attach FK to an existing GroupElementYear
         if not self.instance.pk:
             self.instance.parent = parent
@@ -140,17 +139,17 @@ class BaseGroupElementYearFormset(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def changed_forms(self):
-        return [
-            f for f in self if f.has_changed()
-        ]
-
     def is_valid(self):
-        return all([f.is_valid() for f in self.changed_forms()])
+        return all([f.is_valid() for f in self])
 
     def save(self, commit=True):
-        for f in self.changed_forms():
+        for f in self:
             f.save()
+
+    def get_form_kwargs(self, index):
+        if self.form_kwargs:
+            return self.form_kwargs[index]
+        return {}
 
 
 GroupElementYearFormset = modelformset_factory(

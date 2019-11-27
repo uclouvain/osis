@@ -83,10 +83,10 @@
         document.getElementById("modal_dialog_id").classList.add("modal-lg");
 
         initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
-            {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
+            {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'education_group_attach' root_id education_group_year_id %}";
+        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
@@ -103,9 +103,13 @@
 
         function attachElementSelected(checkUrl, attachUrl){
             return function(){
-                const elementUrl = $("input[name=selected-item]:checked").attr("data-url") || "";
-                const parameters = extract_id_and_content_type_parameters(elementUrl);
-                const paramString = new URLSearchParams(parameters);
+                const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
+                const parameters = extract_ids_and_content_type_parameters(elementsUrl);
+                const paramString = new URLSearchParams();
+                paramString.append("content_type", parameters["content_type"]);
+                for (let index in parameters["id"]){
+                    paramString.append("id", parameters["id"][index]);
+                }
 
                 $.ajax({
                     url: `${checkUrl}?${paramString.toString()}`,
@@ -131,17 +135,20 @@
             };
         }
 
-        function extract_id_and_content_type_parameters(url){
+        function extract_ids_and_content_type_parameters(urls){
             let contentType = "";
-            if (url.includes("learning_units")){
+            if (urls.length === 0){
+                contentType = ""
+            }
+            else if (urls[0].includes("learning_units")){
                 contentType = "base_learningunityear";
-            }else if(url.includes("educationgroups")){
+            }else if(urls[0].includes("educationgroups")){
                 contentType = "base_educationgroupyear";
             }
 
-            let object_id = getIdFromUrl(url).toString();
+            let object_ids = urls.map((url) => getIdFromUrl(url).toString());
 
-            return {"id": object_id, "content_type": contentType};
+            return {"id": object_ids, "content_type": contentType};
         }
 
         // FIXME This method is copy pasted. Should be extracted in a common file.
