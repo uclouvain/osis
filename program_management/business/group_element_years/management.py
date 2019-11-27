@@ -41,8 +41,8 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-def extract_source_link(request_parameters, user):
-    selected_data = _get_element_selected(request_parameters, user)
+def fetch_source_link(request_parameters, user):
+    selected_data = _get_elements_selected(request_parameters, user)
 
     source_link = None
     for selected_element in selected_data:
@@ -52,8 +52,8 @@ def extract_source_link(request_parameters, user):
     return source_link
 
 
-def extract_element_selected(request_parameters, user):
-    selected_data = _get_element_selected(request_parameters, user)
+def fetch_elements_selected(request_parameters, user):
+    selected_data = _get_elements_selected(request_parameters, user)
 
     children = []
     for selected_element in selected_data:
@@ -65,7 +65,7 @@ def extract_element_selected(request_parameters, user):
     return children
 
 
-def _get_element_selected(request_parameters, user):
+def _get_elements_selected(request_parameters, user):
     object_ids = request_parameters.getlist("id", [])
     content_type = request_parameters.get("content_type")
     if object_ids and content_type:

@@ -244,7 +244,7 @@ class TestAttachTypeDialogView(TestCase):
         response = self.client.get(self.url)
         context = response.context
 
-        self.assertEqual(context["objects_to_attach"], [self.selected_egy])
+        self.assertEqual(context["acronyms"], self.selected_egy.acronym)
         self.assertEqual(context["source_link"], self.group_element_year)
         self.assertEqual(context["education_group_year_parent"], self.group_element_year.child_branch)
 
@@ -275,11 +275,20 @@ class TestMoveGroupElementYearView(TestCase):
         self.addCleanup(cache.clear)
 
     def test_move(self):
+        AuthorizedRelationshipFactory(
+            parent_type=self.group_element_year.child_branch.education_group_type,
+            child_type=self.selected_egy.education_group_type,
+            min_count_authorized=0,
+            max_count_authorized=None
+        )
         ElementCache(self.person.user).save_element_selected(
             self.selected_egy,
             source_link_id=self.group_element_year.id
         )
         self.client.post(self.url, data={
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '1',
             "link_type": LinkTypes.REFERENCE.name
         })
 

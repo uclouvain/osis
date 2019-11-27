@@ -41,12 +41,11 @@ from program_management.business.group_element_years.attach import AttachEducati
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
-from program_management.business.group_element_years.management import extract_element_selected, extract_source_link
+from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
 from program_management.forms.group_element_year import GroupElementYearForm, BaseGroupElementYearFormset
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-# FIXME Discard TemplateView inheritage as it only returns json
 class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
     template_name = "group_element_year/group_element_year_attach_type_dialog_inner.html"
     rules = []
@@ -60,11 +59,11 @@ class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
         except PermissionDenied as e:
             context["messages"].append(str(e))
 
-        children = extract_element_selected(self.request.GET, self.request.user)
-        if not children:
+        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
+        if not elements_to_attach:
             context["messages"].append(_("Please select an item before attach it"))
 
-        context["messages"].extend(_check_attach_for_children(self.education_group_year, children))
+        context["messages"].extend(_check_attach(self.education_group_year, elements_to_attach))
 
         return context
 
@@ -78,12 +77,12 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        children = extract_element_selected(self.request.GET, self.request.user)
-        if not children:
+        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
+        if not elements_to_attach:
             display_warning_messages(self.request, _("Please select an item before attach it"))
 
-        context['source_link'] = extract_source_link(self.request.GET, self.request.user)
-        context["acronyms"] = ", ".join([obj.acronym for obj in children])
+        context['source_link'] = fetch_source_link(self.request.GET, self.request.user)
+        context["acronyms"] = ", ".join([obj.acronym for obj in elements_to_attach])
         context['education_group_year_parent'] = self.education_group_year
         return context
 
@@ -92,15 +91,15 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     template_name = "group_element_year/group_element_year_comment_inner.html"
 
     def get_form_class(self):
-        children = extract_element_selected(self.request.GET, self.request.user)
-        if not children:
+        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
+        if not elements_to_attach:
             display_warning_messages(self.request, _("Please select an item before attach it"))
 
         return modelformset_factory(
             model=GroupElementYear,
             form=GroupElementYearForm,
             formset=BaseGroupElementYearFormset,
-            extra=len(children),
+            extra=len(elements_to_attach),
         )
 
     def get_form_kwargs(self):
@@ -112,9 +111,9 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
             del kwargs["instance"]
         kwargs_form_kwargs = []
 
-        children = extract_element_selected(self.request.GET, self.request.user)
+        children = fetch_elements_selected(self.request.GET, self.request.user)
 
-        messages = _check_attach_for_children(self.education_group_year, children)
+        messages = _check_attach(self.education_group_year, children)
         if messages:
             display_error_messages(self.request, messages)
 
@@ -173,18 +172,18 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
         return super().form_valid(form)
 
 
-def _check_attach_for_children(parent: EducationGroupYear, children):
+def _check_attach(parent: EducationGroupYear, elements_to_attach):
     error_messages = []
-    for child in children:
+    for element in elements_to_attach:
         try:
-            strategy = AttachEducationGroupYearStrategy if isinstance(child, EducationGroupYear) else \
+            strategy = AttachEducationGroupYearStrategy if isinstance(element, EducationGroupYear) else \
                 AttachLearningUnitYearStrategy
-            strategy(parent=parent, child=child).is_valid()
+            strategy(parent=parent, child=element).is_valid()
         except ValidationError as e:
             error_messages = []
             for msg in e.messages:
                 msg_prefix = _("Element selected %(element)s") % {
-                    "element": "{} - {}".format(child.academic_year, child.acronym)
+                    "element": "{} - {}".format(element.academic_year, element.acronym)
                 }
                 error_messages.append("{}: {}".format(msg_prefix, msg))
     return error_messages
