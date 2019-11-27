@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-25 14:28+0100\n"
+"POT-Creation-Date: 2019-11-27 12:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,9 @@ msgstr "Fermer"
 
 msgid "Copy"
 msgstr "Copier"
+
+msgid "Cut"
+msgstr "Couper"
 
 msgid "Detach"
 msgstr "Retirer"

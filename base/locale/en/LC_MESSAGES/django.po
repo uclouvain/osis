@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-25 14:21+0100\n"
+"POT-Creation-Date: 2019-11-27 12:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -644,6 +644,9 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Cut element"
 msgstr ""
 
 msgid "Daily"
@@ -1861,6 +1864,9 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
+msgid "Please cut or copy an item before attach it"
+msgstr "Please cut or copy an item before attach it"
+
 #, python-format
 msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
@@ -1877,9 +1883,6 @@ msgstr ""
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
 msgstr ""
-
-msgid "Please cut or copy an item before attach it"
-msgstr "Please cut or copy an item before attach it"
 
 msgid "Pole"
 msgstr ""
@@ -3433,6 +3436,3 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
-
-#~ msgid "Select"
-#~ msgstr "Copy"

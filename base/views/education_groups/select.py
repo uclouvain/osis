@@ -65,7 +65,7 @@ def copy_learning_unit_to_cache(request, learning_unit_year_id):
 
 def _cache_object_and_redirect(request, object_to_cache, redirect_to):
     ElementCache(request.user).save_element_selected(object_to_cache)
-    success_message = build_success_message(object_to_cache)
+    success_message = get_clipboard_content_display(object_to_cache, ElementCache.ElementCacheAction.COPY.value)
     if request.is_ajax():
         return build_success_json_response(success_message)
     else:
@@ -73,11 +73,21 @@ def _cache_object_and_redirect(request, object_to_cache, redirect_to):
         return redirect(redirect_to)
 
 
-def build_success_message(obj):
-    return "<strong>{}</strong><br>{}".format(
-        _("Copied element"),
-        str(obj)
+def get_clipboard_content_display(obj, action):
+    msg_template = "<strong>{clipboard_title}</strong><p>{object_str}</p>"
+    return msg_template.format(
+        clipboard_title=_get_clipboard_title(action),
+        object_str=str(obj),
     )
+
+
+def _get_clipboard_title(action):
+    if action == ElementCache.ElementCacheAction.CUT.value:
+        return _("Cut element")
+    elif action == ElementCache.ElementCacheAction.COPY.value:
+        return _("Copied element")
+    else:
+        return ""
 
 
 def build_success_json_response(success_message):

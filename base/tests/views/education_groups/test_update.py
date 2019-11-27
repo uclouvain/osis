@@ -800,7 +800,7 @@ class TestSelectAttach(TestCase):
                 self.child_education_group_year.id,
             ]
         )
-        self.url_select_learning_unit = reverse(
+        self.url_copy_learning_unit_in_cache = reverse(
             "copy_learning_unit_to_cache",
             args=[self.learning_unit_year.id]
         )
@@ -858,9 +858,30 @@ class TestSelectAttach(TestCase):
             }
         )
 
-    def test_select_ajax_case_learning_unit_year(self):
+    def test_cut_case_education_group(self):
+        cut_action_data = self.copy_action_data
+        cut_action_data['action'] = "cut"
         response = self.client.post(
-            self.url_select_learning_unit,
+            self.url_management,
+            data=cut_action_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        data_cached = ElementCache(self.person.user).cached_data
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertDictEqual(
+            data_cached,
+            {
+                'modelname': management.EDUCATION_GROUP_YEAR,
+                'id': self.child_education_group_year.id,
+                'source_link_id': self.initial_group_element_year.pk,
+                'action': ElementCache.ElementCacheAction.CUT.value,
+            }
+        )
+
+    def test_copy_ajax_case_learning_unit_year(self):
+        response = self.client.post(
+            self.url_copy_learning_unit_in_cache,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
         data_cached = ElementCache(self.person.user).cached_data
@@ -875,9 +896,9 @@ class TestSelectAttach(TestCase):
             }
         )
 
-    def test_select_redirects_if_not_ajax(self):
+    def test_copy_redirects_if_not_ajax(self):
         """In this test, we ensure that redirect is made if the request is not in AJAX """
-        response = self.client.post(self.url_select_learning_unit)
+        response = self.client.post(self.url_copy_learning_unit_in_cache)
 
         redirected_url = reverse('learning_unit', args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
