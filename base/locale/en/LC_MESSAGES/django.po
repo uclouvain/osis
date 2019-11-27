@@ -520,6 +520,9 @@ msgstr ""
 msgid "Classes"
 msgstr ""
 
+msgid "Clear clipboard"
+msgstr ""
+
 msgid "Clear notifications"
 msgstr ""
 

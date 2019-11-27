@@ -23,11 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.apps import AppConfig
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
+
+from base.tests.factories.user import UserFactory
+from webservices.api.views.user import CurrentUser
+from rest_framework import authentication
 
 
-class AssessmentsConfig(AppConfig):
-    name = 'assessments'
+class CurrentUserTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.url = reverse(CurrentUser.name)
 
-    def ready(self):
-        from assessments.signals import subscribers
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_auth_token_without_credentials(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_auth_token_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_ensure_authentication_classes_have_session(self):
+        self.assertIn(authentication.SessionAuthentication, CurrentUser.authentication_classes)

@@ -549,6 +549,9 @@ msgstr "Ville de l'institution"
 msgid "Classes"
 msgstr "Classes"
 
+msgid "Clear clipboard"
+msgstr "Vider le presse-papier"
+
 msgid "Clear notifications"
 msgstr "Supprimer notifications"
 
