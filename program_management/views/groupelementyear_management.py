@@ -108,10 +108,28 @@ def _down(request, group_element_year, *args, **kwargs):
 
 @require_http_methods(['POST'])
 def _copy_to_cache(request, group_element_year, *args, **kwargs):
-    element = kwargs['element']
+    return _cache_object(
+        request.user,
+        group_element_year,
+        object_to_cache=kwargs['element'],
+        action=ElementCache.ElementCacheAction.COPY.value
+    )
+
+
+@require_http_methods(['POST'])
+def _cut_to_cache(request, group_element_year, *args, **kwargs):
+    return _cache_object(
+        request.user,
+        group_element_year,
+        object_to_cache=kwargs['element'],
+        action=ElementCache.ElementCacheAction.CUT.value
+    )
+
+
+def _cache_object(user, group_element_year, object_to_cache, action):
     group_element_year_pk = group_element_year.pk if group_element_year else None
-    ElementCache(request.user).save_element_selected(element, source_link_id=group_element_year_pk)
-    success_msg = build_success_message(element)
+    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action)
+    success_msg = build_success_message(object_to_cache, action)
     return build_success_json_response(success_msg)
 
 
@@ -120,6 +138,7 @@ def _get_action_method(request):
         'up': _up,
         'down': _down,
         'copy': _copy_to_cache,
+        'cut': _cut_to_cache,
     }
     data = getattr(request, request.method, {})
     action = data.get('action')
