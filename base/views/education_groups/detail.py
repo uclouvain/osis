@@ -69,7 +69,7 @@ from base.models.program_manager import ProgramManager
 from base.utils.cache import cache, ElementCache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
-from base.views.education_groups.select import build_success_message
+from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -95,7 +95,7 @@ class CatalogGenericDetailView:
         cached_data = ElementCache(self.request.user).cached_data
         if cached_data:
             obj = self._get_instance_object_from_cache(cached_data)
-            return build_success_message(obj, cached_data['action'])
+            return get_clipboard_content_display(obj, cached_data['action'])
         return None
 
     @staticmethod

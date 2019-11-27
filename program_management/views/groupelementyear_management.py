@@ -36,7 +36,7 @@ from base.models.utils.utils import get_object_or_none
 from base.utils.cache import ElementCache
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
-from base.views.education_groups.select import build_success_message, build_success_json_response
+from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
 
 
 @login_required
@@ -129,7 +129,7 @@ def _cut_to_cache(request, group_element_year, *args, **kwargs):
 def _cache_object(user, group_element_year, object_to_cache, action):
     group_element_year_pk = group_element_year.pk if group_element_year else None
     ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action)
-    success_msg = build_success_message(object_to_cache, action)
+    success_msg = get_clipboard_content_display(object_to_cache, action)
     return build_success_json_response(success_msg)
 
 
