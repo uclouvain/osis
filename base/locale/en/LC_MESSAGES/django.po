@@ -1063,6 +1063,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units in training"
+msgstr ""
+
 msgid "Generate xls of learning units that are prerequisites for"
 msgstr ""
 

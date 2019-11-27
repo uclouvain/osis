@@ -1103,6 +1103,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
+msgid "Generate xls of learning units in training"
+msgstr "Liste des UE de la formation"
+
 msgid "Generate xls of learning units that are prerequisites for"
 msgstr "Liste des UE qui sont des prérequis"
 

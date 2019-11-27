@@ -27,6 +27,7 @@ import itertools
 from collections import namedtuple, defaultdict
 
 from django.db.models import QuerySet, Prefetch, OuterRef, Exists
+from django.template.defaultfilters import yesno
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
@@ -34,16 +35,20 @@ from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED, GREEN
 from openpyxl.writer.excel import save_virtual_workbook
 
+from attribution.business import attribution_charge_new
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
+from base.business.learning_unit_xls import volume_information, annotate_qs
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR, AND
 from base.models.group_element_year import fetch_row_sql, GroupElementYear, get_all_group_elements_in_tree
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
+from base.models.proposal_learning_unit import ProposalLearningUnit, find_by_learning_unit_year
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.forms.custom_xls import CustomXlsForm
 
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
@@ -76,6 +81,36 @@ PrerequisiteOfItemLine = namedtuple(
 HeaderLinePrerequisiteOf = namedtuple('HeaderLinePrerequisiteOf', ['egy_acronym', 'egy_title', 'title_header',
                                                                    'credits_header', 'block_header',
                                                                    'mandatory_header'])
+
+FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Gathering'), _('Cred. rel./abs.'),
+              _('Block'), _('Mandatory')]
+
+FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title', 'type', 'subtype', 'gathering',
+                                                       'credits', 'block', 'mandatory'
+                                                       ])
+
+optional_header_for_required_entity = [_('Req. Entity')]
+optional_header_for_proposition = [_('Proposal type'), _('Proposal status')]
+optional_header_for_credits = [_('Credits')]
+optional_header_for_allocation_entity = [_('Alloc. Ent.')]
+optional_header_for_english_title = [_('English title')]
+optional_header_for_teacher_list = [_('List of teachers')]
+optional_header_for_periodicity = [_('Periodicity')]
+optional_header_for_active = [_('Active')]
+optional_header_for_volume = [
+    '{} - {}'.format(_('Lecturing vol.'), _('Annual')),
+    '{} - {}'.format(_('Lecturing vol.'), _('1st quadri')),
+    '{} - {}'.format(_('Lecturing vol.'), _('2nd quadri')),
+    _('Lecturing planned classes'),
+    '{} - {}'.format(_('Practical vol.'), _('Annual')),
+    '{} - {}'.format(_('Practical vol.'), _('1st quadri')),
+    '{} - {}'.format(_('Practical vol.'), _('2nd quadri')),
+    _('Practical planned classes'),
+
+]
+optional_header_for_quadrimester = [_('Quadrimester')]
+optional_header_for_session_derogation = [_('Session derogation')]
+optional_header_for_language = [_('Language')]
 
 
 class EducationGroupYearLearningUnitsPrerequisitesToExcel:
@@ -445,3 +480,191 @@ def _get_blocks_prerequisite_of(gey):
 def _clean_worksheet_title(title):
     # Worksheet title is max 25 chars (31 chars with sheet number) + does not accept slash present in acronyms
     return title[:25].replace("/", "_")
+
+
+class EducationGroupYearLearningUnitsContainedToExcel:
+
+    def __init__(self, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
+        self.egy = egy
+        self.hierarchy = EducationGroupHierarchy(root=self.egy)
+        self.learning_unit_years_parent = {}
+        for grp in self.hierarchy.included_group_element_years:
+            if not grp.child_leaf:
+                continue
+
+            self.learning_unit_years_parent.setdefault(grp.child_leaf.id, grp)
+        self.custom_xls_form = custom_xls_form
+
+    def get_queryset(self):
+        q = EducationGroupYear.objects.filter(id=self.egy.id)
+        prefetch_content = Prefetch(
+            'groupelementyear_set',
+            queryset=GroupElementYear.objects.select_related(
+                'child_leaf__learning_container_year',
+                'child_branch'
+            )
+        )
+        return q.prefetch_related(prefetch_content)
+
+    def _to_workbook(self):
+        return generate_ue_contained_for_workbook(self.egy,
+                                                  self.learning_unit_years_parent,
+                                                  self.custom_xls_form)
+
+    def to_excel(self, ):
+        return save_virtual_workbook(self._to_workbook())
+
+
+def generate_ue_contained_for_workbook(egy: EducationGroupYear, learning_unit_years_parent,
+                                       custom_xls_form: CustomXlsForm):
+
+    worksheet_title = _("List UE")
+    worksheet_title = _clean_worksheet_title(worksheet_title)
+    workbook = Workbook()
+
+    excel_lines = _build_excel_lines_ues(egy, custom_xls_form, learning_unit_years_parent)
+
+    return _get_workbook_for_custom_xls(excel_lines, workbook, worksheet_title)
+
+
+def _build_excel_lines_ues(egy: EducationGroupYear, custom_xls_form: CustomXlsForm, learning_unit_years_parent):
+    content = _get_headers(custom_xls_form)
+
+    if custom_xls_form.is_valid():
+        has_required_entity = True if custom_xls_form.cleaned_data['required_entity'] else False
+        has_proposal = True if custom_xls_form.cleaned_data['proposition'] else False
+        has_credits = True if custom_xls_form.cleaned_data['credits'] else False
+        has_allocation_entity = custom_xls_form.cleaned_data['allocation_entity']
+        has_english_title = custom_xls_form.cleaned_data['english_title']
+        has_teacher_list = custom_xls_form.cleaned_data['teacher_list']
+        has_periodicity = custom_xls_form.cleaned_data['periodicity']
+        has_active = custom_xls_form.cleaned_data['active']
+        has_volume = custom_xls_form.cleaned_data['volume']
+        has_quadrimester = custom_xls_form.cleaned_data['quadrimester']
+        has_session_derogation = custom_xls_form.cleaned_data['session_derogation']
+        has_language = custom_xls_form.cleaned_data['language']
+    else:
+        has_required_entity = False
+        has_proposal = False
+        has_credits = False
+        has_allocation_entity = False
+        has_english_title = False
+        has_teacher_list = False
+        has_periodicity = False
+        has_active = False
+        has_volume = False
+        has_quadrimester = False
+        has_session_derogation = False
+        has_language = False
+
+    for k, gey in learning_unit_years_parent.items():
+        if gey.child_leaf:
+            luy = gey.child_leaf
+            data = _fix_data(gey, luy)
+
+            if has_required_entity:
+                data.append(luy.learning_container_year.requirement_entity)
+
+            if has_proposal:
+                proposal = find_by_learning_unit_year(luy)
+                if proposal:
+                    data.append(proposal.get_type_display())
+                    data.append(proposal.get_state_display())
+                else:
+                    data.append('')
+                    data.append('')
+
+            if has_credits:
+                data.append(egy.credits)
+
+            if has_allocation_entity:
+                data.append(luy.learning_container_year.allocation_entity)
+
+            if has_english_title:
+                data.append(luy.complete_title_english)
+
+            if has_teacher_list:
+                data.append(
+                    " ; ".join(
+                        [_get_attribution_line(value)
+                         for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+                            luy
+                        ).values()
+                         ]
+                    )
+                )
+
+            if has_periodicity:
+                data.append(luy.get_periodicity_display())
+
+            if has_active:
+                data.append(yesno(luy.status))
+
+            if has_volume:
+                luys = annotate_qs(LearningUnitYear.objects.filter(id=luy.id))
+                data.extend(volume_information(luys[0]))
+
+            if has_quadrimester:
+                data.append(luy.get_quadrimester_display() or '')
+
+            if has_session_derogation:
+                data.append(luy.get_session_display() or '')
+
+            if has_language:
+                data.append(luy.language)
+
+            content.append(data)
+
+    return content
+
+
+def _get_headers(custom_xls_form):
+    content = list()
+    content.append(FIX_TITLES + _add_optional_titles(custom_xls_form))
+    return content
+
+
+def _fix_data(gey, luy):
+    data = []
+    data_fix = FixLineUEContained(acronym=luy.acronym,
+                                  year=luy.academic_year.year,
+                                  title=luy.complete_title_i18n,
+                                  type=luy.get_container_type_display(),
+                                  subtype=luy.get_subtype_display(),
+                                  gathering="{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
+                                  credits="{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
+                                  block=gey.block,
+                                  mandatory=yesno(gey.is_mandatory))
+    for name in data_fix._fields:
+        data.append(getattr(data_fix, name))
+    return data
+
+
+def _get_workbook_for_custom_xls(excel_lines, workbook, worksheet_title):
+    header, *content = [tuple(line) for line in excel_lines]
+
+    worksheet_data = {
+        WORKSHEET_TITLE_KEY: worksheet_title,
+        HEADER_TITLES_KEY: header,
+        CONTENT_KEY: content,
+        STYLED_CELLS: {}
+    }
+    _build_worksheet(worksheet_data, workbook, 0)
+
+    return workbook
+
+
+def _add_optional_titles(custom_xls_form):
+    data = []
+    if custom_xls_form.is_valid():
+        for field in custom_xls_form.fields:
+            if custom_xls_form.cleaned_data[field]:
+                data = data + globals().get("optional_header_for_{}".format(field), [])
+        return data
+
+
+def _get_attribution_line(an_attribution):
+    return "{} {}".format(
+        an_attribution.get('person').last_name or '',
+        an_attribution.get('person').first_name or '',
+    )

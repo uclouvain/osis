@@ -289,18 +289,10 @@ def _get_data_part2(learning_unit_yr, with_attributions):
                 ]
             )
         )
-
+    lu_data_part2.append(learning_unit_yr.get_periodicity_display())
+    lu_data_part2.append(yesno(learning_unit_yr.status))
+    lu_data_part2.extend(volume_information(learning_unit_yr))
     lu_data_part2.extend([
-        learning_unit_yr.get_periodicity_display(),
-        yesno(learning_unit_yr.status),
-        _get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
-        _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
-        _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
-        learning_unit_yr.pm_classes or 0,
-        _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
-        _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
-        _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
-        learning_unit_yr.pp_classes or 0,
         learning_unit_yr.get_quadrimester_display() or '',
         learning_unit_yr.get_session_display() or '',
         learning_unit_yr.language or "",
@@ -464,3 +456,14 @@ def _get_attribution_detail(an_attribution):
         an_attribution.get('LECTURING'),
         an_attribution.get('PRACTICAL_EXERCISES')
     ]
+
+
+def volume_information(learning_unit_yr):
+    return [_get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+            _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+            _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+            learning_unit_yr.pm_classes or 0,
+            _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+            _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+            _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+            learning_unit_yr.pp_classes or 0]
