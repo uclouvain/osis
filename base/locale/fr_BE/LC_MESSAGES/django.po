@@ -3164,7 +3164,7 @@ msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
 msgstr ""
-"Vous ne pouvez modifier une unité d'enseignement qui si vous êtes attaché à "
+"Vous ne pouvez modifier une unité d'enseignement que si vous êtes attaché à "
 "son entité responsable du cahier des charges"
 
 msgid "You can't edit because the learning unit has proposal"
