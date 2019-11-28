@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Tuple
+
+from django.db import models
 
 from django.apps import apps
 from django.core.management import BaseCommand
 from openpyxl import load_workbook
 
-from base.models.person_entity import PersonEntity
 
 NATURAL_KEY_IDENTIFIER = '**'
 
@@ -36,6 +38,10 @@ NATURAL_KEY_IDENTIFIER = '**'
 APP_NAME_ALIASES = {
     'part': 'partnership',
 }
+
+# Custom types
+ModelInstance = models.Model
+ModelFieldName = str
 
 
 class Command(BaseCommand):
@@ -64,7 +70,7 @@ class Command(BaseCommand):
                     try:
                         self._save_in_database(row, model_class, headers)
                     except Exception as e:
-                        print('    ERROR at line {} :: {}'.format(line_index+1, e))
+                        print('    ERROR at line {} :: {}'.format(line_index+2, e))
 
     @staticmethod
     def _get_model_class_from_worksheet_title(xls_worksheet):
@@ -80,7 +86,7 @@ class Command(BaseCommand):
             print('ERROR :: Ignoring data from worksheet named "{}"'.format(ws_title))
             return None
 
-    def _save_in_database(self, row, model_class, headers):
+    def _save_in_database(self, row, model_class, headers) -> Tuple[ModelInstance, bool]:
         object_as_dict = {
             column_name: row[idx].value for idx, column_name in headers if column_name
         }
@@ -106,20 +112,27 @@ class Command(BaseCommand):
         return obj, created
 
     @staticmethod
-    def _clean_header_from_special_chars(header):
+    def _clean_header_from_special_chars(header) -> str:
         """Special chars are used to know if the field compose the unique constraint for update_or_create"""
         # FIXME :: should use the natural_key when Osis-portal will be removed (actually using UUID as natural key)
         return header.replace(NATURAL_KEY_IDENTIFIER, "")
 
     @staticmethod
-    def _convert_boolean_cell_value(value):
+    def _convert_boolean_cell_value(value) -> bool:
         if value == 'True':
             return True
         elif value == 'False':
             return False
         return value
 
-    def _find_object_through_foreign_keys(self, model_class, col_name, value, recur=0) -> object:
+    def _find_object_through_foreign_keys(
+            self,
+            model_class,
+            col_name,
+            value,
+            recur=0
+    ) -> Tuple[ModelFieldName, ModelInstance]:
+
         is_natural_key_field = NATURAL_KEY_IDENTIFIER in col_name
         foreign_key_field = col_name
         if '__' in col_name:
