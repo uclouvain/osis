@@ -329,6 +329,19 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
     def is_valid(self):
         return super(TrainingForm, self).is_valid() and self.hops_form.is_valid()
 
+    @property
+    def diploma_tab_fields(self):
+        return [
+            'joint_diploma', 'diploma_printing_title', 'professional_title',
+            'section', 'certificate_aims'
+        ]
+
+    def show_diploma_tab(self):
+        return any(
+            not field.disabled for field_name, field
+            in self.forms[forms.ModelForm].fields.items() if field_name in self.diploma_tab_fields
+        )
+
 
 @register('university_domains')
 class UniversityDomainsLookup(LookupChannel):

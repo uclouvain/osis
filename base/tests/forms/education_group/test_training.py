@@ -693,3 +693,31 @@ class TestPermissionField(TestCase):
         )
         self.assertTrue(form.forms[forms.ModelForm].fields["main_teaching_campus"].disabled)
         self.assertFalse(form.forms[forms.ModelForm].fields["partial_acronym"].disabled)
+
+    def test_ensure_diploma_tab_fields_property(self):
+        form = TrainingForm(
+            {},
+            user=self.user_with_perm,
+            education_group_type=self.education_group_type,
+            context=TRAINING_DAILY_MANAGEMENT,
+        )
+        expected_fields = [
+            'joint_diploma', 'diploma_printing_title', 'professional_title',
+            'section', 'certificate_aims'
+        ]
+        self.assertEqual(form.diploma_tab_fields, expected_fields)
+
+    def test_ensure_show_diploma_tab_is_hidden(self):
+        """
+        This test ensure that the show diploma property is False if all fields contains in tab are disabled
+        """
+        form = TrainingForm(
+            {},
+            user=self.user_without_perm,
+            education_group_type=self.education_group_type,
+            context=TRAINING_DAILY_MANAGEMENT,
+        )
+        for field_name_in_diploma in form.diploma_tab_fields:
+            form.forms[forms.ModelForm].fields[field_name_in_diploma].disabled = True
+
+        self.assertFalse(form.show_diploma_tab())

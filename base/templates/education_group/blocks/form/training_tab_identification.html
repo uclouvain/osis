@@ -31,12 +31,16 @@
             {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
         </a>
     </li>
-    <li role="presentation"
-        {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}class="active"{% endif %}>
-        <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats">
-            {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
-        </a>
-    </li>
+
+    {% if show_diploma_tab %}
+        <li role="presentation"
+            {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}class="active"{% endif %}>
+            <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats">
+                {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
+            </a>
+        </li>
+    {% endif %}
+
     {% if education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
         <li role="presentation"
             {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
@@ -194,10 +198,13 @@
         {% endif %}
     </div>
 
-    <div id="tab_diploma"
-         class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
-        {% include "education_group/blocks/form/training_tab_diploma.html" %}
-    </div>
+
+    {% if show_diploma_tab %}
+        <div id="tab_diploma"
+             class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
+            {% include "education_group/blocks/form/training_tab_diploma.html" %}
+        </div>
+    {% endif %}
 
     {% if education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
         <div id="tab_content"
