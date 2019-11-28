@@ -73,8 +73,10 @@ def _compute_end_year(education_group):
     return max(max_postponement_end_year, latest_egy.academic_year.year)
 
 
-def _postpone_m2m(education_group_year, postponed_egy, hops_values):
-    fields_to_exclude = []
+def _postpone_m2m(education_group_year, postponed_egy, hops_values, fields_to_exclude=None):
+    if fields_to_exclude is None:
+        fields_to_exclude = []
+
     opts = education_group_year._meta
     for f in opts.many_to_many:
         if f.name in fields_to_exclude:
@@ -129,7 +131,7 @@ def duplicate_education_group_year(old_education_group_year, new_academic_year,
 
         update_object(postponed_egy, dict_new_value)
         # Postpone the m2m [languages / secondary_domains]
-        _postpone_m2m(old_education_group_year, postponed_egy, hops_values)
+        _postpone_m2m(old_education_group_year, postponed_egy, hops_values, fields_to_exclude=fields_to_exclude)
 
     if education_group.has_coorganization(old_education_group_year):
         duplicate_set(old_education_group_year, postponed_egy, initial_dicts.get('initial_sets_dict'))

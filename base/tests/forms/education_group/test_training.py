@@ -35,6 +35,7 @@ from base.business.education_groups.postponement import FIELD_TO_EXCLUDE_IN_SET
 from base.business.utils.model import model_to_dict_fk
 from base.forms.education_group.training import TrainingForm, TrainingEducationGroupYearForm, \
     HopsEducationGroupYearModelForm, CertificateAimsForm
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -512,7 +513,7 @@ class TestPostponeTrainingProperty(TestCase):
             education_group=self.training.education_group,
             academic_year__year=self.training.academic_year.year + 2
         ).get()
-        EducationGroupCertificateAimFactory(education_group_year=training_future)
+        certificate_aims_in_future = EducationGroupCertificateAimFactory(education_group_year=training_future)
 
         # Re-save and ensure that there are not consitency errors and the modification is correctly postponed
         form = TrainingForm(
@@ -526,6 +527,9 @@ class TestPostponeTrainingProperty(TestCase):
 
         training_future.refresh_from_db()
         self.assertEqual(training_future.title, "Modification du titre")
+
+        # Ensure that certificate aims has not be modified during postponement
+        self.assertTrue(EducationGroupCertificateAim.objects.filter(pk=certificate_aims_in_future.pk).exists())
 
 
 class TestPostponeCertificateAims(TestCase):
