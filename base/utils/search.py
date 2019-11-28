@@ -39,7 +39,7 @@ class SearchMixin:
     serializer_class = None
 
     def render_to_response(self, context, **response_kwargs):
-        if "application/json" in self.request.headers.get("Accept"):
+        if "application/json" in self.request.headers.get("Accept", ""):
             serializer = self.serializer_class(
                 context["page_obj"],
                 context={
