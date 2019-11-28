@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -41,6 +42,8 @@ class TestQuickSearchLearningUnitView(TestCase):
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
+
+        self.addCleanup(cache.clear)
 
     def test_show_no_data_when_no_criteria_set(self):
         response = self.client.get(self.url)
@@ -72,6 +75,8 @@ class TestQuickSearchEducationGroupView(TestCase):
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
+
+        self.addCleanup(cache.clear)
 
     def test_show_no_data_when_no_criteria_set(self):
         response = self.client.get(self.url)
