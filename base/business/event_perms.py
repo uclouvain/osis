@@ -98,3 +98,27 @@ class EventPermLearningUnitFacultyManagerEdition(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
     error_msg = _("This learning unit is not editable by faculty managers during this period.")
+
+
+class EventPermCreationOrEndDateProposalCentralManager(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
+    error_msg = _("Creation or end date modification proposal not allowed for central managers during this period.")
+
+
+class EventPermCreationOrEndDateProposalFacultyManager(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
+    error_msg = _("Creation or end date modification proposal not allowed for faculty managers during this period.")
+
+
+class EventPermModificationOrTransformationProposalCentralManager(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS
+    error_msg = _("Modification or transformation proposal not allowed for central managers during this period.")
+
+
+class EventPermModificationOrTransformationProposalFacultyManager(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS
+    error_msg = _("Modification or transformation proposal not allowed for faculty managers during this period.")
