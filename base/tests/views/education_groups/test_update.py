@@ -963,7 +963,7 @@ class TestSelectAttach(TestCase):
         self.client.post(
             reverse(
                 "group_element_year_create",
-                args=[self.copy_action_data["root_id"], self.copy_action_data["element_id"]],
+                args=[self.copy_action_data["root_id"], self.new_parent_education_group_year.id],
             ),
             data={
                 'form-TOTAL_FORMS': '1',
