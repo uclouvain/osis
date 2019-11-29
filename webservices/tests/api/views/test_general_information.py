@@ -115,14 +115,14 @@ class GeneralInformationTestCase(APITestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_results_based_on_edgy_with_acronym(self):
+    def test_get_results_based_on_egy_with_acronym(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = GeneralInformationSerializer(self.egy, context={'language': self.language})
         self.assertEqual(response.data, serializer.data)
 
-    def test_get_results_based_on_edgy_with_partial_acronym(self):
+    def test_get_results_based_on_egy_with_partial_acronym(self):
         url_partial_acronym = reverse('generalinformations_read', kwargs={
             'acronym': self.egy.partial_acronym,
             'year': self.egy.academic_year.year,
