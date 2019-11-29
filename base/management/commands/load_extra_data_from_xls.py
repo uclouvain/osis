@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import logging
 
 from django.apps import apps
+from django.conf import settings
 from django.core.management import BaseCommand
 from openpyxl import load_workbook
-
-from base.models.person_entity import PersonEntity
 
 NATURAL_KEY_IDENTIFIER = '**'
 
@@ -36,6 +36,7 @@ NATURAL_KEY_IDENTIFIER = '**'
 APP_NAME_ALIASES = {
     'part': 'partnership',
 }
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class Command(BaseCommand):
@@ -58,26 +59,26 @@ class Command(BaseCommand):
             model_class = self._get_model_class_from_worksheet_title(ws)
             if model_class:
                 xls_rows = list(ws.rows)
-                print('Number of records : {}'.format(len(xls_rows)))
+                logger.info('Number of records : {}'.format(len(xls_rows)))
                 headers = [(idx, cell.value) for idx, cell in enumerate(xls_rows[0])]
                 for line_index, row in enumerate(xls_rows[1:]):
                     try:
                         self._save_in_database(row, model_class, headers)
                     except Exception as e:
-                        print('    ERROR at line {} :: {}'.format(line_index+1, e))
+                        logger.info('    ERROR at line {} :: {}'.format(line_index+1, e))
 
     @staticmethod
     def _get_model_class_from_worksheet_title(xls_worksheet):
         ws_title = xls_worksheet.title
         app_name, model_name = ws_title.split('.')
         app_name = APP_NAME_ALIASES.get(app_name, app_name)
-        print()
-        print('Working on {}...'.format(ws_title))
+        logger.info()
+        logger.info('Working on {}...'.format(ws_title))
         try:
             return apps.get_model(app_name, model_name)
         except LookupError as e:
-            print('ERROR :: {}'.format(e))
-            print('ERROR :: Ignoring data from worksheet named "{}"'.format(ws_title))
+            logger.info('ERROR :: {}'.format(e))
+            logger.info('ERROR :: Ignoring data from worksheet named "{}"'.format(ws_title))
             return None
 
     def _save_in_database(self, row, model_class, headers):
@@ -102,7 +103,7 @@ class Command(BaseCommand):
             if NATURAL_KEY_IDENTIFIER not in col_name
         }
         obj, created = model_class.objects.update_or_create(**unique_values, defaults=defaults)
-        print('    SUCCESS : Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
+        logger.info('    SUCCESS : Object < {} > successfully {}'.format(obj, 'created' if created else 'updated'))
         return obj, created
 
     @staticmethod
