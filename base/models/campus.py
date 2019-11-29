@@ -24,11 +24,9 @@
 #
 ##############################################################################
 from django.db import models
-from django.db.models import Case, When, CharField, F
 
 from base.models.enums.organization_type import MAIN
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableQuerySet, \
-    SerializableModelManager
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
 class CampusAdmin(SerializableModelAdmin):
@@ -37,34 +35,12 @@ class CampusAdmin(SerializableModelAdmin):
     search_fields = ['name', 'organization__name']
 
 
-class CampusQuerySet(SerializableQuerySet):
-    def annotate_campus_website(self):
-        return self.annotate_campus_organization_website_class_method(self)
-
-    @classmethod
-    def annotate_campus_organization_website_class_method(cls, queryset):
-        return queryset.annotate(
-            website_or_none=Case(
-                When(organization__website__exact='', then=None),
-                default=F('organization__website'),
-                output_field=CharField()
-            )
-        )
-
-
-class BaseCampusManager(SerializableModelManager):
-    def get_queryset(self):
-        return CampusQuerySet(self.model, using=self._db)
-
-
 class Campus(SerializableModel):
     name = models.CharField(max_length=100)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     organization = models.ForeignKey('Organization', on_delete=models.CASCADE)
     is_administration = models.BooleanField(default=False)
-
-    objects = BaseCampusManager()
 
     def __str__(self):
         return "{} - {}".format(self.name, self.organization)

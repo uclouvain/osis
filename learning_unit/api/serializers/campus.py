@@ -30,7 +30,7 @@ from base.models.campus import Campus
 
 class LearningUnitCampusSerializer(serializers.ModelSerializer):
     organization = serializers.ReadOnlyField(source='organization.name')
-    organization_url = serializers.CharField(source='website_or_none')
+    organization_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Campus
@@ -39,3 +39,6 @@ class LearningUnitCampusSerializer(serializers.ModelSerializer):
             'organization',
             'organization_url'
         )
+
+    def get_organization_url(self, obj):
+        return obj.organization.website if obj.organization.website != '' else None
