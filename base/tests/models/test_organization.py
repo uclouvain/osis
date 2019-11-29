@@ -38,7 +38,7 @@ class OrganizationOrderingTest(TestCase):
             (True, 'B')
         ]
         for is_partner, name in organization_datas:
-            OrganizationFactory(is_current_partenr=is_partner, name=name)
+            OrganizationFactory(is_current_partner=is_partner, name=name)
 
     def test_organization_ordering(self):
         expected_order = ['A', 'B', 'C', 'D']
