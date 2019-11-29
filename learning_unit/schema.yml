@@ -480,9 +480,6 @@ components:
             local_url:
               type: string
               format: uri
-            organization_url:
-              type: string
-              format: uri
     LearningUnitComponent:
       type: object
       properties:
@@ -506,6 +503,9 @@ components:
           type: string
         organization:
           type: string
+        organization_url:
+          type: string
+          format: uri
     LearningUnitAttribution:
       type: object
       properties:
