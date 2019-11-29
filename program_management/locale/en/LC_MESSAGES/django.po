@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 14:33+0100\n"
+"POT-Creation-Date: 2019-11-29 14:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,9 +76,16 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
+msgid "Access condition"
+msgstr ""
+
 msgid "Acronym"
 msgstr ""
 
+msgid "Acronym/Short title"
+msgstr ""
+
+msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -96,16 +103,10 @@ msgstr "Are you sure you want to remove %(acronym)s ?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
-msgid "Attach"
-msgstr ""
-
 msgid "Block"
 msgstr ""
 
 msgid "Cancel"
-msgstr ""
-
-msgid "Cannot attach element to learning unit"
 msgstr ""
 
 msgid "Cannot detach due to prerequisites."
@@ -127,6 +128,9 @@ msgstr ""
 "Cannot remove learning unit %(acronym)s as it has a prerequisite or it is a "
 "prerequisite."
 
+msgid "Cannot paste any element to learning unit"
+msgstr ""
+
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
@@ -140,7 +144,10 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Copy"
+msgid "Comment"
+msgstr ""
+
+msgid "Content"
 msgstr ""
 
 msgid "Courses not taught"
@@ -150,16 +157,10 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 #, python-format
-msgid "Do you want to attach %(object_acronym)s ?"
-msgstr ""
-
-#, python-format
-msgid ""
-"Do you want to copy or to move %(object_acronym)s from %(parent_acronym)s ?"
-msgstr ""
-
-#, python-format
 msgid "Element selected %(element)s"
+msgstr ""
+
+msgid "English comment"
 msgstr ""
 
 #, python-format
@@ -194,6 +195,9 @@ msgstr ""
 msgid "Legend"
 msgstr ""
 
+msgid "Link type"
+msgstr ""
+
 msgid "Made in"
 msgstr ""
 
@@ -204,9 +208,6 @@ msgid "Mobile phone"
 msgstr ""
 
 msgid "Modify prerequisites"
-msgstr ""
-
-msgid "Move"
 msgstr ""
 
 msgid "Name"
@@ -278,9 +279,6 @@ msgstr ""
 msgid "Registration form for the content of"
 msgstr ""
 
-msgid "Required"
-msgstr ""
-
 msgid "Save"
 msgstr ""
 
@@ -300,6 +298,10 @@ msgstr ""
 msgid "The content has already been postponed."
 msgstr ""
 
+#, python-format
+msgid "The content of %(acronym)s has been updated."
+msgstr ""
+
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
 msgstr ""
@@ -311,10 +313,6 @@ msgid "The learning unit has prerequisites and is a prerequisite"
 msgstr ""
 
 msgid "The learning unit is a prerequisite"
-msgstr ""
-
-#, python-format
-msgid "The link of %(acronym)s has been created"
 msgstr ""
 
 #, python-format
@@ -393,20 +391,20 @@ msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
 #, python-format
-msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgid "You can not paste a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
-msgid "You can not attach the same child several times."
-msgstr ""
-
-#, python-format
-msgid ""
-"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
-"\"%(parent_type)s\")"
+msgid "You can not paste the same child several times."
 msgstr ""
 
 #, python-format
 msgid "You cannot modify content for %(education_group_types)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot paste \"%(child_types)s\" to \"%(parent)s\" (type "
+"\"%(parent_type)s\")"
 msgstr ""
 
 #, python-format

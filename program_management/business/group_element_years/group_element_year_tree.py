@@ -453,7 +453,7 @@ class AttachPermission(LinkActionPermission):
     def _check_if_leaf(self):
         if self.link and self.link.child_leaf:
             self.errors.append(
-                str(_("Cannot attach element to learning unit"))
+                str(_("Cannot paste any element to learning unit"))
             )
 
 
