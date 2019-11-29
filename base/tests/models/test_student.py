@@ -102,14 +102,14 @@ class StudentTest(TestCase):
 
     def test_students_ordering(self):
         students_data = [
-            ('D', 'D'),
-            ('C', 'A'),
-            ('B', 'C'),
-            ('A', 'B')
+            ('A', 'E'),
+            ('D', 'F'),
+            ('C', 'F'),
+            ('B', 'E')
         ]
         for first_name, name in students_data:
             a_person = PersonWithoutUserFactory(first_name=first_name, last_name=name)
             StudentFactory(person=a_person)
-        expected_order = ['B', 'C', 'A', 'D']
-        result = Student.objects.all().values_list('last_name', flat=True)
+        expected_order = ['A', 'B', 'C', 'D']
+        result = Student.objects.all().values_list('first_name', flat=True)
         self.assertEquals(list(result), expected_order)
