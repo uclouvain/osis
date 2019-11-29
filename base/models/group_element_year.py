@@ -96,9 +96,9 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
     FROM base_groupelementyear gey
     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
     WHERE child_leaf_id = %(child_leaf_id)s
-    
+
     UNION ALL
-    
+
     SELECT 	parent.id,
             parent.child_branch_id,
             parent.child_leaf_id,
