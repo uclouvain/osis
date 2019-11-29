@@ -330,10 +330,12 @@ def find_learning_unit_formations(objects, parents_as_instances=False, with_pare
     roots_by_object_id = {}
     if objects:
         _raise_if_incorrect_instance(objects)
-        try:
-            academic_year = _extract_common_academic_year(objects)
-        except AttributeError:
-            academic_year = None
+        academic_year = None
+        if not luy:
+            try:
+                academic_year = _extract_common_academic_year(objects)
+            except AttributeError:
+                academic_year = None
         parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
         roots_by_object_id = _find_related_formations(objects, parents_by_id)
