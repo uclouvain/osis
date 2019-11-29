@@ -34,11 +34,12 @@ from django.utils.translation import gettext_lazy as _
 from base.business.education_groups.postponement import FIELD_TO_EXCLUDE_IN_SET
 from base.business.utils.model import model_to_dict_fk
 from base.forms.education_group.training import TrainingForm, TrainingEducationGroupYearForm, \
-    HopsEducationGroupYearModelForm
+    HopsEducationGroupYearModelForm, CertificateAimsForm
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, internship_presence, education_group_types
+from base.models.enums import education_group_categories, internship_presence, education_group_types, entity_type
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
@@ -46,6 +47,7 @@ from base.tests.factories.academic_year import create_current_academic_year, get
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
+from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
@@ -54,7 +56,7 @@ from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.group import GroupFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
 from reference.tests.factories.domain import DomainFactory
@@ -467,6 +469,172 @@ class TestPostponementEducationGroupYear(TestCase):
         self.assertEqual(len(form.warnings), 1)
 
 
+class TestPostponeTrainingProperty(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.current_academic_year = AcademicYearFactory(current=True)
+        cls.generated_ac_years = AcademicYearFactory.produce(
+            base_year=cls.current_academic_year.year,
+            number_past=0,
+            number_future=7
+        )
+        cls.entity_version = MainEntityVersionFactory(entity_type=entity_type.SECTOR)
+        cls.central_manager = CentralManagerFactory()
+        PersonEntityFactory(person=cls.central_manager, entity=cls.entity_version.entity)
+
+    def setUp(self):
+        self.training = TrainingFactory(
+            management_entity=self.entity_version.entity,
+            administration_entity=self.entity_version.entity,
+            academic_year=self.current_academic_year
+        )
+        self.form_data = model_to_dict_fk(self.training, exclude=('secondary_domains', ))
+        self.form_data.update({
+            'primary_language': self.form_data['primary_language_id'],
+            'administration_entity': self.entity_version.pk,
+            'management_entity': self.entity_version.pk
+        })
+
+    def test_save_with_postponement_certificate_aims_inconsistant(self):
+        """
+        This test ensure that the we haven't an error if the certificate aims is inconsistant in future because
+        certificate aims is managed by program_manager (This form is only accessible on Central/Faculty manager)
+        """
+        # Save the training instance will create N+6 data...
+        form = TrainingForm(self.form_data, instance=self.training, user=self.central_manager.user)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+
+        # Add certificate aims in future...
+        training_future = EducationGroupYear.objects.filter(
+            education_group=self.training.education_group,
+            academic_year__year=self.training.academic_year.year + 2
+        ).get()
+        certificate_aims_in_future = EducationGroupCertificateAimFactory(education_group_year=training_future)
+
+        # Re-save and ensure that there are not consitency errors and the modification is correctly postponed
+        form = TrainingForm(
+            {**self.form_data, "title": "Modification du titre"},
+            instance=self.training,
+            user=self.central_manager.user,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertFalse(form.warnings, form.warnings)
+
+        training_future.refresh_from_db()
+        self.assertEqual(training_future.title, "Modification du titre")
+
+        # Ensure that certificate aims has not be modified during postponement
+        self.assertTrue(EducationGroupCertificateAim.objects.filter(pk=certificate_aims_in_future.pk).exists())
+
+
+class TestPostponeCertificateAims(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.current_academic_year = AcademicYearFactory(current=True)
+        cls.generated_ac_years = AcademicYearFactory.produce(
+            base_year=cls.current_academic_year.year,
+            number_past=0,
+            number_future=7
+        )
+        cls.entity_version = MainEntityVersionFactory(entity_type=entity_type.SECTOR)
+        cls.central_manager = CentralManagerFactory()
+        PersonEntityFactory(person=cls.central_manager, entity=cls.entity_version.entity)
+
+    def setUp(self):
+        self.training = TrainingFactory(
+            management_entity=self.entity_version.entity,
+            administration_entity=self.entity_version.entity,
+            academic_year=self.current_academic_year
+        )
+        # Save the training instance will create N+6 data...
+        form_data = model_to_dict_fk(self.training, exclude=('secondary_domains', ))
+        form_data.update({
+            'primary_language': form_data['primary_language_id'],
+            'administration_entity': self.entity_version.pk,
+            'management_entity': self.entity_version.pk
+        })
+        training_form = TrainingForm(form_data, instance=self.training, user=self.central_manager.user)
+        training_form.is_valid()
+        training_form.save()
+
+        self.certificate_aim_type_2 = CertificateAimFactory(section=2, code=200)
+        self.certificate_aim_type_4 = CertificateAimFactory(section=4, code=400)
+        self.form_data = {
+            'certificate_aims': [self.certificate_aim_type_2.pk, self.certificate_aim_type_4.pk]
+        }
+        self.qs_training_futures = EducationGroupYear.objects.filter(
+            education_group=self.training.education_group,
+            academic_year__year__gt=self.training.academic_year.year
+        )
+
+    def test_save_with_postponement_on_training_which_have_property_different_in_future(self):
+        """
+        This test ensure that the consistency check is OK even if one/multiple properties on training are
+        different in futures
+        """
+        #  Update multiple property on training future
+        self.qs_training_futures.update(
+            title='Modification du titre dans le futur',
+            professional_title='Modification du titre professionel'
+        )
+
+        form = CertificateAimsForm(self.form_data, instance=self.training)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertFalse(form.warnings, form.warnings)
+
+        self.assertEqual(
+            form.get_instances_valid(),
+            [self.training] + list(self.qs_training_futures.order_by('academic_year__year')),
+            msg="The instance must be ordered in order to be compare year by year in sliding way"
+        )
+        for education_group_year in self.qs_training_futures.all():
+            error_test_msg = "Certificate aims not reported on year {}".format(education_group_year.academic_year.year)
+            self.assertEqual(education_group_year.certificate_aims.count(), 2, msg=error_test_msg)
+
+    def test_save_case_consistency_raised_because_property_different_in_future(self):
+        """
+        This test ensure that the consistency check is raised an exception because certificate aims
+        is different in future
+        """
+        # Update in future
+        training_in_future = self.qs_training_futures.last()
+        certificate_aim_type_9 = CertificateAimFactory(section=9, code=900)
+        form = CertificateAimsForm({'certificate_aims': [certificate_aim_type_9]}, instance=training_in_future)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        self.assertFalse(form.warnings, form.warnings)
+
+        # Update current training...
+        form = CertificateAimsForm(self.form_data, instance=self.training)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+
+        error_expected = _("%(col_name)s has been already modified.") % {
+            "col_name": _(EducationGroupYear._meta.get_field('certificate_aims').verbose_name).title(),
+        }
+        warnings_expected = [
+            _("Consistency error in %(academic_year)s with %(model)s: %(error)s") % {
+                'academic_year': training_in_future.academic_year,
+                'model': EducationGroupYear._meta.verbose_name.title(),
+                'error': error_expected
+            }
+        ]
+        self.assertEqual(form.warnings, warnings_expected, form.warnings)
+
+        edgy_postponed_expected = list(
+            self.qs_training_futures.exclude(pk=training_in_future.pk)
+                                    .order_by('academic_year__year')
+        )
+        self.assertEqual(form.education_group_year_postponed, edgy_postponed_expected)
+
+
 class TestPermissionField(TestCase):
     def setUp(self):
         self.permissions = [PermissionFactory() for _ in range(10)]
@@ -528,3 +696,31 @@ class TestPermissionField(TestCase):
         )
         self.assertTrue(form.forms[forms.ModelForm].fields["main_teaching_campus"].disabled)
         self.assertFalse(form.forms[forms.ModelForm].fields["partial_acronym"].disabled)
+
+    def test_ensure_diploma_tab_fields_property(self):
+        form = TrainingForm(
+            {},
+            user=self.user_with_perm,
+            education_group_type=self.education_group_type,
+            context=TRAINING_DAILY_MANAGEMENT,
+        )
+        expected_fields = [
+            'joint_diploma', 'diploma_printing_title', 'professional_title',
+            'section', 'certificate_aims'
+        ]
+        self.assertEqual(form.diploma_tab_fields, expected_fields)
+
+    def test_ensure_show_diploma_tab_is_hidden(self):
+        """
+        This test ensure that the show diploma property is False if all fields contains in tab are disabled
+        """
+        form = TrainingForm(
+            {},
+            user=self.user_without_perm,
+            education_group_type=self.education_group_type,
+            context=TRAINING_DAILY_MANAGEMENT,
+        )
+        for field_name_in_diploma in form.diploma_tab_fields:
+            form.forms[forms.ModelForm].fields[field_name_in_diploma].disabled = True
+
+        self.assertFalse(form.show_diploma_tab())

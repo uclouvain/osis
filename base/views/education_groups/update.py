@@ -26,9 +26,9 @@
 
 from dal import autocomplete
 from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
@@ -43,11 +43,10 @@ from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm, CertificateAimsForm
-from base.models.academic_year import starting_academic_year
+from base.models import program_manager
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_change_education_group
@@ -70,35 +69,32 @@ def update_education_group(request, root_id, education_group_year_id):
         ),
         pk=education_group_year_id
     )
-    groupelementyear_formset = GroupElementYearFormset(
-        request.POST or None,
-        prefix='group_element_year_formset',
-        queryset=education_group_year.groupelementyear_set.all()
-    )
+    person = request.user.person
 
     # Store root in the instance to avoid to pass the root in methods
     # it will be used in the templates.
     education_group_year.root = root_id
 
-    year = education_group_year.academic_year.year
-    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and \
-            settings.YEAR_LIMIT_EDG_MODIFICATION <= year <= starting_academic_year().year:
-        return update_certificate_aims(request, root_id, education_group_year)
+    if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
+       and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
+        return _update_certificate_aims(request, root_id, education_group_year)
 
-    # Proctect the view
-    can_change_education_group(request.user, education_group_year)
-    return update_education_group_year(request, root_id, education_group_year, groupelementyear_formset)
+    groupelementyear_formset = GroupElementYearFormset(
+        request.POST or None,
+        prefix='group_element_year_formset',
+        queryset=education_group_year.groupelementyear_set.all()
+    )
+    return _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset)
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_certificate_aims(request, root_id, education_group_year):
+def _update_certificate_aims(request, root_id, education_group_year):
+    perms.is_eligible_to_edit_certificate_aims(request.user.person, education_group_year, raise_exception=True)
+
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
     if form_certificate_aims.is_valid():
-        form_certificate_aims.save()
-        url = _get_success_redirect_url(root, education_group_year)
-        return redirect(url)
+        url_redirect = _common_success_redirect(request, form_certificate_aims, root)
+        return JsonResponse({'success_url': url_redirect.url})
 
     return render(request, "education_group/blocks/form/training_certificate.html", {
         "education_group_year": education_group_year,
@@ -106,9 +102,10 @@ def update_certificate_aims(request, root_id, education_group_year):
     })
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_education_group_year(request, root_id, education_group_year, groupelementyear_formset):
+def _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset):
+    # Protect the view
+    can_change_education_group(request.user, education_group_year)
+
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     view_function = _get_view(education_group_year.education_group_type.category)
     return view_function(request, education_group_year, root, groupelementyear_formset)
@@ -122,12 +119,13 @@ def _get_view(category):
     }[category]
 
 
-def _common_success_redirect(request, form, root, groupelementyear_form):
-    groupelementyear_form.save()
+def _common_success_redirect(request, form, root, groupelementyear_form=None):
+    groupelementyear_changed = []
+    if groupelementyear_form:
+        groupelementyear_form.save()
+        groupelementyear_changed = groupelementyear_form.changed_forms()
+
     education_group_year = form.save()
-
-    groupelementyear_changed = groupelementyear_form.changed_forms()
-
     success_msgs = []
     if not education_group_year.education_group.end_year or \
             education_group_year.education_group.end_year.year >= education_group_year.academic_year.year:
@@ -247,6 +245,7 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         "form_coorganization": coorganization_formset,
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": has_coorganization(education_group_year),
+        "show_diploma_tab": form_education_group_year.show_diploma_tab(),
         'can_change_coorganization': perms.is_eligible_to_change_coorganization(
             person=request.user.person,
             education_group=education_group_year,

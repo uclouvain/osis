@@ -131,7 +131,7 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
         self.assertEqual(result, lastest_academic_year.year)
 
 
-class TestPostpone(TestCase):
+class TestPostponeContent(TestCase):
 
     @classmethod
     def setUpTestData(cls):

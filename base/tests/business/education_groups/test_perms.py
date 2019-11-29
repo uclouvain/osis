@@ -28,13 +28,12 @@ import random
 from unittest import mock
 
 from django.core.exceptions import PermissionDenied
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
-from base.business.education_groups import perms
 from base.business.education_groups.perms import check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
-    _is_eligible_to_add_education_group_with_category
+    _is_eligible_to_add_education_group_with_category, CertificateAimsPerms
 from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year
 from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
@@ -44,11 +43,10 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory, MiniTrainingFactory, GroupFactory
-from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
     SICFactory, FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import UserFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.user import UserFactory, SuperUserFactory
 
 
 class TestPerms(TestCase):
@@ -63,55 +61,6 @@ class TestPerms(TestCase):
 
         person_with_right = PersonWithPermissionsFactory("add_educationgroup")
         self.assertTrue(check_permission(person_with_right, "base.add_educationgroup"))
-
-    def test_faculty_manager_modify_certificates_aims(self):
-        today = datetime.date.today()
-        entity_version = EntityVersionFactory()
-        entity = entity_version.entity
-        person = FacultyManagerFactory()
-        PersonEntityFactory(entity=entity, person=person, with_child=True)
-
-        AcademicCalendarFactory(
-            start_date=today + datetime.timedelta(days=1),
-            end_date=today + datetime.timedelta(days=3),
-            academic_year=self.current_academic_year,
-            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
-        )
-
-        test_cases = (
-            {'edy': MiniTrainingFactory(academic_year=self.current_academic_year,
-                                        management_entity=entity,
-                                        administration_entity=entity),
-             'person': person,
-             'expected_result': False
-             },
-            {'edy': GroupFactory(academic_year=self.current_academic_year,
-                                 management_entity=entity,
-                                 administration_entity=entity),
-             'person': person,
-             'expected_result': False
-             },
-            {'edy': TrainingFactory(academic_year=self.current_academic_year,
-                                    management_entity=entity,
-                                    administration_entity=entity),
-             'person': person,
-             'expected_result': True
-             },
-        )
-
-        for case in test_cases:
-            with self.subTest(msg="{} with raise_exception False".format(case['edy'].education_group_type.category)):
-                self.assertEqual(case['expected_result'], perms._is_eligible_certificate_aims(case['person'],
-                                                                                              case['edy'],
-                                                                                              False))
-
-        for case in test_cases[:-1]:
-            with self.subTest(msg="{} with raise_exception True".format(case['edy'].education_group_type.category)):
-                self.assertRaises(PermissionDenied,
-                                  perms._is_eligible_certificate_aims,
-                                  case['person'],
-                                  case['edy'],
-                                  True)
 
     def test_is_education_group_edit_period_opened_case_period_closed(self):
         today = datetime.date.today()
@@ -542,3 +491,46 @@ class TestAdmissionConditionPerms(TestCase):
         perm = AdmissionConditionPerms(person.user, self.training)
         with self.assertRaises(PermissionDenied):
             perm._is_eligible()
+
+
+class TestCertificateAimsPerms(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2019)
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+
+    def test_user_is_not_program_manager(self):
+        person = PersonFactory()
+        perm = CertificateAimsPerms(user=person.user, education_group_year=self.training)
+        self.assertFalse(perm.is_eligible())
+
+    def test_user_is_program_manager_but_not_of_the_education_group_year(self):
+        program_manager = ProgramManagerFactory()
+        perm = CertificateAimsPerms(user=program_manager.person.user, education_group_year=self.training)
+        self.assertFalse(perm.is_eligible())
+
+    def test_user_is_program_manager_of_the_education_group_year(self):
+        program_manager = ProgramManagerFactory(education_group=self.training.education_group)
+        perm = CertificateAimsPerms(user=program_manager.person.user, education_group_year=self.training)
+        self.assertTrue(perm.is_eligible())
+
+    def test_user_is_super_user(self):
+        super_user = SuperUserFactory()
+        perm = CertificateAimsPerms(user=super_user, education_group_year=self.training)
+        self.assertTrue(perm.is_eligible())
+
+    def test_education_group_year_is_not_training_type(self):
+        type_not_allowed = (
+            MiniTrainingFactory(academic_year=self.academic_year),
+            GroupFactory(academic_year=self.academic_year)
+        )
+        for education_group_year in type_not_allowed:
+            with self.subTest(education_group_year=education_group_year):
+                perm = CertificateAimsPerms(user=SuperUserFactory(), education_group_year=education_group_year)
+                self.assertFalse(perm.is_eligible())
+
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2020)
+    def test_education_group_year_is_lower_than_modification_settings(self):
+        super_user = SuperUserFactory()
+        perm = CertificateAimsPerms(user=super_user, education_group_year=self.training)
+        self.assertFalse(perm.is_eligible())
