@@ -27,7 +27,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
 from django.db.models.functions import Concat
 from django.urls import reverse
 from django.utils import translation
