@@ -224,7 +224,7 @@ class LearningUnitDetailedTestCase(APITestCase):
         luy_with_full_title = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate_full_title()
         luy_with_full_title = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(
             luy_with_full_title
-        ).get()
+        ).annotate_campus_website().get()
         serializer = ExternalLearningUnitDetailedSerializer(
             luy_with_full_title,
             context={

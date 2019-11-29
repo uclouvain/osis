@@ -173,7 +173,7 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             learning_container_year__requirement_entity=requirement_entity
         )
         ExternalLearningUnitYearFactory(learning_unit_year=luy)
-        cls.luy = LearningUnitYear.objects.filter(pk=luy.pk).annotate_full_title().get()
+        cls.luy = LearningUnitYear.objects.filter(pk=luy.pk).annotate_campus_website().annotate_full_title().get()
         setattr(cls.luy, "entity_requirement", "OSIS")
         setattr(cls.luy, "entity_allocation", "OSIS")
         url_kwargs = {
