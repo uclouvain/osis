@@ -78,7 +78,6 @@ class Command(BaseCommand):
         ws_title = xls_worksheet.title
         app_name, model_name = ws_title.split('.')
         app_name = APP_NAME_ALIASES.get(app_name, app_name)
-        logger.info()
         logger.info('Working on {}...'.format(ws_title))
         try:
             return apps.get_model(app_name, model_name)

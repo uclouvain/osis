@@ -68,7 +68,7 @@ class Organization(SerializableModel):
     logo_tag.short_description = 'Logo'
 
     class Meta:
-        ordering = ("is_current_partner", "name")
+        ordering = ("-is_current_partner", "name")
         permissions = (
             ("can_access_organization", "Can access organization"),
         )
