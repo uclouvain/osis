@@ -111,5 +111,5 @@ class StudentTest(TestCase):
             a_person = PersonWithoutUserFactory(first_name=first_name, last_name=name)
             StudentFactory(person=a_person)
         expected_order = ['A', 'B', 'C', 'D']
-        result = Student.objects.all().values_list('first_name', flat=True)
+        result = Student.objects.all().values_list('person__first_name', flat=True)
         self.assertEquals(list(result), expected_order)
