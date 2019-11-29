@@ -39,6 +39,7 @@ from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_year
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
@@ -322,15 +323,18 @@ class GroupElementYear(OrderedModel):
             return "{}".format(self.child.title)
 
 
-def find_learning_unit_formations(objects, parents_as_instances=False, with_parents_of_parents=False):
+def find_learning_unit_formations(objects, parents_as_instances=False, with_parents_of_parents=False, luy=None):
     if with_parents_of_parents and not parents_as_instances:
         raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
 
     roots_by_object_id = {}
     if objects:
         _raise_if_incorrect_instance(objects)
-        academic_year = _extract_common_academic_year(objects)
-        parents_by_id = _build_parent_list_by_education_group_year_id(academic_year)
+        try:
+            academic_year = _extract_common_academic_year(objects)
+        except AttributeError:
+            academic_year = None
+        parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
         roots_by_object_id = _find_related_formations(objects, parents_by_id)
 
@@ -358,21 +362,30 @@ def _find_related_formations(objects, parents_by_id):
         return {obj.id: _find_elements(parents_by_id, child_branch_id=obj.id) for obj in objects}
 
 
-def _build_parent_list_by_education_group_year_id(academic_year):
-    group_elements = GroupElementYear.objects.filter(
-        Q(parent__academic_year=academic_year) |
-        Q(child_branch__academic_year=academic_year) |
-        Q(child_leaf__academic_year=academic_year)
-    ).filter(
-        parent__isnull=False
-    ).filter(
-        Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
-    ).select_related(
-        'education_group_year__education_group_type'
-    ).values(
-        'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
-        'parent__education_group_type__category'
-    )
+def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = None, learning_unit_year=None):
+    if academic_year:
+        group_elements = GroupElementYear.objects.filter(
+            Q(parent__academic_year=academic_year) |
+            Q(child_branch__academic_year=academic_year) |
+            Q(child_leaf__academic_year=academic_year)
+        ).filter(
+            parent__isnull=False
+        ).filter(
+            Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
+        )
+    else:
+        geys = fetch_row_sql_tree_from_child(child_leaf_id=learning_unit_year.pk)
+        gey_ids = [gey['id'] for gey in geys]
+        group_elements = GroupElementYear.objects.filter(
+            pk__in=gey_ids
+        )
+
+    group_elements = group_elements.select_related(
+            'education_group_year__education_group_type'
+        ).values(
+            'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
+            'parent__education_group_type__category'
+        )
     result = collections.defaultdict(list)
     for group_element_year in group_elements:
         key = _build_child_key(
@@ -472,7 +485,7 @@ def fetch_row_sql(root_ids):
         ]
 
 
-def fetch_row_sql_tree_from_child(child_leaf_id, academic_year_id=None):
+def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> list:
     parameters = {
         "child_leaf_id": child_leaf_id,
         "academic_year_id": academic_year_id
