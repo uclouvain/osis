@@ -86,10 +86,9 @@
         initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
             {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
-        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
         let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
 
-        $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
+        $("#button-attach").click(attachElementSelected(attachUrl));
 
         $("#search-pagination li a[href]").each(function(index, paginationAnchor){
             paginationAnchor.addEventListener('click', function submitWithPage(e){
@@ -102,7 +101,7 @@
             });
         });
 
-        function attachElementSelected(checkUrl, attachUrl){
+        function attachElementSelected(attachUrl){
             return function(){
                 const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
                 const parameters = extract_ids_and_content_type_parameters(elementsUrl);
@@ -112,25 +111,11 @@
                     paramString.append("id", parameters["id"][index]);
                 }
 
-                $.ajax({
-                    url: `${checkUrl}?${paramString.toString()}`,
-                }).done(function(jsonResponse){
-                    const error_messages = jsonResponse["error_messages"];
-                    if (error_messages.length > 0){
-                        const $span_messages = $("#message_info_modal");
-                        $span_messages.removeAttr("style");
-                        $span_messages.text("");
-                        error_messages.forEach(function(message){
-                            $span_messages.append(`<p>${message}</p>`);
-                        });
-                    } else {
-                        document.getElementById("modal_dialog_id").classList.add("modal-lg");
-                        $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
-                            if (status === "success") {
-                                let form = $(this).find('form').first();
-                                formAjaxSubmit(form, '#form-ajax-modal');
-                            }
-                        });
+                document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
+                    if (status === "success") {
+                        let form = $(this).find('form').first();
+                        formAjaxSubmit(form, '#form-ajax-modal');
                     }
                 });
             };

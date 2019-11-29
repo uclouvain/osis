@@ -74,7 +74,7 @@ def _cache_object_and_redirect(request, object_to_cache, redirect_to):
 
 
 def get_clipboard_content_display(obj, action):
-    msg_template = "<strong>{clipboard_title}</strong><p>{object_str}</p>"
+    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
     return msg_template.format(
         clipboard_title=_get_clipboard_title(action),
         object_str=str(obj),

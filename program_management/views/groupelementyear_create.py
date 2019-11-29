@@ -26,10 +26,11 @@
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.forms import modelformset_factory
 from django.http import JsonResponse
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, RedirectView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
@@ -46,45 +47,30 @@ from program_management.forms.group_element_year import GroupElementYearForm, Ba
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-class AttachCheckView(GenericGroupElementYearMixin, TemplateView):
-    template_name = "group_element_year/group_element_year_attach_type_dialog_inner.html"
-    rules = []
+class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["messages"] = []
+    permanent = False
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.pattern_name = 'group_element_year_create'
 
         try:
             perms.can_change_education_group(self.request.user, self.education_group_year)
         except PermissionDenied as e:
-            context["messages"].append(str(e))
+            display_warning_messages(self.request, str(e))
 
-        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
-        if not elements_to_attach:
-            context["messages"].append(_("Please cut or copy an item before attach it"))
+        cached_data = ElementCache(self.request.user).cached_data
 
-        context["messages"].extend(_check_attach(self.education_group_year, elements_to_attach))
+        if cached_data:
 
-        return context
+            action_from_cache = cached_data.get('action')
 
-    def render_to_response(self, context, **response_kwargs):
-        return JsonResponse({"error_messages": context["messages"]})
+            if action_from_cache == ElementCache.ElementCacheAction.CUT.value:
+                kwargs['group_element_year_id'] = fetch_source_link(self.request.GET, self.request.user).id
+                self.pattern_name = 'group_element_year_move'
 
-
-class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
-    template_name = "group_element_year/group_element_year_attach_type_dialog_inner.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
-        if not elements_to_attach:
-            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
-
-        context['source_link'] = fetch_source_link(self.request.GET, self.request.user)
-        context["acronyms"] = ", ".join([obj.acronym for obj in elements_to_attach])
-        context['education_group_year_parent'] = self.education_group_year
-        return context
+        return super().get_redirect_url(*args, **kwargs)
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
