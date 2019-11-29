@@ -79,10 +79,4 @@ class QuickEducationGroupYearFilter(FilterSet):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
             return EducationGroupYear.objects.none()
-        queryset = EducationGroupYear.objects.filter(
-            education_group_type__category__in=[
-                education_group_categories.Categories.GROUP.name,
-                education_group_categories.Categories.MINI_TRAINING.name,
-            ]
-        )
-        return queryset
+        return EducationGroupYear.objects.all()
