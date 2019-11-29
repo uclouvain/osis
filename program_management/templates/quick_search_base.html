@@ -23,7 +23,8 @@
                 <div class="panel-body" style="border-bottom: 1px solid #ddd;">
                     <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;">
                         <input type="hidden" name="page" value="{{ page_obj.number }}">
-                        <div class="row">
+                        {# FIX: tabindex set to -1 because on Firefox if you click on the checkbox the autocomplete of one of the input text would popup on the upper left side of the screen #}
+                        <div class="row" tabindex="-1">
                             {% block form_field %}
 
 

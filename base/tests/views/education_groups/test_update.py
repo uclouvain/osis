@@ -922,9 +922,12 @@ class TestSelectAttach(TestCase):
 
         # Create a link :
         self.client.post(
-            reverse("group_element_year_create",
-                    args=[self.attach_action_data["root_id"],
-                          self.attach_action_data["element_id"]]),
+            reverse("group_element_year_create", args=[self.attach_data["root_id"], self.attach_data["element_id"]]),
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1',
+            }
         )
 
         expected_group_element_year_existing = GroupElementYear.objects.filter(
@@ -954,9 +957,12 @@ class TestSelectAttach(TestCase):
 
         # Create a link :
         self.client.post(
-            reverse("group_element_year_create",
-                    args=[self.attach_action_data["root_id"],
-                          self.attach_action_data["element_id"]]),
+            reverse("group_element_year_create", args=[self.attach_data["root_id"], self.attach_data["element_id"]]),
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1'
+            }
         )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
@@ -981,7 +987,9 @@ class TestSelectAttach(TestCase):
         # Select :
         self.client.post(
             self.url_copy_education_group,
-            data={'element_id': self.new_parent_education_group_year.id}
+            data={
+                'element_id': self.new_parent_education_group_year.id,
+            }
         )
 
         # Create a link :
@@ -989,10 +997,14 @@ class TestSelectAttach(TestCase):
             reverse("group_element_year_create", args=[
                 self.new_parent_education_group_year.id, self.child_education_group_year.id
             ]),
-            data={}
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1',
+            }
         )
-        self.assertFormError(
-            response, 'form', '__all__',
+        self.assertFormsetError(
+            response, 'form', 0, '__all__',
             _("It is forbidden to attach an element to one of its included elements.")
         )
 
@@ -1049,7 +1061,11 @@ class TestSelectAttach(TestCase):
 
         response = self.client.post(
             reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),
-            data={}
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1',
+            }
         )
         self.assertEqual(response.status_code, 302)
 
@@ -1091,7 +1107,7 @@ class TestSelectAttach(TestCase):
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), _("Dummy message"))
+        self.assertIn(_("Dummy message"), str(messages[0]))
 
     def _assert_link_with_inital_parent_present(self):
         expected_initial_group_element_year = GroupElementYear.objects.get(
