@@ -30,10 +30,12 @@ from base.models.campus import Campus
 
 class LearningUnitCampusSerializer(serializers.ModelSerializer):
     organization = serializers.ReadOnlyField(source='organization.name')
+    organization_url = serializers.CharField(source='website_or_none')
 
     class Meta:
         model = Campus
         fields = (
             'name',
-            'organization'
+            'organization',
+            'organization_url'
         )

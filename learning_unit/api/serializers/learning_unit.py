@@ -147,13 +147,11 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
 
 class ExternalLearningUnitDetailedSerializer(LearningUnitDetailedSerializer):
     local_url = serializers.CharField(source='externallearningunityear.url')
-    organization_url = serializers.CharField(source='website_or_none')
     local_code = serializers.CharField(source='externallearningunityear.external_acronym')
 
     class Meta(LearningUnitDetailedSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitDetailedSerializer.Meta.fields + (
             'local_code',
-            'local_url',
-            'organization_url'
+            'local_url'
         )

@@ -119,9 +119,6 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
 
-    def annotate_campus_website(self):
-        return self.annotate_campus_organization_website_class_method(self)
-
     @classmethod
     def annotate_full_title_class_method(cls, queryset):
         return queryset.annotate(
@@ -151,16 +148,6 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
                 default=Concat('learning_container_year__common_title_english', Value(' - '), 'specific_title_english'),
                 output_field=CharField(),
             ),
-        )
-
-    @classmethod
-    def annotate_campus_organization_website_class_method(cls, queryset):
-        return queryset.annotate(
-            website_or_none=Case(
-                When(campus__organization__website__exact='', then=None),
-                default=F('campus__organization__website'),
-                output_field=CharField()
-            )
         )
 
     @classmethod

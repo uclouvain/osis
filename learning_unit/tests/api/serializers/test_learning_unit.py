@@ -215,7 +215,6 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'proposal',
             'summary_status',
             'local_code',
-            'local_url',
-            'organization_url'
+            'local_url'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
