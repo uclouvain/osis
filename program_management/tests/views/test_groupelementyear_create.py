@@ -148,41 +148,6 @@ class TestCreateGroupElementYearView(TestCase):
 
 
 @override_flag('education_group_update', active=True)
-class TestAttachTypeDialogView(TestCase):
-    def setUp(self):
-        self.next_academic_year = AcademicYearFactory(current=True)
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
-        self.selected_egy = EducationGroupYearFactory(
-            academic_year=self.next_academic_year
-        )
-
-        self.url = reverse(
-            "education_group_attach",
-            args=[self.group_element_year.parent.id, self.group_element_year.child_branch.id]
-        )
-
-        self.person = PersonFactory()
-
-        self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
-
-        self.addCleanup(self.perm_patcher.stop)
-        self.addCleanup(cache.clear)
-
-    def test_context_data(self):
-        ElementCache(self.person.user).save_element_selected(self.selected_egy,
-                                                             source_link_id=self.group_element_year.id)
-        response = self.client.get(self.url)
-        context = response.context
-
-        self.assertEqual(context["acronyms"], self.selected_egy.acronym)
-        self.assertEqual(context["source_link"], self.group_element_year)
-        self.assertEqual(context["education_group_year_parent"], self.group_element_year.child_branch)
-
-
-@override_flag('education_group_update', active=True)
 class TestMoveGroupElementYearView(TestCase):
     def setUp(self):
         self.next_academic_year = AcademicYearFactory(current=True)

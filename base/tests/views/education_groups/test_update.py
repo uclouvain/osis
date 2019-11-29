@@ -32,7 +32,7 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect, QueryDict
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -68,6 +68,7 @@ from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -922,12 +923,15 @@ class TestSelectAttach(TestCase):
 
         # Create a link :
         self.client.post(
-            reverse("group_element_year_create", args=[self.attach_data["root_id"], self.attach_data["element_id"]]),
+            reverse(
+                "group_element_year_create",
+                args=[self.copy_action_data["root_id"], self.copy_action_data["element_id"]],
+            ),
             data={
                 'form-TOTAL_FORMS': '1',
                 'form-INITIAL_FORMS': '0',
                 'form-MAX_NUM_FORMS': '1',
-            }
+            },
         )
 
         expected_group_element_year_existing = GroupElementYear.objects.filter(
@@ -957,12 +961,15 @@ class TestSelectAttach(TestCase):
 
         # Create a link :
         self.client.post(
-            reverse("group_element_year_create", args=[self.attach_data["root_id"], self.attach_data["element_id"]]),
+            reverse(
+                "group_element_year_create",
+                args=[self.copy_action_data["root_id"], self.copy_action_data["element_id"]],
+            ),
             data={
                 'form-TOTAL_FORMS': '1',
                 'form-INITIAL_FORMS': '0',
                 'form-MAX_NUM_FORMS': '1'
-            }
+            },
         )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
