@@ -39,8 +39,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import entity_version
 from base.models import group_element_year
-from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
-    MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
+from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
@@ -392,15 +391,6 @@ class LearningUnitYear(SerializableModel):
 
     def is_past(self):
         return self.academic_year.is_past
-
-    # FIXME move this method to business/perm file
-    def can_update_by_faculty_manager(self):
-        if not self.learning_container_year:
-            return False
-
-        starting_year = starting_academic_year().year
-        year = self.academic_year.year
-        return starting_year <= year <= starting_year + MAX_ACADEMIC_YEAR_FACULTY
 
     def is_full(self):
         return self.subtype == learning_unit_year_subtypes.FULL

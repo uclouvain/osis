@@ -33,12 +33,16 @@ from webservices.api.views.auth_token import AuthToken
 from webservices.api.views.common_admission_condition import CommonAdmissionCondition
 from webservices.api.views.common_text import CommonText
 from webservices.api.views.general_information import GeneralInformation
+from webservices.api.views.user import CurrentUser
 from webservices.views import ws_catalog_offer, ws_catalog_common_offer, ws_catalog_common_admission_condition, \
     ws_catalog_offer_v02
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
-url_api_v1 = [url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name)]
+url_api_v1 = [
+    url(r'^auth/token$', AuthToken.as_view(), name=AuthToken.name),
+    url(r'^users/current$', CurrentUser.as_view(), name=CurrentUser.name)
+]
 
 webservice_apps = [
     'education_group',

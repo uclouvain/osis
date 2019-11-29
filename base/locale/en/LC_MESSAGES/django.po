@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-22 16:01+0100\n"
+"POT-Creation-Date: 2019-11-29 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -518,6 +518,9 @@ msgid "City of institution"
 msgstr ""
 
 msgid "Classes"
+msgstr ""
+
+msgid "Clear clipboard"
 msgstr ""
 
 msgid "Clear notifications"
@@ -1295,6 +1298,9 @@ msgstr ""
 
 #, python-format
 msgid "Learning unit %(acronym)s successfully updated."
+msgstr ""
+
+msgid "Learning unit edition by faculty managers"
 msgstr ""
 
 msgid "Learning unit search"
@@ -2728,6 +2734,10 @@ msgstr ""
 
 #, python-format
 msgid "This label %s does not exist"
+msgstr ""
+
+msgid ""
+"This learning unit is not editable by faculty managers during this period."
 msgstr ""
 
 msgid "This learning unit isn't eligible for modification because of it's type"

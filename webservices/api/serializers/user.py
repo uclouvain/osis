@@ -23,11 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.apps import AppConfig
+from django.contrib.auth.models import User
+from rest_framework import serializers
 
 
-class AssessmentsConfig(AppConfig):
-    name = 'assessments'
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(source='person.first_name', read_only=True)
+    middle_name = serializers.CharField(source='person.middle_name', read_only=True)
+    last_name = serializers.CharField(source='person.last_name', read_only=True)
+    email = serializers.CharField(source='person.email', read_only=True)
 
-    def ready(self):
-        from assessments.signals import subscribers
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+        ]

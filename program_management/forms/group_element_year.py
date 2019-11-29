@@ -61,6 +61,7 @@ class GroupElementYearForm(forms.ModelForm):
             self.instance.parent = parent
             self.instance.child_leaf = child_leaf
             self.instance.child_branch = child_branch
+            self.initial['relative_credits'] = int(self.instance.child.credits) if self.instance.child else None
 
         if self.instance.parent:
             self._define_fields()

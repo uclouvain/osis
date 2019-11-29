@@ -65,7 +65,7 @@
         </div>
         <br>
         <div class="row pull-right">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <a href="{% url 'organization_address_edit' organization_address_id=organization_address.id %}" title="{%trans 'Edit'%}"
                    class="btn btn-primary" role="button" id="lnk_organization_edit">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
@@ -81,7 +81,7 @@
                     </button>
                 </form>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <a href="{% url 'organization_read' organization_id=organization_address.organization.pk %}"
                    id="lnk_organization_read_{{organization_address.organization.id}}"  title="{%trans 'Back'%}"
                    class="btn btn-default" role="button" ><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
