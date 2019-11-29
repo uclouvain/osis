@@ -377,9 +377,8 @@ def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = 
         )
     else:
         geys = fetch_row_sql_tree_from_child(child_leaf_id=learning_unit_year.pk)
-        gey_ids = [gey['id'] for gey in geys]
         group_elements = GroupElementYear.objects.filter(
-            pk__in=gey_ids
+            pk__in=[gey['id'] for gey in geys]
         )
 
     group_elements = group_elements.select_related(
