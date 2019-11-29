@@ -44,10 +44,10 @@ def is_eligible_to_detach_group_element_year(person, group_element_year, raise_e
 
 
 def _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception):
-    return person.is_central_manager or EventPermEducationGroupEdition.is_open(
-        education_group=group_element_year.parent,
+    return person.is_central_manager or EventPermEducationGroupEdition(
+        obj=group_element_year.parent,
         raise_exception=raise_exception
-    )
+    ).is_open()
 
 
 def _can_user_update_education_group_year_child(person, egy_child, raise_exception):

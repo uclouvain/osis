@@ -23,11 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.apps import AppConfig
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.views.decorators.http import require_POST
+
+from base.utils.cache import ElementCache
 
 
-class AssessmentsConfig(AppConfig):
-    name = 'assessments'
-
-    def ready(self):
-        from assessments.signals import subscribers
+@login_required
+@require_POST
+@permission_required('base.can_access_education_group', raise_exception=True)
+def clear_clipboard(request):
+    if request.is_ajax():
+        ElementCache(request.user).clear()
+        return JsonResponse({})
+    return HttpResponseBadRequest()

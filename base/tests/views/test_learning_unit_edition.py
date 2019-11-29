@@ -40,7 +40,9 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
     LearningContainerYearModelForm
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
+from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -132,6 +134,13 @@ class TestEditLearningUnit(TestCase):
     def setUpTestData(cls):
         today = datetime.date.today()
         an_academic_year = create_current_academic_year()
+
+        AcademicCalendarFactory(
+            data_year=an_academic_year,
+            start_date=datetime.datetime(an_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
 
         cls.requirement_entity = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
@@ -356,6 +365,14 @@ class TestLearningUnitVolumesManagement(TestCase):
     def setUp(self):
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 10)
+
+        AcademicCalendarFactory(
+            data_year=start_year,
+            start_date=datetime.datetime(start_year.year - 2, 9, 15),
+            end_date=datetime.datetime(start_year.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+
         self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
         self.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
         self.generated_container_year = self.generate_container.generated_container_years[0]

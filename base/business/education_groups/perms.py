@@ -130,10 +130,13 @@ def is_eligible_to_delete_education_group_year(person, education_group_yr, raise
 
 
 def _is_eligible_education_group(person, education_group, raise_exception):
-    return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or EventPermEducationGroupEdition.is_open(education_group=education_group,
-                                                                                 raise_exception=raise_exception))
-            )
+    return (
+        check_link_to_management_entity(education_group, person, raise_exception) and
+        (
+            person.is_central_manager or
+            EventPermEducationGroupEdition(obj=education_group, raise_exception=raise_exception).is_open()
+        )
+    )
 
 
 def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):
@@ -261,7 +264,7 @@ class CommonEducationGroupStrategyPerms(object):
         return True
 
     def _is_current_academic_year_in_range_of_editable_education_group_year(self):
-        return EventPermEducationGroupEdition.is_open(education_group=self.education_group_year, in_range=True)
+        return EventPermEducationGroupEdition(obj=self.education_group_year, raise_exception=False).is_open()
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
@@ -291,7 +294,7 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if not EventPermEducationGroupEdition.is_open(education_group=self.education_group_year):
+        if not EventPermEducationGroupEdition(obj=self.education_group_year, raise_exception=False).is_open():
             raise PermissionDenied(_("The faculty manager cannot modify general information which are lower than N"))
         return True
 
@@ -323,7 +326,7 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if not EventPermEducationGroupEdition.is_open(education_group=self.education_group_year):
+        if not EventPermEducationGroupEdition(obj=self.education_group_year, raise_exception=False).is_open():
             raise PermissionDenied(_("The faculty manager cannot modify outside of program edition period"))
         return True
 
