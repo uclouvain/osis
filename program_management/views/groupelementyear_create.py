@@ -25,12 +25,10 @@
 ############################################################################
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.forms import modelformset_factory
-from django.http import JsonResponse
-from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
-from django.views.generic.base import TemplateView, RedirectView
+from django.views.generic.base import RedirectView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
