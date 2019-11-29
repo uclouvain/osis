@@ -25,6 +25,7 @@
 ##############################################################################
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms import modelformset_factory, BaseFormSet, BaseModelFormSet
 
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
@@ -60,6 +61,7 @@ class GroupElementYearForm(forms.ModelForm):
             self.instance.parent = parent
             self.instance.child_leaf = child_leaf
             self.instance.child_branch = child_branch
+            self.initial['relative_credits'] = int(self.instance.child.credits) if self.instance.child else None
 
         if self.instance.parent:
             self._define_fields()
@@ -132,3 +134,28 @@ class GroupElementYearForm(forms.ModelForm):
     @staticmethod
     def _is_education_group_year_a_minor_major_option_list_choice(egy):
         return egy.is_minor_major_option_list_choice if egy else False
+
+
+class BaseGroupElementYearFormset(BaseModelFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def changed_forms(self):
+        return [
+            f for f in self if f.has_changed()
+        ]
+
+    def is_valid(self):
+        return all([f.is_valid() for f in self.changed_forms()])
+
+    def save(self, commit=True):
+        for f in self.changed_forms():
+            f.save()
+
+
+GroupElementYearFormset = modelformset_factory(
+    model=GroupElementYear,
+    form=GroupElementYearForm,
+    formset=BaseGroupElementYearFormset,
+    extra=0,
+)

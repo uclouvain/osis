@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-07 16:19+0100\n"
+"POT-Creation-Date: 2019-11-27 11:35+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -288,15 +288,6 @@ msgstr "Ajouter"
 msgid "Add another"
 msgstr "Ajouter un autre"
 
-msgid "Add attribution"
-msgstr "Ajouter attribution"
-
-msgid "Add current year teacher"
-msgstr "Ajouter enseignant année en cours"
-
-msgid "Add over the current year"
-msgstr "Ajouter sur l’année en cours"
-
 msgid "Add the English content of this paragraph"
 msgstr "Ajouter le contenu Anglais de ce paragraphe"
 
@@ -445,23 +436,11 @@ msgstr "Attrib. vol1"
 msgid "Attrib. vol2"
 msgstr "Attrib. vol2"
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
-
 msgid "Attribution duration"
 msgstr "Durée attribution"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr "Attribution modifiée pour %(tutor)s (%(function)s)"
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
-msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
 
 msgid "Attributions"
 msgstr "Attributions"
@@ -569,6 +548,9 @@ msgstr "Ville de l'institution"
 
 msgid "Classes"
 msgstr "Classes"
+
+msgid "Clear clipboard"
+msgstr "Vider le presse-papier"
 
 msgid "Clear notifications"
 msgstr "Supprimer notifications"
@@ -824,7 +806,7 @@ msgid "Duration"
 msgstr "Durée"
 
 msgid "Edit"
-msgstr "Éditer"
+msgstr "Modifier"
 
 msgid "Edit the proposal"
 msgstr "Modifier la proposition"
@@ -903,6 +885,9 @@ msgstr "Fin inscription aux examens"
 msgid "English"
 msgstr "Anglais"
 
+msgid "English comment"
+msgstr "Commentaire en anglais"
+
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
 
@@ -926,9 +911,6 @@ msgstr "Inscriptible"
 
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
-
-msgid "Enrollments to training"
-msgstr "Inscrits à la formation"
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
@@ -954,6 +936,10 @@ msgstr "Entités de charges"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Evaluations"
 msgstr "Évaluations"
@@ -1205,9 +1191,6 @@ msgstr "Inclure les entités subordonnées"
 msgid "Included in"
 msgstr "Inclus dans"
 
-msgid "Indicate the name or the FGS"
-msgstr "Indiquer le nom ou le FGS"
-
 msgid "Industrial partner"
 msgstr "Partenaire industriel"
 
@@ -1369,6 +1352,9 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
+msgid "Learning unit edition by faculty managers"
+msgstr "Modification UE par gestionnaires facultaires"
+
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
 
@@ -1495,9 +1481,6 @@ msgstr "Liste au choix Majeures"
 
 msgid "Male"
 msgstr "Masculin"
-
-msgid "Manage repartition"
-msgstr "Gérer la répartition"
 
 msgid "Manage volumes"
 msgstr "Gérer les volumes"
@@ -1702,9 +1685,6 @@ msgstr "Pas de messages"
 
 msgid "No additional fees"
 msgstr "Pas de frais supplémentaires"
-
-msgid "No attributions exist for the parent learning unit"
-msgstr "Aucune attribution n'existe pour l'UE parent"
 
 msgid "No data"
 msgstr "Pas de données"
@@ -2235,14 +2215,6 @@ msgstr "Release"
 msgid "Remarks"
 msgstr "Remarques"
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
-
 msgid "Req. Entities"
 msgstr "Ent. charges"
 
@@ -2603,6 +2575,9 @@ msgstr "Les groupement suivants se sont terminés par une erreur"
 msgid "The following learning units ended with error"
 msgstr "Les unités d'enseignement suivantes se sont terminées par une erreur"
 
+msgid "The following links has been updated"
+msgstr "Les liens suivants ont été mis à jour"
+
 msgid "The format of the range date is not valid"
 msgstr "Le format de la plage de dates n'est pas valide"
 
@@ -2674,6 +2649,10 @@ msgstr ""
 
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
+
+#, python-format
+msgid "The link of %(acronym)s has been updated"
+msgstr "Le lien de %(acronym)s a été mis à jour"
 
 #, python-format
 msgid ""
@@ -2750,14 +2729,6 @@ msgid ""
 msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
-
-#, python-format
-msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
-msgstr ""
-"La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
-"au volume de l'unité d'apprentissage parent pour ce professeur"
 
 #, python-format
 msgid ""
@@ -2891,6 +2862,11 @@ msgstr "Ce champ est obligatoire."
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
+msgid ""
+"This learning unit is not editable by faculty managers during this period."
+msgstr ""
+"Cette unité d'enseignement n'est pas modifiable par les gestionnaires facultaires durant cette période."
+
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 
@@ -2925,6 +2901,12 @@ msgstr "Intitulé propre au partim"
 msgid "To complete"
 msgstr "A compléter"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Total enrollments to training"
+msgstr "Total d'inscrits à la formation"
+
 msgid "Training"
 msgstr "Formation"
 
@@ -2954,9 +2936,6 @@ msgstr "Trimestre"
 
 msgid "Tutor"
 msgstr "Enseignant·e"
-
-msgid "Tutor for parent LU"
-msgstr "Enseignant·e UE parent"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
@@ -3193,8 +3172,8 @@ msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
 msgstr ""
-"Vous ne pouvez modifier une unité d'enseignement qui si vous êtes attaché à "
-"son entité responsable du cahier des charges"
+"Vous ne pouvez modifier une unité d'enseignement que si vous êtes attaché·e "
+"à son entité responsable du cahier des charges"
 
 msgid "You can't edit because the learning unit has proposal"
 msgstr ""

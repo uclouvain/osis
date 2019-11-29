@@ -23,11 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import shortcuts
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
-from osis_common.decorators.deprecated import deprecated
+from webservices.api.serializers.user import UserSerializer
 
 
-@deprecated
-def render(request, template, values):
-    return shortcuts.render(request, template, values)
+class CurrentUser(APIView):
+    name = 'current_user'
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [SessionAuthentication]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

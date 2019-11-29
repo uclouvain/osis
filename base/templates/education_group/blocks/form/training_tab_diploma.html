@@ -27,29 +27,29 @@
 
 <div class="panel panel-default">
     <div class="panel-body" id="div_tab_diploma">
-{% bootstrap_field form_education_group_year.joint_diploma %}
+        {% bootstrap_field form_education_group_year.joint_diploma %}
 
-{% bootstrap_field form_education_group_year.diploma_printing_title %}
+        {% bootstrap_field form_education_group_year.diploma_printing_title %}
 
 
-{% bootstrap_field form_education_group_year.professional_title %}
+        {% bootstrap_field form_education_group_year.professional_title %}
 
-{% trans 'certificate aims'|capfirst as label_certificate_aims %}
-{% bootstrap_label label_certificate_aims %}
+        {% trans 'certificate aims'|capfirst as label_certificate_aims %}
+        {% bootstrap_label label_certificate_aims %}
 
-<div class="row">
-    <div class="col-md-1">
-        {% trans 'filter by section'|capfirst as label_section %}
-        <p>{{ label_section }} : </p>
+        <div class="row">
+            <div class="col-md-1">
+                {% trans 'filter by section'|capfirst as label_section %}
+                <p>{{ label_section }} : </p>
 
-        {% bootstrap_field form_education_group_year.section show_label=False %}
-    </div>
-    <div class="col-md-11">
-        {% bootstrap_field form_education_group_year.certificate_aims show_label=False %}
-    </div>
-</div>
+                {% bootstrap_field form_education_group_year.section show_label=False %}
+            </div>
+            <div class="col-md-11">
+                {% bootstrap_field form_education_group_year.certificate_aims show_label=False %}
+            </div>
+        </div>
 
-{{ form_education_group_year.media }}
+        {{ form_education_group_year.media }}
     </div>
 </div>
 <style>
@@ -59,7 +59,7 @@
         padding: 0 0 5px 0;
     }
 
-     /* Not displiaying possibility to remove all selected elements */
+    /* Not displiaying possibility to remove all selected elements */
     .select2-container--default .select2-selection--multiple .select2-selection__clear {
         display: none;
     }

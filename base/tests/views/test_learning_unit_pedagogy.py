@@ -128,7 +128,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             entity_type=entity_type.SCHOOL,
             parent=self.requirement_entity_version.entity
         )
-        another_learning_unit_year = LearningUnitYearFactory(
+        LearningUnitYearFactory(
             acronym="LDROI1500",
             academic_year=self.academic_year,
             learning_container_year__academic_year=self.academic_year,
@@ -224,21 +224,21 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         self.client.force_login(self.faculty_person.user)
 
     def test_learning_units_summary_list_by_client_xls(self):
-        bibliography = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='bibliography'),
             entity=LEARNING_UNIT_YEAR,
             text="<ul><li>Test</li></ul>",
             reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='fr-be'
         )
-        online_resources = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL</a>",
             reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='fr-be'
         )
-        online_resources_en = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL EN</a>",
