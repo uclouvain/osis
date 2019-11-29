@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 11:35+0100\n"
+"POT-Creation-Date: 2019-11-29 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2444,6 +2444,9 @@ msgstr ""
 msgid "The education group has been deleted."
 msgstr ""
 
+msgid "The education group is not a training type"
+msgstr ""
+
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
 msgstr ""
@@ -2656,6 +2659,9 @@ msgid "The user has not permission to delete education groups."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
+msgstr ""
+
+msgid "The user is not the program manager of the education group"
 msgstr ""
 
 #, python-format
