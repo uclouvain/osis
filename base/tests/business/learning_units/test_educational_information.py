@@ -62,7 +62,14 @@ class TestEducationalInformation(TestCase):
         self.learning_unit_year_3.summary_responsibles = [self.attribution_lu3]
 
     def test_update_responsible_data_with_new_learning_unit_yr(self):
-        list_before_update = [{PERSON: self.person_lu_2,
+        list_before_update = [{PERSON: self.person_lu_1,
+                               LEARNING_UNIT_YEARS: []}]
+        self.assertEqual(_update_responsible_data_with_new_learning_unit_yr(self.person_lu_1,
+                                                                            self.learning_unit_year_2,
+                                                                            list_before_update), list_before_update)
+
+    def test_update_responsible_and_learning_unit_yr_list(self):
+        list_before_update = [{PERSON: self.person_lu_1,
                                LEARNING_UNIT_YEARS: []}]
         self.assertEqual(_update_responsible_data_with_new_learning_unit_yr(self.person_lu_1,
                                                                             self.learning_unit_year_2,

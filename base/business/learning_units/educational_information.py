@@ -28,8 +28,7 @@ PERSON = 'person'
 
 
 def _update_responsible_data_with_new_learning_unit_yr(a_responsible_person, learning_unit_yr,
-                                                       responsible_and_learning_unit_yr_list_param):
-    responsible_and_learning_unit_yr_list = responsible_and_learning_unit_yr_list_param
+                                                       responsible_and_learning_unit_yr_list):
     for a_known_responsible in responsible_and_learning_unit_yr_list:
         if a_known_responsible.get(PERSON) == a_responsible_person:
             learning_unit_yr_list_for_responsible = a_known_responsible.get(LEARNING_UNIT_YEARS)
@@ -44,8 +43,7 @@ def _build_new_responsible_data(a_responsible_person, learning_unit_yr):
             LEARNING_UNIT_YEARS: [learning_unit_yr]}
 
 
-def _update_responsible_and_learning_unit_yr_list(learning_unit_yr, responsible_and_learning_unit_yr_list_param):
-    responsible_and_learning_unit_yr_list = responsible_and_learning_unit_yr_list_param
+def _update_responsible_and_learning_unit_yr_list(learning_unit_yr, responsible_and_learning_unit_yr_list):
     for responsible in learning_unit_yr.summary_responsibles:
         a_responsible_person = responsible.tutor.person
         if _is_new_responsible(responsible_and_learning_unit_yr_list, a_responsible_person):
