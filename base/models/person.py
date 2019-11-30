@@ -218,7 +218,10 @@ def find_by_id(person_id):
 
 
 def find_by_user(user: User):
-    return user.person if user.person else None
+    try:
+        return user.person
+    except Person.DoesNotExist:
+        return None
 
 
 def get_user_interface_language(user):
