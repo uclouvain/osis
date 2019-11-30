@@ -29,7 +29,7 @@ from base.models import student
 from base.models.student import Student
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonWithoutUserFactory
+from base.tests.factories.person import PersonWithoutUserFactory, PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.models import test_person
 
@@ -108,7 +108,7 @@ class StudentTest(TestCase):
             ('B', 'E')
         ]
         for first_name, name in students_data:
-            a_person = PersonWithoutUserFactory(first_name=first_name, last_name=name)
+            a_person = PersonFactory(first_name=first_name, last_name=name)
             StudentFactory(person=a_person)
         expected_order = ['A', 'B', 'C', 'D']
         result = Student.objects.all().values_list('person__first_name', flat=True)
