@@ -151,7 +151,7 @@ def is_eligible_to_create_modification_proposal(learning_unit_year, person, rais
         not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
         _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
         not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
-        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
+        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
     can_raise_exception(
@@ -570,7 +570,7 @@ def can_raise_exception(raise_exception, result, msg):
 def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception=False):
     result = False
     if person:
-        result = person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
+        result = is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person)
 
     can_raise_exception(
         raise_exception,
@@ -669,3 +669,10 @@ def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
         MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
     )
     return result
+
+
+def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
+    requirement_entity = learning_unit_year.learning_container_year.requirement_entity
+    if not requirement_entity:
+        return False
+    return person.is_attached_entities([requirement_entity])
