@@ -44,6 +44,7 @@ from base.models.enums import person_source_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
+from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
 
@@ -213,17 +214,11 @@ class Person(SerializableModel):
 
 
 def find_by_id(person_id):
-    try:
-        return Person.objects.get(id=person_id)
-    except Person.DoesNotExist:
-        return None
+    return get_object_or_none(Person, id=person_id)
 
 
 def find_by_user(user: User):
-    try:
-        return user.person
-    except Person.DoesNotExist:
-        return None
+    return user.person if user.person else None
 
 
 def get_user_interface_language(user):
@@ -284,11 +279,3 @@ def calculate_age(person):
     today = date.today()
     return today.year - person.birth_date.year - ((today.month, today.day) < (person.birth_date.month,
                                                                               person.birth_date.day))
-
-
-def find_by_firstname_or_lastname(name):
-    return Person.objects.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
-
-
-def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
-    return person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)

@@ -41,7 +41,6 @@ from base.models.enums import learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
@@ -152,7 +151,7 @@ def is_eligible_to_create_modification_proposal(learning_unit_year, person, rais
         not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
         _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
         not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
-        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
+        person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
     can_raise_exception(
@@ -571,7 +570,7 @@ def can_raise_exception(raise_exception, result, msg):
 def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception=False):
     result = False
     if person:
-        result = is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person)
+        result = person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
     can_raise_exception(
         raise_exception,
