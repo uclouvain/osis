@@ -45,6 +45,80 @@ from program_management.business.group_element_years.management import EDUCATION
 
 
 @override_flag('education_group_update', active=True)
+class TestAttachCheckView(TestCase):
+    def setUp(self):
+        self.egy = EducationGroupYearFactory()
+        self.next_academic_year = AcademicYearFactory(current=True)
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
+        self.selected_egy = EducationGroupYearFactory(
+            academic_year=self.next_academic_year
+        )
+
+        self.url = reverse("check_education_group_attach", args=[self.egy.id, self.egy.id])
+
+        self.person = PersonFactory()
+
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                       return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+
+        self.attach_strategy_patcher = mock.patch(
+            "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
+        )
+        self.mocked_attach_strategy = self.attach_strategy_patcher.start()
+
+        self.addCleanup(self.perm_patcher.stop)
+        self.addCleanup(self.attach_strategy_patcher.stop)
+        self.addCleanup(cache.clear)
+
+    def test_when_no_element_selected(self):
+        response = self.client.get(self.url)
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": [_("Please cut or copy an item before attach it")]}
+        )
+
+    def test_when_all_parameters_not_set(self):
+        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": ""})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": [_("Please cut or copy an item before attach it")]}
+        )
+
+    def test_when_element_selected_and_no_error(self):
+        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": EDUCATION_GROUP_YEAR})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": []}
+        )
+
+        self.assertEqual(
+            self.mocked_attach_strategy.call_args_list,
+            [
+                ({"parent": self.egy, "child": self.egy}, )
+            ]
+        )
+
+    def test_when_multiple_element_selected(self):
+        other_egy = EducationGroupYearFactory()
+        response = self.client.get(self.url, data={
+            "id": [self.egy.id, other_egy.id],
+            "content_type": EDUCATION_GROUP_YEAR
+        })
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": []}
+        )
+        self.assertEqual(
+            self.mocked_attach_strategy.call_args_list,
+            [
+                ({"parent": self.egy, "child": self.egy}, ),
+                ({"parent": self.egy, "child": other_egy}, )
+            ]
+        )
+
+@override_flag('education_group_update', active=True)
 class TestCreateGroupElementYearView(TestCase):
     def setUp(self):
         self.egy = TrainingFactory(academic_year__current=True, education_group_type__name=TrainingType.BACHELOR.name)

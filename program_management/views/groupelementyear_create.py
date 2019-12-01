@@ -25,10 +25,11 @@
 ############################################################################
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.forms import modelformset_factory
+from django.http import JsonResponse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
-from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView, View
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
@@ -43,6 +44,26 @@ from program_management.business.group_element_years.detach import DetachEducati
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
 from program_management.forms.group_element_year import GroupElementYearForm, BaseGroupElementYearFormset
 from program_management.views.generic import GenericGroupElementYearMixin
+
+
+class AttachCheckView(GenericGroupElementYearMixin, View):
+    rules = []
+
+    def get(self, request, *args, **kwargs):
+        error_messages = []
+
+        try:
+            perms.can_change_education_group(self.request.user, self.education_group_year)
+        except PermissionDenied as e:
+            error_messages.append(str(e))
+
+        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
+        if not elements_to_attach:
+            error_messages.append(_("Please cut or copy an item before attach it"))
+
+        error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
+
+        return JsonResponse({"error_messages": error_messages})
 
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
@@ -125,7 +146,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         return context
 
     def get_success_message(self, cleaned_data):
-        return _("The content of %(acronym)s has been updated." % {"acronym": self.education_group_year.verbose})
+        return _("The content of %(acronym)s has been updated.") % {"acronym": self.education_group_year.verbose}
 
     def get_success_url(self):
         """ We'll reload the page """
