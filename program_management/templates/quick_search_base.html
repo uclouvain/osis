@@ -23,15 +23,14 @@
                 <div class="panel-body" style="border-bottom: 1px solid #ddd;">
                     <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;">
                         <input type="hidden" name="page" value="{{ page_obj.number }}">
-                        {# FIX: tabindex set to -1 because on Firefox if you click on the checkbox the autocomplete of one of the input text would popup on the upper left side of the screen #}
-                        <div class="row" tabindex="-1">
+                        <div class="row">
                             {% block form_field %}
 
 
                             {% endblock form_field %}
                             <br>
                             <div class="col-md-2">
-                                <button type="submit" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-eg" title="search">
+                                <button type="submit" class="btn btn-primary" name="search-eg" title="search">
                                     <em class="fa fa-search"></em>
                                 </button>
                             </div>
@@ -83,12 +82,13 @@
     {
         document.getElementById("modal_dialog_id").classList.add("modal-lg");
 
-        initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
+       initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
             {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
+        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
         let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
 
-        $("#button-attach").click(attachElementSelected(attachUrl));
+        $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
         $("#search-pagination li a[href]").each(function(index, paginationAnchor){
             paginationAnchor.addEventListener('click', function submitWithPage(e){
@@ -101,7 +101,7 @@
             });
         });
 
-        function attachElementSelected(attachUrl){
+        function attachElementSelected(checkUrl, attachUrl){
             return function(){
                 const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
                 const parameters = extract_ids_and_content_type_parameters(elementsUrl);
@@ -111,11 +111,25 @@
                     paramString.append("id", parameters["id"][index]);
                 }
 
-                document.getElementById("modal_dialog_id").classList.add("modal-lg");
-                $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
-                    if (status === "success") {
-                        let form = $(this).find('form').first();
-                        formAjaxSubmit(form, '#form-ajax-modal');
+                $.ajax({
+                    url: `${checkUrl}?${paramString.toString()}`
+                }).done(function(jsonResponse){
+                    const error_messages = jsonResponse["error_messages"];
+                    if (error_messages.length > 0) {
+                        const $span_messages = $("#message_info_modal");
+                        $span_messages.removeAttr("style");
+                        $span_messages.text("");
+                        error_messages.forEach(function (message) {
+                            $span_messages.append(`<p>${message}</p>`);
+                        });
+                    } else {
+                        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                        $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
+                            if (status === "success") {
+                                let form = $(this).find('form').first();
+                                formAjaxSubmit(form, '#form-ajax-modal');
+                            }
+                        });
                     }
                 });
             };
@@ -150,6 +164,7 @@
         }
 
         bind_trigger_modal();
+
     });
 </script>
 {% endblock script %}
