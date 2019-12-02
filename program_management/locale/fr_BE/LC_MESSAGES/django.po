@@ -118,7 +118,7 @@ msgid "Alloc. Ent."
 msgstr ""
 
 msgid "Annual"
-msgstr ""
+msgstr "Annuel"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
