@@ -21,7 +21,8 @@
             <div class="panel panel-default">
 
                 <div class="panel-body" style="border-bottom: 1px solid #ddd;">
-                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;">
+                    {# FIXME: Disable autocomplete because otherwise the aucomplete scroll of the last text input completed would appear at the top left of the screen when clicking on the checkbox #}
+                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;" autocomplete="off">
                         <input type="hidden" name="page" value="{{ page_obj.number }}">
                         <div class="row">
                             {% block form_field %}

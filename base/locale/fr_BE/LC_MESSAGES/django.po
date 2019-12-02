@@ -1246,10 +1246,10 @@ msgstr "Ce n'est pas une proposition"
 msgid "Isolated classes"
 msgstr "Cours isolés"
 
-msgid "It is forbidden to attach an element to itself."
-msgstr "Il est interdit d’attacher un élément à lui-même."
+msgid "It is forbidden to add an element to itself."
+msgstr "Il est interdit d’ajouter un élément à lui-même."
 
-msgid "It is forbidden to attach an element to one of its included elements."
+msgid "It is forbidden to paste an element to one of its included elements."
 msgstr ""
 "Il est interdit de coller un élement sur un autre élement y étant inclus."
 
@@ -1271,7 +1271,7 @@ msgid "It is not possible to detach the root element."
 msgstr "Il n'est pas possible de retirer l'élément racine."
 
 msgid ""
-"It is prohibited to attach a group, mini-training or training to an element "
+"It is prohibited to paste a group, mini-training or training to an element "
 "of another academic year."
 msgstr ""
 "Il est interdit de coller un groupement, une mini-formation ou une formation "
