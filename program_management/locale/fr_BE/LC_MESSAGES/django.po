@@ -321,6 +321,9 @@ msgstr[1] "Prérequis"
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
+msgid "Proposal legend"
+msgstr "Légende proposition"
+
 msgid "Registration ID"
 msgstr "NOMA"
 

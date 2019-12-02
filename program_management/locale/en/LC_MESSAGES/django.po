@@ -271,6 +271,9 @@ msgstr[1] ""
 msgid "Prerequisites saved."
 msgstr ""
 
+msgid "Proposal legend"
+msgstr ""
+
 msgid "Registration ID"
 msgstr ""
 
