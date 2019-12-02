@@ -44,11 +44,13 @@ class LearningUnitAutomaticPostponementToN6(AutomaticPostponementToN6):
     def get_queryset(self, queryset=None):
         learning_unit_year_with_containers = LearningUnitYear.objects.filter(
             learning_unit=OuterRef("pk"),
-            learning_container_year__isnull=False
+            learning_container_year__isnull=False,
+            academic_year__year__gte=self.current_year.year
         )
         external_learning_unit_year_that_are_not_mobility = LearningUnitYear.objects.filter(
             learning_unit=OuterRef("pk"),
-            externallearningunityear__mobility=True
+            externallearningunityear__mobility=True,
+            academic_year__year__gte=self.current_year.year
         )
         return super().get_queryset(queryset).annotate(
             has_container=Exists(learning_unit_year_with_containers),
