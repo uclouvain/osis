@@ -143,6 +143,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         context['formset'] = context["form"]
         if len(context["formset"]) > 0:
             context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
+        context["education_group_year"] = self.education_group_year
         return context
 
     def get_success_message(self, cleaned_data):
