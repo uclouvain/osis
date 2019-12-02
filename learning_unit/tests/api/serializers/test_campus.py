@@ -38,6 +38,7 @@ class LearningUnitCampusSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'name',
-            'organization'
+            'organization',
+            'organization_url'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
