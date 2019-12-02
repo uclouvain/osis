@@ -184,7 +184,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                     luy.get_subtype_display(),
                     "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
                     "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
-                    gey.block,
+                    gey.block or '',
                     _('yes')
                     ]
         res = _fix_data(gey, luy)
@@ -278,7 +278,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                         luy.get_subtype_display(),
                         "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
                         "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
-                        gey.block,
+                        gey.block or '',
                         _('yes')
                         ]
             self.assertListEqual(excel_lines[idx], expected)
