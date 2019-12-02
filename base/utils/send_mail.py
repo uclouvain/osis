@@ -126,17 +126,16 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
     txt_template_ref = 'luy_after_auto_postponement_txt'
 
     permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
-        .distinct()
+    managers = Person.objects.filter(
+        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
+    ).distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    distinct_luys_postponed = [luy for luy in luys_postponed
-                               if luy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
     template_base_data = {
         'academic_year':  statistics_context['max_academic_year_to_postpone'].past(),
         'end_academic_year': statistics_context['max_academic_year_to_postpone'],
-        'luys_postponed': len(distinct_luys_postponed),
-        'luys_postponed_qs': sorted(distinct_luys_postponed, key=lambda luy: luy.acronym),
+        'luys_postponed': len(luys_postponed),
+        'luys_postponed_qs': sorted(luys_postponed, key=lambda luy: luy.acronym),
         'luys_already_existing': statistics_context['already_duplicated'].count(),
         'luys_already_existing_qs': statistics_context['already_duplicated'].order_by("learningunityear__acronym"),
         'luys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
@@ -180,11 +179,9 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
     txt_template_ref = 'egy_after_auto_postponement_txt'
 
     permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
-        .distinct()
-
-    egys_postponed = [edy for edy in egys_postponed
-                      if edy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
+    managers = Person.objects.filter(
+        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
+    ).distinct()
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
         'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past(),
