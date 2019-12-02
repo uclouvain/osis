@@ -40,6 +40,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
 from base.models.prerequisite_item import PrerequisiteItem
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from program_management.business.group_element_years import attach
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 
 
@@ -181,10 +182,14 @@ class EducationGroupHierarchy:
                 'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
                 'modification_disabled': not self.modification_perm.is_permitted(),
                 'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
-                'search_url': reverse('quick_search_education_group',
-                                      args=[self.root.pk, self.education_group_year.pk]),
+                'search_url': self._get_search_url(),
             },
         }
+
+    def _get_search_url(self):
+        if attach.can_attach_learning_units(self.education_group_year):
+            return reverse('quick_search_learning_unit', args=[self.root.pk, self.education_group_year.pk])
+        return reverse('quick_search_education_group', args=[self.root.pk, self.education_group_year.pk])
 
     def _get_acronym(self):
         acronym = ''
