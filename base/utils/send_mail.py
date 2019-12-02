@@ -107,8 +107,8 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_luy(statistic
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
-        'academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
-        'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
+        'academic_year': statistics_context['max_academic_year_to_postpone'].past(),
+        'end_academic_year': statistics_context['max_academic_year_to_postpone'],
 
         # Use len instead of count() (it's buggy when a queryset is built with a difference())
         'luys_to_postpone': len(statistics_context['to_duplicate']),
@@ -133,8 +133,8 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
     distinct_luys_postponed = [luy for luy in luys_postponed
                                if luy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
     template_base_data = {
-        'academic_year':  statistics_context['max_academic_year_to_postpone'].past().year,
-        'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
+        'academic_year':  statistics_context['max_academic_year_to_postpone'].past(),
+        'end_academic_year': statistics_context['max_academic_year_to_postpone'],
         'luys_postponed': len(distinct_luys_postponed),
         'luys_postponed_qs': sorted(distinct_luys_postponed, key=lambda luy: luy.acronym),
         'luys_already_existing': statistics_context['already_duplicated'].count(),
