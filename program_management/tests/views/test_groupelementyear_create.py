@@ -118,6 +118,7 @@ class TestAttachCheckView(TestCase):
             ]
         )
 
+
 @override_flag('education_group_update', active=True)
 class TestCreateGroupElementYearView(TestCase):
     def setUp(self):
@@ -150,6 +151,7 @@ class TestCreateGroupElementYearView(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.context["education_group_year"], self.egy)
 
         msgs = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])

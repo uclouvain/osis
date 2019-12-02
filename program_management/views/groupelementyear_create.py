@@ -186,7 +186,6 @@ def _check_attach(parent: EducationGroupYear, elements_to_attach):
                 AttachLearningUnitYearStrategy
             strategy(parent=parent, child=element).is_valid()
         except ValidationError as e:
-            error_messages = []
             for msg in e.messages:
                 msg_prefix = _("Element selected %(element)s") % {
                     "element": "{} - {}".format(element.academic_year, element.acronym)
