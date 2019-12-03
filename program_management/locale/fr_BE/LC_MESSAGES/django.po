@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 10:39+0100\n"
+"POT-Creation-Date: 2019-11-26 14:44+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -75,11 +75,18 @@ msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
-msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+msgstr ""
+"%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+
+msgid "1st quadri"
+msgstr ""
+
+msgid "2nd quadri"
+msgstr ""
 
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
@@ -98,11 +105,20 @@ msgstr "Sigle"
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
+msgid "Active"
+msgstr ""
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
+
+msgid "Alloc. Ent."
+msgstr ""
+
+msgid "Annual"
+msgstr "Annuel"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -205,6 +221,9 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "Gathering"
+msgstr "Regroupement"
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -218,8 +237,11 @@ msgstr ""
 msgid "Learning units"
 msgstr "Unités d'enseignement"
 
-msgid "Legend"
-msgstr "Légende"
+msgid "LearningUnitList-%(year)s-%(acronym)s"
+msgstr "Liste-UE-%(year)s-%(acronym)s"
+
+msgid "List UE"
+msgstr "Liste UE"
 
 msgid "Made in"
 msgstr "Fait à"
@@ -298,6 +320,9 @@ msgstr[1] "Prérequis"
 
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
+
+msgid "Proposal legend"
+msgstr "Légende proposition"
 
 msgid "Registration ID"
 msgstr "NOMA"

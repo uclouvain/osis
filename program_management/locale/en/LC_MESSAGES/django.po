@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 10:39+0100\n"
+"POT-Creation-Date: 2019-11-26 14:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -177,6 +177,9 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
+msgid "Gathering"
+msgstr ""
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -187,7 +190,14 @@ msgstr ""
 msgid "Learning units"
 msgstr ""
 
+#, python-format
+msgid "LearningUnitList-%(year)s-%(acronym)s"
+msgstr ""
+
 msgid "Legend"
+msgstr ""
+
+msgid "List UE"
 msgstr ""
 
 msgid "Made in"
@@ -216,6 +226,9 @@ msgstr ""
 
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
+msgstr ""
+
+msgid "No result!"
 msgstr ""
 
 msgid "Official"
@@ -256,6 +269,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Prerequisites saved."
+msgstr ""
+
+msgid "Proposal legend"
 msgstr ""
 
 msgid "Registration ID"

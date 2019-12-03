@@ -97,7 +97,9 @@
         <br>
         {{ selected_element_clipboard }}
     </div>
-
+    {% if education_group_year %}
+        {% include "education_group/blocks/modal/custom_xls.html" %}
+    {% endif %}
     <script>
         const root_id = "{{ root_id }}";
         const url_resolver_match = "{% url_resolver_match %}";
@@ -114,4 +116,5 @@
     </script>
     <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
     </script>
+
 {% endblock content %}

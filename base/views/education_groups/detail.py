@@ -72,6 +72,7 @@ from base.views.common import display_error_messages, display_success_messages
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.forms.custom_xls import CustomXlsForm
 from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
@@ -174,6 +175,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
+        context['form_xls_custom']= CustomXlsForm()
+        context['form_custom_legend']= None
         return context
 
     def get(self, request, *args, **kwargs):
