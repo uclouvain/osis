@@ -28,6 +28,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
+from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
@@ -77,8 +78,18 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
             'child': obj.child,
             'parent': obj.parent,
         }
+
+        self._remove_element_from_clipboard_if_stored(obj)
+
         display_success_messages(request, success_msg)
         return super().delete(request, *args, **kwargs)
+
+    def _remove_element_from_clipboard_if_stored(self, obj):
+        element_cache = ElementCache(self.request.user)
+        cached_data = element_cache.cached_data
+        obj_cached = obj.child_branch or obj.child_leaf
+        if cached_data and cached_data['id'] == obj_cached.id and cached_data['modelname'] == obj_cached._meta.db_table:
+            element_cache.clear()
 
     def get_success_url(self):
         # We can just reload the page
