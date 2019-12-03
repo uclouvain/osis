@@ -880,6 +880,21 @@ class TestSelectAttach(TestCase):
             }
         )
 
+    def test_cut_when_group_element_year_not_given(self):
+        """When user click on 'cut' action into the root element in the tree"""
+        cut_action_data = dict(self.copy_action_data)
+        cut_action_data['action'] = "cut"
+        del cut_action_data['group_element_year_id']
+        self.client.post(
+            self.url_management,
+            data=cut_action_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        action_cached = ElementCache(self.person.user).cached_data['action']
+
+        self.assertEqual(action_cached, ElementCache.ElementCacheAction.COPY.value)
+        self.assertNotEqual(action_cached, ElementCache.ElementCacheAction.CUT.value)
+
     def test_copy_ajax_case_learning_unit_year(self):
         response = self.client.post(
             self.url_copy_learning_unit_in_cache,
