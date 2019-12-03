@@ -31,7 +31,7 @@ class CustomXlsForm(forms.Form):
 
     required_entity = forms.BooleanField(required=False, label=_('Req. Entity'))
     proposition = forms.BooleanField(required=False, label=_('Proposal'))
-    credits = forms.BooleanField(required=False,label=_('Credits'))
+    credits = forms.BooleanField(required=False, label=_('Credits'))
     allocation_entity = forms.BooleanField(required=False, label=_('Alloc. Ent.'))
     english_title = forms.BooleanField(required=False, label=_('Title in English'))
     teacher_list = forms.BooleanField(required=False, label=_('List of teachers'))
