@@ -136,14 +136,8 @@ class GroupElementYearForm(forms.ModelForm):
 
 
 class BaseGroupElementYearFormset(BaseModelFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def changed_forms(self):
         return [f for f in self if f.has_changed()]
-
-    def is_valid(self):
-        return all([f.is_valid() for f in self])
 
     def save(self, commit=True):
         for f in self:

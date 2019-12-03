@@ -126,11 +126,11 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
             kwargs_form_kwargs.append({
                 'parent': self.education_group_year,
                 'child_branch': child if isinstance(child, EducationGroupYear) else None,
-                'child_leaf': child if isinstance(child, LearningUnitYear) else None
+                'child_leaf': child if isinstance(child, LearningUnitYear) else None,
+                'empty_permitted': False
             })
 
         kwargs["form_kwargs"] = kwargs_form_kwargs
-        kwargs["initial"] = [{} for f in kwargs_form_kwargs]
         kwargs["queryset"] = GroupElementYear.objects.none()
         return kwargs
 
