@@ -84,10 +84,10 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
         display_success_messages(request, success_msg)
         return super().delete(request, *args, **kwargs)
 
-    def _remove_element_from_clipboard_if_stored(self, obj):
+    def _remove_element_from_clipboard_if_stored(self, obj_detached):
         element_cache = ElementCache(self.request.user)
-        obj_cached = obj.child_branch or obj.child_leaf
-        if element_cache.equals(obj_cached):
+        obj_detached = obj_detached.child_branch or obj_detached.child_leaf
+        if element_cache.equals(obj_detached):
             element_cache.clear()
 
     def get_success_url(self):
