@@ -168,7 +168,7 @@ class CheckAuthorizedRelationship:
                 'parent': self.parent
             })
         if not_authorized_types:
-            self.not_authorized_errors.append(_("You cannot paste \"%(child_types)s\" to \"%(parent)s\" "
+            self.not_authorized_errors.append(_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" "
                                                 "(type \"%(parent_type)s\")") % {
                 'child_types': ', '.join(str(AllTypes.get_value(name)) for name in not_authorized_types),
                 'parent': self.parent,

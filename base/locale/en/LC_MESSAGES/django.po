@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 14:31+0100\n"
+"POT-Creation-Date: 2019-12-03 14:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -691,6 +691,9 @@ msgstr ""
 msgid "Delete message"
 msgstr ""
 
+msgid "Delete permanently"
+msgstr ""
+
 msgid "Delete selected messages"
 msgstr ""
 
@@ -1207,7 +1210,7 @@ msgstr ""
 msgid "It is forbidden to add an element to itself."
 msgstr ""
 
-msgid "It is forbidden to paste an element to one of its included elements."
+msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
 msgid ""
@@ -1226,7 +1229,7 @@ msgid "It is not possible to detach the root element."
 msgstr "It is not possible to remove the root element."
 
 msgid ""
-"It is prohibited to paste a group, mini-training or training to an element "
+"It is prohibited to attach a group, mini-training or training to an element "
 "of another academic year."
 msgstr ""
 

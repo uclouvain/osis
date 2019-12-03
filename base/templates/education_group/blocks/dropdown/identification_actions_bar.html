@@ -91,7 +91,7 @@
 
                 {% flag "education_group_delete" %}
                     {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
-                    {% li_with_deletion_perm delete_url _('Delete') %}
+                    {% li_with_deletion_perm delete_url _('Delete permanently') %}
                 {% endflag %}
 
                 {% flag "education_group_update" %}

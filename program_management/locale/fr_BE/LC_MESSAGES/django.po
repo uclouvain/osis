@@ -142,8 +142,8 @@ msgstr ""
 "L'unité d'enseignement %(acronym)s dispose de prérequis ou est prerequis et "
 "ne peut pas être retirée."
 
-msgid "Cannot paste any element to learning unit"
-msgstr "Interdit de coller des éléments sur une UE"
+msgid "Cannot attach any element to learning unit"
+msgstr "Interdit d'attacher des éléments à une UE"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -432,23 +432,23 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
-msgid "You can not paste a learning unit to a %(category)s of type %(type)s."
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
-"Vous ne pouvez pas coller une unité d'enseignement sur un/une %(category)s "
+"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
 "de type %(type)s."
 
-msgid "You can not paste the same child several times."
-msgstr "Vous ne pouvez pas coller plusieurs fois le même enfant sur un même parent."
+msgid "You can not attach the same child several times."
+msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
 
 #, python-format
 msgid "You cannot modify content for %(education_group_types)s"
 msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_types)s"
 
 msgid ""
-"You cannot paste \"%(child_types)s\" to \"%(parent)s\" (type "
+"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
-"Vous ne pouvez pas coller \"%(child_types)s\" sur \"%(parent)s\" (de type "
+"Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type "
 "\"%(parent_type)s\")"
 
 #, python-format

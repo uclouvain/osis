@@ -94,13 +94,6 @@ $(document).ready(function () {
                 "select_node": false,
                 "items": function($node){
                     return {
-                        "copy": {
-                            "label": gettext("Copy"),
-                            "action": function (data) {
-                                handleCopyOrCutAction(data, "copy")
-                            }
-                        },
-
                         "cut": {
                             "label": gettext("Cut"),
                             "action": function (data) {
@@ -108,32 +101,15 @@ $(document).ready(function () {
                             }
                         },
 
-                        "modify": {
-                            "label": gettext("Modify"),
+                        "copy": {
+                            "label": gettext("Copy"),
                             "action": function (data) {
-                                let __ret = get_data_from_tree(data);
-
-                                $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
-                                    if (status === "success") {
-                                        $('#form-ajax-modal').modal('toggle');
-                                        let form = $(this).find('form').first();
-                                        formAjaxSubmit(form, '#form-ajax-modal');
-                                    } else {
-                                        window.location.href = __ret.modify_url
-                                    }
-                                });
-                            },
-                            "title": $node.a_attr.modification_msg,
-                            "_disabled": function (data) {
-                                let __ret = get_data_from_tree(data);
-                                // tree's root cannot be edit (no link with parent...)
-                                return __ret.modification_disabled === true;
+                                handleCopyOrCutAction(data, "copy")
                             }
                         },
 
                         "paste": {
                             "label": gettext("Paste"),
-                            "separator_before": true,
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);
 
@@ -156,6 +132,7 @@ $(document).ready(function () {
 
                         "detach": {
                             "label": gettext("Detach"),
+                            "separator_before": true,
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);
                                 if (__ret.detach_url === '#') {
@@ -179,6 +156,30 @@ $(document).ready(function () {
                                 let __ret = get_data_from_tree(data);
                                 // tree's root and learning_unit having/being prerequisite(s) cannot be detached
                                 return __ret.detach_disabled === true;
+                            }
+                        },
+
+                        "modify": {
+                            "label": gettext("Modify the link"),
+                            "separator_before": true,
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+
+                                $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.modify_url
+                                    }
+                                });
+                            },
+                            "title": $node.a_attr.modification_msg,
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                // tree's root cannot be edit (no link with parent...)
+                                return __ret.modification_disabled === true;
                             }
                         },
 
