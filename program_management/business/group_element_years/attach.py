@@ -62,6 +62,11 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
         if not self.instance:
             self._check_new_attach_is_not_duplication()
+            GroupElementYear(
+                parent=self.parent,
+                child_branch=self.child if isinstance(self.child, EducationGroupYear) else None,
+                child_leaf=self.child if isinstance(self.child, LearningUnitYear) else None
+            ).clean()
         return True
 
     def _check_end_year_constraints_on_2m(self):
