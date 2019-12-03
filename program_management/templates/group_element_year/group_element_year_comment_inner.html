@@ -59,6 +59,7 @@
                                 {{ form.media }}
                             {% endif %}
                             <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                                {{ form.id }}
                                 <td style="word-wrap: break-word; min-width: 30px;max-width: 30px;">{{ form.instance.child_branch.acronym }}</td>
                                 <td>{{ form.instance.child_branch.partial_acronym }}</td>
                                 <td>{{ form.instance.child_branch.complete_title }}</td>
@@ -94,6 +95,7 @@
                                 {{ form.media }}
                             {% endif %}
                             <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                                {{ form.id }}
                                 <td >{{ form.instance.child_leaf.acronym }}</td>
                                 <td>{{ form.instance.child_leaf.complete_title }}</td>
                                 <td>

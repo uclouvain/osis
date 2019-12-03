@@ -118,6 +118,7 @@ class TestAttachCheckView(TestCase):
             ]
         )
 
+
 @override_flag('education_group_update', active=True)
 class TestCreateGroupElementYearView(TestCase):
     def setUp(self):
