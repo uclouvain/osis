@@ -96,6 +96,9 @@ $(document).ready(function () {
                     return {
                         "cut": {
                             "label": gettext("Cut"),
+                            "_disabled": function (data) {
+                                return ! get_data_from_tree(data).group_element_year_id;
+                            },
                             "action": function (data) {
                                 handleCopyOrCutAction(data, "cut")
                             }

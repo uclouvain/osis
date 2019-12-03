@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -118,11 +119,14 @@ def _copy_to_cache(request, group_element_year, *args, **kwargs):
 
 @require_http_methods(['POST'])
 def _cut_to_cache(request, group_element_year, *args, **kwargs):
+    action = ElementCache.ElementCacheAction.CUT.value
+    if not group_element_year:
+        action = ElementCache.ElementCacheAction.COPY.value
     return _cache_object(
         request.user,
         group_element_year,
         object_to_cache=kwargs['element'],
-        action=ElementCache.ElementCacheAction.CUT.value
+        action=action
     )
 
 
