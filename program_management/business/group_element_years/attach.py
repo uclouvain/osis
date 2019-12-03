@@ -165,7 +165,7 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
     def is_valid(self):
         if not self.instance:
             self._check_new_attach_is_not_duplication()
-            GroupElementYear(parent=self.parent, child_branch=self.child, child_leaf=None).clean()
+            GroupElementYear(parent=self.parent, child_branch=None, child_leaf=self.child).clean()
         if not self.parent.education_group_type.learning_unit_child_allowed:
             raise ValidationError(gettext("You can not paste a learning unit to a %(category)s of type %(type)s.") % {
                 'category': self.parent.education_group_type.get_category_display(),
