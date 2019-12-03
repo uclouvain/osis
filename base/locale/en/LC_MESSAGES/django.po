@@ -1207,7 +1207,7 @@ msgstr ""
 msgid "It is forbidden to add an element to itself."
 msgstr ""
 
-msgid "It is forbidden to paste an element to one of its included elements."
+msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
 msgid ""
@@ -1226,7 +1226,7 @@ msgid "It is not possible to detach the root element."
 msgstr "It is not possible to remove the root element."
 
 msgid ""
-"It is prohibited to paste a group, mini-training or training to an element "
+"It is prohibited to attach a group, mini-training or training to an element "
 "of another academic year."
 msgstr ""
 

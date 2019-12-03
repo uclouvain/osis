@@ -255,7 +255,7 @@ class GroupElementYear(OrderedModel):
             raise ValidationError(_("It is forbidden to add an element to itself."))
 
         if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise ValidationError(_("It is forbidden to paste an element to one of its included elements."))
+            raise ValidationError(_("It is forbidden to attach an element to one of its included elements."))
 
         if self.child_leaf and self.link_type == LinkTypes.REFERENCE.name:
             raise ValidationError(
@@ -266,7 +266,7 @@ class GroupElementYear(OrderedModel):
     def _check_same_academic_year_parent_child_branch(self):
         if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
-            raise ValidationError(_("It is prohibited to paste a group, mini-training or training to an element of "
+            raise ValidationError(_("It is prohibited to attach a group, mini-training or training to an element of "
                                     "another academic year."))
 
         self._clean_link_type()

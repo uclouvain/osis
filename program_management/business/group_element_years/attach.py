@@ -152,7 +152,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_branch=self.child).exists():
-            raise ValidationError(gettext("You can not paste the same child several times."))
+            raise ValidationError(gettext("You can not attach the same child several times."))
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
@@ -165,7 +165,7 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
         if not self.instance:
             self._check_new_attach_is_not_duplication()
         if not self.parent.education_group_type.learning_unit_child_allowed:
-            raise ValidationError(gettext("You can not paste a learning unit to a %(category)s of type %(type)s.") % {
+            raise ValidationError(gettext("You can not attach a learning unit to a %(category)s of type %(type)s.") % {
                 'category': self.parent.education_group_type.get_category_display(),
                 'type': self.parent.education_group_type.get_name_display()
             })
@@ -173,7 +173,7 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
 
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
-            raise ValidationError(gettext("You can not paste the same child several times."))
+            raise ValidationError(gettext("You can not attach the same child several times."))
 
 
 def can_attach_learning_units(egy: EducationGroupYear):

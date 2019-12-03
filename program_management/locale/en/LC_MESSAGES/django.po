@@ -128,7 +128,7 @@ msgstr ""
 "Cannot remove learning unit %(acronym)s as it has a prerequisite or it is a "
 "prerequisite."
 
-msgid "Cannot paste any element to learning unit"
+msgid "Cannot attach any element to learning unit"
 msgstr ""
 
 #, python-format
@@ -391,10 +391,10 @@ msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
 #, python-format
-msgid "You can not paste a learning unit to a %(category)s of type %(type)s."
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
-msgid "You can not paste the same child several times."
+msgid "You can not attach the same child several times."
 msgstr ""
 
 #, python-format
@@ -403,7 +403,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You cannot paste \"%(child_types)s\" to \"%(parent)s\" (type "
+"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
 
