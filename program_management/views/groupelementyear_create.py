@@ -166,6 +166,11 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
+        try:
+            perms.can_change_education_group(self.request.user, self.get_object().parent)
+        except PermissionDenied as e:
+            display_warning_messages(self.request, str(e))
+
         if not self.detach_strategy.is_valid():
             display_error_messages(self.request, self.detach_strategy.errors)
 
