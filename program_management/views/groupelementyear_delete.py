@@ -86,9 +86,8 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
 
     def _remove_element_from_clipboard_if_stored(self, obj):
         element_cache = ElementCache(self.request.user)
-        cached_data = element_cache.cached_data
         obj_cached = obj.child_branch or obj.child_leaf
-        if cached_data and cached_data['id'] == obj_cached.id and cached_data['modelname'] == obj_cached._meta.db_table:
+        if element_cache.equals(obj_cached):
             element_cache.clear()
 
     def get_success_url(self):
