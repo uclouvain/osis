@@ -76,7 +76,7 @@ class GroupElementYearForm(forms.ModelForm):
 
         elif self.instance.parent.education_group_type.category == education_group_categories.TRAINING and \
                 self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
-            self._keep_only_fields(["block"])
+            self._disable_all_fields(["block"])
 
         elif self.instance.child_leaf:
             self.fields.pop("link_type")
@@ -126,6 +126,11 @@ class GroupElementYearForm(forms.ModelForm):
         for counter, child in enumerate(children):
             child.order = counter
             child.save()
+
+    def _disable_all_fields(self, fields_to_not_disable):
+        for name, field in self.fields.items():
+            if name not in fields_to_not_disable:
+                field.disabled = True
 
     def _keep_only_fields(self, fields_to_keep):
         self.fields = {name: field for name, field in self.fields.items() if name in fields_to_keep}
