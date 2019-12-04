@@ -142,8 +142,8 @@ msgstr ""
 "L'unité d'enseignement %(acronym)s dispose de prérequis ou est prerequis et "
 "ne peut pas être retirée."
 
-msgid "Cannot attach any element to learning unit"
-msgstr "Interdit d'attacher des éléments à une UE"
+msgid "Cannot add any element to learning unit"
+msgstr "Interdit d'ajouter des éléments à une UE"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
