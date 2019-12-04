@@ -50,12 +50,16 @@
                 {% endflag %}
 
                 {% flag "copy_education_group_to_cache" %}
+                    <li id='select_li' {% if not group_to_parent or group_to_parent == "0" %}class="disabled"{% endif %}>
+                        <a href="#" {% if group_to_parent and group_to_parent != "0" %}onclick="select_education_group('cut')"{% endif %}>
+                            {% trans 'Cut' %}
+                        </a>
+                    </li>
                     <li id='select_li'>
-                        <a href="#" onclick="select_education_group()" >
+                        <a href="#" onclick="select_education_group('copy')" >
                             {% trans 'Copy' %}
                         </a>
                     </li>
-                    <li class="divider"></li>
                 {% endflag %}
 
                 {% flag "education_group_attach" %}
@@ -67,6 +71,7 @@
                     {% endif %}>
                         <a>{% trans 'Paste' %}</a>
                     </li>
+                    <li class="divider"></li>
                 {% endflag %}
 
                 {% flag "education_group_detach" %}
@@ -134,11 +139,11 @@
 {% block script %}
     <script>
         // FIXME move this method to common file
-        function select_education_group() {
+        function select_education_group(action) {
             $.ajax({
                 type: "POST",
-                url: "{% url "copy_education_group_to_cache" parent.pk education_group_year.pk %}",
-                data: {'element_id': {{ education_group_year.id }}},
+                url: "{% url 'education_groups_management' %}",
+                data: {'element_id': {{ education_group_year.id }}, 'group_element_year_id': "{{ group_to_parent }}", 'action': action},
                 dataType: 'json',
                 success: function (jsonResponse) {
                     displayInfoMessage(jsonResponse, 'clipboard');

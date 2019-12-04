@@ -169,7 +169,8 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
         try:
             perms.can_change_education_group(self.request.user, self.get_object().parent)
         except PermissionDenied as e:
-            display_warning_messages(self.request, str(e))
+            msg = "{}: {}".format(str(self.get_object().parent), str(e))
+            display_warning_messages(self.request, msg)
 
         if not self.detach_strategy.is_valid():
             display_error_messages(self.request, self.detach_strategy.errors)
