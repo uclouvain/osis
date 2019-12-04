@@ -134,7 +134,7 @@ class TestGroupElementYearForm(TestCase):
                 form = GroupElementYearForm(parent=parent, child_branch=self.child_branch)
                 self.assertCountEqual(expected_fields, list(form.fields.keys()))
 
-    def test_disable_all_except_keep_block_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
+    def test_disable_all_fields_except_block_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
         expected_fields = [
             "block"
         ]
