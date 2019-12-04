@@ -511,3 +511,9 @@ div.dataTables_wrapper div.dataTables_processing {
         affichage: inline-flex ! important;
     }
 }
+
+/* reposition autocomplete selected content */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 15px !important;
+    padding-left: 0 !important;
+}
