@@ -391,10 +391,10 @@ msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
 #, python-format
-msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
-msgid "You can not attach the same child several times."
+msgid "You can not add the same child several times."
 msgstr ""
 
 #, python-format
@@ -403,7 +403,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
+"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
 

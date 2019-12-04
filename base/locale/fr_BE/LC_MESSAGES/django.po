@@ -1252,9 +1252,9 @@ msgstr "Cours isolés"
 msgid "It is forbidden to add an element to itself."
 msgstr "Il est interdit d’ajouter un élément à lui-même."
 
-msgid "It is forbidden to attach an element to one of its included elements."
+msgid "It is forbidden to add an element to one of its included elements."
 msgstr ""
-"Il est interdit d'attacher un élement à un autre élement y étant inclus."
+"Il est interdit d'ajouter un élement à un autre élement y étant inclus."
 
 msgid ""
 "It is forbidden to save a GroupElementYear with a child branch and a child "

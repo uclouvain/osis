@@ -166,7 +166,7 @@ class TestGroupElementYearForm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["link_type"],
-            [_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+            [_("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                  'child_types': self.child_branch.education_group_type,
                  'parent': self.parent,
                  'parent_type': self.parent.education_group_type,
