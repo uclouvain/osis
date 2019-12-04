@@ -235,7 +235,7 @@ class TestMoveGroupElementYearView(TestCase):
 
         self.url = reverse(
             "group_element_year_move",
-            args=[self.root_egy.id, self.group_element_year.child_branch.id, self.group_element_year.id]
+            args=[self.root_egy.id, self.selected_egy.id, self.group_element_year.id]
         )
 
         self.person = PersonFactory()
@@ -250,13 +250,13 @@ class TestMoveGroupElementYearView(TestCase):
 
     def test_move(self):
         AuthorizedRelationshipFactory(
-            parent_type=self.group_element_year.child_branch.education_group_type,
-            child_type=self.selected_egy.education_group_type,
+            parent_type=self.selected_egy.education_group_type,
+            child_type=self.group_element_year.child_branch.education_group_type,
             min_count_authorized=0,
             max_count_authorized=None
         )
         ElementCache(self.person.user).save_element_selected(
-            self.selected_egy,
+            self.group_element_year.child_branch,
             source_link_id=self.group_element_year.id
         )
         self.client.post(self.url, data={
@@ -267,3 +267,5 @@ class TestMoveGroupElementYearView(TestCase):
         })
 
         self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id))
+        self.mocked_perm.assert_any_call(self.person, self.selected_egy, raise_exception=True)
+        self.mocked_perm.assert_any_call(self.person, self.group_element_year.parent, raise_exception=True)

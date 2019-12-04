@@ -126,11 +126,11 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
             kwargs_form_kwargs.append({
                 'parent': self.education_group_year,
                 'child_branch': child if isinstance(child, EducationGroupYear) else None,
-                'child_leaf': child if isinstance(child, LearningUnitYear) else None
+                'child_leaf': child if isinstance(child, LearningUnitYear) else None,
+                'empty_permitted': False
             })
 
         kwargs["form_kwargs"] = kwargs_form_kwargs
-        kwargs["initial"] = [{} for f in kwargs_form_kwargs]
         kwargs["queryset"] = GroupElementYear.objects.none()
         return kwargs
 
@@ -165,6 +165,11 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+
+        try:
+            perms.can_change_education_group(self.request.user, self.get_object().parent)
+        except PermissionDenied as e:
+            display_warning_messages(self.request, str(e))
 
         if not self.detach_strategy.is_valid():
             display_error_messages(self.request, self.detach_strategy.errors)
