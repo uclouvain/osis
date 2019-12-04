@@ -113,7 +113,7 @@ class TestSendMessage(TestCase):
     def test_send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self, mock_send_messages):
         send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_luy(self.statistics_data)
         args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
+        self.assertEqual(self.academic_year, args.get('template_base_data').get('end_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
@@ -125,7 +125,7 @@ class TestSendMessage(TestCase):
             LearningUnitYear.objects.none()
         )
         args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
+        self.assertEqual(self.academic_year, args.get('template_base_data').get('end_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
@@ -133,7 +133,7 @@ class TestSendMessage(TestCase):
     def test_send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
         send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self.statistics_data)
         args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('current_academic_year'))
+        self.assertEqual(self.academic_year, args.get('template_base_data').get('current_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
@@ -148,13 +148,13 @@ class TestSendMessage(TestCase):
             []
         )
         args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('current_academic_year'))
+        self.assertEqual(self.academic_year, args.get('template_base_data').get('current_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
         # Ensure that the mail contains only postponed of academic year
         # (Doesn't contains previous which are technical problem)
-        self.assertEqual(args['template_base_data']['egys_postponed'], 1)
+        self.assertEqual(args['template_base_data']['egys_postponed'], 2)
         self.assertEqual(args['template_base_data']['egys_postponed_qs'][0], edgy_same_year)
 
     @patch("osis_common.messaging.send_message.send_messages")
