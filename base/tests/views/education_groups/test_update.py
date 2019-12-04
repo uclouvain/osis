@@ -1027,7 +1027,7 @@ class TestSelectAttach(TestCase):
         )
         self.assertFormsetError(
             response, 'form', 0, '__all__',
-            _("It is forbidden to attach an element to one of its included elements.")
+            _("It is forbidden to add an element to one of its included elements.")
         )
 
         expected_absent_group_element_year = GroupElementYear.objects.filter(

@@ -1210,7 +1210,7 @@ msgstr ""
 msgid "It is forbidden to add an element to itself."
 msgstr ""
 
-msgid "It is forbidden to attach an element to one of its included elements."
+msgid "It is forbidden to add an element to one of its included elements."
 msgstr ""
 
 msgid ""

@@ -432,23 +432,23 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
-msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
-"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
+"Vous ne pouvez pas ajouter une unité d'enseignement à un/une %(category)s "
 "de type %(type)s."
 
-msgid "You can not attach the same child several times."
-msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
+msgid "You can not add the same child several times."
+msgstr "Vous ne pouvez pas ajouter plusieurs fois le même enfant."
 
 #, python-format
 msgid "You cannot modify content for %(education_group_types)s"
 msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_types)s"
 
 msgid ""
-"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
+"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type "
 "\"%(parent_type)s\")"
 msgstr ""
-"Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type "
+"Vous ne pouvez pas ajouter \"%(child_types)s\" à \"%(parent)s\" (de type "
 "\"%(parent_type)s\")"
 
 #, python-format
