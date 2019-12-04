@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-03 14:25+0100\n"
+"POT-Creation-Date: 2019-12-04 15:42+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -674,6 +674,9 @@ msgstr "Créd. rel./abs."
 
 msgid "Credits"
 msgstr "Crédits"
+
+msgid "Cut"
+msgstr "Couper"
 
 msgid "Cut element"
 msgstr "Élément coupé"
@@ -1906,10 +1909,8 @@ msgstr "Partenariats"
 msgid "Password"
 msgstr "Mot de passe"
 
-#, fuzzy
-#| msgid "Master"
 msgid "Paste"
-msgstr "Master"
+msgstr "Coller"
 
 msgid "Pending"
 msgstr "En attente"
@@ -3643,6 +3644,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Attach"
-#~ msgstr "Attacher"
