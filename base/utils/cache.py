@@ -133,6 +133,13 @@ class ElementCache(OsisCache):
     def key(self):
         return self.PREFIX_KEY.format(user=self.user.pk)
 
+    def equals(self, obj_to_compare):
+        return (
+            self.cached_data
+            and self.cached_data['id'] == obj_to_compare.id
+            and self.cached_data['modelname'] == obj_to_compare._meta.db_table
+        )
+
     def save_element_selected(
             self,
             obj,
