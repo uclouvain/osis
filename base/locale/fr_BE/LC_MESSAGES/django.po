@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 10:38+0100\n"
+"POT-Creation-Date: 2019-11-29 14:45+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -548,6 +548,9 @@ msgstr "Ville de l'institution"
 
 msgid "Classes"
 msgstr "Classes"
+
+msgid "Clear clipboard"
+msgstr "Vider le presse-papier"
 
 msgid "Clear notifications"
 msgstr "Supprimer notifications"
@@ -1191,9 +1194,6 @@ msgstr "Inclure les entités subordonnées"
 msgid "Included in"
 msgstr "Inclus dans"
 
-msgid "Indicate the name or the FGS"
-msgstr "Indiquer le nom ou le FGS"
-
 msgid "Industrial partner"
 msgstr "Partenaire industriel"
 
@@ -1354,6 +1354,9 @@ msgstr ""
 #, python-format
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
+
+msgid "Learning unit edition by faculty managers"
+msgstr "Modification UE par gestionnaires facultaires"
 
 msgid "Learning unit search"
 msgstr "Recherche d'unités d'enseignement"
@@ -1864,9 +1867,6 @@ msgstr "P."
 
 msgid "Page not found."
 msgstr "Page inexistante."
-
-msgid "Parent"
-msgstr ""
 
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
@@ -2532,6 +2532,9 @@ msgstr "La valeur du champ crédits doit être un entier"
 msgid "The education group has been deleted."
 msgstr "L'organisation de formation a été supprimée."
 
+msgid "The education group is not a training type"
+msgstr "Il ne s'agit pas d'une formation"
+
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
 msgstr ""
@@ -2653,6 +2656,7 @@ msgstr ""
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
+#, python-format
 msgid "The link of %(acronym)s has been updated"
 msgstr "Le lien de %(acronym)s a été mis à jour"
 
@@ -2779,6 +2783,9 @@ msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
 
+msgid "The user is not the program manager of the education group"
+msgstr "L'utilisateur n'est pas gestionnaire de programme de cette formation"
+
 #, python-format
 msgid ""
 "The value of field '%(field)s' for the learning unit %(acronym)s "
@@ -2863,6 +2870,12 @@ msgstr "Ce champ est obligatoire."
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
+
+msgid ""
+"This learning unit is not editable by faculty managers during this period."
+msgstr ""
+"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
+"facultaires durant cette période."
 
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
@@ -3169,8 +3182,8 @@ msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
 msgstr ""
-"Vous ne pouvez modifier une unité d'enseignement qui si vous êtes attaché à "
-"son entité responsable du cahier des charges"
+"Vous ne pouvez modifier une unité d'enseignement que si vous êtes attaché·e "
+"à son entité responsable du cahier des charges"
 
 msgid "You can't edit because the learning unit has proposal"
 msgstr ""

@@ -23,19 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.test import TestCase
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from webservices.views import get_title_of_education_group_year
+from webservices.api.serializers.user import UserSerializer
 
 
-class GetTitleOrEducationGroupYear_TestCase(TestCase):
-    def test_get_title_or_education_group_year(self):
-        ega = EducationGroupYearFactory(title='french', title_english='english')
+class CurrentUser(APIView):
+    name = 'current_user'
+    authentication_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES + [SessionAuthentication]
 
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_FR)
-        self.assertEqual('french', title)
-
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_EN)
-        self.assertEqual('english', title)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)

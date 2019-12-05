@@ -23,22 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from rest_framework import status
+from rest_framework.reverse import reverse
+from rest_framework.test import APITestCase
 
-from base.tests.factories.campus import CampusFactory
-from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
+from base.tests.factories.user import UserFactory
+from webservices.api.views.user import CurrentUser
+from rest_framework import authentication
 
 
-class LearningUnitCampusSerializerTestCase(TestCase):
+class CurrentUserTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.campus = CampusFactory()
-        cls.serializer = LearningUnitCampusSerializer(cls.campus)
+        cls.user = UserFactory()
+        cls.url = reverse(CurrentUser.name)
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'name',
-            'organization',
-            'organization_url'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_auth_token_without_credentials(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_auth_token_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_ensure_authentication_classes_have_session(self):
+        self.assertIn(authentication.SessionAuthentication, CurrentUser.authentication_classes)

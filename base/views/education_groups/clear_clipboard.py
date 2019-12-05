@@ -23,22 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponseBadRequest, JsonResponse
+from django.views.decorators.http import require_POST
 
-from base.tests.factories.campus import CampusFactory
-from learning_unit.api.serializers.campus import LearningUnitCampusSerializer
+from base.utils.cache import ElementCache
 
 
-class LearningUnitCampusSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.campus = CampusFactory()
-        cls.serializer = LearningUnitCampusSerializer(cls.campus)
-
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'name',
-            'organization',
-            'organization_url'
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+@login_required
+@require_POST
+@permission_required('base.can_access_education_group', raise_exception=True)
+def clear_clipboard(request):
+    if request.is_ajax():
+        ElementCache(request.user).clear()
+        return JsonResponse({})
+    return HttpResponseBadRequest()

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-15 10:38+0100\n"
+"POT-Creation-Date: 2019-11-29 14:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -518,6 +518,9 @@ msgid "City of institution"
 msgstr ""
 
 msgid "Classes"
+msgstr ""
+
+msgid "Clear clipboard"
 msgstr ""
 
 msgid "Clear notifications"
@@ -1149,9 +1152,6 @@ msgstr ""
 msgid "Included in"
 msgstr ""
 
-msgid "Indicate the name or the FGS"
-msgstr ""
-
 msgid "Industrial partner"
 msgstr ""
 
@@ -1301,6 +1301,9 @@ msgstr ""
 
 #, python-format
 msgid "Learning unit %(acronym)s successfully updated."
+msgstr ""
+
+msgid "Learning unit edition by faculty managers"
 msgstr ""
 
 msgid "Learning unit search"
@@ -1796,9 +1799,6 @@ msgid "P."
 msgstr ""
 
 msgid "Page not found."
-msgstr ""
-
-msgid "Parent"
 msgstr ""
 
 #, python-format
@@ -2447,6 +2447,9 @@ msgstr ""
 msgid "The education group has been deleted."
 msgstr ""
 
+msgid "The education group is not a training type"
+msgstr ""
+
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
 msgstr ""
@@ -2661,6 +2664,9 @@ msgstr ""
 msgid "The user is not attached to the management entity"
 msgstr ""
 
+msgid "The user is not the program manager of the education group"
+msgstr ""
+
 #, python-format
 msgid ""
 "The value of field '%(field)s' for the learning unit %(acronym)s "
@@ -2731,6 +2737,10 @@ msgstr ""
 
 #, python-format
 msgid "This label %s does not exist"
+msgstr ""
+
+msgid ""
+"This learning unit is not editable by faculty managers during this period."
 msgstr ""
 
 msgid "This learning unit isn't eligible for modification because of it's type"
