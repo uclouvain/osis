@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-29 14:45+0100\n"
+"POT-Creation-Date: 2019-12-04 15:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -393,9 +393,6 @@ msgstr ""
 msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
-msgid "Attach"
-msgstr ""
-
 msgid "Attached entities"
 msgstr ""
 
@@ -612,6 +609,12 @@ msgstr ""
 msgid "Coordinator"
 msgstr ""
 
+msgid "Copied element"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
 msgid "Copy Reddot data from previous academic year."
 msgstr ""
 
@@ -641,6 +644,12 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Cut"
+msgstr ""
+
+msgid "Cut element"
 msgstr ""
 
 msgid "Daily"
@@ -685,6 +694,9 @@ msgstr ""
 msgid "Delete message"
 msgstr ""
 
+msgid "Delete permanently"
+msgstr ""
+
 msgid "Delete selected messages"
 msgstr ""
 
@@ -701,7 +713,7 @@ msgid "Description fiche status"
 msgstr ""
 
 msgid "Detach"
-msgstr ""
+msgstr "Remove"
 
 msgid "Detailed program"
 msgstr ""
@@ -1198,10 +1210,10 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-msgid "It is forbidden to attach an element to itself."
+msgid "It is forbidden to add an element to itself."
 msgstr ""
 
-msgid "It is forbidden to attach an element to one of its included elements."
+msgid "It is forbidden to add an element to one of its included elements."
 msgstr ""
 
 msgid ""
@@ -1217,7 +1229,7 @@ msgid "It is not possible to %(action)s the root element."
 msgstr ""
 
 msgid "It is not possible to detach the root element."
-msgstr ""
+msgstr "It is not possible to remove the root element."
 
 msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "
@@ -1830,6 +1842,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Paste"
+msgstr ""
+
 msgid "Pending"
 msgstr ""
 
@@ -1861,6 +1876,9 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
+msgid "Please cut or copy an item before attach it"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
@@ -1876,9 +1894,6 @@ msgstr ""
 
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
-msgstr ""
-
-msgid "Please select an item before attach it"
 msgstr ""
 
 msgid "Pole"
@@ -2232,9 +2247,6 @@ msgstr ""
 msgid "Sector"
 msgstr ""
 
-msgid "Select"
-msgstr ""
-
 msgid "Select a language"
 msgstr ""
 
@@ -2242,9 +2254,6 @@ msgid "Select action to execute"
 msgstr ""
 
 msgid "Select all the messages"
-msgstr ""
-
-msgid "Selected element"
 msgstr ""
 
 msgid "Separate"

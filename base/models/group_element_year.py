@@ -252,10 +252,10 @@ class GroupElementYear(OrderedModel):
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
 
         if self.child_branch == self.parent:
-            raise ValidationError(_("It is forbidden to attach an element to itself."))
+            raise ValidationError(_("It is forbidden to add an element to itself."))
 
         if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise ValidationError(_("It is forbidden to attach an element to one of its included elements."))
+            raise ValidationError(_("It is forbidden to add an element to one of its included elements."))
 
         if self.child_leaf and self.link_type == LinkTypes.REFERENCE.name:
             raise ValidationError(

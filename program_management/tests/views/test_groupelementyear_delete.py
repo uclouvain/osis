@@ -41,6 +41,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from base.utils.cache import ElementCache
 
 
 @override_flag('education_group_update', active=True)
@@ -104,6 +105,28 @@ class TestDetach(TestCase):
         self.assertJSONEqual(str(response.content, encoding='utf8'), {'success': True})
         self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
         self.assertTrue(mock_delete.called)
+
+    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_detach_when_element_is_in_clipboard(self, mock_permission, mock_delete):
+        ElementCache(self.person.user).save_element_selected(
+            self.group_element_year.child_branch,
+            source_link_id=self.group_element_year.id
+        )
+        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        error_msg = "The clipboard should be cleared if detached element is in clipboard"
+        self.assertFalse(ElementCache(self.person.user).cached_data, error_msg)
+
+    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_detach_when_clipboard_filled_with_different_detached_element(self, mock_permission, mock_delete):
+        element_cached = EducationGroupYearFactory()
+        ElementCache(self.person.user).save_element_selected(
+            element_cached,
+        )
+        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
+        self.assertEqual(ElementCache(self.person.user).cached_data['id'], element_cached.id, error_msg)
 
 
 @override_flag('education_group_update', active=True)
