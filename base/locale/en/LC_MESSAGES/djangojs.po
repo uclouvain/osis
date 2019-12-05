@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-08 16:18+0200\n"
+"POT-Creation-Date: 2019-12-03 16:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,17 +14,20 @@ msgstr ""
 msgid ": "
 msgstr ""
 
-msgid "Attach"
-msgstr ""
-
 msgid "Close all"
 msgstr ""
 
 msgid "Collapse"
 msgstr ""
 
-msgid "Detach"
+msgid "Copy"
 msgstr ""
+
+msgid "Cut"
+msgstr ""
+
+msgid "Detach"
+msgstr "Remove"
 
 msgid "Existed code for "
 msgstr ""
@@ -44,13 +47,16 @@ msgstr ""
 msgid "Loading..."
 msgstr ""
 
-msgid "Modify"
+msgid "Modify the link"
 msgstr ""
 
 msgid "Open"
 msgstr ""
 
 msgid "Open all"
+msgstr ""
+
+msgid "Paste"
 msgstr ""
 
 msgid "Please enter a valid URL."
@@ -66,9 +72,6 @@ msgid "Please enter a value that is a multiple of 0.5."
 msgstr ""
 
 msgid "Search"
-msgstr ""
-
-msgid "Select"
 msgstr ""
 
 msgid "Selection of target files"

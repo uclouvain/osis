@@ -38,7 +38,7 @@ from cms.models import translated_text
 
 
 class LearningUnitPedagogyEditForm(forms.Form):
-    trans_text = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
+    trans_text = forms.CharField(widget=CKEditorWidget(config_name='minimal'), required=False)
     cms_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     def __init__(self, *args, **kwargs):

@@ -142,8 +142,8 @@ class TestEducationGroupAdmin(TestCase):
         msg = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(msg[0], ngettext(
             "%(count)d education group has been postponed with success.",
-            "%(count)d education groups have been postponed with success.", 6
-        ) % {'count': 6})
+            "%(count)d education groups have been postponed with success.", 1
+        ) % {'count': 1})
 
 
 class TestEducationGroupConstraintEndYearOn2M(TestCase):

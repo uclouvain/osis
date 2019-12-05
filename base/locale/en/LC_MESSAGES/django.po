@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-07 16:19+0100\n"
+"POT-Creation-Date: 2019-12-04 15:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -264,15 +264,6 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add attribution"
-msgstr ""
-
-msgid "Add current year teacher"
-msgstr ""
-
-msgid "Add over the current year"
-msgstr ""
-
 msgid "Add the English content of this paragraph"
 msgstr ""
 
@@ -402,9 +393,6 @@ msgstr ""
 msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
-msgid "Attach"
-msgstr ""
-
 msgid "Attached entities"
 msgstr ""
 
@@ -417,22 +405,10 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Attribution duration"
 msgstr ""
 
 msgid "Attribution entity"
-msgstr ""
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Attributions"
@@ -541,6 +517,9 @@ msgstr ""
 msgid "Classes"
 msgstr ""
 
+msgid "Clear clipboard"
+msgstr ""
+
 msgid "Clear notifications"
 msgstr ""
 
@@ -630,6 +609,12 @@ msgstr ""
 msgid "Coordinator"
 msgstr ""
 
+msgid "Copied element"
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
 msgid "Copy Reddot data from previous academic year."
 msgstr ""
 
@@ -659,6 +644,12 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Cut"
+msgstr ""
+
+msgid "Cut element"
 msgstr ""
 
 msgid "Daily"
@@ -703,6 +694,9 @@ msgstr ""
 msgid "Delete message"
 msgstr ""
 
+msgid "Delete permanently"
+msgstr ""
+
 msgid "Delete selected messages"
 msgstr ""
 
@@ -719,7 +713,7 @@ msgid "Description fiche status"
 msgstr ""
 
 msgid "Detach"
-msgstr ""
+msgstr "Remove"
 
 msgid "Detailed program"
 msgstr ""
@@ -867,6 +861,9 @@ msgstr ""
 msgid "English"
 msgstr ""
 
+msgid "English comment"
+msgstr ""
+
 msgid "English title proper"
 msgstr ""
 
@@ -891,9 +888,6 @@ msgstr ""
 msgid "Enrollments to learning unit"
 msgstr ""
 
-msgid "Enrollments to training"
-msgstr ""
-
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -914,6 +908,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluations"
@@ -1164,9 +1161,6 @@ msgstr ""
 msgid "Included in"
 msgstr ""
 
-msgid "Indicate the name or the FGS"
-msgstr ""
-
 msgid "Industrial partner"
 msgstr ""
 
@@ -1216,10 +1210,10 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-msgid "It is forbidden to attach an element to itself."
+msgid "It is forbidden to add an element to itself."
 msgstr ""
 
-msgid "It is forbidden to attach an element to one of its included elements."
+msgid "It is forbidden to add an element to one of its included elements."
 msgstr ""
 
 msgid ""
@@ -1235,7 +1229,7 @@ msgid "It is not possible to %(action)s the root element."
 msgstr ""
 
 msgid "It is not possible to detach the root element."
-msgstr ""
+msgstr "It is not possible to remove the root element."
 
 msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "
@@ -1316,6 +1310,9 @@ msgstr ""
 
 #, python-format
 msgid "Learning unit %(acronym)s successfully updated."
+msgstr ""
+
+msgid "Learning unit edition by faculty managers"
 msgstr ""
 
 msgid "Learning unit search"
@@ -1443,9 +1440,6 @@ msgid "Major list choice"
 msgstr ""
 
 msgid "Male"
-msgstr ""
-
-msgid "Manage repartition"
 msgstr ""
 
 msgid "Manage volumes"
@@ -1643,9 +1637,6 @@ msgid "No Messages"
 msgstr ""
 
 msgid "No additional fees"
-msgstr ""
-
-msgid "No attributions exist for the parent learning unit"
 msgstr ""
 
 msgid "No data"
@@ -1851,6 +1842,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Paste"
+msgstr ""
+
 msgid "Pending"
 msgstr ""
 
@@ -1882,6 +1876,9 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
+msgid "Please cut or copy an item before attach it"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
@@ -1897,9 +1894,6 @@ msgstr ""
 
 #, python-format
 msgid "Please select an academic year lower than %(academic_year_max)d."
-msgstr ""
-
-msgid "Please select an item before attach it"
 msgstr ""
 
 msgid "Pole"
@@ -2157,14 +2151,6 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Req. Entities"
 msgstr ""
 
@@ -2261,9 +2247,6 @@ msgstr ""
 msgid "Sector"
 msgstr ""
 
-msgid "Select"
-msgstr ""
-
 msgid "Select a language"
 msgstr ""
 
@@ -2271,9 +2254,6 @@ msgid "Select action to execute"
 msgstr ""
 
 msgid "Select all the messages"
-msgstr ""
-
-msgid "Selected element"
 msgstr ""
 
 msgid "Separate"
@@ -2473,6 +2453,9 @@ msgstr ""
 msgid "The education group has been deleted."
 msgstr ""
 
+msgid "The education group is not a training type"
+msgstr ""
+
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
 msgstr ""
@@ -2512,6 +2495,9 @@ msgid "The following education groups ended with error"
 msgstr ""
 
 msgid "The following learning units ended with error"
+msgstr ""
+
+msgid "The following links has been updated"
 msgstr ""
 
 msgid "The format of the range date is not valid"
@@ -2573,6 +2559,10 @@ msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 msgid "The learning units"
+msgstr ""
+
+#, python-format
+msgid "The link of %(acronym)s has been updated"
 msgstr ""
 
 #, python-format
@@ -2639,12 +2629,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
-msgstr ""
-
-#, python-format
-msgid ""
 "The teaching material has been deleted up to %(last_year_reported)s with "
 "success"
 msgstr ""
@@ -2684,6 +2668,9 @@ msgid "The user has not permission to delete education groups."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
+msgstr ""
+
+msgid "The user is not the program manager of the education group"
 msgstr ""
 
 #, python-format
@@ -2758,6 +2745,10 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
+msgid ""
+"This learning unit is not editable by faculty managers during this period."
+msgstr ""
+
 msgid "This learning unit isn't eligible for modification because of it's type"
 msgstr ""
 
@@ -2790,6 +2781,12 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
+msgid "Total"
+msgstr ""
+
+msgid "Total enrollments to training"
+msgstr ""
+
 msgid "Training"
 msgstr ""
 
@@ -2818,9 +2815,6 @@ msgid "Trimester"
 msgstr ""
 
 msgid "Tutor"
-msgstr ""
-
-msgid "Tutor for parent LU"
 msgstr ""
 
 msgid "Tutors"

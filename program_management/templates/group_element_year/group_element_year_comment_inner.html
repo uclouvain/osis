@@ -1,4 +1,4 @@
-{% load bootstrap3 osis_bootstrap3 i18n %}
+{% load bootstrap3 osis_bootstrap3 i18n static %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -25,29 +25,102 @@
 
 
 <div class="modal-content" id="form-modal-content">
-    {# We do not display the form if those are warnings or errors #}
     {% if not messages %}
         <div class="modal-header">
-            <h4 class="text-center">{{ form.instance.child.partial_acronym }} - {{ form.instance.child.acronym }}</h4>
+            <h4 class="text-center">{% trans 'Content' %}</h4>
         </div>
 
         <div id="form-modal-body" class="modal-body">
-            <form method="post" id="form_comment_update" action="{{ request.path }}?{{ request.GET.urlencode }}">
-                {% bootstrap_form_errors form %}
-
+            <form method="post" id="form_comment_update" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}">
                 {% csrf_token %}
-                {% if form.link_type %}
-                    {% bootstrap_row field_0=form.link_type form_group_class_0="col-md-5" field_1=form.block form_group_class_1="col-md-4" field_2=form.is_mandatory label_2=_('Required') form_group_class_2="col-md-3"%}
+                {{ formset.management_form }}
+                {{ formset.media }}
+                {% if is_education_group_year_formset %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                                <th>{% trans 'Code' %}</th>
+                                {% if group_element_year.parent.is_minor_major_option_list_choice %}
+                                <th>{% trans 'Access condition' %}</th>
+                                {% else %}
+                                <th>{% trans 'Mandatory' %}</th>
+                                <th>{% trans 'Block' %}</th>
+                                <th>{% trans 'Link type' %}</th>
+                                <th>{% trans 'Comment' %}</th>
+                                <th>{% trans 'English comment' %}</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody data-formset-body id="group_element_year-form">
+                        {% for form in formset.forms %}
+                            {% if forloop.first %}
+                                {{ form.media }}
+                            {% endif %}
+                            <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                                {{ form.id }}
+                                <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{{ form.instance.child_branch.acronym }}</td>
+                                <td>{{ form.instance.child_branch.partial_acronym }}</td>
+                                {% if group_element_year.parent.is_minor_major_option_list_choice %}
+                                <td>{{ form.access_condition }}</td>
+                                {% else %}
+                                <td>{{ form.is_mandatory }}</td>
+                                <td style="word-wrap: break-word; min-width: 90px;max-width: 90px;">{% bootstrap_field form.block show_label=False %}</td>
+                                <td style="word-wrap: break-word; min-width: 125px;max-width: 125px;">{% bootstrap_field form.link_type show_label=False %}</td>
+                                <td>{% bootstrap_field form.comment show_label=False %}</td>
+                                <td>{% bootstrap_field form.comment_english show_label=False %}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 {% else %}
-                    {% bootstrap_row field_0=form.relative_credits form_group_class_0="col-md-5" field_1=form.block form_group_class_1="col-md-4" field_2=form.is_mandatory label_2=_('Required') form_group_class_2="col-md-3"%}
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Cred. rel./abs.' %}</th>
+                            <th>{% trans 'Mandatory' %}</th>
+                            <th>{% trans 'Block' %}</th>
+                            <th>{% trans 'Comment' %}</th>
+                            <th>{% trans 'English comment' %}</th>
+                        </tr>
+                        </thead>
+                        <tbody data-formset-body id="group_element_year-form">
+                        {% for form in formset.forms %}
+                            {% if forloop.first %}
+                                {{ form.media }}
+                            {% endif %}
+                            <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                                {{ form.id }}
+                                <td >{{ form.instance.child_leaf.acronym }}</td>
+                                <td>
+                                    {% with form.instance.child.credits|floatformat:-2|default_if_none:'-' as absolute_credits %}
+                                        {% bootstrap_field form.relative_credits show_label=False addon_after='/'|add:absolute_credits %}
+                                    {% endwith %}
+                                </td>
+                                <td>{{ form.is_mandatory }}</td>
+                                <td>{% bootstrap_field form.block show_label=False %}</td>
+                                <td>{% bootstrap_field form.comment show_label=False %}</td>
+                                <td>{% bootstrap_field form.comment_english show_label=False %}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
                 {% endif %}
-
-                {% bootstrap_row field_0=form.comment form_group_class_0="col-md-12" %}
-
-                {% bootstrap_row field_0=form.comment_english form_group_class_0="col-md-12" %}
-
-                {% bootstrap_row field_0=form.access_condition form_group_class_0="col-md-4" %}
             </form>
+            <script src="{% static 'js/jquery.formset.js' %}"></script>
+            <script>
+                $(document).ready(function() {
+                    document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                    $('.link-formset').formset({
+                        prefix: '{{ formset.prefix }}',
+                        addText: '',
+                        deleteText: ''
+                    });
+                });
+            </script>
+
         </div>
 
         <div class="modal-footer">
@@ -66,4 +139,3 @@
     {% endif %}
 
 </div>
-

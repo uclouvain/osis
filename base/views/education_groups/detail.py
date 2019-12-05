@@ -44,7 +44,7 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base import models as mdl
-from base.business.education_group import can_user_edit_administrative_data, show_coorganization
+from base.business.education_group import can_user_edit_administrative_data, has_coorganization
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
@@ -69,6 +69,7 @@ from base.models.program_manager import ProgramManager
 from base.utils.cache import cache, ElementCache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
+from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -91,12 +92,22 @@ EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 class CatalogGenericDetailView:
     def get_selected_element_for_clipboard(self):
-        selected_data = ElementCache(self.request.user).cached_data
-        if selected_data and selected_data.get('modelname') == LEARNING_UNIT_YEAR:
-            return LearningUnitYear.objects.get(id=selected_data.get('id'))
-        elif selected_data and selected_data.get('modelname') == EDUCATION_GROUP_YEAR:
-            return EducationGroupYear.objects.get(id=selected_data.get('id'))
+        cached_data = ElementCache(self.request.user).cached_data
+        if cached_data:
+            obj = self._get_instance_object_from_cache(cached_data)
+            return get_clipboard_content_display(obj, cached_data['action'])
         return None
+
+    @staticmethod
+    def _get_instance_object_from_cache(cached_data):
+        model_name = cached_data.get('modelname')
+        cached_obj_id = cached_data.get('id')
+        obj = None
+        if model_name == LEARNING_UNIT_YEAR:
+            obj = LearningUnitYear.objects.get(id=cached_obj_id)
+        elif model_name == EDUCATION_GROUP_YEAR:
+            obj = EducationGroupYear.objects.get(id=cached_obj_id)
+        return obj
 
 
 @method_decorator(login_required, name='dispatch')
@@ -238,7 +249,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
-        context["show_coorganization"] = show_coorganization(self.object)
+        context["show_coorganization"] = has_coorganization(self.object)
         return context
 
     def get_template_names(self):
@@ -538,7 +549,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
-            text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
+            text_field = forms.CharField(widget=CKEditorWidget(config_name='education_group_pedagogy'))
 
         admission_condition_form = AdmissionConditionForm()
         admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=self.object)

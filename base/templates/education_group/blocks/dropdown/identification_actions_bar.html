@@ -49,13 +49,17 @@
                     <li class="divider"></li>
                 {% endflag %}
 
-                {% flag "education_group_select" %}
-                    <li id='select_li'>
-                        <a href="#" onclick="select_education_group()" >
-                            {% trans 'Select' %}
+                {% flag "copy_education_group_to_cache" %}
+                    <li id='select_li' {% if not group_to_parent or group_to_parent == "0" %}class="disabled"{% endif %}>
+                        <a href="#" {% if group_to_parent and group_to_parent != "0" %}onclick="select_education_group('cut')"{% endif %}>
+                            {% trans 'Cut' %}
                         </a>
                     </li>
-                    <li class="divider"></li>
+                    <li id='select_li'>
+                        <a href="#" onclick="select_education_group('copy')" >
+                            {% trans 'Copy' %}
+                        </a>
+                    </li>
                 {% endflag %}
 
                 {% flag "education_group_attach" %}
@@ -65,8 +69,9 @@
                         class="trigger_modal"
                         data-url="{% url 'education_group_attach' parent.id education_group_year.id %}"
                     {% endif %}>
-                        <a>{% trans 'Attach' %}</a>
+                        <a>{% trans 'Paste' %}</a>
                     </li>
+                    <li class="divider"></li>
                 {% endflag %}
 
                 {% flag "education_group_detach" %}
@@ -80,7 +85,7 @@
 
                 {% flag "education_group_update" %}
                     {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
-                    {% if tab_to_show %}
+                    {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
                         {% with update_url|add:"?tab_to_show="|add:tab_to_show as update_url %}
                             {% li_with_update_perm update_url _('Modify') %}
                         {% endwith %}
@@ -91,7 +96,7 @@
 
                 {% flag "education_group_delete" %}
                     {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
-                    {% li_with_deletion_perm delete_url _('Delete') %}
+                    {% li_with_deletion_perm delete_url _('Delete permanently') %}
                 {% endflag %}
 
                 {% flag "education_group_update" %}
@@ -134,11 +139,11 @@
 {% block script %}
     <script>
         // FIXME move this method to common file
-        function select_education_group() {
+        function select_education_group(action) {
             $.ajax({
                 type: "POST",
-                url: "{% url "education_group_select" parent.pk education_group_year.pk %}",
-                data: {'element_id': {{ education_group_year.id }}},
+                url: "{% url 'education_groups_management' %}",
+                data: {'element_id': {{ education_group_year.id }}, 'group_element_year_id': "{{ group_to_parent }}", 'action': action},
                 dataType: 'json',
                 success: function (jsonResponse) {
                     displayInfoMessage(jsonResponse, 'clipboard');
