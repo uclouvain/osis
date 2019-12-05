@@ -85,6 +85,7 @@ WITH RECURSIVE group_element_year_parent AS (
 SELECT * FROM group_element_year_parent ;
 """
 
+# TODO: Déplacer le code dans un Manager du modèle GroupElementYear
 SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD = """
 WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
     SELECT  gey.id,
