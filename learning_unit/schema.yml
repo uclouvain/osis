@@ -546,6 +546,8 @@ components:
           format: uri
         acronym:
           type: string
+        code:
+          type: string
         credits:
           type: number
           multipleOf: 0.01
