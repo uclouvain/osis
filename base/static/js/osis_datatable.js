@@ -22,6 +22,9 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
         "serverSide": true,
         "ajax" : {
             "url": ajaxUrl,
+            "accepts": {
+              json: 'application/json'
+            },
             "type": "GET",
             "dataSrc": "object_list",
             "data": function (d){

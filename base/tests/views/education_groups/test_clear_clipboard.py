@@ -77,7 +77,7 @@ class TestClearClipboard(TestCase):
         element_cache.save_element_selected(luy)
         self.assertDictEqual(
             element_cache.cached_data,
-            {'id': luy.pk, 'modelname': 'base_learningunityear'}
+            {'id': luy.pk, 'modelname': 'base_learningunityear', 'action': ElementCache.ElementCacheAction.COPY.value}
         )
 
         self.client.post(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')

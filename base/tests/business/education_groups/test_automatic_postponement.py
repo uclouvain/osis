@@ -63,26 +63,26 @@ class TestFetchEducationGroupToPostpone(TestCase):
         self.education_group = EducationGroupFactory(end_year=None)
 
     def test_fetch_education_group_to_postpone_to_N6(self):
-        EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-4],
+        education_group_years_to_postpone = EducationGroupYearFactory.create_batch(
+            2,
+            education_group__end_year=None,
+            academic_year=self.academic_years[-4]
         )
-        education_group_to_postpone = EducationGroupYearFactory(
-            education_group=self.education_group,
-            academic_year=self.academic_years[-3],
-        )
-
-        self.assertEqual(EducationGroupYear.objects.count(), 2)
 
         result, errors = EducationGroupAutomaticPostponementToN6().postpone()
 
-        self.assertEqual(len(result), 2)
-        self.assertEqual(EducationGroupYear.objects.count(), 4)
-
-        latest_postponed_egy = result[-1]
-        self.assertEqual(latest_postponed_egy.academic_year.year, self.current_year + 6)
-        self.assertEqual(latest_postponed_egy.education_group, education_group_to_postpone.education_group)
         self.assertFalse(errors)
+
+        self.assertCountEqual(
+            [egy.academic_year for egy in result],
+            [self.academic_years[6]] * 2
+        )
+        self.assertCountEqual(
+            [egy.education_group for egy in result],
+            [egy.education_group for egy in education_group_years_to_postpone]
+        )
+
+        self.assertEqual(EducationGroupYear.objects.count(), 8)
 
     def test_if_structure_is_postponed(self):
         parent = EducationGroupYearFactory(

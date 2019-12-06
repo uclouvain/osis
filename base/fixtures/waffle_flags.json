@@ -223,7 +223,7 @@
     "model": "waffle.flag",
     "pk": 13,
     "fields": {
-        "name": "education_group_select",
+        "name": "copy_education_group_to_cache",
         "everyone": null,
         "percent": null,
         "testing": false,

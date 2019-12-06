@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
+from base.business.education_groups import general_information_sections
 from base.models.education_group_year import EducationGroupYear
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 
@@ -46,8 +48,9 @@ class GeneralInformation(generics.RetrieveAPIView):
                 'educationgrouppublicationcontact_set',
                 'educationgroupachievement_set'
             ),
-            acronym=self.kwargs['acronym'].upper(),
-            academic_year__year=self.kwargs['year']
+            Q(acronym__iexact=self.kwargs['acronym']) | Q(partial_acronym__iexact=self.kwargs['acronym']),
+            academic_year__year=self.kwargs['year'],
+            education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys()
         )
         return egy
 

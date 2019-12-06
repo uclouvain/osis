@@ -31,7 +31,7 @@ from base.templatetags import pagination
 
 class SearchMixin:
     """
-        Search Mixin to return FilterView filter result as json when request is of type ajax.
+        Search Mixin to return FilterView filter result as json when accept header is of type application/json.
         Also implements method to return number of items per page.
 
         serializer_class: class used to serialize the resulting queryset
@@ -39,7 +39,7 @@ class SearchMixin:
     serializer_class = None
 
     def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
+        if "application/json" in self.request.headers.get("Accept", ""):
             serializer = self.serializer_class(
                 context["page_obj"],
                 context={

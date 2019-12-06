@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -42,12 +43,14 @@ from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, \
     is_valid_proposal, MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, \
     li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
 from base.tests.business.test_perms import create_person_with_permission_and_group
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -243,6 +246,12 @@ class LearningUnitTagLiEditTest(TestCase):
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
         current_academic_yr = AcademicYear.objects.get(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
+        AcademicCalendarFactory(
+            data_year=current_academic_yr,
+            start_date=datetime.datetime(current_academic_yr.year - 2, 9, 15),
+            end_date=datetime.datetime(current_academic_yr.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
         lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
             academic_year=current_academic_yr,
