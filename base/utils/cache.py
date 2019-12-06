@@ -25,6 +25,7 @@
 ##############################################################################
 import abc
 import logging
+from enum import Enum
 from functools import wraps
 
 from django.conf import settings
@@ -121,6 +122,10 @@ class RequestCache(OsisCache):
 class ElementCache(OsisCache):
     PREFIX_KEY = 'select_element_{user}'
 
+    class ElementCacheAction(Enum):
+        COPY = "copy-action"
+        CUT = "cut-action"
+
     def __init__(self, user):
         self.user = user
 
@@ -128,8 +133,20 @@ class ElementCache(OsisCache):
     def key(self):
         return self.PREFIX_KEY.format(user=self.user.pk)
 
-    def save_element_selected(self, obj, source_link_id=None):
-        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table}
+    def equals(self, obj_to_compare):
+        return (
+            self.cached_data
+            and self.cached_data['id'] == obj_to_compare.id
+            and self.cached_data['modelname'] == obj_to_compare._meta.db_table
+        )
+
+    def save_element_selected(
+            self,
+            obj,
+            source_link_id=None,
+            action: ElementCacheAction = ElementCacheAction.COPY.value
+    ):
+        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table, 'action': action}
         if source_link_id:
             data_to_cache['source_link_id'] = source_link_id
         self.set_cached_data(data_to_cache)

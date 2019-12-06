@@ -163,5 +163,5 @@ class TestLearningUnitAdmin(TestCase):
         msg = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(msg[0], ngettext(
             "%(count)d learning unit has been postponed with success",
-            "%(count)d learning units have been postponed with success", 6
-        ) % {'count': 6})
+            "%(count)d learning units have been postponed with success", 1
+        ) % {'count': 1})

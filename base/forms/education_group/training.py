@@ -32,7 +32,8 @@ from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import shorten
-from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
+from base.business.education_groups.postponement import PostponementEducationGroupYearMixin, \
+    CheckConsistencyCertificateAimsMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
     MainEntitiesVersionChoiceField, EducationGroupYearModelForm, PermissionFieldTrainingMixin
 from base.forms.utils.choice_field import add_blank
@@ -255,7 +256,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
             )
 
 
-class CertificateAimsForm(forms.ModelForm):
+class CertificateAimsForm(CheckConsistencyCertificateAimsMixin, forms.ModelForm):
     section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
 
     class Meta:
@@ -277,12 +278,24 @@ class CertificateAimsForm(forms.ModelForm):
         return EducationGroupCertificateAim.check_certificate_aims(self.cleaned_data)
 
     def save(self, commit=True):
-        self.instance.certificate_aims.clear()
-        for certificate_aim in self.cleaned_data.get("certificate_aims", []):
-            EducationGroupCertificateAim.objects.get_or_create(
-                education_group_year=self.instance,
-                certificate_aim=certificate_aim,
-            )
+        self.check_consistency()
+
+        for egy in self.get_instances_valid():
+            egy.certificate_aims.clear()
+            for certificate_aim in self.cleaned_data.get("certificate_aims", []):
+                EducationGroupCertificateAim.objects.get_or_create(
+                    education_group_year=egy,
+                    certificate_aim=certificate_aim,
+                )
+        return self.instance
+
+    @property
+    def warnings(self):
+        return getattr(self, 'consistency_errors', [])
+
+    @property
+    def education_group_year_postponed(self):
+        return [egy for egy in self.get_instances_valid() if egy.pk != self.instance.pk]
 
 
 class TrainingModelForm(EducationGroupModelForm):
@@ -315,6 +328,19 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
 
     def is_valid(self):
         return super(TrainingForm, self).is_valid() and self.hops_form.is_valid()
+
+    @property
+    def diploma_tab_fields(self):
+        return [
+            'joint_diploma', 'diploma_printing_title', 'professional_title',
+            'section', 'certificate_aims'
+        ]
+
+    def show_diploma_tab(self):
+        return any(
+            not field.disabled for field_name, field
+            in self.forms[forms.ModelForm].fields.items() if field_name in self.diploma_tab_fields
+        )
 
 
 @register('university_domains')

@@ -104,7 +104,7 @@ Feature: Modification d'offre
     And Cliquer sur Copier dans la modal
     And Cliquer sur « Enregistrer » dans la modal
 
-    And Dans l'arbre et dans LDRCC900R, cliquer sur Détacher sur LDROI2108.
+    And Dans l'arbre et dans LDRCC900R, cliquer sur Retirer sur LDROI2108.
     And Cliquer sur « Enregistrer » dans la modal
     And Ouvrir LDRMM900R dans l’arbre
     And LDROI2108 se trouve bien dans l'arbre sous LDRMM900R

@@ -401,7 +401,7 @@ def qualification(signatories):
                             if signatory.mandate.qualification))
 
 
-def show_coorganization(education_group_year):
+def has_coorganization(education_group_year):
     return education_group_year.education_group_type.category == "TRAINING" and \
            education_group_year.education_group_type.name not in [
                TrainingType.PGRM_MASTER_120.name,

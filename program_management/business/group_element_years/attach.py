@@ -31,6 +31,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ngettext, gettext
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -62,6 +63,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
         if not self.instance:
             self._check_new_attach_is_not_duplication()
+            GroupElementYear(parent=self.parent, child_branch=self.child, child_leaf=None).clean()
         return True
 
     def _check_end_year_constraints_on_2m(self):
@@ -151,7 +153,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
 
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_branch=self.child).exists():
-            raise ValidationError(gettext("You can not attach the same child several times."))
+            raise ValidationError(gettext("You can not add the same child several times."))
 
 
 class AttachLearningUnitYearStrategy(AttachStrategy):
@@ -163,8 +165,9 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
     def is_valid(self):
         if not self.instance:
             self._check_new_attach_is_not_duplication()
+            GroupElementYear(parent=self.parent, child_branch=None, child_leaf=self.child).clean()
         if not self.parent.education_group_type.learning_unit_child_allowed:
-            raise ValidationError(gettext("You can not attach a learning unit to a %(category)s of type %(type)s.") % {
+            raise ValidationError(gettext("You can not add a learning unit to a %(category)s of type %(type)s.") % {
                 'category': self.parent.education_group_type.get_category_display(),
                 'type': self.parent.education_group_type.get_name_display()
             })
@@ -172,4 +175,8 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
 
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
-            raise ValidationError(gettext("You can not attach the same child several times."))
+            raise ValidationError(gettext("You can not add the same child several times."))
+
+
+def can_attach_learning_units(egy: EducationGroupYear):
+    return egy.education_group_type.category == education_group_categories.Categories.GROUP.name

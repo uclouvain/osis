@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-08 16:18+0200\n"
+"POT-Creation-Date: 2019-12-03 16:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,17 +14,20 @@ msgstr ""
 msgid ": "
 msgstr ""
 
-msgid "Attach"
-msgstr "Attacher"
-
 msgid "Close all"
 msgstr "Fermer tout"
 
 msgid "Collapse"
 msgstr "Fermer"
 
+msgid "Copy"
+msgstr "Copier"
+
+msgid "Cut"
+msgstr "Couper"
+
 msgid "Detach"
-msgstr "Détacher"
+msgstr "Retirer"
 
 msgid "Existed code for "
 msgstr "Code a déjà existé pour "
@@ -44,14 +47,17 @@ msgstr "Lien vers document du CDN"
 msgid "Loading..."
 msgstr "Chargement en cours..."
 
-msgid "Modify"
-msgstr "Modifier"
+msgid "Modify the link"
+msgstr "Modifier le lien"
 
 msgid "Open"
 msgstr "Ouvrir"
 
 msgid "Open all"
 msgstr "Ouvrir tout"
+
+msgid "Paste"
+msgstr "Coller"
 
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
@@ -67,9 +73,6 @@ msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
 msgid "Search"
 msgstr "Rechercher"
-
-msgid "Select"
-msgstr "Sélectionner"
 
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"

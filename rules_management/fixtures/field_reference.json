@@ -4223,10 +4223,7 @@
             ],
             "groups": [
                 [
-                    "central_managers"
-                ],
-                [
-                    "faculty_managers"
+                    "program_managers"
                 ]
             ]
         },
@@ -4254,14 +4251,7 @@
                 "base",
                 "educationgroupyear"
             ],
-            "groups": [
-                [
-                    "central_managers"
-                ],
-                [
-                    "faculty_managers"
-                ]
-            ]
+            "groups": []
         },
         "model": "rules_management.fieldreference"
     },
