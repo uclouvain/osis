@@ -470,6 +470,8 @@ components:
                   type: string
             summary_status:
               type: string
+            professional_integration:
+              type: boolean
     ExternalLearningUnit:
       allOf:
         - $ref: '#/components/schemas/LearningUnitDetailed'
