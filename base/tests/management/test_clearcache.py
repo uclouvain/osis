@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,21 +22,20 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django.test import TestCase
-
-from base.models import offer
-from base.tests.factories.offer import OfferFactory
-
-
-def create_offer(title):
-    return OfferFactory(title=title)
+############################################################################
+from io import StringIO
+from django.core.management import call_command
+from django.test import SimpleTestCase
+from django.core.cache import cache
 
 
-class OfferTest(TestCase):
-    def test_find_by_id_with_instance(self):
-        of = OfferFactory()
-        self.assertEqual(of,  offer.find_by_id(of.pk))
+class ClearCacheTest(SimpleTestCase):
+    def test_empty_cache_content(self):
+        cache.set("key", "value")
 
-    def test_find_by_id_none(self):
-        self.assertIsNone(offer.find_by_id(-1))
+        out = StringIO()
+        call_command("clearcache", stdout=out)
+
+        self.assertIsNone(cache.get("key"))
+        self.assertIn('Successfully clear cache', out.getvalue())
+
