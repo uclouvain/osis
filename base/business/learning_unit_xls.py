@@ -156,7 +156,8 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
                                                     _get_parameters_configurable_list(learning_units,
                                                                                       titles_part1,
                                                                                       user))
-    ws_data.update({xls_build.WORKSHEETS_DATA: [ws_data.get(xls_build.WORKSHEETS_DATA)[0], _prepare_legend_ws_data()]})
+    ws_data.update({xls_build.WORKSHEETS_DATA: [ws_data.get(xls_build.WORKSHEETS_DATA)[0],
+                                                prepare_proposal_legend_ws_data()]})
     return xls_build.generate_xls(ws_data, filters)
 
 
@@ -185,7 +186,7 @@ def _get_significant_volume(volume):
     return ''
 
 
-def _prepare_legend_ws_data():
+def prepare_proposal_legend_ws_data():
     return {
         xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
         xls_build.CONTENT_KEY: [
