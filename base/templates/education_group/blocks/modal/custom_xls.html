@@ -28,21 +28,16 @@
         <div class="modal-content">
             <form role="form" method="POST" name="custom_xls_form" id="custom_xls_form"
                   action="{% url "education_group_learning_units_contains" education_group_year_pk=education_group_year.pk %}">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">×</button>
-                    <h4>{% trans 'Do you want to export the following informations' %}?</h4>
-                </div>
                 <div class="modal-body">
                     {% csrf_token %}
+                    <label>{% trans 'Do you want to export the following informations' %}?</label>
                     <br>
                     <input type="checkbox" id="chb_select_all_custom"/>
-                    <label>{% trans 'Select/deselect all' %}</label>
-                    <br><br>
-
+                    {% trans 'Select all' %}
+                    <br>
                     {% for field in form_xls_custom %}
                         {{ field }}
-                        <label>{{ field.label }}</label>
+                        {{ field.label }}
                         <br>
                     {% endfor %}
                     <br>

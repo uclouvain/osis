@@ -167,7 +167,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                                          'volume': 'on'})
 
         expected_headers = \
-            FIX_TITLES + optional_header_for_proposition + optional_header_for_credits + optional_header_for_volume
+            FIX_TITLES + optional_header_for_credits + optional_header_for_volume + optional_header_for_proposition
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_get_attribution_line(self):
@@ -177,25 +177,16 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_fix_data(self):
         gey = self.child_leaves[0]
         luy = self.luy_children[0]
-        expected = [luy.acronym,
-                    luy.academic_year.year,
-                    luy.complete_title_i18n,
-                    luy.get_container_type_display(),
-                    luy.get_subtype_display(),
-                    "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
-                    "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
-                    gey.block or '',
-                    _('yes')
-                    ]
+        expected = get_expected_data(gey, luy)
         res = _fix_data(gey, luy)
         self.assertEqual(res, expected)
 
     def test_legend_workbook_exists(self):
-        wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], True)
+        wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], True, {})
         self.assertEqual(len(wb.worksheets), 2)
 
     def test_legend_workbook_do_not_exists(self):
-        wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], False)
+        wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], False, {})
         self.assertEqual(len(wb.worksheets), 1)
 
     def test_legend_workbook_content(self):
@@ -265,21 +256,26 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_data(self):
         custom_form = CustomXlsForm({})
         exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
-        excel_lines = _build_excel_lines_ues(exl.egy, custom_form, exl.learning_unit_years_parent)
-
+        data = _build_excel_lines_ues(exl.egy, custom_form, exl.learning_unit_years_parent)
+        content = data.get('content')
         idx = 1
 
-        for k, gey in exl.learning_unit_years_parent.items():
+        for gey in exl.learning_unit_years_parent:
             luy = gey.child_leaf
-            expected = [luy.acronym,
-                        luy.academic_year.year,
-                        luy.complete_title_i18n,
-                        luy.get_container_type_display(),
-                        luy.get_subtype_display(),
-                        "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
-                        "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
-                        gey.block or '',
-                        _('yes')
-                        ]
-            self.assertListEqual(excel_lines[idx], expected)
+            expected = get_expected_data(gey, luy)
+            self.assertListEqual(content[idx], expected)
             idx += 1
+
+
+def get_expected_data(gey, luy):
+    expected = [luy.acronym,
+                luy.academic_year,
+                luy.complete_title_i18n,
+                luy.get_container_type_display(),
+                luy.get_subtype_display(),
+                "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
+                "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
+                gey.block or '',
+                _('yes')
+                ]
+    return expected

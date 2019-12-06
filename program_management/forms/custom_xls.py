@@ -29,17 +29,17 @@ from django.utils.translation import gettext_lazy as _
 
 class CustomXlsForm(forms.Form):
 
-    required_entity = forms.BooleanField(required=False, label=_('Req. Entity'))
-    proposition = forms.BooleanField(required=False, label=_('Proposal'))
+    required_entity = forms.BooleanField(required=False, label=_('Requirement entity'))
+    allocation_entity = forms.BooleanField(required=False, label=_('Attribution entity'))
     credits = forms.BooleanField(required=False, label=_('Credits'))
-    allocation_entity = forms.BooleanField(required=False, label=_('Alloc. Ent.'))
-    english_title = forms.BooleanField(required=False, label=_('Title in English'))
-    teacher_list = forms.BooleanField(required=False, label=_('List of teachers'))
     periodicity = forms.BooleanField(required=False, label=_('Periodicity'))
     active = forms.BooleanField(required=False, label=_('Active'))
-    volume = forms.BooleanField(required=False, label=_('Volume'))
     quadrimester = forms.BooleanField(required=False, label=_('Quadrimester'))
     session_derogation = forms.BooleanField(required=False, label=_('Session derogation'))
+    volume = forms.BooleanField(required=False, label=_('Volume'))
+    teacher_list = forms.BooleanField(required=False, label=_('Tutors'))
+    proposition = forms.BooleanField(required=False, label=_('Proposals'))
+    english_title = forms.BooleanField(required=False, label=_('Title in English'))
     language = forms.BooleanField(required=False, label=_('Language'))
 
     def get_optional_data(self):
