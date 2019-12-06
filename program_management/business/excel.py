@@ -344,11 +344,11 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
         self.egy = egy
         self.hierarchy = EducationGroupHierarchy(root=self.egy)
         self.learning_unit_years_parent = {}
-        print('coucou')
+
         for grp in self.hierarchy.included_group_element_years:
             if not grp.child_leaf:
                 continue
-            print(grp.child_leaf.id)
+
             self.learning_unit_years_parent.setdefault(grp.child_leaf.id, grp)
 
     def get_queryset(self):
@@ -535,9 +535,6 @@ def _build_excel_lines_ues(egy: EducationGroupYear, custom_xls_form: CustomXlsFo
     optional_data_needed = _optional_data(custom_xls_form)
     colored_cells = defaultdict(list)
     idx = 1
-    # for l in learning_unit_years_parent:
-    #     print(type(l))
-    print(len(learning_unit_years_parent))
     cpt = 0
     for gey in learning_unit_years_parent:
         luy = gey.child_leaf
