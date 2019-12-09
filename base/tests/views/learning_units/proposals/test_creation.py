@@ -123,6 +123,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        self.assertCountEqual(
+            list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
+            self.academic_years[:-1]
+        )
 
     def test_get_proposal_learning_unit_creation_form_with_faculty_user(self):
         self.client.force_login(self.faculty_person.user)
@@ -132,6 +136,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        self.assertCountEqual(
+            list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
+            self.academic_years[1:-1]
+        )
 
     def test_post_proposal_learning_unit_creation_form(self):
         self.client.force_login(self.person.user)
