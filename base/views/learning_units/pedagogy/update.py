@@ -96,6 +96,7 @@ def _post_learning_unit_pedagogy_form(request):
         form.save()
         last_academic_year_reported = form.luys[-1].academic_year if len(form.luys) >= 2 else None
         if last_academic_year_reported and is_pedagogy_data_must_be_postponed(form.luys[0]):
+            print('coucou')
             display_success_messages(
                 request,
                 _("The sections you modified have been saved and "
