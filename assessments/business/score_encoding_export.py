@@ -34,8 +34,8 @@ from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
 
-HEADER = ['Academic year', 'Session', 'Learning unit', 'Program', 'Registration number', 'Lastname',
-          'Firstname', 'Email', 'Numbered scores', 'Justification (A,T)', 'End date Prof']
+HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
+          _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof')]
 
 JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
@@ -90,7 +90,8 @@ def export_xls(exam_enrollments):
     academic_year = lst_exam_enrollments[0].learning_unit_enrollment.learning_unit_year.academic_year
 
     filename = "session_%s_%s_%s.xlsx" % (str(academic_year.year), str(number_session), learn_unit_acronym)
-    response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(save_virtual_workbook(workbook),
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 
@@ -108,7 +109,7 @@ def _add_header_and_legend_to_file(exam_enrollments, worksheet):
     _color_legend(worksheet)
     worksheet.append([str('')])
     __columns_resizing(worksheet)
-    header_translate_list = [str(_(elem)) for elem in HEADER]
+    header_translate_list = [str(elem) for elem in HEADER]
     worksheet.append(header_translate_list)
 
 
