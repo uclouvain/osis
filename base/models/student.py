@@ -91,8 +91,8 @@ def find_by_person(a_person):
         return None
 
 
-def find_by_offer_year(offer_y):
-    return Student.objects.filter(offerenrollment__offer_year=offer_y)
+def find_by_education_group_year(education_group_year):
+    return Student.objects.filter(offerenrollment__education_group_year=education_group_year)
 
 
 def find_by_id(student_id):
