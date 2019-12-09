@@ -470,6 +470,8 @@ components:
                   type: string
             summary_status:
               type: string
+            professional_integration:
+              type: boolean
     ExternalLearningUnit:
       allOf:
         - $ref: '#/components/schemas/LearningUnitDetailed'
@@ -503,6 +505,9 @@ components:
           type: string
         organization:
           type: string
+        organization_url:
+          type: string
+          format: uri
     LearningUnitAttribution:
       type: object
       properties:
@@ -542,6 +547,8 @@ components:
           type: string
           format: uri
         acronym:
+          type: string
+        code:
           type: string
         credits:
           type: number

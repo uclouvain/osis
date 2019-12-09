@@ -125,18 +125,24 @@ class AutomaticPostponementToN6(AutomaticPostponement):
             try:
                 with transaction.atomic():
                     last_year = obj.end_year.year if obj.end_year else self.last_academic_year.year
-                    obj_to_copy = getattr(obj, self.annualized_set + "_set").latest('academic_year__year')
+                    obj_to_copy = self.get_object_to_copy(obj)
                     copied_objs = []
+                    last_object_copied = None
                     for year in range(obj.last_year + 1, last_year + 1):
                         new_obj = self.extend_obj(obj_to_copy, AcademicYear.objects.get(year=year))
                         copied_objs.append(new_obj)
+                        last_object_copied = new_obj
 
                     self.post_extend(obj_to_copy, copied_objs)
-                    self.result.extend(copied_objs)
+                    if last_object_copied:
+                        self.result.append(last_object_copied)
 
             # General catch to be sure to not stop the rest of the duplication
             except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
                 self.errors.append(obj)
+
+    def get_object_to_copy(self, object_to_duplicate):
+        return getattr(object_to_duplicate, self.annualized_set + "_set").latest('academic_year__year')
 
     @classmethod
     def extend_obj(cls, obj, last_academic_year):

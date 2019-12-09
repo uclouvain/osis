@@ -29,7 +29,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Value, CharField
 from rest_framework import serializers
 
-from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE, \
+from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
@@ -71,7 +72,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         sections = []
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
-        pertinent_sections = SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
+        pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
         common_egy = EducationGroupYear.objects.get_common(
             academic_year=obj.academic_year
         )

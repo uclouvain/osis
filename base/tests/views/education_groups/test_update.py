@@ -28,21 +28,22 @@ import random
 from http import HTTPStatus
 from unittest import mock
 
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from base.forms.education_group.group import GroupYearModelForm
+from base.forms.education_group.training import CertificateAimsForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
@@ -63,7 +64,8 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import SuperUserFactory, UserFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from program_management.business.group_element_years import management
@@ -113,9 +115,6 @@ class TestUpdate(TestCase):
         self.client.force_login(self.person.user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.person.user.user_permissions.add(permission)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_certificate_aims",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
 
         self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         self.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
@@ -175,7 +174,9 @@ class TestUpdate(TestCase):
         self.domains = [DomainFactory() for _ in range(10)]
 
         self.a_mini_training_education_group_type = EducationGroupTypeFactory(
-            category=education_group_categories.MINI_TRAINING)
+            category=education_group_categories.MINI_TRAINING,
+            name=MiniTrainingType.DEEPENING.name
+        )
 
         self.mini_training_education_group_year = MiniTrainingFactory(
             academic_year=self.current_academic_year,
@@ -192,9 +193,6 @@ class TestUpdate(TestCase):
             entity=self.mini_training_education_group_year.management_entity,
             start_date=self.education_group_year.academic_year.start_date
         )
-
-    def tearDown(self):
-        self.perm_patcher.stop()
 
     def test_login_required(self):
         self.client.logout()
@@ -269,44 +267,6 @@ class TestUpdate(TestCase):
         response = self.client.get(self.training_url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "education_group/update_trainings.html")
-
-    def test_template_used_for_certificate_edition(self):
-        faculty_managers_group = Group.objects.get(name='faculty_managers')
-        self.faculty_user = UserFactory()
-        self.faculty_user.groups.add(faculty_managers_group)
-        self.faculty_person = PersonFactory(user=self.faculty_user)
-        self.client.force_login(self.faculty_user)
-        permission = Permission.objects.get(codename='change_educationgroup')
-        self.faculty_user.user_permissions.add(permission)
-        self._assert_redirects_to_modal_to_update_certificate_aims(self.previous_training_education_group_year)
-        self._assert_redirects_to_modal_to_update_certificate_aims(self.training_education_group_year)
-
-        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
-        first_certificate_aim = certificate_aims[0].id
-
-        self._assert_post_to_modal_to_update_certificate_aims(
-            first_certificate_aim,
-            self.previous_training_education_group_year
-        )
-        self._assert_post_to_modal_to_update_certificate_aims(
-            first_certificate_aim,
-            self.training_education_group_year
-        )
-
-    def _assert_redirects_to_modal_to_update_certificate_aims(self, education_group_year):
-        response = self.client.get(reverse(
-            update_education_group,
-            args=[education_group_year.pk, education_group_year.pk]
-        ))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
-
-    def _assert_post_to_modal_to_update_certificate_aims(self, first_certificate_aim, education_group_year):
-        response = self.client.post(reverse(update_education_group,
-                                            args=[education_group_year.pk,
-                                                  education_group_year.pk]),
-                                    data={'certificate_aims': str(first_certificate_aim)})
-        self.assertEqual(response.status_code, 302)
 
     def test_post_training(self):
         old_domain = DomainFactory()
@@ -755,7 +715,7 @@ class TestGetSuccessRedirectUrl(TestCase):
 
 
 @override_flag('education_group_attach', active=True)
-@override_flag('education_group_select', active=True)
+@override_flag('copy_education_group_to_cache', active=True)
 @override_flag('education_group_update', active=True)
 class TestSelectAttach(TestCase):
     @classmethod
@@ -793,15 +753,15 @@ class TestSelectAttach(TestCase):
             child_leaf=self.learning_unit_year
         )
 
-        self.url_select_education_group = reverse(
-            "education_group_select",
+        self.url_copy_education_group = reverse(
+            "copy_education_group_to_cache",
             args=[
                 self.initial_parent_education_group_year.id,
                 self.child_education_group_year.id,
             ]
         )
-        self.url_select_learning_unit = reverse(
-            "learning_unit_select",
+        self.url_copy_learning_unit_in_cache = reverse(
+            "copy_learning_unit_to_cache",
             args=[self.learning_unit_year.id]
         )
         group_above_new_parent = GroupElementYearFactory(
@@ -810,14 +770,17 @@ class TestSelectAttach(TestCase):
         )
 
         self.url_management = reverse("education_groups_management")
-        self.select_data = {
+        select_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": self.child_education_group_year.id,
             "group_element_year_id": self.initial_group_element_year.id,
-            "action": "select",
+        }
+        self.copy_action_data = {
+            **select_data,
+            **{'action': 'copy'}
         }
         self.root = group_above_new_parent.parent
-        self.attach_data = {
+        self.attach_action_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": self.new_parent_education_group_year.id,
             "group_element_year_id": group_above_new_parent.id,
@@ -836,8 +799,12 @@ class TestSelectAttach(TestCase):
         # Clean cache state
         self.addCleanup(cache.clear)
 
-    def test_select_case_education_group(self):
-        response = self.client.post(self.url_management, data=self.select_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    def test_copy_case_education_group(self):
+        response = self.client.post(
+            self.url_management,
+            data=self.copy_action_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
         data_cached = ElementCache(self.person.user).cached_data
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -846,13 +813,50 @@ class TestSelectAttach(TestCase):
             {
                 'modelname': management.EDUCATION_GROUP_YEAR,
                 'id': self.child_education_group_year.id,
-                'source_link_id': self.initial_group_element_year.pk
+                'source_link_id': self.initial_group_element_year.pk,
+                'action': ElementCache.ElementCacheAction.COPY.value,
             }
         )
 
-    def test_select_ajax_case_learning_unit_year(self):
+    def test_cut_case_education_group(self):
+        cut_action_data = self.copy_action_data
+        cut_action_data['action'] = "cut"
         response = self.client.post(
-            self.url_select_learning_unit,
+            self.url_management,
+            data=cut_action_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        data_cached = ElementCache(self.person.user).cached_data
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertDictEqual(
+            data_cached,
+            {
+                'modelname': management.EDUCATION_GROUP_YEAR,
+                'id': self.child_education_group_year.id,
+                'source_link_id': self.initial_group_element_year.pk,
+                'action': ElementCache.ElementCacheAction.CUT.value,
+            }
+        )
+
+    def test_cut_when_group_element_year_not_given(self):
+        """When user click on 'cut' action into the root element in the tree"""
+        cut_action_data = dict(self.copy_action_data)
+        cut_action_data['action'] = "cut"
+        del cut_action_data['group_element_year_id']
+        self.client.post(
+            self.url_management,
+            data=cut_action_data,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        action_cached = ElementCache(self.person.user).cached_data['action']
+
+        self.assertEqual(action_cached, ElementCache.ElementCacheAction.COPY.value)
+        self.assertNotEqual(action_cached, ElementCache.ElementCacheAction.CUT.value)
+
+    def test_copy_ajax_case_learning_unit_year(self):
+        response = self.client.post(
+            self.url_copy_learning_unit_in_cache,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
         )
         data_cached = ElementCache(self.person.user).cached_data
@@ -862,13 +866,14 @@ class TestSelectAttach(TestCase):
             data_cached,
             {
                 'modelname': management.LEARNING_UNIT_YEAR,
-                'id': self.learning_unit_year.id
+                'id': self.learning_unit_year.id,
+                'action': ElementCache.ElementCacheAction.COPY.value,
             }
         )
 
-    def test_select_redirects_if_not_ajax(self):
+    def test_copy_redirects_if_not_ajax(self):
         """In this test, we ensure that redirect is made if the request is not in AJAX """
-        response = self.client.post(self.url_select_learning_unit)
+        response = self.client.post(self.url_copy_learning_unit_in_cache)
 
         redirected_url = reverse('learning_unit', args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
@@ -888,13 +893,19 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.select_data)
+        self.client.post(self.url_management, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
-            reverse("group_element_year_create",
-                    args=[self.attach_data["root_id"],
-                          self.attach_data["element_id"]]),
+            reverse(
+                "group_element_year_create",
+                args=[self.copy_action_data["root_id"], self.copy_action_data["element_id"]],
+            ),
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1',
+            },
         )
 
         expected_group_element_year_existing = GroupElementYear.objects.filter(
@@ -920,13 +931,19 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.select_data)
+        self.client.post(self.url_management, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
-            reverse("group_element_year_create",
-                    args=[self.attach_data["root_id"],
-                          self.attach_data["element_id"]]),
+            reverse(
+                "group_element_year_create",
+                args=[self.copy_action_data["root_id"], self.new_parent_education_group_year.id],
+            ),
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1'
+            },
         )
 
         expected_group_element_year_count = GroupElementYear.objects.filter(
@@ -950,8 +967,10 @@ class TestSelectAttach(TestCase):
 
         # Select :
         self.client.post(
-            self.url_select_education_group,
-            data={'element_id': self.new_parent_education_group_year.id}
+            self.url_copy_education_group,
+            data={
+                'element_id': self.new_parent_education_group_year.id,
+            }
         )
 
         # Create a link :
@@ -959,11 +978,15 @@ class TestSelectAttach(TestCase):
             reverse("group_element_year_create", args=[
                 self.new_parent_education_group_year.id, self.child_education_group_year.id
             ]),
-            data={}
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1',
+            }
         )
-        self.assertFormError(
-            response, 'form', '__all__',
-            _("It is forbidden to attach an element to one of its included elements.")
+        self.assertFormsetError(
+            response, 'form', 0, '__all__',
+            _("It is forbidden to add an element to one of its included elements.")
         )
 
         expected_absent_group_element_year = GroupElementYear.objects.filter(
@@ -989,7 +1012,7 @@ class TestSelectAttach(TestCase):
         # Select :
         self.client.post(
             self.url_management,
-            data=self.select_data
+            data=self.copy_action_data
         )
 
         # Create link :
@@ -1019,7 +1042,11 @@ class TestSelectAttach(TestCase):
 
         response = self.client.post(
             reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),
-            data={}
+            data={
+                'form-TOTAL_FORMS': '1',
+                'form-INITIAL_FORMS': '0',
+                'form-MAX_NUM_FORMS': '1',
+            }
         )
         self.assertEqual(response.status_code, 302)
 
@@ -1047,7 +1074,7 @@ class TestSelectAttach(TestCase):
         messages = list(get_messages(response.wsgi_request))
 
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), _("Please select an item before attach it"))
+        self.assertEqual(str(messages[0]), _("Please cut or copy an item before attach it"))
 
     @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
     def test_attach_a_not_valid_case(self, mock_attach_strategy):
@@ -1061,7 +1088,7 @@ class TestSelectAttach(TestCase):
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), _("Dummy message"))
+        self.assertIn(_("Dummy message"), str(messages[0]))
 
     def _assert_link_with_inital_parent_present(self):
         expected_initial_group_element_year = GroupElementYear.objects.get(
@@ -1111,3 +1138,67 @@ class TestCertificateAimAutocomplete(TestCase):
         results = json.loads(json_response)['results']
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['id'], str(self.certificate_aim.id))
+
+
+@override_flag('education_group_update', active=True)
+class TestCertificateAimView(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.academic_year = AcademicYearFactory(year=2019)
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+
+        cls.program_manager = ProgramManagerFactory(education_group=cls.training.education_group)
+        read_permission = Permission.objects.get(codename='can_access_education_group')
+        cls.program_manager.person.user.user_permissions.add(read_permission)
+
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("update_education_group", kwargs={
+            "root_id": self.training.pk,
+            "education_group_year_id": self.training.pk
+        })
+        self.client.force_login(user=self.program_manager.person.user)
+
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, "/login/?next={}".format(self.url))
+
+    def test_user_is_not_program_manager_of_training(self):
+        training_without_pgrm_manager = TrainingFactory(academic_year=self.academic_year)
+        url = reverse("update_education_group", kwargs={
+            "root_id": training_without_pgrm_manager.pk,
+            "education_group_year_id": training_without_pgrm_manager.pk
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
+    def test_use_certificate_aims_template(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
+
+    def test_ensure_context_kwargs(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.context['education_group_year'], self.training)
+        self.assertIsInstance(response.context['form_certificate_aims'], CertificateAimsForm)
+
+    @mock.patch('base.views.education_groups.update.CertificateAimsForm')
+    def test_post_method_ensure_data_is_correctly_save(self, mock_form):
+        mock_form.return_value.is_valid.return_value = True
+        mock_form.return_value.save.return_value = self.training
+
+        response = self.client.post(self.url, data={'dummy_key': 'dummy'})
+        excepted_url = reverse("education_group_read", args=[self.training.pk, self.training.pk])
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'success_url': excepted_url}
+        )

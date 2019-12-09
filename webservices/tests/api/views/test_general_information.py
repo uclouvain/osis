@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
     SKILLS_AND_ACHIEVEMENTS, COMMON_DIDACTIC_PURPOSES
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
@@ -51,14 +51,8 @@ class GeneralInformationTestCase(APITestCase):
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES, EVALUATION_KEY]
         }
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[
-            cls.egy.education_group_type.name
-        ] = cls.pertinent_sections
         for section in cls.pertinent_sections['common']:
-            TranslatedTextLabelFactory(
-                language=cls.language,
-                text_label__label=section
-            )
+            TranslatedTextLabelFactory(language=cls.language, text_label__label=section)
             TranslatedTextFactory(
                 reference=common_egy.id,
                 entity=OFFER_YEAR,
@@ -67,10 +61,7 @@ class GeneralInformationTestCase(APITestCase):
             )
         for section in cls.pertinent_sections['specific']:
             if section != EVALUATION_KEY:
-                TranslatedTextLabelFactory(
-                    language=cls.language,
-                    text_label__label=section
-                )
+                TranslatedTextLabelFactory(language=cls.language, text_label__label=section)
             TranslatedTextFactory(
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
@@ -91,6 +82,12 @@ class GeneralInformationTestCase(APITestCase):
         })
 
     def setUp(self):
+        sections_patcher = mock.patch(
+            "base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE",
+            {self.egy.education_group_type.name: self.pertinent_sections}
+        )
+        mocked_sections = sections_patcher.start()
+        self.addCleanup(sections_patcher.stop)
         self.client.force_authenticate(user=self.person.user)
 
     def test_get_not_authorized(self):
@@ -115,8 +112,21 @@ class GeneralInformationTestCase(APITestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_get_results(self):
+    def test_get_results_based_on_egy_with_acronym(self):
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = GeneralInformationSerializer(self.egy, context={'language': self.language})
+        self.assertEqual(response.data, serializer.data)
+
+    def test_get_results_based_on_egy_with_partial_acronym(self):
+        url_partial_acronym = reverse('generalinformations_read', kwargs={
+            'acronym': self.egy.partial_acronym,
+            'year': self.egy.academic_year.year,
+            'language': self.language
+        })
+
+        response = self.client.get(url_partial_acronym)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = GeneralInformationSerializer(self.egy, context={'language': self.language})

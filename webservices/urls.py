@@ -34,8 +34,6 @@ from webservices.api.views.common_admission_condition import CommonAdmissionCond
 from webservices.api.views.common_text import CommonText
 from webservices.api.views.general_information import GeneralInformation
 from webservices.api.views.user import CurrentUser
-from webservices.views import ws_catalog_offer, ws_catalog_common_offer, ws_catalog_common_admission_condition, \
-    ws_catalog_offer_v02
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -68,24 +66,6 @@ for appname in webservice_apps:
 
 
 urlpatterns = [
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
-        ws_catalog_common_offer,
-        name='v0.1-ws_catalog_common_offer'),
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common/admission_condition$',
-        ws_catalog_common_admission_condition,
-        name='v0.1-ws_catalog_common_admission_condition'),
-    url('^v0.1/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer,
-        name='v0.1-ws_catalog_offer'),
-    url('^v0.2/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
-        ws_catalog_common_offer,
-        name='v0.2-ws_catalog_common_offer'),
-    url('^v0.2/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common/admission_condition$',
-        ws_catalog_common_admission_condition,
-        name='v0.2-ws_catalog_common_admission_condition'),
-    url('^v0.2/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/(?P<acronym>[a-zA-Z0-9]+)$',
-        ws_catalog_offer_v02,
-        name='v0.2-ws_catalog_offer'),
     url('^v0.3/catalog/offer/(?P<year>[0-9]{4})/(?P<language>[a-zA-Z]{2})/common$',
         CommonText.as_view(),
         name=CommonText.name),

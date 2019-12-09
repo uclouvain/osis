@@ -21,13 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.core.cache import cache
+from django.http import JsonResponse
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import SuperUserFactory
 
@@ -44,6 +43,8 @@ class TestQuickSearchLearningUnitView(TestCase):
     def setUp(self) -> None:
         self.client.force_login(self.user)
 
+        self.addCleanup(cache.clear)
+
     def test_show_no_data_when_no_criteria_set(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'quick_search_luy_inner.html')
@@ -57,6 +58,11 @@ class TestQuickSearchLearningUnitView(TestCase):
         response = self.client.get(self.url, data={'title': 'asgard'})
         self.assertNotIn(self.luy_to_find, response.context['page_obj'])
 
+    def test_return_json_when_accept_header_set_to_json(self):
+        response = self.client.get(self.url, data={'title': 'dead'}, HTTP_ACCEPT="application/json")
+
+        self.assertIsInstance(response, JsonResponse)
+
 
 class TestQuickSearchEducationGroupView(TestCase):
 
@@ -69,6 +75,8 @@ class TestQuickSearchEducationGroupView(TestCase):
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
+
+        self.addCleanup(cache.clear)
 
     def test_show_no_data_when_no_criteria_set(self):
         response = self.client.get(self.url)
@@ -88,3 +96,8 @@ class TestQuickSearchEducationGroupView(TestCase):
 
         response = self.client.get(self.url, data={'partial_acronym': 'RB'})
         self.assertNotIn(self.egy_to_find, response.context['page_obj'])
+
+    def test_return_json_when_accept_header_set_to_json(self):
+        response = self.client.get(self.url, data={'title': 'dead'}, HTTP_ACCEPT="application/json")
+
+        self.assertIsInstance(response, JsonResponse)
