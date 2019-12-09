@@ -86,7 +86,7 @@ class TestDetach(TestCase):
         self.mocked_perm.return_value = False
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/blocks/modal/modal_access_denied.html")
 
     def test_detach_case_get_with_ajax_success(self):

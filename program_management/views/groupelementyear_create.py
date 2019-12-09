@@ -26,7 +26,6 @@
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.forms import modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
@@ -66,18 +65,6 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
 
         return JsonResponse({"error_messages": error_messages})
 
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            for rule in self.rules:
-                perm = self.rules[0](self.request.user, self.education_group_year)
-                if not perm:
-                    break
-
-        except PermissionDenied as e:
-            return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(AttachCheckView, self).dispatch(request, *args, **kwargs)
-
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
 
@@ -103,18 +90,6 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
                 self.pattern_name = 'group_element_year_move'
 
         return super().get_redirect_url(*args, **kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            for rule in self.rules:
-                perm = rule(self.request.user, self.education_group_year)
-                if not perm:
-                    break
-
-        except PermissionDenied as e:
-            return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(PasteElementFromCacheToSelectedTreeNode, self).dispatch(request, *args, **kwargs)
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):

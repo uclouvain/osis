@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
@@ -95,17 +93,3 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def get_success_url(self):
         # We can just reload the page
         return
-
-    def dispatch(self, request, *args, **kwargs):
-
-        if request.user.is_authenticated:
-            try:
-                self.rules[0](self.request.user, self.get_object())
-
-            except PermissionDenied as e:
-
-                return render(request,
-                              'education_group/blocks/modal/modal_access_denied.html',
-                              {'access_message': _('You are not eligible to detach this item')})
-
-        return super(DetachGroupElementYearView, self).dispatch(request, *args, **kwargs)
