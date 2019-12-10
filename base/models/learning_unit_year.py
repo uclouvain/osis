@@ -112,7 +112,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
                     'status')
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id']
+    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
     actions = [
         'resend_messages_to_queue',
     ]
