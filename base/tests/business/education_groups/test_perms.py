@@ -215,12 +215,20 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         self.assertTrue(perm._is_linked_to_management_entity())
         self.assertTrue(mock_check_link.called)
 
-    def test_is_eligible_case_user_as_superuser(self):
+    def test_is_eligible_case_user_as_superuser_case_greater_or_equal_limit_year(self):
         super_user = UserFactory(is_superuser=True)
-        training = TrainingFactory()
+        training = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
         perm = CommonEducationGroupStrategyPerms(super_user, training)
         self.assertTrue(perm._is_eligible())
+
+    def test_is_eligible_case_user_as_superuser_case_lower_than_limit_year(self):
+        super_user = UserFactory(is_superuser=True)
+        training = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION - 1)
+
+        perm = CommonEducationGroupStrategyPerms(super_user, training)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
 
     @mock.patch(
         "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_lower_than_limit_edg_year",
