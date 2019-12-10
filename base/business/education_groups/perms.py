@@ -255,13 +255,16 @@ class CommonEducationGroupStrategyPerms(object):
     def _is_eligible(self):
         if self.user.is_superuser:
             return True
-        if self.education_group_year.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+        if self._is_lower_than_limit_edg_year():
             raise PermissionDenied(_("You cannot change a education group before %(limit_year)s") % {
                 "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
             })
         if not self._is_linked_to_management_entity():
             raise PermissionDenied(_("The user is not attached to the management entity"))
         return True
+
+    def _is_lower_than_limit_edg_year(self):
+        return self.education_group_year.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
