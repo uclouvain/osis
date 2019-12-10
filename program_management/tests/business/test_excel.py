@@ -256,7 +256,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_data(self):
         custom_form = CustomXlsForm({})
         exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
-        data = _build_excel_lines_ues(exl.egy, custom_form, exl.learning_unit_years_parent)
+        data = _build_excel_lines_ues(custom_form, exl.learning_unit_years_parent)
         content = data.get('content')
         idx = 1
 

@@ -522,14 +522,15 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 
 def generate_ue_contained_for_workbook(egy: EducationGroupYear, learning_unit_years_parent,
                                        custom_xls_form: CustomXlsForm):
-    data = _build_excel_lines_ues(egy, custom_xls_form, learning_unit_years_parent)
+    data = _build_excel_lines_ues(custom_xls_form, learning_unit_years_parent)
     excel_lines = data.get('content')
+    need_proposal_legend = custom_xls_form.cleaned_data['proposition']
     return _get_workbook_for_custom_xls(excel_lines,
-                                        custom_xls_form.cleaned_data['proposition'],
-                                        data.get('colored_cells', {}))
+                                        need_proposal_legend,
+                                        data.get('colored_cells', {}) if need_proposal_legend else {})
 
 
-def _build_excel_lines_ues(egy: EducationGroupYear, custom_xls_form: CustomXlsForm, learning_unit_years_parent):
+def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, learning_unit_years_parent):
     content = _get_headers(custom_xls_form)
 
     optional_data_needed = _optional_data(custom_xls_form)
