@@ -27,6 +27,7 @@ from django.test import TestCase
 
 from base.models import student
 from base.models.student import Student
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonWithoutUserFactory, PersonFactory
@@ -77,6 +78,14 @@ class StudentTest(TestCase):
     def test_find_by_id(self):
         tmp_student = StudentFactory()
         db_student = student.find_by_id(tmp_student.id)
+        self.assertIsNotNone(db_student)
+        self.assertEqual(db_student, tmp_student)
+
+    def test_find_by_education_group_year(self):
+        tmp_student = StudentFactory()
+        tmp_education_group_year = EducationGroupYearFactory()
+        OfferEnrollmentFactory.create(education_group_year=tmp_education_group_year, student=tmp_student)
+        db_student = list(student.find_by_education_group_year([tmp_education_group_year][0]))[0]
         self.assertIsNotNone(db_student)
         self.assertEqual(db_student, tmp_student)
 
