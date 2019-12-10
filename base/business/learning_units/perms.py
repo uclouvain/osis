@@ -31,10 +31,10 @@ from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
+from base.business.event_perms import EventPermLearningUnitFacultyManagerEdition
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
-from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
-    starting_academic_year
+from base.models.academic_year import starting_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
@@ -355,21 +355,27 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
 
 
 def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise_exception=False):
-    current_acy = starting_academic_year()
-    luy_acy = learning_unit_year.academic_year
-    max_range = MAX_ACADEMIC_YEAR_FACULTY if person.is_faculty_manager else MAX_ACADEMIC_YEAR_CENTRAL
-
-    return current_acy.year <= luy_acy.year <= current_acy.year + max_range
+    if person.is_central_manager:
+        return not is_learning_unit_year_in_past(learning_unit_year, person)
+    elif person.is_faculty_manager:
+        return _can_be_updated_by_faculty_manager(learning_unit_year)
+    return False
 
 
 def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
-    result = person.is_central_manager or learning_unit_year.can_update_by_faculty_manager()
+    result = person.is_central_manager or _can_be_updated_by_faculty_manager(learning_unit_year)
     can_raise_exception(
         raise_exception,
         result,
         MSG_NOT_GOOD_RANGE_OF_YEARS,
         )
     return result
+
+
+def _can_be_updated_by_faculty_manager(learning_unit_year):
+    if not learning_unit_year.learning_container_year:
+        return False
+    return EventPermLearningUnitFacultyManagerEdition(obj=learning_unit_year, raise_exception=False).is_open()
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):

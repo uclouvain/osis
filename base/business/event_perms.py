@@ -23,83 +23,78 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
+from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
+from base.models.learning_unit_year import LearningUnitYear
 
 
 class EventPerm(ABC):
-    @classmethod
-    @abstractmethod
-    def is_open(cls, *args, **kwargs):
-        raise NotImplementedError
+    academic_year_field = 'academic_year'
+    model = None  # To instantiate == ex : EducationGroupYear
+    event_reference = None  # To instantiate == ex : academic_calendar_type.EDUCATION_GROUP_EDITION
+    obj = None  # To instantiate
+    raise_exception = True
+    error_msg = ""  # To instantiate == ex : _("This education group is not editable during this period.")
+
+    def __init__(self, obj=None, raise_exception=True):
+        if self.model and obj and not isinstance(obj, self.model):
+            raise AttributeError("The provided obj must be a {}".format(self.model.__name__))
+        self.obj = obj
+        self.raise_exception = raise_exception
+
+    def is_open(self):
+        if self.obj:
+            return self._is_open_for_specific_object()
+        return self._is_calendar_opened()
 
     @classmethod
-    @abstractmethod
-    def __is_open_for_spec_egy(cls, *args, **kwargs):
-        raise NotImplementedError
+    def get_open_academic_calendars_queryset(cls) -> QuerySet:
+        qs = AcademicCalendar.objects.open_calendars()
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+        return qs
+
+    @cached_property
+    def open_academic_calendars_for_specific_object(self) -> list:
+        obj_ac_year = getattr(self.obj, self.academic_year_field)
+        return list(self.get_open_academic_calendars_queryset().filter(data_year=obj_ac_year))
+
+    def _is_open_for_specific_object(self) -> bool:
+        if not self.open_academic_calendars_for_specific_object:
+            if self.raise_exception:
+                raise PermissionDenied(_(self.error_msg).capitalize())
+            return False
+        return True
 
     @classmethod
-    @abstractmethod
-    def __is_open_other_rules(cls, *args, **kwargs):
-        raise NotImplementedError
+    def _is_calendar_opened(cls) -> bool:
+        return cls.get_open_academic_calendars_queryset().exists()
 
     @classmethod
-    @abstractmethod
-    def get_academic_years(*args, **kwargs) -> QuerySet:
-        raise NotImplementedError
-
-    @classmethod
-    @abstractmethod
-    def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
-        raise NotImplementedError
-
-
-class EventPermEducationGroupEdition(EventPerm):
-    @classmethod
-    def is_open(cls, *args, **kwargs):
-        if kwargs.get('education_group'):
-            return cls.__is_open_for_spec_egy(*args, **kwargs)
-        return cls.__is_open_other_rules(*args, **kwargs)
-
-    @classmethod
-    def __is_open_for_spec_egy(cls, *args, **kwargs):
-        aca_year = kwargs.get('education_group').academic_year
-        academic_calendar = get_academic_calendar_by_date_and_reference_and_data_year(
-            aca_year, academic_calendar_type.EDUCATION_GROUP_EDITION)
-        if kwargs.get('in_range'):
-            return academic_calendar
-        error_msg = None
-        if not academic_calendar:
-            error_msg = _("This education group is not editable during this period.")
-
-        result = error_msg is None
-        if kwargs.get('raise_exception', False) and not result:
-            raise PermissionDenied(_(error_msg).capitalize())
-        return result
-
-    @classmethod
-    def __is_open_other_rules(cls, *args, **kwargs):
-        return cls.__is_calendar_opened(*args, **kwargs)
-
-    @staticmethod
-    def __is_calendar_opened(*args, **kwargs):
-        return AcademicCalendar.objects.open_calendars()\
-            .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
-            .exists()
-
-    @classmethod
-    def get_academic_years(cls, *args, **kwargs) -> QuerySet:
+    def get_academic_years(cls) -> QuerySet:
         return AcademicYear.objects.filter(pk__in=cls.get_academic_years_ids())
 
     @classmethod
-    def get_academic_years_ids(cls, *args, **kwargs) -> QuerySet:
-        return AcademicCalendar.objects.open_calendars()\
-            .filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION)\
-            .values_list('data_year', flat=True)
+    def get_academic_years_ids(cls) -> QuerySet:
+        return cls.get_open_academic_calendars_queryset().values_list('data_year', flat=True)
+
+
+class EventPermEducationGroupEdition(EventPerm):
+    model = EducationGroupYear
+    event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
+    error_msg = _("This education group is not editable during this period.")
+
+
+class EventPermLearningUnitFacultyManagerEdition(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+    error_msg = _("This learning unit is not editable by faculty managers during this period.")

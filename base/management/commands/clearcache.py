@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,20 +22,12 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django.conf import settings
-from django.test import TestCase
-
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from webservices.views import get_title_of_education_group_year
+############################################################################
+from django.core.management import BaseCommand
+from django.core.cache import cache
 
 
-class GetTitleOrEducationGroupYear_TestCase(TestCase):
-    def test_get_title_or_education_group_year(self):
-        ega = EducationGroupYearFactory(title='french', title_english='english')
-
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_FR)
-        self.assertEqual('french', title)
-
-        title = get_title_of_education_group_year(ega, settings.LANGUAGE_CODE_EN)
-        self.assertEqual('english', title)
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        cache.clear()
+        self.stdout.write(self.style.SUCCESS('Successfully clear cache'))

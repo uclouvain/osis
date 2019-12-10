@@ -21,7 +21,8 @@
             <div class="panel panel-default">
 
                 <div class="panel-body" style="border-bottom: 1px solid #ddd;">
-                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;">
+                    {# FIXME: Disable autocomplete because otherwise the aucomplete scroll of the last text input completed would appear at the top left of the screen when clicking on the checkbox #}
+                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;" autocomplete="off">
                         <input type="hidden" name="page" value="{{ page_obj.number }}">
                         <div class="row">
                             {% block form_field %}
@@ -30,7 +31,7 @@
                             {% endblock form_field %}
                             <br>
                             <div class="col-md-2">
-                                <button type="submit" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-eg" title="search">
+                                <button type="submit" class="btn btn-primary" name="search-eg" title="search">
                                     <em class="fa fa-search"></em>
                                 </button>
                             </div>
@@ -49,7 +50,7 @@
                             </div>
                             <div class="cold-md-6">
                                 <div class="pull-right" style="margin-right: 20px">
-                                    <button class="btn btn-primary" id="button-attach">{% trans 'Attach' %}</button>
+                                    <button class="btn btn-primary" id="button-attach">{% trans 'Add' %}</button>
                                 </div>
                             </div>
                         </div>
@@ -82,11 +83,11 @@
     {
         document.getElementById("modal_dialog_id").classList.add("modal-lg");
 
-        initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
-            {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
+       initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
+            {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'education_group_attach' root_id education_group_year_id %}";
+        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
@@ -103,19 +104,23 @@
 
         function attachElementSelected(checkUrl, attachUrl){
             return function(){
-                const elementUrl = $("input[name=selected-item]:checked").attr("data-url") || "";
-                const parameters = extract_id_and_content_type_parameters(elementUrl);
-                const paramString = new URLSearchParams(parameters);
+                const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
+                const parameters = extract_ids_and_content_type_parameters(elementsUrl);
+                const paramString = new URLSearchParams();
+                paramString.append("content_type", parameters["content_type"]);
+                for (let index in parameters["id"]){
+                    paramString.append("id", parameters["id"][index]);
+                }
 
                 $.ajax({
-                    url: `${checkUrl}?${paramString.toString()}`,
+                    url: `${checkUrl}?${paramString.toString()}`
                 }).done(function(jsonResponse){
                     const error_messages = jsonResponse["error_messages"];
-                    if (error_messages.length > 0){
+                    if (error_messages.length > 0) {
                         const $span_messages = $("#message_info_modal");
                         $span_messages.removeAttr("style");
                         $span_messages.text("");
-                        error_messages.forEach(function(message){
+                        error_messages.forEach(function (message) {
                             $span_messages.append(`<p>${message}</p>`);
                         });
                     } else {
@@ -131,17 +136,20 @@
             };
         }
 
-        function extract_id_and_content_type_parameters(url){
+        function extract_ids_and_content_type_parameters(urls){
             let contentType = "";
-            if (url.includes("learning_units")){
+            if (urls.length === 0){
+                contentType = ""
+            }
+            else if (urls[0].includes("learning_units")){
                 contentType = "base_learningunityear";
-            }else if(url.includes("educationgroups")){
+            }else if(urls[0].includes("educationgroups")){
                 contentType = "base_educationgroupyear";
             }
 
-            let object_id = getIdFromUrl(url).toString();
+            let object_ids = urls.map((url) => getIdFromUrl(url).toString());
 
-            return {"id": object_id, "content_type": contentType};
+            return {"id": object_ids, "content_type": contentType};
         }
 
         // FIXME This method is copy pasted. Should be extracted in a common file.
@@ -157,6 +165,7 @@
         }
 
         bind_trigger_modal();
+
     });
 </script>
 {% endblock script %}

@@ -60,11 +60,14 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.business.test_perms import create_person_with_permission_and_group
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -239,16 +242,24 @@ class LearningUnitViewCreateFullTestCase(TestCase):
 class LearningUnitViewCreatePartimTestCase(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
+
+        AcademicCalendarFactory(
+            data_year=self.current_academic_year,
+            start_date=datetime.datetime(self.current_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(self.current_academic_year.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
+
         self.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             learning_container_year__academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
         self.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': self.learning_unit_year_full.id})
-        self.user = UserFactory()
+        faculty_manager = FacultyManagerFactory()
+        self.user = faculty_manager.user
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        PersonFactory(user=self.user)
         self.client.force_login(self.user)
 
     def test_create_partim_form_when_user_not_logged(self):
@@ -331,6 +342,13 @@ class LearningUnitViewTestCase(TestCase):
 
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
+
+        AcademicCalendarFactory(
+            data_year=cls.current_academic_year,
+            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
+            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+        )
 
         cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
 
@@ -1080,15 +1098,15 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_specifications_save_with_postponement(self):
         year_range = 5
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
-        learning_unit_year = LearningUnitYearFactory(
-            academic_year=create_current_academic_year(),
-            learning_unit=LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
-        )
-        future_learning_unit_years = [LearningUnitYearFactory(
-            academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
-            learning_unit=learning_unit_year.learning_unit,
-            acronym=learning_unit_year.acronym
-        ) for i in range(1, year_range)]
+        learning_unit = LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
+        learning_unit_years = [LearningUnitYearFactory(
+            academic_year=ac,
+            learning_unit=learning_unit,
+            acronym=learning_unit.acronym,
+            subtype=FULL,
+        ) for ac in academic_years]
+        # delete last learning unit year to ensure luy is not created
+        learning_unit_years.pop().delete()
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
@@ -1097,16 +1115,16 @@ class LearningUnitViewTestCase(TestCase):
             reference=luy.id,
             language='fr-be',
             text_label=label
-        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        ) for luy in learning_unit_years]
         trans_en = [TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=luy.id,
             language='en',
             text_label=label
-        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        ) for luy in learning_unit_years]
 
         response = self.client.post(
-            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_years[0].id}),
             data={
                 'trans_text_fr': 'textFR',
                 'trans_text_en': 'textEN',

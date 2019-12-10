@@ -92,12 +92,16 @@
         </div>
     </div>
     <div id="clipboard" class="alert alert-info" role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
-        <button type="button" class="close" id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
-            <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
-        </button>
-        <strong>{% trans "Selected element" %}</strong>
-        <br>
-        {{ selected_element_clipboard }}
+        <div style="display: inline-block;">
+            <div class="pull-right">
+                <button type="button" class="close" id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
+                    <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
+                </button>
+            </div>
+            <div id="clipboard_content" class="pull-left">
+                {{ selected_element_clipboard | safe }}
+            </div>
+        </div>
     </div>
 
     <script>
