@@ -26,6 +26,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+from osis_common.decorators.deprecated import deprecated
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -94,6 +95,11 @@ def find_by_person(a_person):
 
 def find_by_education_group_year(education_group_year):
     return Student.objects.filter(offerenrollment__education_group_year=education_group_year)
+
+
+@deprecated
+def find_by_offer_year(offer_y):
+    return Student.objects.filter(offerenrollment__offer_year=offer_y)
 
 
 def find_by_id(student_id):
