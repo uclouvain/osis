@@ -155,6 +155,7 @@ class TestPerms(TestCase):
         self.assertFalse(result)
 
 
+@override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
 class TestCommonEducationGroupStrategyPerms(TestCase):
     @classmethod
     def setUpTestData(cls):
