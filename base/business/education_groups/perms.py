@@ -34,7 +34,6 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
-from base.models.program_manager import ProgramManager
 from program_management.business.group_element_years import postponement, management
 
 ERRORS_MSG = {

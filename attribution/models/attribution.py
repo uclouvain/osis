@@ -24,12 +24,12 @@
 #
 ##############################################################################
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 from attribution.models.enums.function import Functions
-from base.models import person
 from base.models.academic_year import current_academic_year
 from base.models.entity import Entity
+from base.models.person import Person
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
@@ -163,7 +163,9 @@ def find_by_id(attribution_id):
 
 
 def _filter_by_tutor(queryset, tutor):
-    return queryset.filter(tutor__person__in=person.find_by_firstname_or_lastname(tutor))
+    return queryset.filter(tutor__person__in=Person.objects.filter(
+        Q(first_name__icontains=tutor) | Q(last_name__icontains=tutor)
+    ))
 
 
 def _prefetch_entity_version(queryset):
