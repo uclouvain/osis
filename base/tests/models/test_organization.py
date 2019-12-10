@@ -43,4 +43,4 @@ class OrganizationOrderingTest(TestCase):
     def test_organization_ordering(self):
         expected_order = ['A', 'B', 'C', 'D']
         result = Organization.objects.all().values_list('name', flat=True)
-        self.assertEquals(list(result), expected_order)
+        self.assertEqual(list(result), expected_order)
