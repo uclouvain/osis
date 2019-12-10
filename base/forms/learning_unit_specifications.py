@@ -30,6 +30,7 @@ from django.conf import settings
 from base.business.learning_unit import get_academic_year_postponement_range
 from base.forms.common import set_trans_txt
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from cms.enums import entity_name
 from cms.models import translated_text
 from cms.models.translated_text import TranslatedText
@@ -64,6 +65,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         self.postponement = bool(int(args[0]['postpone'])) if args else False
         self.learning_unit_year = kwargs.pop('learning_unit_year', None)
         self.text_label = kwargs.pop('text_label', None)
+        self.has_proposal = ProposalLearningUnit.objects.filter(learning_unit_year=self.learning_unit_year).exists()
         super(LearningUnitSpecificationsEditForm, self).__init__(*args, **kwargs)
 
     def load_initial(self):

@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business.learning_unit import get_academic_year_postponement_range
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
@@ -72,6 +73,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.postponement = bool(int(data['postpone'])) if data else False
         self.luy = kwargs.pop('luy', None)
         self.code = kwargs.pop('code', '')
+        self.has_proposal = ProposalLearningUnit.objects.filter(learning_unit_year=self.luy).exists()
         super().__init__(data, initial=initial, **kwargs)
 
         self._get_code_name_disabled_status()
