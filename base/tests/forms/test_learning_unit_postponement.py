@@ -57,39 +57,39 @@ SUBDIVISION_ACRONYM = 'C'
 class LearningUnitPostponementFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing LEARNING UNIT POSTPONEMENT
        FORM"""
-
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
-        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year_6 = AcademicYearFactory(year=cls.current_academic_year.year + 6)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
 
         # Creation of a LearingContainerYear and all related models - FOR 6 years
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year, end_year_6)
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, end_year_6)
         # Build in Generated Container [first index = start Generate Container ]
-        self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
+        cls.generated_container_year = cls.learn_unit_structure.generated_container_years[0]
 
         # Update All full learning unit year acronym
-        LearningUnitYear.objects.filter(learning_unit=self.learn_unit_structure.learning_unit_full) \
+        LearningUnitYear.objects.filter(learning_unit=cls.learn_unit_structure.learning_unit_full) \
             .update(acronym=FULL_ACRONYM)
         # Update All partim learning unit year acronym
-        LearningUnitYear.objects.filter(learning_unit=self.learn_unit_structure.learning_unit_partim) \
+        LearningUnitYear.objects.filter(learning_unit=cls.learn_unit_structure.learning_unit_partim) \
             .update(acronym=FULL_ACRONYM + SUBDIVISION_ACRONYM)
 
-        self.learning_unit_year_full = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year=self.current_academic_year
+        cls.learning_unit_year_full = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_full,
+            academic_year=cls.current_academic_year
         )
 
-        self.learning_unit_year_partim = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_partim,
-            academic_year=self.current_academic_year
+        cls.learning_unit_year_partim = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_partim,
+            academic_year=cls.current_academic_year
         )
 
-        self.person = PersonFactory()
-        for entity in self.learn_unit_structure.entities:
-            PersonEntityFactory(person=self.person, entity=entity)
+        cls.person = PersonFactory()
+        for entity in cls.learn_unit_structure.entities:
+            PersonEntityFactory(person=cls.person, entity=entity)
 
         FacultyManagerGroupFactory()
 
