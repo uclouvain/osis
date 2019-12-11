@@ -43,9 +43,9 @@ from base.tests.factories.student import StudentFactory
 
 
 class ComputeScoresEncodingsDeadlinesTest(TestCase):
-
-    def setUp(self):
-        self.nb_session = number_session.ONE
+    @classmethod
+    def setUpTestData(cls):
+        cls.nb_session = number_session.ONE
 
         current_year = datetime.now().year
         current_date = datetime(year=current_year, month=9, day=1, hour=12)
@@ -53,14 +53,14 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
                                             start_date=current_date,
                                             end_date=current_date + timedelta(days=365))
 
-        self.off_year = OfferYearFactory()
-        self.education_group_year = EducationGroupYearFactory()
+        cls.off_year = OfferYearFactory()
+        cls.education_group_year = EducationGroupYearFactory()
 
-        self._load_initial_data_of_type_deliberation(academic_year)
+        cls._load_initial_data_of_type_deliberation(academic_year)
 
-        self._load_initial_data_of_type_scores_exam_submission(academic_year)
+        cls._load_initial_data_of_type_scores_exam_submission(academic_year)
 
-        self._load_one_student_session_exam_deadline()
+        cls._load_one_student_session_exam_deadline()
 
     def _load_initial_data_of_type_deliberation(self, academic_year):
         self.academic_calendar_deliberation = AcademicCalendarFactory(

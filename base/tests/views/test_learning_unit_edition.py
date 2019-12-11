@@ -602,7 +602,7 @@ class TestLearningUnitVolumesManagement(TestCase):
 
 class TestEntityAutocomplete(TestCase):
     @classmethod
-    def setUpClassData(cls):
+    def setUpTestData(cls):
         cls.super_user = SuperUserFactory()
         cls.url = reverse("entity_autocomplete")
         today = datetime.date.today()
