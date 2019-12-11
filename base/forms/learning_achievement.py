@@ -118,7 +118,6 @@ class LearningAchievementEditForm(forms.ModelForm):
             self.last_postponed_academic_year = None
             if not self.text.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.text.learning_unit_year)
-                self.last_postponed_academic_year = ac_year_postponement_range.last()
                 self._update_future_luy(ac_year_postponement_range, self.text)
 
         # For sync purpose, we need to trigger for the first year
@@ -138,18 +137,24 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def _update_future_luy(self, ac_year_postponement_range, text):
         for ac in ac_year_postponement_range:
+            luy = text.learning_unit_year
+            try:
+                next_luy = LearningUnitYear.objects.get(
+                    academic_year=ac,
+                    acronym=luy.acronym,
+                    learning_unit=luy.learning_unit
+                )
+            except LearningUnitYear.DoesNotExist:
+                continue
+
             # For sync purpose, we need to trigger for the following years
             # an update of the THEMES_DISCUSSED cms when we update learning achievement
-            update_themes_discussed_changed_field_in_cms(text.learning_unit_year)
-            luy = text.learning_unit_year
-            next_luy, created = LearningUnitYear.objects.get_or_create(
-                academic_year=ac,
-                acronym=luy.acronym,
-                learning_unit=luy.learning_unit
-            )
+            update_themes_discussed_changed_field_in_cms(next_luy)
+
             LearningAchievement.objects.update_or_create(
                 code_name=self.old_code_name,
                 language=text.language,
                 learning_unit_year=next_luy,
                 defaults={'text': text.text, 'code_name': self.cleaned_data.get('code_name')}
             )
+            self.last_postponed_academic_year = ac

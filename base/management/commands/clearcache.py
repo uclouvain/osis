@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,28 +22,12 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django import forms
-
-from osis_common.decorators.deprecated import deprecated
-
-
-class BootstrapModelForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(BootstrapModelForm, self).__init__(*args, **kwargs)
-        set_form_control(self)
+############################################################################
+from django.core.management import BaseCommand
+from django.core.cache import cache
 
 
-# Why ? Still used
-@deprecated
-def set_form_control(self):
-    for field in iter(self.fields):
-        attr_class = self.fields[field].widget.attrs.get('class') or ''
-        # Exception because we don't apply form-control on widget checkbox
-        if self.fields[field].widget.template_name != 'django/forms/widgets/checkbox.html':
-            if isinstance(self.fields[field].widget, forms.MultiWidget):
-                for widget in self.fields[field].widget.widgets:
-                    widget.attrs['class'] = ' '.join((widget.attrs.get('class', ''), 'form-control'))
-            else:
-                self.fields[field].widget.attrs['class'] = ' '.join((attr_class, 'form-control'))
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        cache.clear()
+        self.stdout.write(self.style.SUCCESS('Successfully clear cache'))
