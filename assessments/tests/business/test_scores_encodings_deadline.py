@@ -68,14 +68,6 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
             number_session=cls.nb_session,
         )
 
-        cls.offer_year_calendar_deliberation = OfferYearCalendarFactory(
-            academic_calendar=cls.academic_calendar_deliberation,
-            offer_year=cls.off_year,
-            start_date=cls.academic_calendar_deliberation.start_date,
-            end_date=cls.academic_calendar_deliberation.end_date,
-            education_group_year=cls.education_group_year
-        )
-
         cls.ac_score_exam_submission = AcademicCalendarFactory(
             academic_year=academic_year,
             reference=academic_calendar_type.SCORES_EXAM_SUBMISSION,
@@ -87,12 +79,20 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
             number_session=cls.nb_session
         )
 
-        off_enrol = OfferEnrollmentFactory(offer_year=cls.offer_year_calendar_deliberation.offer_year)
-        cls.sess_exam_dealine = SessionExamDeadlineFactory(offer_enrollment=off_enrol, deliberation_date=None,
-                                                           deadline=scores_encodings_deadline._one_day_before(
-                                                               cls.academic_calendar_deliberation.end_date),
-                                                           deadline_tutor=0,
-                                                           number_session=cls.nb_session)
+    def setUp(self):
+        self.offer_year_calendar_deliberation = OfferYearCalendarFactory(
+            academic_calendar=self.academic_calendar_deliberation,
+            offer_year=self.off_year,
+            start_date=self.academic_calendar_deliberation.start_date,
+            end_date=self.academic_calendar_deliberation.end_date,
+            education_group_year=self.education_group_year
+        )
+        off_enrol = OfferEnrollmentFactory(offer_year=self.offer_year_calendar_deliberation.offer_year)
+        self.sess_exam_dealine = SessionExamDeadlineFactory(offer_enrollment=off_enrol, deliberation_date=None,
+                                                            deadline=scores_encodings_deadline._one_day_before(
+                                                                self.academic_calendar_deliberation.end_date),
+                                                            deadline_tutor=0,
+                                                            number_session=self.nb_session)
 
     def _create_tutor_scores_submission_end_date(self, end_date):
         return OfferYearCalendarFactory(
@@ -254,9 +254,11 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
         new_global_submission_date = self.offer_year_calendar_deliberation.end_date - timedelta(days=20)
         self.offer_year_calendar_deliberation.end_date = new_global_submission_date
         self.offer_year_calendar_deliberation.save()
-        persistent_session_exams = SessionExamDeadline.objects.filter(pk__in=[obj.id for obj in session_exam_deadlines])
+        persistent_session_exams = SessionExamDeadline.objects.filter(
+            pk__in=[obj.id for obj in session_exam_deadlines])
         for obj in persistent_session_exams:
-            self._assert_date_equal(obj.deadline, scores_encodings_deadline._one_day_before(new_global_submission_date))
+            self._assert_date_equal(obj.deadline,
+                                    scores_encodings_deadline._one_day_before(new_global_submission_date))
 
     def test_get_oyc_by_reference_when_education_group_year_is_null(self):
         ac_cal = AcademicCalendarFactory(reference=academic_calendar_type.DELIBERATION)
@@ -271,7 +273,8 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
         ac_cal = AcademicCalendarFactory(reference=academic_calendar_type.DELIBERATION)
         SessionExamCalendarFactory(academic_calendar=ac_cal)
         off_year_cal = OfferYearCalendarFactory(academic_calendar=ac_cal)
-        oyc = scores_encodings_deadline._get_oyc_by_reference(off_year_cal, academic_calendar_type.COURSE_ENROLLMENT)
+        oyc = scores_encodings_deadline._get_oyc_by_reference(off_year_cal,
+                                                              academic_calendar_type.COURSE_ENROLLMENT)
         self.assertIsNone(oyc)
 
     @mock.patch("assessments.business.scores_encodings_deadline.compute_deadline")

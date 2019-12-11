@@ -210,29 +210,30 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
 
 
 class TestPostponementEducationGroupYear(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         administration_entity_version = MainEntityVersionFactory()
         management_entity_version = MainEntityVersionFactory()
 
-        self.education_group_year = TrainingFactory(
+        cls.education_group_year = TrainingFactory(
             academic_year=create_current_academic_year(),
             education_group_type__name=education_group_types.TrainingType.BACHELOR,
             management_entity=management_entity_version.entity,
             administration_entity=administration_entity_version.entity,
         )
-        self.education_group_type = EducationGroupTypeFactory(
+        cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.BACHELOR
         )
 
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 40)
-        self.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
+        cls.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
 
-        self.data = {
+        cls.data = {
             'title': 'Métamorphose',
             'title_english': 'Transfiguration',
-            'education_group_type': self.education_group_type.pk,
+            'education_group_type': cls.education_group_type.pk,
             'credits': 42,
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
@@ -251,8 +252,8 @@ class TestPostponementEducationGroupYear(TestCase):
 
         # Create user and attached it to management entity
         person = PersonFactory()
-        PersonEntityFactory(person=person, entity=self.education_group_year.management_entity)
-        self.user = person.user
+        PersonEntityFactory(person=person, entity=cls.education_group_year.management_entity)
+        cls.user = person.user
 
     def test_init(self):
         # In case of creation
@@ -636,32 +637,33 @@ class TestPostponeCertificateAims(TestCase):
 
 
 class TestPermissionField(TestCase):
-    def setUp(self):
-        self.permissions = [PermissionFactory() for _ in range(10)]
+    @classmethod
+    def setUpTestData(cls):
+        cls.permissions = [PermissionFactory() for _ in range(10)]
 
         FieldReferenceFactory(
             content_type=ContentType.objects.get(app_label="base", model="educationgroupyear"),
             field_name="main_teaching_campus",
             context=TRAINING_DAILY_MANAGEMENT,
-            permissions=self.permissions,
+            permissions=cls.permissions,
         )
 
         FieldReferenceFactory(
             content_type=ContentType.objects.get(app_label="base", model="educationgroupyear"),
             field_name="partial_acronym",
             context="",
-            permissions=self.permissions,
+            permissions=cls.permissions,
         )
 
         person = PersonFactory()
-        self.user_with_perm = person.user
-        self.user_with_perm.user_permissions.add(self.permissions[2])
+        cls.user_with_perm = person.user
+        cls.user_with_perm.user_permissions.add(cls.permissions[2])
 
         person = PersonFactory()
-        self.user_without_perm = person.user
-        self.user_without_perm.user_permissions.add(PermissionFactory())
+        cls.user_without_perm = person.user
+        cls.user_without_perm.user_permissions.add(PermissionFactory())
 
-        self.education_group_type = EducationGroupTypeFactory(
+        cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING
         )
 
