@@ -93,7 +93,9 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
             gey.child_leaf_id,
             gey.parent_id,
             edyc.academic_year_id,
-            0 AS level
+            0 AS level,
+            CASE edyc.education_group_type_id WHEN 84 THEN true
+            ELSE false END in_complementary_module
     FROM base_groupelementyear gey
     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
     WHERE child_leaf_id = %(child_leaf_id)s
@@ -105,13 +107,16 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
             parent.child_leaf_id,
             parent.parent_id,
             edyp.academic_year_id,
-            child.level + 1
+            child.level + 1,
+            child.in_complementary_module OR
+            CASE edyp.education_group_type_id WHEN 84 THEN true
+            ELSE false END in_complementary_module
     FROM base_groupelementyear AS parent
     INNER JOIN group_element_year_parent_from_child_leaf AS child on parent.child_branch_id = child.parent_id
     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
 )
 
-SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level
+SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level, in_complementary_module
 FROM group_element_year_parent_from_child_leaf
 WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
 ORDER BY level DESC, id;
@@ -501,6 +506,7 @@ def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = No
                 'child_leaf_id': row[2],
                 'parent_id': row[3],
                 'level': row[4],
+                'in_complementary_module': row[5]
             } for row in cursor.fetchall()
         ]
 

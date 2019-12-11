@@ -50,8 +50,10 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        education_group_root_ids = group_element_year.find_learning_unit_formations([learning_unit_year]). \
-            get(learning_unit_year.id, [])
+        education_group_root_ids = group_element_year.find_learning_unit_formations(
+            [learning_unit_year],
+            luy=learning_unit_year
+        ).get(learning_unit_year.id, [])
         return EducationGroupYear.objects.filter(pk__in=education_group_root_ids)\
             .select_related('education_group_type', 'academic_year')
 
