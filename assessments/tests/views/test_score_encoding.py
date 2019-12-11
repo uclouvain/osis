@@ -170,6 +170,9 @@ class TestOnlineEncodingTransaction(MixinSetupOnlineEncoding, TransactionTestCas
         self.assert_exam_enrollments(self.enrollments[0], 15, 15, None, None)
         self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
 
+    def test_get_json_data_scores_sheets_with_global_id_is_none(self):
+        self.assertEqual(score_encoding.get_json_data_scores_sheets(None), {})
+
 
 class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
     def test_filter_enrollments_by_offer_year(self):
