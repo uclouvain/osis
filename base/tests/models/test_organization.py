@@ -25,18 +25,22 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models import offer
-from base.tests.factories.offer import OfferFactory
+from base.models.organization import Organization
+from base.tests.factories.organization import OrganizationFactory
 
 
-def create_offer(title):
-    return OfferFactory(title=title)
+class OrganizationOrderingTest(TestCase):
+    def setUp(self):
+        organization_datas = [
+            (False, 'D'),
+            (True, 'A'),
+            (False, 'C'),
+            (True, 'B')
+        ]
+        for is_partner, name in organization_datas:
+            OrganizationFactory(is_current_partner=is_partner, name=name)
 
-
-class OfferTest(TestCase):
-    def test_find_by_id_with_instance(self):
-        of = OfferFactory()
-        self.assertEqual(of,  offer.find_by_id(of.pk))
-
-    def test_find_by_id_none(self):
-        self.assertIsNone(offer.find_by_id(-1))
+    def test_organization_ordering(self):
+        expected_order = ['A', 'B', 'C', 'D']
+        result = Organization.objects.all().values_list('name', flat=True)
+        self.assertEquals(list(result), expected_order)
