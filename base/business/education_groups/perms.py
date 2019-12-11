@@ -253,17 +253,18 @@ class CommonEducationGroupStrategyPerms(object):
             raise
 
     def _is_eligible(self):
+        if self._is_lower_than_limit_edg_year():
+            raise PermissionDenied(_("You cannot change a education group before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+            })
         if self.user.is_superuser:
             return True
-
-        if not self._is_current_academic_year_in_range_of_editable_education_group_year():
-            raise PermissionDenied(_("The user cannot modify data which are greater than N+1"))
         if not self._is_linked_to_management_entity():
             raise PermissionDenied(_("The user is not attached to the management entity"))
         return True
 
-    def _is_current_academic_year_in_range_of_editable_education_group_year(self):
-        return EventPermEducationGroupEdition(obj=self.education_group_year, raise_exception=False).is_open()
+    def _is_lower_than_limit_edg_year(self):
+        return self.education_group_year.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
@@ -275,7 +276,6 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
 
         if not self._is_user_have_perm():
             raise PermissionDenied(_("The user doesn't have right to update general information"))
-
         if self.person.is_central_manager:
             return self._is_central_manager_eligible()
         elif self.person.is_faculty_manager:
@@ -293,8 +293,6 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if not EventPermEducationGroupEdition(obj=self.education_group_year, raise_exception=False).is_open():
-            raise PermissionDenied(_("The faculty manager cannot modify general information which are lower than N"))
         return True
 
     def _is_sic_eligible(self):
