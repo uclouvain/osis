@@ -37,14 +37,15 @@ from base.tests.factories.person import CentralManagerFactory, FacultyManagerFac
 
 
 class TestVolumeEditionForm(TestCase):
-    def setUp(self):
-        self.start_year = AcademicYearFactory(year=2010)
-        self.end_year = AcademicYearFactory(year=2020)
-        self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
-        self.generated_container = GenerateContainer(self.start_year, self.end_year)
-        self.first_learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
-        self.learning_unit_with_context = get_with_context(
-            learning_container_year_id=self.first_learning_unit_year.learning_container_year)[0]
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_year = AcademicYearFactory(year=2010)
+        cls.end_year = AcademicYearFactory(year=2020)
+        cls.generated_ac_years = GenerateAcademicYear(cls.start_year, cls.end_year)
+        cls.generated_container = GenerateContainer(cls.start_year, cls.end_year)
+        cls.first_learning_unit_year = cls.generated_container.generated_container_years[0].learning_unit_year_full
+        cls.learning_unit_with_context = get_with_context(
+            learning_container_year_id=cls.first_learning_unit_year.learning_container_year)[0]
 
     def test_get_volume_form(self):
         for component, component_values in self.learning_unit_with_context.components.items():

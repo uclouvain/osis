@@ -395,7 +395,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         PersonEntityFactory(entity=cls.generate_container.entities[0], person=cls.person)
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.person.user)
         self.user = self.person.user
 
     @mock.patch('base.models.program_manager.is_program_manager')
@@ -601,11 +601,12 @@ class TestLearningUnitVolumesManagement(TestCase):
 
 
 class TestEntityAutocomplete(TestCase):
-    def setUp(self):
-        self.super_user = SuperUserFactory()
-        self.url = reverse("entity_autocomplete")
+    @classmethod
+    def setUpClassData(cls):
+        cls.super_user = SuperUserFactory()
+        cls.url = reverse("entity_autocomplete")
         today = datetime.date.today()
-        self.external_entity_version = EntityVersionFactory(
+        cls.external_entity_version = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             end_date=None,
