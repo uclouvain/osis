@@ -432,6 +432,9 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
+msgid "You are not eligible to detach this item"
+msgstr "Vous n'êtes pas autorisé à détacher cet item"
+
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 "Vous ne pouvez pas ajouter une unité d'enseignement à un/une %(category)s "
