@@ -64,28 +64,29 @@ class LearningUnitsMixin:
     list_of_learning_container_year = []
     list_of_learning_unit_years = []
 
-    def setup_academic_years(self):
-        self.this_year = datetime.datetime.now().year
-        self.start_year = AcademicYearFactory(year=self.this_year - LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
-        self.last_year = AcademicYearFactory(year=self.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
-        self.list_of_academic_years = self.create_list_of_academic_years(self.start_year, self.last_year)
-        self.starting_academic_year = mdl_academic_year.starting_academic_year()
-        index_of_current_academic_year_in_list = self.list_of_academic_years.index(self.starting_academic_year)
+    @classmethod
+    def setup_academic_years(cls):
+        cls.this_year = datetime.datetime.now().year
+        cls.start_year = AcademicYearFactory(year=cls.this_year - LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
+        cls.last_year = AcademicYearFactory(year=cls.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
+        cls.list_of_academic_years = cls.create_list_of_academic_years(cls.start_year, cls.last_year)
+        cls.starting_academic_year = mdl_academic_year.starting_academic_year()
+        index_of_current_academic_year_in_list = cls.list_of_academic_years.index(cls.starting_academic_year)
 
-        self.oldest_academic_year = self.list_of_academic_years[0]
-        self.latest_academic_year = self.list_of_academic_years[-1]
-        self.old_academic_year = self.list_of_academic_years[index_of_current_academic_year_in_list -
+        cls.oldest_academic_year = cls.list_of_academic_years[0]
+        cls.latest_academic_year = cls.list_of_academic_years[-1]
+        cls.old_academic_year = cls.list_of_academic_years[index_of_current_academic_year_in_list -
                                                              LEARNING_UNIT_CREATION_SPAN_YEARS]
-        self.last_academic_year = self.list_of_academic_years[index_of_current_academic_year_in_list +
+        cls.last_academic_year = cls.list_of_academic_years[index_of_current_academic_year_in_list +
                                                               LEARNING_UNIT_CREATION_SPAN_YEARS]
 
-        self.list_of_academic_years_after_now = [
-            academic_year for academic_year in self.list_of_academic_years
-            if (self.starting_academic_year.year <= academic_year.year <= self.last_academic_year.year)
+        cls.list_of_academic_years_after_now = [
+            academic_year for academic_year in cls.list_of_academic_years
+            if (cls.starting_academic_year.year <= academic_year.year <= cls.last_academic_year.year)
         ]
-        self.list_of_odd_academic_years = [academic_year for academic_year in self.list_of_academic_years_after_now
+        cls.list_of_odd_academic_years = [academic_year for academic_year in cls.list_of_academic_years_after_now
                                            if academic_year.year % 2]
-        self.list_of_even_academic_years = [academic_year for academic_year in self.list_of_academic_years_after_now
+        cls.list_of_even_academic_years = [academic_year for academic_year in cls.list_of_academic_years_after_now
                                             if not academic_year.year % 2]
 
     @staticmethod
@@ -121,14 +122,7 @@ class LearningUnitsMixin:
         result = None
         end_year = learning_unit.end_year or AcademicYearFactory(year=compute_max_academic_year_adjournment())
         if learning_unit.start_year.year <= academic_year.year <= end_year.year:
-            if periodicity == learning_unit_year_periodicity.BIENNIAL_ODD:
-                if not (academic_year.year % 2):
-                    create = True
-            elif periodicity == learning_unit_year_periodicity.BIENNIAL_EVEN:
-                if academic_year.year % 2:
-                    create = True
-            elif periodicity == learning_unit_year_periodicity.ANNUAL:
-                create = True
+            create = LearningUnitsMixin._has_to_be_created(academic_year, create, periodicity)
 
             if create:
                 if not learning_container_year:
@@ -144,6 +138,18 @@ class LearningUnitsMixin:
                     periodicity=periodicity
                 )
         return result
+
+    @staticmethod
+    def _has_to_be_created(academic_year, create, periodicity):
+        if periodicity == learning_unit_year_periodicity.BIENNIAL_ODD:
+            if not (academic_year.year % 2):
+                create = True
+        elif periodicity == learning_unit_year_periodicity.BIENNIAL_EVEN:
+            if academic_year.year % 2:
+                create = True
+        elif periodicity == learning_unit_year_periodicity.ANNUAL:
+            create = True
+        return create
 
     @staticmethod
     def setup_list_of_learning_unit_years_full(list_of_academic_years, learning_unit_full, periodicity):
@@ -407,7 +413,7 @@ def _setup_learning_component_year(learning_unit_year, component_type):
 
 
 def _setup_classes(learning_component_year, number_classes=5):
-    for i in range(number_classes):
+    for _ in range(number_classes):
         LearningClassYearFactory(learning_component_year=learning_component_year)
 
 

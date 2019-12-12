@@ -62,31 +62,32 @@ from reference.tests.factories.country import CountryFactory
 
 @override_flag('learning_unit_update', active=True)
 class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
-
-    def setUp(self):
-        super().setUp()
-        self.user = UserFactory(username="YodaTheJediMaster")
-        self.person = PersonFactory(user=self.user)
-        self.permission = Permission.objects.get(codename="can_edit_learningunit_date")
-        self.person.user.user_permissions.add(self.permission)
-        self.client.force_login(self.user)
-
-        self.setup_academic_years()
-        self.learning_unit = self.setup_learning_unit(self.starting_academic_year)
-        self.learning_container_year = self.setup_learning_container_year(
-            academic_year=self.starting_academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.user = UserFactory(username="YodaTheJediMaster")
+        cls.person = PersonFactory(user=cls.user)
+        cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
+        cls.person.user.user_permissions.add(cls.permission)
+        cls.setup_academic_years()
+        cls.learning_unit = cls.setup_learning_unit(cls.starting_academic_year)
+        cls.learning_container_year = cls.setup_learning_container_year(
+            academic_year=cls.starting_academic_year,
             container_type=learning_container_year_types.COURSE
         )
-        self.learning_unit_year = self.setup_learning_unit_year(
-            self.starting_academic_year,
-            self.learning_unit,
-            self.learning_container_year,
+        cls.learning_unit_year = cls.setup_learning_unit_year(
+            cls.starting_academic_year,
+            cls.learning_unit,
+            cls.learning_container_year,
             learning_unit_year_subtypes.FULL,
             learning_unit_year_periodicity.ANNUAL
         )
 
-        self.a_superuser = SuperUserFactory()
-        self.a_superperson = PersonFactory(user=self.a_superuser)
+        cls.a_superuser = SuperUserFactory()
+        cls.a_superperson = PersonFactory(user=cls.a_superuser)
+
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_view_learning_unit_edition_permission_denied(self):
         from base.views.learning_units.update import learning_unit_edition_end_date
@@ -393,6 +394,8 @@ class TestLearningUnitVolumesManagement(TestCase):
         })
 
         PersonEntityFactory(entity=cls.generate_container.entities[0], person=cls.person)
+        cls.request_factory = RequestFactory()
+        cls.data = get_valid_formset_data(cls.learning_unit_year.acronym)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -438,16 +441,15 @@ class TestLearningUnitVolumesManagement(TestCase):
     def test_learning_unit_volumes_management_post_full_form(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        data = get_valid_formset_data(self.learning_unit_year.acronym)
+        data = self.data.copy()
         data.update(get_valid_formset_data(self.learning_unit_year_partim.acronym, is_partim=True))
 
-        request = request_factory.post(reverse(learning_unit_volumes_management,
-                                               kwargs={
-                                                   'learning_unit_year_id': self.learning_unit_year.id,
-                                                   'form_type': 'full'
-                                               }),
-                                       data=data)
+        request = self.request_factory.post(reverse(learning_unit_volumes_management,
+                                                    kwargs={
+                                                        'learning_unit_year_id': self.learning_unit_year.id,
+                                                        'form_type': 'full'
+                                                    }),
+                                            data=data)
 
         request.user = self.user
         setattr(request, 'session', 'session')
@@ -470,16 +472,15 @@ class TestLearningUnitVolumesManagement(TestCase):
     def test_learning_unit_volumes_management_post_simple_form(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        data = get_valid_formset_data(self.learning_unit_year.acronym)
+        data = self.data.copy()
         data.update(get_valid_formset_data(self.learning_unit_year_partim.acronym, is_partim=True))
 
-        request = request_factory.post(reverse(learning_unit_volumes_management,
-                                               kwargs={
-                                                   'learning_unit_year_id': self.learning_unit_year.id,
-                                                   'form_type': 'simple'
-                                               }),
-                                       data=data)
+        request = self.request_factory.post(reverse(learning_unit_volumes_management,
+                                                    kwargs={
+                                                        'learning_unit_year_id': self.learning_unit_year.id,
+                                                        'form_type': 'simple'
+                                                    }),
+                                            data=data)
 
         request.user = self.user
         setattr(request, 'session', 'session')
@@ -510,20 +511,21 @@ class TestLearningUnitVolumesManagement(TestCase):
     def test_learning_unit_volumes_management_post_wrong_data(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        data = get_valid_formset_data(self.learning_unit_year.acronym)
+        data = self.data.copy()
         data.update(get_valid_formset_data(self.learning_unit_year_partim.acronym))
-        data.update({'LDROI1200A-0-volume_total': 3})
-        data.update({'LDROI1200A-0-volume_q2': 3})
-        data.update({'LDROI1200A-0-volume_requirement_entity': 2})
-        data.update({'LDROI1200A-0-volume_total_requirement_entities': 3})
+        data.update({
+            'LDROI1200A-0-volume_total': 3,
+            'LDROI1200A-0-volume_q2': 3,
+            'LDROI1200A-0-volume_requirement_entity': 2,
+            'LDROI1200A-0-volume_total_requirement_entities': 3
+        })
 
-        request = request_factory.post(reverse(learning_unit_volumes_management,
-                                               kwargs={
-                                                   'learning_unit_year_id': self.learning_unit_year.id,
-                                                   'form_type': 'full'
-                                               }),
-                                       data=data)
+        request = self.request_factory.post(reverse(learning_unit_volumes_management,
+                                                    kwargs={
+                                                        'learning_unit_year_id': self.learning_unit_year.id,
+                                                        'form_type': 'full'
+                                                    }),
+                                            data=data)
 
         request.user = self.user
         setattr(request, 'session', 'session')
@@ -540,21 +542,22 @@ class TestLearningUnitVolumesManagement(TestCase):
     def test_learning_unit_volumes_management_post_wrong_data_ajax(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        request_factory = RequestFactory()
-        data = get_valid_formset_data(self.learning_unit_year.acronym)
+        data = self.data.copy()
         data.update(get_valid_formset_data(self.learning_unit_year_partim.acronym))
-        data.update({'LDROI1200A-0-volume_total': 3})
-        data.update({'LDROI1200A-0-volume_q2': 3})
-        data.update({'LDROI1200A-0-volume_requirement_entity': 2})
-        data.update({'LDROI1200A-0-volume_total_requirement_entities': 3})
+        data.update({
+            'LDROI1200A-0-volume_total': 3,
+            'LDROI1200A-0-volume_q2': 3,
+            'LDROI1200A-0-volume_requirement_entity': 2,
+            'LDROI1200A-0-volume_total_requirement_entities': 3
+        })
 
-        request = request_factory.post(reverse(learning_unit_volumes_management,
-                                               kwargs={
-                                                   'learning_unit_year_id': self.learning_unit_year.id,
-                                                   'form_type': 'full'
-                                               }),
-                                       data=data,
-                                       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request = self.request_factory.post(reverse(learning_unit_volumes_management,
+                                                    kwargs={
+                                                        'learning_unit_year_id': self.learning_unit_year.id,
+                                                        'form_type': 'full'
+                                                    }),
+                                            data=data,
+                                            HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         request.user = self.user
 
@@ -614,16 +617,17 @@ class TestEntityAutocomplete(TestCase):
             entity__organization__type=ACADEMIC_PARTNER
         )
 
+    def setUp(self):
+        self.client.force_login(user=self.super_user)
+
     def test_when_param_is_digit_assert_searching_on_code(self):
         # When searching on "code"
-        self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url, data={'q': 'DRT', 'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
         )
         self._assert_result_is_correct(response)
 
     def test_with_filter_by_section(self):
-        self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url, data={'forward': '{"country": "%s"}' % self.external_entity_version.entity.country.id}
         )
@@ -651,7 +655,6 @@ class TestEntityAutocomplete(TestCase):
                 entity__organization__type=ACADEMIC_PARTNER,
                 entity__country=country,
             )
-        self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url, data={'forward': '{"country": "%s"}' % country.id}
         )
@@ -669,7 +672,6 @@ class TestEntityAutocomplete(TestCase):
                 acronym="{letter}{letter}{letter}".format(letter=letter),
                 entity__organization__type=MAIN
             )
-        self.client.force_login(user=self.super_user)
         response = self.client.get(
             self.url, data={'forward': '{"country": ""}'}
         )
