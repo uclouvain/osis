@@ -210,7 +210,16 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
 
 
 class TestPostponementEducationGroupYear(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        start_year = AcademicYearFactory(year=get_current_year())
+        end_year = AcademicYearFactory(year=get_current_year() + 40)
+        cls.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
+
     def setUp(self):
+        # Create user and attached it to management entity
+        self.person = PersonFactory()
+        self.user = self.person.user
         administration_entity_version = MainEntityVersionFactory()
         management_entity_version = MainEntityVersionFactory()
 
@@ -220,14 +229,11 @@ class TestPostponementEducationGroupYear(TestCase):
             management_entity=management_entity_version.entity,
             administration_entity=administration_entity_version.entity,
         )
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
         self.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.BACHELOR
         )
-
-        start_year = AcademicYearFactory(year=get_current_year())
-        end_year = AcademicYearFactory(year=get_current_year() + 40)
-        self.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
 
         self.data = {
             'title': 'Métamorphose',
@@ -248,11 +254,6 @@ class TestPostponementEducationGroupYear(TestCase):
             "constraint_type": "",
             "diploma_printing_title": 'Diploma title'
         }
-
-        # Create user and attached it to management entity
-        person = PersonFactory()
-        PersonEntityFactory(person=person, entity=self.education_group_year.management_entity)
-        self.user = person.user
 
     def test_init(self):
         # In case of creation
