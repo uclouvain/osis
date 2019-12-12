@@ -390,6 +390,9 @@ msgstr ""
 msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
+msgid "You are not eligible to detach this item"
+msgstr ""
+
 #, python-format
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
