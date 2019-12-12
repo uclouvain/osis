@@ -674,8 +674,10 @@ def _add_optional_titles(custom_xls_form):
 
 
 def _get_attribution_line(a_person_teacher):
-    return " ".join([
-        ("{}".format(a_person_teacher.last_name) if a_person_teacher.last_name else "").upper(),
-        a_person_teacher.first_name or "",
-        a_person_teacher.middle_name or ""
-    ]).strip()
+    if a_person_teacher:
+        return " ".join([
+            (a_person_teacher.last_name or "").upper(),
+            a_person_teacher.first_name or "",
+            a_person_teacher.middle_name or ""
+        ]).strip()
+    return ""

@@ -173,6 +173,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_get_attribution_line(self):
         person = PersonFactory(last_name='Last', first_name='First', middle_name='Middle')
         self.assertEqual(_get_attribution_line(person), 'LAST First Middle')
+        person = PersonFactory(last_name=None, first_name='First', middle_name='Middle')
+        self.assertEqual(_get_attribution_line(person), 'First Middle')
+        self.assertEqual(_get_attribution_line(None), '')
 
     def test_fix_data(self):
         gey = self.child_leaves[0]
