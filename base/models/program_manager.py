@@ -135,9 +135,9 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
 
     offer_enrollments_education_group_year = LearningUnitEnrollment.objects.filter(
         offer_enrollment__education_group_year__academic_year=current_ac,
-        offer_enrollment__education_group_year__education_group__in=programs_manager_qs
-            .values_list('education_group', flat=True)
-    ).distinct('offer_enrollment__education_group_year')\
+        offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list('education_group',
+                                                                                                    flat=True)
+    ).distinct('offer_enrollment__education_group_year') \
         .prefetch_related(
         Prefetch(
             'offer_enrollment__education_group_year__administration_entity',
@@ -146,9 +146,9 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
     )
     lu_enrollments = LearningUnitEnrollment.objects.filter(
         offer_enrollment__education_group_year__academic_year=current_ac,
-        offer_enrollment__education_group_year__education_group__in=programs_manager_qs
-            .values_list('education_group', flat=True)
-    ).distinct('learning_unit_year')\
+        offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list('education_group',
+                                                                                                    flat=True)
+    ).distinct('learning_unit_year') \
         .prefetch_related(
         Prefetch(
             'offer_enrollment__education_group_year__administration_entity',
