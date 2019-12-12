@@ -515,16 +515,6 @@ def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = No
                 'in_complementary_module': row[5]
             } for row in cursor.fetchall()
         }
-        # return [
-        #     {
-        #         'id': row[0],
-        #         'child_branch_id': row[1],
-        #         'child_leaf_id': row[2],
-        #         'parent_id': row[3],
-        #         'level': row[4],
-        #         'in_complementary_module': row[5]
-        #     } for row in cursor.fetchall()
-        # ]
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):
