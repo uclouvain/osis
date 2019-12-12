@@ -170,6 +170,21 @@ class TestOnlineEncodingTransaction(MixinSetupOnlineEncoding, TransactionTestCas
         self.assert_exam_enrollments(self.enrollments[0], 15, 15, None, None)
         self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
 
+    def test_get_json_data_scores_sheets_with_global_id_is_none(self):
+        self.assertEqual(score_encoding.get_json_data_scores_sheets(None), {})
+
+    def test_get_json_data_scores_sheets_with_global_id_is_string(self):
+        self.tutor.person.global_id = "00321234"
+        self.tutor.person.save()
+        result = score_encoding.get_json_data_scores_sheets(self.tutor.person.global_id)
+        self.assertEqual(len(result), 6)
+
+    def test_get_json_data_scores_sheets_with_global_id_is_bytes(self):
+        self.tutor.person.global_id = "00321234"
+        self.tutor.person.save()
+        result = score_encoding.get_json_data_scores_sheets(self.tutor.person.global_id.encode('utf-8'))
+        self.assertEqual(len(result), 6)
+
 
 class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
     def test_filter_enrollments_by_offer_year(self):
