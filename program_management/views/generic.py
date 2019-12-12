@@ -28,11 +28,9 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, DetailView
 
 from base.models.education_group_year import EducationGroupYear
@@ -79,15 +77,6 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
 
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            return render(request, 'education_group/blocks/modal/modal_access_denied.html',
-                          {'access_message': _('The user has not permission to change education groups.')})
-
-        return super(GenericGroupElementYearMixin, self).dispatch(request, *args, **kwargs)
 
 
 @method_decorator(login_required, name='dispatch')

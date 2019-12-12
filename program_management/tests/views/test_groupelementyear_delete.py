@@ -28,9 +28,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.contrib.messages import constants as MSG
 from django.contrib.messages import get_messages
-from django.http import HttpResponse
-from django.http import HttpResponseForbidden
-from django.http import HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
