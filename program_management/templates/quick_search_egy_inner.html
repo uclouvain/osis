@@ -17,7 +17,8 @@
 {% block form_field %}
     {% bootstrap_field form.academic_year form_group_class="hidden" %}
     {% bootstrap_field form.acronym form_group_class="col-md-3" %}
-    {% bootstrap_field form.title form_group_class="col-md-6" %}
+    {% bootstrap_field form.partial_acronym form_group_class="col-md-3" %}
+    {% bootstrap_field form.title form_group_class="col-md-4" %}
 {% endblock form_field %}
 
 {% block count_message %}
@@ -30,11 +31,11 @@
     <th id="th_0_temp"></th>
     <th id="th_1_academic_year">{% trans 'Ac yr.' %}</th>
     <th id="th_2_acronym">{% trans 'Acronym/Short title' %}</th>
-    <th id="th_3_title">{% trans 'Title' %}</th>
+    <th id="th_3_partial_acronym">{% trans 'Code' %}</th>
+    <th id="th_4_title">{% trans 'Title' %}</th>
 {% endblock table_header %}
 
 {% block script %}
-    {% url 'quick_search_education_group_serializer' root_id education_group_year_id as quick_search_url %}
     <script>
         columnDefs = [
             {
@@ -44,7 +45,7 @@
                 "orderable": false,
                 "render": function(data, type, row, meta) {
                     let input = document.createElement("input");
-                    input.type = 'radio';
+                    input.type = 'checkbox';
                     input.name = 'selected-item';
                     input.value = data;
                     // FIXME Use uuid in the future when implemented in place of data-url
@@ -66,7 +67,8 @@
                     return '<a href="'+ row['url'] +'">'+ data + '</a>';
                 }
             },
-            { "name": "title", "targets": 3, "data": "title"},
+            { "name": "code", "targets": 3, "data": "code"},
+            { "name": "title", "targets": 4, "data": "title"}
         ];
     </script>
     {{ block.super }}

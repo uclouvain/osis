@@ -87,6 +87,7 @@
     <script type="text/javascript" src="{% static 'js/jquery-validation/jquery.validate.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/diacritics-sort.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jstree.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ckeditor/custom_ckeditor.js' %}"></script>
     <script src="{% statici18n LANGUAGE_CODE %}"></script>
 
     {% block header %}
@@ -142,7 +143,7 @@
 
 {% if subject %}
     <div class="container-fluid p0-50">
-        <div class="alert alert-warning" role="alert"><b>{{ subject|safe }}</b><br>{{ notice|safe }}</div>
+        <div class="alert alert-warning" role="alert"><strong>{{ subject|safe }}</strong><br>{{ notice|safe }}</div>
     </div>
 {% endif %}
 

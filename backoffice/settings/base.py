@@ -78,6 +78,7 @@ INSTALLED_APPS = (
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'bootstrap3',
     'ordered_model',
     'waffle',
@@ -109,6 +110,7 @@ class CustomLocaleMiddleware(LocaleMiddleware):
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'backoffice.settings.base.CustomLocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -118,7 +120,7 @@ MIDDLEWARE = (
     'base.middlewares.extra_http_responses_midleware.ExtraHttpResponsesMiddleware',
     'waffle.middleware.WaffleMiddleware',
     'base.middlewares.notification_middleware.NotificationMiddleware',
-    'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
+    'base.middlewares.reversion_middleware.BaseRevisionMiddleware',
 )
 
 
@@ -280,21 +282,19 @@ LOCALE_PATHS = ()
 CDN_URL = os.environ.get("CDN_URL", "")
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
-    'reddot': {
-        "removePlugins": "stylesheetparser",
+    'minimal': {
         'extraPlugins': ','.join(['pastefromword']),
         'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
+            ['Format', 'Styles'],
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink'],
-            ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
         ],
         'autoParagraph': False,
-        'allowedContent': True,
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -320,34 +320,12 @@ CKEDITOR_CONFIGS = {
         ],
         'autoParagraph': False
     },
-    'minimal': {
-        'toolbar': 'Custom',
-        'extraPlugins': '',
-        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
-        'toolbar_Custom': [
-            {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
-            ['Bold', 'Italic', 'Underline'],
-            ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink'],
-        ],
-        'autoParagraph': False,
-        'allowedContent': True,
-    },
-    'minimal_plus_headers': {
-        'toolbar': 'Custom',
-        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
-        'toolbar_Custom': [
-            {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
-            ['Format', 'Styles'],
-            ['Bold', 'Italic', 'Underline'],
-            ['Link', 'Unlink'],
-            ['NumberedList', 'BulletedList']
-        ],
-        'autoParagraph': False
-    },
 }
+
+CKEDITOR_CONFIGS['education_group_pedagogy'] = dict(CKEDITOR_CONFIGS['minimal'])
+
 if CDN_URL:
-    for config_name in ['reddot', 'minimal']:
+    for config_name in ['education_group_pedagogy']:
         CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
         CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
         CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
@@ -412,6 +390,8 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
+CORS_ORIGIN_WHITELIST = os.environ.get('CORS_ORIGIN_WHITELIST', '').split()
+CORS_ALLOW_CREDENTIALS = os.environ.get('CORS_ALLOW_CREDENTIALS', 'False').lower() == 'true'
 
 # ESB Configuration
 ESB_API_URL = os.environ.get('ESB_API_URL')

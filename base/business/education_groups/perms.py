@@ -29,6 +29,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
+from base.models import program_manager
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -128,20 +129,13 @@ def is_eligible_to_delete_education_group_year(person, education_group_yr, raise
 
 
 def _is_eligible_education_group(person, education_group, raise_exception):
-    return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or EventPermEducationGroupEdition.is_open(education_group=education_group,
-                                                                                 raise_exception=raise_exception))
-            )
-
-
-def _is_eligible_certificate_aims(person, education_group, raise_exception):
-    result = check_link_to_management_entity(education_group, person, raise_exception)
-    if education_group.education_group_type.category != TRAINING:
-        if raise_exception:
-            raise PermissionDenied(_("This education group is not editable during this period.").capitalize())
-        return False
-
-    return result
+    return (
+        check_link_to_management_entity(education_group, person, raise_exception) and
+        (
+            person.is_central_manager or
+            EventPermEducationGroupEdition(obj=education_group, raise_exception=raise_exception).is_open()
+        )
+    )
 
 
 def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):
@@ -235,6 +229,11 @@ def is_eligible_to_edit_admission_condition(person, education_group_year, raise_
     return perm.is_eligible(raise_exception)
 
 
+def is_eligible_to_edit_certificate_aims(person, education_group_year, raise_exception=False):
+    perm = CertificateAimsPerms(person.user, education_group_year)
+    return perm.is_eligible(raise_exception)
+
+
 class CommonEducationGroupStrategyPerms(object):
     def __init__(self, user, education_group_year):
         self.user = user
@@ -254,17 +253,18 @@ class CommonEducationGroupStrategyPerms(object):
             raise
 
     def _is_eligible(self):
+        if self._is_lower_than_limit_edg_year():
+            raise PermissionDenied(_("You cannot change a education group before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+            })
         if self.user.is_superuser:
             return True
-
-        if not self._is_current_academic_year_in_range_of_editable_education_group_year():
-            raise PermissionDenied(_("The user cannot modify data which are greater than N+1"))
         if not self._is_linked_to_management_entity():
             raise PermissionDenied(_("The user is not attached to the management entity"))
         return True
 
-    def _is_current_academic_year_in_range_of_editable_education_group_year(self):
-        return EventPermEducationGroupEdition.is_open(education_group=self.education_group_year, in_range=True)
+    def _is_lower_than_limit_edg_year(self):
+        return self.education_group_year.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION
 
     def _is_linked_to_management_entity(self):
         return check_link_to_management_entity(self.education_group_year, self.person, False)
@@ -276,7 +276,6 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
 
         if not self._is_user_have_perm():
             raise PermissionDenied(_("The user doesn't have right to update general information"))
-
         if self.person.is_central_manager:
             return self._is_central_manager_eligible()
         elif self.person.is_faculty_manager:
@@ -294,8 +293,6 @@ class GeneralInformationPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if not EventPermEducationGroupEdition.is_open(education_group=self.education_group_year):
-            raise PermissionDenied(_("The faculty manager cannot modify general information which are lower than N"))
         return True
 
     def _is_sic_eligible(self):
@@ -326,7 +323,7 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
         return True
 
     def _is_faculty_manager_eligible(self):
-        if not EventPermEducationGroupEdition.is_open(education_group=self.education_group_year):
+        if not EventPermEducationGroupEdition(obj=self.education_group_year, raise_exception=False).is_open():
             raise PermissionDenied(_("The faculty manager cannot modify outside of program edition period"))
         return True
 
@@ -339,3 +336,22 @@ def can_delete_all_education_group(user, education_group: EducationGroup):
         if not is_eligible_to_delete_education_group(user.person, education_group_yr, raise_exception=True):
             raise PermissionDenied
     return True
+
+
+class CertificateAimsPerms(CommonEducationGroupStrategyPerms):
+    """
+    Certification aims can only be modified by program manager no matter the program edition period
+    """
+    def _is_eligible(self):
+        if self.education_group_year.education_group_type.category != TRAINING:
+            raise PermissionDenied(_("The education group is not a training type"))
+        if self.education_group_year.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+            raise PermissionDenied(_("You cannot change a education group before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+            })
+
+        if self.user.is_superuser:
+            return True
+        if not program_manager.is_program_manager(self.user, education_group=self.education_group_year.education_group):
+            raise PermissionDenied(_("The user is not the program manager of the education group"))
+        return True

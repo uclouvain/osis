@@ -134,7 +134,7 @@ class TestGroupElementYearForm(TestCase):
                 form = GroupElementYearForm(parent=parent, child_branch=self.child_branch)
                 self.assertCountEqual(expected_fields, list(form.fields.keys()))
 
-    def test_only_keep_block_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
+    def test_disable_all_fields_except_block_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
         expected_fields = [
             "block"
         ]
@@ -146,7 +146,8 @@ class TestGroupElementYearForm(TestCase):
                     child_type=child_branch.education_group_type
                 )
                 form = GroupElementYearForm(parent=self.parent, child_branch=child_branch)
-                self.assertCountEqual(expected_fields, list(form.fields.keys()))
+                enabled_fields = [name for name, field in form.fields.items() if not field.disabled]
+                self.assertCountEqual(expected_fields, enabled_fields)
 
     def test_remove_access_condition_when_authorized_relationship(self):
         AuthorizedRelationshipFactory(
@@ -166,9 +167,19 @@ class TestGroupElementYearForm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors["link_type"],
-            [_("You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+            [_("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                  'child_types': self.child_branch.education_group_type,
                  'parent': self.parent,
                  'parent_type': self.parent.education_group_type,
              }]
         )
+
+    def test_initial_value_relative_credits(self):
+        form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
+        self.assertEqual(form.initial['relative_credits'], self.child_branch.credits)
+
+        form = GroupElementYearForm(parent=self.parent, child_leaf=self.child_leaf)
+        self.assertEqual(form.initial['relative_credits'], self.child_leaf.credits)
+
+        form = GroupElementYearForm(parent=self.parent)
+        self.assertEqual(form.initial['relative_credits'], None)

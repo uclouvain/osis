@@ -23,13 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import PermissionDenied
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestEventPermEducationGroupEditionPerms(TestCase):
@@ -44,11 +48,11 @@ class TestEventPermEducationGroupEditionPerms(TestCase):
                                     data_year__year=cls.current_academic_year.year + 1)
 
     def test_is_open_for_spec_egy(self):
-        edy = TrainingFactory(academic_year=self.current_academic_year)
-        self.assertTrue(EventPermEducationGroupEdition.is_open(education_group=edy))
+        egy = TrainingFactory(academic_year=self.current_academic_year)
+        self.assertTrue(EventPermEducationGroupEdition(obj=egy).is_open())
 
     def test_is_open_other_rules(self):
-        self.assertTrue(EventPermEducationGroupEdition.is_open())
+        self.assertTrue(EventPermEducationGroupEdition().is_open())
 
 
 class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
@@ -56,9 +60,27 @@ class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
-    def test_is_open_for_spec_egy(self):
-        edy = TrainingFactory(academic_year=self.current_academic_year)
-        self.assertFalse(EventPermEducationGroupEdition.is_open(education_group=edy))
+    def test_is_not_open_for_spec_egy_without_exception_raise(self):
+        egy = TrainingFactory(academic_year=self.current_academic_year)
+        self.assertFalse(EventPermEducationGroupEdition(obj=egy, raise_exception=False).is_open())
 
-    def test_is_open_other_rules(self):
-        self.assertFalse(EventPermEducationGroupEdition.is_open())
+    def test_is_not_open_for_spec_egy_with_exception_raise(self):
+        egy = TrainingFactory(academic_year=self.current_academic_year)
+        expected_exception_message = str(_("This education group is not editable during this period."))
+        with self.assertRaisesMessage(PermissionDenied, expected_exception_message):
+            EventPermEducationGroupEdition(obj=egy, raise_exception=True).is_open()
+
+    def test_is_not_open_other_rules(self):
+        self.assertFalse(EventPermEducationGroupEdition().is_open())
+
+
+class TestEventPermInit(TestCase):
+    def test_init_obj_matches_model(self):
+        egy = TrainingFactory()
+        EventPermEducationGroupEdition(obj=egy, raise_exception=False)
+
+    def test_init_obj_dont_match_model(self):
+        luy = LearningUnitYearFactory()
+        expected_exception_message = "The provided obj must be a {}".format(EducationGroupYear.__name__)
+        with self.assertRaisesMessage(AttributeError, expected_exception_message):
+            EventPermEducationGroupEdition(obj=luy, raise_exception=False)
