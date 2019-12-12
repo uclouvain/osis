@@ -212,14 +212,14 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
 class TestPostponementEducationGroupYear(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Create user and attached it to management entity
-        cls.person = PersonFactory()
-        cls.user = cls.person.user
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 40)
         cls.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
 
     def setUp(self):
+        # Create user and attached it to management entity
+        self.person = PersonFactory()
+        self.user = self.person.user
         administration_entity_version = MainEntityVersionFactory()
         management_entity_version = MainEntityVersionFactory()
 
