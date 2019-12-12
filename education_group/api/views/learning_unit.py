@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import When, BooleanField, Case
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
@@ -52,10 +53,24 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         )
         education_group_root_ids = group_element_year.find_learning_unit_formations(
             [learning_unit_year],
-            luy=learning_unit_year
+            luy=learning_unit_year,
+            in_complementary_module=True
         ).get(learning_unit_year.id, [])
-        return EducationGroupYear.objects.filter(pk__in=education_group_root_ids)\
-            .select_related('education_group_type', 'academic_year')
+        whens = [
+            When(pk=k, then=v) for k, v in education_group_root_ids
+        ]
+
+        return EducationGroupYear.objects.filter(
+            pk__in=[egr[0] for egr in education_group_root_ids]
+        ).select_related(
+            'education_group_type', 'academic_year'
+        ).annotate(
+            in_complementary_module=Case(
+                *whens,
+                default=False,
+                output_field=BooleanField()
+            )
+        )
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
