@@ -54,7 +54,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         education_group_root_ids = group_element_year.find_learning_unit_formations(
             [learning_unit_year],
             luy=learning_unit_year,
-            in_complementary_module=True
+            module_compl=True
         ).get(learning_unit_year.id, [])
         whens = [
             When(pk=k, then=v) for k, v in education_group_root_ids
