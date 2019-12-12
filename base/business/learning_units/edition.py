@@ -25,7 +25,6 @@
 ##############################################################################
 
 from django.db import IntegrityError, transaction, Error
-from django.db.models import F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -38,13 +37,13 @@ from base.enums.component_detail import COMPONENT_DETAILS
 from base.models import learning_class_year, academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
-from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
-from cms.models import translated_text
+from cms.models.translated_text import TranslatedText
 from osis_common.utils.numbers import normalize_fraction
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
@@ -230,7 +229,7 @@ def _duplicate_teaching_material(duplicated_luy):
 
 
 def _duplicate_cms_data(duplicated_luy):
-    previous_cms_data = translated_text.find_by_reference(duplicated_luy.copied_from.id)
+    previous_cms_data = TranslatedText.objects.filter(reference=duplicated_luy.copied_from.id)
     for item in previous_cms_data:
         update_related_object(item, 'reference', duplicated_luy.id)
 
