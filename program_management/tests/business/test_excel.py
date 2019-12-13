@@ -28,14 +28,16 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
-    _build_excel_lines_ues
+    _build_excel_lines_ues, _get_optional_data
 from program_management.forms.custom_xls import CustomXlsForm
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
@@ -153,7 +155,15 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         for node, acronym in zip(cls.child_leaves, ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]):
             node.child_leaf.acronym = acronym
             node.child_leaf.save()
+
         cls.luy_children = [child.child_leaf for child in cls.child_leaves]
+        cls.workbook_contains = \
+            EducationGroupYearLearningUnitsContainedToExcel(cls.education_group_year, CustomXlsForm({}))._to_workbook()
+        cls.sheet_contains = cls.workbook_contains.worksheets[0]
+
+        generator_container = GenerateContainer(cls.education_group_year.academic_year,
+                                                cls.education_group_year.academic_year)
+        cls.luy = generator_container.generated_container_years[0].learning_unit_year_full
 
     def test_header_lines_without_optional_titles(self):
         custom_xls_form = CustomXlsForm({})
@@ -269,6 +279,70 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
             self.assertListEqual(content[idx], expected)
             idx += 1
 
+    def test_get_optional_required_entity(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_required_entity'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.learning_container_year.requirement_entity])
+
+    def test_get_optional_allocation_entity(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_allocation_entity'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.learning_container_year.allocation_entity])
+
+    def test_get_optional_credits(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_credits'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.credits.normalize()])
+
+    def test_get_optional_has_periodicity(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_periodicity'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.get_periodicity_display()])
+
+    def test_get_optional_has_active(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_active'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [_('yes')])
+
+    def test_get_optional_has_quadrimester(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_quadrimester'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.get_quadrimester_display() or ''])
+
+    def test_get_optional_has_session_derogation(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_session_derogation'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.get_session_display() or ''])
+
+    def test_get_optional_has_proposition(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_proposition'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              ['', ''])
+        proposal = ProposalLearningUnitFactory(learning_unit_year=self.luy)
+
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [proposal.get_type_display(), proposal.get_state_display()])
+
+    def test_get_optional_has_english_title(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_english_title'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.complete_title_english])
+
+    def test_get_optional_has_language(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_language'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.language])
+
 
 def get_expected_data(gey, luy):
     expected = [luy.acronym,
@@ -282,3 +356,20 @@ def get_expected_data(gey, luy):
                 _('yes')
                 ]
     return expected
+
+
+def initialize_optional_data():
+    return {
+        'has_required_entity': False,
+        'has_allocation_entity': False,
+        'has_credits': False,
+        'has_periodicity': False,
+        'has_active': False,
+        'has_quadrimester': False,
+        'has_session_derogation': False,
+        'has_volume': False,
+        'has_teacher_list': False,
+        'has_proposition': False,
+        'has_english_title': False,
+        'has_language': False
+    }

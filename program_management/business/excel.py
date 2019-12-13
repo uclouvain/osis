@@ -512,20 +512,18 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         return q.prefetch_related(prefetch_content)
 
     def _to_workbook(self):
-        return generate_ue_contained_for_workbook(self.egy,
-                                                  self.learning_unit_years_parent,
+        return generate_ue_contained_for_workbook(self.learning_unit_years_parent,
                                                   self.custom_xls_form)
 
     def to_excel(self, ):
         return save_virtual_workbook(self._to_workbook())
 
 
-def generate_ue_contained_for_workbook(egy: EducationGroupYear, learning_unit_years_parent,
-                                       custom_xls_form: CustomXlsForm):
+def generate_ue_contained_for_workbook(learning_unit_years_parent, custom_xls_form: CustomXlsForm):
     data = _build_excel_lines_ues(custom_xls_form, learning_unit_years_parent)
-    excel_lines = data.get('content')
-    need_proposal_legend = custom_xls_form.cleaned_data['proposition']
-    return _get_workbook_for_custom_xls(excel_lines,
+    need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
+
+    return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
                                         data.get('colored_cells', {}) if need_proposal_legend else {})
 
@@ -536,80 +534,31 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, learning_unit_years_p
     optional_data_needed = _optional_data(custom_xls_form)
     colored_cells = defaultdict(list)
     idx = 1
-    cpt = 0
+
     for gey in learning_unit_years_parent:
         luy = gey.child_leaf
-        data = _fix_data(gey, luy)
-
-        if optional_data_needed['has_required_entity']:
-            data.append(luy.learning_container_year.requirement_entity)
-
-        if optional_data_needed['has_allocation_entity']:
-            data.append(luy.learning_container_year.allocation_entity)
-
-        if optional_data_needed['has_credits']:
-            data.append(luy.credits.normalize() or '-')
-        if optional_data_needed['has_periodicity']:
-            data.append(luy.get_periodicity_display())
-
-        if optional_data_needed['has_active']:
-            data.append(str.strip(yesno(luy.status)))
-
-        if optional_data_needed['has_quadrimester']:
-            data.append(luy.get_quadrimester_display() or '')
-
-        if optional_data_needed['has_session_derogation']:
-            data.append(luy.get_session_display() or '')
-
-        if optional_data_needed['has_volume']:
-            luys = annotate_qs(LearningUnitYear.objects.filter(id=luy.id))
-            data.extend(volume_information(luys[0]))
-
-        if optional_data_needed['has_teacher_list']:
-            data.append(
-                ";".join(
-                    [_get_attribution_line(value.get('person'))
-                     for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-                        luy
-                    ).values()
-                     ]
-                )
-            )
-
-        if optional_data_needed['has_proposition']:
-            proposal = find_by_learning_unit_year(luy)
-            if proposal:
-                data.append(proposal.get_type_display())
-                data.append(proposal.get_state_display())
-            else:
-                data.append('')
-                data.append('')
-
-        if optional_data_needed['has_english_title']:
-            data.append(luy.complete_title_english)
-
-        if optional_data_needed['has_language']:
-            data.append(luy.language)
-
-        content.append(data)
-
+        content.append(_get_optional_data(_fix_data(gey, luy), luy, optional_data_needed))
         if getattr(luy, "proposallearningunit", None):
             colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
         idx += 1
-        cpt += 1
+
     colored_cells[Style(font=Font(bold=True))].append(0)
     return {'content': content, 'colored_cells': colored_cells}
 
 
 def _optional_data(custom_xls_form):
-    optional_data = {}
-
-    for field in custom_xls_form.fields:
-        optional_data['has_{}'.format(field)] = False
+    optional_data = _initialize_optional_data_dict(custom_xls_form)
 
     if custom_xls_form.is_valid():
         for field in custom_xls_form.fields:
             optional_data['has_{}'.format(field)] = custom_xls_form.cleaned_data[field]
+    return optional_data
+
+
+def _initialize_optional_data_dict(custom_xls_form):
+    optional_data = {}
+    for field in custom_xls_form.fields:
+        optional_data['has_{}'.format(field)] = False
     return optional_data
 
 
@@ -670,7 +619,7 @@ def _add_optional_titles(custom_xls_form):
         for field in custom_xls_form.fields:
             if custom_xls_form.cleaned_data[field]:
                 data = data + globals().get("optional_header_for_{}".format(field), [])
-        return data
+    return data
 
 
 def _get_attribution_line(a_person_teacher):
@@ -681,3 +630,46 @@ def _get_attribution_line(a_person_teacher):
             a_person_teacher.middle_name or ""
         ]).strip()
     return ""
+
+
+def _get_optional_data(data, luy, optional_data_needed):
+    if optional_data_needed['has_required_entity']:
+        data.append(luy.learning_container_year.requirement_entity)
+    if optional_data_needed['has_allocation_entity']:
+        data.append(luy.learning_container_year.allocation_entity)
+    if optional_data_needed['has_credits']:
+        data.append(luy.credits.normalize() or '-')
+    if optional_data_needed['has_periodicity']:
+        data.append(luy.get_periodicity_display())
+    if optional_data_needed['has_active']:
+        data.append(str.strip(yesno(luy.status)))
+    if optional_data_needed['has_quadrimester']:
+        data.append(luy.get_quadrimester_display() or '')
+    if optional_data_needed['has_session_derogation']:
+        data.append(luy.get_session_display() or '')
+    if optional_data_needed['has_volume']:
+        luys = annotate_qs(LearningUnitYear.objects.filter(id=luy.id))
+        data.extend(volume_information(luys[0]))
+    if optional_data_needed['has_teacher_list']:
+        data.append(
+            ";".join(
+                [_get_attribution_line(value.get('person'))
+                 for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+                    luy
+                ).values()
+                 ]
+            )
+        )
+    if optional_data_needed['has_proposition']:
+        proposal = find_by_learning_unit_year(luy)
+        if proposal:
+            data.append(proposal.get_type_display())
+            data.append(proposal.get_state_display())
+        else:
+            data.append('')
+            data.append('')
+    if optional_data_needed['has_english_title']:
+        data.append(luy.complete_title_english)
+    if optional_data_needed['has_language']:
+        data.append(luy.language)
+    return data
