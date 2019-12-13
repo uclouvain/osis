@@ -57,7 +57,6 @@ SUBDIVISION_ACRONYM = 'C'
 class LearningUnitPostponementFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing LEARNING UNIT POSTPONEMENT
        FORM"""
-
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -438,6 +437,15 @@ class TestLearningUnitPostponementFormCheckConsistency(LearningUnitPostponementF
 
 class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostponementFormContextMixin):
     """Unit tests for LearningUnitPostponementForm._find_consistency_errors()"""
+    def setUp(self):
+        super(TestLearningUnitPostponementFormFindConsistencyErrors, self).setUp()
+        self.instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
+        self.form = _instanciate_postponement_form(
+            self.person,
+            self.learning_unit_year_full.academic_year,
+            learning_unit_instance=self.instance_luy_base_form.learning_unit_instance,
+            data=self.instance_luy_base_form.data
+        )
 
     def _change_credits_value(self, academic_year):
         initial_credits_value = self.learning_unit_year_full.credits
@@ -475,20 +483,14 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         qs.update(repartition_volume_requirement_entity=repartition_volume)
         return qs.get()
 
-    def _remove_additional_requirement_entity_2(self, academic_year):
+    @staticmethod
+    def _remove_additional_requirement_entity_2(academic_year):
         # Remove additional requirement entity 2 container year
         learn_container_year = LearningContainerYear.objects.filter(academic_year=academic_year).get()
         initial_entity = learn_container_year.additional_entity_2
         learn_container_year.additional_entity_2 = None
         learn_container_year.save()
         return initial_entity
-
-    def setUp(self):
-        super().setUp()
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        self.form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                                   learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                                   data=instance_luy_base_form.data)
 
     def test_when_no_differences_found_in_future(self):
         self.assertTrue(self.form.is_valid())
@@ -514,18 +516,15 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         LearningUnitYear.objects.filter(academic_year=next_academic_year,
                                         learning_unit=self.learning_unit_year_full.learning_unit) \
             .update(specific_title=None)
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-        self.assertTrue(form.is_valid())
-        result = form.consistency_errors
+
+        self.assertTrue(self.form.is_valid())
+        result = self.form.consistency_errors
         expected_result = OrderedDict({
             next_academic_year: [
                 _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
                     'col_name': _('French title proper'),
                     'new_value': '-',
-                    'current_value': instance_luy_base_form.data['specific_title']
+                    'current_value': self.instance_luy_base_form.data['specific_title']
                 }
             ]
         })
@@ -609,16 +608,9 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                 }
             ],
         })
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
 
-        form = LearningUnitPostponementForm(
-            self.person,
-            self.learning_unit_year_full.academic_year,
-            learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-            data=instance_luy_base_form.data
-        )
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
         self.assertDictEqual(result, expected_result)
 
     def test_postponement_with_proposal(self):
