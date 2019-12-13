@@ -170,6 +170,8 @@ class TestCreate(TestCase):
                 self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
                 if expected_forms_by_category.get(category) == education_group_categories.TRAINING:
                     self.assertEqual(response.context["form_education_group_year"]["show_diploma_tab"], True)
+                else:
+                    self.assertFalse("show_diploma_tab" in response.context["form_education_group_year"])
 
 
 @override_flag('education_group_create', active=True)
