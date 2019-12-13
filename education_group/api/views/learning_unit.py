@@ -65,8 +65,15 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             luy=learning_unit_year,
             module_compl=True
         ).get(learning_unit_year.id, [])
+
+        ids = dict()
+        for egy_id, in_complementary_module in education_group_root_ids:
+            if egy_id not in ids:
+                ids.update({egy_id: in_complementary_module})
+            else:
+                ids[egy_id] = ids[egy_id] and in_complementary_module
         whens = [
-            When(pk=k, then=v) for k, v in education_group_root_ids
+            When(pk=k, then=v) for k, v in ids.items()
         ]
 
         return EducationGroupYear.objects.filter(
