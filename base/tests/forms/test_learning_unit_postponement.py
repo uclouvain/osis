@@ -58,13 +58,16 @@ class LearningUnitPostponementFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing LEARNING UNIT POSTPONEMENT
        FORM"""
 
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
-        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
+        FacultyManagerGroupFactory()
 
+    def setUp(self):
+        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
         # Creation of a LearingContainerYear and all related models - FOR 6 years
         self.learn_unit_structure = GenerateContainer(self.current_academic_year, end_year_6)
         # Build in Generated Container [first index = start Generate Container ]
@@ -90,8 +93,6 @@ class LearningUnitPostponementFormContextMixin(TestCase):
         self.person = PersonFactory()
         for entity in self.learn_unit_structure.entities:
             PersonEntityFactory(person=self.person, entity=entity)
-
-        FacultyManagerGroupFactory()
 
 
 class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMixin):
@@ -230,22 +231,28 @@ class TestLearningUnitPostponementFormIsValid(LearningUnitPostponementFormContex
 class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMixin):
     """Unit tests for LearningUnitPostponementForm.save()"""
 
+    def setUp(self):
+        super().setUp()
+        LearningUnitYear.objects.filter(
+            learning_unit=self.learn_unit_structure.learning_unit_full,
+            academic_year__year__gt=self.current_academic_year.year
+        ).delete()
+        self.instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
+        self.form = _instanciate_postponement_form(
+            self.person,
+            self.learning_unit_year_full.academic_year,
+            learning_unit_instance=self.instance_luy_base_form.learning_unit_instance,
+            data=self.instance_luy_base_form.data
+        )
+
     @mock.patch('base.forms.learning_unit.learning_unit_create_2.FullForm.save', side_effect=None)
     def test_save_with_all_luy_to_create(self, mock_baseform_save):
         """This test will ensure that the save will call LearningUnitBaseForm [CREATE] for all luy
            No update because all LUY doesn't exist on db
         """
-        LearningUnitYear.objects.filter(
-            learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year__year__gt=self.current_academic_year.year
-        ).delete()
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-        self.assertEqual(len(form._forms_to_upsert), 7)
+        self.assertEqual(len(self.form._forms_to_upsert), 7)
 
-        form.save()
+        self.form.save()
         self.assertEqual(mock_baseform_save.call_count, 7)
 
     @mock.patch('base.forms.learning_unit.learning_unit_partim.PartimForm.save', side_effect=None)
@@ -332,13 +339,9 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
             academic_year__year__gt=self.current_academic_year.year + 2
         ).delete()
 
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-        self.assertEqual(len(form._forms_to_upsert), 7)
+        self.assertEqual(len(self.form._forms_to_upsert), 7)
 
-        form.save()
+        self.form.save()
         self.assertEqual(mock_baseform_save.call_count, 7)
 
     def test_all_learning_unit_years_have_same_learning_unit(self):
@@ -365,13 +368,12 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
         next_learning_unit_year.learning_container_year.type_declaration_vacant = vacant_declaration_type.DO_NOT_ASSIGN
         next_learning_unit_year.learning_container_year.save()
 
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        data = dict(instance_luy_base_form.data)
+        data = dict(self.instance_luy_base_form.data)
         data['is_vacant'] = True
         data['attribution_procedure'] = attribution_procedure.INTERNAL_TEAM
         data['type_declaration_vacant'] = vacant_declaration_type.EXCEPTIONAL_PROCEDURE
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                              learning_unit_instance=self.instance_luy_base_form.learning_unit_instance,
                                               data=data)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -481,14 +483,17 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         learn_container_year.save()
         return initial_entity
 
-    def test_when_no_differences_found_in_future(self):
+    def setUp(self):
+        super().setUp()
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-        self.assertTrue(form.is_valid())
+        self.form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
+                                                   learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                                   data=instance_luy_base_form.data)
+
+    def test_when_no_differences_found_in_future(self):
+        self.assertTrue(self.form.is_valid())
         expected_result = {}
-        self.assertEqual(form.consistency_errors, expected_result)
+        self.assertEqual(self.form.consistency_errors, expected_result)
 
     def test_when_no_differences_found_empty_string_as_null(self):
         # Set specific title to 'None' for current academic year
@@ -499,13 +504,9 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                                         learning_unit=self.learning_unit_year_full.learning_unit) \
             .update(specific_title='')
 
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-        self.assertTrue(form.is_valid())
+        self.assertTrue(self.form.is_valid())
         expected_result = {}
-        self.assertEqual(form.consistency_errors, expected_result)
+        self.assertEqual(self.form.consistency_errors, expected_result)
 
     def test_when_difference_found_on_none_value(self):
         # Set specific title to 'None' for learning unit next academic year
@@ -542,13 +543,9 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                 }
             ]
         })
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
 
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
         self.assertIsInstance(result, OrderedDict)
         self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
 
@@ -574,13 +571,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
             ],
         })
 
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
         self.assertIsInstance(result, OrderedDict)  # Need to be ordered by academic_year
         self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
 
@@ -596,13 +588,9 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                 }
             ],
         })
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
 
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
         self.assertEqual(result, expected_result)
 
     def test_when_differences_found_on_repartition_volume(self):
@@ -650,13 +638,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
             next_academic_year: [msg_proposal],
         })
 
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
         self.assertIsInstance(result, OrderedDict)  # Need to be ordered by academic_year
         self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
 
@@ -677,12 +660,9 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                 }
             ],
         })
-        instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
-                                              data=instance_luy_base_form.data)
-        self.assertTrue(form.is_valid(), form.errors)
-        result = form.consistency_errors
+
+        self.assertTrue(self.form.is_valid(), self.form.errors)
+        result = self.form.consistency_errors
         self.assertEqual(result, expected_result)
 
 
