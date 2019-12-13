@@ -36,7 +36,6 @@
 {% endblock table_header %}
 
 {% block script %}
-    {% url 'quick_search_education_group_serializer' root_id education_group_year_id as quick_search_url %}
     <script>
         columnDefs = [
             {
@@ -46,7 +45,7 @@
                 "orderable": false,
                 "render": function(data, type, row, meta) {
                     let input = document.createElement("input");
-                    input.type = 'radio';
+                    input.type = 'checkbox';
                     input.name = 'selected-item';
                     input.value = data;
                     // FIXME Use uuid in the future when implemented in place of data-url

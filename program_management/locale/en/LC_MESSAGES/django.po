@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-26 14:44+0100\n"
+"POT-Creation-Date: 2019-11-29 14:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
-msgstr ""
+msgstr "\"%(child)s\" has been removed from \"%(parent)s\""
 
 #, python-format
 msgid ""
@@ -76,9 +76,16 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
+msgid "Access condition"
+msgstr ""
+
 msgid "Acronym"
 msgstr ""
 
+msgid "Acronym/Short title"
+msgstr ""
+
+msgctxt "abbreviation"
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -90,13 +97,10 @@ msgstr ""
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
-msgstr ""
+msgstr "Are you sure you want to remove %(acronym)s ?"
 
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
-msgstr ""
-
-msgid "Attach"
 msgstr ""
 
 msgid "Block"
@@ -105,22 +109,26 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-msgid "Cannot attach element to learning unit"
-msgstr ""
-
 msgid "Cannot detach due to prerequisites."
-msgstr ""
+msgstr "Cannot remove link due to prerequisites."
 
 #, python-format
 msgid ""
 "Cannot detach education group year %(acronym)s as the following learning "
 "units are prerequisite in %(formation)s: %(learning_units)s"
 msgstr ""
+"Cannot remove education group year %(acronym)s as the following learning "
+"units are prerequisite in %(formation)s: %(learning_units)s"
 
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
 "prerequisite."
+msgstr ""
+"Cannot remove learning unit %(acronym)s as it has a prerequisite or it is a "
+"prerequisite."
+
+msgid "Cannot add any element to learning unit"
 msgstr ""
 
 #, python-format
@@ -128,7 +136,7 @@ msgid "Cannot perform action on a education group before %(limit_year)s"
 msgstr ""
 
 msgid "Cannot perform detach action on root."
-msgstr ""
+msgstr "Cannot perform remove action on root."
 
 msgid "Cannot perform modification action on root."
 msgstr ""
@@ -136,7 +144,10 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-msgid "Copy"
+msgid "Comment"
+msgstr ""
+
+msgid "Content"
 msgstr ""
 
 msgid "Courses not taught"
@@ -146,16 +157,10 @@ msgid "Cred. rel./abs."
 msgstr ""
 
 #, python-format
-msgid "Do you want to attach %(object_acronym)s ?"
-msgstr ""
-
-#, python-format
-msgid ""
-"Do you want to copy or to move %(object_acronym)s from %(parent_acronym)s ?"
-msgstr ""
-
-#, python-format
 msgid "Element selected %(element)s"
+msgstr ""
+
+msgid "English comment"
 msgstr ""
 
 #, python-format
@@ -200,6 +205,9 @@ msgstr ""
 msgid "List UE"
 msgstr ""
 
+msgid "Link type"
+msgstr ""
+
 msgid "Made in"
 msgstr ""
 
@@ -210,9 +218,6 @@ msgid "Mobile phone"
 msgstr ""
 
 msgid "Modify prerequisites"
-msgstr ""
-
-msgid "Move"
 msgstr ""
 
 msgid "Name"
@@ -242,7 +247,11 @@ msgid_plural ""
 "Options \"%(acronym)s\" cannot be detach because they are contained in "
 "%(finality_acronym)s program."
 msgstr[0] ""
+"Option \"%(acronym)s\" cannot be removed because it is contained in "
+"%(finality_acronym)s program."
 msgstr[1] ""
+"Options \"%(acronym)s\" cannot be removed because they are contained in "
+"%(finality_acronym)s program."
 
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
@@ -254,13 +263,16 @@ msgstr[1] ""
 msgid "Optional"
 msgstr ""
 
+msgid "Paste"
+msgstr ""
+
 msgid "Periodic courses not taught"
 msgstr ""
 
 msgid "Periodic courses taught during"
 msgstr ""
 
-msgid "Please select an item before attach it"
+msgid "Please cut or copy an item before attach it"
 msgstr ""
 
 msgid "Prerequisite"
@@ -278,9 +290,6 @@ msgid "Registration ID"
 msgstr ""
 
 msgid "Registration form for the content of"
-msgstr ""
-
-msgid "Required"
 msgstr ""
 
 msgid "Save"
@@ -302,6 +311,10 @@ msgstr ""
 msgid "The content has already been postponed."
 msgstr ""
 
+#, python-format
+msgid "The content of %(acronym)s has been updated."
+msgstr ""
+
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
 msgstr ""
@@ -313,10 +326,6 @@ msgid "The learning unit has prerequisites and is a prerequisite"
 msgstr ""
 
 msgid "The learning unit is a prerequisite"
-msgstr ""
-
-#, python-format
-msgid "The link of %(acronym)s has been created"
 msgstr ""
 
 #, python-format
@@ -394,21 +403,24 @@ msgstr ""
 msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
-#, python-format
-msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
-msgstr ""
-
-msgid "You can not attach the same child several times."
+msgid "You are not eligible to detach this item"
 msgstr ""
 
 #, python-format
-msgid ""
-"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
-"\"%(parent_type)s\")"
+msgid "You can not add a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+
+msgid "You can not add the same child several times."
 msgstr ""
 
 #, python-format
 msgid "You cannot modify content for %(education_group_types)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot add \"%(child_types)s\" to \"%(parent)s\" (type "
+"\"%(parent_type)s\")"
 msgstr ""
 
 #, python-format

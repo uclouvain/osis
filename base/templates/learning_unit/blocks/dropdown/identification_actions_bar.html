@@ -54,11 +54,11 @@
                         {% endflag %}
 
                         {# This feature is used for managing tree in education group context #}
-                        {% flag "education_group_select" %}
+                        {% flag "copy_education_group_to_cache" %}
                             <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
                                 <a {% if "base.can_edit_learningunit" in perms %} href="#"
                                                                                   onclick="javascript:select()" {% endif %}>
-                                    {% trans 'Select' %}
+                                    {% trans 'Copy' %}
                                 </a>
                             </li>
                             <li class="divider"></li>
@@ -131,7 +131,7 @@
     <script>
         function select() {
             $.ajax({
-                url: "{% url 'learning_unit_select' learning_unit_year_id=learning_unit_year.id %}",
+                url: "{% url 'copy_learning_unit_to_cache' learning_unit_year_id=learning_unit_year.id %}",
                 dataType: 'json',
                 type: 'POST',
                 success: function (jsonResponse) {

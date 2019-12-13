@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -36,7 +37,7 @@ from base.models.utils.utils import get_object_or_none
 from base.utils.cache import ElementCache
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
-from base.views.education_groups.select import build_success_message, build_success_json_response
+from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
 
 
 @login_required
@@ -107,11 +108,32 @@ def _down(request, group_element_year, *args, **kwargs):
 
 
 @require_http_methods(['POST'])
-def _select(request, group_element_year, *args, **kwargs):
-    element = kwargs['element']
+def _copy_to_cache(request, group_element_year, *args, **kwargs):
+    return _cache_object(
+        request.user,
+        group_element_year,
+        object_to_cache=kwargs['element'],
+        action=ElementCache.ElementCacheAction.COPY.value
+    )
+
+
+@require_http_methods(['POST'])
+def _cut_to_cache(request, group_element_year, *args, **kwargs):
+    action = ElementCache.ElementCacheAction.CUT.value
+    if not group_element_year:
+        action = ElementCache.ElementCacheAction.COPY.value
+    return _cache_object(
+        request.user,
+        group_element_year,
+        object_to_cache=kwargs['element'],
+        action=action
+    )
+
+
+def _cache_object(user, group_element_year, object_to_cache, action):
     group_element_year_pk = group_element_year.pk if group_element_year else None
-    ElementCache(request.user).save_element_selected(element, source_link_id=group_element_year_pk)
-    success_msg = build_success_message(element)
+    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action)
+    success_msg = get_clipboard_content_display(object_to_cache, action)
     return build_success_json_response(success_msg)
 
 
@@ -119,7 +141,8 @@ def _get_action_method(request):
     available_actions = {
         'up': _up,
         'down': _down,
-        'select': _select,
+        'copy': _copy_to_cache,
+        'cut': _cut_to_cache,
     }
     data = getattr(request, request.method, {})
     action = data.get('action')

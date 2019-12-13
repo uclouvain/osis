@@ -87,7 +87,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
 
     def _save_translated_text(self):
         for code, label in settings.LANGUAGES:
-            self.trans_text = translated_text.find_by_id(self.cleaned_data['cms_{}_id'.format(code[:2])])
+            self.trans_text = TranslatedText.objects.get(pk=self.cleaned_data['cms_{}_id'.format(code[:2])])
             self.trans_text.text = self.cleaned_data.get('trans_text_{}'.format(code[:2]))
             self.text_label = self.trans_text.text_label
             self.trans_text.save()
@@ -100,16 +100,19 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             self.last_postponed_academic_year = None
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
-                self.last_postponed_academic_year = ac_year_postponement_range.last()
                 self._update_future_luy(ac_year_postponement_range, self.learning_unit_year)
 
     def _update_future_luy(self, ac_year_postponement_range, luy):
         for ac in ac_year_postponement_range:
-            next_luy, created = LearningUnitYear.objects.get_or_create(
-                academic_year=ac,
-                acronym=luy.acronym,
-                learning_unit=luy.learning_unit
-            )
+            try:
+                next_luy = LearningUnitYear.objects.get(
+                    academic_year=ac,
+                    acronym=luy.acronym,
+                    learning_unit=luy.learning_unit
+                )
+            except LearningUnitYear.DoesNotExist:
+                continue
+
             TranslatedText.objects.update_or_create(
                 entity=entity_name.LEARNING_UNIT_YEAR,
                 reference=next_luy.id,
@@ -117,3 +120,4 @@ class LearningUnitSpecificationsEditForm(forms.Form):
                 text_label=self.text_label,
                 defaults={'text': self.trans_text.text}
             )
+            self.last_postponed_academic_year = ac
