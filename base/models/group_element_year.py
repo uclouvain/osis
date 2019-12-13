@@ -30,7 +30,7 @@ from collections import Counter
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, connection
-from django.db.models import Q, F, Case, When, BooleanField, Value
+from django.db.models import Q, F, Case, When, BooleanField
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -94,10 +94,11 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
             gey.parent_id,
             edyc.academic_year_id,
             0 AS level,
-            CASE edyc.education_group_type_id WHEN 84 THEN true
+            CASE egc.name WHEN 'COMPLEMENTARY_MODULE' THEN true
             ELSE false END in_complementary_module
     FROM base_groupelementyear gey
     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+    INNER JOIN base_educationgrouptype AS egc on edyc.education_group_type_id = egc.id
     WHERE child_leaf_id = %(child_leaf_id)s
 
     UNION ALL
@@ -109,11 +110,12 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
             edyp.academic_year_id,
             child.level + 1,
             child.in_complementary_module OR
-            CASE edyp.education_group_type_id WHEN 84 THEN true
+            CASE egc.name WHEN 'COMPLEMENTARY_MODULE' THEN true
             ELSE false END in_complementary_module
     FROM base_groupelementyear AS parent
     INNER JOIN group_element_year_parent_from_child_leaf AS child on parent.child_branch_id = child.parent_id
     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+    INNER JOIN base_educationgrouptype AS egc on edyp.education_group_type_id = egc.id
 )
 
 SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level, in_complementary_module
@@ -388,8 +390,6 @@ def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = 
             parent__isnull=False
         ).filter(
             Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
-        ).annotate(
-            in_complementary_module=Value(False, output_field=BooleanField())
         )
     else:
         geys = fetch_row_sql_tree_from_child(child_leaf_id=learning_unit_year.pk)
@@ -424,6 +424,7 @@ def _find_elements(group_elements_by_child_id, module_compl=False, child_leaf_id
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
+
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
         if _is_root_group_element_year(group_elem_year):

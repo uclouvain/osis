@@ -52,6 +52,7 @@ class TrainingListViewTestCase(APITestCase):
         """
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        cls.training.in_complementary_module = False
         cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
