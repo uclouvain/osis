@@ -65,7 +65,11 @@ class TestGetLearningUnitExcel(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)
+        expected_filename = "{workbook_name}.xlsx".format(
+            workbook_name=str(_("LearningUnitList-%(year)s-%(acronym)s") % {
+                "year": self.education_group_year.academic_year.year,
+                "acronym": self.education_group_year.acronym
+            })
+        )
         self.assertEqual(response['Content-Disposition'],
-                         "attachment; filename={}-{}-{}.xlsx".format(_('List UE'),
-                                                                     self.education_group_year.academic_year.year,
-                                                                     self.education_group_year.acronym))
+                         "attachment; filename={}".format(expected_filename))
