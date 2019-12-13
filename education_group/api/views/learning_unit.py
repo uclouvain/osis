@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.db.models import When, BooleanField, Case
+from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
@@ -36,13 +37,21 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
     LearningUnitYearPrerequisitesListSerializer
 
 
+class EducationGroupRootsFilter(filters.FilterSet):
+    in_complementary_module = filters.BooleanFilter(field_name="in_complementary_module")
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ['in_complementary_module']
+
+
 class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return all education groups root which utilize the learning unit specified
     """
     name = 'learningunitutilization_read'
     serializer_class = EducationGroupRootsListSerializer
-    filter_backends = []
+    filterset_class = EducationGroupRootsFilter
     paginator = None
 
     def get_queryset(self):
