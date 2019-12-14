@@ -161,8 +161,8 @@ class TestReadPdfContent(TestCase):
 
 
 class TestReadTree(TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_year = AcademicYearFactory()
         minor_list_type = EducationGroupTypeFactory(
             category=education_group_categories.GROUP,
@@ -173,9 +173,9 @@ class TestReadTree(TestCase):
             name=education_group_types.GroupType.COMMON_CORE,
         )
 
-        self.base_1 = GroupFactory(education_group_type=common_type,
-                                   acronym="BASE",
-                                   academic_year=academic_year)
+        cls.base_1 = GroupFactory(education_group_type=common_type,
+                                  acronym="BASE",
+                                  academic_year=academic_year)
         child_1 = GroupFactory(education_group_type=common_type,
                                acronym="CHILD",
                                academic_year=academic_year)
@@ -188,10 +188,10 @@ class TestReadTree(TestCase):
         minor_content_2 = MiniTrainingFactory(education_group_type=minor_list_type,
                                               academic_year=academic_year)
 
-        self.groupe_element_yr_1 = GroupElementYearFactory(parent=self.base_1, child_branch=minor_list_choice)
-        self.groupe_element_yr_2 = GroupElementYearFactory(parent=self.base_1, child_branch=child_1)
-        self.groupe_element_yr_3 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_1)
-        self.groupe_element_yr_4 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_2)
+        cls.groupe_element_yr_1 = GroupElementYearFactory(parent=cls.base_1, child_branch=minor_list_choice)
+        cls.groupe_element_yr_2 = GroupElementYearFactory(parent=cls.base_1, child_branch=child_1)
+        cls.groupe_element_yr_3 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_1)
+        cls.groupe_element_yr_4 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_2)
 
     def test_minor_list_detail_in_pdf_tree(self):
         result = EducationGroupHierarchy(self.base_1, pdf_content=True).to_list()

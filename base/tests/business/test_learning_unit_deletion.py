@@ -65,9 +65,10 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class LearningUnitYearDeletion(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.learning_unit = LearningUnitFactory(start_year__year=1900)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit = LearningUnitFactory(start_year__year=1900)
 
     def test_check_related_partims_deletion(self):
         l_container_year = LearningContainerYearFactory()
@@ -223,7 +224,7 @@ class LearningUnitYearDeletion(TestCase):
         learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
-        for x in range(number_classes):
+        for _ in range(number_classes):
             LearningClassYearFactory(learning_component_year=learning_component_year)
 
         learning_unit_year = learning_component_year.learning_unit_year
