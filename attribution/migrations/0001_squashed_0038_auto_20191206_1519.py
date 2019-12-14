@@ -52,7 +52,10 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('base', '0083_auto_20161215_1414'),
+        ('attribution', '0004_attribution_score_responsible'),
+        ('attribution', '0007_attribution_uuid'),
         ('base', '0157_entitymanager_entity'),
+        ('attribution', '0023_auto_20180116_1026'),
         ('base', '0082_auto_20161213_1654'),
         ('base', '0088_auto_20170106_1728'),
         ('base', '0224_auto_20180129_1308'),
