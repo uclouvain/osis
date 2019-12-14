@@ -3,7 +3,6 @@
 import uuid
 
 import django.core.validators
-import django.db.models.deletion
 from django.core.exceptions import FieldError, FieldDoesNotExist
 from django.db import migrations, models, transaction, connection
 from django.utils import timezone
@@ -62,8 +61,8 @@ class Migration(migrations.Migration):
                 ('start_date', models.DateField(blank=True, null=True)),
                 ('end_date', models.DateField(blank=True, null=True)),
                 ('function', models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('PROFESSOR', 'PROFESSOR')], db_index=True, max_length=15, null=True)),
-                ('learning_unit_year', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear')),
-                ('tutor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor')),
+                ('learning_unit_year', models.ForeignKey(blank=True, default=None, null=True, on_delete=models.deletion.CASCADE, to='base.LearningUnitYear')),
+                ('tutor', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Tutor')),
                 ('score_responsible', models.BooleanField(default=False)),
             ],
         ),
@@ -73,8 +72,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
                 ('allocation_charge', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('attribution', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='attribution.Attribution')),
-                ('learning_unit_component', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitComponent')),
+                ('attribution', models.ForeignKey(on_delete=models.deletion.CASCADE, to='attribution.Attribution')),
+                ('learning_unit_component', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnitComponent')),
             ],
             options={
                 'abstract': False,
@@ -129,7 +128,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='attribution',
             name='learning_unit_year',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnitYear'),
         ),
         migrations.AddField(
             model_name='attribution',
@@ -149,10 +148,10 @@ class Migration(migrations.Migration):
                 ('start_year', models.IntegerField(blank=True, null=True)),
                 ('end_year', models.IntegerField(blank=True, null=True)),
                 ('score_responsible', models.BooleanField(default=False)),
-                ('learning_container_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
-                ('tutor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor')),
+                ('learning_container_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningContainerYear')),
+                ('tutor', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Tutor')),
                 ('summary_responsible', models.BooleanField(default=False)),
-                ('substitute', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                ('substitute', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.Person')),
                 ('deleted_new', models.DateTimeField(blank=True, db_index=True, default=None, null=True)),
             ],
             options={
@@ -176,8 +175,8 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(default=False)),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('allocation_charge', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
-                ('attribution', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='attribution.AttributionNew')),
-                ('learning_component_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningComponentYear')),
+                ('attribution', models.ForeignKey(on_delete=models.deletion.CASCADE, to='attribution.AttributionNew')),
+                ('learning_component_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningComponentYear')),
                 ('deleted_new', models.DateTimeField(blank=True, db_index=True, default=None, null=True)),
             ],
             options={
@@ -194,8 +193,8 @@ class Migration(migrations.Migration):
                 ('function', models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'), ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'), ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'), ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35, null=True)),
                 ('volume_lecturing', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
                 ('volume_pratical_exercice', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
-                ('learning_container_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
-                ('tutor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor')),
+                ('learning_container_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningContainerYear')),
+                ('tutor', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Tutor')),
                 ('course_summary', models.TextField(blank=True, null=True)),
                 ('last_changed', models.DateTimeField(null=True)),
                 ('remark', models.TextField(blank=True, null=True)),
