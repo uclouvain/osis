@@ -6,12 +6,6 @@ import django.core.validators
 import django.db.models.deletion
 from django.core.exceptions import FieldError, FieldDoesNotExist
 from django.db import migrations, models, transaction, connection
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# attribution.migrations.0005_from_coordinator_to_score_responsible
-# attribution.migrations.0008_populate_uuid_values
-# attribution.migrations.0024_auto_20180116_1034
 from django.utils import timezone
 
 
@@ -52,10 +46,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('base', '0083_auto_20161215_1414'),
-        ('attribution', '0004_attribution_score_responsible'),
-        ('attribution', '0007_attribution_uuid'),
         ('base', '0157_entitymanager_entity'),
-        ('attribution', '0023_auto_20180116_1026'),
         ('base', '0082_auto_20161213_1654'),
         ('base', '0088_auto_20170106_1728'),
         ('base', '0224_auto_20180129_1308'),
