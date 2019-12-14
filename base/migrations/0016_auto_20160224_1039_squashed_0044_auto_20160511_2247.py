@@ -3,7 +3,6 @@
 import uuid
 
 import ckeditor.fields
-import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
@@ -48,7 +47,7 @@ class Migration(migrations.Migration):
                 ('postal_code', models.CharField(max_length=20)),
                 ('city', models.CharField(max_length=255)),
                 ('country', models.CharField(max_length=255)),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Organization')),
+                ('organization', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Organization')),
             ],
         ),
         migrations.RemoveField(
@@ -76,7 +75,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='programmemanager',
             name='offer_year',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.OfferYear'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.OfferYear'),
         ),
         migrations.AddField(
             model_name='offeryear',
@@ -111,7 +110,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(blank=True, max_length=255, null=True)),
                 ('sub_directory', models.CharField(blank=True, max_length=100, null=True)),
                 ('size', models.IntegerField(blank=True, null=True)),
-                ('user', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(blank=True, null=True, on_delete=models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(
@@ -170,7 +169,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('name', models.CharField(max_length=255)),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Domain')),
+                ('parent', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.Domain')),
             ],
         ),
         migrations.CreateModel(
@@ -211,7 +210,7 @@ class Migration(migrations.Migration):
                 ('phone', models.CharField(blank=True, max_length=30, null=True)),
                 ('fax', models.CharField(blank=True, max_length=255, null=True)),
                 ('email', models.EmailField(blank=True, max_length=255, null=True)),
-                ('country', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reference.Country')),
+                ('country', models.ForeignKey(on_delete=models.deletion.CASCADE, to='reference.Country')),
             ],
         ),
         migrations.CreateModel(
@@ -223,7 +222,7 @@ class Migration(migrations.Migration):
                 ('postal_code', models.CharField(max_length=20)),
                 ('city', models.CharField(max_length=255)),
                 ('country', models.CharField(max_length=255)),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                ('person', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Person')),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
             ],
         ),
@@ -233,7 +232,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='organizationaddress',
             name='country',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reference.Country'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='reference.Country'),
         ),
         migrations.RunSQL(
             sql='delete from base_personaddress;',
@@ -241,7 +240,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='personaddress',
             name='country',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reference.Country'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='reference.Country'),
         ),
         migrations.AlterField(
             model_name='personaddress',
@@ -251,7 +250,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='structureaddress',
             name='structure',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Structure'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Structure'),
         ),
         migrations.RunSQL(
             sql='delete from base_programmemanager where offer_year_id is null;',
@@ -268,7 +267,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='programmanager',
             name='offer_year',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.OfferYear'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.OfferYear'),
         ),
         migrations.AlterField(
             model_name='structure',
@@ -278,7 +277,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tutor',
             name='person',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='base.Person'),
+            field=models.OneToOneField(on_delete=models.deletion.CASCADE, to='base.Person'),
         ),
         migrations.AlterField(
             model_name='academicyear',
@@ -372,7 +371,7 @@ class Migration(migrations.Migration):
                 ('content_html', models.TextField()),
                 ('created', models.DateTimeField(editable=False)),
                 ('sent', models.DateTimeField(null=True)),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                ('person', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Person')),
                 ('content_txt', models.TextField(default='')),
                 ('reference', models.CharField(db_index=True, max_length=100, null=True)),
             ],
