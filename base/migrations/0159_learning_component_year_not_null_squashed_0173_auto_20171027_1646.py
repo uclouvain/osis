@@ -2,7 +2,6 @@
 
 import uuid
 
-import django.db.models.deletion
 from django.db import migrations, models
 
 import base.models.enums.diploma_coorganization
@@ -22,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='learningunitcomponent',
             name='learning_component_year',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningComponentYear'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningComponentYear'),
         ),
         migrations.AlterModelOptions(
             name='academicyear',
@@ -77,7 +76,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='groupelementyear',
             name='child_leaf',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_leaf', to='base.LearningUnitYear'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='child_leaf', to='base.LearningUnitYear'),
         ),
         migrations.CreateModel(
             name='EducationGroupOrganization',
@@ -86,8 +85,8 @@ class Migration(migrations.Migration):
                 ('all_students', models.BooleanField(default=False)),
                 ('enrollment_place', models.BooleanField(default=False)),
                 ('diploma', models.CharField(choices=[('UNIQUE', 'UNIQUE'), ('SEPARATE', 'SEPARATE'), ('NOT_CONCERNED', 'NOT_CONCERNED')], default=base.models.enums.diploma_coorganization.DiplomaCoorganizationTypes('NOT_CONCERNED'), max_length=40)),
-                ('education_group_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear')),
-                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Organization')),
+                ('education_group_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.EducationGroupYear')),
+                ('organization', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Organization')),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
             ],
@@ -113,8 +112,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('type', models.CharField(choices=[('PRIMARY_LANGUAGE', 'PRIMARY_LANGUAGE')], max_length=255)),
                 ('order', models.IntegerField()),
-                ('education_group_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear')),
-                ('language', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reference.Language')),
+                ('education_group_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.EducationGroupYear')),
+                ('language', models.ForeignKey(on_delete=models.deletion.CASCADE, to='reference.Language')),
             ],
         ),
         migrations.AddField(

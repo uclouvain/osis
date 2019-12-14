@@ -2,7 +2,6 @@
 
 import uuid
 
-import django.db.models.deletion
 from django.db import migrations, models
 
 
@@ -70,12 +69,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entitylink',
             name='child',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='link_to_parent', to='base.Entity'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='link_to_parent', to='base.Entity'),
         ),
         migrations.AlterField(
             model_name='entitylink',
             name='parent',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='links_to_children', to='base.Entity'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='links_to_children', to='base.Entity'),
         ),
         migrations.AlterField(
             model_name='entitylink',
@@ -90,7 +89,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningcontaineryear',
             name='language',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reference.Language'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='reference.Language'),
         ),
         migrations.AddField(
             model_name='learningcontaineryear',
@@ -155,7 +154,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningcontaineryear',
             name='campus',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Campus'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.Campus'),
         ),
         migrations.AlterField(
             model_name='learningcomponentyear',
@@ -356,12 +355,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='entityversion',
             name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='parent_of', to='base.Entity'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='parent_of', to='base.Entity'),
         ),
         migrations.AlterField(
             model_name='entity',
             name='organization',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Organization'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.Organization'),
         ),
         migrations.AlterField(
             model_name='entityversion',
@@ -371,7 +370,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entityversion',
             name='entity',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='child_of', to='base.Entity'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, related_name='child_of', to='base.Entity'),
         ),
         migrations.DeleteModel(
             name='EntityAddress',
@@ -387,7 +386,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entityversion',
             name='entity',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Entity'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Entity'),
         ),
         migrations.AlterField(
             model_name='entityversion',
@@ -413,8 +412,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('type', models.CharField(choices=[('REQUIREMENT_ENTITY', 'REQUIREMENT_ENTITY'), ('ALLOCATION_ENTITY', 'ALLOCATION_ENTITY'), ('ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_1'), ('ADDITIONAL_REQUIREMENT_ENTITY_2', 'ADDITIONAL_REQUIREMENT_ENTITY_2')], max_length=35)),
-                ('entity', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Entity')),
-                ('learning_container_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
+                ('entity', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Entity')),
+                ('learning_container_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningContainerYear')),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
                 ('external_id', models.CharField(blank=True, max_length=255, null=True)),
             ],
@@ -433,8 +432,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('hourly_volume_total', models.DecimalField(blank=True, decimal_places=2, max_digits=6, null=True)),
                 ('hourly_volume_partial', models.DecimalField(blank=True, decimal_places=2, max_digits=6, null=True)),
-                ('entity_container_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.EntityContainerYear')),
-                ('learning_component_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningComponentYear')),
+                ('entity_container_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.EntityContainerYear')),
+                ('learning_component_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningComponentYear')),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
                 ('external_id', models.CharField(blank=True, max_length=255, null=True)),
             ],
@@ -498,9 +497,9 @@ class Migration(migrations.Migration):
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
                 ('acronym', models.CharField(db_index=True, max_length=15)),
                 ('title', models.CharField(max_length=255)),
-                ('academic_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.AcademicYear')),
-                ('education_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroup')),
-                ('education_group_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.OfferType')),
+                ('academic_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.AcademicYear')),
+                ('education_group', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.EducationGroup')),
+                ('education_group_type', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.OfferType')),
             ],
             options={
                 'abstract': False,
@@ -513,10 +512,10 @@ class Migration(migrations.Migration):
                 ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
-                ('child_branch', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_branch', to='base.EducationGroupYear')),
-                ('child_leaf', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='child_leaf', to='base.EducationGroupYear')),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='parent', to='base.EducationGroupYear')),
-                ('learning_unit_year', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear')),
+                ('child_branch', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='child_branch', to='base.EducationGroupYear')),
+                ('child_leaf', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='child_leaf', to='base.EducationGroupYear')),
+                ('parent', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='parent', to='base.EducationGroupYear')),
+                ('learning_unit_year', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.LearningUnitYear')),
             ],
             options={
                 'abstract': False,
@@ -594,7 +593,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='entity',
             name='country',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reference.Country'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='reference.Country'),
         ),
         migrations.RemoveField(
             model_name='educationgroup',
@@ -652,7 +651,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='educationgroupyear',
             name='enrollment_campus',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='enrollment', to='base.Campus'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='enrollment', to='base.Campus'),
         ),
         migrations.AddField(
             model_name='educationgroupyear',
@@ -697,7 +696,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='educationgroupyear',
             name='main_teaching_campus',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='teaching', to='base.Campus'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='teaching', to='base.Campus'),
         ),
         migrations.AddField(
             model_name='educationgroupyear',
@@ -732,7 +731,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='offeryeardomain',
             name='education_group_year',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.EducationGroupYear'),
         ),
         migrations.AddField(
             model_name='educationgroupyear',
@@ -752,7 +751,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='educationgroupyear',
             name='primary_language',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reference.Language'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='reference.Language'),
         ),
         migrations.AlterField(
             model_name='academiccalendar',
@@ -771,9 +770,9 @@ class Migration(migrations.Migration):
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
                 ('type', models.CharField(blank=True, choices=[('ENTITY_ADMINISTRATION', 'ENTITY_ADMINISTRATION'), ('ENTITY_MANAGEMENT', 'ENTITY_MANAGEMENT')], max_length=30, null=True)),
-                ('entity', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Entity')),
-                ('offer_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.OfferYear')),
-                ('education_group_year', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear')),
+                ('entity', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Entity')),
+                ('offer_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.OfferYear')),
+                ('education_group_year', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, to='base.EducationGroupYear')),
             ],
             options={
                 'unique_together': {('offer_year', 'type')},
