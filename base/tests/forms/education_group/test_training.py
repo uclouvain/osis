@@ -389,8 +389,8 @@ class TestPostponementEducationGroupYear(TestCase):
         form.save()
         self.assertEqual(len(form.warnings), 1)
         error_msg = _("%(col_name)s has been already modified.") % {
-                    "col_name": _(EducationGroupOrganization._meta.get_field('all_students').verbose_name).title(),
-                }
+            "col_name": _(EducationGroupOrganization._meta.get_field('all_students').verbose_name).title(),
+        }
         self.assertEqual(
             form.warnings,
             [
@@ -491,7 +491,7 @@ class TestPostponeTrainingProperty(TestCase):
             administration_entity=self.entity_version.entity,
             academic_year=self.current_academic_year
         )
-        self.form_data = model_to_dict_fk(self.training, exclude=('secondary_domains', ))
+        self.form_data = model_to_dict_fk(self.training, exclude=('secondary_domains',))
         self.form_data.update({
             'primary_language': self.form_data['primary_language_id'],
             'administration_entity': self.entity_version.pk,
@@ -554,7 +554,7 @@ class TestPostponeCertificateAims(TestCase):
             academic_year=self.current_academic_year
         )
         # Save the training instance will create N+6 data...
-        form_data = model_to_dict_fk(self.training, exclude=('secondary_domains', ))
+        form_data = model_to_dict_fk(self.training, exclude=('secondary_domains',))
         form_data.update({
             'primary_language': form_data['primary_language_id'],
             'administration_entity': self.entity_version.pk,
@@ -631,13 +631,14 @@ class TestPostponeCertificateAims(TestCase):
 
         edgy_postponed_expected = list(
             self.qs_training_futures.exclude(pk=training_in_future.pk)
-                                    .order_by('academic_year__year')
+                .order_by('academic_year__year')
         )
         self.assertEqual(form.education_group_year_postponed, edgy_postponed_expected)
 
 
 class TestPermissionField(TestCase):
     def setUp(self):
+        create_current_academic_year()
         self.permissions = [PermissionFactory() for _ in range(10)]
 
         FieldReferenceFactory(
