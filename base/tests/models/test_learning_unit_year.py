@@ -57,17 +57,18 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory, cre
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 from cms.enums import entity_name
-from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.models.translated_text import TranslatedText
+from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class LearningUnitYearTest(TestCase):
-    def setUp(self):
-        self.tutor = TutorFactory()
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(acronym="LDROI1004",
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(acronym="LDROI1004",
                                                           specific_title="Juridic law courses",
-                                                          academic_year=self.academic_year,
+                                                          academic_year=cls.academic_year,
                                                           subtype=learning_unit_year_subtypes.FULL)
 
     def test_find_by_tutor_with_none_argument(self):
@@ -199,11 +200,12 @@ class LearningUnitYearTest(TestCase):
 
 
 class LearningUnitYearGetEntityTest(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory(
             learning_container_year__requirement_entity=EntityFactory()
         )
-        self.requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
+        cls.requirement_entity = cls.learning_unit_year.learning_container_year.requirement_entity
 
     def test_get_entity_case_found_entity_type(self):
         result = self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY)
@@ -218,14 +220,15 @@ class LearningUnitYearGetEntityTest(TestCase):
 
 
 class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.current_academic_year,
+            learning_container_year__academic_year=cls.current_academic_year,
         )
-        self.tutor = TutorFactory()
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor)
+        cls.tutor = TutorFactory()
+        AttributionFactory(learning_unit_year=cls.learning_unit_year, tutor=cls.tutor)
 
     def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_occurrence_found(self):
         result = find_learning_unit_years_by_academic_year_tutor_attributions(
@@ -262,16 +265,20 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
 
 class LearningUnitYearWarningsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_year = AcademicYearFactory(year=2010)
+        cls.end_year = AcademicYearFactory(year=2020)
+        cls.generated_ac_years = GenerateAcademicYear(cls.start_year, cls.end_year)
+
     def setUp(self):
-        self.start_year = AcademicYearFactory(year=2010)
-        self.end_year = AcademicYearFactory(year=2020)
-        self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full
         self.component_full_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
             learning_unit_year=self.luy_full
         ).first()
+
         self.luy_full.quadrimester = None
         self.luy_full.save()
         self.luy_full.get_partims_related().update(quadrimester=None)
@@ -998,12 +1005,13 @@ class ContainerTypeVerboseTest(TestCase):
 
 
 class LearningUnitYearDeleteCms(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory()
-        self.translated_text = TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                                     reference=self.learning_unit_year.id)
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.translated_text = TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR,
+                                                     reference=cls.learning_unit_year.id)
 
-        self.learning_unit_year_no_cms = LearningUnitYearFactory()
+        cls.learning_unit_year_no_cms = LearningUnitYearFactory()
 
     def test_delete_learning_unit_yr_and_cms(self):
         luy_id = self.learning_unit_year.id
