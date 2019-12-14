@@ -141,15 +141,10 @@ class LearningUnitsMixin:
 
     @staticmethod
     def _has_to_be_created(academic_year, create, periodicity):
-        if periodicity == learning_unit_year_periodicity.BIENNIAL_ODD:
-            if not (academic_year.year % 2):
-                create = True
-        elif periodicity == learning_unit_year_periodicity.BIENNIAL_EVEN:
-            if academic_year.year % 2:
-                create = True
-        elif periodicity == learning_unit_year_periodicity.ANNUAL:
-            create = True
-        return create
+        biennial_odd = periodicity == learning_unit_year_periodicity.BIENNIAL_ODD and not academic_year.year % 2
+        biennial_even = periodicity == learning_unit_year_periodicity.BIENNIAL_EVEN and academic_year.year % 2
+        annual = periodicity == learning_unit_year_periodicity.ANNUAL
+        return any([biennial_odd, biennial_even, annual, create])
 
     @staticmethod
     def setup_list_of_learning_unit_years_full(list_of_academic_years, learning_unit_full, periodicity):

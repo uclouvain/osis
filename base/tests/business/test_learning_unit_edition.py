@@ -145,7 +145,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
 
         list_of_expected_learning_unit_years_full = list(range(start_year_full.year, end_year_full.year + 1))
         list_of_expected_learning_unit_years_partim = list(
-            range(start_year_partim.year, excepted_end_year_partim.year + 1))
+            range(start_year_partim.year, excepted_end_year_partim.year + 1)
+        )
 
         academic_year_of_new_end_date = academic_year.find_academic_year_by_year(excepted_end_year_partim.year)
 
@@ -547,8 +548,10 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self._assert_entity_container_year_correctly_duplicated(generator_learning_container.entities, last_container)
 
         last_generated_component = LearningComponentYear.objects.filter(learning_unit_year=last_generated_luy).last()
-        self.assertEqual(last_generated_luy.learning_container_year,
-                         last_generated_component.learning_unit_year.learning_container_year)
+        self.assertEqual(
+            last_generated_luy.learning_container_year,
+            last_generated_component.learning_unit_year.learning_container_year
+        )
 
         self._assert_learning_classes_correctly_duplicated(
             last_generated_component,
@@ -615,11 +618,15 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         with self.assertRaises(IntegrityError) as e:
             self._edit_lu(learning_unit_full_annual, excepted_end_year.year)
 
-        self.assertEqual(str(e.exception), _('The entity %(entity_acronym)s does not exist for '
-                                             'the selected academic year %(academic_year)s') % {
-                             'entity_acronym': outdated_entity_version.acronym,
-                             'academic_year': academic_year.find_academic_year_by_year(end_year_full.year + 1)
-                         })
+        self.assertEqual(
+            str(e.exception),
+            _(
+                'The entity %(entity_acronym)s does not exist for '
+                'the selected academic year %(academic_year)s') %
+            {
+                'entity_acronym': outdated_entity_version.acronym,
+                'academic_year': academic_year.find_academic_year_by_year(end_year_full.year + 1)
+            })
 
     def test_with_partim_fields_that_are_not_reported(self):
         start_academic_year = AcademicYearFactory(year=self.starting_academic_year.year)
@@ -1095,8 +1102,12 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
         a_new_requirement_entity = EntityFactory()
         entities_to_update = {entity_container_year_link_type.REQUIREMENT_ENTITY: a_new_requirement_entity}
 
-        update_learning_unit_year_with_report(learning_unit_years[1], {}, entities_to_update,
-                                              override_postponement_consistency=True)
+        update_learning_unit_year_with_report(
+            learning_unit_years[1],
+            {},
+            entities_to_update,
+            override_postponement_consistency=True
+        )
 
         self.assert_entity_has_not_changed(
             learning_unit_years[0].learning_container_year,
@@ -1125,8 +1136,11 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
 
         update_learning_unit_year_with_report(learning_unit_years[0], {}, entities_to_update, with_report=False)
 
-        self.assert_entity_has_been_modified(learning_unit_years[0].learning_container_year, a_new_requirement_entity,
-                                             REQUIREMENT_ENTITY)
+        self.assert_entity_has_been_modified(
+            learning_unit_years[0].learning_container_year,
+            a_new_requirement_entity,
+            REQUIREMENT_ENTITY
+        )
 
         for luy in learning_unit_years[1:]:
             self.assert_entity_has_not_changed(
