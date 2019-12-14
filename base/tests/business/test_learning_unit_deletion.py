@@ -224,7 +224,7 @@ class LearningUnitYearDeletion(TestCase):
         learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
-        for _ in range(number_classes):
+        for i in range(number_classes):
             LearningClassYearFactory(learning_component_year=learning_component_year)
 
         learning_unit_year = learning_component_year.learning_unit_year
