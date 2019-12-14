@@ -16,7 +16,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('base', '0217_auto_20180116_1046'),
         ('reference', '0017_language_changed'),
-        ('attribution', '0032_auto_20180327_1458'),
     ]
 
     operations = [
