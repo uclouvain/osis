@@ -66,7 +66,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
 
     def _get_translated_texts(self, luy):
         language = self.request.LANGUAGE_CODE
-        qs_parent = TranslatedText.objects.filter(
+        qs = TranslatedText.objects.filter(
             reference=luy.pk,
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         ).annotate(
@@ -82,4 +82,4 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
                 label__in=CMS_LABEL_PEDAGOGY_FR_ONLY
             )
         )
-        return qs_parent
+        return qs
