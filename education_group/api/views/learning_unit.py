@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
+
 from django.db.models import When, BooleanField, Case
 from django_filters import rest_framework as filters
 from rest_framework import generics
@@ -66,12 +68,10 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             module_compl=True
         ).get(learning_unit_year.id, [])
 
-        ids = dict()
+        ids = collections.defaultdict(lambda: True)
         for egy_id, in_complementary_module in education_group_root_ids:
-            if egy_id not in ids:
-                ids.update({egy_id: in_complementary_module})
-            else:
-                ids[egy_id] = ids[egy_id] and in_complementary_module
+            ids[egy_id] = ids[egy_id] and in_complementary_module
+
         whens = [
             When(pk=k, then=v) for k, v in ids.items()
         ]

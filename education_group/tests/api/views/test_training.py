@@ -140,7 +140,7 @@ class GetAllTrainingTestCase(APITestCase):
         ).order_by('-academic_year__year', 'acronym')
         serializer = TrainingListSerializer(trainings, many=True, context={
             'request': RequestFactory().get(self.url),
-            'language': settings.LANGUAGE_CODE_EN
+            'language': settings.LANGUAGE_CODE_FR
         })
         self.assertEqual(response.data['results'], serializer.data)
 
@@ -219,9 +219,11 @@ class FilterTrainingTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_FR
             },
         )
+        print(response.data['results'])
+        print(serializer.data)
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_type_params(self):
