@@ -103,19 +103,24 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
-                self._update_future_luy(ac_year_postponement_range, self.learning_unit_year)
+                cms = {"language": self.trans_text.language,
+                       "text_label": self.text_label,
+                       "text": self.trans_text.text
+                       }
+                update_future_luy(ac_year_postponement_range, self.learning_unit_year, cms)
 
-    def _update_future_luy(self, ac_year_postponement_range, luy):
-        for ac in ac_year_postponement_range:
-            next_luy, created = LearningUnitYear.objects.get_or_create(
-                academic_year=ac,
-                acronym=luy.acronym,
-                learning_unit=luy.learning_unit
-            )
-            TranslatedText.objects.update_or_create(
-                entity=entity_name.LEARNING_UNIT_YEAR,
-                reference=next_luy.id,
-                language=self.trans_text.language,
-                text_label=self.text_label,
-                defaults={'text': self.trans_text.text}
-            )
+
+def update_future_luy(ac_year_postponement_range, luy, cms):
+    for ac in ac_year_postponement_range:
+        next_luy, created = LearningUnitYear.objects.get_or_create(
+            academic_year=ac,
+            acronym=luy.acronym,
+            learning_unit=luy.learning_unit
+        )
+        TranslatedText.objects.update_or_create(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=next_luy.id,
+            language=cms.get("language"),
+            text_label=cms.get("text_label"),
+            defaults={'text': cms.get("text")}
+        )
