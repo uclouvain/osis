@@ -307,35 +307,7 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
     if lu_to_consolidate:
         postpone_teaching_materials(luy_to_update)
-
-        if not luy_to_update.academic_year.is_past:
-            ac_year_postponement_range = get_academic_year_postponement_range(lu_to_consolidate)
-
-            cms_labels = \
-                CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
-
-            for label_key in cms_labels:
-                a_text_label = TextLabel.objects.filter(label=label_key).first()
-                for code, label in settings.LANGUAGES:
-                    a_text = TranslatedText.objects.filter(text_label=a_text_label,
-                                                           language=code,
-                                                           entity=LEARNING_UNIT_YEAR,
-                                                           reference=lu_to_consolidate.id).first()
-                    cms = {"language": code,
-                           "text_label": a_text_label,
-                           "text": a_text.text if a_text else None
-                           }
-                    update_future_luy(ac_year_postponement_range, luy_to_update, cms)
-            for code, label in settings.LANGUAGES:
-                language = find_by_code(code[:2].upper())
-                texts = LearningAchievement.objects.filter(
-                    learning_unit_year_id=lu_to_consolidate.id,
-                    language=language)
-                for achievement in texts:
-                    update_future_luy_achievement(ac_year_postponement_range,
-                                                  achievement,
-                                                  achievement.code_name,
-                                                  achievement.code_name)
+        _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -644,3 +616,44 @@ def update_partim_acronym(acronym_full, luy_to_update):
             new_acronym = acronym_full + str(partim.acronym[-1])
             partim.acronym = new_acronym
             partim.save()
+
+
+def _update_luy_achievements_in_future(ac_year_postponement_range, lu_to_consolidate):
+    for code, label in settings.LANGUAGES:
+        language = find_by_code(code[:2].upper())
+        texts = LearningAchievement.objects.filter(
+            learning_unit_year_id=lu_to_consolidate.id,
+            language=language)
+        for achievement in texts:
+            update_future_luy_achievement(ac_year_postponement_range,
+                                          achievement,
+                                          achievement.code_name,
+                                          achievement.code_name)
+
+
+def _update_descriptive_fiche(ac_year_postponement_range, lu_to_consolidate, luy_to_update):
+    cms_labels = \
+        CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
+
+    for label_key in cms_labels:
+        a_text_label = TextLabel.objects.filter(label=label_key).first()
+
+        for code, label in settings.LANGUAGES:
+            a_text = TranslatedText.objects.filter(text_label=a_text_label,
+                                                   language=code,
+                                                   entity=LEARNING_UNIT_YEAR,
+                                                   reference=lu_to_consolidate.id).first()
+
+            cms = {"language": code,
+                   "text_label": a_text_label,
+                   "text": a_text.text if a_text else None
+                   }
+            update_future_luy(ac_year_postponement_range, luy_to_update, cms)
+
+
+def _descriptive_fiche_and_achievements_update(proposal_learning_unit_year: LearningUnitYear,
+                                               luy_to_update: LearningUnitYear):
+    if not luy_to_update.academic_year.is_past:
+        ac_year_postponement_range = get_academic_year_postponement_range(proposal_learning_unit_year)
+        _update_descriptive_fiche(ac_year_postponement_range, proposal_learning_unit_year, luy_to_update)
+        _update_luy_achievements_in_future(ac_year_postponement_range, proposal_learning_unit_year)
