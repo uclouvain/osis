@@ -41,6 +41,7 @@ from base.models.enums import learning_unit_year_subtypes, learning_container_ye
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.tests.factories import academic_calendar as academic_calendar_factories
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory, person as factory_person, user as factory_user
 from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
@@ -48,6 +49,7 @@ from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
+from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
 from reference.tests.factories.language import LanguageFactory
@@ -66,7 +68,7 @@ class LearningUnitViewTestCase(TestCase):
         self.super_user = factory_user.SuperUserFactory()
         self.person = factory_person.PersonFactory(user=self.super_user)
         start_year = AcademicYearFactory(year=get_current_year())
-        end_year = AcademicYearFactory(year= get_current_year() + 7)
+        end_year = AcademicYearFactory(year=get_current_year() + 7)
         self.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         self.current_academic_year = self.academic_years[0]
         self.next_academic_year = self.academic_years[1]
@@ -123,12 +125,40 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+
+    def test_get_proposal_learning_unit_creation_form_with_central_user(self):
+        self.academic_calendars = [
+            academic_calendar_factories.AcademicCalendarCreationEndDateProposalCentralManagerFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            )
+            for academic_year in self.academic_years
+        ]
+        central_manager_person = CentralManagerFactory()
+        central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
+        central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
+        self.client.force_login(central_manager_person.user)
+        url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
+        self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
+        self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
         self.assertCountEqual(
             list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
-            self.academic_years[:-1]
+            self.academic_years[:-1]  # Exclude last one because central manager cannot propose luy in n+7
         )
 
     def test_get_proposal_learning_unit_creation_form_with_faculty_user(self):
+        self.academic_calendars = [
+            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year, 9, 14)
+            )
+            for academic_year in self.academic_years
+        ]
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
         response = self.client.get(url)
@@ -138,7 +168,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
         self.assertCountEqual(
             list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
-            self.academic_years[1:-1]
+            self.academic_years[1:-1]  # Exclude first and last one because fac manager cannot propose luy in n and n+7
         )
 
     def test_post_proposal_learning_unit_creation_form(self):

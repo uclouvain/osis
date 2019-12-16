@@ -29,8 +29,7 @@ import string
 
 import factory.fuzzy
 
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EDUCATION_GROUP_EDITION, \
-    ACADEMIC_CALENDAR_TYPES, SCORES_EXAM_SUBMISSION
+from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_year import AcademicYearFactory
 
 
@@ -50,7 +49,7 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
     highlight_title = factory.Sequence(lambda n: 'Highlight - %d' % n)
     highlight_description = factory.Sequence(lambda n: 'Description - %d' % n)
     highlight_shortcut = factory.Sequence(lambda n: 'Shortcut Highlight - %d' % n)
-    reference = factory.Iterator(ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
+    reference = factory.Iterator(academic_calendar_type.ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
 
 
 class OpenAcademicCalendarFactory(AcademicCalendarFactory):
@@ -64,12 +63,21 @@ class CloseAcademicCalendarFactory(AcademicCalendarFactory):
 
 
 class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
-    reference = SCORES_EXAM_SUBMISSION
+    reference = academic_calendar_type.SCORES_EXAM_SUBMISSION
 
 
 class AcademicCalendarSummaryCourseSubmissionFactory(AcademicCalendarFactory):
-    reference = SUMMARY_COURSE_SUBMISSION
+    reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
 
 
 class AcademicCalendarEducationGroupEditionFactory(AcademicCalendarFactory):
-    reference = EDUCATION_GROUP_EDITION
+    reference = academic_calendar_type.EDUCATION_GROUP_EDITION
+
+
+class AcademicCalendarCreationEndDateProposalCentralManagerFactory(AcademicCalendarFactory):
+    reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
+
+
+class AcademicCalendarCreationEndDateProposalFacultyManagerFactory(AcademicCalendarFactory):
+    reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
+
