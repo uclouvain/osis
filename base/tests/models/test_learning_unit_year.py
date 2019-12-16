@@ -66,10 +66,12 @@ class LearningUnitYearTest(TestCase):
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
         cls.academic_year = create_current_academic_year()
-        cls.learning_unit_year = LearningUnitYearFactory(acronym="LDROI1004",
-                                                          specific_title="Juridic law courses",
-                                                          academic_year=cls.academic_year,
-                                                          subtype=learning_unit_year_subtypes.FULL)
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym="LDROI1004",
+            specific_title="Juridic law courses",
+            academic_year=cls.academic_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
 
     def test_find_by_tutor_with_none_argument(self):
         self.assertEqual(attribution.find_by_tutor(None), None)
@@ -187,7 +189,6 @@ class LearningUnitYearTest(TestCase):
     def test_common_title_property_no_container(self):
         self.learning_unit_year.learning_container_year = None
         self.assertEqual(self.learning_unit_year.container_common_title, '')
-
 
     def test_is_external(self):
         luy = LearningUnitYearFactory()
@@ -654,7 +655,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            self._manage_lcy_properties(case)
+            self._update_lecturing_component_volumes(case)
 
         self.assertTrue(
             LearningComponentYearQuadriNoStrategy(lcy=self.learning_component_year_full_lecturing).is_valid())
@@ -668,7 +669,7 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        self._manage_lcy_properties(test_cases[0])
+        self._update_lecturing_component_volumes(test_cases[0])
 
         self.assertTrue(LearningComponentYearQ1Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -682,7 +683,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            self._manage_lcy_properties(case)
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -691,7 +692,7 @@ class TestQuadriConsistency(TestCase):
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
-    def _manage_lcy_properties(self, case):
+    def _update_lecturing_component_volumes(self, case):
         with self.subTest(case=case):
             self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
             self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
@@ -710,7 +711,7 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        self._manage_lcy_properties(test_cases[0])
+        self._update_lecturing_component_volumes(test_cases[0])
 
         self.assertTrue(LearningComponentYearQ2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -724,7 +725,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            self._manage_lcy_properties(case)
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -742,7 +743,7 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': 10, 'vol_q2': 10, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        self._manage_lcy_properties(test_cases[0])
+        self._update_lecturing_component_volumes(test_cases[0])
 
         self.assertTrue(LearningComponentYearQ1and2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -758,7 +759,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            self._manage_lcy_properties(case)
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -778,7 +779,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            self._manage_lcy_properties(case)
+            self._update_lecturing_component_volumes(case)
 
         self.assertTrue(LearningComponentYearQ1or2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -793,7 +794,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            self._manage_lcy_properties(case)
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -957,8 +958,10 @@ class LearningUnitYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.learning_unit_year = LearningUnitYearFactory()
-        cls.translated_text = TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                                     reference=cls.learning_unit_year.id)
+        cls.translated_text = TranslatedTextFactory(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=cls.learning_unit_year.id
+        )
 
         cls.learning_unit_year_no_cms = LearningUnitYearFactory()
 

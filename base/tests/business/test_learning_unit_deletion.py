@@ -106,12 +106,15 @@ class LearningUnitYearDeletion(TestCase):
         msg = list(msg.values())
 
         self.assertEqual(len(msg), 5)
-        self.assertIn(_("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s")
-                      % {'subtype': _('The partim'),
-                         'acronym': l_unit_2.acronym,
-                         'year': l_unit_2.academic_year,
-                         'count': 3},
-                      msg)
+        self.assertIn(
+            _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") % {
+                'subtype': _('The partim'),
+                'acronym': l_unit_2.acronym,
+                'year': l_unit_2.academic_year,
+                'count': 3
+            },
+            msg
+        )
 
         msg_delete_tutor = _("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s")
         self.assertIn(msg_delete_tutor % {'subtype': _('The partim'),
@@ -218,13 +221,15 @@ class LearningUnitYearDeletion(TestCase):
 
     def test_delete_learning_component_class(self):
         # Composant annualisé est associé à son composant et à son conteneur annualisé
-        learning_component_year = LearningComponentYearFactory(acronym="/C",
-                                                               comment="TEST",
-                                                               learning_unit_year__learning_unit__start_year__year=1900)
+        learning_component_year = LearningComponentYearFactory(
+            acronym="/C",
+            comment="TEST",
+            learning_unit_year__learning_unit__start_year__year=1900
+        )
         learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
-        for i in range(number_classes):
+        for __ in range(number_classes):
             LearningClassYearFactory(learning_component_year=learning_component_year)
 
         learning_unit_year = learning_component_year.learning_unit_year

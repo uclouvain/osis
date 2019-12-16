@@ -45,24 +45,29 @@ class TestLearningUnitForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.country = CountryFactory()
-        cls.ac = create_current_academic_year()
+        cls.current_ac_year = create_current_academic_year()
         cls.tutor = TutorFactory()
         cls.attribution = AttributionNewFactory(tutor=cls.tutor)
         cls.list_learning_unit_container_year = [
-            LearningContainerYearFactory(acronym="LC%d" % container,
-                                         academic_year=cls.ac)
+            LearningContainerYearFactory(
+                acronym="LC%d" % container,
+                academic_year=cls.current_ac_year
+            )
             for container in range(4)
         ]
         cls.list_learning_unit_year = cls._create_list_learning_units_from_containers(
             cls.list_learning_unit_container_year,
-            cls.ac
+            cls.current_ac_year
         )
         cls.learning_component = LearningComponentYearFactory(learning_unit_year=cls.list_learning_unit_year[0])
         cls.attribution_charge_new = AttributionChargeNewFactory(
             attribution=cls.attribution,
             learning_component_year=cls.learning_component
         )
-        cls.list_entity_version = cls._create_list_entities_version(cls.ac.end_date, cls.ac.start_date)
+        cls.list_entity_version = cls._create_list_entities_version(
+            cls.current_ac_year.end_date,
+            cls.current_ac_year.start_date
+        )
 
         cls._add_entities_to_containers(
             cls.list_entity_version,
@@ -72,8 +77,7 @@ class TestLearningUnitForm(TestCase):
     @staticmethod
     def _create_list_containers(number_of_containers, ac):
         list_lu_container_year = [
-            LearningContainerYearFactory(acronym="LC%d" % container,
-                                         academic_year=ac)
+            LearningContainerYearFactory(acronym="LC%d" % container, academic_year=ac)
             for container in range(number_of_containers)
         ]
         return list_lu_container_year
@@ -87,10 +91,7 @@ class TestLearningUnitForm(TestCase):
         LUY0, LUY1, LUY2 and LUY3.
         """
         list_lu_year = [
-            LearningUnitYearFactory(acronym="LUY%d" % i,
-                                    learning_container_year=container,
-                                    academic_year=ac
-                                    )
+            LearningUnitYearFactory(acronym="LUY%d" % i, learning_container_year=container, academic_year=ac)
             for i, container in enumerate(list_containers)
         ]
         return list_lu_year
@@ -171,35 +172,35 @@ class TestLearningUnitForm(TestCase):
 
     def test_is_service_course(self):
         self.assertTrue(
-            is_service_course(self.ac, self.list_entity_version[0], self.list_entity_version[1])
+            is_service_course(self.current_ac_year, self.list_entity_version[0], self.list_entity_version[1])
         )
 
     def test_is_service_course_pedagogical_exception(self):
         exception_entity = [
             EntityVersionFactory(
-                start_date=self.ac.start_date, end_date=self.ac.end_date,
+                start_date=self.current_ac_year.start_date, end_date=self.current_ac_year.end_date,
                 acronym=acronym, entity_type=entity_type.SCHOOL
             )
             for acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
         ]
         for entity in exception_entity:
             self.assertTrue(
-                is_service_course(self.ac, entity, self.list_entity_version[0])
+                is_service_course(self.current_ac_year, entity, self.list_entity_version[0])
             )
 
     def test_is_not_service_course(self):
         self.assertFalse(
-            is_service_course(self.ac, self.list_entity_version[2], self.list_entity_version[3])
+            is_service_course(self.current_ac_year, self.list_entity_version[2], self.list_entity_version[3])
         )
 
     def get_valid_data(self):
         return {
-            "academic_year": self.ac.pk,
+            "academic_year": self.current_ac_year.pk,
             "acronym": "LDROI1001"
         }
 
     def test_get_service_courses_by_empty_requirement_and_allocation_entity(self):
-        form_data = {"academic_year": self.ac.pk}
+        form_data = {"academic_year": self.current_ac_year.pk}
 
         service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
         self.assertTrue(service_course_filter.is_valid())

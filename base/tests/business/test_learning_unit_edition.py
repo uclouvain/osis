@@ -1115,8 +1115,11 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
         )
 
         for luy in learning_unit_years[1:]:
-            self.assert_entity_has_been_modified(luy.learning_container_year, a_new_requirement_entity,
-                                                 REQUIREMENT_ENTITY)
+            self.assert_entity_has_been_modified(
+                luy.learning_container_year,
+                a_new_requirement_entity,
+                REQUIREMENT_ENTITY
+            )
 
     def test_with_no_report(self):
         a_learning_unit = self.setup_learning_unit(self.starting_academic_year)
