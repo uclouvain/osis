@@ -513,7 +513,7 @@ class TestEducationGroupDlWithParent(TestCase):
 
     def test_dl_invalid_key(self):
         self.education_group_year.partial_deliberation = False
-        with self.assertRaises(FieldDoesNotExist, dl_with_parent(self.context, "not_a_real_attr")):
+        with self.assertRaises(FieldDoesNotExist):
             dl_with_parent(self.context, "not_a_real_attr")
 
 
