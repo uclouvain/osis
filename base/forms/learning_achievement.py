@@ -34,8 +34,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
-from reference.models import language
-from reference.models.language import EN_CODE_LANGUAGE
+from reference.models.language import EN_CODE_LANGUAGE, Language
 
 
 def update_themes_discussed_changed_field_in_cms(learning_unit_year):
@@ -86,7 +85,7 @@ class LearningAchievementEditForm(forms.ModelForm):
                 LearningAchievement,
                 learning_unit_year__id=self.luy.id,
                 code_name=self.code,
-                language=language.find_by_code(code[:2].upper())
+                language=Language.objects.get(code=code[:2].upper())
             )
             if value:
                 self.value = value
@@ -108,7 +107,7 @@ class LearningAchievementEditForm(forms.ModelForm):
             ).get_or_create(
                 learning_unit_year_id=self.luy.id,
                 code_name=self.code,
-                language=language.find_by_code(code[:2].upper())
+                language=Language.objects.get(code=code[:2].upper())
             )
             self.old_code_name = self.text.code_name
             self.text.code_name = self.cleaned_data.get('code_name')
