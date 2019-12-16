@@ -76,18 +76,18 @@ class LearningUnitsMixin:
         cls.oldest_academic_year = cls.list_of_academic_years[0]
         cls.latest_academic_year = cls.list_of_academic_years[-1]
         cls.old_academic_year = cls.list_of_academic_years[index_of_current_academic_year_in_list -
-                                                             LEARNING_UNIT_CREATION_SPAN_YEARS]
+                                                           LEARNING_UNIT_CREATION_SPAN_YEARS]
         cls.last_academic_year = cls.list_of_academic_years[index_of_current_academic_year_in_list +
-                                                              LEARNING_UNIT_CREATION_SPAN_YEARS]
+                                                            LEARNING_UNIT_CREATION_SPAN_YEARS]
 
         cls.list_of_academic_years_after_now = [
             academic_year for academic_year in cls.list_of_academic_years
             if (cls.starting_academic_year.year <= academic_year.year <= cls.last_academic_year.year)
         ]
         cls.list_of_odd_academic_years = [academic_year for academic_year in cls.list_of_academic_years_after_now
-                                           if academic_year.year % 2]
+                                          if academic_year.year % 2]
         cls.list_of_even_academic_years = [academic_year for academic_year in cls.list_of_academic_years_after_now
-                                            if not academic_year.year % 2]
+                                           if not academic_year.year % 2]
 
     @staticmethod
     def create_list_of_academic_years(start_year, end_year):
@@ -209,14 +209,15 @@ class GenerateAcademicYear:
         self.end_year = end_year
         self.academic_years = LearningUnitsMixin.create_list_of_academic_years(start_year, end_year)
 
-    def __getitem__(self,index):
+    def __getitem__(self, index):
         return self.academic_years[index]
 
 
 def generate_academic_years(range=2):
     current_academic_year = create_current_academic_year()
-    previous_years = GenerateAcademicYear(current_academic_year.year-range, current_academic_year.year-1).academic_years
-    next_years = GenerateAcademicYear(current_academic_year.year+1, current_academic_year.year+range).academic_years
+    previous_years = GenerateAcademicYear(current_academic_year.year - range,
+                                          current_academic_year.year - 1).academic_years
+    next_years = GenerateAcademicYear(current_academic_year.year + 1, current_academic_year.year + range).academic_years
     return list(itertools.chain(previous_years, [current_academic_year], next_years))
 
 
@@ -330,7 +331,6 @@ class GenerateContainerYear:
         )
 
     def _setup_learning_components_year(self):
-
         self.learning_component_cm_full = _setup_learning_component_cm(
             self.learning_unit_year_full)
         self.learning_component_cm_partim = _setup_learning_component_cm(

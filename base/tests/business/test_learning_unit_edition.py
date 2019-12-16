@@ -566,18 +566,20 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         diff = set(expected_entities) - set(duplicated_container.get_map_entity_by_type().values())
         self.assertEqual(diff, set())
 
-    def test_shorten_and_extend_learning_unit(self):
+    def _create_full_learning_unit(self):
         start_year_full = AcademicYearFactory(year=self.starting_academic_year.year)
         end_year_full = AcademicYearFactory(year=start_year_full.year + 6)
-
         learning_unit_full_annual = self.setup_learning_unit(start_year=start_year_full, end_year=end_year_full)
         learning_unit_years = self.setup_list_of_learning_unit_years_full(
             self.list_of_academic_years_after_now,
             learning_unit_full_annual,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
-
         _create_learning_component_years(learning_unit_years, self.number_classes)
+        return end_year_full, learning_unit_full_annual, learning_unit_years
+
+    def test_shorten_and_extend_learning_unit(self):
+        end_year_full, learning_unit_full_annual, _ = self._create_full_learning_unit()
 
         # shorten & extend lu
         excepted_end_year = end_year_full.year - 2
@@ -596,23 +598,13 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self._edit_lu(learning_unit_full_annual, excepted_end_year)
 
     def test_extend_learning_unit_with_wrong_entity(self):
-        start_year_full = AcademicYearFactory(year=self.starting_academic_year.year)
-        end_year_full = AcademicYearFactory(year=start_year_full.year + 6)
-
-        learning_unit_full_annual = self.setup_learning_unit(start_year=start_year_full, end_year=end_year_full)
-        learning_unit_years = self.setup_list_of_learning_unit_years_full(
-            self.list_of_academic_years_after_now,
-            learning_unit_full_annual,
-            periodicity=learning_unit_year_periodicity.ANNUAL
-        )
-
-        _create_learning_component_years(learning_unit_years, self.number_classes)
+        end_year_full, learning_unit_full_annual, learning_unit_years = self._create_full_learning_unit()
 
         # Add outdated entityversion for requirement entity
         outdated_entity_version = EntityVersionFactory(end_date=self.starting_academic_year.end_date)
-        for luy in learning_unit_years:
-            luy.learning_container_year.requirement_entity = outdated_entity_version.entity
-            luy.learning_container_year.save()
+        LearningContainerYear.objects.filter(
+            id__in=[luy.learning_container_year_id for luy in learning_unit_years]
+        ).update(requirement_entity=outdated_entity_version.entity)
 
         excepted_end_year = AcademicYearFactory(year=end_year_full.year + 3)
         with self.assertRaises(IntegrityError) as e:
