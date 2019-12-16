@@ -26,11 +26,12 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
+from base.views.education_groups.clear_clipboard import clear_clipboard
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
-from base.views.education_groups.select import education_group_select, learning_unit_select
+from base.views.education_groups.select import copy_education_group_to_cache, copy_learning_unit_to_cache
 from base.views.education_groups.update import CertificateAimAutocomplete
 from . import search, create, detail, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
@@ -48,7 +49,16 @@ urlpatterns = [
     ),
 
     url(r'^$', search.education_groups, name='education_groups'),
-    url(r'^select_lu/(?P<learning_unit_year_id>[0-9]+)$', learning_unit_select, name='learning_unit_select'),
+    url(
+        r'^select_lu/(?P<learning_unit_year_id>[0-9]+)$',
+        copy_learning_unit_to_cache,
+        name='copy_learning_unit_to_cache'
+    ),
+    url(
+        r'^clear_clipboard/$',
+        clear_clipboard,
+        name='education_group_clear_clipboard'
+    ),
 
     url(
         r'^new/(?P<category>[A-Z_]+)/(?P<education_group_type_pk>[0-9]+)/$',
@@ -83,8 +93,6 @@ urlpatterns = [
 
         url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
         url(r'^update/$', update.update_education_group, name="update_education_group"),
-        url(r'^update_certificate_aims/$', update.update_certificate_aims, name="update_certificate_aims"),
-
         url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
             name='education_group_diplomas'),
         url(r'^informations/$', detail.EducationGroupGeneralInformation.as_view(),
@@ -98,7 +106,7 @@ urlpatterns = [
             url(u'^edit/$', education_group.education_group_edit_administrative_data,
                 name='education_group_edit_administrative')
         ])),
-        url(r'^select/$', education_group_select, name='education_group_select'),
+        url(r'^select/$', copy_education_group_to_cache, name='copy_education_group_to_cache'),
         url(r'^content/', include([
             url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
         ])),

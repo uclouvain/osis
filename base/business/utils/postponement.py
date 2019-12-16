@@ -47,7 +47,7 @@ class AutomaticPostponement(ABC):
 
         self.already_duplicated = self.get_already_duplicated()
         self.to_not_duplicate = self.get_to_not_duplicated()
-        self.ending_on_max_adjournment = self.get_ending_on_max_adjournment()
+        self.ending_before_max_adjournment = self.get_ending_before_max_adjournment()
 
         if self.already_duplicated or self.to_not_duplicate:
             self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
@@ -72,7 +72,7 @@ class AutomaticPostponement(ABC):
     def get_to_not_duplicated(self):
         return self.model.objects.none()
 
-    def get_ending_on_max_adjournment(self):
+    def get_ending_before_max_adjournment(self):
         return self.model.objects.none()
 
     def serialize_postponement_results(self):
@@ -105,11 +105,8 @@ class AutomaticPostponementToN6(AutomaticPostponement):
     def __init__(self, queryset=None):
         # Fetch the N and N+6 academic_years
         self.last_academic_year = AcademicYear.objects.max_adjournment()
-        self.current_year = AcademicYear.objects.current()
 
         super().__init__(queryset)
-
-        self.queryset = self.get_queryset(queryset)
 
     def postpone(self):
         # send statistics to the managers
@@ -128,18 +125,24 @@ class AutomaticPostponementToN6(AutomaticPostponement):
             try:
                 with transaction.atomic():
                     last_year = obj.end_year.year if obj.end_year else self.last_academic_year.year
-                    obj_to_copy = getattr(obj, self.annualized_set + "_set").latest('academic_year__year')
+                    obj_to_copy = self.get_object_to_copy(obj)
                     copied_objs = []
+                    last_object_copied = None
                     for year in range(obj.last_year + 1, last_year + 1):
                         new_obj = self.extend_obj(obj_to_copy, AcademicYear.objects.get(year=year))
                         copied_objs.append(new_obj)
+                        last_object_copied = new_obj
 
                     self.post_extend(obj_to_copy, copied_objs)
-                    self.result.extend(copied_objs)
+                    if last_object_copied:
+                        self.result.append(last_object_copied)
 
             # General catch to be sure to not stop the rest of the duplication
             except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
                 self.errors.append(obj)
+
+    def get_object_to_copy(self, object_to_duplicate):
+        return getattr(object_to_duplicate, self.annualized_set + "_set").latest('academic_year__year')
 
     @classmethod
     def extend_obj(cls, obj, last_academic_year):
@@ -160,11 +163,11 @@ class AutomaticPostponementToN6(AutomaticPostponement):
     def get_to_not_duplicated(self):
         """ We cannot postpone an education_group in the past """
         return self.queryset.filter(
-            Q(last_year__lt=self.current_year.year) | Q(end_year__lt=self.last_academic_year.year)
+            Q(last_year__lt=self.current_year.year) | Q(end_year__year__lt=self.last_academic_year.year)
         )
 
-    def get_ending_on_max_adjournment(self):
-        return self.queryset.filter(end_year=self.last_academic_year.year)
+    def get_ending_before_max_adjournment(self):
+        return self.queryset.filter(end_year__year=self.last_academic_year.year-1)
 
     def get_statistics_context(self):
         """ Override if you need to add additional values to statistics"""
@@ -173,5 +176,5 @@ class AutomaticPostponementToN6(AutomaticPostponement):
             'to_duplicate': self.to_duplicate,
             'already_duplicated':  self.already_duplicated,
             'to_ignore': self.to_not_duplicate,
-            'ending_on_max_academic_year': self.ending_on_max_adjournment,
+            'ending_on_max_academic_year': self.ending_before_max_adjournment,
         }

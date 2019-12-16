@@ -25,7 +25,6 @@
 ##############################################################################
 from http import HTTPStatus
 from unittest import mock
-
 from django.http import HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
@@ -99,21 +98,25 @@ class TestEdit(TestCase):
 
     def test_edit_comment_post(self):
         data = {
-            "comment":  """C'est une affaire dangereuse de passer ta porte, Frodon, 
+            "form-0-id": str(self.group_element_year.id),
+            "form-0-comment":  """C'est une affaire dangereuse de passer ta porte, Frodon, 
             Tu vas sur la route, et si tu ne retiens pas tes pieds,
             Dieu sait jusqu'où tu pourrais être emporté.""",
 
-            "comment_english": """It's a dangerous business, Frodo, 
+            "form-0-comment_english": """It's a dangerous business, Frodo, 
             going out your door. You step onto the road, and if you don't keep your feet,
              there's no knowing where you might be swept off to.""",
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '0',
         }
         response = self.client.post(self.url, data=data)
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND, catch_error_forms(response))
 
         self.group_element_year.refresh_from_db()
-        self.assertEqual(self.group_element_year.comment, data['comment'])
-        self.assertEqual(self.group_element_year.comment_english, data['comment_english'])
+        self.assertEqual(self.group_element_year.comment, data['form-0-comment'])
+        self.assertEqual(self.group_element_year.comment_english, data['form-0-comment_english'])
 
 
 def catch_error_forms(response) -> str:

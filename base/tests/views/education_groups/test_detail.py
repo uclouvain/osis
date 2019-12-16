@@ -54,6 +54,8 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
+from base.utils.cache import ElementCache
+from base.views.education_groups.detail import CatalogGenericDetailView
 
 
 class EducationGroupRead(TestCase):
@@ -638,3 +640,30 @@ class TestContent(TestCase):
 
         response = self.client.get(self.url)
         self.assertFalse(response.context["show_minor_major_option_table"])
+
+
+class TestCatalogGenericDetailView(TestCase):
+
+    def test_get_instance_from_cache_when_learning_unit(self):
+        luy = LearningUnitYearFactory()
+        cached_data = {
+            'id': luy.pk, 'modelname': luy._meta.db_table, 'action': ElementCache.ElementCacheAction.COPY.value
+        }
+        result = CatalogGenericDetailView._get_instance_object_from_cache(cached_data)
+        self.assertEqual(result, luy)
+
+    def test_get_instance_from_cache_when_education_group(self):
+        eg = EducationGroupYearFactory()
+        cached_data = {
+            'id': eg.pk, 'modelname': eg._meta.db_table, 'action': ElementCache.ElementCacheAction.COPY.value
+        }
+        result = CatalogGenericDetailView._get_instance_object_from_cache(cached_data)
+        self.assertEqual(result, eg)
+
+    def test_get_instance_from_cache_when_obj_not_education_group_or_learning_unit(self):
+        obj = PersonEntityFactory()
+        cached_data = {
+            'id': obj.pk, 'modelname': obj._meta.db_table, 'action': ElementCache.ElementCacheAction.COPY.value
+        }
+        result = CatalogGenericDetailView._get_instance_object_from_cache(cached_data)
+        self.assertIsNone(result)

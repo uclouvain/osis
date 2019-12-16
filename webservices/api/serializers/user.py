@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,27 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth.models import User
+from rest_framework import serializers
 
 
-def convert_sections_to_list_of_dict(sections):
-    list_of_dict = []
-    for key, value in sections.items():
-        dico = {
-            'id': key,
-            'label': value['label'],
-            'content': value['content']
-        }
-        if 'free_text' in value:
-            dico.update({'free_text': value['free_text']})
-        list_of_dict.append(dico)
-    return list_of_dict
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(source='person.first_name', read_only=True)
+    middle_name = serializers.CharField(source='person.middle_name', read_only=True)
+    last_name = serializers.CharField(source='person.last_name', read_only=True)
+    email = serializers.CharField(source='person.email', read_only=True)
 
-
-def convert_sections_list_of_dict_to_dict(sections):
-    return {
-        item['id']: {
-            'label': item['label'],
-            'content': item['content']
-        }
-        for item in sections
-    }
+    class Meta:
+        model = User
+        fields = [
+            'username',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'email',
+        ]

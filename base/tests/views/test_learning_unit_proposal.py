@@ -30,6 +30,7 @@ from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -453,7 +454,7 @@ class TestGroupActionsOnProposals(TestCase):
             "action": ACTION_FORCE_STATE,
             "selected_action": [self.proposals[0].learning_unit_year.acronym]
         }
-        response = self.client.post(self.url, data=post_data, follow=True)
+        self.client.post(self.url, data=post_data, follow=True)
 
         self.assertFalse(mock_force_state.called)
 
@@ -835,6 +836,13 @@ class TestEditProposal(TestCase):
 
         self.proposal.refresh_from_db()
         self.assertEqual(self.proposal.folder_id, 12)
+
+    def test_edit_suppression_proposal_wrong_post(self):
+        self.proposal.type = ProposalType.SUPPRESSION.name
+        self.proposal.save()
+        response = self.client.post(self.url, data={"academic_year": self.academic_years[3].id,
+                                                    "entity": self.entity_version.id})
+        self.assertEqual(self.url, response.request['PATH_INFO'])
 
 
 class TestLearningUnitProposalDisplay(TestCase):

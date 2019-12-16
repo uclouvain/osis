@@ -55,8 +55,8 @@ class LearningUnitSpecificationsForm(forms.Form):
 
 
 class LearningUnitSpecificationsEditForm(forms.Form):
-    trans_text_fr = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
-    trans_text_en = forms.CharField(widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False)
+    trans_text_fr = forms.CharField(widget=CKEditorWidget(config_name='minimal'), required=False)
+    trans_text_en = forms.CharField(widget=CKEditorWidget(config_name='minimal'), required=False)
     cms_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
     cms_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 

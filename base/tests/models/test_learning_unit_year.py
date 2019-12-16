@@ -56,6 +56,9 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
+from cms.enums import entity_name
+from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitYearTest(TestCase):
@@ -184,26 +187,6 @@ class LearningUnitYearTest(TestCase):
         self.learning_unit_year.learning_container_year = None
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
-    def test_can_be_updated_by_faculty_manager(self):
-        start_year = AcademicYearFactory(year=self.academic_year.year - 3)
-        end_year = AcademicYearFactory(year=self.academic_year.year - 1)
-        previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
-        next_start_year = AcademicYearFactory(year=self.academic_year.year + 1)
-        next_end_year = AcademicYearFactory(year=self.academic_year.year + 3)
-        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
-        previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
-                         for ac in previous_academic_years]
-        next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
-                     for ac in next_academic_years]
-
-        for luy in previous_luys:
-            self.assertFalse(luy.can_update_by_faculty_manager())
-
-        self.assertTrue(self.learning_unit_year.can_update_by_faculty_manager())
-        self.assertTrue(next_luys[0].can_update_by_faculty_manager())
-        self.assertTrue(next_luys[1].can_update_by_faculty_manager())
-
-        self.assertFalse(next_luys[2].can_update_by_faculty_manager())
 
     def test_is_external(self):
         luy = LearningUnitYearFactory()
@@ -1012,3 +995,23 @@ class ContainerTypeVerboseTest(TestCase):
             luy.get_subtype_display()
         )
         self.assertEqual(result, expected_result)
+
+
+class LearningUnitYearDeleteCms(TestCase):
+    def setUp(self):
+        self.learning_unit_year = LearningUnitYearFactory()
+        self.translated_text = TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR,
+                                                     reference=self.learning_unit_year.id)
+
+        self.learning_unit_year_no_cms = LearningUnitYearFactory()
+
+    def test_delete_learning_unit_yr_and_cms(self):
+        luy_id = self.learning_unit_year.id
+        self.learning_unit_year.delete()
+        self.assertCountEqual(list(TranslatedText.objects.filter(id=self.translated_text.id)), [])
+        self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])
+
+    def test_delete_learning_unit_yr_without_cms(self):
+        luy_id = self.learning_unit_year_no_cms.id
+        self.learning_unit_year_no_cms.delete()
+        self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])
