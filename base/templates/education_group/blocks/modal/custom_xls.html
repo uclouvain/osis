@@ -35,11 +35,13 @@
                     <input type="checkbox" id="chb_select_all_custom"/>
                     <label>{% trans 'Select all' %}</label>
                     <br>
+                    <div id="div_xls_choices">
                     {% for field in form_xls_custom %}
                         {{ field }}
                         {{ field.label }}
                         <br>
                     {% endfor %}
+                    </div>
                     <br>
                 </div>
                 <div class="modal-footer">
@@ -67,7 +69,22 @@
         });
 
     });
+    
+    $("#div_xls_choices").click(function(){
+        var chboxes =$('div#div_xls_choices input:checkbox').not(this);
+        var cpt = 0;
 
+        $.each(chboxes, function() {
+            if ($(this).prop('checked') == false){
+                $("#chb_select_all_custom").prop('checked', false);
+                return false;
+            }else{
+                cpt += 1;
+            }
+        });
 
-
+        if( cpt == chboxes.length ){
+            $("#chb_select_all_custom").prop('checked', true);
+        }
+    });
 </script>
