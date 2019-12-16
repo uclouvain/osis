@@ -56,10 +56,11 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         qs = self._get_translated_texts(learning_unit_year).values('label', 'text')
 
         summary_specification_grouped = dict.fromkeys(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS, None)
-        for translated_text in qs:
-            key = translated_text['label']
-            parent_text = qs_parent.get(label=key).text if qs_parent else None
-            summary_specification_grouped[key] = translated_text['text'] if translated_text['text'] else parent_text
+        for key in summary_specification_grouped.keys():
+            partim_text = qs.filter(label=key).values_list('text', flat=True).first()
+            parent_text = qs_parent.filter(label=key).values_list('text', flat=True).first() if qs_parent else None
+            summary_specification_grouped[key] = partim_text if partim_text else parent_text
+
         serializer = self.get_serializer(summary_specification_grouped)
 
         return Response(serializer.data)
