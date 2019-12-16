@@ -58,7 +58,7 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
         summary_specification_grouped = dict.fromkeys(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS, None)
         for translated_text in qs:
             key = translated_text['label']
-            parent_text = qs_parent.get(label=key).text if parent else None
+            parent_text = qs_parent.get(label=key).text if qs_parent else None
             summary_specification_grouped[key] = translated_text['text'] if translated_text['text'] else parent_text
         serializer = self.get_serializer(summary_specification_grouped)
 
