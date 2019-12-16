@@ -37,7 +37,7 @@ from program_management.business.excel import EducationGroupYearLearningUnitsPre
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
-    _build_excel_lines_ues, _get_optional_data
+    _build_excel_lines_ues, _get_optional_data, BOLD_FONT
 from program_management.forms.custom_xls import CustomXlsForm
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
@@ -271,8 +271,12 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
         data = _build_excel_lines_ues(custom_form, exl.learning_unit_years_parent)
         content = data.get('content')
-        idx = 1
+        self._assert_content_equals(content, exl)
+        # First line (Header line) is always bold
+        self.assertListEqual(data.get('colored_cells')[Style(font=BOLD_FONT)], [0])
 
+    def _assert_content_equals(self, content, exl):
+        idx = 1
         for gey in exl.learning_unit_years_parent:
             luy = gey.child_leaf
             expected = get_expected_data(gey, luy)
