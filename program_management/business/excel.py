@@ -52,6 +52,8 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.forms.custom_xls import CustomXlsForm
 
+BOLD_FONT = Font(bold=True)
+
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
         bottom=Side(
@@ -525,7 +527,7 @@ def generate_ue_contained_for_workbook(learning_unit_years_parent, custom_xls_fo
 
     return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
-                                        data.get('colored_cells', {}) if need_proposal_legend else {})
+                                        data.get('colored_cells'))
 
 
 def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, learning_unit_years_parent):
@@ -542,7 +544,7 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, learning_unit_years_p
             colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
         idx += 1
 
-    colored_cells[Style(font=Font(bold=True))].append(0)
+    colored_cells[Style(font=BOLD_FONT)].append(0)
     return {'content': content, 'colored_cells': colored_cells}
 
 
