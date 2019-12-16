@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from django.db.models import F, When, Case
 from django.http import HttpResponse
 from django.test import TestCase
@@ -88,10 +90,8 @@ class TestRead(TestCase):
     @override_switch('education_group_year_generate_pdf', active=True)
     def test_pdf_content(self):
         self.client.force_login(self.a_superuser)
-        url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, "fr-be"])
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'pdf_content.html')
-        url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, "en"])
+        lang = random.choice(['fr-be', 'en'])
+        url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, lang])
         response = self.client.get(url)
         self.assertTemplateUsed(response, 'pdf_content.html')
 
@@ -132,16 +132,16 @@ class TestRead(TestCase):
 class TestReadPdfContent(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch__academic_year=cls.academic_year)
+        academic_year = AcademicYearFactory()
+        education_group_year = EducationGroupYearFactory(academic_year=academic_year)
+        GroupElementYearFactory(parent=education_group_year,
+                                child_branch__academic_year=academic_year)
         cls.person = CentralManagerFactory("can_access_education_group")
         cls.url = reverse(
             "group_content",
             kwargs={
-                "root_id": cls.education_group_year.id,
-                "education_group_year_id": cls.education_group_year.id
+                "root_id": education_group_year.id,
+                "education_group_year_id": education_group_year.id
             }
         )
         cls.post_valid_data = {'action': 'Generate pdf', 'language': LANGUAGE_CODE_EN}
