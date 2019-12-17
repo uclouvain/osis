@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url, include
+from django.conf.urls import url
 
-from learning_unit_enrollment.api.views.learning_unit_enrollment import LearningUnitEnrollmentList
+from learning_unit_enrollment.api.views.learning_unit_enrollment import EnrollmentsByLearningUnit, EnrollmentsByStudent
 
 app_name = "learning_unit_enrollment"
 
 urlpatterns = [
-    url(r'^(?P<registration_id>[\w]+)/$', LearningUnitEnrollmentList.as_view(), name=LearningUnitEnrollmentList.name),
+    url(r'^(?P<registration_id>[\w]+)/$', EnrollmentsByStudent.as_view(), name=EnrollmentsByStudent.name),
+    url(r'^learning_units/(?P<year>[\d]{4})/(?P<acronym>[\w]+)/enrollments/$', EnrollmentsByLearningUnit.as_view(), name=EnrollmentsByLearningUnit.name),
 ]

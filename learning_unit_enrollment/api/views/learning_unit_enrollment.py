@@ -65,5 +65,19 @@ class LearningUnitEnrollmentList(generics.ListAPIView):
         'learning_unit_year__acronym',
     )
 
+
+class EnrollmentsByStudent(LearningUnitEnrollmentList):
+    name = 'enrollment-list-by-student'
+
     def get_queryset(self):
         return super().get_queryset().filter(offer_enrollment__student__registration_id=self.kwargs['registration_id'])
+
+
+class EnrollmentsByLearningUnit(LearningUnitEnrollmentList):
+    name = 'enrollment-list-by-learning-unit'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            learning_unit_year__academic_year__year=self.kwargs['year'],
+            learning_unit_year__acronym__icontains=self.kwargs['acronym'],
+        )
