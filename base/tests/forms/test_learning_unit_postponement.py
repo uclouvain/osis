@@ -131,7 +131,6 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
             learning_unit_instance=instance_luy_base_form.learning_unit_instance,
             data=instance_luy_base_form.data
         )
-        self._instantiate_postponement_forms()
         self.assertTrue(form.check_consistency)
 
     def test_forms_property_end_year_is_none(self):
