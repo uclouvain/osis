@@ -665,7 +665,7 @@ def _get_optional_data(data, luy, optional_data_needed):
         )
         data.append(
             ";".join(
-                [_get_teacher_email(value.get('person'))
+                [value.get('person').email
                  for value in attribution_values
                  ]
             )
@@ -683,7 +683,3 @@ def _get_optional_data(data, luy, optional_data_needed):
     if optional_data_needed['has_language']:
         data.append(luy.language)
     return data
-
-
-def _get_teacher_email(a_person_teacher):
-    return a_person_teacher.email if a_person_teacher and a_person_teacher.email else ""

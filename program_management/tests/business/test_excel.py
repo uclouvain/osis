@@ -389,7 +389,6 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_get_optional_has_teacher_list(self):
         optional_data = initialize_optional_data()
         optional_data['has_teacher_list'] = True
-        print(_get_optional_data([], self.luy, optional_data))
         teacher_data = _get_optional_data([], self.luy, optional_data)
         self.assertEqual(teacher_data[0], "{} {};{} {}"
                          .format(self.person_1.last_name.upper(), self.person_1.first_name,
