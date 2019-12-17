@@ -199,7 +199,7 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
     def test_tutor_encoding_with_a_student(self):
         self.client.force_login(self.tutor.person.user)
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
-        response = self.client.post(url, data=self.get_form_with_one_student_filled())
+        self.client.post(url, data=self.get_form_with_one_student_filled())
 
         self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
         self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
