@@ -433,6 +433,7 @@ def _find_elements(group_elements_by_child_id, module_compl=False, child_leaf_id
         else:
             # Recursive call ; the parent_id becomes the child_branch.
             roots.extend(_find_elements(group_elements_by_child_id, module_compl, child_branch_id=parent_id))
+
     return list(set(roots))
 
 

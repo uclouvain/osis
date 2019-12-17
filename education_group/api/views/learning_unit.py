@@ -23,7 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
+
 from django.db.models import When, BooleanField, Case
+from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
@@ -36,13 +39,21 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
     LearningUnitYearPrerequisitesListSerializer
 
 
+class EducationGroupRootsFilter(filters.FilterSet):
+    in_complementary_module = filters.BooleanFilter(field_name="in_complementary_module")
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ['in_complementary_module']
+
+
 class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return all education groups root which utilize the learning unit specified
     """
     name = 'learningunitutilization_read'
     serializer_class = EducationGroupRootsListSerializer
-    filter_backends = []
+    filterset_class = EducationGroupRootsFilter
     paginator = None
 
     def get_queryset(self):
@@ -56,8 +67,13 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             luy=learning_unit_year,
             module_compl=True
         ).get(learning_unit_year.id, [])
+
+        ids = collections.defaultdict(lambda: True)
+        for egy_id, in_complementary_module in education_group_root_ids:
+            ids[egy_id] = ids[egy_id] and in_complementary_module
+
         whens = [
-            When(pk=k, then=v) for k, v in education_group_root_ids
+            When(pk=k, then=v) for k, v in ids.items()
         ]
 
         return EducationGroupYear.objects.filter(
