@@ -222,8 +222,6 @@ class FilterTrainingTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             },
         )
-        print(response.data['results'])
-        print(serializer.data)
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_type_params(self):
