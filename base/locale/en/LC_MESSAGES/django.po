@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-04 15:42+0100\n"
+"POT-Creation-Date: 2019-12-17 13:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1237,6 +1237,9 @@ msgid ""
 msgstr ""
 
 msgid "It remains notes to encode."
+msgstr ""
+
+msgid "It will be done at the consolidation"
 msgstr ""
 
 msgid ""
@@ -3266,6 +3269,9 @@ msgid "initial value"
 msgstr ""
 
 msgid "is using in"
+msgstr ""
+
+msgid "it will be reported at the consolidation"
 msgstr ""
 
 msgid "items per page"

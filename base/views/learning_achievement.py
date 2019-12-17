@@ -35,6 +35,7 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications
 from base.views.learning_units import perms
@@ -56,9 +57,11 @@ def operation(request, learning_achievement_id, operation_str):
     last_academic_year = execute_operation(filtered_achievements, operation_str)
     default_success_msg = _("Operation on learning achievement has been successfully completed")
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
-        display_success_messages(request, _build_postponement_success_message(default_success_msg))
+        display_success_messages(request, _build_postponement_success_message(default_success_msg, None, lu_yr_id))
     else:
-        display_success_messages(request, _build_postponement_success_message(default_success_msg, last_academic_year))
+        display_success_messages(request, _build_postponement_success_message(default_success_msg,
+                                                                              last_academic_year,
+                                                                              lu_yr_id))
 
     return HttpResponseRedirect(reverse(learning_unit_specifications,
                                         kwargs={'learning_unit_year_id': lu_yr_id}) + anchor)
@@ -156,14 +159,19 @@ def _save_and_redirect(request, form, learning_unit_year_id):
         request,
         _build_postponement_success_message(
             _("Learning achievement content has been successfully saved"),
-            last_academic_year
+            last_academic_year,
+            learning_unit_year_id
         )
     )
     return HttpResponse()
 
 
-def _build_postponement_success_message(default_msg, last_academic_year=None):
+def _build_postponement_success_message(default_msg, last_academic_year=None, learning_unit_year_id=None):
     msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+    luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
+    if luy and ProposalLearningUnit.objects. \
+            filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
+        msg = "{}, {}".format(msg, _("it will be reported at the consolidation"))
     return msg % {
         'year': last_academic_year
     }

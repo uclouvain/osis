@@ -37,6 +37,7 @@ from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
@@ -104,4 +105,8 @@ def _post_learning_unit_pedagogy_form(request):
                 }
             )
         else:
-            display_success_messages(request, _("The sections you modified have been saved with success."))
+            msg = _("The sections you modified have been saved with success.")
+            if ProposalLearningUnit.objects.\
+                    filter(learning_unit_year__learning_unit=form.luys[0].learning_unit).exists():
+                msg = "{}. {}".format(msg, _('It will be done at the consolidation'))
+            display_success_messages(request, msg)

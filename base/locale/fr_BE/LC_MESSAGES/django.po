@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-04 15:42+0100\n"
+"POT-Creation-Date: 2019-12-17 13:54+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1285,6 +1285,9 @@ msgstr ""
 
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
+
+msgid "It will be done at the consolidation"
+msgstr "Ce sera reporté lors de la consolidation"
 
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
@@ -3447,6 +3450,9 @@ msgstr "valeur initiale"
 
 msgid "is using in"
 msgstr "est utilisée dans"
+
+msgid "it will be reported at the consolidation"
+msgstr "ce sera reporté lors de la consolidation"
 
 msgid "items per page"
 msgstr "éléments par page"
