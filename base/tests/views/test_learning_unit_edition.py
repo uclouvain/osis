@@ -385,6 +385,13 @@ class TestLearningUnitVolumesManagement(TestCase):
         cls.data = get_valid_formset_data(cls.learning_unit_year.acronym)
         cls.partim_formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym, is_partim=True)
         cls.formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym)
+        cls.data.update({
+            **cls.formset_data,
+            'LDROI1200A-0-volume_total': 3,
+            'LDROI1200A-0-volume_q2': 3,
+            'LDROI1200A-0-volume_requirement_entity': 2,
+            'LDROI1200A-0-volume_total_requirement_entities': 3,
+        })
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -482,13 +489,6 @@ class TestLearningUnitVolumesManagement(TestCase):
     def test_learning_unit_volumes_management_post_wrong_data(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        self.data.update({
-            **self.formset_data,
-            'LDROI1200A-0-volume_total': 3,
-            'LDROI1200A-0-volume_q2': 3,
-            'LDROI1200A-0-volume_requirement_entity': 2,
-            'LDROI1200A-0-volume_total_requirement_entities': 3,
-        })
         response = self.client.post(self.url, data=self.data)
         # Volumes of partims can be greater than parent's
         msg = [m.message for m in get_messages(response.wsgi_request)]
@@ -499,14 +499,6 @@ class TestLearningUnitVolumesManagement(TestCase):
     @mock.patch('base.models.program_manager.is_program_manager')
     def test_learning_unit_volumes_management_post_wrong_data_ajax(self, mock_program_manager):
         mock_program_manager.return_value = True
-
-        self.data.update({
-            **self.formset_data,
-            'LDROI1200A-0-volume_total': 3,
-            'LDROI1200A-0-volume_q2': 3,
-            'LDROI1200A-0-volume_requirement_entity': 2,
-            'LDROI1200A-0-volume_total_requirement_entities': 3,
-        })
 
         response = self.client.post(self.url, data=self.data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         # Volumes of partims can be greater than parent's
