@@ -98,7 +98,7 @@ optional_header_for_proposition = [_('Proposal type'), _('Proposal status')]
 optional_header_for_credits = [_('Credits')]
 optional_header_for_allocation_entity = [_('Alloc. Ent.')]
 optional_header_for_english_title = [_('Title in English')]
-optional_header_for_teacher_list = [_('List of teachers')]
+optional_header_for_teacher_list = [_('List of teachers'), "{} ({})".format(_('List of teachers'), _('emails'))]
 optional_header_for_periodicity = [_('Periodicity')]
 optional_header_for_active = [_('Active')]
 optional_header_for_volume = [
@@ -653,12 +653,20 @@ def _get_optional_data(data, luy, optional_data_needed):
         luys = annotate_qs(LearningUnitYear.objects.filter(id=luy.id))
         data.extend(volume_information(luys[0]))
     if optional_data_needed['has_teacher_list']:
+        attribution_values = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+                    luy
+                ).values()
         data.append(
             ";".join(
                 [_get_attribution_line(value.get('person'))
-                 for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-                    luy
-                ).values()
+                 for value in attribution_values
+                 ]
+            )
+        )
+        data.append(
+            ";".join(
+                [_get_teacher_email(value.get('person'))
+                 for value in attribution_values
                  ]
             )
         )
@@ -675,3 +683,7 @@ def _get_optional_data(data, luy, optional_data_needed):
     if optional_data_needed['has_language']:
         data.append(luy.language)
     return data
+
+
+def _get_teacher_email(a_person_teacher):
+    return a_person_teacher.email if a_person_teacher and a_person_teacher.email else ""
