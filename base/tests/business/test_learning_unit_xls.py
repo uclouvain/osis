@@ -36,7 +36,7 @@ from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
-    _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
+    _get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
@@ -272,7 +272,7 @@ class TestLearningUnitXls(TestCase):
             xls_build.STYLED_CELLS:
                 DEFAULT_LEGEND_STYLES
         }
-        self.assertEqual(_prepare_legend_ws_data(), expected)
+        self.assertEqual(prepare_proposal_legend_ws_data(), expected)
 
     def test_add_training_data(self):
         luy_1 = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
