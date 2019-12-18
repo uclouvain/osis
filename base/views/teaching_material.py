@@ -110,6 +110,6 @@ def _save_and_return_response(request, form, learning_unit_year):
         msg = _("The teaching material has been saved with success")
         if ProposalLearningUnit.objects. \
                 filter(learning_unit_year__learning_unit=learning_unit_year.learning_unit).exists():
-            msg = "{}, {}".format(msg, _('it will be reported at the consolidation'))
+            msg = "{}. {}".format(msg, _('It will be done at the consolidation'))
         display_success_messages(request, msg)
     return JsonResponse({})
