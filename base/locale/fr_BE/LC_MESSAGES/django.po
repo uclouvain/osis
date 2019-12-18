@@ -3647,6 +3647,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "it will be reported at the consolidation"
-#~ msgstr "ce sera reporté lors de la consolidation"
