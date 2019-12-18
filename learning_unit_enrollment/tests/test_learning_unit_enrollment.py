@@ -84,6 +84,15 @@ class FilterEnrollmentsByStudentTestCase(APITestCase):
             response = getattr(self.client, method)(self.url)
             self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def test_pagination(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertTrue('previous' in response.data)
+        self.assertTrue('next' in response.data)
+        self.assertTrue('results' in response.data)
+        self.assertTrue('count' in response.data)
+
 
 class LearningUnitEnrollmentSerializerTestCase(TestCase):
     @classmethod
