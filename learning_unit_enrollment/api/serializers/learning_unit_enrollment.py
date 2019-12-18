@@ -44,7 +44,7 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     student_email = serializers.CharField(
-        source='offer_enrollment.student.person.mail',
+        source='offer_enrollment.student.person.email',
         read_only=True,
     )
     learning_unit_acronym = serializers.CharField(
