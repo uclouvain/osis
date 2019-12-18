@@ -326,6 +326,9 @@ msgstr[1] "Prérequis"
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
+msgid "Program manager is not allowed to change education group content"
+msgstr "Le gestionnaire de parcours étudiant n'a pas la permission de modifier le contenu d'une offre de formation"
+
 msgid "Proposal legend"
 msgstr "Légende proposition"
 
@@ -461,6 +464,9 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
 
 msgid "You are not eligible to detach this item"
 msgstr "Vous n'êtes pas autorisé à détacher cet item"
+
+msgid "You are not eligible to update the group element year"
+msgstr "Vous n'êtes pas autorisé à mettre à jour la formation"
 
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
