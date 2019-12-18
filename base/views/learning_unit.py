@@ -170,7 +170,7 @@ def _build_edit_specification_success_message(last_academic_year, translated_fie
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
     if ProposalLearningUnit.objects. \
             filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
-        msg = "{}, {}".format(msg, _("it will be reported at the consolidation"))
+        msg = "{}. {}".format(msg, _("It will be done at the consolidation"))
     return msg % {
         'field': translated_field_label,
         'year': last_academic_year

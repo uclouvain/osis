@@ -171,7 +171,7 @@ def _build_postponement_success_message(default_msg, last_academic_year=None, le
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
     if luy and ProposalLearningUnit.objects. \
             filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
-        msg = "{}, {}".format(msg, _("it will be reported at the consolidation"))
+        msg = "{}. {}".format(msg, _("It will be done at the consolidation"))
     return msg % {
         'year': last_academic_year
     }
