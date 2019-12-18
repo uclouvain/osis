@@ -43,6 +43,7 @@ from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learn
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.models import proposal_learning_unit
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
@@ -261,17 +262,17 @@ class TestLearningUnitSuppressionProposal(TestCase):
         AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
-        current_academic_year = create_current_academic_year()
+        cls.current_academic_year = create_current_academic_year()
 
         an_entity = EntityFactory(organization=an_organization)
         cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                  start_date=current_academic_year.start_date,
-                                                  end_date=current_academic_year.end_date)
+                                                  start_date=cls.current_academic_year.start_date,
+                                                  end_date=cls.current_academic_year.end_date)
 
-        cls.next_academic_year = AcademicYearFactory(year=current_academic_year.year + 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
         learning_container_year = LearningContainerYearFactory(
-            academic_year=current_academic_year,
+            academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,
             requirement_entity=cls.entity_version.entity,
             allocation_entity=cls.entity_version.entity,
@@ -283,7 +284,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         cls.learning_unit_year = LearningUnitYearFakerFactory(
             acronym="LOSIS1212",
             subtype=learning_unit_year_subtypes.FULL,
-            academic_year=current_academic_year,
+            academic_year=cls.current_academic_year,
             learning_container_year=learning_container_year,
             quadrimester=None,
             learning_unit=cls.learning_unit,
@@ -317,6 +318,12 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
         self.assertIsInstance(response.context['form_end_date'], LearningUnitEndDateForm)
+        self.assertCountEqual(
+            list(response.context['form_end_date'].fields['academic_year'].queryset),
+            list(AcademicYear.objects.filter(
+                year__range=(self.current_academic_year.year, self.current_academic_year.year + 6)
+            ))
+        )
 
         form_proposal = response.context['form_proposal']
         form_end_date = response.context['form_end_date']
@@ -810,6 +817,12 @@ class TestEditProposal(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/proposal/update_suppression.html')
         self.assertIsInstance(response.context['form_end_date'], LearningUnitEndDateForm)
+        self.assertCountEqual(
+            list(response.context['form_end_date'].fields['academic_year'].queryset),
+            list(AcademicYear.objects.filter(
+                year__range=(self.current_academic_year.year, self.current_academic_year.year + 6)
+            ))
+        )
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_edit_suppression_proposal_post(self):
