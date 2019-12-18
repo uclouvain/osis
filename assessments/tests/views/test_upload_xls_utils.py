@@ -286,7 +286,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             )
 
     def test_with_correct_score_sheet_white_one_empty_email(self):
-        self.students[0].person.email = " "
+        self.students[0].person.email = ""
         self.students[0].person.save()
         NUMBER_CORRECT_SCORES = "2"
         with open("assessments/tests/resources/correct_score_sheet_one_empty_email.xlsx", 'rb') as score_sheet:
