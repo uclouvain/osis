@@ -32,10 +32,6 @@ from django_filters import rest_framework as filters
 from learning_unit_enrollment.api.serializers.learning_unit_enrollment import LearningUnitEnrollmentSerializer
 
 
-# class CharInFilter(filters.BaseInFilter, filters.CharFilter):
-#     pass
-
-
 class LearningUnitEnrollmentFilter(filters.FilterSet):
     offer_acronym = filters.CharFilter(
         field_name="offer_enrollment__education_group_year__acronym",

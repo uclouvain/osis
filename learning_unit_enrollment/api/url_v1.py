@@ -31,5 +31,9 @@ app_name = "learning_unit_enrollment"
 
 urlpatterns = [
     url(r'^(?P<registration_id>[\w]+)/$', EnrollmentsByStudent.as_view(), name=EnrollmentsByStudent.name),
-    url(r'^learning_units/(?P<year>[\d]{4})/(?P<acronym>[\w]+)/enrollments/$', EnrollmentsByLearningUnit.as_view(), name=EnrollmentsByLearningUnit.name),
+    url(
+        r'^learning_units/(?P<year>[\d]{4})/(?P<acronym>[\w]+)/enrollments/$',
+        EnrollmentsByLearningUnit.as_view(),
+        name=EnrollmentsByLearningUnit.name
+    ),
 ]
