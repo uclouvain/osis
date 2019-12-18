@@ -80,4 +80,3 @@ class AcademicCalendarCreationEndDateProposalCentralManagerFactory(AcademicCalen
 
 class AcademicCalendarCreationEndDateProposalFacultyManagerFactory(AcademicCalendarFactory):
     reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
-
