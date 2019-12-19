@@ -199,7 +199,12 @@ paths:
       - in: query
         name: lang
         schema:
-          type: string	
+          type: string
+      - in: query
+        name: complementary_module
+        schema:
+          description: Include or not complementary modules
+          type: boolean
       responses:
         '200':
           description: OK
