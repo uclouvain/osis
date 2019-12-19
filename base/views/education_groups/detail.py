@@ -524,7 +524,9 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
         context["group_element_years"] = self.object.child_branch.select_related("parent")
         context["formations"] = find_learning_unit_formations(
             list(grp.parent for grp in self.object.child_branch.select_related("parent")),
-            parents_as_instances=True
+            result_params={
+                'parents_as_instances': True
+            }
         )
         return context
 

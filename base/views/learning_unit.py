@@ -78,8 +78,10 @@ def learning_unit_formations(request, learning_unit_year_id):
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
     formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(
         education_groups_years,
-        parents_as_instances=True,
-        with_parents_of_parents=True,
+        result_params={
+            'parents_as_instances': True,
+            'with_parents_of_parents': True
+        },
         luy=learn_unit_year
     )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year

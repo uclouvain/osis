@@ -93,7 +93,9 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
     def _parents(self):
         return group_element_year.find_learning_unit_formations(
             [self.parent],
-            parents_as_instances=True
+            result_params={
+                'parents_as_instances': True
+            }
         )[self.parent.pk] + [self.parent]
 
     @cached_property

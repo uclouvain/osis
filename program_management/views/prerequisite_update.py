@@ -64,8 +64,10 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
 
         formations = group_element_year.find_learning_unit_formations(
             [learning_unit_year],
-            parents_as_instances=True,
-            with_parents_of_parents=True
+            result_params={
+                'parents_as_instances': True,
+                'with_parents_of_parents': True
+            }
         )
 
         formations_set = set(flatten([parents for child_id, parents in formations.items()]))

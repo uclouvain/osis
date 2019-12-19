@@ -324,12 +324,11 @@ class GroupElementYear(OrderedModel):
             return "{}".format(self.child.title)
 
 
-def find_learning_unit_formations(
-        objects,
-        parents_as_instances=False, with_parents_of_parents=False,
-        luy=None,
-        fetch_complementary_module=False
-):
+def find_learning_unit_formations(objects, result_params=None, luy=None, type_to_catch=''):
+    if result_params is None:
+        result_params = {}
+    parents_as_instances = result_params.get('parents_as_instances', False)
+    with_parents_of_parents = result_params.get('with_parents_of_parents', False)
     if with_parents_of_parents and not parents_as_instances:
         raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
 
@@ -345,7 +344,7 @@ def find_learning_unit_formations(
 
         parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
-        roots_by_object_id = _find_related_formations(objects, parents_by_id, fetch_complementary_module)
+        roots_by_object_id = _find_related_formations(objects, parents_by_id, type_to_catch)
 
         if parents_as_instances:
             roots_by_object_id = _convert_parent_ids_to_instances(roots_by_object_id)
@@ -362,15 +361,13 @@ def _flatten_list_of_lists(list_of_lists):
     return list(set(itertools.chain.from_iterable(list_of_lists)))
 
 
-def _find_related_formations(objects, parents_by_id, fetch_complementary_module=False):
-    recursive_stop = _is_root_or_complementary_module_group_element_year if fetch_complementary_module \
-        else _is_root_group_element_year
+def _find_related_formations(objects, parents_by_id, type_to_catch=''):
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
-        return {obj.id: _find_elements(parents_by_id, recursive_stop, child_leaf_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, type_to_catch, child_leaf_id=obj.id) for obj in objects}
     else:
-        return {obj.id: _find_elements(parents_by_id, recursive_stop, child_branch_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, type_to_catch, child_branch_id=obj.id) for obj in objects}
 
 
 def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = None, learning_unit_year=None):
@@ -449,29 +446,25 @@ def _is_root_group_element_year(group_element_year):
         and group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
 
 
-def _is_root_or_complementary_module_group_element_year(group_element_year):
+def _is_root_group_element_year_or_type_to_catch(group_element_year, type_to_catch=''):
     is_root = _is_root_group_element_year(group_element_year)
-    return group_element_year["parent__education_group_type__name"] == GroupType.COMPLEMENTARY_MODULE.name or is_root
+    return group_element_year["parent__education_group_type__name"] == type_to_catch or is_root
 
 
-def _find_elements(
-        group_elements_by_child_id,
-        stop_recursivity_function=_is_root_group_element_year,
-        child_leaf_id=None, child_branch_id=None,
-):
+def _find_elements(group_elements_by_child_id, type_to_catch='', child_leaf_id=None, child_branch_id=None):
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
 
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
-        if stop_recursivity_function(group_elem_year):
+        if _is_root_group_element_year_or_type_to_catch(group_elem_year, type_to_catch):
             # If record matches any filter, we must stop mounting across the hierarchy.
             roots.append(parent_id)
         else:
             # Recursive call ; the parent_id becomes the child_branch.
             roots.extend(
-                _find_elements(group_elements_by_child_id, stop_recursivity_function, child_branch_id=parent_id)
+                _find_elements(group_elements_by_child_id, child_branch_id=parent_id)
             )
 
     return list(set(roots))

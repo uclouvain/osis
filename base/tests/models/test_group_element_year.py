@@ -263,7 +263,12 @@ class TestFindLearningUnitFormationRoots(TestCase):
             child_branch=None,
             child_leaf=self.child_leaf
         )
-        result = group_element_year.find_learning_unit_formations([self.child_leaf], parents_as_instances=True)
+        result = group_element_year.find_learning_unit_formations(
+            [self.child_leaf],
+            result_params={
+                'parents_as_instances': True
+            }
+        )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent])
 
     def test_with_kwarg_fetch_complementary_module_is_true_and_not_in_module_compl(self):
@@ -274,7 +279,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_formations(
             [self.child_leaf],
             luy=self.child_leaf,
-            fetch_complementary_module=True
+            type_to_catch=GroupType.COMPLEMENTARY_MODULE.name
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent.id])
 
@@ -287,7 +292,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_formations(
             [self.child_leaf],
             luy=self.child_leaf,
-            fetch_complementary_module=True
+            type_to_catch=GroupType.COMPLEMENTARY_MODULE.name
         )
 
         self.assertEqual(result[self.child_leaf.id], [hierarchy['group_element_child'].parent.id])
@@ -338,8 +343,10 @@ class TestConvertParentIdsToInstances(TestCase):
                 "If parameter with_parents_of_parents is True, parameter parents_as_instances must be True"):
             group_element_year.find_learning_unit_formations(
                 [],
-                parents_as_instances=False,
-                with_parents_of_parents=True
+                result_params={
+                    'parents_as_instances': False,
+                    'with_parents_of_parents': True
+                }
             )
 
 

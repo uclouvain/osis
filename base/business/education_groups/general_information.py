@@ -48,7 +48,9 @@ def publish(education_group_year):
 
     trainings = find_learning_unit_formations(
         [education_group_year],
-        parents_as_instances=True
+        result_params={
+            'parents_as_instances': True
+        }
     ).get(education_group_year.pk, [])
 
     education_groups_to_publish = [education_group_year] + trainings \

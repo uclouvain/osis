@@ -35,7 +35,9 @@ class LearningUnitUtilization(LearningUnitGenericDetailView):
         context["group_element_years"] = self.object.child_leaf.select_related("parent")
         context["formations"] = find_learning_unit_formations(
             list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
-            parents_as_instances=True,
+            result_params={
+                'parents_as_instances': True
+            },
             luy=self.object
         )
         return context
