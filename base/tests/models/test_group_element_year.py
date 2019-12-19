@@ -271,7 +271,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent])
 
-    def test_with_kwarg_fetch_complementary_module_is_true_and_not_in_module_compl(self):
+    def test_with_kwarg_type_to_catch_is_complementary_module_and_not_in_itl(self):
         group_element = GroupElementYearFactory(
             child_branch=None,
             child_leaf=self.child_leaf
@@ -283,7 +283,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent.id])
 
-    def test_with_kwarg_fetch_complementary_module_is_true_and_in_module_compl(self):
+    def test_with_kwarg_type_to_catch_is_complementary_module_and_in_it(self):
         group_type = EducationGroupTypeFactory(
             name=GroupType.COMPLEMENTARY_MODULE.name,
             category=education_group_categories.GROUP
