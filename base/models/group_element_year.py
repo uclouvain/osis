@@ -464,7 +464,7 @@ def _find_elements(group_elements_by_child_id, type_to_catch='', child_leaf_id=N
         else:
             # Recursive call ; the parent_id becomes the child_branch.
             roots.extend(
-                _find_elements(group_elements_by_child_id, child_branch_id=parent_id)
+                _find_elements(group_elements_by_child_id, type_to_catch, child_branch_id=parent_id)
             )
 
     return list(set(roots))
