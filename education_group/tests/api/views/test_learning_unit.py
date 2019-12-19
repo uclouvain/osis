@@ -82,7 +82,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_get_educationgrouproots_case_filter_complementary_module_params(self):
-        query_string = {'complementary_module': 'true'}
+        query_string = {'complementary_module': 'false'}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -97,7 +97,6 @@ class FilterEducationGroupRootsTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             }
         )
-        print(response.data, serializer.data)
         self.assertEqual(response.data, serializer.data)
 
 

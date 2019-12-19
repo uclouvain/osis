@@ -47,8 +47,8 @@ class EducationGroupRootsFilter(filters.FilterSet):
     @property
     def qs(self):
         qs = super().qs
-        complementary_module = self.data.get('complementary_module', False)
-        if complementary_module:
+        complementary_module = self.data.get('complementary_module', 'true').capitalize()
+        if not eval(complementary_module):
             qs = qs.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
         return qs
 
