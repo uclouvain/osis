@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Value, BooleanField
 from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -82,15 +81,13 @@ class FilterEducationGroupRootsTestCase(APITestCase):
     def setUp(self):
         self.client.force_authenticate(user=self.user)
 
-    def test_get_educationgrouproots_case_filter_in_complementary_module_params(self):
-        query_string = {'in_complementary_module': 'false'}
+    def test_get_educationgrouproots_case_filter_complementary_module_params(self):
+        query_string = {'complementary_module': 'false'}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id).annotate(
-            in_complementary_module=Value(False, output_field=BooleanField())
-        )
+        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id)
 
         serializer = EducationGroupRootsListSerializer(
             education_group_roots,
@@ -100,7 +97,6 @@ class FilterEducationGroupRootsTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             }
         )
-
         self.assertEqual(response.data, serializer.data)
 
 
@@ -114,7 +110,6 @@ class EducationGroupRootsListTestCase(APITestCase):
         """
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
-        cls.training.in_complementary_module = False
         cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year

@@ -30,7 +30,7 @@ from collections import Counter
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, connection
-from django.db.models import Q, F, Case, When, BooleanField
+from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -93,12 +93,9 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
             gey.child_leaf_id,
             gey.parent_id,
             edyc.academic_year_id,
-            0 AS level,
-            CASE egc.name WHEN 'COMPLEMENTARY_MODULE' THEN true
-            ELSE false END in_complementary_module
+            0 AS level
     FROM base_groupelementyear gey
     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-    INNER JOIN base_educationgrouptype AS egc on edyc.education_group_type_id = egc.id
     WHERE child_leaf_id = %(child_leaf_id)s
 
     UNION ALL
@@ -108,17 +105,13 @@ WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
             parent.child_leaf_id,
             parent.parent_id,
             edyp.academic_year_id,
-            child.level + 1,
-            child.in_complementary_module OR
-            CASE egc.name WHEN 'COMPLEMENTARY_MODULE' THEN true
-            ELSE false END in_complementary_module
+            child.level + 1
     FROM base_groupelementyear AS parent
     INNER JOIN group_element_year_parent_from_child_leaf AS child on parent.child_branch_id = child.parent_id
     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
-    INNER JOIN base_educationgrouptype AS egc on edyp.education_group_type_id = egc.id
 )
 
-SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level, in_complementary_module
+SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level
 FROM group_element_year_parent_from_child_leaf
 WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
 ORDER BY level DESC, id;
@@ -332,8 +325,10 @@ class GroupElementYear(OrderedModel):
 
 
 def find_learning_unit_formations(
-        objects, parents_as_instances=False, with_parents_of_parents=False,
-        luy=None, module_compl=False
+        objects,
+        parents_as_instances=False, with_parents_of_parents=False,
+        luy=None,
+        fetch_complementary_module=False
 ):
     if with_parents_of_parents and not parents_as_instances:
         raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
@@ -350,13 +345,13 @@ def find_learning_unit_formations(
 
         parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
-        roots_by_object_id = _find_related_formations(objects, parents_by_id, module_compl)
+        roots_by_object_id = _find_related_formations(objects, parents_by_id, fetch_complementary_module)
 
         if parents_as_instances:
             roots_by_object_id = _convert_parent_ids_to_instances(roots_by_object_id)
             if with_parents_of_parents:
                 flat_list_of_parents = _flatten_list_of_lists(roots_by_object_id.values())
-                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id, module_compl)
+                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id)
                 roots_by_parent_id = _convert_parent_ids_to_instances(roots_by_parent_id)
                 roots_by_object_id = {**roots_by_object_id, **roots_by_parent_id}
 
@@ -367,20 +362,18 @@ def _flatten_list_of_lists(list_of_lists):
     return list(set(itertools.chain.from_iterable(list_of_lists)))
 
 
-def _find_related_formations(objects, parents_by_id, module_compl=False):
+def _find_related_formations(objects, parents_by_id, fetch_complementary_module=False):
+    recursive_stop = _is_root_or_complementary_module_group_element_year if fetch_complementary_module \
+        else _is_root_group_element_year
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
-        return {obj.id: _find_elements(parents_by_id, module_compl, child_leaf_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, recursive_stop, child_leaf_id=obj.id) for obj in objects}
     else:
-        return {obj.id: _find_elements(parents_by_id, module_compl, child_branch_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, recursive_stop, child_branch_id=obj.id) for obj in objects}
 
 
 def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = None, learning_unit_year=None):
-    values_list = [
-        'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
-        'parent__education_group_type__category'
-    ]
     if academic_year:
         group_elements = GroupElementYear.objects.filter(
             Q(parent__academic_year=academic_year) |
@@ -393,23 +386,15 @@ def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = 
         )
     else:
         geys = fetch_row_sql_tree_from_child(child_leaf_id=learning_unit_year.pk)
-        whens = [
-            When(pk=k, then=v['in_complementary_module']) for k, v in geys.items()
-        ]
-        group_elements = GroupElementYear.objects.filter(
-            pk__in=geys.keys()
-        ).annotate(
-            in_complementary_module=Case(
-                *whens,
-                default=False,
-                output_field=BooleanField()
-            )
-        )
-        values_list += ['in_complementary_module']
+
+        group_elements = GroupElementYear.objects.filter(pk__in=[gey['id'] for gey in geys])
 
     group_elements = group_elements.select_related(
         'education_group_year__education_group_type'
-    ).values(*values_list)
+    ).values(
+        'parent', 'child_branch', 'child_leaf', 'parent__education_group_type__name',
+        'parent__education_group_type__category'
+    )
     result = collections.defaultdict(list)
     for group_element_year in group_elements:
         key = _build_child_key(
@@ -418,23 +403,6 @@ def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = 
         )
         result[key].append(group_element_year)
     return result
-
-
-def _find_elements(group_elements_by_child_id, module_compl=False, child_leaf_id=None, child_branch_id=None):
-    roots = []
-    unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
-    group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
-
-    for group_elem_year in group_elem_year_parents:
-        parent_id = group_elem_year['parent']
-        if _is_root_group_element_year(group_elem_year):
-            # If record matches any filter, we must stop mounting across the hierarchy.
-            roots.append((parent_id, group_elem_year['in_complementary_module']) if module_compl else parent_id)
-        else:
-            # Recursive call ; the parent_id becomes the child_branch.
-            roots.extend(_find_elements(group_elements_by_child_id, module_compl, child_branch_id=parent_id))
-
-    return list(set(roots))
 
 
 def _convert_parent_ids_to_instances(root_ids_by_object_id):
@@ -477,8 +445,36 @@ def _build_child_key(child_branch=None, child_leaf=None):
 
 def _is_root_group_element_year(group_element_year):
     root_categories = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
-    return group_element_year["parent__education_group_type__category"] in root_categories and \
-        group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
+    return group_element_year["parent__education_group_type__category"] in root_categories \
+        and group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
+
+
+def _is_root_or_complementary_module_group_element_year(group_element_year):
+    is_root = _is_root_group_element_year(group_element_year)
+    return group_element_year["parent__education_group_type__name"] == GroupType.COMPLEMENTARY_MODULE.name or is_root
+
+
+def _find_elements(
+        group_elements_by_child_id,
+        stop_recursivity_function=_is_root_group_element_year,
+        child_leaf_id=None, child_branch_id=None,
+):
+    roots = []
+    unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
+    group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
+
+    for group_elem_year in group_elem_year_parents:
+        parent_id = group_elem_year['parent']
+        if stop_recursivity_function(group_elem_year):
+            # If record matches any filter, we must stop mounting across the hierarchy.
+            roots.append(parent_id)
+        else:
+            # Recursive call ; the parent_id becomes the child_branch.
+            roots.extend(
+                _find_elements(group_elements_by_child_id, stop_recursivity_function, child_branch_id=parent_id)
+            )
+
+    return list(set(roots))
 
 
 def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
@@ -511,22 +507,22 @@ def fetch_row_sql(root_ids):
         ]
 
 
-def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> dict:
+def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> list:
     parameters = {
         "child_leaf_id": child_leaf_id,
         "academic_year_id": academic_year_id
     }
     with connection.cursor() as cursor:
         cursor.execute(SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD, parameters)
-        return {
-            row[0]: {
+        return [
+            {
+                'id': row[0],
                 'child_branch_id': row[1],
                 'child_leaf_id': row[2],
                 'parent_id': row[3],
                 'level': row[4],
-                'in_complementary_module': row[5]
             } for row in cursor.fetchall()
-        }
+        ]
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):

@@ -70,7 +70,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'in_complementary_module'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

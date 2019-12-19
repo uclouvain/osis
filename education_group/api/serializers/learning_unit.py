@@ -63,7 +63,6 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
     decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='get_duration_unit_display', read_only=True)
-    in_complementary_module = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = EducationGroupYear
@@ -80,7 +79,6 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'in_complementary_module'
         )
 
 
