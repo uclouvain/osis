@@ -40,10 +40,6 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
 
 class EducationGroupRootsFilter(filters.FilterSet):
 
-    class Meta:
-        model = EducationGroupYear
-        fields = ['education_group_type__name']
-
     @property
     def qs(self):
         qs = super().qs
