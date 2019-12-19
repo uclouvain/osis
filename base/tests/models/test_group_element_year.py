@@ -82,60 +82,6 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
         self.assertEqual(len(result), len(expected_result))
         self.assertDictEqual(result, expected_result)
 
-    def test_not_in_complementary_module(self):
-        result = group_element_year._build_parent_list_by_education_group_year_id(learning_unit_year=self.child_leaf)
-
-        expected_result = {
-            'base_educationgroupyear_{}'.format(self.child_branch.id): [{
-                'parent': self.root.id,
-                'child_branch': self.child_branch.id,
-                'child_leaf': None,
-                'parent__education_group_type__category': self.root.education_group_type.category,
-                'parent__education_group_type__name': self.root.education_group_type.name,
-                'in_complementary_module': False
-            }, ],
-            'base_learningunityear_{}'.format(self.child_leaf.id): [{
-                'parent': self.child_branch.id,
-                'child_branch': None,
-                'child_leaf': self.child_leaf.id,
-                'parent__education_group_type__category': self.child_branch.education_group_type.category,
-                'parent__education_group_type__name': self.child_branch.education_group_type.name,
-                'in_complementary_module': False
-            }, ]
-        }
-        self.assertEqual(len(result), len(expected_result))
-        self.assertDictEqual(result, expected_result)
-
-    def test_in_complementary_module(self):
-        self.child_branch.education_group_type = EducationGroupTypeFactory(
-            category=education_group_categories.GROUP,
-            name=GroupType.COMPLEMENTARY_MODULE.name,
-        )
-        self.child_branch.save()
-
-        result = group_element_year._build_parent_list_by_education_group_year_id(learning_unit_year=self.child_leaf)
-
-        expected_result = {
-            'base_educationgroupyear_{}'.format(self.child_branch.id): [{
-                'parent': self.root.id,
-                'child_branch': self.child_branch.id,
-                'child_leaf': None,
-                'parent__education_group_type__category': self.root.education_group_type.category,
-                'parent__education_group_type__name': self.root.education_group_type.name,
-                'in_complementary_module': True
-            }, ],
-            'base_learningunityear_{}'.format(self.child_leaf.id): [{
-                'parent': self.child_branch.id,
-                'child_branch': None,
-                'child_leaf': self.child_leaf.id,
-                'parent__education_group_type__category': self.child_branch.education_group_type.category,
-                'parent__education_group_type__name': self.child_branch.education_group_type.name,
-                'in_complementary_module': True
-            }, ]
-        }
-        self.assertEqual(len(result), len(expected_result))
-        self.assertDictEqual(result, expected_result)
-
 
 class TestFindRelatedRootEducationGroups(TestCase):
     """Unit tests for find_learning_unit_formations() function"""
@@ -320,7 +266,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_formations([self.child_leaf], parents_as_instances=True)
         self.assertEqual(result[self.child_leaf.id], [group_element.parent])
 
-    def test_with_kwarg_module_compl_is_true_and_not_in_module_compl(self):
+    def test_with_kwarg_fetch_complementary_module_is_true_and_not_in_module_compl(self):
         group_element = GroupElementYearFactory(
             child_branch=None,
             child_leaf=self.child_leaf
@@ -328,11 +274,11 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_formations(
             [self.child_leaf],
             luy=self.child_leaf,
-            module_compl=True
+            fetch_complementary_module=True
         )
-        self.assertEqual(result[self.child_leaf.id], [(group_element.parent.id, False)])
+        self.assertEqual(result[self.child_leaf.id], [group_element.parent.id])
 
-    def test_with_kwarg_module_compl_is_true_and_in_module_compl(self):
+    def test_with_kwarg_fetch_complementary_module_is_true_and_in_module_compl(self):
         group_type = EducationGroupTypeFactory(
             name=GroupType.COMPLEMENTARY_MODULE.name,
             category=education_group_categories.GROUP
@@ -341,9 +287,10 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_formations(
             [self.child_leaf],
             luy=self.child_leaf,
-            module_compl=True
+            fetch_complementary_module=True
         )
-        self.assertEqual(result[self.child_leaf.id], [(hierarchy['group_element_root'].parent.id, True)])
+
+        self.assertEqual(result[self.child_leaf.id], [hierarchy['group_element_child'].parent.id])
 
 
 class TestConvertParentIdsToInstances(TestCase):
