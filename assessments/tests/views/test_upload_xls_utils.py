@@ -134,8 +134,6 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
 
         cls.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
 
-        # Mock academic_year in order to be decouple from system time
-
     def setUp(self):
         self.client = Client()
         self.a_user = self.attribution.tutor.person.user
