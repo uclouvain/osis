@@ -569,7 +569,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'is_iufc': is_iufc,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
                 'show_free_text': self._show_free_text()
@@ -586,9 +585,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         return context
 
     def _show_free_text(self):
-        concerned_training_types = list(
-            set(TrainingType.with_admission_condition()) - set(TrainingType.continuing_education_types())
-        )
+        concerned_training_types = list(TrainingType.with_admission_condition())
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
             concerned_training_types,
             MiniTrainingType.with_admission_condition(),
