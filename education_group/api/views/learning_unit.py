@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import collections
 
-from django.db.models import When, BooleanField, Case
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -33,6 +31,7 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
@@ -40,11 +39,18 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
 
 
 class EducationGroupRootsFilter(filters.FilterSet):
-    in_complementary_module = filters.BooleanFilter(field_name="in_complementary_module")
 
     class Meta:
         model = EducationGroupYear
-        fields = ['in_complementary_module']
+        fields = ['education_group_type__name']
+
+    @property
+    def qs(self):
+        qs = super().qs
+        complementary_module = self.data.get('complementary_module', False)
+        if complementary_module:
+            qs = qs.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
+        return qs
 
 
 class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -65,27 +71,13 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         education_group_root_ids = group_element_year.find_learning_unit_formations(
             [learning_unit_year],
             luy=learning_unit_year,
-            module_compl=True
+            fetch_complementary_module=True
         ).get(learning_unit_year.id, [])
 
-        ids = collections.defaultdict(lambda: True)
-        for egy_id, in_complementary_module in education_group_root_ids:
-            ids[egy_id] = ids[egy_id] and in_complementary_module
-
-        whens = [
-            When(pk=k, then=v) for k, v in ids.items()
-        ]
-
         return EducationGroupYear.objects.filter(
-            pk__in=[egr[0] for egr in education_group_root_ids]
+            pk__in=education_group_root_ids
         ).select_related(
             'education_group_type', 'academic_year'
-        ).annotate(
-            in_complementary_module=Case(
-                *whens,
-                default=False,
-                output_field=BooleanField()
-            )
         )
 
 

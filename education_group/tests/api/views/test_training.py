@@ -161,7 +161,7 @@ class GetAllTrainingTestCase(APITestCase):
                     many=True,
                     context={
                         'request': RequestFactory().get(self.url, query_string),
-                        'language': settings.LANGUAGE_CODE_EN
+                        'language': settings.LANGUAGE_CODE_FR
                     },
                 )
                 self.assertEqual(response.data['results'], serializer.data)
