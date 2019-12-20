@@ -81,8 +81,8 @@ class FilterEducationGroupRootsTestCase(APITestCase):
     def setUp(self):
         self.client.force_authenticate(user=self.user)
 
-    def test_get_educationgrouproots_case_filter_complementary_module_params(self):
-        query_string = {'complementary_module': 'true'}
+    def test_get_educationgrouproots_case_filter_ignore_complementary_module_params(self):
+        query_string = {'ignore_complementary_module': 'true'}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
