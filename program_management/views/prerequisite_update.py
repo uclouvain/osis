@@ -62,9 +62,9 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         learning_unit_year = context["learning_unit_year"]
         education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
 
-        formations = group_element_year.find_learning_unit_formations(
+        formations = group_element_year.find_learning_unit_roots(
             [learning_unit_year],
-            result_params={
+            return_result_params={
                 'parents_as_instances': True,
                 'with_parents_of_parents': True
             }
