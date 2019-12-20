@@ -201,7 +201,7 @@ paths:
         schema:
           type: string
       - in: query
-        name: complementary_module
+        name: ignore_complementary_module
         schema:
           description: True if we want to filter roots if the learning unit is inside a complementary module behind the root. By default, all roots of the learning unit are returned.
           type: boolean
