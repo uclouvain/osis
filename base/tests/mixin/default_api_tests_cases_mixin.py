@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 
 
 class APIFilterTestCaseData:
-    filters: Dict = None
+    filters = None
     expected_result = None
 
     def __init__(self, filters, expected_result):
