@@ -45,7 +45,9 @@ class GroupTest(TestCase):
         )
         with self.assertRaises(ValidationError):
             group.clean()
-            self.assertFalse(Group.objects.exists())
+            self.assertFalse(
+                Group.objects.get(start_year=self.academic_year_2000, end_year=self.academic_year_1999).exists()
+            )
 
     def test_clean_case_start_year_equals_to_end_year_no_error(self):
         group = GroupFactory.build(
@@ -54,7 +56,10 @@ class GroupTest(TestCase):
         )
         group.clean()
         group.save()
-        self.assertTrue(Group.objects.exists())
+
+        self.assertTrue(
+            Group.objects.filter(start_year=self.academic_year_2000, end_year=self.academic_year_2000).exists()
+        )
 
     def test_clean_case_start_year_lower_to_end_year_no_error(self):
         group = GroupFactory.build(
@@ -63,4 +68,7 @@ class GroupTest(TestCase):
         )
         group.clean()
         group.save()
-        self.assertTrue(Group.objects.all().exists())
+
+        self.assertTrue(
+            Group.objects.filter(start_year=self.academic_year_1999, end_year=self.academic_year_2000).exists()
+        )

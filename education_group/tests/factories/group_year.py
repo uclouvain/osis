@@ -26,7 +26,6 @@
 import random
 import string
 
-import exrex
 import factory.fuzzy
 
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
@@ -49,7 +48,7 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "education_group.group_year"
 
-    acronym = ""
+    acronym = factory.Sequence(lambda n: 'Gy %d' % n)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
     constraint_type = CREDITS
@@ -60,11 +59,3 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     title_en = factory.LazyAttribute(generate_title)
     remark_fr = factory.fuzzy.FuzzyText(length=255)
     remark_en = factory.fuzzy.FuzzyText(length=255)
-
-    @factory.post_generation
-    def gen_acronym(self, create, extracted, **kwargs):
-        try:
-            if self.acronym == "":
-                self.acronym = exrex.getone(self.rules['acronym'].regex_rule).upper()
-        except KeyError:
-            self.acronym = string_generator(7)
