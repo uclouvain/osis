@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 
 
 class APIFilterTestCaseData:
-    filters: dict = None
+    filters: Dict = None
     expected_result = None
 
     def __init__(self, filters, expected_result):
@@ -25,7 +25,7 @@ def requires_attributes(attributes: List[str]):
         def function_wrapper(self):
             for attr in attributes:
                 if getattr(self, attr) is None:
-                    raise NotImplementedError("Please set the param '{}' to run this unit test.".format(attribute))
+                    raise NotImplementedError("Please set the param '{}' to run this unit test.".format(attr))
             func(self)
         return function_wrapper
     return attribute_required_decorator
