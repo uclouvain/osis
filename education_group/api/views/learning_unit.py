@@ -43,8 +43,8 @@ class EducationGroupRootsFilter(filters.FilterSet):
     @property
     def qs(self):
         qs = super().qs
-        complementary_module = self.data.get('complementary_module', 'true').capitalize()
-        if not eval(complementary_module):
+        complementary_module = self.data.get('complementary_module', 'false').capitalize()
+        if eval(complementary_module):
             qs = qs.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
         return qs
 
@@ -64,10 +64,10 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        education_group_root_ids = group_element_year.find_learning_unit_formations(
+        education_group_root_ids = group_element_year.find_learning_unit_roots(
             [learning_unit_year],
             luy=learning_unit_year,
-            fetch_complementary_module=True
+            is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
         ).get(learning_unit_year.id, [])
 
         return EducationGroupYear.objects.filter(

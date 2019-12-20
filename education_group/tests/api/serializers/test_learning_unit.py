@@ -45,7 +45,6 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
-        cls.training.in_complementary_module = False
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year

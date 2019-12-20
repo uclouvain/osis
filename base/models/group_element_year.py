@@ -26,6 +26,7 @@
 import collections
 import itertools
 from collections import Counter
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -42,7 +43,7 @@ from base.models import education_group_year
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -324,12 +325,17 @@ class GroupElementYear(OrderedModel):
             return "{}".format(self.child.title)
 
 
-def find_learning_unit_formations(
+def find_learning_unit_roots(
         objects,
-        parents_as_instances=False, with_parents_of_parents=False,
+        return_result_params=None,
         luy=None,
-        fetch_complementary_module=False
+        is_root_when_matches: List[EducationGroupTypesEnum] = None
 ):
+    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+    if return_result_params is None:
+        return_result_params = {}
+    parents_as_instances = return_result_params.get('parents_as_instances', False)
+    with_parents_of_parents = return_result_params.get('with_parents_of_parents', False)
     if with_parents_of_parents and not parents_as_instances:
         raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
 
@@ -345,13 +351,13 @@ def find_learning_unit_formations(
 
         parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
-        roots_by_object_id = _find_related_formations(objects, parents_by_id, fetch_complementary_module)
+        roots_by_object_id = _find_related_formations(objects, parents_by_id, is_root_when_matches)
 
         if parents_as_instances:
             roots_by_object_id = _convert_parent_ids_to_instances(roots_by_object_id)
             if with_parents_of_parents:
                 flat_list_of_parents = _flatten_list_of_lists(roots_by_object_id.values())
-                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id)
+                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id, is_root_when_matches)
                 roots_by_parent_id = _convert_parent_ids_to_instances(roots_by_parent_id)
                 roots_by_object_id = {**roots_by_object_id, **roots_by_parent_id}
 
@@ -362,15 +368,14 @@ def _flatten_list_of_lists(list_of_lists):
     return list(set(itertools.chain.from_iterable(list_of_lists)))
 
 
-def _find_related_formations(objects, parents_by_id, fetch_complementary_module=False):
-    recursive_stop = _is_root_or_complementary_module_group_element_year if fetch_complementary_module \
-        else _is_root_group_element_year
+def _find_related_formations(objects, parents_by_id, is_root_when_matches: List[EducationGroupTypesEnum] = None):
+    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
-        return {obj.id: _find_elements(parents_by_id, recursive_stop, child_leaf_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, is_root_when_matches, child_leaf_id=obj.id) for obj in objects}
     else:
-        return {obj.id: _find_elements(parents_by_id, recursive_stop, child_branch_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, is_root_when_matches, child_branch_id=obj.id) for obj in objects}
 
 
 def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = None, learning_unit_year=None):
@@ -449,29 +454,36 @@ def _is_root_group_element_year(group_element_year):
         and group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
 
 
-def _is_root_or_complementary_module_group_element_year(group_element_year):
+def _is_root_group_element_year_or_is_root_when_matches(
+        group_element_year,
+        is_root_when_matches: List[EducationGroupTypesEnum] = None
+):
+    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+    type_names = [egy_type.name for egy_type in is_root_when_matches]
     is_root = _is_root_group_element_year(group_element_year)
-    return group_element_year["parent__education_group_type__name"] == GroupType.COMPLEMENTARY_MODULE.name or is_root
+    return group_element_year["parent__education_group_type__name"] in type_names or is_root
 
 
 def _find_elements(
         group_elements_by_child_id,
-        stop_recursivity_function=_is_root_group_element_year,
-        child_leaf_id=None, child_branch_id=None,
+        is_root_when_matches: List[EducationGroupTypesEnum] = None,
+        child_leaf_id=None,
+        child_branch_id=None
 ):
+    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
 
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
-        if stop_recursivity_function(group_elem_year):
+        if _is_root_group_element_year_or_is_root_when_matches(group_elem_year, is_root_when_matches):
             # If record matches any filter, we must stop mounting across the hierarchy.
             roots.append(parent_id)
         else:
             # Recursive call ; the parent_id becomes the child_branch.
             roots.extend(
-                _find_elements(group_elements_by_child_id, stop_recursivity_function, child_branch_id=parent_id)
+                _find_elements(group_elements_by_child_id, is_root_when_matches, child_branch_id=parent_id)
             )
 
     return list(set(roots))
