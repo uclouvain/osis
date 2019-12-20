@@ -1,9 +1,7 @@
-from typing import Dict, List
+from typing import List
 
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase
 
 from base.models.enums import learning_unit_enrollment_state
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
