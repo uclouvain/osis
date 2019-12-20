@@ -62,4 +62,12 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LearningUnitEnrollment
-        fields = ('registration_id', 'student_first_name', 'student_last_name', 'student_email', 'learning_unit_acronym', 'education_group_acronym', 'academic_year')
+        fields = (
+            'registration_id',
+            'student_first_name',
+            'student_last_name',
+            'student_email',
+            'learning_unit_acronym',
+            'education_group_acronym',
+            'academic_year'
+        )
