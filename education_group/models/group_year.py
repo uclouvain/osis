@@ -34,12 +34,12 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class GroupYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('acronym', 'partial_acronym', 'title_fr_ISO_639_1', 'group', 'education_group_type', 'changed')
+    list_display = ('acronym', 'title_fr', 'group', 'education_group_type', 'changed')
     list_filter = ('education_group_type', )
     raw_id_fields = (
         'education_group_type', 'group',
     )
-    search_fields = ['acronym', 'partial_acronym', 'title_fr_ISO_639_1', 'group__pk', 'id']
+    search_fields = ['acronym', 'title_fr', 'group__pk', 'id']
 
 
 class GroupYear(SerializableModel):
@@ -47,16 +47,10 @@ class GroupYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    partial_acronym = models.CharField(
-        max_length=15,
-        db_index=True,
-        null=True,
-        verbose_name=_("code"),
-    )
     acronym = models.CharField(
         max_length=40,
         db_index=True,
-        verbose_name=_("Acronym/Short title"),
+        verbose_name=_("code"),
     )
     education_group_type = models.ForeignKey(
         'base.EducationGroupType',
@@ -93,12 +87,12 @@ class GroupYear(SerializableModel):
         'Group',
         on_delete=models.CASCADE
     )
-    title_fr_ISO_639_1 = models.CharField(
+    title_fr = models.CharField(
         max_length=255,
         verbose_name=_("Title in French")
     )
 
-    title_en_ISO_639_1 = models.CharField(
+    title_en = models.CharField(
         max_length=240,
         blank=True,
         default="",
@@ -110,7 +104,7 @@ class GroupYear(SerializableModel):
         verbose_name=_("remark")
     )
 
-    remark_english_en = models.TextField(
+    remark_en = models.TextField(
         blank=True,
         default="",
         verbose_name=_("remark in english")
