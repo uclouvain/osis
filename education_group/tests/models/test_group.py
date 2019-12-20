@@ -29,6 +29,7 @@ from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import GroupFactory
+from education_group.models.group import Group
 from education_group.tests.factories.group import GroupFactory
 
 
@@ -44,6 +45,7 @@ class GroupTest(TestCase):
         )
         with self.assertRaises(ValidationError):
             group.clean()
+            self.assertFalse(Group.objects.exists())
 
     def test_clean_case_start_year_equals_to_end_year_no_error(self):
         group = GroupFactory.build(
@@ -52,6 +54,7 @@ class GroupTest(TestCase):
         )
         group.clean()
         group.save()
+        self.assertTrue(Group.objects.exists())
 
     def test_clean_case_start_year_lower_to_end_year_no_error(self):
         group = GroupFactory.build(
@@ -60,3 +63,4 @@ class GroupTest(TestCase):
         )
         group.clean()
         group.save()
+        self.assertTrue(Group.objects.all().exists())

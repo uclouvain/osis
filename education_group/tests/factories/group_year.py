@@ -29,9 +29,9 @@ import string
 import exrex
 import factory.fuzzy
 
-from base.models.enums.constraint_type import CREDITS
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from education_group.models.enums.constraint_type import CREDITS
 from education_group.tests.factories.group import GroupFactory
 
 
@@ -64,7 +64,7 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def gen_acronym(self, create, extracted, **kwargs):
         try:
-            if self.acronym == '':
+            if self.acronym == "":
                 self.acronym = exrex.getone(self.rules['acronym'].regex_rule).upper()
         except KeyError:
-            self.acronym = string_generator(6)
+            self.acronym = string_generator(7)

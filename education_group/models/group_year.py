@@ -29,7 +29,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models.enums.constraint_type import CONSTRAINT_TYPE
+from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -55,7 +55,8 @@ class GroupYear(SerializableModel):
     education_group_type = models.ForeignKey(
         'base.EducationGroupType',
         verbose_name=_("Type of training"),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        db_index=True
     )
     credits = models.PositiveIntegerField(
         blank=True,
@@ -64,7 +65,7 @@ class GroupYear(SerializableModel):
     )
     constraint_type = models.CharField(
         max_length=20,
-        choices=CONSTRAINT_TYPE,
+        choices=ConstraintTypes.choices(),
         default=None,
         blank=True,
         null=True,
@@ -76,7 +77,6 @@ class GroupYear(SerializableModel):
         verbose_name=_("minimum constraint"),
         validators=[MinValueValidator(1)]
     )
-
     max_constraint = models.IntegerField(
         blank=True,
         null=True,
@@ -91,7 +91,6 @@ class GroupYear(SerializableModel):
         max_length=255,
         verbose_name=_("Title in French")
     )
-
     title_en = models.CharField(
         max_length=240,
         blank=True,
@@ -103,7 +102,6 @@ class GroupYear(SerializableModel):
         default="",
         verbose_name=_("remark")
     )
-
     remark_en = models.TextField(
         blank=True,
         default="",
