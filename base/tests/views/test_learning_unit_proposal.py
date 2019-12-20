@@ -44,14 +44,15 @@ from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.models import proposal_learning_unit
 from base.models.academic_year import AcademicYear
+from base.models.enums import groups
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
 from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.tests.factories import campus as campus_factory, \
-    organization as organization_factory
+from base.tests.factories import campus as campus_factory, organization as organization_factory, \
+    person as person_factory
 from base.tests.factories.academic_year import create_current_academic_year, \
     AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -65,15 +66,12 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
-    FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
-    learning_unit_modification_proposal, \
-    learning_unit_suppression_proposal
+    learning_unit_modification_proposal, learning_unit_suppression_proposal
 from base.views.learning_units.search.proposal import ACTION_CONSOLIDATE, ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
 from reference.tests.factories.language import LanguageFactory
 
@@ -85,7 +83,7 @@ class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
+        cls.person = person_factory.PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
@@ -166,7 +164,7 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_user_has_not_permission(self):
-        person = PersonFactory()
+        person = person_factory.PersonFactory()
         self.client.force_login(person.user)
         response = self.client.get(self.url)
 
@@ -260,7 +258,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
+        cls.person = person_factory.PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
 
@@ -332,6 +330,16 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(form_proposal.fields['folder_id'].initial, None)
         self.assertEqual(form_proposal.fields['entity'].initial, None)
 
+    def test_get_request_academic_year_list_in_form_for_central_manager(self):
+        person_factory.add_person_to_groups(self.person, [groups.CENTRAL_MANAGER_GROUP])
+        response = self.client.get(self.url)
+        self.assertCountEqual(
+            list(response.context['form_end_date'].fields['academic_year'].queryset),
+            list(AcademicYear.objects.filter(
+                year__range=(self.current_academic_year.year, self.current_academic_year.year + 6)
+            ))
+        )
+
     def test_post_request(self):
         response = self.client.post(self.url, data=self.form_data)
 
@@ -358,7 +366,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
 class TestLearningUnitProposalSearch(TestCase):
     def setUp(self):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        self.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
+        self.person = person_factory.PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         ac_years = AcademicYearFactory.produce_in_future(quantity=3)
         self.an_entity = EntityFactory()
         self.entity_version = EntityVersionFactory(entity=self.an_entity, entity_type=entity_type.SCHOOL,
@@ -408,7 +416,7 @@ class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = PersonFactory()
+        cls.person = person_factory.PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
                          _create_proposal_learning_unit("LOSIS1212"),
@@ -484,7 +492,7 @@ class TestGroupActionsOnProposals(TestCase):
 class TestLearningUnitProposalCancellation(TestCase):
     def setUp(self):
         create_current_academic_year()
-        self.person = FacultyManagerFactory()
+        self.person = person_factory.FacultyManagerFactory()
         self.permission = Permission.objects.get(codename="can_propose_learningunit")
         self.person.user.user_permissions.add(self.permission)
 
@@ -696,7 +704,7 @@ class TestEditProposal(TestCase):
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
 
-        cls.person = PersonWithPermissionsFactory("can_edit_learning_unit_proposal")
+        cls.person = person_factory.PersonWithPermissionsFactory("can_edit_learning_unit_proposal")
         requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         PersonEntityFactory(entity=requirement_entity_of_luy, person=cls.person)
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.entity)
@@ -712,7 +720,7 @@ class TestEditProposal(TestCase):
         self.client.force_login(self.person.user)
 
     def test_edit_proposal_get_no_permission(self):
-        person = PersonFactory()
+        person = person_factory.PersonFactory()
         self.client.force_login(person.user)
         response = self.client.get(self.url)
 
@@ -1003,7 +1011,9 @@ class TestLearningUnitProposalDisplay(TestCase):
 class TestCreationProposalCancel(TestCase):
 
     def setUp(self):
-        self.a_person_central_manager = CentralManagerFactory('can_propose_learningunit', 'can_access_learningunit')
+        self.a_person_central_manager = person_factory.CentralManagerFactory(
+            'can_propose_learningunit', 'can_access_learningunit'
+        )
         self.client.force_login(self.a_person_central_manager.user)
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_eligible_for_cancel_of_proposal',
