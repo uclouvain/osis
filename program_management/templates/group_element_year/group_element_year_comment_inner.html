@@ -41,7 +41,7 @@
                             <tr>
                                 <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
                                 <th>{% trans 'Code' %}</th>
-                                {% if group_element_year.parent.is_minor_major_option_list_choice %}
+                                {% if  formset.forms.0.instance.parent.is_minor_major_option_list_choice %}
                                 <th>{% trans 'Access condition' %}</th>
                                 {% else %}
                                 <th>{% trans 'Mandatory' %}</th>
