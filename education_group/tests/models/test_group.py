@@ -34,9 +34,10 @@ from education_group.tests.factories.group import GroupFactory
 
 
 class GroupTest(TestCase):
-    def setUp(self):
-        self.academic_year_1999 = AcademicYearFactory(year=1999)
-        self.academic_year_2000 = AcademicYearFactory(year=2000)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year_1999 = AcademicYearFactory(year=1999)
+        cls.academic_year_2000 = AcademicYearFactory(year=2000)
 
     def test_clean_case_start_year_greater_than_end_year_error(self):
         group = GroupFactory.build(
