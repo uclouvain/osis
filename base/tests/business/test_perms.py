@@ -72,38 +72,39 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 
 
 class PermsTestCase(TestCase):
-    def setUp(self):
-        self.academic_yr = create_current_academic_year()
-        self.academic_yr_1 = AcademicYearFactory.build(year=self.academic_yr.year + 1)
-        super(AcademicYear, self.academic_yr_1).save()
-        self.academic_yr_2 = AcademicYearFactory.build(year=self.academic_yr.year + 2)
-        super(AcademicYear, self.academic_yr_2).save()
-        self.academic_yr_6 = AcademicYearFactory.build(year=self.academic_yr.year + 6)
-        super(AcademicYear, self.academic_yr_6).save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_yr = create_current_academic_year()
+        cls.academic_yr_1 = AcademicYearFactory.build(year=cls.academic_yr.year + 1)
+        super(AcademicYear, cls.academic_yr_1).save()
+        cls.academic_yr_2 = AcademicYearFactory.build(year=cls.academic_yr.year + 2)
+        super(AcademicYear, cls.academic_yr_2).save()
+        cls.academic_yr_6 = AcademicYearFactory.build(year=cls.academic_yr.year + 6)
+        super(AcademicYear, cls.academic_yr_6).save()
 
-        self.lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
-        self.luy = LearningUnitYearFactory(
-            academic_year=self.academic_yr,
-            learning_container_year=self.lunit_container_yr,
+        cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
+        cls.luy = LearningUnitYearFactory(
+            academic_year=cls.academic_yr,
+            learning_container_year=cls.lunit_container_yr,
             subtype=FULL,
-            learning_unit=LearningUnitFactory(end_year=self.academic_yr)
+            learning_unit=LearningUnitFactory(end_year=cls.academic_yr)
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr,
-            start_date=datetime.datetime(self.academic_yr.year - 2, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 1, 9, 14),
+            data_year=cls.academic_yr,
+            start_date=datetime.datetime(cls.academic_yr.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr_1,
-            start_date=datetime.datetime(self.academic_yr.year - 1, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 2, 9, 14),
+            data_year=cls.academic_yr_1,
+            start_date=datetime.datetime(cls.academic_yr.year - 1, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 2, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr_2,
-            start_date=datetime.datetime(self.academic_yr.year, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 3, 9, 14),
+            data_year=cls.academic_yr_2,
+            start_date=datetime.datetime(cls.academic_yr.year, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 3, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
