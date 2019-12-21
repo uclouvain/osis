@@ -84,10 +84,19 @@ class LearningUnitYearComparaisonTest(TestCase):
         cls.academic_year = create_current_academic_year()
         cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
 
-        cls.learning_unit_year = cls.create_learning_unit_yr(cls.academic_year, "LDR", True,
-                                                             learning_unit_year_subtypes.FULL)
-        cls.previous_learning_unit_year = cls.create_learning_unit_yr(cls.previous_academic_year, NEW_ACRONYM, False,
-                                                                      learning_unit_year_subtypes.PARTIM)
+    def setUp(self):
+        self.learning_unit_year = self.create_learning_unit_yr(
+            self.academic_year,
+            "LDR",
+            True,
+            learning_unit_year_subtypes.FULL
+        )
+        self.previous_learning_unit_year = self.create_learning_unit_yr(
+            self.previous_academic_year,
+            NEW_ACRONYM,
+            False,
+            learning_unit_year_subtypes.PARTIM
+        )
 
     def create_learning_unit_yr(self, academic_year, acronym, status, subtype):
         return LearningUnitYearFactory(acronym=acronym,
