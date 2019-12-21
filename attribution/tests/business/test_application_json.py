@@ -38,22 +38,23 @@ from base.tests.factories.tutor import TutorFactory
 
 
 class AttributionJsonTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         today = date.today()
-        self.academic_year = AcademicYearFactory(year=today.year, start_date=today)
-        self.l_container_1 = LearningContainerYearFactory(in_charge=True)
-        self.tutor_1 = TutorFactory(person=PersonFactory(global_id='00012345'))
-        self.tutor_2 = TutorFactory(person=PersonFactory(global_id=''))
-        self.tutor_3 = TutorFactory(person=PersonFactory(global_id=None))
-        self.tutor_application_1 = TutorApplicationFactory(tutor=self.tutor_1,
-                                                           learning_container_year=self.l_container_1)
-        self.tutor_application_2 = TutorApplicationFactory(tutor=self.tutor_2,
-                                                           learning_container_year=self.l_container_1)
-        self.tutor_application_3 = TutorApplicationFactory(tutor=self.tutor_3,
-                                                           learning_container_year=self.l_container_1)
+        cls.academic_year = AcademicYearFactory(year=today.year, start_date=today)
+        cls.l_container_1 = LearningContainerYearFactory(in_charge=True)
+        cls.tutor_1 = TutorFactory(person=PersonFactory(global_id='00012345'))
+        cls.tutor_2 = TutorFactory(person=PersonFactory(global_id=''))
+        cls.tutor_3 = TutorFactory(person=PersonFactory(global_id=None))
+        cls.tutor_application_1 = TutorApplicationFactory(tutor=cls.tutor_1,
+                                                          learning_container_year=cls.l_container_1)
+        cls.tutor_application_2 = TutorApplicationFactory(tutor=cls.tutor_2,
+                                                          learning_container_year=cls.l_container_1)
+        cls.tutor_application_3 = TutorApplicationFactory(tutor=cls.tutor_3,
+                                                          learning_container_year=cls.l_container_1)
 
     @mock.patch('osis_common.queue.queue_sender.send_message')
-    @override_settings(QUEUES={'QUEUES_NAME':{'APPLICATION_OSIS_PORTAL': 'dummy'}})
+    @override_settings(QUEUES={'QUEUES_NAME': {'APPLICATION_OSIS_PORTAL': 'dummy'}})
     def test_build_attributions_json(self, mock_send_message):
         application_list = application_json._compute_list()
         self.assertIsInstance(application_list, list)
