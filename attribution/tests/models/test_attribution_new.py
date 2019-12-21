@@ -33,13 +33,14 @@ from base.tests.factories.tutor import TutorFactory
 
 
 class AttributionChargeNewTest(TestCase):
-    def setUp(self):
-        self.person = PersonFactory()
-        self.tutor = TutorFactory(person=self.person)
-        self.learning_container_year = LearningContainerYearFactory()
-        self.attribution_new = AttributionNewFactory(learning_container_year=self.learning_container_year,
-                                                     start_year=2018, end_year=2020, tutor=self.tutor,
-                                                     score_responsible=True)
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.tutor = TutorFactory(person=cls.person)
+        cls.learning_container_year = LearningContainerYearFactory()
+        cls.attribution_new = AttributionNewFactory(learning_container_year=cls.learning_container_year,
+                                                    start_year=2018, end_year=2020, tutor=cls.tutor,
+                                                    score_responsible=True)
 
     def test_duration(self):
         self.assertEqual(self.attribution_new.duration, 3)
