@@ -131,10 +131,8 @@ msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
 
-msgid ""
-"At least an education group year, a group year, a learning unit year or a "
-"learning class year has to be set"
-msgstr "Il faut au mininum une clé vers education group year, group year, learning unit year or learning class year"
+msgid "At least an education group year, a group year, a learning unit year or a learning class year has to be set"
+msgstr "Il faut au mininum une clé vers education group year, group year, learning unit year ou learning class year"
 
 msgid "Block"
 msgstr "Bloc"
@@ -282,6 +280,12 @@ msgstr "Aucun résultat!"
 
 msgid "Official"
 msgstr "Officiel"
+
+msgid ""
+"Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
+msgstr ""
+"Seulement une des clés étrangères doit être garnie (education group year, groupe year, learning unit year ou learning "
+"class year)"
 
 #, python-format
 msgid ""

@@ -36,7 +36,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 
 class ElementFactory(factory.DjangoModelFactory):
     class Meta:
-        model = 'program_management.element'
+        model = 'program_management.Element'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))

@@ -24,7 +24,8 @@
 #
 ##############################################################################
 
-from django.core.exceptions import ValidationError
+from collections import Counter
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -48,42 +49,55 @@ class Element(models.Model):
         'base.EducationGroupYear',
         blank=True, null=True,
         verbose_name=_('education group year'),
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
     group_year = models.ForeignKey(
         'education_group.GroupYear',
         blank=True, null=True,
         verbose_name=_('group year'),
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
     learning_unit_year = models.ForeignKey(
         'base.LearningUnitYear',
         blank=True, null=True,
         verbose_name=_('learning unit year'),
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     learning_class_year = models.ForeignKey(
         'base.LearningClassYear',
         blank=True, null=True,
         verbose_name=_('learning class year'),
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
 
     def __str__(self):
-        return u"%s - %s - %s - %s" % (
-            u"Education group year : %s" % (self.education_group_year) if self.education_group_year else '',
-            u"Group year : %s" % (self.group_year) if self.group_year else '',
-            u"Learning unit year : %s" % (self.learning_unit_year) if self.learning_unit_year else '',
-            u"Learning class year : %s" % (self.learning_class_year) if self.learning_class_year else ''
-        )
+        if self.education_group_year:
+            return str(self.education_group_year)
+        elif self.group_year:
+            return str(self.group_year)
+        elif self.learning_unit_year:
+            return str(self.learning_unit_year)
+        elif self.learning_class_year:
+            return str(self.learning_class_year)
 
-    def clean(self):
-        super().clean()
+    def save(self, *args, **kwargs):
         if not (
                 self.education_group_year or self.group_year
                 or self.learning_class_year or self.learning_unit_year):
-            raise ValidationError(
-                _(
-                    'At least an education group year, a group year, a learning unit year or a learning class '
-                    'year has to be set')
+            raise AttributeError(
+                _('At least an education group year, a group year, a learning unit year or a learning class year has '
+                  'to be set')
             )
+        resulted_counter = Counter([self.education_group_year,
+                                    self.group_year,
+                                    self.learning_class_year,
+                                    self.learning_unit_year])
+
+        if resulted_counter[None] < 3:
+            raise AttributeError(
+                _(
+                    'Only one of the following has to be set : an education group year, a group year, '
+                    'a learning unit year or a learning class')
+            )
+
+        super().save(*args, **kwargs)

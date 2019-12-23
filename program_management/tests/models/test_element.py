@@ -24,10 +24,9 @@
 #
 ##############################################################################
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
-from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -39,60 +38,98 @@ from program_management.tests.factories.element import ElementFactory, ElementEd
     ElementLearningUnitYearFactory, ElementLearningClassYearFactory, ElementGroupYearFactory
 
 
-class ElementTest(TestCase):
+class TestElementSave(TestCase):
 
-    def setUp(self):
-        academic_yr = AcademicYearFactory(year=2020)
-        self.egy = EducationGroupYearFactory(academic_year=academic_yr)
-        self.luy = LearningUnitYearFactory(academic_year=academic_yr)
-        lcpy = LearningComponentYearFactory(learning_unit_year=self.luy)
-        self.lcy = LearningClassYearFactory(learning_component_year=lcpy)
-        g = GroupFactory(start_year=academic_yr)
-        self.gy = GroupYearFactory(group=g)
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = EducationGroupYearFactory()
+        academic_yr = cls.egy.academic_year
+        cls.luy = LearningUnitYearFactory(academic_year=academic_yr)
+        learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy)
+        cls.lcy = LearningClassYearFactory(learning_component_year=learning_component_yr)
+        cls.gy = GroupYearFactory(group=GroupFactory(start_year=academic_yr))
 
-    def test_clean_no_foreign_key_set(self):
-        element = ElementFactory()
-        with self.assertRaises(ValidationError):
-            element.clean()
+    def test_save_no_foreign_key_set(self):
+
+        with self.assertRaisesMessage(
+                AttributeError,
+                _('At least an education group year, a group year, a learning unit year or a learning class year '
+                  'has to be set')):
+            element = ElementFactory(education_group_year=None,
+                                     group_year=None,
+                                     learning_unit_year=None,
+                                     learning_class_year=None)
+            element.save()
             self.assertFalse(
-                Element.objects.get(education_group_year=None,
-                                    group_year=None,
-                                    learning_unit_year=None,
-                                    learning_class_year=None,).exists()
+                Element.objects.filter(education_group_year=None,
+                                       group_year=None,
+                                       learning_unit_year=None,
+                                       learning_class_year=None).exists()
             )
 
-    def test_clean_one_education_group_year_fk(self):
-        element = ElementEducationGroupYearFactory.build(education_group_year=self.egy)
-        element.clean()
+    def test_save_one_education_group_year_fk(self):
+        element = ElementEducationGroupYearFactory(education_group_year=self.egy,
+                                                   group_year=None,
+                                                   learning_unit_year=None,
+                                                   learning_class_year=None
+                                                   )
         element.save()
 
         self.assertTrue(
             Element.objects.filter(education_group_year=element.education_group_year).exists()
         )
 
-    def test_clean_one_group_year_fk(self):
+    def test_save_one_group_year_fk(self):
         element = ElementGroupYearFactory.build(group_year=self.gy)
-        element.clean()
         element.save()
 
         self.assertTrue(
             Element.objects.filter(group_year=self.gy).exists()
         )
 
-    def test_clean_one_learning_unit_year_fk(self):
+    def test_save_one_learning_unit_year_fk(self):
         element = ElementLearningUnitYearFactory.build(learning_unit_year=self.luy)
-        element.clean()
         element.save()
 
         self.assertTrue(
             Element.objects.filter(learning_unit_year=self.luy).exists()
         )
 
-    def test_clean_one_learning_class_year_fk(self):
+    def test_save_one_learning_class_year_fk(self):
         element = ElementLearningClassYearFactory.build(learning_class_year=self.lcy)
-        element.clean()
         element.save()
 
         self.assertTrue(
             Element.objects.filter(learning_class_year=self.lcy).exists()
         )
+
+    def test_save_more_than_one_fk(self):
+
+        with self.assertRaisesMessage(
+                AttributeError,
+                _('Only one of the following has to be set : an education group year, a group year, '
+                  'a learning unit year or a learning class')):
+            element = ElementLearningClassYearFactory(learning_class_year=self.lcy, group_year=self.gy)
+            element.save()
+
+            self.assertFalse(
+                Element.objects.get(education_group_year=None,
+                                    group_year=self.gy,
+                                    learning_unit_year=None,
+                                    learning_class_year=self.lcy).exists())
+
+    def test_str_egy(self):
+        element = ElementFactory(education_group_year=self.egy)
+        self.assertEqual(element.__str__(), str(self.egy))
+
+    def test_str_luy(self):
+        element = ElementFactory(learning_unit_year=self.luy)
+        self.assertEqual(element.__str__(), str(self.luy))
+
+    def test_str_gy(self):
+        element = ElementFactory(group_year=self.gy)
+        self.assertEqual(element.__str__(), str(self.gy))
+
+    def test_str_lcy(self):
+        element = ElementFactory(learning_class_year=self.lcy)
+        self.assertEqual(element.__str__(), str(self.lcy))
