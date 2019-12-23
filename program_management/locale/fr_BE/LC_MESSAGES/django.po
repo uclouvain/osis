@@ -131,6 +131,11 @@ msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
 
+msgid ""
+"At least an education group year, a group year, a learning unit year or a "
+"learning class year has to be set"
+msgstr "Il faut au mininum une clé vers education group year, group year, learning unit year or learning class year"
+
 msgid "Block"
 msgstr "Bloc"
 

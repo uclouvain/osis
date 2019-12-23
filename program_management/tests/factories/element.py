@@ -23,24 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import string
 
 import factory.fuzzy
-from django.utils import timezone
-from factory.django import DjangoModelFactory
-from faker import Faker
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from osis_common.utils.datetime import get_tzinfo
-
-fake = Faker()
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.learning_class_year import LearningClassYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
-class GroupFactory(DjangoModelFactory):
+class ElementFactory(factory.DjangoModelFactory):
     class Meta:
-        model = "education_group.Group"
+        model = 'program_management.element'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
-    end_year = None
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+
+    education_group_year = None
+    group_year = None
+    learning_unit_year = None
+    learning_class_year = None
+
+
+class ElementEducationGroupYearFactory(ElementFactory):
+    education_group_year = factory.SubFactory(EducationGroupYearFactory)
+
+
+class ElementGroupYearFactory(ElementFactory):
+    group_year = factory.SubFactory(GroupYearFactory)
+
+
+class ElementLearningUnitYearFactory(ElementFactory):
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
+
+
+class ElementLearningClassYearFactory(ElementFactory):
+    learning_class_year = factory.SubFactory(LearningClassYearFactory)
