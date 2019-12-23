@@ -29,10 +29,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class ElementAdmin(VersionAdmin, SerializableModelAdmin):
+class ElementAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('education_group_year', 'group_year', 'learning_unit_year', 'learning_class_year')
     search_fields = ('education_group_year__acronym',
                      'group_year__acronym',
@@ -40,7 +40,7 @@ class ElementAdmin(VersionAdmin, SerializableModelAdmin):
                      'learning_class_year__acronym')
 
 
-class Element(SerializableModel):
+class Element(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
