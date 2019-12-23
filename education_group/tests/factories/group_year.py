@@ -46,7 +46,7 @@ def generate_title(group_year):
 
 class GroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "education_group.group_year"
+        model = "education_group.GroupYear"
 
     acronym = factory.Sequence(lambda n: 'Gy %d' % n)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
