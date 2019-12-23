@@ -3057,10 +3057,6 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr ""
 
-msgid ""
-"You can't modify proposition which are related to a learning unit year under"
-msgstr ""
-
 #, python-format
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
