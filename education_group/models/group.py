@@ -60,4 +60,3 @@ class Group(models.Model):
             raise AttributeError(_('End year must be greater than the start year, or equal'))
 
         super().save(*args, **kwargs)
-
