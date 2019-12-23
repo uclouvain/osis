@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -56,7 +55,9 @@ class Group(models.Model):
         on_delete=models.PROTECT
     )
 
-    def clean(self):
-        super().clean()
+    def save(self, *args, **kwargs):
         if self.end_year and self.start_year.year > self.end_year.year:
-            raise ValidationError(_('End year must be greater than the start year, or equal'))
+            raise AttributeError(_('End year must be greater than the start year, or equal'))
+
+        super().save(*args, **kwargs)
+

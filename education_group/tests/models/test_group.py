@@ -33,40 +33,40 @@ from education_group.models.group import Group
 from education_group.tests.factories.group import GroupFactory
 
 
-class GroupTest(TestCase):
-    def setUp(self):
-        self.academic_year_1999 = AcademicYearFactory(year=1999)
-        self.academic_year_2000 = AcademicYearFactory(year=2000)
+class TestGroupSave(TestCase):
 
-    def test_clean_case_start_year_greater_than_end_year_error(self):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year_1999 = AcademicYearFactory(year=1999)
+        cls.academic_year_2000 = AcademicYearFactory(year=2000)
+
+    def test_save_case_start_year_greater_than_end_year_error(self):
         group = GroupFactory.build(
             start_year=self.academic_year_2000,
             end_year=self.academic_year_1999
         )
-        with self.assertRaises(ValidationError):
-            group.clean()
+        with self.assertRaises(AttributeError):
+            group.save()
             self.assertFalse(
                 Group.objects.get(start_year=self.academic_year_2000, end_year=self.academic_year_1999).exists()
             )
 
-    def test_clean_case_start_year_equals_to_end_year_no_error(self):
+    def test_save_case_start_year_equals_to_end_year_no_error(self):
         group = GroupFactory.build(
             start_year=self.academic_year_2000,
             end_year=self.academic_year_2000
         )
-        group.clean()
         group.save()
 
         self.assertTrue(
             Group.objects.filter(start_year=self.academic_year_2000, end_year=self.academic_year_2000).exists()
         )
 
-    def test_clean_case_start_year_lower_to_end_year_no_error(self):
+    def test_save_case_start_year_lower_to_end_year_no_error(self):
         group = GroupFactory.build(
             start_year=self.academic_year_1999,
             end_year=self.academic_year_2000
         )
-        group.clean()
         group.save()
 
         self.assertTrue(
