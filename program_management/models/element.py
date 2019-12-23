@@ -81,9 +81,8 @@ class Element(models.Model):
             return str(self.learning_class_year)
 
     def save(self, *args, **kwargs):
-        if not (
-                self.education_group_year or self.group_year
-                or self.learning_class_year or self.learning_unit_year):
+
+        if not any([self.education_group_year, self.group_year, self.learning_class_year, self.learning_unit_year]):
             raise AttributeError(
                 _('At least an education group year, a group year, a learning unit year or a learning class year has '
                   'to be set')

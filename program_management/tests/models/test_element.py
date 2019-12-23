@@ -109,14 +109,14 @@ class TestElementSave(TestCase):
                 AttributeError,
                 _('Only one of the following has to be set : an education group year, a group year, '
                   'a learning unit year or a learning class')):
-            element = ElementLearningClassYearFactory(learning_class_year=self.lcy, group_year=self.gy)
+            element = ElementFactory(learning_class_year=self.lcy, group_year=self.gy)
             element.save()
 
             self.assertFalse(
-                Element.objects.get(education_group_year=None,
-                                    group_year=self.gy,
-                                    learning_unit_year=None,
-                                    learning_class_year=self.lcy).exists())
+                Element.objects.filter(education_group_year=None,
+                                       group_year=self.gy,
+                                       learning_unit_year=None,
+                                       learning_class_year=self.lcy).exists())
 
     def test_str_egy(self):
         element = ElementFactory(education_group_year=self.egy)
