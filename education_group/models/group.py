@@ -29,15 +29,15 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class GroupAdmin(VersionAdmin, SerializableModelAdmin):
+class GroupAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('start_year', 'end_year', 'changed')
-    search_fields = ('groupyear__acronym',)
+    search_fields = ('groupyear__acronym', 'groupyear__partial_acronym',)
 
 
-class Group(SerializableModel):
+class Group(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 

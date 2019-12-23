@@ -30,23 +30,26 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from education_group.models.enums.constraint_type import ConstraintTypes
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class GroupYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('acronym', 'title_fr', 'group', 'education_group_type', 'changed')
+class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
+    list_display = ('acronym', 'partial_acronym', 'title_fr', 'group', 'education_group_type', 'changed')
     list_filter = ('education_group_type', )
-    raw_id_fields = (
-        'education_group_type', 'group',
-    )
-    search_fields = ['acronym', 'title_fr', 'group__pk', 'id']
+    search_fields = ['acronym', 'partial_acronym', 'title_fr', 'group__pk', 'id']
 
 
-class GroupYear(SerializableModel):
+class GroupYear(models.Model):
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
+    partial_acronym = models.CharField(
+        max_length=15,
+        db_index=True,
+        null=True,
+        verbose_name=_("code"),
+    )
     acronym = models.CharField(
         max_length=40,
         db_index=True,
