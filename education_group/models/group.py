@@ -34,7 +34,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 class GroupAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('start_year', 'end_year', 'changed')
-    search_fields = ('groupyear__acronym', 'groupyear__partial_acronym')
+    search_fields = ('groupyear__acronym', 'groupyear__acronym')
 
 
 class Group(SerializableModel):
