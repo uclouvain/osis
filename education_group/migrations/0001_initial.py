@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('external_id', models.CharField(blank=True, db_index=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
-                ('partial_acronym', models.CharField(db_index=True, max_length=15, null=True, verbose_name='code')),
+                ('partial_acronym', models.CharField(db_index=True, max_length=15, null=True, verbose_name='Acronym/Short title')),
                 ('acronym', models.CharField(db_index=True, max_length=40, verbose_name='code')),
                 ('credits', models.PositiveIntegerField(blank=True, null=True, verbose_name='credits')),
                 ('constraint_type', models.CharField(blank=True, choices=[('CREDITS', 'credits'), ('NUMBER_OF_ELEMENTS', 'Number of elements')], default=None, max_length=20, null=True, verbose_name='type of constraint')),
