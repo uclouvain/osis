@@ -154,7 +154,7 @@ msgstr "<b>Prolonger</b> l’unité d’enseignement du même sigle"
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
-"Une unité d'enseignement ne peut pas être prérequise à elle-même : %(acronym)s"
+"Une unité d'enseignement ne peut pas être un prérequis à elle-même : %(acronym)s"
 
 msgid "A null value means many relationships."
 msgstr "Une valeur nulle signifie plusieurs relations."
