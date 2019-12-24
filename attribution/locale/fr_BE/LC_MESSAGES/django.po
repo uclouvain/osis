@@ -163,7 +163,7 @@ msgid ""
 "the volume of full UE for this professor"
 msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
-"au volume de l'unité d'apprentissage parent pour ce professeur"
+"au volume de l'unité d'apprentissage complète pour ce professeur"
 
 msgid "There is no course for which you can edit description fiche"
 msgstr ""
