@@ -120,16 +120,16 @@ class TestElementSave(TestCase):
 
     def test_str_egy(self):
         element = ElementFactory(education_group_year=self.egy)
-        self.assertEqual(element.__str__(), str(self.egy))
+        self.assertEqual(str(element), str(self.egy))
 
     def test_str_luy(self):
         element = ElementFactory(learning_unit_year=self.luy)
-        self.assertEqual(element.__str__(), str(self.luy))
+        self.assertEqual(str(element), str(self.luy))
 
     def test_str_gy(self):
         element = ElementFactory(group_year=self.gy)
-        self.assertEqual(element.__str__(), str(self.gy))
+        self.assertEqual(str(element), str(self.gy))
 
     def test_str_lcy(self):
         element = ElementFactory(learning_class_year=self.lcy)
-        self.assertEqual(element.__str__(), str(self.lcy))
+        self.assertEqual(str(element), str(self.lcy))
