@@ -81,8 +81,6 @@ class PermsTestCase(TestCase):
         cls.academic_yr_6 = AcademicYearFactory.build(year=cls.academic_yr.year + 6)
         super(AcademicYear, cls.academic_yr_6).save()
 
-        cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
-
         AcademicCalendarFactory(
             data_year=cls.academic_yr,
             start_date=datetime.datetime(cls.academic_yr.year - 2, 9, 15),
@@ -200,9 +198,10 @@ class PermsTestCase(TestCase):
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
         PersonEntityFactory(entity=requirement_entity, person=a_person)
+        lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
         for proposal_needed_container_type in ALL_TYPES:
-            self.lunit_container_yr.container_type = proposal_needed_container_type
-            self.lunit_container_yr.save()
+            lunit_container_yr.container_type = proposal_needed_container_type
+            lunit_container_yr.save()
             self.assertTrue(perms.is_eligible_for_modification_end_date(luy, a_person))
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):
