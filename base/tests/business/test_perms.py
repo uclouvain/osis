@@ -51,7 +51,6 @@ from base.tests.factories.business.learning_units import GenerateContainer, Gene
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory, \
     PersonWithPermissionsFactory, UEFacultyManagerFactory
@@ -72,38 +71,32 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 
 
 class PermsTestCase(TestCase):
-    def setUp(self):
-        self.academic_yr = create_current_academic_year()
-        self.academic_yr_1 = AcademicYearFactory.build(year=self.academic_yr.year + 1)
-        super(AcademicYear, self.academic_yr_1).save()
-        self.academic_yr_2 = AcademicYearFactory.build(year=self.academic_yr.year + 2)
-        super(AcademicYear, self.academic_yr_2).save()
-        self.academic_yr_6 = AcademicYearFactory.build(year=self.academic_yr.year + 6)
-        super(AcademicYear, self.academic_yr_6).save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_yr = create_current_academic_year()
+        cls.academic_yr_1 = AcademicYearFactory.build(year=cls.academic_yr.year + 1)
+        super(AcademicYear, cls.academic_yr_1).save()
+        cls.academic_yr_2 = AcademicYearFactory.build(year=cls.academic_yr.year + 2)
+        super(AcademicYear, cls.academic_yr_2).save()
+        cls.academic_yr_6 = AcademicYearFactory.build(year=cls.academic_yr.year + 6)
+        super(AcademicYear, cls.academic_yr_6).save()
 
-        self.lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
-        self.luy = LearningUnitYearFactory(
-            academic_year=self.academic_yr,
-            learning_container_year=self.lunit_container_yr,
-            subtype=FULL,
-            learning_unit=LearningUnitFactory(end_year=self.academic_yr)
-        )
         AcademicCalendarFactory(
-            data_year=self.academic_yr,
-            start_date=datetime.datetime(self.academic_yr.year - 2, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 1, 9, 14),
+            data_year=cls.academic_yr,
+            start_date=datetime.datetime(cls.academic_yr.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr_1,
-            start_date=datetime.datetime(self.academic_yr.year - 1, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 2, 9, 14),
+            data_year=cls.academic_yr_1,
+            start_date=datetime.datetime(cls.academic_yr.year - 1, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 2, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr_2,
-            start_date=datetime.datetime(self.academic_yr.year, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 3, 9, 14),
+            data_year=cls.academic_yr_2,
+            start_date=datetime.datetime(cls.academic_yr.year, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 3, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
@@ -205,9 +198,10 @@ class PermsTestCase(TestCase):
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
         PersonEntityFactory(entity=requirement_entity, person=a_person)
+        lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
         for proposal_needed_container_type in ALL_TYPES:
-            self.lunit_container_yr.container_type = proposal_needed_container_type
-            self.lunit_container_yr.save()
+            lunit_container_yr.container_type = proposal_needed_container_type
+            lunit_container_yr.save()
             self.assertTrue(perms.is_eligible_for_modification_end_date(luy, a_person))
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):

@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from osis_common.models import osis_model_admin
 
@@ -33,11 +35,14 @@ class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
     search_fields = ['acronym']
 
 
+only_letters_validator = RegexValidator(r'^[a-zA-Z]*$', _('Only letters are allowed.'))
+
+
 class LearningClassYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
-    acronym = models.CharField(max_length=3)
-    description = models.CharField(max_length=100, blank=True, null=True)
+    acronym = models.CharField(max_length=3, validators=[only_letters_validator])
+    description = models.CharField(max_length=100, blank=True)
 
     class Meta:
         permissions = (
