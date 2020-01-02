@@ -670,7 +670,7 @@
                 "learningclassyear"
             ],
             [
-                "can_access_learningclassyear",
+                "view_learningclassyear",
                 "base",
                 "learningclassyear"
             ],
@@ -3467,7 +3467,7 @@
         "name": "administrative_managers",
         "permissions": [
             [
-                "can_access_learningclassyear",
+                "view_learningclassyear",
                 "base",
                 "learningclassyear"
             ],

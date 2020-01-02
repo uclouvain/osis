@@ -44,11 +44,6 @@ class LearningClassYear(models.Model):
     acronym = models.CharField(max_length=3, validators=[only_letters_validator])
     description = models.CharField(max_length=100, blank=True)
 
-    class Meta:
-        permissions = (
-            ("can_access_learningclassyear", "Can access learning class year"),
-        )
-
     def __str__(self):
         return u'{}-{}'.format(self.learning_component_year.acronym, self.acronym)
 
