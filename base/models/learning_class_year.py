@@ -46,11 +46,3 @@ class LearningClassYear(models.Model):
 
     def __str__(self):
         return u'{}-{}'.format(self.learning_component_year.acronym, self.acronym)
-
-
-def find_by_id(learning_class_year_id):
-    return LearningClassYear.objects.get(pk=learning_class_year_id)
-
-
-def find_by_learning_component_year(a_learning_component_year):
-    return LearningClassYear.objects.filter(learning_component_year=a_learning_component_year).order_by("acronym")
