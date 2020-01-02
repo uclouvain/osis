@@ -3649,6 +3649,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "The user cannot modify data which are greater than N+1"
-#~ msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
