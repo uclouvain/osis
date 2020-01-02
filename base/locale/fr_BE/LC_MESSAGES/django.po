@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-04 15:42+0100\n"
+"POT-Creation-Date: 2020-01-02 09:41+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1785,12 +1785,18 @@ msgstr "OU"
 msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
 
+msgid "Ok"
+msgstr ""
+
 msgid "On the file: direct access or access with additional training"
 msgstr ""
 "Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
 
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
+
+msgid "Only letters are allowed."
+msgstr "Uniquement des lettres sont acceptées"
 
 msgid ""
 "Only program managers of the education group OR central manager linked to "
@@ -2572,10 +2578,6 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
-msgid ""
-"The faculty manager cannot modify general information which are lower than N"
-msgstr ""
-
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -2761,9 +2763,6 @@ msgstr "Le support de cours a été supprimé avec succès"
 
 msgid "The teaching material has been saved with success"
 msgstr "Le support de cours a été modifié avec succès"
-
-msgid "The user cannot modify data which are greater than N+1"
-msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
 
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
@@ -3650,3 +3649,6 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "The user cannot modify data which are greater than N+1"
+#~ msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
