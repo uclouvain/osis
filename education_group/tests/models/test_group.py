@@ -34,7 +34,6 @@ from education_group.tests.factories.group import GroupFactory
 
 
 class TestGroupSave(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.academic_year_1999 = AcademicYearFactory(year=1999)
