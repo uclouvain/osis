@@ -28,7 +28,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.http import Http404
-from django.test import TestCase, Client, TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -135,7 +135,6 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
         cls.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
 
     def setUp(self):
-        self.client = Client()
         self.a_user = self.attribution.tutor.person.user
         self.client.force_login(user=self.a_user)
         self.mock_academic_year(

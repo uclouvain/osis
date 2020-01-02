@@ -38,7 +38,7 @@ fake = Faker()
 
 class GroupFactory(DjangoModelFactory):
     class Meta:
-        model = "education_group.group"
+        model = "education_group.Group"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
