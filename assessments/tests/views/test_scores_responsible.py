@@ -59,7 +59,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.user = cls.tutor.person.user
         cls.academic_year = AcademicYearFactory(
             year=datetime.date.today().year,
-            start_date=datetime.date.today()
+            start_date=datetime.date.today() - datetime.timedelta(days=1)
         )
 
         # FIXME: Old structure model [To remove]
@@ -210,6 +210,7 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
             structure=cls.structure,
             entity=cls.root_entity,
         )
+        cls.entity_manager.person.user.groups.add(group)
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
@@ -283,6 +284,7 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             administration_entity=cls.root_entity
         )
         cls.program_manager = ProgramManagerFactory(education_group=cls.education_group_year.education_group)
+        cls.program_manager.person.user.groups.add(group)
         offer_enrollment = OfferEnrollmentFactory(education_group_year=cls.education_group_year)
         LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
 
@@ -330,6 +332,7 @@ class ScoresResponsibleAddTestCase(TestCase):
             structure=cls.structure,
             entity=cls.root_entity,
         )
+        cls.entity_manager.person.user.groups.add(group)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1210",
