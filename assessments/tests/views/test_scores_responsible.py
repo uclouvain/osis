@@ -59,7 +59,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.user = cls.tutor.person.user
         cls.academic_year = AcademicYearFactory(
             year=datetime.date.today().year,
-            start_date=datetime.date.today() - datetime.timedelta(days=1)
+            start_date=datetime.date.today()
         )
 
         # FIXME: Old structure model [To remove]
@@ -106,10 +106,11 @@ class ScoresResponsibleSearchTestCase(TestCase):
             learning_unit_year=cls.learning_unit_year_children,
             score_responsible=True
         )
+        cls.url = reverse('scores_responsible_list')
+        cls.user.groups.add(group)
 
     def setUp(self):
         self.client.force_login(self.user)
-        self.url = reverse('scores_responsible_list')
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
