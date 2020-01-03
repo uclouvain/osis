@@ -43,20 +43,23 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
-class TestEducationGroupAchievementAction(TestCase):
+class TestEducationGroupAchievementActionUpdateDelete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+
+        cls.achievement_0 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
+        cls.achievement_1 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
+        cls.achievement_2 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
+
+        cls.user = UserFactory()
+        cls.person = PersonFactory(user=cls.user)
+        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="delete_educationgroupachievement"))
+        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
     def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-
-        self.achievement_0 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        self.achievement_1 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        self.achievement_2 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
         self.client.force_login(self.user)
 
     def test_form_valid_up(self):
@@ -105,23 +108,6 @@ class TestEducationGroupAchievementAction(TestCase):
         messages = [m.message for m in get_messages(response.wsgi_request)]
         self.assertEqual(messages[0], _("Invalid action"))
 
-
-class TestUpdateEducationGroupAchievement(TestCase):
-
-    def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-
-        self.achievement_0 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        self.achievement_1 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        self.achievement_2 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.client.force_login(self.user)
-
     def test_update(self):
         code = "The life is like a box of chocolates"
         response = self.client.post(
@@ -152,24 +138,6 @@ class TestUpdateEducationGroupAchievement(TestCase):
         )
 
         self.assertEqual(response.status_code, 403)
-
-
-class TestDeleteEducationGroupAchievement(TestCase):
-
-    def setUp(self):
-
-        self.education_group_year = EducationGroupYearFactory()
-
-        self.achievement_0 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        self.achievement_1 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-        self.achievement_2 = EducationGroupAchievementFactory(education_group_year=self.education_group_year)
-
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.user.user_permissions.add(Permission.objects.get(codename="delete_educationgroupachievement"))
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.client.force_login(self.user)
 
     def test_delete(self):
         response = self.client.post(

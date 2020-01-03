@@ -37,15 +37,16 @@ from base.tests.factories.user import UserFactory
 
 
 class TestCreateEducationGroupAchievement(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.user = UserFactory()
+        cls.person = PersonFactory(user=cls.user)
+        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="add_educationgroupachievement"))
+        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
     def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.user.user_permissions.add(Permission.objects.get(codename="add_educationgroupachievement"))
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
         self.client.force_login(self.user)
 
     def test_create(self):
