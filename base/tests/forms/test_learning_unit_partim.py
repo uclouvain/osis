@@ -53,35 +53,36 @@ SUBDIVISION_ACRONYM = 'A'
 
 class LearningUnitPartimFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing PARTIM FORM"""
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
-        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
 
         # Creation of a LearingContainerYear and all related models
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year, self.current_academic_year)
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year)
         # Build in Generated Container [first index = start Generate Container ]
-        self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
+        cls.generated_container_year = cls.learn_unit_structure.generated_container_years[0]
 
         # Update Full learning unit year acronym
-        self.learning_unit_year_full = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year=self.current_academic_year
+        cls.learning_unit_year_full = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_full,
+            academic_year=cls.current_academic_year
         )
-        self.learning_unit_year_full.acronym = FULL_ACRONYM
-        self.learning_unit_year_full.learning_container_year.acronym = FULL_ACRONYM
-        self.learning_unit_year_full.learning_container_year.save()
-        self.learning_unit_year_full.save()
+        cls.learning_unit_year_full.acronym = FULL_ACRONYM
+        cls.learning_unit_year_full.learning_container_year.acronym = FULL_ACRONYM
+        cls.learning_unit_year_full.learning_container_year.save()
+        cls.learning_unit_year_full.save()
 
         # Update Partim learning unit year acronym
-        self.learning_unit_year_partim = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_partim,
-            academic_year=self.current_academic_year,
-            learning_container_year=self.learning_unit_year_full.learning_container_year
+        cls.learning_unit_year_partim = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_partim,
+            academic_year=cls.current_academic_year,
+            learning_container_year=cls.learning_unit_year_full.learning_container_year
         )
-        self.learning_unit_year_partim.acronym = FULL_ACRONYM + SUBDIVISION_ACRONYM
-        self.learning_unit_year_partim.save()
+        cls.learning_unit_year_partim.acronym = FULL_ACRONYM + SUBDIVISION_ACRONYM
+        cls.learning_unit_year_partim.save()
 
 
 class TestPartimFormInit(LearningUnitPartimFormContextMixin):
