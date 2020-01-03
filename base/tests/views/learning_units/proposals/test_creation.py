@@ -55,32 +55,36 @@ from reference.tests.factories.language import LanguageFactory
 
 @override_flag('learning_unit_proposal_create', active=True)
 class LearningUnitViewTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         today = datetime.date.today()
         FacultyManagerGroupFactory()
-        self.faculty_user = factory_user.UserFactory()
-        self.faculty_user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        self.faculty_person = factory_person.PersonFactory(user=self.faculty_user)
-        self.faculty_user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
-        self.faculty_user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
-        self.super_user = factory_user.SuperUserFactory()
-        self.person = factory_person.PersonFactory(user=self.super_user)
+        cls.faculty_user = factory_user.UserFactory()
+        cls.faculty_user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        cls.faculty_person = factory_person.PersonFactory(user=cls.faculty_user)
+        cls.faculty_user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
+        cls.faculty_user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
+        cls.super_user = factory_user.SuperUserFactory()
+        cls.person = factory_person.PersonFactory(user=cls.super_user)
         start_year = AcademicYearFactory(year=get_current_year())
-        end_year = AcademicYearFactory(year= get_current_year() + 7)
-        self.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
-        self.current_academic_year = self.academic_years[0]
-        self.next_academic_year = self.academic_years[1]
+        end_year = AcademicYearFactory(year=get_current_year() + 7)
+        cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
+        cls.current_academic_year = cls.academic_years[0]
+        cls.next_academic_year = cls.academic_years[1]
 
-        self.language = LanguageFactory(code='FR')
-        self.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
-        self.campus = campus_factory.CampusFactory(organization=self.organization, is_administration=True)
-        self.entity = EntityFactory(organization=self.organization)
-        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=entity_type.FACULTY,
-                                                   start_date=today.replace(year=1900),
-                                                   end_date=None)
+        cls.language = LanguageFactory(code='FR')
+        cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
+        cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
+        cls.entity = EntityFactory(organization=cls.organization)
+        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=entity_type.FACULTY,
+                                                  start_date=today.replace(year=1900),
+                                                  end_date=None)
 
-        PersonEntityFactory(person=self.faculty_person, entity=self.entity)
-        PersonEntityFactory(person=self.person, entity=self.entity)
+        PersonEntityFactory(person=cls.faculty_person, entity=cls.entity)
+        PersonEntityFactory(person=cls.person, entity=cls.entity)
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
 
     def get_valid_data(self):
         return {
@@ -116,7 +120,6 @@ class LearningUnitViewTestCase(TestCase):
         }
 
     def test_get_proposal_learning_unit_creation_form(self):
-        self.client.force_login(self.person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -134,7 +137,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_post_proposal_learning_unit_creation_form(self):
-        self.client.force_login(self.person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.current_academic_year.id])
         response = self.client.post(url, data=self.get_valid_data())
         self.assertEqual(response.status_code, 302)
@@ -160,7 +162,6 @@ class LearningUnitViewTestCase(TestCase):
         return faultydict
 
     def test_proposal_learning_unit_add_with_invalid_data(self):
-        self.client.force_login(self.person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.current_academic_year.id])
         response = self.client.post(url, data=self.get_invalid_data())
         self.assertEqual(response.status_code, 200)
