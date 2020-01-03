@@ -387,7 +387,7 @@ msgid "Assistants"
 msgstr ""
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of parent"
+"At least a partim volume value is greater than corresponding volume of full UE"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
