@@ -407,7 +407,7 @@ def create_xls_attributions(user, found_learning_units, filters):
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
                   xls_build.STYLED_CELLS: {xls_build.STYLE_BORDER_TOP: cells_with_top_border,
                                            Style(font=Font(color=Color('00FFFFFF')),): cells_with_white_font},
-                  xls_build.COLORED_ROWS: {Style(font=BOLD_FONT) : [0]}
+                  xls_build.COLORED_ROWS: {Style(font=BOLD_FONT): [0]}
                   }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
