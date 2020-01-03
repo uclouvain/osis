@@ -689,31 +689,35 @@ class TestPostponeContent(TestCase):
         )
 
     def test_faculty_cannot_copy_into_future(self):
-        faculty_manager = FacultyManagerFactory()
-        current_year = self.current_academic_year.year
-
-        self.current_education_group_year.education_group.end_year.year = current_year + 4
-        self.current_education_group_year.academic_year.year = current_year + 2
-        next = AcademicYearFactory(year=current_year + 3)
+        eg = EducationGroupFactory(end_year=AcademicYearFactory(year=self.current_academic_year.year + 4))
+        egy = EducationGroupYearFactory(
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 2
+        )
         EducationGroupYearFactory(
-            education_group=self.current_education_group_year.education_group,
-            academic_year=next
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 3
         )
 
         with self.assertRaises(NotPostponeError, msg=_('You are not allowed to postpone this training in the future.')):
-            self.postponer = PostponeContent(self.current_education_group_year, faculty_manager)
+            self.postponer = PostponeContent(egy, FacultyManagerFactory())
 
     def test_central_can_copy_into_future(self):
         central_manager = CentralManagerFactory()
-        current_year = self.current_academic_year.year
-
-        self.current_education_group_year.education_group.end_year.year = current_year + 4
-        self.current_education_group_year.academic_year.year = current_year + 2
-        next = AcademicYearFactory(year=current_year + 3)
+        eg = EducationGroupFactory(end_year=AcademicYearFactory(year=self.current_academic_year.year + 4))
+        egy = EducationGroupYearFactory(
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 2
+        )
+        GroupElementYearFactory(
+            parent=egy,
+            child_branch__academic_year=egy.academic_year,
+            child_branch__education_group__end_year=None
+        )
         EducationGroupYearFactory(
-            education_group=self.current_education_group_year.education_group,
-            academic_year=next
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 3
         )
 
-        self.postponer = PostponeContent(self.current_education_group_year, central_manager)
+        self.postponer = PostponeContent(egy, central_manager)
         self.assertIsNone(self.postponer.check_instance(central_manager))
