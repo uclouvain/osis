@@ -132,7 +132,6 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
 
 
 class TestPostponeContent(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()

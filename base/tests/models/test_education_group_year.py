@@ -30,6 +30,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import search, find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit
+from base.models.enums import offer_enrollment_state
 from base.models.enums.constraint_type import CREDITS
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.validation_rule import ValidationRule
@@ -118,6 +119,13 @@ class EducationGroupYearTest(TestCase):
         result = search(education_group_type=[self.education_group_type_training,
                                               self.education_group_type_minitraining])
         self.assertEqual(len(result), 4)
+
+        OfferEnrollmentFactory(education_group_year=self.education_group_year_2,
+                               enrollment_state=offer_enrollment_state.SUBSCRIBED)
+        OfferEnrollmentFactory(education_group_year=self.education_group_year_2,
+                               enrollment_state=offer_enrollment_state.PENDING)
+        result = search(enrollment_states=[offer_enrollment_state.SUBSCRIBED])
+        self.assertEqual(len(result), 1)
 
     def test_domains_property(self):
         domains = self.education_group_year_1.str_domains
@@ -396,10 +404,27 @@ class TestFindWithEnrollmentsCount(TestCase):
         self.assertEqual(list(result), [])
 
     def test_with_learning_unit_enrollment_and_with_offer_enrollments(self):
-        enrol_not_in_education_group = LearningUnitEnrollmentFactory(learning_unit_year=LearningUnitYearFactory())
+        enrol_not_in_education_group = LearningUnitEnrollmentFactory(
+            learning_unit_year=LearningUnitYearFactory(),
+            offer_enrollment=OfferEnrollmentFactory(enrollment_state=offer_enrollment_state.SUBSCRIBED)
+        )
         result = find_with_enrollments_count(enrol_not_in_education_group.learning_unit_year)
         self.assertEqual(result[0].count_learning_unit_enrollments, 1)
         self.assertEqual(result[0].count_formation_enrollments, 1)
+
+    def test_count_formation_enrollments_with_pending_enrollment(self):
+        luy = LearningUnitYearFactory()
+        edy = EducationGroupYearFactory()
+        for k in dict(offer_enrollment_state.STATES):
+            LearningUnitEnrollmentFactory(
+                learning_unit_year=luy,
+                offer_enrollment=OfferEnrollmentFactory(
+                    enrollment_state=k,
+                    education_group_year=edy),
+            )
+        result = find_with_enrollments_count(luy)
+        self.assertEqual(result[0].count_learning_unit_enrollments, 5)
+        self.assertEqual(result[0].count_formation_enrollments, 2)
 
     def test_count_learning_unit_enrollments(self):
         LearningUnitEnrollmentFactory(
