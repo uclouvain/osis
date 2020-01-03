@@ -657,14 +657,14 @@ class TestPostponeContent(TestCase):
             education_group=root_grp.parent.education_group,
             academic_year=self.next_academic_year
         )
-        child_egy_n1 = EducationGroupYearFactory(
+        EducationGroupYearFactory(
             acronym=child_grp.child_branch.acronym,
             partial_acronym=child_grp.child_branch.partial_acronym,
             education_group_type=child_grp.child_branch.education_group_type,
             education_group=child_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
         )
-        child_child_egy_n1 = EducationGroupYearFactory(
+        EducationGroupYearFactory(
             acronym=child_child_grp.child_branch.acronym,
             partial_acronym=child_child_grp.child_branch.partial_acronym,
             education_group_type=child_child_grp.child_branch.education_group_type,
