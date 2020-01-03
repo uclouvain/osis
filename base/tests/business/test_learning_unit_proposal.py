@@ -57,6 +57,8 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from reference.tests.factories.language import LanguageFactory
+from django.test.utils import override_settings
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -270,6 +272,12 @@ def mock_message_by_level(*args, **kwargs):
 
 
 class TestConsolidateProposal(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        LanguageFactory(code='FR', name='FRENCH')
+
     def test_when_proposal_is_not_accepted_nor_refused(self):
         states = (state for state, value in proposal_state.ProposalState.__members__.items()
                   if state not in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES)
@@ -348,6 +356,7 @@ class TestConsolidateProposal(TestCase):
         consolidate_proposal(proposal)
         self.assertTrue(mock_update_learning_unit_with_report.called)
 
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ], LANGUAGE_CODE='fr-be')
     def test_when_proposal_of_type_modification_and_accepted_with_partim(self):
         old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
