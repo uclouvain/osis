@@ -30,8 +30,9 @@ from base.tests.factories.campus import CampusFactory
 
 
 class TestCampus(TestCase):
-    def setUp(self):
-        self.campus = CampusFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.campus = CampusFactory()
 
     def test_find_by_id(self):
         campus_id = self.campus.id

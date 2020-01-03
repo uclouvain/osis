@@ -42,10 +42,6 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 
 
 class AcademicCalendarTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        pass
-
     def test_start_date_higher_than_end_date(self):
         fake = Faker()
         with self.assertRaises(StartDateHigherThanEndDateException):
