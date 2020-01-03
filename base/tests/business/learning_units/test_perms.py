@@ -65,12 +65,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):
-
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
@@ -84,11 +81,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.next_academic_yr,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
@@ -99,11 +94,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_by_proposal(self, mock_perm):
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
@@ -119,11 +112,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_is_eligible_to_modify_by_proposal(self, mock_perm):
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.next_academic_yr,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)

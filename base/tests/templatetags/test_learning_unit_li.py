@@ -33,7 +33,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
+from base.business.learning_units.perms import MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
     MSG_NOT_PROPOSAL_STATE_FACULTY, MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL, \
     MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, \
@@ -82,7 +82,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.person_entity = PersonEntityFactory(person=self.central_manager_person)
 
         self.learning_unit = LearningUnitFactory()
-        self.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
+        self.previous_learning_unit = LearningUnitFactory()
         self.current_academic_year = create_current_academic_year()
         self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
@@ -164,49 +164,13 @@ class LearningUnitTagLiEditTest(TestCase):
                     'data_target': ""
                 })
 
-    def test_li_edit_lu_year_is_editable_but_existing_proposal_in_epc(self):
-        self.learning_unit.existing_proposal_in_epc = True
-        self.learning_unit.save()
-        self.context["learning_unit_year"] = self.learning_unit_year
-
-        result = li_edit_lu(self.context, self.url_edit, "")
-        self.assertEqual(result,
-                         self._get_result_data_expected(ID_LINK_EDIT_LU, MSG_EXISTING_PROPOSAL_IN_EPC))
-
-        result = li_edit_date_lu(self.context, self.url_edit, "")
-        self.assertEqual(
-            result,
-            self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, MSG_EXISTING_PROPOSAL_IN_EPC))
-
-        result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
-        expected = self._get_result_data_expected_delete("link_delete_lus", MSG_EXISTING_PROPOSAL_IN_EPC)
-
-        self.assertEqual(result, expected)
-
-        self.proposal.learning_unit_year = self.learning_unit_year
-        self.proposal.save()
-        self.context["proposal"] = self.proposal
-        result = li_suppression_proposal(self.context, self.url_edit, "")
-        self.assertEqual(
-            result, self._get_result_data_expected_for_proposal_suppression("link_proposal_suppression",
-                                                                            MSG_EXISTING_PROPOSAL_IN_EPC,
-                                                                            DISABLED
-                                                                            )
-        )
-        result = li_modification_proposal(self.context, self.url_edit, "")
-
-        self.assertEqual(
-            result, self._get_result_data_expected("link_proposal_modification", MSG_EXISTING_PROPOSAL_IN_EPC, )
-        )
-
     def test_li_edit_lu_year_is_learning_unit_year_not_in_range_to_be_modified(self):
         managers = [
             create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
             create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
         ]
 
-        later_luy = LearningUnitYearFactory(academic_year=self.later_academic_year,
-                                            learning_unit=LearningUnitFactory(existing_proposal_in_epc=False))
+        later_luy = LearningUnitYearFactory(academic_year=self.later_academic_year)
         self.context["learning_unit_year"] = later_luy
 
         for manager in managers:
@@ -252,10 +216,8 @@ class LearningUnitTagLiEditTest(TestCase):
             end_date=datetime.datetime(current_academic_yr.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
             academic_year=current_academic_yr,
-            learning_unit=lu,
         )
         person_faculty_managers = [
             create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
