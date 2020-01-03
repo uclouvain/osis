@@ -690,12 +690,15 @@ class TestPostponeContent(TestCase):
 
     def test_faculty_cannot_copy_into_future(self):
         faculty_manager = FacultyManagerFactory()
-        self.current_education_group_year.education_group.end_year.year = 2023
-        self.current_education_group_year.academic_year.year = 2021
-        next = AcademicYearFactory(year=2022)
+        current_year = self.current_academic_year.year
+
+        self.current_education_group_year.education_group.end_year.year = current_year + 4
+        self.current_education_group_year.academic_year.year = current_year + 2
+        next = AcademicYearFactory(year=current_year + 3)
         EducationGroupYearFactory(
             education_group=self.current_education_group_year.education_group,
             academic_year=next
         )
+
         with self.assertRaises(NotPostponeError, msg=_('You are not allowed to postpone this training in the future.')):
             self.postponer = PostponeContent(self.current_education_group_year, faculty_manager)
