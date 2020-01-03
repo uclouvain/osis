@@ -106,12 +106,14 @@ class TestFindAllResponsibleByLearningUnitYear(TestCase):
             function=COORDINATOR,
             learning_unit_year=cls.luy,
             score_responsible=False,
+            summary_responsible=False
         )
         AttributionFactory(
             function=CO_HOLDER,
             tutor=attr1.tutor,
             learning_unit_year=cls.luy,
             score_responsible=True,
+            summary_responsible=True
         )  # Second attribution with different function
 
     def test_score_responsible_when_multiple_attribution_for_same_tutor(self):
