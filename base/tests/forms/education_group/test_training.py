@@ -70,17 +70,18 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=get_current_year())
         cls.central_manager = GroupFactory(name='central_managers')
+        cls.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        cls.form_class = TrainingEducationGroupYearForm
+        cls.hops_form_class = HopsEducationGroupYearModelForm
+        super(TestTrainingEducationGroupYearForm, cls).setUpTestData(education_group_type=cls.education_group_type)
 
     def setUp(self):
-        self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        self.form_class = TrainingEducationGroupYearForm
-        self.hops_form_class = HopsEducationGroupYearModelForm
-        super(TestTrainingEducationGroupYearForm, self).setUp(education_group_type=self.education_group_type)
-        self.hops = HopsFactory(education_group_year=self.parent_education_group_year,
-                                ares_study=100,
-                                ares_graca=200,
-                                ares_ability=300
-                                )
+        self.hops = HopsFactory(
+            education_group_year=self.parent_education_group_year,
+            ares_study=100,
+            ares_graca=200,
+            ares_ability=300
+        )
 
     def test_clean_certificate_aims(self):
         administration_entity_version = MainEntityVersionFactory(end_date=None)
@@ -215,26 +216,16 @@ class TestPostponementEducationGroupYear(TestCase):
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 40)
         cls.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
-
-    def setUp(self):
         # Create user and attached it to management entity
-        self.person = PersonFactory()
-        self.user = self.person.user
-        administration_entity_version = MainEntityVersionFactory()
-        management_entity_version = MainEntityVersionFactory()
-
-        self.education_group_year = TrainingFactory(
-            academic_year=create_current_academic_year(),
-            education_group_type__name=education_group_types.TrainingType.BACHELOR,
-            management_entity=management_entity_version.entity,
-            administration_entity=administration_entity_version.entity,
-        )
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.education_group_type = EducationGroupTypeFactory(
+        cls.person = PersonFactory()
+        cls.user = cls.person.user
+        cls.management_entity_version = MainEntityVersionFactory()
+        cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.BACHELOR
         )
 
+    def setUp(self):
         self.data = {
             'title': 'Métamorphose',
             'title_english': 'Transfiguration',
@@ -242,7 +233,7 @@ class TestPostponementEducationGroupYear(TestCase):
             'credits': 42,
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
-            'management_entity': management_entity_version.pk,
+            'management_entity': self.management_entity_version.pk,
             'administration_entity': MainEntityVersionFactory().pk,
             'main_teaching_campus': "",
             'academic_year': create_current_academic_year().pk,
@@ -254,6 +245,14 @@ class TestPostponementEducationGroupYear(TestCase):
             "constraint_type": "",
             "diploma_printing_title": 'Diploma title'
         }
+        self.administration_entity_version = MainEntityVersionFactory()
+        self.education_group_year = TrainingFactory(
+            academic_year=create_current_academic_year(),
+            education_group_type__name=education_group_types.TrainingType.BACHELOR,
+            management_entity=self.management_entity_version.entity,
+            administration_entity=self.administration_entity_version.entity,
+        )
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
 
     def test_init(self):
         # In case of creation
@@ -484,18 +483,16 @@ class TestPostponeTrainingProperty(TestCase):
         cls.entity_version = MainEntityVersionFactory(entity_type=entity_type.SECTOR)
         cls.central_manager = CentralManagerFactory()
         PersonEntityFactory(person=cls.central_manager, entity=cls.entity_version.entity)
-
-    def setUp(self):
-        self.training = TrainingFactory(
-            management_entity=self.entity_version.entity,
-            administration_entity=self.entity_version.entity,
-            academic_year=self.current_academic_year
+        cls.training = TrainingFactory(
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            academic_year=cls.current_academic_year
         )
-        self.form_data = model_to_dict_fk(self.training, exclude=('secondary_domains',))
-        self.form_data.update({
-            'primary_language': self.form_data['primary_language_id'],
-            'administration_entity': self.entity_version.pk,
-            'management_entity': self.entity_version.pk
+        cls.form_data = model_to_dict_fk(cls.training, exclude=('secondary_domains',))
+        cls.form_data.update({
+            'primary_language': cls.form_data['primary_language_id'],
+            'administration_entity': cls.entity_version.pk,
+            'management_entity': cls.entity_version.pk
         })
 
     def test_save_with_postponement_certificate_aims_inconsistant(self):
@@ -546,32 +543,30 @@ class TestPostponeCertificateAims(TestCase):
         cls.entity_version = MainEntityVersionFactory(entity_type=entity_type.SECTOR)
         cls.central_manager = CentralManagerFactory()
         PersonEntityFactory(person=cls.central_manager, entity=cls.entity_version.entity)
-
-    def setUp(self):
-        self.training = TrainingFactory(
-            management_entity=self.entity_version.entity,
-            administration_entity=self.entity_version.entity,
-            academic_year=self.current_academic_year
+        cls.training = TrainingFactory(
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            academic_year=cls.current_academic_year
         )
         # Save the training instance will create N+6 data...
-        form_data = model_to_dict_fk(self.training, exclude=('secondary_domains',))
+        form_data = model_to_dict_fk(cls.training, exclude=('secondary_domains',))
         form_data.update({
             'primary_language': form_data['primary_language_id'],
-            'administration_entity': self.entity_version.pk,
-            'management_entity': self.entity_version.pk
+            'administration_entity': cls.entity_version.pk,
+            'management_entity': cls.entity_version.pk
         })
-        training_form = TrainingForm(form_data, instance=self.training, user=self.central_manager.user)
+        training_form = TrainingForm(form_data, instance=cls.training, user=cls.central_manager.user)
         training_form.is_valid()
         training_form.save()
 
-        self.certificate_aim_type_2 = CertificateAimFactory(section=2, code=200)
-        self.certificate_aim_type_4 = CertificateAimFactory(section=4, code=400)
-        self.form_data = {
-            'certificate_aims': [self.certificate_aim_type_2.pk, self.certificate_aim_type_4.pk]
+        cls.certificate_aim_type_2 = CertificateAimFactory(section=2, code=200)
+        cls.certificate_aim_type_4 = CertificateAimFactory(section=4, code=400)
+        cls.form_data = {
+            'certificate_aims': [cls.certificate_aim_type_2.pk, cls.certificate_aim_type_4.pk]
         }
-        self.qs_training_futures = EducationGroupYear.objects.filter(
-            education_group=self.training.education_group,
-            academic_year__year__gt=self.training.academic_year.year
+        cls.qs_training_futures = EducationGroupYear.objects.filter(
+            education_group=cls.training.education_group,
+            academic_year__year__gt=cls.training.academic_year.year
         )
 
     def test_save_with_postponement_on_training_which_have_property_different_in_future(self):
@@ -637,33 +632,34 @@ class TestPostponeCertificateAims(TestCase):
 
 
 class TestPermissionField(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         create_current_academic_year()
-        self.permissions = [PermissionFactory() for _ in range(10)]
+        cls.permissions = [PermissionFactory() for _ in range(10)]
 
         FieldReferenceFactory(
             content_type=ContentType.objects.get(app_label="base", model="educationgroupyear"),
             field_name="main_teaching_campus",
             context=TRAINING_DAILY_MANAGEMENT,
-            permissions=self.permissions,
+            permissions=cls.permissions,
         )
 
         FieldReferenceFactory(
             content_type=ContentType.objects.get(app_label="base", model="educationgroupyear"),
             field_name="partial_acronym",
             context="",
-            permissions=self.permissions,
+            permissions=cls.permissions,
         )
 
         person = PersonFactory()
-        self.user_with_perm = person.user
-        self.user_with_perm.user_permissions.add(self.permissions[2])
+        cls.user_with_perm = person.user
+        cls.user_with_perm.user_permissions.add(cls.permissions[2])
 
         person = PersonFactory()
-        self.user_without_perm = person.user
-        self.user_without_perm.user_permissions.add(PermissionFactory())
+        cls.user_without_perm = person.user
+        cls.user_without_perm.user_permissions.add(PermissionFactory())
 
-        self.education_group_type = EducationGroupTypeFactory(
+        cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING
         )
 
