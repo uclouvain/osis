@@ -62,13 +62,15 @@ class TestSearchForm(TestCase):
         start_year = AcademicYearFactory(year=current_year - 2)
         end_year = AcademicYearFactory(year=current_year + 2)
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
-        cls.data = QueryDict(mutable=True)
         ExternalLearningUnitYearFactory(
             learning_unit_year__academic_year=cls.academic_years[0],
             learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
             mobility=True,
             co_graduation=False,
         )
+
+    def setUp(self):
+        self.data = QueryDict(mutable=True)
 
     def test_get_research_criteria(self):
         self.data.update({
