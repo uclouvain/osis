@@ -35,10 +35,11 @@ from osis_common.tests.factories.application_notice import ApplicationNoticeFact
 
 
 class ErrorViewTestCase(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user('tmp', 'tmp@gmail.com', 'tmp')
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('tmp', 'tmp@gmail.com', 'tmp')
         permission = Permission.objects.get(codename='can_access_academic_calendar')
-        self.user.user_permissions.add(permission)
+        cls.user.user_permissions.add(permission)
 
     @override_settings(DEBUG=False)
     def test_404_error(self):
@@ -48,9 +49,12 @@ class ErrorViewTestCase(TestCase):
 
 
 class TestCheckNotice(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.url = reverse(home)
+        cls.notice = ApplicationNoticeFactory()
+
     def setUp(self):
-        self.url = reverse(home)
-        self.notice = ApplicationNoticeFactory()
         self.client.force_login(UserFactory())
 
     def test_context(self):
