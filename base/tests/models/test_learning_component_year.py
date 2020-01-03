@@ -32,14 +32,17 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 
 
 class LearningUnitYearWithContextTestCase(TestCase):
-    def setUp(self):
-        self.component_with_repartition = LearningComponentYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.component_with_repartition = LearningComponentYearFactory(
             hourly_volume_total_annual=15.0,
             planned_classes=3,
             repartition_volume_requirement_entity=20.0,
             repartition_volume_additional_entity_1=10.0,
             repartition_volume_additional_entity_2=15.0,
         )
+
+    def setUp(self):
         self.component_without_repartition = LearningComponentYearFactory(
             hourly_volume_total_annual=15.0,
             planned_classes=3,
