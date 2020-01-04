@@ -39,8 +39,9 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 
 
 class TestSearch(TestCase):
-    def setUp(self):
-        self.proposal_learning_unit = ProposalLearningUnitFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.proposal_learning_unit = ProposalLearningUnitFactory()
 
     def test_find_by_learning_unit_year(self):
         a_proposal_learning_unit = proposal_learning_unit.find_by_learning_unit_year(
@@ -61,25 +62,25 @@ class TestSearch(TestCase):
 
 
 class TestSearchCases(TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         yr = timezone.now().year
-        self.entity_1 = EntityFactory()
-        EntityVersionFactory(entity=self.entity_1)
-        self.an_academic_year = AcademicYearFactory(year=yr)
-        self.an_acronym = "LBIO1212"
+        cls.entity_1 = EntityFactory()
+        EntityVersionFactory(entity=cls.entity_1)
+        cls.an_academic_year = AcademicYearFactory(year=yr)
+        cls.an_acronym = "LBIO1212"
 
-        self.learning_container_yr = LearningContainerYearFactory(
-            academic_year=self.an_academic_year,
-            requirement_entity=self.entity_1,
+        cls.learning_container_yr = LearningContainerYearFactory(
+            academic_year=cls.an_academic_year,
+            requirement_entity=cls.entity_1,
         )
-        a_learning_unit_year = LearningUnitYearFactory(acronym=self.an_acronym,
-                                                       academic_year=self.an_academic_year,
-                                                       learning_container_year=self.learning_container_yr)
-        self.a_proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=a_learning_unit_year,
+        a_learning_unit_year = LearningUnitYearFactory(acronym=cls.an_acronym,
+                                                       academic_year=cls.an_academic_year,
+                                                       learning_container_year=cls.learning_container_yr)
+        cls.a_proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=a_learning_unit_year,
                                                                     type=proposal_type.ProposalType.CREATION,
                                                                     state=proposal_state.ProposalState.CENTRAL,
-                                                                    entity=self.entity_1)
+                                                                    entity=cls.entity_1)
 
     def test_search_by_proposal_type(self):
         qs = LearningUnitYear.objects.all()
