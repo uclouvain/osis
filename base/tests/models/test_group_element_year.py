@@ -38,14 +38,15 @@ from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory, \
+    TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestFindBuildParentListByEducationGroupYearId(TestCase):
     """Unit tests for _build_parent_list_by_education_group_year_id() function"""
-
     @classmethod
     def setUpTestData(cls):
         current_academic_year = create_current_academic_year()
@@ -435,41 +436,32 @@ class TestSaveGroupElementYear(TestCase):
 
 class TestFetchGroupElementsBehindHierarchy(TestCase):
     """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
-
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        formation_master_type = EducationGroupTypeFactory(
-            category=education_group_categories.TRAINING,
-            name=education_group_types.TrainingType.PGRM_MASTER_120,
+        cls.root = TrainingFactory(
+            acronym='DROI2M',
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120,
+            academic_year=cls.academic_year
         )
-        cls.root = EducationGroupYearFactory(acronym='DROI2M',
-                                             education_group_type=formation_master_type,
-                                             academic_year=cls.academic_year)
 
-        finality_list_type = EducationGroupTypeFactory(
-            category=education_group_categories.GROUP,
-            name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
+        finality_list = GroupYearFactory(
+            acronym='LIST FINALITIES',
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
+            academic_year=cls.academic_year
         )
-        finality_list = EducationGroupYearFactory(acronym='LIST FINALITIES',
-                                                  education_group_type=finality_list_type,
-                                                  academic_year=cls.academic_year)
 
-        formation_master_md_type = EducationGroupTypeFactory(
-            category=education_group_categories.TRAINING,
-            name=education_group_types.TrainingType.MASTER_MD_120,
+        formation_master_md = TrainingFactory(
+            acronym='DROI2MD',
+            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120,
+            academic_year=cls.academic_year
         )
-        formation_master_md = EducationGroupYearFactory(acronym='DROI2MD',
-                                                        education_group_type=formation_master_md_type,
-                                                        academic_year=cls.academic_year)
 
-        common_core_type = EducationGroupTypeFactory(
-            category=education_group_categories.GROUP,
-            name=education_group_types.GroupType.COMMON_CORE,
+        common_core = GroupYearFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.COMMON_CORE,
+            academic_year=cls.academic_year
         )
-        common_core = EducationGroupYearFactory(acronym='TC DROI2MD',
-                                                education_group_type=common_core_type,
-                                                academic_year=cls.academic_year)
 
         cls.link_1 = GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
         cls.link_1_bis = GroupElementYearFactory(parent=cls.root,

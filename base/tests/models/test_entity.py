@@ -73,6 +73,7 @@ class EntityTest(TestCase):
                 end_date=cls.end_date,
                 entity_type=types[x]
             )
+        cls.an_entity = EntityFactory(external_id="1234567")
 
     def test_search_entities_by_version_acronym_date_in(self):
         self.assertCountEqual(entity.search(acronym='ENTITY_V', version_date=self.date_in_2015), self.children)
@@ -85,14 +86,12 @@ class EntityTest(TestCase):
         self.assertCountEqual(entity.search(acronym='ENTITY_V_1', version_date=self.date_in_2017), [])
 
     def test_get_by_external_id(self):
-        an_entity = EntityFactory(external_id="1234567")
-        self.assertEqual(entity.get_by_external_id("1234567"), an_entity)
+        self.assertEqual(entity.get_by_external_id("1234567"), self.an_entity)
         self.assertEqual(entity.get_by_external_id("321"), None)
 
     def test_get_by_internal_id(self):
-        an_entity = EntityFactory()
-        self.assertEqual(entity.get_by_internal_id(an_entity.id), an_entity)
-        self.assertEqual(entity.get_by_internal_id(an_entity.id + 1), None)
+        self.assertEqual(entity.get_by_internal_id(self.an_entity.id), self.an_entity)
+        self.assertEqual(entity.get_by_internal_id(self.an_entity.id + 1), None)
 
     def test_find_descendants_with_parent(self):
         entities_with_descendants = EntityVersion.objects.get_tree([self.parent], date=self.date_in_2015)
@@ -118,15 +117,14 @@ class EntityTest(TestCase):
         self.assertEqual(len(entities_with_descendants), 8)  # 5 for parent + 3 for parent_2
 
     def test_most_recent_acronym(self):
-        entity_instance = EntityFactory()
         most_recent_year = 2018
         for year in range(2016, most_recent_year + 1):
             date = datetime.date(year=year, month=1, day=1)
-            EntityVersionFactory(entity_id=entity_instance.id, start_date=date)
+            EntityVersionFactory(entity_id=self.an_entity.id, start_date=date)
         most_recent_date = datetime.date(year=most_recent_year, month=1, day=1)
         most_recent_entity_version = EntityVersion.objects.get(start_date=most_recent_date,
-                                                               entity=entity_instance)
-        self.assertEqual(entity_instance.most_recent_acronym, most_recent_entity_version.acronym)
+                                                               entity=self.an_entity)
+        self.assertEqual(self.an_entity.most_recent_acronym, most_recent_entity_version.acronym)
 
     def test_find_versions_from_entites_with_date(self):
         entities_list = find_versions_from_entites([self.parent.id], self.start_date)

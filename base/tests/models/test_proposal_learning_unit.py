@@ -25,7 +25,6 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils import timezone
 
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_state, proposal_type
@@ -64,23 +63,21 @@ class TestSearch(TestCase):
 class TestSearchCases(TestCase):
     @classmethod
     def setUpTestData(cls):
-        yr = timezone.now().year
         cls.entity_1 = EntityFactory()
         EntityVersionFactory(entity=cls.entity_1)
-        cls.an_academic_year = AcademicYearFactory(year=yr)
-        cls.an_acronym = "LBIO1212"
+        cls.an_academic_year = AcademicYearFactory(current=True)
 
         cls.learning_container_yr = LearningContainerYearFactory(
             academic_year=cls.an_academic_year,
             requirement_entity=cls.entity_1,
         )
-        a_learning_unit_year = LearningUnitYearFactory(acronym=cls.an_acronym,
+        a_learning_unit_year = LearningUnitYearFactory(acronym="LBIO1212",
                                                        academic_year=cls.an_academic_year,
                                                        learning_container_year=cls.learning_container_yr)
         cls.a_proposal_learning_unit = ProposalLearningUnitFactory(learning_unit_year=a_learning_unit_year,
-                                                                    type=proposal_type.ProposalType.CREATION,
-                                                                    state=proposal_state.ProposalState.CENTRAL,
-                                                                    entity=cls.entity_1)
+                                                                   type=proposal_type.ProposalType.CREATION,
+                                                                   state=proposal_state.ProposalState.CENTRAL,
+                                                                   entity=cls.entity_1)
 
     def test_search_by_proposal_type(self):
         qs = LearningUnitYear.objects.all()
@@ -99,7 +96,10 @@ class TestSearchCases(TestCase):
 
     def test_search_by_entity_folder(self):
         qs = LearningUnitYear.objects.all()
-        results = proposal_learning_unit.filter_proposal_fields(qs, entity_folder_id=self.a_proposal_learning_unit.entity.id)
+        results = proposal_learning_unit.filter_proposal_fields(
+            qs,
+            entity_folder_id=self.a_proposal_learning_unit.entity.id
+        )
         self.check_search_result(results)
 
     def check_search_result(self, results):

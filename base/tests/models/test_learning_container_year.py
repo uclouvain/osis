@@ -38,11 +38,13 @@ class LearningContainerYearAttributesTestMixin(TestCase):
         cls.allocation_entity = EntityVersionFactory().entity
         cls.additional_entity_1 = EntityVersionFactory().entity
         cls.additional_entity_2 = EntityVersionFactory().entity
-        cls.container_year = LearningContainerYearFactory(
-            requirement_entity=cls.requirement_entity,
-            allocation_entity=cls.allocation_entity,
-            additional_entity_1=cls.additional_entity_1,
-            additional_entity_2=cls.additional_entity_2,
+
+    def setUp(self):
+        self.container_year = LearningContainerYearFactory(
+            requirement_entity=self.requirement_entity,
+            allocation_entity=self.allocation_entity,
+            additional_entity_1=self.additional_entity_1,
+            additional_entity_2=self.additional_entity_2,
         )
 
 

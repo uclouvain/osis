@@ -88,11 +88,11 @@ class EducationGroupTest(TestCase):
 class EducationGroupManagerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_training = EducationGroupFactory()
+        cls.education_group = EducationGroupFactory()
         most_recent_year = 2018
         for year in range(2016, most_recent_year + 1):
             EducationGroupYearFactory(
-                education_group=cls.education_group_training,
+                education_group=cls.education_group,
                 academic_year=AcademicYearFactory(year=year)
             )
 
@@ -112,7 +112,7 @@ class EducationGroupManagerTest(TestCase):
 
         self.assertCountEqual(
             list(EducationGroup.objects.having_related_training()),
-            [self.education_group_training]
+            [self.education_group]
         )
 
         self.assertNotEqual(
