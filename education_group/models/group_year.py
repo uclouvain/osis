@@ -110,3 +110,6 @@ class GroupYear(models.Model):
         default="",
         verbose_name=_("remark in english")
     )
+
+    def __str__(self):
+        return u"%s (%s)" % (self.acronym, self.group)
