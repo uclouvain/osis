@@ -82,7 +82,7 @@ class LearningUnitTagLiEditTest(TestCase):
         )
         cls.person_entity = PersonEntityFactory(person=cls.central_manager_person)
 
-        cls.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
+        cls.previous_learning_unit = LearningUnitFactory()
         cls.current_academic_year = create_current_academic_year()
         cls.next_academic_yr = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
