@@ -47,7 +47,7 @@ from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.factories.user import UserFactory
@@ -169,9 +169,7 @@ class TestLearningAchievementActions(TestCase):
         cls.language_fr = LanguageFactory(code="FR")
         cls.language_en = LanguageFactory(code="EN")
         cls.user = UserFactory()
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        cls.person = PersonFactory(user=cls.user)
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
         cls.a_superuser = SuperUserFactory()
         cls.superperson = PersonFactory(user=cls.a_superuser)
 
@@ -365,9 +363,7 @@ class TestLearningAchievementPostponement(TestCase):
         cls.user = UserFactory()
         flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
         flag.users.add(cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        cls.person = PersonFactory(user=cls.user)
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
         cls.person_entity = PersonEntityFactory(person=cls.person)
         EntityVersionFactory(entity=cls.person_entity.entity)
         cls.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]

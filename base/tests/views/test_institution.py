@@ -40,20 +40,16 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
 from base.views.institution import entities_search
-from reference.tests.factories.country import CountryFactory
 
 
 class EntityViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = PersonFactory().user
-        today = datetime.date.today()
-        cls.current_academic_year = AcademicYearFactory(start_date=today,
-                                                         end_date=today.replace(year=today.year + 1),
-                                                         year=today.year)
+        cls.current_academic_year = AcademicYearFactory(current=True)
         cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
-                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-        cls.entity = EntityFactory(country=CountryFactory())
+                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        cls.entity = EntityFactory()
         cls.parent = EntityFactory()
         cls.start_date = datetime.date(2015, 1, 1)
         cls.end_date = datetime.date(2015, 12, 31)
@@ -102,7 +98,7 @@ class EntityViewTestCase(APITestCase):
 
     @mock.patch('base.models.entity_version.find_by_id')
     @mock.patch('django.contrib.auth.decorators')
-    def test_get_entity_address(self,  mock_decorators, mock_find_by_id):
+    def test_get_entity_address(self, mock_decorators, mock_find_by_id):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
         entity = EntityFactory()
@@ -120,7 +116,7 @@ class EntityViewTestCase(APITestCase):
 
     @mock.patch('base.models.entity_version.find_by_id')
     @mock.patch('django.contrib.auth.decorators')
-    def test_get_entity_address_case_no_current_entity_version_exists(self,  mock_decorators, mock_find_by_id):
+    def test_get_entity_address_case_no_current_entity_version_exists(self, mock_decorators, mock_find_by_id):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
         entity = EntityFactory()

@@ -367,10 +367,7 @@ class EducationGroupPublishViewTestCase(TestCase):
 class EducationGroupViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        today = datetime.date.today()
-        cls.academic_year = AcademicYearFactory(start_date=today,
-                                                 end_date=today.replace(year=today.year + 1),
-                                                 year=today.year)
+        cls.academic_year = AcademicYearFactory(current=True)
 
         cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.type_minitraining = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
@@ -447,13 +444,12 @@ class EducationGroupViewTestCase(TestCase):
 class EducationGroupAdministrativedata(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
+        cls.person = PersonWithPermissionsFactory(
+            'can_access_education_group', 'can_edit_education_group_administrative_data'
+        )
 
         cls.permission_access = Permission.objects.get(codename='can_access_education_group')
-        cls.person.user.user_permissions.add(cls.permission_access)
-
         cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
-        cls.person.user.user_permissions.add(cls.permission_edit)
 
         cls.education_group_year = EducationGroupYearFactory()
         cls.program_manager = ProgramManagerFactory(
@@ -556,12 +552,12 @@ class EducationGroupAdministrativedata(TestCase):
         combinations = list(product((0, 1, -1), repeat=2))
         one_day = datetime.timedelta(days=1)
         good_dates = [
-            (ac.start_date + combi[0]*one_day, ac.end_date + combi[1]*one_day)
+            (ac.start_date + combi[0] * one_day, ac.end_date + combi[1] * one_day)
             for combi in combinations
         ]
         bad_dates = [
-            (ac.start_date - 2*one_day, ac.start_date - one_day),
-            (ac.end_date + one_day, ac.end_date + 2*one_day),
+            (ac.start_date - 2 * one_day, ac.start_date - one_day),
+            (ac.end_date + one_day, ac.end_date + 2 * one_day),
         ]
 
         good_mandataries = [
@@ -591,21 +587,16 @@ class EducationGroupAdministrativedata(TestCase):
 class EducationGroupEditAdministrativeData(TestCase):
     @classmethod
     def setUpTestData(cls):
-        today = datetime.date.today()
-        cls.person = PersonFactory()
-
+        cls.person = PersonWithPermissionsFactory('can_edit_education_group_administrative_data')
         cls.permission = Permission.objects.get(codename='can_edit_education_group_administrative_data')
-        cls.person.user.user_permissions.add(cls.permission)
 
-        cls.academic_year = AcademicYearFactory(start_date=today,
-                                                 end_date=today.replace(year=today.year + 1),
-                                                 year=today.year)
+        cls.academic_year = AcademicYearFactory(current=True)
 
         cls.education_group_year = EducationGroupYearFactory()
         cls.program_manager = ProgramManagerFactory(person=cls.person,
-                                                     education_group=cls.education_group_year.education_group)
+                                                    education_group=cls.education_group_year.education_group)
         cls.url = reverse('education_group_edit_administrative',
-                           args=[cls.education_group_year.id, cls.education_group_year.id])
+                          args=[cls.education_group_year.id, cls.education_group_year.id])
 
     def setUp(self):
         self.client.force_login(self.person.user)

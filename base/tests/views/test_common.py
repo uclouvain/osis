@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -37,13 +37,13 @@ from osis_common.tests.factories.application_notice import ApplicationNoticeFact
 class ErrorViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user('tmp', 'tmp@gmail.com', 'tmp')
+        cls.user = UserFactory()
         permission = Permission.objects.get(codename='can_access_academic_calendar')
         cls.user.user_permissions.add(permission)
 
     @override_settings(DEBUG=False)
     def test_404_error(self):
-        self.client.login(username='tmp', password='tmp')
+        self.client.force_login(self.user)
         response = self.client.get(reverse('academic_calendar_read', args=[46898]), follow=True)
         self.assertEqual(response.status_code, 404)
 

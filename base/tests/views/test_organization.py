@@ -83,13 +83,13 @@ class TestOrganizationAutocomplete(TestCase):
         cls.url = reverse("organization_autocomplete")
 
         cls.organization = OrganizationFactory(name="Université de Louvain")
-        cls.organization_address = OrganizationAddressFactory(
-            organization=cls.organization,
+
+    def setUp(self):
+        self.organization_address = OrganizationAddressFactory(
+            organization=self.organization,
             country__iso_code='BE',
             is_main=True
         )
-
-    def setUp(self):
         self.client.force_login(user=self.super_user)
 
     def test_when_filter_without_country_data_forwarded_result_found(self):

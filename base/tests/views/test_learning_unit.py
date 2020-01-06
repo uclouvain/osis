@@ -257,10 +257,8 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
             subtype=learning_unit_year_subtypes.FULL
         )
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
-        faculty_manager = FacultyManagerFactory()
+        faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
         cls.user = faculty_manager.user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
 
     def setUp(self):
         self.client.force_login(self.user)

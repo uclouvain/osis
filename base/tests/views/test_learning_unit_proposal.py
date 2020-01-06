@@ -404,8 +404,7 @@ class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = PersonFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit")
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
                          _create_proposal_learning_unit("LOSIS1212"),
                          _create_proposal_learning_unit("LOSIS1213")]
@@ -481,9 +480,8 @@ class TestLearningUnitProposalCancellation(TestCase):
     @classmethod
     def setUpTestData(cls):
         create_current_academic_year()
-        cls.person = FacultyManagerFactory()
+        cls.person = FacultyManagerFactory("can_propose_learningunit")
         cls.permission = Permission.objects.get(codename="can_propose_learningunit")
-        cls.person.user.user_permissions.add(cls.permission)
 
     def setUp(self):
         self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")

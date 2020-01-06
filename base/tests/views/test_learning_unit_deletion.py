@@ -72,7 +72,9 @@ class LearningUnitDelete(TestCase):
                                                   end_date=None)
         PersonEntityFactory(person=person, entity=cls.entity_version.entity, with_child=True)
         cls.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
-        cls.learning_unit_year_list = cls.create_learning_unit_years_and_dependencies(cls.start_year)
+
+    def setUp(self):
+        self.learning_unit_year_list = self.create_learning_unit_years_and_dependencies(self.start_year)
 
     @classmethod
     def create_learning_unit_years_and_dependencies(cls, start_year):

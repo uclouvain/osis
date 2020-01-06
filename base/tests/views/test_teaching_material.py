@@ -92,14 +92,14 @@ class TeachingMaterialUpdateTestCase(TestCase):
             LearningUnitYearFactory(subtype=FULL, academic_year=acy)
             for acy in ([cls.current_academic_year] + cls.future_academic_years)
         ]
-        cls.teaching_material = TeachingMaterialFactory(learning_unit_year=cls.learning_unit_year)
-        cls.url = reverse('teaching_material_edit', kwargs={
-            'learning_unit_year_id': cls.learning_unit_year.id,
-            'teaching_material_id': cls.teaching_material.id
-        })
         cls.person = _get_central_manager_person_with_permission()
 
     def setUp(self):
+        self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
+        self.url = reverse('teaching_material_edit', kwargs={
+            'learning_unit_year_id': self.learning_unit_year.id,
+            'teaching_material_id': self.teaching_material.id
+        })
         self.client.force_login(self.person.user)
 
     def test_teaching_material_update_when_user_not_logged(self):
@@ -141,14 +141,14 @@ class TeachingMaterialDeleteTestCase(TestCase):
             LearningUnitYearFactory(subtype=FULL, academic_year=acy)
             for acy in ([cls.current_academic_year] + cls.future_academic_years)
         ]
-        cls.teaching_material = TeachingMaterialFactory(learning_unit_year=cls.learning_unit_year)
-        cls.url = reverse('teaching_material_delete', kwargs={
-            'learning_unit_year_id': cls.learning_unit_year.id,
-            'teaching_material_id': cls.teaching_material.id
-        })
         cls.person = _get_central_manager_person_with_permission()
 
     def setUp(self):
+        self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
+        self.url = reverse('teaching_material_delete', kwargs={
+            'learning_unit_year_id': self.learning_unit_year.id,
+            'teaching_material_id': self.teaching_material.id
+        })
         self.client.force_login(self.person.user)
 
     def test_teaching_material_delete_when_user_not_logged(self):

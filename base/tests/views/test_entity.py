@@ -40,7 +40,6 @@ class EntityViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.preexisting_entity_version = EntityVersionFactory(external_id='old_external_id')
-        cls.preexisting_entity_version.save()
 
     def setUp(self):
         user = UserFactory()
