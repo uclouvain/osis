@@ -19,7 +19,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
         cls.offer_acronym = 'DROI1BA'
         cls.registration_id = '00000001'
         cls.url = reverse(
-            'learning_unit_enrollment_api_v1:enrollment-list-by-student',
+            'learning_unit_enrollment_api_v1:enrollments-list-by-student',
             kwargs={'registration_id': cls.registration_id}
         )
 
@@ -70,7 +70,7 @@ class LearningUnitEnrollmentSerializerTestCase(TestCase):
         cls.year = 2020
         cls.learning_unit_acronym = 'LDROI1001'
         cls.url = reverse(
-            'learning_unit_enrollment_api_v1:enrollment-list-by-learning-unit',
+            'learning_unit_enrollment_api_v1:enrollments-list-by-learning-unit',
             kwargs={'year': cls.year, 'acronym': cls.learning_unit_acronym}
         )
         cls.learning_unit_enrollment = LearningUnitEnrollmentFactory(

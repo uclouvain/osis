@@ -64,14 +64,14 @@ class LearningUnitEnrollmentList(generics.ListAPIView):
 
 
 class EnrollmentsByStudent(LearningUnitEnrollmentList):
-    name = 'enrollment-list-by-student'
+    name = 'enrollments-list-by-student'
 
     def get_queryset(self):
         return super().get_queryset().filter(offer_enrollment__student__registration_id=self.kwargs['registration_id'])
 
 
 class EnrollmentsByLearningUnit(LearningUnitEnrollmentList):
-    name = 'enrollment-list-by-learning-unit'
+    name = 'enrollments-list-by-learning-unit'
 
     def get_queryset(self):
         return super().get_queryset().filter(
