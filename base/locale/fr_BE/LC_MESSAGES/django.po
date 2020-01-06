@@ -70,7 +70,7 @@ msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 msgid ""
 "%(number_extended)s education group(s) extended and %(number_error)s error(s)"
 msgstr ""
-"%(number_extended)s organisation(s) de formation reportée(s) et "
+"%(number_extended)s formation(s) reportée(s) et "
 "%(number_error)s erreur(s)"
 
 #, python-format
@@ -377,7 +377,7 @@ msgid "Annual"
 msgstr "Annuel"
 
 msgid "Apply postponement on education group year"
-msgstr "Appliquer le report sur les organisations de formations annualisées"
+msgstr "Appliquer le report sur les formations annualisées"
 
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
@@ -827,10 +827,10 @@ msgid "Education group"
 msgstr "Organisation de formations"
 
 msgid "Education group achievement"
-msgstr "Acquis d'apprentissage d'une organisation de formations"
+msgstr "Acquis d'apprentissage d'une formation"
 
 msgid "Education group detailed achievement"
-msgstr "Acquis d'apprentissage détaillé d'une organisation de formations"
+msgstr "Acquis d'apprentissage détaillé d'une formation"
 
 msgid "Education group edition"
 msgstr "Édition des programmes"
@@ -1796,7 +1796,7 @@ msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
 msgstr ""
-"Seuls les gestionnaires de programme d'organisation de formations OU les "
+"Seuls les gestionnaires de programme des formations OU les "
 "gestionnaires facultaires lié·es à l'entité peuvent modifier."
 
 msgid "Only the volume Q1 must have a value"
@@ -2542,7 +2542,7 @@ msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
 msgid "The education group has been deleted."
-msgstr "L'organisation de formations a été supprimée."
+msgstr "La formation a été supprimée."
 
 msgid "The education group is not a training type"
 msgstr "Il ne s'agit pas d'une formation"
@@ -2867,7 +2867,7 @@ msgstr "Ce code existe déja pour cette unité d'enseignement"
 
 msgid "This education group is not editable during this period."
 msgstr ""
-"La période de modification des organisations de formations n'est pas ouverte "
+"La période de modification des formations n'est pas ouverte "
 "durant cette période."
 
 msgid "This feature is in testing phase"
@@ -3217,13 +3217,13 @@ msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 #, python-format
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas modifier une organisation de formation datant d'avant "
+"Vous ne pouvez pas modifier une formation datant d'avant "
 "%(limit_year)s"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas créer/modifier une organisation de formation datant "
+"Vous ne pouvez pas créer/modifier une formation datant "
 "d'avant %(limit_year)s"
 
 #, python-format
