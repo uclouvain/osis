@@ -48,10 +48,11 @@ class LearningUnitEnrollmentList(generics.ListAPIView):
     """
        Return a list of all the training with optional filtering.
     """
-    name = 'learning-unit-enrollment-list'
+    name = 'learning-unit-enrollments-list'
     queryset = LearningUnitEnrollment.objects.select_related(
-        'offer_enrollment__student',
+        'offer_enrollment__student__person',
         'learning_unit_year__academic_year',
+        'offer_enrollment__education_group_year',
     )
 
     serializer_class = LearningUnitEnrollmentSerializer
