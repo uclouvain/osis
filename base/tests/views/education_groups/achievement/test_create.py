@@ -41,7 +41,7 @@ class TestCreateEducationGroupAchievement(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
         cls.user = UserFactory()
-        cls.person = cls.person = PersonWithPermissionsFactory(
+        cls.person = PersonWithPermissionsFactory(
             'can_access_education_group',
             'add_educationgroupachievement',
             user=cls.user
