@@ -388,7 +388,6 @@ class TestCleanAcronym(TestCase):
 
 class TestFindWithEnrollmentsCount(TestCase):
     """Unit tests on find_with_enrollments_count()"""
-
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
