@@ -44,11 +44,10 @@ class LearningUnitEnrollmentFilter(filters.FilterSet):
         fields = ['enrollment_state']
 
 
-class LearningUnitEnrollmentList(generics.ListAPIView):
+class LearningUnitEnrollmentList:
     """
        Return a list of all the training with optional filtering.
     """
-    name = 'learning-unit-enrollments-list'
     queryset = LearningUnitEnrollment.objects.select_related(
         'offer_enrollment__student__person',
         'learning_unit_year__academic_year',
@@ -63,14 +62,14 @@ class LearningUnitEnrollmentList(generics.ListAPIView):
     )
 
 
-class EnrollmentsByStudent(LearningUnitEnrollmentList):
+class EnrollmentsByStudent(generics.ListAPIView, LearningUnitEnrollmentList):
     name = 'enrollments-list-by-student'
 
     def get_queryset(self):
         return super().get_queryset().filter(offer_enrollment__student__registration_id=self.kwargs['registration_id'])
 
 
-class EnrollmentsByLearningUnit(LearningUnitEnrollmentList):
+class EnrollmentsByLearningUnit(generics.ListAPIView, LearningUnitEnrollmentList):
     name = 'enrollments-list-by-learning-unit'
 
     def get_queryset(self):
