@@ -177,18 +177,20 @@ class TestExternalPartimForm(TestCase):
         cls.academic_year = academic_years[1]
         cls.language = LanguageFactory(code='FR')
         organization = OrganizationFactory(type=organization_type.MAIN)
-        campus = CampusFactory(organization=organization)
-        language = LanguageFactory(code='FR')
-        container_year = LearningContainerYearFactory(academic_year=cls.academic_year, container_type=EXTERNAL)
+        cls.campus = CampusFactory(organization=organization)
+        cls.language = LanguageFactory(code='FR')
+        cls.container_year = LearningContainerYearFactory(academic_year=cls.academic_year, container_type=EXTERNAL)
         cls.learning_unit = LearningUnitFactory(start_year=cls.academic_year)
-        cls.learning_unit_year = LearningUnitYearFactory(
+
+    def setUp(self):
+        self.learning_unit_year = LearningUnitYearFactory(
             acronym='EOSIS1111',
-            academic_year=cls.academic_year,
-            learning_unit=cls.learning_unit,
-            learning_container_year=container_year,
+            academic_year=self.academic_year,
+            learning_unit=self.learning_unit,
+            learning_container_year=self.container_year,
             subtype=learning_unit_year_subtypes.FULL,
-            campus=campus,
-            language=language,
+            campus=self.campus,
+            language=self.language,
             internship_subtype=None
         )
 

@@ -75,14 +75,15 @@ class LearningUnitPartimFormContextMixin(TestCase):
         cls.learning_unit_year_full.learning_container_year.save()
         cls.learning_unit_year_full.save()
 
+    def setUp(self):
         # Update Partim learning unit year acronym
-        cls.learning_unit_year_partim = LearningUnitYear.objects.get(
-            learning_unit=cls.learn_unit_structure.learning_unit_partim,
-            academic_year=cls.current_academic_year,
-            learning_container_year=cls.learning_unit_year_full.learning_container_year
+        self.learning_unit_year_partim = LearningUnitYear.objects.get(
+            learning_unit=self.learn_unit_structure.learning_unit_partim,
+            academic_year=self.current_academic_year,
+            learning_container_year=self.learning_unit_year_full.learning_container_year
         )
-        cls.learning_unit_year_partim.acronym = FULL_ACRONYM + SUBDIVISION_ACRONYM
-        cls.learning_unit_year_partim.save()
+        self.learning_unit_year_partim.acronym = FULL_ACRONYM + SUBDIVISION_ACRONYM
+        self.learning_unit_year_partim.save()
 
 
 class TestPartimFormInit(LearningUnitPartimFormContextMixin):
