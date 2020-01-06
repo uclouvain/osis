@@ -42,7 +42,6 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestFindBuildParentListByEducationGroupYearId(TestCase):
@@ -445,7 +444,7 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
             academic_year=cls.academic_year
         )
 
-        finality_list = GroupYearFactory(
+        finality_list = GroupFactory(
             acronym='LIST FINALITIES',
             education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
             academic_year=cls.academic_year
@@ -457,7 +456,7 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
             academic_year=cls.academic_year
         )
 
-        common_core = GroupYearFactory(
+        common_core = GroupFactory(
             acronym='TC DROI2MD',
             education_group_type__name=education_group_types.GroupType.COMMON_CORE,
             academic_year=cls.academic_year
