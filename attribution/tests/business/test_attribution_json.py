@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 from decimal import Decimal
 
 from django.test import TestCase
@@ -45,8 +44,7 @@ from base.tests.factories.tutor import TutorFactory
 class AttributionJsonTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        today = date.today()
-        cls.academic_year = AcademicYearFactory(year=today.year, start_date=today)
+        cls.academic_year = AcademicYearFactory(current=True)
 
         # Creation Container / UE and components related
         cls.l_container = LearningContainerYearFactory(academic_year=cls.academic_year, acronym="LBIR1210",
