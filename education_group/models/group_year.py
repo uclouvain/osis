@@ -110,3 +110,8 @@ class GroupYear(models.Model):
         default="",
         verbose_name=_("remark in english")
     )
+
+    def __str__(self):
+        return "{} ({} - {})".format(self.acronym,
+                                     self.group.start_year.year,
+                                     self.group.end_year.year if self.group.end_year else '-')

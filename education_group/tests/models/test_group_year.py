@@ -27,11 +27,13 @@
 from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from education_group.models.group import Group
 from education_group.tests.factories.group import GroupFactory
+from education_group.tests.factories.group_year import GroupYearFactory
+
+ACRONYM = "ECON11BA"
 
 
-class TestGroup(TestCase):
+class TestGroupYear(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year_1 = AcademicYearFactory()
@@ -40,52 +42,16 @@ class TestGroup(TestCase):
     def test_str_without_end_year(self):
         group_without_end_year = GroupFactory(start_year=self.academic_year_1,
                                               end_year=None)
-        self.assertEqual(str(group_without_end_year),
-                         "{} - -".format(group_without_end_year.start_year.year))
+        group_yr = GroupYearFactory(group=group_without_end_year, acronym=ACRONYM)
+        self.assertEqual(str(group_yr),
+                         "{} ({} - -)".format(group_yr.acronym,
+                                              group_without_end_year.start_year.year))
 
     def test_str_with_end_year(self):
         group_with_end_year = GroupFactory(start_year=self.academic_year_1,
                                            end_year=self.academic_year_2)
-        self.assertEqual(str(group_with_end_year),
-                         "{} - {}".format(group_with_end_year.start_year.year,
-                                          group_with_end_year.end_year.year))
-
-
-class TestGroupSave(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year_1999 = AcademicYearFactory(year=1999)
-        cls.academic_year_2000 = AcademicYearFactory(year=2000)
-
-    def test_save_case_start_year_greater_than_end_year_error(self):
-        group = GroupFactory.build(
-            start_year=self.academic_year_2000,
-            end_year=self.academic_year_1999
-        )
-        with self.assertRaises(AttributeError):
-            group.save()
-            self.assertFalse(
-                Group.objects.get(start_year=self.academic_year_2000, end_year=self.academic_year_1999).exists()
-            )
-
-    def test_save_case_start_year_equals_to_end_year_no_error(self):
-        group = GroupFactory.build(
-            start_year=self.academic_year_2000,
-            end_year=self.academic_year_2000
-        )
-        group.save()
-
-        self.assertTrue(
-            Group.objects.filter(start_year=self.academic_year_2000, end_year=self.academic_year_2000).exists()
-        )
-
-    def test_save_case_start_year_lower_to_end_year_no_error(self):
-        group = GroupFactory.build(
-            start_year=self.academic_year_1999,
-            end_year=self.academic_year_2000
-        )
-        group.save()
-
-        self.assertTrue(
-            Group.objects.filter(start_year=self.academic_year_1999, end_year=self.academic_year_2000).exists()
-        )
+        group_yr = GroupYearFactory(group=group_with_end_year, acronym=ACRONYM)
+        self.assertEqual(str(group_yr),
+                         "{} ({} - {})".format(group_yr.acronym,
+                                               group_with_end_year.start_year.year,
+                                               group_with_end_year.end_year.year))
