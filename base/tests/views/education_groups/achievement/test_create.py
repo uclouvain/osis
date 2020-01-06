@@ -31,7 +31,7 @@ from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
@@ -41,9 +41,11 @@ class TestCreateEducationGroupAchievement(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
         cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="add_educationgroupachievement"))
+        cls.person = cls.person = PersonWithPermissionsFactory(
+            'can_access_education_group',
+            'add_educationgroupachievement',
+            user=cls.user
+        )
         PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
     def setUp(self):

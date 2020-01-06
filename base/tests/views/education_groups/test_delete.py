@@ -55,24 +55,24 @@ class TestDeleteGroupEducationView(TestCase):
 
         cls.education_group1 = EducationGroupFactory()
         cls.education_group2 = EducationGroupFactory()
-        cls.education_group_year1 = EducationGroupYearFactory(
-            education_group=cls.education_group1,
-            academic_year=cls.current_ac,
-        )
-        cls.education_group_year2 = EducationGroupYearFactory(
-            education_group=cls.education_group2,
-            academic_year=cls.current_ac,
-        )
         cls.person = PersonWithPermissionsFactory("delete_educationgroup")
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year1.management_entity)
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year2.management_entity)
-
-        cls.url = reverse('delete_education_group', args=[cls.education_group_year1.id,
-                                                          cls.education_group_year1.education_group.id])
-        cls.url2 = reverse('delete_education_group', args=[cls.education_group_year2.id,
-                                                           cls.education_group_year2.education_group.id])
 
     def setUp(self):
+        self.education_group_year1 = EducationGroupYearFactory(
+            education_group=self.education_group1,
+            academic_year=self.current_ac,
+        )
+        self.education_group_year2 = EducationGroupYearFactory(
+            education_group=self.education_group2,
+            academic_year=self.current_ac,
+        )
+        PersonEntityFactory(person=self.person, entity=self.education_group_year1.management_entity)
+        PersonEntityFactory(person=self.person, entity=self.education_group_year2.management_entity)
+
+        self.url = reverse('delete_education_group', args=[self.education_group_year1.id,
+                                                           self.education_group_year1.education_group.id])
+        self.url2 = reverse('delete_education_group', args=[self.education_group_year2.id,
+                                                            self.education_group_year2.education_group.id])
         self.client.force_login(user=self.person.user)
 
     def test_delete_get_permission_denied(self):
