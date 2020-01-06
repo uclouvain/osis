@@ -25,7 +25,9 @@
 ##############################################################################
 
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
+from base.models.enums.education_group_categories import Categories
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 
 
@@ -40,7 +42,7 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     student_last_name = serializers.CharField(
-        source='offer_enrollment.student.person.first_name',
+        source='offer_enrollment.student.person.last_name',
         read_only=True,
     )
     student_email = serializers.CharField(
@@ -59,6 +61,18 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
         source='learning_unit_year.academic_year.year',
         read_only=True,
     )
+    education_group_url = serializers.SerializerMethodField(read_only=True)
+
+    def get_education_group_url(self, learning_unit_enrollment):
+        category = learning_unit_enrollment.offer_enrollment.education_group_year.education_group_type.category
+        acronym = learning_unit_enrollment.offer_enrollment.education_group_year.acronym
+        year = learning_unit_enrollment.learning_unit_year.academic_year.year
+        if category == Categories.TRAINING.name:
+            return reverse('education_group_api_v1:training_read', kwargs={'acronym': acronym, 'year': year})
+        elif category == Categories.MINI_TRAINING.name:
+            kwargs = {'partial_acronym': acronym, 'year': year}
+            return reverse('education_group_api_v1:mini_training_read', kwargs=kwargs)
+        return None
 
     class Meta:
         model = LearningUnitEnrollment
@@ -69,5 +83,6 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
             'student_email',
             'learning_unit_acronym',
             'education_group_acronym',
-            'academic_year'
+            'academic_year',
+            'education_group_url',
         )

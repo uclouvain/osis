@@ -152,6 +152,8 @@ components:
           type: string
         academic_year:
           type: number
+        education_group_url:
+          type: string
 
 
     Error:
