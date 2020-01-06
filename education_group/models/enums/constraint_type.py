@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
 
-FRENCH = "FRENCH"
-GERMAN = "GERMAN"
-DUTCH = "DUTCH"
+from base.models.utils.utils import ChoiceEnum
 
-NATIONAL_COMMUNITY_TYPES = (
-    (FRENCH, FRENCH),
-    (GERMAN, GERMAN),
-    (DUTCH, DUTCH),
-)
+CREDITS = "CREDITS"
+NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
+
+
+class ConstraintTypes(ChoiceEnum):
+    CREDITS = _("credits")
+    NUMBER_OF_ELEMENTS = _("Number of elements")

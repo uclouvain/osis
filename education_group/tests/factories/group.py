@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,34 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import Mock
+import string
 
-from django.template import Context, Template
-from django.test import TestCase
+import factory.fuzzy
+from django.utils import timezone
+from factory.django import DjangoModelFactory
+from faker import Faker
+
+from base.tests.factories.academic_year import AcademicYearFactory
+from osis_common.utils.datetime import get_tzinfo
+
+fake = Faker()
 
 
-class CheckTagTests(TestCase):
-    def test_check_tag_empty(self):
-        out = Template(
-            "{% load check %}"
-            "{{ offers_on|is_checked:pgm_id }}"
-        ).render(Context({
-            'offers_on': [],
-            'pgm_id': 15
-        }))
-        self.assertEqual(out, "")
+class GroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "education_group.Group"
 
-    def test_check_tag_checked(self):
-        mock = Mock()
-        mock.id = 56
-        mock_2 = Mock()
-        mock_2.id = 15
-
-        out = Template(
-            "{% load check %}"
-            "{{ offers_on|is_checked:pgm_id }}"
-        ).render(Context({
-            'offers_on': [mock, mock_2],
-            'pgm_id': 15
-        }))
-        self.assertEqual(out, "checked")
+    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
+    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    end_year = None

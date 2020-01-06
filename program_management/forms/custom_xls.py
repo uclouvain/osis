@@ -24,26 +24,28 @@
 #
 ##############################################################################
 from django import forms
-
-from osis_common.decorators.deprecated import deprecated
-
-
-class BootstrapModelForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(BootstrapModelForm, self).__init__(*args, **kwargs)
-        set_form_control(self)
+from django.utils.translation import gettext_lazy as _
 
 
-# Why ? Still used
-@deprecated
-def set_form_control(self):
-    for field in iter(self.fields):
-        attr_class = self.fields[field].widget.attrs.get('class') or ''
-        # Exception because we don't apply form-control on widget checkbox
-        if self.fields[field].widget.template_name != 'django/forms/widgets/checkbox.html':
-            if isinstance(self.fields[field].widget, forms.MultiWidget):
-                for widget in self.fields[field].widget.widgets:
-                    widget.attrs['class'] = ' '.join((widget.attrs.get('class', ''), 'form-control'))
-            else:
-                self.fields[field].widget.attrs['class'] = ' '.join((attr_class, 'form-control'))
+class CustomXlsForm(forms.Form):
+
+    required_entity = forms.BooleanField(required=False, label=_('Requirement entity'))
+    allocation_entity = forms.BooleanField(required=False, label=_('Attribution entity'))
+    credits = forms.BooleanField(required=False, label=_('Credits'))
+    periodicity = forms.BooleanField(required=False, label=_('Periodicity'))
+    active = forms.BooleanField(required=False, label=_('Active'))
+    quadrimester = forms.BooleanField(required=False, label=_('Quadrimester'))
+    session_derogation = forms.BooleanField(required=False, label=_('Session derogation'))
+    volume = forms.BooleanField(required=False, label=_('Volume'))
+    teacher_list = forms.BooleanField(required=False, label=_('Tutors'))
+    proposition = forms.BooleanField(required=False, label=_('Proposals'))
+    english_title = forms.BooleanField(required=False, label=_('Title in English'))
+    language = forms.BooleanField(required=False, label=_('Language'))
+
+    def get_optional_data(self):
+        data = []
+        if self.is_valid():
+            for field in self.fields:
+                if self.cleaned_data[field]:
+                    data.append(field)
+        return data

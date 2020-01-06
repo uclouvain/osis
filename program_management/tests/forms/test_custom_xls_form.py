@@ -1,4 +1,4 @@
-#############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,14 +22,24 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django import template
+############################################################################
+from django.test import TestCase
 
-register = template.Library()
+from program_management.forms.custom_xls import CustomXlsForm
+
+REQUIRED_ENTITY_FIELD = 'required_entity'
+PROPOSITION_FIELD = 'proposition'
+NON_EXISTING_FIELD = 'any_stupid_think'
 
 
-@register.filter
-def has_permission_can_read_persons_roles(the_user):
-    if the_user:
-        return the_user.has_perm("base.can_read_persons_roles")
-    return False
+class TestCustomXlsForm(TestCase):
+    def test_get_optional_data(self):
+        form = CustomXlsForm({REQUIRED_ENTITY_FIELD: 'on',
+                              PROPOSITION_FIELD: 'on',
+                              NON_EXISTING_FIELD: 'on'})
+
+        self.assertCountEqual(form.get_optional_data(), [REQUIRED_ENTITY_FIELD, PROPOSITION_FIELD])
+
+    def test_get_no_optional_data(self):
+        form = CustomXlsForm()
+        self.assertCountEqual(form.get_optional_data(), [])

@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,24 +22,12 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
+############################################################################
+from django.core.management import BaseCommand
+from django.core.cache import cache
 
-from django.utils.translation import gettext_lazy as _
 
-CRITERIA_1 = "CRITERIA_1"
-CRITERIA_2 = "CRITERIA_2"
-CRITERIA_3 = "CRITERIA_3"
-CRITERIA_4 = "CRITERIA_4"
-CRITERIA_5 = "CRITERIA_5"
-CRITERIA_6 = "CRITERIA_6"
-CRITERIA_7 = "CRITERIA_7"
-
-ASSIMILATION_CRITERIA_CHOICES = (
-    (CRITERIA_1, _(CRITERIA_1)),
-    (CRITERIA_2, _(CRITERIA_2)),
-    (CRITERIA_3, _(CRITERIA_3)),
-    (CRITERIA_4, _(CRITERIA_4)),
-    (CRITERIA_5, _(CRITERIA_5)),
-    (CRITERIA_6, _(CRITERIA_6)),
-    (CRITERIA_7, _(CRITERIA_7)),
-)
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        cache.clear()
+        self.stdout.write(self.style.SUCCESS('Successfully clear cache'))

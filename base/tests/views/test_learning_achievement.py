@@ -38,11 +38,16 @@ from base.business.learning_units.achievement import DELETE, DOWN, UP
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_container import LearningContainerFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.factories.user import UserFactory
@@ -82,10 +87,10 @@ class TestLearningAchievementView(TestCase):
         self.reverse_learning_unit_yr = reverse('learning_unit', args=[self.learning_unit_year.id])
         flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
         flag.users.add(self.user)
+        self.request_factory = RequestFactory()
 
     def test_operation_method_not_allowed(self):
-        request_factory = RequestFactory()
-        request = request_factory.post(
+        request = self.request_factory.post(
             reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]),
             data={'achievement_id': self.achievement_fr.id, 'action': DELETE}
         )
@@ -97,8 +102,7 @@ class TestLearningAchievementView(TestCase):
             management(request, self.achievement_fr.learning_unit_year.id)
 
     def test_delete_redirection(self):
-        request_factory = RequestFactory()
-        request = request_factory.post(
+        request = self.request_factory.post(
             reverse('achievement_management', args=[self.achievement_fr.learning_unit_year.id]),
             data={'achievement_id': self.achievement_fr.id, 'action': DELETE}
         )
@@ -115,8 +119,7 @@ class TestLearningAchievementView(TestCase):
 
     def test_delete_permission_denied(self):
         self.person_entity.delete()
-        request_factory = RequestFactory()
-        request = request_factory.post(reverse('achievement_management',
+        request = self.request_factory.post(reverse('achievement_management',
                                                args=[self.achievement_fr.learning_unit_year.id]),
                                        data={'achievement_id': self.achievement_fr.id,
                                              'action': DELETE})
@@ -128,28 +131,26 @@ class TestLearningAchievementView(TestCase):
             management(request, self.achievement_fr.learning_unit_year.id)
 
     def test_create_not_allowed(self):
-        request_factory = RequestFactory()
-        request = request_factory.get(self.reverse_learning_unit_yr)
+        request = self.request_factory.get(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
             create(request, self.learning_unit_year.id, self.achievement_fr.id)
 
-        request = request_factory.post(self.reverse_learning_unit_yr)
+        request = self.request_factory.post(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
             create(request, self.learning_unit_year.id, self.achievement_fr.id)
 
     def test_create_first_not_allowed(self):
-        request_factory = RequestFactory()
-        request = request_factory.get(self.reverse_learning_unit_yr)
+        request = self.request_factory.get(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
             create_first(request, self.learning_unit_year.id)
 
-        request = request_factory.post(self.reverse_learning_unit_yr)
+        request = self.request_factory.post(self.reverse_learning_unit_yr)
         request.user = self.user
 
         with self.assertRaises(PermissionDenied):
@@ -163,25 +164,26 @@ class TestLearningAchievementView(TestCase):
 
 
 class TestLearningAchievementActions(TestCase):
-    def setUp(self):
-        self.language_fr = LanguageFactory(code="FR")
-        self.language_en = LanguageFactory(code="EN")
-        self.user = UserFactory()
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        self.person = PersonFactory(user=self.user)
-        self.a_superuser = SuperUserFactory()
-        self.client.force_login(self.a_superuser)
-        self.superperson = PersonFactory(user=self.a_superuser)
+    @classmethod
+    def setUpTestData(cls):
+        cls.language_fr = LanguageFactory(code="FR")
+        cls.language_en = LanguageFactory(code="EN")
+        cls.user = UserFactory()
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
+        cls.a_superuser = SuperUserFactory()
+        cls.superperson = PersonFactory(user=cls.a_superuser)
 
-        self.person_entity = PersonEntityFactory(person=self.superperson)
+        cls.person_entity = PersonEntityFactory(person=cls.superperson)
 
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.academic_year,
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_container_year__requirement_entity=self.person_entity.entity,
+            learning_container_year__requirement_entity=cls.person_entity.entity,
         )
+
+    def setUp(self):
+        self.client.force_login(self.a_superuser)
 
     def test_delete(self):
         achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,
@@ -354,27 +356,34 @@ class TestLearningAchievementActions(TestCase):
 
 
 class TestLearningAchievementPostponement(TestCase):
-
     @classmethod
-    def setUpTestData(self):
-        self.language_fr = LanguageFactory(code="FR")
-        self.language_en = LanguageFactory(code="EN")
-        self.user = UserFactory()
+    def setUpTestData(cls):
+        cls.language_fr = LanguageFactory(code="FR")
+        cls.language_en = LanguageFactory(code="EN")
+        cls.user = UserFactory()
         flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
-        flag.users.add(self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        self.person = PersonFactory(user=self.user)
-        self.person_entity = PersonEntityFactory(person=self.person)
-        self.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]
-        self.learning_unit = LearningUnitFactory(start_year=self.academic_years[0], end_year=self.academic_years[-1])
-        self.learning_unit_years = [LearningUnitYearFactory(
+        flag.users.add(cls.user)
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
+        cls.person_entity = PersonEntityFactory(person=cls.person)
+        EntityVersionFactory(entity=cls.person_entity.entity)
+        cls.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]
+        cls.max_la_number = 2*len(cls.academic_years)
+        cls.learning_unit = LearningUnitFactory(start_year=cls.academic_years[0], end_year=cls.academic_years[-1])
+        cls.learning_container = LearningContainerFactory()
+        cls.learning_unit_years = [LearningUnitYearFactory(
             academic_year=academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_container_year__requirement_entity=self.person_entity.entity,
-            learning_unit=self.learning_unit,
+            learning_container_year=LearningContainerYearFactory(
+                academic_year=academic_year,
+                learning_container=cls.learning_container,
+                requirement_entity=cls.person_entity.entity
+            ),
+            learning_unit=cls.learning_unit,
             acronym="TEST0000"
-        ) for academic_year in self.academic_years]
+        ) for academic_year in cls.academic_years]
+        cls.learning_component_years = [LearningComponentYearFactory(
+            learning_unit_year=luy,
+        ) for luy in cls.learning_unit_years]
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -397,13 +406,20 @@ class TestLearningAchievementPostponement(TestCase):
 
     def test_learning_achievement_move_up_with_postponement(self):
         self._move_achievement(achievement_code_name=2, operation=UP)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), 10)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), self.max_la_number)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), self.max_la_number)
 
     def test_learning_achievement_move_down_with_postponement(self):
         self._move_achievement(achievement_code_name=1, operation=DOWN)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), 10)
-        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), 10)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=1, order=1).count(), self.max_la_number)
+        self.assertEqual(LearningAchievement.objects.filter(code_name=2, order=0).count(), self.max_la_number)
+
+    def test_no_learning_unit_year_is_created_after_postponement(self):
+        self.learning_unit_years.pop().delete()
+        self.learning_component_years.pop().delete()
+        create_response = self._create_achievements(code_name=1)
+        self.assertEqual(create_response.status_code, 200)
+        self.assertFalse(LearningUnitYear.objects.filter(academic_year=self.academic_years[-1]).exists())
 
     def _create_achievements(self, code_name):
         create_url = reverse('achievement_create_first', args=[self.learning_unit_years[0].id])
