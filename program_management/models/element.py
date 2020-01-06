@@ -33,6 +33,16 @@ from reversion.admin import VersionAdmin
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
+class ElementManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'education_group_year',
+            'group_year',
+            'learning_unit_year',
+            'learning_class_year'
+        )
+
+
 class ElementAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('education_group_year', 'group_year', 'learning_unit_year', 'learning_class_year')
     search_fields = ('education_group_year__acronym',
@@ -69,6 +79,8 @@ class Element(models.Model):
         verbose_name=_('learning class year'),
         on_delete=models.PROTECT,
     )
+
+    objects = ElementManager()
 
     def __str__(self):
         if self.education_group_year:
