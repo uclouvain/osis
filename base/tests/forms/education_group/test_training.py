@@ -564,9 +564,11 @@ class TestPostponeCertificateAims(TestCase):
         cls.form_data = {
             'certificate_aims': [cls.certificate_aim_type_2.pk, cls.certificate_aim_type_4.pk]
         }
-        cls.qs_training_futures = EducationGroupYear.objects.filter(
-            education_group=cls.training.education_group,
-            academic_year__year__gt=cls.training.academic_year.year
+
+    def setUp(self):
+        self.qs_training_futures = EducationGroupYear.objects.filter(
+            education_group=self.training.education_group,
+            academic_year__year__gt=self.training.academic_year.year
         )
 
     def test_save_with_postponement_on_training_which_have_property_different_in_future(self):

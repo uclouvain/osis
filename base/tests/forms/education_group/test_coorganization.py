@@ -25,7 +25,6 @@
 ##############################################################################
 import random
 
-from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -37,10 +36,9 @@ from base.tests.factories.education_group_organization import EducationGroupOrga
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.group import GroupFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.user import UserFactory
 from reference.tests.factories.country import CountryFactory
 
@@ -48,11 +46,8 @@ from reference.tests.factories.country import CountryFactory
 class TestCoorganizationForm(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.group = GroupFactory(name='central_managers')
         cls.user = UserFactory()
-        cls.user.groups.add(cls.group)
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = CentralManagerFactory(user=cls.user)
 
         cls.academic_year = create_current_academic_year()
         cls.education_group_yr = EducationGroupYearFactory(
