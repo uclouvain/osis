@@ -29,7 +29,6 @@ from django.utils.translation import gettext as _
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
@@ -45,8 +44,7 @@ class TestElementSave(TestCase):
         cls.egy = EducationGroupYearFactory()
         academic_yr = cls.egy.academic_year
         cls.luy = LearningUnitYearFactory(academic_year=academic_yr)
-        learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy)
-        cls.lcy = LearningClassYearFactory(learning_component_year=learning_component_yr)
+        cls.lcy = LearningClassYearFactory()
         cls.gy = GroupYearFactory(group=GroupFactory(start_year=academic_yr))
 
     def test_save_no_foreign_key_set(self):
