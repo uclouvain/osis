@@ -31,7 +31,7 @@ from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from base.tests.forms.test_external_learning_unit import get_valid_external_learning_unit_form_data
 from base.views.learning_units.external.create import get_external_learning_unit_creation_form
@@ -45,10 +45,11 @@ class TestCreateExternalLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="add_externallearningunityear"))
-        cls.person = PersonFactory(user=cls.user)
+        cls.person = PersonWithPermissionsFactory(
+            'can_access_learningunit', 'can_create_learningunit', 'add_externallearningunityear',
+            user=cls.user
+        )
+
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 1)
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years

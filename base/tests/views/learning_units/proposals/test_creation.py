@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from django.contrib.auth.models import Group, Permission
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -38,7 +37,6 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm, Creation
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     entity_type, learning_unit_year_periodicity
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
@@ -48,6 +46,7 @@ from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
+from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
 from reference.tests.factories.language import LanguageFactory
@@ -60,10 +59,10 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         FacultyManagerGroupFactory()
         cls.faculty_user = factory_user.UserFactory()
-        cls.faculty_user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        cls.faculty_person = factory_person.PersonFactory(user=cls.faculty_user)
-        cls.faculty_user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
-        cls.faculty_user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
+        cls.faculty_person = FacultyManagerFactory(
+            'can_propose_learningunit', 'can_create_learningunit',
+            user=cls.faculty_user
+        )
         cls.super_user = factory_user.SuperUserFactory()
         cls.person = factory_person.PersonFactory(user=cls.super_user)
         start_year = AcademicYearFactory(year=get_current_year())

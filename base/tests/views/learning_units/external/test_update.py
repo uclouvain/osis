@@ -47,9 +47,10 @@ class TestUpdateExternalLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit"))
-        cls.person = CentralManagerFactory(user=cls.user)
+        cls.person = CentralManagerFactory(
+            "can_access_learningunit", "can_edit_learningunit",
+            user=cls.user
+        )
 
         person_entity = PersonEntityFactory(
             person=cls.person,
@@ -58,21 +59,19 @@ class TestUpdateExternalLearningUnitView(TestCase):
 
         cls.academic_year = create_current_academic_year()
 
-        luy = LearningUnitYearFullFactory(
+        cls.luy = LearningUnitYearFullFactory(
             academic_year=cls.academic_year,
             internship_subtype=None,
             acronym="EFAC0000",
             learning_container_year__container_type=EXTERNAL,
             learning_container_year__requirement_entity=person_entity.entity,
         )
-        cls.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
+        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.person, cls.luy)
 
-        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.person,
-                                                              cls.external.learning_unit_year)
-
-        cls.url = reverse(update_learning_unit, args=[cls.external.learning_unit_year.pk])
+        cls.url = reverse(update_learning_unit, args=[cls.luy.pk])
 
     def setUp(self):
+        self.external = ExternalLearningUnitYearFactory(learning_unit_year=self.luy)
         self.client.force_login(self.user)
 
     def test_update_get(self):
