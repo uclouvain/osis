@@ -62,15 +62,23 @@ class TestSearchForm(TestCase):
         start_year = AcademicYearFactory(year=current_year - 2)
         end_year = AcademicYearFactory(year=current_year + 2)
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=cls.academic_years[0],
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            mobility=True,
+            co_graduation=False,
+        )
+
+    def setUp(self):
+        self.data = QueryDict(mutable=True)
 
     def test_get_research_criteria(self):
-        data = QueryDict(mutable=True)
-        data.update({
+        self.data.update({
             "requirement_entity": "INFO",
             "tutor": "Jean Marcel",
             "academic_year": str(self.academic_years[0].id),
         })
-        form = LearningUnitFilter(data).form
+        form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
         expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
                                       (_('Req. Entity'), "INFO"),
@@ -79,12 +87,11 @@ class TestSearchForm(TestCase):
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
     def test_get_research_criteria_with_choice_field(self):
-        data = QueryDict(mutable=True)
-        data.update({
+        self.data.update({
             "academic_year": str(self.academic_years[0].id),
             "container_type": learning_container_year_types.COURSE
         })
-        form = LearningUnitFilter(data).form
+        form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
         expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
                                       (_('Type'), _("Course"))]
@@ -92,47 +99,30 @@ class TestSearchForm(TestCase):
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
     def test_search_on_external_mobility(self):
-        data = QueryDict(mutable=True)
-        academic_year = self.academic_years[0]
-        data.update({
-            "academic_year_id": str(academic_year.id),
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
             "container_type": MOBILITY
         })
-        ExternalLearningUnitYearFactory(
-            learning_unit_year__academic_year=academic_year,
-            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
-            mobility=True,
-            co_graduation=False,
-        )
-        form = LearningUnitFilter(data)
+        form = LearningUnitFilter(self.data)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.get_queryset().count(), 1)
 
     def test_search_on_external_cograduation(self):
-        data = QueryDict(mutable=True)
-        academic_year = self.academic_years[0]
-        data.update({
-            "academic_year_id": str(academic_year.id),
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
             "container_type": learning_container_year_types.EXTERNAL
         })
         ExternalLearningUnitYearFactory(
-            learning_unit_year__academic_year=academic_year,
-            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
-            mobility=True,
-            co_graduation=False,
-        )
-        ExternalLearningUnitYearFactory(
-            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__academic_year=self.academic_years[0],
             learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
             mobility=False,
             co_graduation=True,
         )
-        learning_unit_filter = LearningUnitFilter(data)
+        learning_unit_filter = LearningUnitFilter(self.data)
         self.assertTrue(learning_unit_filter.is_valid())
         self.assertEqual(learning_unit_filter.qs.count(), 1)
 
     def test_dropdown_init(self):
-
         country = CountryFactory()
 
         organization_1 = OrganizationFactory(name="organization 1")
