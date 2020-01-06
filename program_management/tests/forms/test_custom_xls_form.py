@@ -33,7 +33,6 @@ NON_EXISTING_FIELD = 'any_stupid_think'
 
 
 class TestCustomXlsForm(TestCase):
-
     def test_get_optional_data(self):
         form = CustomXlsForm({REQUIRED_ENTITY_FIELD: 'on',
                               PROPOSITION_FIELD: 'on',

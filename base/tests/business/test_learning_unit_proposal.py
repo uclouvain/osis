@@ -38,7 +38,6 @@ from base.business import learning_unit_proposal as lu_proposal_business
 from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state, \
     copy_learning_unit_data
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
-from base.business.learning_units.edition import update_partim_acronym
 from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.enums import learning_component_year_type
@@ -231,11 +230,12 @@ def create_academic_years():
 
 
 class TestConsolidateProposals(TestCase):
-    def setUp(self):
-        self.author = PersonFactory()
-        self.proposals = [ProposalLearningUnitFactory() for _ in range(2)]
-        person_entity = PersonEntityFactory(person=self.author)
-        for proposal in self.proposals:
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = PersonFactory()
+        cls.proposals = [ProposalLearningUnitFactory() for _ in range(2)]
+        person_entity = PersonEntityFactory(person=cls.author)
+        for proposal in cls.proposals:
             container_year = proposal.learning_unit_year.learning_container_year
             container_year.requirement_entity = person_entity.entity
             container_year.save()

@@ -154,7 +154,7 @@ class TestLearningUnitXls(TestCase):
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        a_person_tutor_1 = PersonFactory(last_name='Dupuis', first_name='Tom')
+        a_person_tutor_1 = PersonFactory(last_name='Dupuis', first_name='Tom', email="dupuis@gmail.com")
         cls.a_tutor_1 = TutorFactory(person=a_person_tutor_1)
 
         cls.an_attribution_1 = AttributionNewFactory(
@@ -448,7 +448,7 @@ class TestLearningUnitXls(TestCase):
         ]
 
     def test_get_attribution_detail(self):
-        a_person = PersonFactory(last_name="Smith", first_name='Aaron')
+        a_person = PersonFactory(last_name="Smith", first_name='Aaron', email='smith@google.com')
         attribution_dict = {
             'LECTURING': 10,
             'substitute': None,
@@ -461,6 +461,7 @@ class TestLearningUnitXls(TestCase):
         self.assertCountEqual(
             _get_attribution_detail(attribution_dict),
             ['Smith Aaron',
+             'smith@google.com',
              _('Co-holder'),
              '',
              self.academic_year,
@@ -488,12 +489,13 @@ class TestLearningUnitXls(TestCase):
         first_attribution = result.get('data')[0]
 
         self.assertEqual(first_attribution[24], 'Dupuis Tom')
-        self.assertEqual(first_attribution[25], _("Coordinator"))
-        self.assertEqual(first_attribution[26], "")
-        self.assertEqual(first_attribution[27], 2017)
-        self.assertEqual(first_attribution[28], '')
-        self.assertEqual(first_attribution[29], 15)
-        self.assertEqual(first_attribution[30], 5)
+        self.assertEqual(first_attribution[25], 'dupuis@gmail.com')
+        self.assertEqual(first_attribution[26], _("Coordinator"))
+        self.assertEqual(first_attribution[27], "")
+        self.assertEqual(first_attribution[28], 2017)
+        self.assertEqual(first_attribution[29], '')
+        self.assertEqual(first_attribution[30], 15)
+        self.assertEqual(first_attribution[31], 5)
 
 
 def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):
