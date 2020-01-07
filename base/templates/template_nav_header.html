@@ -52,7 +52,10 @@
         </div>
     </div>
    <input id="nav-url" type="hidden"
-    data-nav-base-url="{% url tab_active learning_unit_year_id=learning_unit_year.id%}"/>
+        {% if tab_active %}
+            data-nav-base-url="{% url tab_active learning_unit_year_id=learning_unit_year.id%}"
+        {% endif %}
+        />
 
     <script type="text/javascript">
         let removeNavButtons = function () {
