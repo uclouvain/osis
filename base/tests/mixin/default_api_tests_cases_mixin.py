@@ -43,9 +43,9 @@ def only_run_if_called_from_subclass(func):
 class APIDefaultTestsCasesHttpGetMixin(APITestCase):
 
     http_method = 'GET'  # Could write a mixin with "post", "put"...
-    user: User = None
+    user = None
     url: str = None
-    methods_not_allowed: List[str] = None
+    methods_not_allowed: list = None
 
     has_api_pagination = True
     has_api_filters = True
