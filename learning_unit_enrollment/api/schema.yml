@@ -154,6 +154,8 @@ components:
           type: number
         education_group_url:
           type: string
+        learning_unit_url:
+          type: string
 
 
     Error:

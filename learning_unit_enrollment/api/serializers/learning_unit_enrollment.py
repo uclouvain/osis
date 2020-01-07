@@ -25,10 +25,10 @@
 ##############################################################################
 
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_categories import Categories
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
+from education_group.api.serializers.utils import EducationGroupYearHyperlinkedIdentityField
+from learning_unit_enrollment.api.serializers.utils import LearningUnitHyperlinkedIdentityField
 
 
 class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
@@ -61,18 +61,11 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
         source='learning_unit_year.academic_year.year',
         read_only=True,
     )
-    education_group_url = serializers.SerializerMethodField(read_only=True)
-
-    def get_education_group_url(self, learning_unit_enrollment):
-        category = learning_unit_enrollment.offer_enrollment.education_group_year.education_group_type.category
-        acronym = learning_unit_enrollment.offer_enrollment.education_group_year.acronym
-        year = learning_unit_enrollment.learning_unit_year.academic_year.year
-        if category == Categories.TRAINING.name:
-            return reverse('education_group_api_v1:training_read', kwargs={'acronym': acronym, 'year': year})
-        elif category == Categories.MINI_TRAINING.name:
-            kwargs = {'partial_acronym': acronym, 'year': year}
-            return reverse('education_group_api_v1:mini_training_read', kwargs=kwargs)
-        return None
+    education_group_url = EducationGroupYearHyperlinkedIdentityField(
+        read_only=True,
+        lookup_field='offer_enrollment__education_group_year',
+    )
+    learning_unit_url = LearningUnitHyperlinkedIdentityField(read_only=True)
 
     class Meta:
         model = LearningUnitEnrollment
@@ -85,4 +78,5 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
             'education_group_acronym',
             'academic_year',
             'education_group_url',
+            'learning_unit_url',
         )
