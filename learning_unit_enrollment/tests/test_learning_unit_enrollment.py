@@ -1,6 +1,6 @@
 from typing import List
 
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
 from base.models.enums import learning_unit_enrollment_state
@@ -39,6 +39,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 filters={'year': 2018},
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(learning_unit_year__academic_year__year=2018),
+                    context={'request': RequestFactory().get(self.url)},
                     many=True,
                 ).data,
             ),
@@ -49,6 +50,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                     LearningUnitEnrollment.objects.filter(
                         offer_enrollment__education_group_year__acronym=self.offer_acronym
                     ),
+                    context={'request': RequestFactory().get(self.url)},
                     many=True,
                 ).data,
             ),
@@ -57,6 +59,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 filters={'enrollment_state': learning_unit_enrollment_state.ENROLLED},
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(enrollment_state=learning_unit_enrollment_state.ENROLLED),
+                    context={'request': RequestFactory().get(self.url)},
                     many=True,
                 ).data,
             ),
@@ -78,7 +81,10 @@ class LearningUnitEnrollmentSerializerTestCase(TestCase):
             learning_unit_year__academic_year__year=cls.year,
             learning_unit_year__acronym=cls.learning_unit_acronym,
         )
-        cls.serializer = LearningUnitEnrollmentSerializer(cls.learning_unit_enrollment)
+        cls.serializer = LearningUnitEnrollmentSerializer(
+            cls.learning_unit_enrollment,
+            context={'request': RequestFactory().get(cls.url)}
+        )
 
     def test_contains_expected_fields(self):
         expected_fields = [
