@@ -27,7 +27,7 @@
 from rest_framework import serializers
 
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
-from education_group.api.serializers.utils import EducationGroupYearHyperlinkedIdentityField
+from education_group.api.serializers.education_group import EducationGroupYearHyperlinkedIdentityField
 from learning_unit_enrollment.api.serializers.utils import LearningUnitHyperlinkedIdentityField
 
 

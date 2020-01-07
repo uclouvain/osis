@@ -26,52 +26,6 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_categories import Categories
-
-
-class EducationGroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
-    default_view = 'education_group_api_v1:training_read'
-
-    lookup_field = None
-
-    def __init__(self, lookup_field=None, **kwargs):
-        self.lookup_field = lookup_field or ''
-        super().__init__(view_name=self.default_view, **kwargs)
-
-    @staticmethod
-    def _get_view_name(category):
-        return {
-            Categories.TRAINING.name: 'education_group_api_v1:training_read',
-            Categories.MINI_TRAINING.name: 'education_group_api_v1:mini_training_read',
-            Categories.GROUP.name: 'education_group_api_v1:group_read',
-        }[category]
-
-    @staticmethod
-    def _get_view_kwargs(education_group_year):
-        acronym_key = {
-            Categories.TRAINING.name: 'acronym',
-            Categories.MINI_TRAINING.name: 'partial_acronym',
-            Categories.GROUP.name: 'partial_acronym',
-        }[education_group_year.education_group_type.category]
-        return {
-            acronym_key: getattr(education_group_year, acronym_key, education_group_year),
-            'year': education_group_year.academic_year.year
-        }
-
-    def get_url(self, obj, view_name, request, format):
-        education_group_year = obj
-        for attr in self.lookup_field.split('__'):
-            education_group_year = getattr(education_group_year, attr, education_group_year)
-
-        category = education_group_year.education_group_type.category
-
-        return reverse(
-            self._get_view_name(category),
-            kwargs=self._get_view_kwargs(education_group_year),
-            request=request,
-            format=format
-        )
-
 
 # FIXME :: deprecated : use EducationGroupYearHyperlinkedIdentityField instead
 class TrainingGetUrlMixin:
