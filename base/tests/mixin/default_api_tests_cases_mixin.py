@@ -62,6 +62,7 @@ class APIDefaultTestsCasesHttpGetMixin(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    @only_run_if_called_from_subclass
     @requires_attributes(['url'])
     def test_authentication(self):
         response = self.client.get(self.url)
