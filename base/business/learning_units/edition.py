@@ -25,7 +25,6 @@
 ##############################################################################
 
 from django.db import IntegrityError, transaction, Error
-from django.db.models import F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -38,14 +37,26 @@ from base.enums.component_detail import COMPONENT_DETAILS
 from base.models import learning_class_year, academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
-from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
-from cms.models import translated_text
+from cms.models.translated_text import TranslatedText
 from osis_common.utils.numbers import normalize_fraction
+from base.business.learning_units.pedagogy import postpone_teaching_materials
+from base.business.learning_unit import get_academic_year_postponement_range
+from base.forms.learning_unit_specifications import update_future_luy
+from django.conf import settings
+from base.business.learning_unit import CMS_LABEL_SUMMARY, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
+    CMS_LABEL_PEDAGOGY_FR_ONLY, CMS_LABEL_SPECIFICATIONS
+from cms.models.translated_text import TranslatedText
+from cms.models.text_label import TextLabel
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
+from base.models.learning_achievement import LearningAchievement
+from reference.models.language import Language
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 
@@ -230,7 +241,7 @@ def _duplicate_teaching_material(duplicated_luy):
 
 
 def _duplicate_cms_data(duplicated_luy):
-    previous_cms_data = translated_text.find_by_reference(duplicated_luy.copied_from.id)
+    previous_cms_data = TranslatedText.objects.filter(reference=duplicated_luy.copied_from.id)
     for item in previous_cms_data:
         update_related_object(item, 'reference', duplicated_luy.id)
 
@@ -275,6 +286,7 @@ def get_next_academic_years(learning_unit_to_edit, year):
 def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entities_by_type_to_update, **kwargs):
     with_report = kwargs.get('with_report', True)
     override_postponement_consistency = kwargs.get('override_postponement_consistency', False)
+    lu_to_consolidate = kwargs.get('lu_to_consolidate', None)
 
     conflict_report = {}
     if with_report:
@@ -292,6 +304,10 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
+
+    if lu_to_consolidate:
+        postpone_teaching_materials(luy_to_update)
+        _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -600,3 +616,44 @@ def update_partim_acronym(acronym_full, luy_to_update):
             new_acronym = acronym_full + str(partim.acronym[-1])
             partim.acronym = new_acronym
             partim.save()
+
+
+def _update_luy_achievements_in_future(ac_year_postponement_range, lu_to_consolidate):
+    for code, label in settings.LANGUAGES:
+        language = Language.objects.get(code=code[:2].upper())
+        texts = LearningAchievement.objects.filter(
+            learning_unit_year_id=lu_to_consolidate.id,
+            language=language)
+        for achievement in texts:
+            update_future_luy_achievement(ac_year_postponement_range,
+                                          achievement,
+                                          achievement.code_name,
+                                          achievement.code_name)
+
+
+def _update_descriptive_fiche(ac_year_postponement_range, lu_to_consolidate, luy_to_update):
+    cms_labels = \
+        CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
+
+    for label_key in cms_labels:
+        a_text_label = TextLabel.objects.filter(label=label_key).first()
+
+        for code, label in settings.LANGUAGES:
+            a_text = TranslatedText.objects.filter(text_label=a_text_label,
+                                                   language=code,
+                                                   entity=LEARNING_UNIT_YEAR,
+                                                   reference=lu_to_consolidate.id).first()
+
+            cms = {"language": code,
+                   "text_label": a_text_label,
+                   "text": a_text.text if a_text else None
+                   }
+            update_future_luy(ac_year_postponement_range, luy_to_update, cms)
+
+
+def _descriptive_fiche_and_achievements_update(proposal_learning_unit_year: LearningUnitYear,
+                                               luy_to_update: LearningUnitYear):
+    if not luy_to_update.academic_year.is_past:
+        ac_year_postponement_range = get_academic_year_postponement_range(proposal_learning_unit_year)
+        _update_descriptive_fiche(ac_year_postponement_range, proposal_learning_unit_year, luy_to_update)
+        _update_luy_achievements_in_future(ac_year_postponement_range, proposal_learning_unit_year)

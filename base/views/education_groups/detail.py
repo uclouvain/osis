@@ -73,6 +73,7 @@ from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.forms.custom_xls import CustomXlsForm
 from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
@@ -185,6 +186,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
+        context['form_xls_custom'] = CustomXlsForm()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -545,7 +547,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_master = acronym.endswith(('2m', '2m1'))
         is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
-        is_iufc = acronym.endswith('fc')
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
@@ -567,7 +568,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'is_iufc': is_iufc,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
                 'show_free_text': self._show_free_text()
@@ -584,9 +584,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         return context
 
     def _show_free_text(self):
-        concerned_training_types = list(
-            set(TrainingType.with_admission_condition()) - set(TrainingType.continuing_education_types())
-        )
+        concerned_training_types = list(TrainingType.with_admission_condition())
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
             concerned_training_types,
             MiniTrainingType.with_admission_condition(),
