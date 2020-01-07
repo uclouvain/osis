@@ -24,21 +24,19 @@
 #
 ##############################################################################
 import mock
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP
-from base.tests.business.test_perms import create_person_with_permission_and_group
+from base.models.enums.groups import PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
     OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonFactory, FacultyManagerFactory, PersonWithPermissionsFactory, \
+    CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from program_management.views.perms import can_update_group_element_year, \
     can_detach_group_element_year
@@ -55,11 +53,7 @@ class TestCanUpdateGroupElementYear(TestCase):
                 education_group_type__name=MiniTrainingType.DEEPENING.name
             ),
         )
-        cls.faculty_manager = FacultyManagerFactory()
-        cls.faculty_manager.user.user_permissions.add(
-            Permission.objects.get(codename='change_educationgroup'),
-            Permission.objects.get(codename='change_educationgroupcontent')
-        )
+        cls.faculty_manager = FacultyManagerFactory('change_educationgroup','change_educationgroupcontent')
         PersonEntityFactory(
             entity=cls.group_element_year.parent.management_entity,
             person=cls.faculty_manager
@@ -71,16 +65,14 @@ class TestCanUpdateGroupElementYear(TestCase):
             can_update_group_element_year(person.user, self.group_element_year)
 
     def test_return_true_if_is_central_manager(self):
-        central_manager = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'change_educationgroup')
-        central_manager.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupcontent"))
+        central_manager = CentralManagerFactory('change_educationgroup', 'change_educationgroupcontent')
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=central_manager)
 
         self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
 
     def test_return_true_if_child_is_learning_unit_and_user_is_central_manager(self):
-        central_manager = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'change_educationgroup')
-        central_manager.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupcontent"))
+        central_manager = CentralManagerFactory('change_educationgroup', 'change_educationgroupcontent')
         GroupElementYearChildLeafFactory(parent=self.group_element_year.parent)
         person_entity = PersonEntityFactory(entity=self.group_element_year.parent.management_entity,
                                             person=central_manager)
@@ -108,9 +100,9 @@ class TestCanUpdateGroupElementYear(TestCase):
     @mock.patch("program_management.business.group_element_years.perms.is_eligible_to_update_group_element_year")
     def test_true_if_person_has_both_roles(self, mock_permission):
         mock_permission.return_value = True
-        person_with_both_roles = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP))
-        person_with_both_roles.user.user_permissions.add(
-            Permission.objects.get(codename="change_educationgroupcontent")
+        person_with_both_roles = PersonWithPermissionsFactory(
+            'change_educationgroupcontent',
+            groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP)
         )
         self.assertTrue(can_update_group_element_year(person_with_both_roles.user, self.group_element_year))
 

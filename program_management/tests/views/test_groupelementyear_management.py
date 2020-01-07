@@ -26,14 +26,12 @@
 from unittest import mock
 
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
 from base.business.education_groups.perms import is_eligible_to_change_education_group_content
-from base.models.education_group import EducationGroup
 from base.models.enums.groups import PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.templatetags.education_group import _get_permission
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -130,9 +128,9 @@ class TestOrderingButtons(TestCase):
     def test_button_order_enabled_for_person_with_both_roles(self, mock_permission, mock_year_editable):
         mock_permission.return_value = True
         mock_year_editable.return_value = True
-        person_with_both_roles = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP))
-        person_with_both_roles.user.user_permissions.add(
-            Permission.objects.get(codename='change_educationgroupcontent')
+        person_with_both_roles = PersonWithPermissionsFactory(
+            'change_educationgroupcontent',
+            groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP)
         )
         context = {'person': person_with_both_roles, 'group': self.group_element_year, 'root': None}
         self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], '')
