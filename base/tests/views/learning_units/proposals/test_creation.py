@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 
+from django.contrib.auth.models import Permission
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
