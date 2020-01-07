@@ -39,7 +39,7 @@ paths:
             description: The initial index from which to return the results.
             type: integer
         - in: query
-          name: offer_acronym
+          name: education_group_acronym
           schema:
             type: string
         - in: query
