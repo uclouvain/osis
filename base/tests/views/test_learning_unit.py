@@ -240,26 +240,27 @@ class LearningUnitViewCreateFullTestCase(TestCase):
 
 @override_flag('learning_unit_create', active=True)
 class LearningUnitViewCreatePartimTestCase(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
 
         AcademicCalendarFactory(
-            data_year=self.current_academic_year,
-            start_date=datetime.datetime(self.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(self.current_academic_year.year + 1, 9, 14),
+            data_year=cls.current_academic_year,
+            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
-        self.learning_unit_year_full = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year,
+        cls.learning_unit_year_full = LearningUnitYearFactory(
+            academic_year=cls.current_academic_year,
+            learning_container_year__academic_year=cls.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
-        self.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': self.learning_unit_year_full.id})
-        faculty_manager = FacultyManagerFactory()
-        self.user = faculty_manager.user
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
+        cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
+        faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
+        cls.user = faculty_manager.user
+
+    def setUp(self):
         self.client.force_login(self.user)
 
     def test_create_partim_form_when_user_not_logged(self):
@@ -1159,14 +1160,15 @@ class LearningUnitViewTestCase(TestCase):
 
 
 class TestCreateXls(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory(
             learning_container_year__requirement_entity=EntityFactory(),
             learning_container_year__allocation_entity=EntityFactory(),
             acronym="LOSI1452"
         )
 
-        self.user = UserFactory()
+        cls.user = UserFactory()
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_no_data(self, mock_generate_xls):
