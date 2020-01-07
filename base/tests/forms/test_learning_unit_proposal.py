@@ -32,7 +32,7 @@ from django.test import TestCase
 from base.forms.learning_unit import learning_unit_create_2
 from base.forms.learning_unit_proposal import ProposalBaseForm
 from base.forms.proposal import learning_unit_proposal
-from base.models import proposal_learning_unit, academic_year
+from base.models import proposal_learning_unit
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
@@ -41,6 +41,7 @@ from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROU
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories import academic_calendar as academic_calendar_factories
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -64,7 +65,7 @@ class TestSave(TestCase):
     def setUpTestData(cls):
         cls.an_organization = OrganizationFactory(type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
-        GenerateAcademicYear(
+        cls.academic_years = GenerateAcademicYear(
             AcademicYearFactory(year=cls.current_academic_year.year - 10),
             AcademicYearFactory(year=cls.current_academic_year.year + 10)
         )
@@ -300,7 +301,14 @@ class TestSave(TestCase):
         self.assertTrue('entity' in form.errors[1])
 
     def test_academic_year_range_creation_proposal_central_manager(self):
-
+        self.academic_calendars = [
+            academic_calendar_factories.AcademicCalendarCreationEndDateProposalCentralManagerFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            )
+            for academic_year in self.academic_years
+        ]
         LanguageFactory(code="FR")
         central_manager = CentralManagerFactory()
         form = learning_unit_create_2.FullForm(
@@ -318,6 +326,14 @@ class TestSave(TestCase):
         )
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
+        self.academic_calendars = [
+            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year, 9, 14)
+            )
+            for academic_year in self.academic_years
+        ]
         LanguageFactory(code="FR")
         faculty_manager = FacultyManagerFactory()
         form = learning_unit_create_2.FullForm(
