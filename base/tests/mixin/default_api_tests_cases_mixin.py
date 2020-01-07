@@ -44,8 +44,8 @@ class APIDefaultTestsCasesHttpGetMixin(APITestCase):
 
     http_method = 'GET'  # Could write a mixin with "post", "put"...
     user = None
-    url: str = None
-    methods_not_allowed: list = None
+    url = None
+    methods_not_allowed = None
 
     has_api_pagination = True
     has_api_filters = True
