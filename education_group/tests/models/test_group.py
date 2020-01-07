@@ -28,27 +28,30 @@ from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.models.group import Group
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group import GroupFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year_1 = AcademicYearFactory()
-        cls.academic_year_2 = AcademicYearFactory(year=cls.academic_year_1.year+1)
+        cls.academic_year_2 = AcademicYearFactory(year=cls.academic_year_1.year+3)
 
-    def test_str_without_end_year(self):
-        group_without_end_year = GroupFactory(start_year=self.academic_year_1,
-                                              end_year=None)
-        self.assertEqual(str(group_without_end_year),
-                         "{} - -".format(group_without_end_year.start_year.year))
+    def test_most_recent_acronym_no_group_year(self):
+        group = GroupFactory()
+        group_in_db = Group.objects.get(pk=group.id)  # Necessary otherwise the groupyear_set collection is empty
+        self.assertIsNone(group_in_db.most_recent_acronym, "")
 
-    def test_str_with_end_year(self):
-        group_with_end_year = GroupFactory(start_year=self.academic_year_1,
-                                           end_year=self.academic_year_2)
-        self.assertEqual(str(group_with_end_year),
-                         "{} - {}".format(group_with_end_year.start_year.year,
-                                          group_with_end_year.end_year.year))
+    def test_most_recent_acronym(self):
+        a_group = GroupFactory(start_year=self.academic_year_1)
+        GroupYearFactory(group=a_group, academic_year=self.academic_year_1)
+        most_recent_group_yr = GroupYearFactory(group=a_group, academic_year=self.academic_year_2)
+        group_in_db = Group.objects.get(pk=a_group.id)  # Necessary otherwise the groupyear_set collection is empty
+
+        self.assertEqual(group_in_db.most_recent_acronym,
+                         GroupYear.objects.get(pk=most_recent_group_yr.id).acronym)
 
 
 class TestGroupSave(TestCase):

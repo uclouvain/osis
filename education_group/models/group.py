@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -32,7 +33,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class GroupAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('start_year', 'end_year', 'changed')
+    list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
     search_fields = ('groupyear__acronym', 'groupyear__partial_acronym',)
 
 
@@ -62,5 +63,12 @@ class Group(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return "{} - {}".format(self.start_year.year,
-                                self.end_year.year if self.end_year else '-')
+        return "{}".format(self.most_recent_acronym or '')
+
+    @cached_property
+    def most_recent_acronym(self):
+        try:
+            most_recent_group = sorted(self.groupyear_set.all(), key=lambda x: x.academic_year.start_date)
+            return most_recent_group[-1].acronym
+        except IndexError:
+            return None

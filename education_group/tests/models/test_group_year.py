@@ -25,33 +25,73 @@
 ##############################################################################
 
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 from base.tests.factories.academic_year import AcademicYearFactory
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 
-ACRONYM = "ECON11BA"
-
 
 class TestGroupYear(TestCase):
+    def test_str(self):
+        group = GroupFactory()
+        group_yr = GroupYearFactory(group=group, academic_year=group.start_year)
+        self.assertEqual(str(group_yr),
+                         "{} ({})".format(group_yr.acronym,
+                                          group_yr.academic_year))
+
+
+class TestGroupYearSave(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year_1 = AcademicYearFactory()
-        cls.academic_year_2 = AcademicYearFactory(year=cls.academic_year_1.year+1)
 
-    def test_str_without_end_year(self):
-        group_without_end_year = GroupFactory(start_year=self.academic_year_1,
-                                              end_year=None)
-        group_yr = GroupYearFactory(group=group_without_end_year, acronym=ACRONYM)
-        self.assertEqual(str(group_yr),
-                         "{} ({} - -)".format(group_yr.acronym,
-                                              group_without_end_year.start_year.year))
+        cls.academic_year_2019 = AcademicYearFactory(year=2019)
+        cls.academic_year_2023 = AcademicYearFactory(year=2023)
 
-    def test_str_with_end_year(self):
-        group_with_end_year = GroupFactory(start_year=self.academic_year_1,
-                                           end_year=self.academic_year_2)
-        group_yr = GroupYearFactory(group=group_with_end_year, acronym=ACRONYM)
-        self.assertEqual(str(group_yr),
-                         "{} ({} - {})".format(group_yr.acronym,
-                                               group_with_end_year.start_year.year,
-                                               group_with_end_year.end_year.year))
+        cls.academic_year_less = AcademicYearFactory(year=cls.academic_year_2019.year - 1)
+        cls.academic_year_greater = AcademicYearFactory(year=cls.academic_year_2023.year + 1)
+
+        cls.group_2019_2023 = GroupFactory(start_year=cls.academic_year_2019,
+                                           end_year=cls.academic_year_2023)
+        cls.group_without_end_year = GroupFactory(start_year=cls.academic_year_2019,
+                                                  end_year=None)
+
+    def test_save_case_academic_year_less_than_start_year_error(self):
+
+        with self.assertRaisesMessage(
+                AttributeError,
+                _('Please enter an academic year greater or equal to group start year.')):
+            group_yr = GroupYearFactory(
+                group=self.group_2019_2023,
+                academic_year=self.academic_year_less
+            )
+            group_yr.save()
+            self.assertFalse(
+                GroupYear.objects.filter(group=self.group_2019_2023, academic_year=self.academic_year_less).exists()
+            )
+
+    def test_save_case_academic_year_greater_than_end_year_error(self):
+
+        with self.assertRaisesMessage(
+                AttributeError,
+                _('Please enter an academic year less or equal to group end year.')):
+            group_yr = GroupYearFactory(
+                group=self.group_2019_2023,
+                academic_year=self.academic_year_greater
+            )
+            group_yr.save()
+            self.assertFalse(
+                GroupYear.objects.filter(group=self.group_2019_2023, academic_year=self.academic_year_greater).exists()
+            )
+
+    def test_save_case_academic_year_no_check_on_end_year(self):
+        group_yr = GroupYearFactory(
+            group=self.group_without_end_year,
+            academic_year=self.academic_year_greater
+        )
+        group_yr.save()
+        self.assertTrue(
+            GroupYear.objects.filter(group=self.group_without_end_year,
+                                     academic_year=self.academic_year_greater).exists()
+        )
