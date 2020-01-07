@@ -49,7 +49,7 @@ paths:
         - in: query
           name: enrollment_state
           schema:
-            type: string
+            $ref: '#/components/schemas/EnrollmentStateEnum'
       responses:
         '200':
           description: OK
@@ -156,6 +156,11 @@ components:
           type: string
         learning_unit_url:
           type: string
+
+    EnrollmentStateEnum:
+      type: string
+      enum:
+        - ENROLLED
 
 
     Error:
