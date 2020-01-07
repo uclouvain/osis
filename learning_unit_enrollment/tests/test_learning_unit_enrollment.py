@@ -30,11 +30,12 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 offer_enrollment__student__registration_id=cls.registration_id,
                 offer_enrollment__education_group_year__academic_year__year=year,
                 offer_enrollment__education_group_year__acronym=cls.education_group_acronym,
-                offer_enrollment__education_group_year__education_group_type__category=Categories.TRAINING,
+                offer_enrollment__education_group_year__education_group_type__category=Categories.TRAINING.name,
                 learning_unit_year__academic_year__year=year,
             )
 
     def get_filter_test_cases(self) -> List[APIFilterTestCaseData]:
+        expected_ordering = ('learning_unit_year__acronym', 'learning_unit_year__academic_year__year')
         return [
 
             APIFilterTestCaseData(
@@ -51,7 +52,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(
                         offer_enrollment__education_group_year__acronym=self.education_group_acronym
-                    ),
+                    ).order_by(*expected_ordering),
                     context={'request': RequestFactory().get(self.url)},
                     many=True,
                 ).data,
@@ -60,7 +61,9 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
             APIFilterTestCaseData(
                 filters={'enrollment_state': learning_unit_enrollment_state.ENROLLED},
                 expected_result=LearningUnitEnrollmentSerializer(
-                    LearningUnitEnrollment.objects.filter(enrollment_state=learning_unit_enrollment_state.ENROLLED),
+                    LearningUnitEnrollment.objects.filter(
+                        enrollment_state=learning_unit_enrollment_state.ENROLLED
+                    ).order_by(*expected_ordering),
                     context={'request': RequestFactory().get(self.url)},
                     many=True,
                 ).data,

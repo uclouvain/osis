@@ -59,6 +59,7 @@ class LearningUnitEnrollmentList(generics.ListAPIView):
 
     ordering = (
         'learning_unit_year__acronym',
+        'learning_unit_year__academic_year__year',
     )
 
 
