@@ -32,7 +32,7 @@ from django.test import TestCase
 from base.forms.learning_unit import learning_unit_create_2
 from base.forms.learning_unit_proposal import ProposalBaseForm
 from base.forms.proposal import learning_unit_proposal
-from base.models import proposal_learning_unit
+from base.models import proposal_learning_unit, academic_year as academic_year_mdl
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
@@ -319,7 +319,7 @@ class TestSave(TestCase):
         )
         self.assertCountEqual(
             list(form.fields['academic_year'].queryset),
-            list(academic_year.find_academic_years(
+            list(academic_year_mdl.find_academic_years(
                 start_year=self.current_academic_year.year,
                 end_year=self.current_academic_year.year + 6
             ))
@@ -344,7 +344,7 @@ class TestSave(TestCase):
         )
         self.assertCountEqual(
             list(form.fields['academic_year'].queryset),
-            list(academic_year.find_academic_years(
+            list(academic_year_mdl.find_academic_years(
                 start_year=self.current_academic_year.year + 1,
                 end_year=self.current_academic_year.year + 6
             ))
