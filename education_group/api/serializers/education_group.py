@@ -74,7 +74,7 @@ class EducationGroupSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EducationGroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
-    default_view = 'education_group_api_v1:training_read'
+    default_view = 'education_group_api_v1:' + TrainingDetail.name
 
     lookup_field = None
 
@@ -82,10 +82,9 @@ class EducationGroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentity
         self.lookup_field = lookup_field or ''
         super().__init__(view_name=self.default_view, **kwargs)
 
-    @staticmethod
-    def _get_view_name(category):
+    def _get_view_name(self, category):
         return {
-            Categories.TRAINING.name: 'education_group_api_v1:' + TrainingDetail.name,
+            Categories.TRAINING.name: self.default_view,
             Categories.MINI_TRAINING.name: 'education_group_api_v1:' + MiniTrainingDetail.name,
             Categories.GROUP.name: 'education_group_api_v1:' + GroupDetail.name,
         }[category]
@@ -97,8 +96,9 @@ class EducationGroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentity
             Categories.MINI_TRAINING.name: 'partial_acronym',
             Categories.GROUP.name: 'partial_acronym',
         }[education_group_year.education_group_type.category]
+        acronym_value = getattr(education_group_year, acronym_key, education_group_year)
         return {
-            acronym_key: getattr(education_group_year, acronym_key, education_group_year),
+            acronym_key: acronym_value,
             'year': education_group_year.academic_year.year
         }
 
