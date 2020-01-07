@@ -16,7 +16,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
 
     @classmethod
     def setUpTestData(cls):
-        cls.offer_acronym = 'DROI1BA'
+        cls.education_group_acronym = 'DROI1BA'
         cls.registration_id = '00000001'
         cls.url = reverse(
             'learning_unit_enrollment_api_v1:enrollments-list-by-student',
@@ -28,7 +28,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 offer_enrollment__student__person__user=cls.user,
                 offer_enrollment__student__registration_id=cls.registration_id,
                 offer_enrollment__education_group_year__academic_year__year=year,
-                offer_enrollment__education_group_year__acronym=cls.offer_acronym,
+                offer_enrollment__education_group_year__acronym=cls.education_group_acronym,
                 learning_unit_year__academic_year__year=year,
             )
 
@@ -45,10 +45,10 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
             ),
 
             APIFilterTestCaseData(
-                filters={'offer_acronym': self.offer_acronym},
+                filters={'education_group_acronym': self.education_group_acronym},
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(
-                        offer_enrollment__education_group_year__acronym=self.offer_acronym
+                        offer_enrollment__education_group_year__acronym=self.education_group_acronym
                     ),
                     context={'request': RequestFactory().get(self.url)},
                     many=True,
