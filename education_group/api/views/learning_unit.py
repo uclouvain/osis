@@ -39,14 +39,13 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
 
 
 class EducationGroupRootsFilter(filters.FilterSet):
+    ignore_complementary_module = filters.BooleanFilter(method='filter_complementary_module')
 
-    @property
-    def qs(self):
-        qs = super().qs
-        ignore_complementary_module = self.data.get('ignore_complementary_module', 'false').capitalize()
-        if eval(ignore_complementary_module):
-            qs = qs.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
-        return qs
+    @staticmethod
+    def filter_complementary_module(queryset, _, value):
+        if value:
+            queryset = queryset.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
+        return queryset
 
 
 class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIView):
