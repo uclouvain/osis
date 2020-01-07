@@ -78,10 +78,12 @@ def learning_unit_formations(request, learning_unit_year_id):
         "parent", "child_leaf", "parent__education_group_type"
     ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(
+    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_roots(
         education_groups_years,
-        parents_as_instances=True,
-        with_parents_of_parents=True,
+        return_result_params={
+            'parents_as_instances': True,
+            'with_parents_of_parents': True
+        },
         luy=learn_unit_year
     )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
