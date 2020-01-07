@@ -97,6 +97,7 @@ class LearningUnitEnrollmentSerializerTestCase(TestCase):
             'academic_year',
             'education_group_url',
             'learning_unit_url',
+            'enrollment_state',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

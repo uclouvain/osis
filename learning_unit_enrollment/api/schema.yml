@@ -156,6 +156,8 @@ components:
           type: string
         learning_unit_url:
           type: string
+        enrollment_state:
+          $ref: '#/components/schemas/EnrollmentStateEnum'
 
     EnrollmentStateEnum:
       type: string

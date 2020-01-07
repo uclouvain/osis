@@ -79,4 +79,5 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
             'academic_year',
             'education_group_url',
             'learning_unit_url',
+            'enrollment_state',
         )
