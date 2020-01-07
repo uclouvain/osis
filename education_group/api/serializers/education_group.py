@@ -29,6 +29,9 @@ from rest_framework.reverse import reverse
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
+from education_group.api.views.group import GroupDetail
+from education_group.api.views.mini_training import MiniTrainingDetail
+from education_group.api.views.training import TrainingDetail
 
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -83,8 +86,8 @@ class EducationGroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentity
     def _get_view_name(category):
         return {
             Categories.TRAINING.name: 'education_group_api_v1:' + TrainingDetail.name,
-            Categories.MINI_TRAINING.name: 'education_group_api_v1:mini_training_read',
-            Categories.GROUP.name: 'education_group_api_v1:group_read',
+            Categories.MINI_TRAINING.name: 'education_group_api_v1:' + MiniTrainingDetail.name,
+            Categories.GROUP.name: 'education_group_api_v1:' + GroupDetail.name,
         }[category]
 
     @staticmethod
