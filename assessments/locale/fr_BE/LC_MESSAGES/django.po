@@ -67,7 +67,7 @@ msgid "Accepted value: %(justification_label_authorized)s "
 msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
 msgid "Acronym"
-msgstr "Acronyme"
+msgstr "Sigle"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -349,7 +349,7 @@ msgid "Online scores encoding"
 msgstr "Encodage en ligne des notes"
 
 msgid "Other tutors"
-msgstr "Autre tuteurs"
+msgstr "Autres enseignants"
 
 #, python-format
 msgid ""
