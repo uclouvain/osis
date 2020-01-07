@@ -4,6 +4,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
 from base.models.enums import learning_unit_enrollment_state
+from base.models.enums.education_group_categories import Categories
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.mixin.default_api_tests_cases_mixin import APIDefaultTestsCasesHttpGetMixin, APIFilterTestCaseData
@@ -29,6 +30,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 offer_enrollment__student__registration_id=cls.registration_id,
                 offer_enrollment__education_group_year__academic_year__year=year,
                 offer_enrollment__education_group_year__acronym=cls.education_group_acronym,
+                offer_enrollment__education_group_year__education_group_type__category=Categories.TRAINING,
                 learning_unit_year__academic_year__year=year,
             )
 
