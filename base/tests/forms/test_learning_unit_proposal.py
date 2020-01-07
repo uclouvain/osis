@@ -29,7 +29,7 @@ from decimal import Decimal
 from django.contrib.auth.models import Group
 from django.test import TestCase
 
-from base.forms.learning_unit.learning_unit_create_2 import FullForm
+from base.forms.learning_unit import learning_unit_create_2
 from base.forms.learning_unit_proposal import ProposalBaseForm
 from base.forms.proposal import learning_unit_proposal
 from base.models import proposal_learning_unit, academic_year
@@ -299,9 +299,10 @@ class TestSave(TestCase):
         self.assertTrue('entity' in form.errors[1])
 
     def test_academic_year_range_creation_proposal_central_manager(self):
+
         LanguageFactory(code="FR")
         central_manager = CentralManagerFactory()
-        form = FullForm(
+        form = learning_unit_create_2.FullForm(
             central_manager,
             self.learning_unit_year.academic_year,
             start_year=self.learning_unit_year.academic_year,
@@ -318,7 +319,7 @@ class TestSave(TestCase):
     def test_academic_year_range_creation_proposal_faculty_manager(self):
         LanguageFactory(code="FR")
         faculty_manager = FacultyManagerFactory()
-        form = FullForm(
+        form = learning_unit_create_2.FullForm(
             faculty_manager,
             self.learning_unit_year.academic_year,
             start_year=self.learning_unit_year.academic_year,
