@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -407,15 +408,8 @@ class TestLearningAchievementPostponement(TestCase):
         return create_response
 
     def _move_achievement(self, achievement_code_name, operation):
-        for luy in self.learning_unit_years:
-            for code_name in [1, 2]:
-                for language in [self.language_en, self.language_fr]:
-                    LearningAchievementFactory(
-                        code_name=code_name,
-                        learning_unit_year=luy,
-                        language=language,
-                        order=code_name-1
-                    )
+        for luy, code, lang in itertools.product(self.learning_unit_years, [1,2], [self.language_en, self.language_fr]):
+            LearningAchievementFactory(code_name=code, learning_unit_year=luy, language=lang, order=code-1)
         operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
         self.client.post(operation_url, data={
             'achievement_id': LearningAchievement.objects.filter(
