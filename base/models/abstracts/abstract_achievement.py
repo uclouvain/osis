@@ -40,7 +40,7 @@ class AbstractAchievementAdmin(OrderedModelAdmin):
 class AbstractAchievement(OrderedModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    code_name = models.CharField(max_length=100, verbose_name=_('code'))
+    code_name = models.CharField(null=True, max_length=100, verbose_name=_('code'))
     text = RichTextField(null=True, verbose_name=_('text'))
     language = models.ForeignKey(
         'reference.Language',
