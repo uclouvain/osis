@@ -184,6 +184,14 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(count_proposition_by_author, 1)
 
     def test_post_proposal_learning_unit_creation_form_with_faculty_user(self):
+        self.academic_calendars = [
+            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year, 9, 14)
+            )
+            for academic_year in self.academic_years
+        ]
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
         response = self.client.post(url, data=self.get_valid_data())
@@ -242,8 +250,15 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(lcy_errors['common_title'], [_('You must either set the common title or the specific title')])
 
     def test_proposal_learning_unit_add_with_valid_data_for_faculty_manager(self):
+        self.academic_calendars = [
+            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year, 9, 14)
+            )
+            for academic_year in self.academic_years
+        ]
         learning_unit_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)
-
         self.assertTrue(learning_unit_form.is_valid(), learning_unit_form.errors)
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.current_academic_year.id])
