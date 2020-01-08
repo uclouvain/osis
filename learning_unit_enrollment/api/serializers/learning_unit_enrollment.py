@@ -67,6 +67,11 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
     )
     learning_unit_url = LearningUnitHyperlinkedIdentityField(read_only=True)
 
+    learning_unit_enrollment_state = serializers.CharField(
+        read_only=True,
+        source='enrollment_state',
+    )
+
     class Meta:
         model = LearningUnitEnrollment
         fields = (
@@ -79,5 +84,5 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
             'academic_year',
             'education_group_url',
             'learning_unit_url',
-            'enrollment_state',
+            'learning_unit_enrollment_state',
         )

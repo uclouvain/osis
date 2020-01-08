@@ -59,7 +59,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
             ),
 
             APIFilterTestCaseData(
-                filters={'enrollment_state': learning_unit_enrollment_state.ENROLLED},
+                filters={'learning_unit_enrollment_state': learning_unit_enrollment_state.ENROLLED},
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(
                         enrollment_state=learning_unit_enrollment_state.ENROLLED
@@ -102,13 +102,14 @@ class LearningUnitEnrollmentSerializerTestCase(TestCase):
             'academic_year',
             'education_group_url',
             'learning_unit_url',
-            'enrollment_state',
+            'learning_unit_enrollment_state',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_academic_year_field_is_slugified(self):
+        test = self.serializer.data['academic_year']
         self.assertEqual(
-            self.serializer.data['academic_year'],
+            test,
             self.year
         )
 

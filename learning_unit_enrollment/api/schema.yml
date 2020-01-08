@@ -47,9 +47,9 @@ paths:
           schema:
             type: integer
         - in: query
-          name: enrollment_state
+          name: learning_unit_enrollment_state
           schema:
-            $ref: '#/components/schemas/EnrollmentStateEnum'
+            $ref: '#/components/schemas/LearningUnitEnrollmentStateEnum'
       responses:
         '200':
           description: OK
@@ -156,10 +156,10 @@ components:
           type: string
         learning_unit_url:
           type: string
-        enrollment_state:
-          $ref: '#/components/schemas/EnrollmentStateEnum'
+        learning_unit_enrollment_state:
+          $ref: '#/components/schemas/LearningUnitEnrollmentStateEnum'
 
-    EnrollmentStateEnum:
+    LearningUnitEnrollmentStateEnum:
       type: string
       enum:
         - ENROLLED
