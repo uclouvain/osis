@@ -49,7 +49,6 @@ class LearningUnitAttribution(generics.ListAPIView):
             academic_year__year=self.kwargs['year']
         )
 
-        # Coordinator doesn't have any volume
         attribution_qs = AttributionNew.objects.select_related('substitute').only(
             'tutor__person', 'substitute', 'function'
         ).distinct('tutor', 'function').annotate(
