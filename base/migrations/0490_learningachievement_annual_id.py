@@ -15,10 +15,7 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=1, validators=[django.core.validators.MinValueValidator(1)]),
         ),
         migrations.RunSQL(
-            sql=(
-                'UPDATE base_learningachievement SET annual_id = CASE WHEN upper(code_name) = lower(code_name)'
-                'THEN cast(code_name as int) ELSE 0 END;'
-            ),
+            sql='UPDATE base_learningachievement SET annual_id=base_learningachievement.order',
             reverse_sql=migrations.RunSQL.noop
         ),
     ]
