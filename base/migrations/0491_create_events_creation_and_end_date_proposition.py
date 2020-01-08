@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import date
 
-from django.db import migrations, models
+from django.db import migrations
 
 from base.models.enums import academic_calendar_type
 
@@ -81,26 +81,4 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(create_events_propositions_creation_and_end_date, reverse_migration),
-        migrations.AlterField(
-            model_name='academiccalendar',
-            name='reference',
-            field=models.CharField(
-                choices=[('DELIBERATION', 'Deliberation'), ('DISSERTATION_SUBMISSION', 'Dissertation submission'),
-                         ('EXAM_ENROLLMENTS', 'Exam enrollments'), ('SCORES_EXAM_DIFFUSION', 'Scores exam diffusion'),
-                         ('SCORES_EXAM_SUBMISSION', 'Scores exam submission'),
-                         ('TEACHING_CHARGE_APPLICATION', 'Teaching charge application'),
-                         ('COURSE_ENROLLMENT', 'Course enrollment'),
-                         ('SUMMARY_COURSE_SUBMISSION', 'Summary course submission'),
-                         ('EDUCATION_GROUP_EDITION', 'Education group edition'),
-                         ('LEARNING_UNIT_EDITION_FACULTY_MANAGERS', 'Learning unit edition by faculty managers'), (
-                         'CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS',
-                         'Creation or end date proposal by central managers'), (
-                         'CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS',
-                         'Creation or end date proposal by faculty managers'), (
-                         'MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS',
-                         'Modification or transformation proposal by central managers'), (
-                         'MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS',
-                         'Modification or transformation proposal by faculty managers'), ('TESTING', 'Testing'),
-                         ('RELEASE', 'Release')], max_length=70),
-        ),
     ]
