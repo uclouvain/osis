@@ -33,9 +33,17 @@ from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
+class GroupYearManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'group'
+        )
+
+
 class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('acronym', 'partial_acronym', 'title_fr', 'group', 'education_group_type', 'changed')
-    list_filter = ('education_group_type', )
+    list_display = ('acronym', 'partial_acronym', 'title_fr', 'group', 'education_group_type', 'academic_year',
+                    'changed')
+    list_filter = ('education_group_type', 'academic_year')
     search_fields = ['acronym', 'partial_acronym', 'title_fr', 'group__pk', 'id']
 
 
@@ -110,3 +118,28 @@ class GroupYear(models.Model):
         default="",
         verbose_name=_("remark in english")
     )
+
+    academic_year = models.ForeignKey(
+        'base.AcademicYear',
+        verbose_name=_('Academic year'),
+        on_delete=models.PROTECT
+    )
+
+    objects = GroupYearManager()
+
+    def __str__(self):
+        return "{} ({})".format(self.acronym,
+                                self.academic_year)
+
+    def save(self, *args, **kwargs):
+
+        if self.academic_year.year < self.group.start_year.year:
+            raise AttributeError(
+                _('Please enter an academic year greater or equal to group start year.')
+            )
+        if self.group.end_year and self.academic_year.year > self.group.end_year.year:
+            raise AttributeError(
+                _('Please enter an academic year less or equal to group end year.')
+            )
+
+        super().save(*args, **kwargs)
