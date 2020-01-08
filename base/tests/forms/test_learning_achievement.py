@@ -43,7 +43,8 @@ class TestLearningAchievementForm(TestCase):
         self.learning_achievement = LearningAchievementFactory(
             learning_unit_year=self.learning_unit_year,
             language=self.language_fr,
-            code_name='TEST'
+            code_name='TEST',
+            annual_id=1
         )
 
     def test_should_not_raise_validation_error_case_update_same_achievement(self):
@@ -52,6 +53,7 @@ class TestLearningAchievementForm(TestCase):
             'code_name': self.learning_achievement.code_name,
             'postpone': 0,
             'text_fr': text,
+            'annual_id': 1
         }
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
@@ -65,6 +67,7 @@ class TestLearningAchievementForm(TestCase):
         data = {
             'code_name': self.learning_achievement.code_name,
             'postpone': 0,
+            'annual_id': self.learning_achievement.annual_id
         }
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
