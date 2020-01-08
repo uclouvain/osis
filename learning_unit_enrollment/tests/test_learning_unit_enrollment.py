@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from base.models.enums import learning_unit_enrollment_state
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.offer_enrollment_state import OfferEnrollmentState
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.mixin.default_api_tests_cases_mixin import APIDefaultTestsCasesHttpGetMixin, APIFilterTestCaseData
@@ -23,6 +24,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
             'learning_unit_enrollment_api_v1:enrollments-list-by-student',
             kwargs={'registration_id': cls.registration_id}
         )
+        cls.offer_enrollment_state = OfferEnrollmentState.PROVISORY.name
 
         for year in [2018, 2019, 2020]:
             LearningUnitEnrollmentFactory(
@@ -32,6 +34,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 offer_enrollment__education_group_year__acronym=cls.education_group_acronym,
                 offer_enrollment__education_group_year__education_group_type__category=Categories.TRAINING.name,
                 learning_unit_year__academic_year__year=year,
+                offer_enrollment__enrollment_state=cls.offer_enrollment_state,
             )
 
     def get_filter_test_cases(self) -> List[APIFilterTestCaseData]:
@@ -63,6 +66,16 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(
                         enrollment_state=learning_unit_enrollment_state.ENROLLED
+                    ).order_by(*expected_ordering),
+                    context={'request': RequestFactory().get(self.url)},
+                    many=True,
+                ).data,
+            ),
+            APIFilterTestCaseData(
+                filters={'offer_enrollment_state': self.offer_enrollment_state},
+                expected_result=LearningUnitEnrollmentSerializer(
+                    LearningUnitEnrollment.objects.filter(
+                        offer_enrollment__enrollment_state=OfferEnrollmentState.PROVISORY.name
                     ).order_by(*expected_ordering),
                     context={'request': RequestFactory().get(self.url)},
                     many=True,
@@ -103,6 +116,7 @@ class LearningUnitEnrollmentSerializerTestCase(TestCase):
             'education_group_url',
             'learning_unit_url',
             'learning_unit_enrollment_state',
+            'offer_enrollment_state',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

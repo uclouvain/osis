@@ -158,11 +158,22 @@ components:
           type: string
         learning_unit_enrollment_state:
           $ref: '#/components/schemas/LearningUnitEnrollmentStateEnum'
+        offer_enrollment_state:
+          $ref: '#/components/schemas/OfferEnrollmentStateEnum'
 
     LearningUnitEnrollmentStateEnum:
       type: string
       enum:
         - ENROLLED
+
+    OfferEnrollmentStateEnum:
+      type: string
+      enum:
+        - SUBSCRIBED
+        - PROVISORY
+        - PENDING
+        - TERMINATION
+        - END_OF_CYCLE
 
 
     Error:

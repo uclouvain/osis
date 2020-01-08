@@ -71,6 +71,10 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
         read_only=True,
         source='enrollment_state',
     )
+    offer_enrollment_state = serializers.CharField(
+        read_only=True,
+        source='offer_enrollment.enrollment_state',
+    )
 
     class Meta:
         model = LearningUnitEnrollment
@@ -85,4 +89,5 @@ class LearningUnitEnrollmentSerializer(serializers.ModelSerializer):
             'education_group_url',
             'learning_unit_url',
             'learning_unit_enrollment_state',
+            'offer_enrollment_state',
         )

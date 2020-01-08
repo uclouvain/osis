@@ -39,10 +39,16 @@ class LearningUnitEnrollmentFilter(filters.FilterSet):
     )
     year = filters.NumberFilter(field_name="learning_unit_year__academic_year__year")
     learning_unit_enrollment_state = filters.CharFilter(field_name="enrollment_state")
+    offer_enrollment_state = filters.CharFilter(field_name="offer_enrollment__enrollment_state")
 
     class Meta:
         model = LearningUnitEnrollment
-        fields = ['offer_acronym', 'year', 'learning_unit_enrollment_state']
+        fields = [
+            'offer_acronym',
+            'year',
+            'learning_unit_enrollment_state',
+            'offer_enrollment_state',
+        ]
 
 
 class LearningUnitEnrollmentList(generics.ListAPIView):

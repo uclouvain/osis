@@ -25,15 +25,28 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
+# TODO :: Use OfferEnrollmentState enumeration instead
 SUBSCRIBED = 'SUBSCRIBED'
 PROVISORY = 'PROVISORY'
 PENDING = 'PENDING'
 TERMINATION = 'TERMINATION'
 END_OF_CYCLE = 'END_OF_CYCLE'
 
+# TODO :: Use OfferEnrollmentState enumeration instead
 STATES = (
     (SUBSCRIBED, _("Subscribed")),
     (PROVISORY, _("Provisory")),  # TODO this word does not exist
     (PENDING, _("Pending")),
     (TERMINATION, _("Termination")),
-    (END_OF_CYCLE, _("End of cycle")))
+    (END_OF_CYCLE, _("End of cycle")),
+)
+
+
+class OfferEnrollmentState(ChoiceEnum):
+    SUBSCRIBED = _("Subscribed")
+    PROVISORY = _("Provisory")  # TODO this word does not exist
+    PENDING = _("Pending")
+    TERMINATION = _("Termination")
+    END_OF_CYCLE = _("End of cycle")
