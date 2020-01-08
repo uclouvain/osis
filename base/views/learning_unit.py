@@ -57,6 +57,7 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models.text_label import TextLabel
@@ -77,10 +78,12 @@ def learning_unit_formations(request, learning_unit_year_id):
         "parent", "child_leaf", "parent__education_group_type"
     ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_formations(
+    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_roots(
         education_groups_years,
-        parents_as_instances=True,
-        with_parents_of_parents=True,
+        return_result_params={
+            'parents_as_instances': True,
+            'with_parents_of_parents': True
+        },
         luy=learn_unit_year
     )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
@@ -137,7 +140,9 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
             translated_field_label = _get_cms_label_translated(field_label, get_language())
             display_success_messages(
                 request,
-                _build_edit_specification_success_message(last_academic_year, translated_field_label)
+                _build_edit_specification_success_message(last_academic_year,
+                                                          translated_field_label,
+                                                          learning_unit_year_id)
             )
         return HttpResponse()
     else:
@@ -164,9 +169,13 @@ def _get_cms_label_translated(cms_label, user_language):
     ).first().label
 
 
-def _build_edit_specification_success_message(last_academic_year, translated_field_label):
+def _build_edit_specification_success_message(last_academic_year, translated_field_label, learning_unit_year_id):
     default_msg = _("The '%(field)s' field content has been successfully saved")
     msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+    luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
+    if ProposalLearningUnit.objects. \
+            filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
+        msg = "{}. {}".format(msg, _("It will be done at the consolidation"))
     return msg % {
         'field': translated_field_label,
         'year': last_academic_year

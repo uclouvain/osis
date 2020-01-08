@@ -30,7 +30,8 @@ from base.tests.factories.organization import OrganizationFactory
 
 
 class OrganizationOrderingTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         organization_datas = [
             (False, 'D'),
             (True, 'A'),
