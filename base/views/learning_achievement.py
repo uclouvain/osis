@@ -48,9 +48,12 @@ def operation(request, learning_achievement_id, operation_str):
     )
     lu_yr_id = achievement_fr.learning_unit_year.id
 
-    achievement_en = find_learning_unit_achievement(achievement_fr.learning_unit_year,
-                                                    EN_CODE_LANGUAGE,
-                                                    achievement_fr.order)
+    achievement_en = find_learning_unit_achievement(
+        achievement_fr.code_name,
+        achievement_fr.learning_unit_year,
+        EN_CODE_LANGUAGE,
+        achievement_fr.order
+    )
     anchor = get_anchor_reference(operation_str, achievement_fr)
     filtered_achievements = list(filter(None, [achievement_fr, achievement_en]))
     last_academic_year = execute_operation(filtered_achievements, operation_str)

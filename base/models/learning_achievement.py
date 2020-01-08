@@ -62,11 +62,14 @@ def find_by_learning_unit_year(learning_unit_yr):
         .order_by('order', 'language__code')
 
 
-def find_learning_unit_achievement(learning_unit_yr, a_language_code, position):
+def find_learning_unit_achievement(code_name, learning_unit_yr, a_language_code, position):
     try:
-        return LearningAchievement.objects.get(learning_unit_year=learning_unit_yr,
-                                               language__code=a_language_code,
-                                               order=position)
+        return LearningAchievement.objects.get(
+            code_name=code_name,
+            learning_unit_year=learning_unit_yr,
+            language__code=a_language_code,
+            order=position
+        )
     except ObjectDoesNotExist:
         return None
 
