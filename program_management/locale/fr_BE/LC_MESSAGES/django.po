@@ -419,6 +419,9 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'année academique suivante."
 
+msgid "The user is not allowed to change education group content."
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
+
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
 "secretariat of your faculty."
@@ -461,6 +464,9 @@ msgstr "Vous n'êtes pas autorisé.e à reporter cette formation dans le passé.
 
 msgid "You are not eligible to detach this item"
 msgstr "Vous n'êtes pas autorisé.e à détacher cet élément"
+
+msgid "You are not eligible to update the group element year"
+msgstr "Vous n'êtes pas autorisé à mettre à jour la formation"
 
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
