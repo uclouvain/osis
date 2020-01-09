@@ -374,6 +374,9 @@ msgstr ""
 msgid "The root does not exist in the next academic year."
 msgstr ""
 
+msgid "The user is not allowed to change education group content."
+msgstr ""
+
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
 "secretariat of your faculty."
@@ -411,6 +414,9 @@ msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
 msgid "You are not eligible to detach this item"
+msgstr ""
+
+msgid "You are not eligible to update the group element year"
 msgstr ""
 
 #, python-format
