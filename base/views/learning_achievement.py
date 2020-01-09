@@ -103,7 +103,7 @@ def management(request, learning_unit_year_id):
 
 
 def get_action(request):
-    action = request.POST.get('action', None)
+    action = request.POST.get('action')
     if action not in AVAILABLE_ACTIONS:
         raise AttributeError('Action should be {}, {} or {}'.format(DELETE, UP, DOWN))
     return action

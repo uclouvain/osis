@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_achievement import AbstractAchievement, AbstractAchievementAdmin
+from base.models.utils.utils import get_object_or_none
 
 
 class LearningAchievementAdmin(VersionAdmin, AbstractAchievementAdmin):
@@ -63,15 +64,13 @@ def find_by_learning_unit_year(learning_unit_yr):
 
 
 def find_learning_unit_achievement(code_name, learning_unit_yr, a_language_code, position):
-    try:
-        return LearningAchievement.objects.get(
-            code_name=code_name,
-            learning_unit_year=learning_unit_yr,
-            language__code=a_language_code,
-            order=position
-        )
-    except ObjectDoesNotExist:
-        return None
+    return get_object_or_none(
+        LearningAchievement,
+        code_name=code_name,
+        learning_unit_year=learning_unit_yr,
+        language__code=a_language_code,
+        order=position
+    )
 
 
 def search(learning_unit_yr=None, position=None):
