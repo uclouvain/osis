@@ -7,12 +7,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('reference', '0002_auto_20190308_1450'),
-        ('base', '0492_learningachievement_annual_id'),
+        ('base', '0492_learningachievement_consistency_id'),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
             name='learningachievement',
-            unique_together={('annual_id', 'learning_unit_year', 'language')},
+            unique_together={('consistency_id', 'learning_unit_year', 'language')},
         ),
     ]

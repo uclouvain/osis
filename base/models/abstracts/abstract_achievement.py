@@ -47,7 +47,7 @@ class AbstractAchievement(OrderedModel):
         verbose_name=_('Language'),
         on_delete=models.CASCADE,
     )
-    annual_id = models.IntegerField(default=1, validators=[MinValueValidator(1)])
+    consistency_id = models.IntegerField(default=1, validators=[MinValueValidator(1)])
 
     class Meta:
         abstract = True

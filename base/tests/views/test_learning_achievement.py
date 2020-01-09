@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -187,8 +188,8 @@ class TestLearningAchievementActions(TestCase):
 
     def test_delete(self):
         achievements =  [
-            LearningAchievementFactory(language=lang, learning_unit_year=self.luy, annual_id=annual_id)
-            for lang in [self.language_fr, self.language_en] for annual_id in [1,2]
+            LearningAchievementFactory(language=lang, learning_unit_year=self.luy, consistency_id=consistency_id)
+            for lang in [self.language_fr, self.language_en] for consistency_id in [1,2]
         ]
         request_factory = RequestFactory()
         request = request_factory.post(management)
@@ -201,45 +202,38 @@ class TestLearningAchievementActions(TestCase):
 
     def test_up(self):
         achievements =  [
-            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, annual_id=code)
+            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, consistency_id=code)
             for code in [1,2] for lang in [self.language_fr, self.language_en]
         ]
-        request_factory = RequestFactory()
-        request = request_factory.post(management)
-        request.user = self.user
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        operation(request, achievements[2].id, UP)
-        for achievement in LearningAchievement.objects.filter(annual_id=1):
+        self.client.post(
+            reverse('achievement_management', args=[self.luy.id]),
+            data={'action': UP, 'achievement_id': achievements[2].id}
+        )
+        for achievement in LearningAchievement.objects.filter(consistency_id=1):
             self.assertEqual(achievement.order, 1)
-        for achievement in LearningAchievement.objects.filter(annual_id=2):
+        for achievement in LearningAchievement.objects.filter(consistency_id=2):
             self.assertEqual(achievement.order, 0)
 
     def test_down(self):
         achievements =  [
-            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, annual_id=code)
+            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, consistency_id=code)
             for code in [1,2] for lang in [self.language_fr, self.language_en]
         ]
-        request_factory = RequestFactory()
-        request = request_factory.post(reverse('achievement_management', args=[self.luy.id]))
-        request.user = self.user
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        operation(request, achievements[0].id, DOWN)
-        for achievement in LearningAchievement.objects.filter(annual_id=1):
+        self.client.post(
+            reverse('achievement_management', args=[self.luy.id]),
+            data={'action': DOWN, 'achievement_id': achievements[0].id}
+        )
+        for achievement in LearningAchievement.objects.filter(consistency_id=1):
             self.assertEqual(achievement.order, 1)
-        for achievement in LearningAchievement.objects.filter(annual_id=2):
+        for achievement in LearningAchievement.objects.filter(consistency_id=2):
             self.assertEqual(achievement.order, 0)
 
     def test_learning_achievement_edit(self):
         learning_achievement = LearningAchievementFactory(learning_unit_year=self.luy)
-        self.client.force_login(self.a_superuser)
-        response = self.client.get(reverse('achievement_edit',
-                                           args=[self.luy.id, learning_achievement.id]),
-                                   data={'achievement_id': learning_achievement.id})
-
+        response = self.client.get(
+            reverse('achievement_edit', args=[self.luy.id, learning_achievement.id]),
+            data={'achievement_id': learning_achievement.id}
+        )
         self.assertTemplateUsed(response, 'learning_unit/achievement_edit.html')
         self.assertIsInstance(response.context['form'], LearningAchievementEditForm)
 
@@ -275,13 +269,13 @@ class TestLearningAchievementActions(TestCase):
             code_name=1,
             learning_unit_year=self.luy,
             language=self.language_fr,
-            annual_id=1
+            consistency_id=1
         )
         learning_achievement_en = LearningAchievementFactory(
             code_name=1,
             learning_unit_year=self.luy,
             language=self.language_en,
-            annual_id=1
+            consistency_id=1
         )
         TextLabelFactory(label='themes_discussed')
 
@@ -296,7 +290,7 @@ class TestLearningAchievementActions(TestCase):
                 'code_name': 'AA1',
                 'text_fr': 'Text',
                 'postpone': 0,
-                'annual_id': 1,
+                'consistency_id': 1,
             }
         )
         self.assertTrue(mock_translated_text_update_or_create.called)
@@ -305,7 +299,6 @@ class TestLearningAchievementActions(TestCase):
         achievement_fr = LearningAchievementFactory(language=self.language_fr,
                                                     learning_unit_year=self.luy)
 
-        self.client.force_login(self.a_superuser)
         response = self.client.get(reverse('achievement_create',
                                            args=[self.luy.id, achievement_fr.id]),
                                    data={'language_code': self.language_fr.code})
@@ -318,7 +311,6 @@ class TestLearningAchievementActions(TestCase):
         self.assertTrue(context['create'], self.language_fr.code)
 
     def test_learning_achievement_create_first(self):
-        self.client.force_login(self.a_superuser)
         response = self.client.get(reverse('achievement_create_first', args=[self.luy.id]),
                                    data={'language_code': FR_CODE_LANGUAGE})
 
@@ -402,24 +394,20 @@ class TestLearningAchievementPostponement(TestCase):
             'code_name': code_name,
             'text_fr': 'text',
             'postpone': '1',
-            'annual_id': 1
+            'consistency_id': 1
         })
         return create_response
 
     def _move_achievement(self, achievement_code_name, operation):
-        for luy in self.learning_unit_years:
-            for code_name in [1, 2]:
-                for language in [self.language_en, self.language_fr]:
-                    LearningAchievementFactory(
-                        code_name=code_name,
-                        learning_unit_year=luy,
-                        language=language,
-                        order=code_name-1
-                    )
+        for luy, code, lang in itertools.product(self.learning_unit_years, [1,2], [self.language_en, self.language_fr]):
+            LearningAchievementFactory(code_name=code, learning_unit_year=luy, language=lang, order=code-1)
         operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
+        achievement_to_move = LearningAchievement.objects.get(
+                code_name=achievement_code_name,
+                learning_unit_year=self.learning_unit_years[0],
+                language=self.language_fr
+        )
         self.client.post(operation_url, data={
-            'achievement_id': LearningAchievement.objects.filter(
-                code_name=achievement_code_name, language=self.language_fr
-            ).first().id,
+            'achievement_id': achievement_to_move.id,
             'action': operation
         })
