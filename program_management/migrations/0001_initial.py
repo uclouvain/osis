@@ -9,8 +9,8 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('base', '0489_auto_20191217_1505'),
-        ('education_group', '0001_initial'),
+        ('base', '0491_auto_20200107_1458'),
+        ('education_group', '0003_groupyear_academic_year'),
     ]
 
     operations = [
