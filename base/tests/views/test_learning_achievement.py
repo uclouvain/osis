@@ -205,13 +205,10 @@ class TestLearningAchievementActions(TestCase):
             LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, annual_id=code)
             for code in [1,2] for lang in [self.language_fr, self.language_en]
         ]
-        request_factory = RequestFactory()
-        request = request_factory.post(management)
-        request.user = self.user
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        operation(request, achievements[2].id, UP)
+        self.client.post(
+            reverse('achievement_management', args=[self.luy.id]),
+            data={'action': UP, 'achievement_id': achievements[2].id}
+        )
         for achievement in LearningAchievement.objects.filter(annual_id=1):
             self.assertEqual(achievement.order, 1)
         for achievement in LearningAchievement.objects.filter(annual_id=2):
@@ -222,13 +219,10 @@ class TestLearningAchievementActions(TestCase):
             LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, annual_id=code)
             for code in [1,2] for lang in [self.language_fr, self.language_en]
         ]
-        request_factory = RequestFactory()
-        request = request_factory.post(reverse('achievement_management', args=[self.luy.id]))
-        request.user = self.user
-        setattr(request, 'session', 'session')
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        operation(request, achievements[0].id, DOWN)
+        self.client.post(
+            reverse('achievement_management', args=[self.luy.id]),
+            data={'action': DOWN, 'achievement_id': achievements[0].id}
+        )
         for achievement in LearningAchievement.objects.filter(annual_id=1):
             self.assertEqual(achievement.order, 1)
         for achievement in LearningAchievement.objects.filter(annual_id=2):
@@ -236,11 +230,10 @@ class TestLearningAchievementActions(TestCase):
 
     def test_learning_achievement_edit(self):
         learning_achievement = LearningAchievementFactory(learning_unit_year=self.luy)
-        self.client.force_login(self.a_superuser)
-        response = self.client.get(reverse('achievement_edit',
-                                           args=[self.luy.id, learning_achievement.id]),
-                                   data={'achievement_id': learning_achievement.id})
-
+        response = self.client.get(
+            reverse('achievement_edit', args=[self.luy.id, learning_achievement.id]),
+            data={'achievement_id': learning_achievement.id}
+        )
         self.assertTemplateUsed(response, 'learning_unit/achievement_edit.html')
         self.assertIsInstance(response.context['form'], LearningAchievementEditForm)
 
@@ -306,7 +299,6 @@ class TestLearningAchievementActions(TestCase):
         achievement_fr = LearningAchievementFactory(language=self.language_fr,
                                                     learning_unit_year=self.luy)
 
-        self.client.force_login(self.a_superuser)
         response = self.client.get(reverse('achievement_create',
                                            args=[self.luy.id, achievement_fr.id]),
                                    data={'language_code': self.language_fr.code})
@@ -319,7 +311,6 @@ class TestLearningAchievementActions(TestCase):
         self.assertTrue(context['create'], self.language_fr.code)
 
     def test_learning_achievement_create_first(self):
-        self.client.force_login(self.a_superuser)
         response = self.client.get(reverse('achievement_create_first', args=[self.luy.id]),
                                    data={'language_code': FR_CODE_LANGUAGE})
 
@@ -411,9 +402,12 @@ class TestLearningAchievementPostponement(TestCase):
         for luy, code, lang in itertools.product(self.learning_unit_years, [1,2], [self.language_en, self.language_fr]):
             LearningAchievementFactory(code_name=code, learning_unit_year=luy, language=lang, order=code-1)
         operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
+        achievement_to_move = LearningAchievement.objects.get(
+                code_name=achievement_code_name,
+                learning_unit_year=self.learning_unit_years[0],
+                language=self.language_fr
+        )
         self.client.post(operation_url, data={
-            'achievement_id': LearningAchievement.objects.filter(
-                code_name=achievement_code_name, language=self.language_fr
-            ).first().id,
+            'achievement_id': achievement_to_move.id,
             'action': operation
         })
