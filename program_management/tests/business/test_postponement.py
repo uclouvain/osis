@@ -46,6 +46,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError, \
@@ -686,3 +687,37 @@ class TestPostponeContent(TestCase):
             },
             str(self.postponer.warnings[0])
         )
+
+    def test_faculty_cannot_copy_into_future(self):
+        eg = EducationGroupFactory(end_year=AcademicYearFactory(year=self.current_academic_year.year + 4))
+        egy = EducationGroupYearFactory(
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 2
+        )
+        EducationGroupYearFactory(
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 3
+        )
+
+        with self.assertRaises(NotPostponeError, msg=_('You are not allowed to postpone this training in the future.')):
+            self.postponer = PostponeContent(egy, FacultyManagerFactory())
+
+    def test_central_can_copy_into_future(self):
+        central_manager = CentralManagerFactory()
+        eg = EducationGroupFactory(end_year=AcademicYearFactory(year=self.current_academic_year.year + 4))
+        egy = EducationGroupYearFactory(
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 2
+        )
+        GroupElementYearFactory(
+            parent=egy,
+            child_branch__academic_year=egy.academic_year,
+            child_branch__education_group__end_year=None
+        )
+        EducationGroupYearFactory(
+            education_group=eg,
+            academic_year__year=self.current_academic_year.year + 3
+        )
+
+        self.postponer = PostponeContent(egy, central_manager)
+        self.assertIsNone(self.postponer.check_instance(central_manager))

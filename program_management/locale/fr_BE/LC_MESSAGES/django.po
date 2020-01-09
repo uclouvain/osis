@@ -131,6 +131,9 @@ msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
 
+msgid "At least an education group year, a group year, a learning unit year or a learning class year has to be set"
+msgstr "Il faut au mininum une clé vers education group year, group year, learning unit year ou learning class year"
+
 msgid "Block"
 msgstr "Bloc"
 
@@ -278,6 +281,12 @@ msgstr "Aucun résultat!"
 msgid "Official"
 msgstr "Officiel"
 
+msgid ""
+"Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
+msgstr ""
+"Seulement une des clés étrangères doit être garnie (education group year, groupe year, learning unit year ou learning "
+"class year)"
+
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -419,6 +428,9 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'année academique suivante."
 
+msgid "The user is not allowed to change education group content."
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
+
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
 "secretariat of your faculty."
@@ -461,6 +473,9 @@ msgstr "Vous n'êtes pas autorisé.e à reporter cette formation dans le passé.
 
 msgid "You are not eligible to detach this item"
 msgstr "Vous n'êtes pas autorisé.e à détacher cet élément"
+
+msgid "You are not eligible to update the group element year"
+msgstr "Vous n'êtes pas autorisé à mettre à jour la formation"
 
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
