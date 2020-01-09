@@ -53,10 +53,7 @@ class TestElementSave(TestCase):
                 AttributeError,
                 _('At least an education group year, a group year, a learning unit year or a learning class year '
                   'has to be set')):
-            element = ElementFactory(education_group_year=None,
-                                     group_year=None,
-                                     learning_unit_year=None,
-                                     learning_class_year=None)
+            element = ElementFactory()
             element.save()
             self.assertFalse(
                 Element.objects.filter(education_group_year=None,
@@ -66,11 +63,7 @@ class TestElementSave(TestCase):
             )
 
     def test_save_one_education_group_year_fk(self):
-        element = ElementEducationGroupYearFactory(education_group_year=self.egy,
-                                                   group_year=None,
-                                                   learning_unit_year=None,
-                                                   learning_class_year=None
-                                                   )
+        element = ElementEducationGroupYearFactory(education_group_year=self.egy)
         element.save()
 
         self.assertTrue(
