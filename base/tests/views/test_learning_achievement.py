@@ -188,8 +188,8 @@ class TestLearningAchievementActions(TestCase):
 
     def test_delete(self):
         achievements =  [
-            LearningAchievementFactory(language=lang, learning_unit_year=self.luy, annual_id=annual_id)
-            for lang in [self.language_fr, self.language_en] for annual_id in [1,2]
+            LearningAchievementFactory(language=lang, learning_unit_year=self.luy, consistency_id=consistency_id)
+            for lang in [self.language_fr, self.language_en] for consistency_id in [1,2]
         ]
         request_factory = RequestFactory()
         request = request_factory.post(management)
@@ -202,30 +202,30 @@ class TestLearningAchievementActions(TestCase):
 
     def test_up(self):
         achievements =  [
-            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, annual_id=code)
+            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, consistency_id=code)
             for code in [1,2] for lang in [self.language_fr, self.language_en]
         ]
         self.client.post(
             reverse('achievement_management', args=[self.luy.id]),
             data={'action': UP, 'achievement_id': achievements[2].id}
         )
-        for achievement in LearningAchievement.objects.filter(annual_id=1):
+        for achievement in LearningAchievement.objects.filter(consistency_id=1):
             self.assertEqual(achievement.order, 1)
-        for achievement in LearningAchievement.objects.filter(annual_id=2):
+        for achievement in LearningAchievement.objects.filter(consistency_id=2):
             self.assertEqual(achievement.order, 0)
 
     def test_down(self):
         achievements =  [
-            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, annual_id=code)
+            LearningAchievementFactory(code_name=code, language=lang, learning_unit_year=self.luy, consistency_id=code)
             for code in [1,2] for lang in [self.language_fr, self.language_en]
         ]
         self.client.post(
             reverse('achievement_management', args=[self.luy.id]),
             data={'action': DOWN, 'achievement_id': achievements[0].id}
         )
-        for achievement in LearningAchievement.objects.filter(annual_id=1):
+        for achievement in LearningAchievement.objects.filter(consistency_id=1):
             self.assertEqual(achievement.order, 1)
-        for achievement in LearningAchievement.objects.filter(annual_id=2):
+        for achievement in LearningAchievement.objects.filter(consistency_id=2):
             self.assertEqual(achievement.order, 0)
 
     def test_learning_achievement_edit(self):
@@ -269,13 +269,13 @@ class TestLearningAchievementActions(TestCase):
             code_name=1,
             learning_unit_year=self.luy,
             language=self.language_fr,
-            annual_id=1
+            consistency_id=1
         )
         learning_achievement_en = LearningAchievementFactory(
             code_name=1,
             learning_unit_year=self.luy,
             language=self.language_en,
-            annual_id=1
+            consistency_id=1
         )
         TextLabelFactory(label='themes_discussed')
 
@@ -290,7 +290,7 @@ class TestLearningAchievementActions(TestCase):
                 'code_name': 'AA1',
                 'text_fr': 'Text',
                 'postpone': 0,
-                'annual_id': 1,
+                'consistency_id': 1,
             }
         )
         self.assertTrue(mock_translated_text_update_or_create.called)
@@ -394,7 +394,7 @@ class TestLearningAchievementPostponement(TestCase):
             'code_name': code_name,
             'text_fr': 'text',
             'postpone': '1',
-            'annual_id': 1
+            'consistency_id': 1
         })
         return create_response
 

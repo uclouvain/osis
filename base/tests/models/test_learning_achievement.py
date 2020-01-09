@@ -47,9 +47,9 @@ class LearningAchievementTest(TestCase):
         cls.language_en = LanguageFactory(code='EN')
 
     def test_unique(self):
-        LearningAchievementFactory(annual_id=1, learning_unit_year=self.luy, language=self.language_fr)
+        LearningAchievementFactory(consistency_id=1, learning_unit_year=self.luy, language=self.language_fr)
         with self.assertRaises(IntegrityError):
-            LearningAchievementFactory(annual_id=1, learning_unit_year=self.luy, language=self.language_fr)
+            LearningAchievementFactory(consistency_id=1, learning_unit_year=self.luy, language=self.language_fr)
 
     def test_find_by_learning_unit_year(self):
         luy_achievement_fr = LearningAchievementFactory(code_name=A_CODE_NAME, learning_unit_year=self.luy,
