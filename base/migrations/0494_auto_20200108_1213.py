@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='learningachievement',
             name='code_name',
-            field=models.CharField(max_length=100, null=True, verbose_name='code'),
+            field=models.CharField(blank=True, max_length=100, null=True, verbose_name='code'),
         ),
         migrations.RunSQL(
             sql="UPDATE base_learningachievement SET code_name=NULL where code_name='.' or code_name=''",
