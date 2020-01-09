@@ -42,9 +42,10 @@ class TestElementSave(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = EducationGroupYearFactory()
-        cls.luy = LearningUnitYearFactory()
+        academic_year = cls.egy.academic_year
+        cls.luy = LearningUnitYearFactory(academic_year=academic_year)
         cls.lcy = LearningClassYearFactory()
-        cls.gy = GroupYearFactory(group=GroupFactory())
+        cls.gy = GroupYearFactory(academic_year=academic_year, group=GroupFactory(start_year=academic_year))
 
     def test_save_no_foreign_key_set(self):
 
