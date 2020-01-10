@@ -125,8 +125,6 @@ def update(request, learning_unit_year_id, learning_achievement_id):
 
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
-    else:
-        print(form.errors)
 
     context = {'learning_unit_year': learning_unit_year,
                'learning_achievement': learning_achievement,
