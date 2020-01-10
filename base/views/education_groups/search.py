@@ -84,7 +84,11 @@ def education_groups(request):
         'object_list': object_list_paginated,
         'object_list_count': objects_qs.count(),
         'enums': education_group_categories,
-        'person': person
+        'person': person,
+        'tooltip_text': _(
+            'To search a string strictly beginning with a substring, put \'^\' as first character. '
+            'To ensure that a string is ending with a substring, put \'$\' as last character.'
+        )
     }
     return render(request, "education_group/search.html", context)
 

@@ -35,6 +35,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 
+AUTHORIZED_REGEX_CHARS = "$^"
+
 
 class EducationGroupFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
@@ -70,21 +72,21 @@ class EducationGroupFilter(FilterSet):
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr='icontains',
+        method="filter_education_group_year_field",
         max_length=40,
         required=False,
         label=_('Acronym/Short title'),
     )
     title = filters.CharFilter(
         field_name="title",
-        lookup_expr='icontains',
+        method='filter_education_group_year_field',
         max_length=255,
         required=False,
         label=_('Title')
     )
     partial_acronym = filters.CharFilter(
         field_name="partial_acronym",
-        lookup_expr='icontains',
+        method='filter_education_group_year_field',
         max_length=15,
         required=False,
         label=_('Code'),
@@ -127,3 +129,20 @@ class EducationGroupFilter(FilterSet):
             entity_ids = get_entities_ids(value, with_subordinated)
             queryset = queryset.filter(management_entity__in=entity_ids)
         return queryset
+
+    @staticmethod
+    def filter_education_group_year_field(queryset, name, value):
+        if value:
+            filter_field = name
+            if _is_regex(value):
+                search_string = r"(" + value + ")"
+                filter_field += "__iregex"
+            else:
+                search_string = value
+                filter_field += "__icontains"
+            queryset = queryset.filter(**{filter_field: search_string})
+        return queryset
+
+
+def _is_regex(value):
+    return set(AUTHORIZED_REGEX_CHARS).intersection(set(value))
