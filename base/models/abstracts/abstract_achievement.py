@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from ckeditor.fields import RichTextField
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
@@ -46,6 +47,7 @@ class AbstractAchievement(OrderedModel):
         verbose_name=_('Language'),
         on_delete=models.CASCADE,
     )
+    consistency_id = models.IntegerField(default=1, validators=[MinValueValidator(1)])
 
     class Meta:
         abstract = True

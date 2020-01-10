@@ -65,7 +65,7 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     class Meta:
         model = LearningAchievement
-        fields = ['code_name', 'text_fr', 'text_en']
+        fields = ['code_name', 'text_fr', 'text_en', 'consistency_id']
 
     def __init__(self, data=None, initial=None, **kwargs):
         initial = initial or {}
