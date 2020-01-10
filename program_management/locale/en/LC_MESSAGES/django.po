@@ -282,6 +282,9 @@ msgstr ""
 msgid "Please cut or copy an item before attach it"
 msgstr ""
 
+msgid "Please select an item before adding it"
+msgstr ""
+
 msgid "Prerequisite"
 msgid_plural "Prerequisites"
 msgstr[0] ""
