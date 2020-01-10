@@ -623,12 +623,15 @@ def _update_luy_achievements_in_future(ac_year_postponement_range, lu_to_consoli
         language = Language.objects.get(code=code[:2].upper())
         texts = LearningAchievement.objects.filter(
             learning_unit_year_id=lu_to_consolidate.id,
-            language=language)
+            language=language
+        )
         for achievement in texts:
-            update_future_luy_achievement(ac_year_postponement_range,
-                                          achievement,
-                                          achievement.code_name,
-                                          achievement.code_name)
+            update_future_luy_achievement(
+                ac_year_postponement_range,
+                achievement,
+                achievement.consistency_id,
+                achievement.code_name
+            )
 
 
 def _update_descriptive_fiche(ac_year_postponement_range, lu_to_consolidate, luy_to_update):

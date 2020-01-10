@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             field=models.IntegerField(default=1, validators=[django.core.validators.MinValueValidator(1)]),
         ),
         migrations.RunSQL(
-            sql='UPDATE base_learningachievement SET consistency_id=base_learningachievement.order',
+            sql='UPDATE base_learningachievement SET consistency_id=base_learningachievement.order+1',
             reverse_sql=migrations.RunSQL.noop
         ),
     ]
