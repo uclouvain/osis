@@ -94,9 +94,14 @@ class APIDefaultTestsCasesHttpGetMixin(APITestCase):
     @requires_attributes(['url'])
     def test_filters(self):
         for counter, api_test_case in enumerate(self.get_filter_test_cases()):
-            msg = "\n \n Test case number {counter}. Data :\n {data}".format(counter=counter, data=api_test_case)
             response = self.client.get(self.url, data=api_test_case.filters)
-            self.assertEqual(response.data['results'], api_test_case.expected_result, msg=msg)
+            result = response.data['results']
+            msg = "\n \n Test case number {counter}. Data :\n {data} \n result = {result}".format(
+                counter=counter,
+                data=api_test_case,
+                result=result
+            )
+            self.assertEqual(result, api_test_case.expected_result, msg=msg)
 
     def get_filter_test_cases(self) -> List[APIFilterTestCaseData]:
         if self.has_api_filters:
