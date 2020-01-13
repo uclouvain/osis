@@ -35,8 +35,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 
-AUTHORIZED_REGEX_CHARS = "$^"
-
 
 class EducationGroupFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
@@ -134,15 +132,9 @@ class EducationGroupFilter(FilterSet):
     def filter_education_group_year_field(queryset, name, value):
         if value:
             filter_field = name
-            if _is_regex(value):
-                search_string = r"(" + value + ")"
-                filter_field += "__iregex"
-            else:
-                search_string = value
-                filter_field += "__icontains"
+            value = value.replace("[", "\\[")
+            value = value.replace("]", "\\]")
+            search_string = r"({})".format(value)
+            filter_field += "__iregex"
             queryset = queryset.filter(**{filter_field: search_string})
         return queryset
-
-
-def _is_regex(value):
-    return set(AUTHORIZED_REGEX_CHARS).intersection(set(value))
