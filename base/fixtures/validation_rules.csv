@@ -7,7 +7,7 @@ Examples: <i>ARKE2A, BIOL2A, HIST2A</i>","Sigle d’une Aggégation est composé
 <ul>
 <li>2-4 lettres + <b>2A</b></li>
 </ul>
-Exemples: <i>ARKE2A, BIOL2A, HIST2A</i>",Ex: BIOL2A
+Exemples: <i>ARKE2A, BIOL2A, HIST2A</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_8FC,REQUIRED,8FC,"^([A-Za-z]{2,4})(8)([Ff])([Cc])$",,"title_english of Certificate of Participation is composed of:
 <ul>
 <li>2-4 letters + <b>8FC</b></li>
@@ -16,7 +16,7 @@ Examples: <i>ACHA8FC, BARO8FC, CHAN8FC</i>","Sigle d’une Attestation de partic
 <ul>
 <li>2-4 lettres + <b>8FC</b></li>
 </ul>
-Exemples: <i>ACHA8FC, BARO8FC, CHAN8FC</i>",Ex: ACHA8FC
+Exemples: <i>ACHA8FC, BARO8FC, CHAN8FC</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_7FC,REQUIRED,7FC,"^([A-Za-z]{2,4})(7)([Ff])([Cc])$",,"title_english of Certificate of Success is composed of:
 <ul>
 <li>2-4 letters + <b>7FC</b></li>
@@ -25,7 +25,7 @@ Examples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>","Sigle d’une Attestation de réuss
 <ul>
 <li>2-4 lettres + <b>7FC</b></li>
 </ul>
-Exemples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>",Ex: FITN7FC
+Exemples: <i>ANIM7FC, ECPO7FC, FITN7FC</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_9FC,REQUIRED,9FC,"^([A-Za-z]{2,4})(9)([Ff])([Cc])$",,"title_english of Certificate of holding credits is composed of:
 <ul>
 <li>2-4 letters + <b>9FC</b></li>
@@ -34,7 +34,7 @@ Examples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>","Sigle d’une Attestation d’obten
 <ul>
 <li>2-4 lettres + <b>9FC</b></li>
 </ul>
-Exemples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>",Ex: PCDI9FC
+Exemples: <i>PCDI9FC, FRTB9FC, SIMU9FC</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_1BA,REQUIRED,1BA,"^([A-Za-z]{2,4})(1)([Bb])([Aa])$",,"title_english of Bachelor credits is composed of:
 <ul>
 <li>2-4 letters + <b>1BA</b></li>
@@ -43,7 +43,7 @@ Examples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>","Sigle d’un Bachelier est composé
 <ul>
 <li>2-4 lettres + <b>1BA</b></li>
 </ul>
-Exemples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>",Ex: BIOL1BA
+Exemples: <i>BIOL1BA, DROI1BA, ECGE1BA</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_CE,REQUIRED,CE,"^([A-Za-z]{2,4})([2|9])([Cc])([Ee])$",,"title_english of Certificate is composed of:
 <ul>
 <li>2-4 letters + 1 number among 2 and 9 + <b>CE</b></li>
@@ -52,7 +52,7 @@ Examples: <i>ETES9CE</i>","Sigle d’un Certificat est composé de:
 <ul>
 <li>2-4 lettres + 1 chiffre parmi 2 et 9 + <b>CE</b></li>
 </ul>
-Exemples: <i>ETES9CE</i>",Ex: ETES9CE
+Exemples: <i>ETES9CE</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2CE,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"title_english of CAPAES is composed of:
 <ul>
 <li>2-4 letters + <b>2CE</b></li>
@@ -61,7 +61,7 @@ Examples: <i>CAPA2CE</i>","Sigle d’un CAPAES est composé de
 <ul>
 <li>2-4 lettres + <b>2CE</b></li>
 </ul>
-Exemples: <i>CAPA2CE</i>",Ex: CAPA2CE
+Exemples: <i>CAPA2CE</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_3CE,REQUIRED,3CE,"^([A-Za-z]{2,4})(3)([Cc])([Ee])$",,"title_english of Research certificate is composed of:
 <ul>
 <li>2-4 letters + <b>3CE</b></li>
@@ -70,7 +70,7 @@ Examples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>","Sigle d’un Certificat de recherch
 <ul>
 <li>2-4 lettres + <b>3CE</b></li>
 </ul>
-Exemples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>",Ex: DROI3CE
+Exemples: <i>DROI3CE, FIAL3CE, ESPO3CE</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_1FC,REQUIRED,1FC,"^([A-Za-z]{2,4})(1)([Ff])([Cc])$",,"title_english of University first cycle certificate is composed of:
 <ul>
 <li>2-4 letters + <b>1FC</b></li>
@@ -79,7 +79,7 @@ Examples: <i>RESE1FC, DICI1FC, PACC1FC</i>","Sigle d’un Certificat d’univers
 <ul>
 <li>2-4 lettres + <b>1FC</b></li>
 </ul>
-Exemples: <i>RESE1FC, DICI1FC, PACC1FC</i>",Ex: DICI1FC
+Exemples: <i>RESE1FC, DICI1FC, PACC1FC</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2FC,REQUIRED,2FC,"^([A-Za-z]{2,4})(2)([Ff])([Cc])$",,"title_english of University second cycle certificate is composed of:
 <ul>
 <li>2-4 letters + <b>12FC</b></li>
@@ -88,7 +88,7 @@ Examples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>","Sigle d’un Certificat d’universi
 <ul>
 <li>2-4 lettres + <b>12FC</b></li>
 </ul>
-Exemples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>",Ex: ANSO2FC
+Exemples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_CA,REQUIRED,CA,"^([A-Za-z]{2,4})[ ]([Cc])([Aa])$",,"title_english of Access contest is composed of:
 <ul>
 <li>2-4 letters + space + <b>CA</b></li>
@@ -97,7 +97,7 @@ Examples: <i>MED CA</i>","Sigle d’un Concours d’accès est composé de:
 <ul>
 <li>2-4 lettres + espace + <b>CA</b></li>
 </ul>
-Exemples: <i>MED CA</i>",Ex: MED CA
+Exemples: <i>MED CA</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_LV,REQUIRED,LV,"^([A-Za-z]{2,4})[ ]([Ll])([Vv])$",,"title_english of Language classes is composed of:
 <ul>
 <li>2-4 letters + space + <b>LV</b></li>
@@ -106,7 +106,7 @@ Examples: <i>ALLE LV, JAPO LV, FRAN LV</i>","Sigle d’un Cours de langue est co
 <ul>
 <li>2-4 lettres + espace + <b>LV</b></li>
 </ul>
-Exemples: <i>ALLE LV, JAPO LV, FRAN LV</i>",Ex: FRAN LV
+Exemples: <i>ALLE LV, JAPO LV, FRAN LV</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})[ ](([Ii][Ss])|([Ii][Ss]\/([A-Za-z]{1,2}))|([Ii][Nn]))$",,"title_english of Isolated class is composed of:
 <ul>
 <li>2-4 letters </li> <li>space</li> <li> <b>IS</b> <u>OR</u> <b>IS/</b> + letters <u>OR</u> <b>IN</b></li>
@@ -115,7 +115,7 @@ Examples: <i>ACTU IS, SC IS/G, SC IN</i>","Sigle d’un Cours isolés est compos
 <ul>
 <li>2-4 lettres </li> <li> espace </li> <li> <b>IS</b> <u>OU</u> <b>IS/</b> + lettres <u>OU</u> <b>IN</b></li>
 </ul>
-Exemples: <i>ACTU IS, SC IS/G, SC IN</i>","Ex: ACTU IS,SC IS/G,SC IN"
+Exemples: <i>ACTU IS, SC IS/G, SC IN</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)(([Dd][Pp])|([Dd]))$",,"title_english of PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3DP</b> or <b>3D</b></li>
@@ -124,7 +124,7 @@ Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un Doctorat est composé de
 <ul>
 <li>2-4 lettres + <b>3DP</b> ou <b>3D</b></li>
 </ul>
-Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",Ex: ART3DP
+Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)((([Ff])([Pp]))|(([Ff])([Dd])))$",,"title_english of Formation PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3FP</b> or <b>3FD</b></li>
@@ -133,7 +133,7 @@ Examples: <i>ART3FD</i>","Sigle d’une Formation doctorale est composé de:
 <ul>
 <li>2-4 lettres + <b>3FP</b> ou <b>3FD</b></li>
 </ul>
-Exemples: <i>ART3FD</i>",Ex: ART3FD
+Exemples: <i>ART3FD</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})[ ]([Jj])([Yy])$",,"title_english of Junior year is composed of:
 <ul>
 <li>2-4 letters + space + <b>JY</b></li>
@@ -142,7 +142,7 @@ Examples: <i>TECC JY</i>","Sigle d’un Junior Year  est composé de:
 <ul>
 <li>2-4 lettres + espace + <b>JY</b></li>
 </ul>
-Exemples: <i>TECC JY</i>",Ex: TECC JY
+Exemples: <i>TECC JY</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2M120,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"title_english of Program master 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2M</b></li>
@@ -151,7 +151,7 @@ Examples: <i>ACTU2M, GBIO2M, BBMC2M</i>","Sigle d’un Master en 120 crédits (p
 <ul>
 <li>2-4 lettres + <b>2M</b></li>
 </ul>
-Exemples: <i>ACTU2M, GBIO2M, BBMC2M</i>",Ex: BBMC2M
+Exemples: <i>ACTU2M, GBIO2M, BBMC2M</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MA120,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"title_english of Master MA 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MA</b></li>
@@ -160,7 +160,7 @@ Examples: <i>BBMC2MA, FILO2MA, INGE2MA</i>","Sigle d’un Master en 120 crédits
 <ul>
 <li>2-4 lettres + <b>2MA</b></li>
 </ul>
-Exemples: <i>BBMC2MA, FILO2MA, INGE2MA</i>",Ex: BBMC2MA
+Exemples: <i>BBMC2MA, FILO2MA, INGE2MA</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MD120,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"title_english of Master MD 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MD</b></li>
@@ -169,7 +169,7 @@ Examples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>","Sigle d’un Master en 120 crédits 
 <ul>
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
-Exemples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>",Ex: BBMC2MD
+Exemples: <i>BBMC2MD, SOC2MD, TRAD2MD</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MS120,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"title_english of Master MS 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
@@ -178,7 +178,7 @@ Examples: <i>ACTU2MS/SA, BBMC2MS/BT, FYAP2MS/G</i>","Sigle d’un Master en 120 
 <ul>
 <li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
-Exemples: <i>ACTU2MS/SA,BBMC2MS/BT, FYAP2MS/G</i>",Ex: BBMC2MS/BT
+Exemples: <i>ACTU2MS/SA,BBMC2MS/BT, FYAP2MS/G</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2M180,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"title_english of Program master 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2M</b></li>
@@ -187,7 +187,7 @@ Examples: <i>MED2M</i>","Sigle d’un Master en 180-240 crédits (programme) est
 <ul>
 <li>2-4 lettres + <b>2M</b></li>
 </ul>
-Exemples: <i>MED2M</i>",Ex: MED2M
+Exemples: <i>MED2M</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MA180,REQUIRED,2MA,"^([A-Za-z]{2,4})(2)([Mm])([Aa])$",,"title_english of Master MA 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2MA</b></li>
@@ -196,7 +196,7 @@ Examples: <i>MED2MA</i>","Sigle d’un Master en 180-240 crédits à finalité a
 <ul>
 <li>2-4 lettres + <b>2MA</b></li>
 </ul>
-Exemples: <i>MED2MA</i>",Ex: MED2MA
+Exemples: <i>MED2MA</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MD180,REQUIRED,2MD,"^([A-Za-z]{2,4})(2)([Mm])([Dd])$",,"title_english of Master MD 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2MD</b></li>
@@ -205,7 +205,7 @@ Examples: <i>MED2MD</i>","Sigle d’un Master en 180-240 crédits à finalité d
 <ul>
 <li>2-4 lettres + <b>2MD</b></li>
 </ul>
-Exemples: <i>MED2MD</i>",Ex: MED2MD
+Exemples: <i>MED2MD</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MS180,REQUIRED,2MS/,"^([A-Za-z]{2,4})(2)([Mm])([Ss])(\/)(.{1,2})$",,"title_english of Master MS 180-240 is composed of:
 <ul>
 <li>2-4 letters + <b>2MS/</b> + 1-2 letters</li>
@@ -214,7 +214,7 @@ Examples: <i>MED2MS/G, MED2MS/SG</i>","Sigle d’un Master en 180-240 crédits �
 <ul>
 <li>2-4 lettres + <b>2MS/</b> + 1-2 lettres</li>
 </ul>
-Exemples: <i>MED2MS/G, MED2MS/SG</i>",Ex: MED2MS/G
+Exemples: <i>MED2MS/G, MED2MS/SG</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2M1,REQUIRED,2M1,"^([A-Za-z]{2,4})(2)([Mm])(1)$",,"title_english of Master 60 is composed of:
 <ul>
 <li>2-4 letters + <b>2M1</b></li>
@@ -223,7 +223,7 @@ Examples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>","Sigle d’un Master en 60 crédits 
 <ul>
 <li>2-4 lettres + <b>2M1</b></li>
 </ul>
-Exemples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>",Ex: BIOL2M1
+Exemples: <i>BIOL2M1, GEST2M1, ROGE2M1</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_2MC,REQUIRED,2MC,"^([A-Za-z]{2,4})(2)([Mm])([Cc])$",,"title_english of Master of specialist is composed of:
 <ul>
 <li>2-4 letters + <b>2MC</b></li>
@@ -232,7 +232,7 @@ Examples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>","Sigle d’un Master de spécialisat
 <ul>
 <li>2-4 lettres + <b>2MC</b></li>
 </ul>
-Exemples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>",Ex: BRAS2MC
+Exemples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>",
 base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_ST,REQUIRED,ST,"^([A-Za-z]{2,4})[ ]([Ss])([Tt])$",,"title_english of Internship is composed of:
 <ul>
 <li>2-4 letters + space + <b>ST</b></li>
@@ -241,7 +241,7 @@ Examples: <i>DRT ST, AGRO ST, STAT ST</i>","Sigle d’un Stagiaire est composé 
 <ul>
 <li>2-4 lettres + espace + <b>ST</b></li>
 </ul>
-Exemples: <i>DRT ST, AGRO ST, STAT ST</i>",Ex: AGRO ST
+Exemples: <i>DRT ST, AGRO ST, STAT ST</i>",
 base.validationrule,base_educationgroupyear.partial_title_english.osis.education_group_type_2A,REQUIRED,200E,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ee])$",,"Code of Aggregation is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1487,14 +1487,14 @@ Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mo
 <li><b>V</b></li>
 </ul>
 Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_deepening,REQUIRED,,,,,,Ex: APPBIOL
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_sociatyminor,REQUIRED,,,,,,Ex: MINDD
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_accessminor,REQUIRED,,,,,,Ex: MINECON
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_openminor,REQUIRED,,,,,,Ex: MINCULTS
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,Ex: MINANGL
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,Ex: MAJPSY
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_option,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
-base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_deepening,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_sociatyminor,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_accessminor,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_openminor,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_disciplinarycomplementminor,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_fsaspeciality,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_option,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.title_english.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_deepening,REQUIRED,Approfondissement en,^(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure,^(Mineure)(.*)$,,,,
