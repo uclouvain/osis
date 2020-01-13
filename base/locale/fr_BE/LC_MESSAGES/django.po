@@ -2789,10 +2789,8 @@ msgstr "L'utilisateur n'a pas la permission de créer des formations."
 msgid "The user has not permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
-#, fuzzy
-#| msgid "The user has not permission to change education groups."
 msgid "The user is not allowed to change education group content."
-msgstr "L'utilisateur n'a pas la permission de modifier les formations."
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation."
 
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
@@ -3654,9 +3652,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Existing proposal in epc"
-#~ msgstr "Il existe des propositions dans EPC"
-
-#~ msgid "The user cannot modify data which are greater than N+1"
-#~ msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
