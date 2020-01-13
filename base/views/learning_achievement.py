@@ -50,7 +50,7 @@ def operation(request, learning_achievement_id, operation_str):
     lu_yr_id = achievement_fr.learning_unit_year.id
 
     achievement_en = find_learning_unit_achievement(
-        achievement_fr.code_name,
+        achievement_fr.consistency_id,
         achievement_fr.learning_unit_year,
         EN_CODE_LANGUAGE,
         achievement_fr.order
@@ -76,7 +76,7 @@ def execute_operation(achievements, operation_str):
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
-        if not next_luy.is_past() and an_achievement.code_name:
+        if not next_luy.is_past():
             last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
     return last_academic_year
 
@@ -86,7 +86,7 @@ def _postpone_operation(an_achievement, next_luy, operation_str):
         next_luy = next_luy.get_learning_unit_next_year()
         next_achievement = LearningAchievement.objects.filter(
             learning_unit_year=next_luy,
-            code_name=an_achievement.code_name,
+            consistency_id=an_achievement.consistency_id,
             language=an_achievement.language
         ).first()
         if next_achievement:
