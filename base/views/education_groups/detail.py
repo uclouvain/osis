@@ -61,7 +61,7 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.group_element_year import find_learning_unit_formations, GroupElementYear
+from base.models.group_element_year import find_learning_unit_roots, GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -524,9 +524,11 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_branch.select_related("parent")
-        context["formations"] = find_learning_unit_formations(
+        context["formations"] = find_learning_unit_roots(
             list(grp.parent for grp in self.object.child_branch.select_related("parent")),
-            parents_as_instances=True
+            return_result_params={
+                'parents_as_instances': True
+            }
         )
         return context
 
@@ -547,7 +549,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_master = acronym.endswith(('2m', '2m1'))
         is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
-        is_iufc = acronym.endswith('fc')
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
@@ -569,7 +570,6 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
-                'is_iufc': is_iufc,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
                 'show_free_text': self._show_free_text()
@@ -586,9 +586,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         return context
 
     def _show_free_text(self):
-        concerned_training_types = list(
-            set(TrainingType.with_admission_condition()) - set(TrainingType.continuing_education_types())
-        )
+        concerned_training_types = list(TrainingType.with_admission_condition())
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
             concerned_training_types,
             MiniTrainingType.with_admission_condition(),

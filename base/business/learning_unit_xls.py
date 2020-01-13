@@ -57,6 +57,7 @@ DEFAULT_LEGEND_STYLES = {
     Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_COLOR)): ['A5'],
     Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_AND_MODIFICATION_COLOR)): ['A6'],
 }
+BOLD_FONT = Font(bold=True)
 SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
 HEADER_PROGRAMS = _('Programs')
@@ -386,6 +387,8 @@ def create_xls(user, found_learning_units, filters):
 
 def create_xls_attributions(user, found_learning_units, filters):
     titles = learning_unit_titles_part1() + learning_unit_titles_part2() + [str(_('Tutor')),
+                                                                            "{} ({})".format(str(_('Tutor')),
+                                                                                             str(_('email'))),
                                                                             str(_('Function')),
                                                                             str(_('Substitute')),
                                                                             str(_('Beg. of attribution')),
@@ -404,6 +407,7 @@ def create_xls_attributions(user, found_learning_units, filters):
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
                   xls_build.STYLED_CELLS: {xls_build.STYLE_BORDER_TOP: cells_with_top_border,
                                            Style(font=Font(color=Color('00FFFFFF')),): cells_with_white_font},
+                  xls_build.COLORED_ROWS: {Style(font=BOLD_FONT): [0]}
                   }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
@@ -450,6 +454,7 @@ def prepare_xls_content_with_attributions(found_learning_units, nb_columns):
 def _get_attribution_detail(an_attribution):
     return [
         an_attribution.get('person').full_name,
+        an_attribution.get('person').email,
         Functions[an_attribution['function']].value if 'function' in an_attribution else '',
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         an_attribution.get('start_year'),
