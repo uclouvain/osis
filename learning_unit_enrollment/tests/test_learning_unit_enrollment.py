@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 from django.test import TestCase, RequestFactory
@@ -24,7 +25,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
             'learning_unit_enrollment_api_v1:enrollments-list-by-student',
             kwargs={'registration_id': cls.registration_id}
         )
-        cls.offer_enrollment_state = OfferEnrollmentState.PROVISORY.name
+        cls.offer_enrollment_states = [OfferEnrollmentState.PROVISORY.name, OfferEnrollmentState.SUBSCRIBED.name]
 
         for year in [2018, 2019, 2020]:
             LearningUnitEnrollmentFactory(
@@ -34,7 +35,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 offer_enrollment__education_group_year__acronym=cls.education_group_acronym,
                 offer_enrollment__education_group_year__education_group_type__category=Categories.TRAINING.name,
                 learning_unit_year__academic_year__year=year,
-                offer_enrollment__enrollment_state=cls.offer_enrollment_state,
+                offer_enrollment__enrollment_state=random.choice(cls.offer_enrollment_states),
             )
 
     def get_filter_test_cases(self) -> List[APIFilterTestCaseData]:
@@ -72,7 +73,7 @@ class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
                 ).data,
             ),
             APIFilterTestCaseData(
-                filters={'offer_enrollment_state': self.offer_enrollment_state},
+                filters={'offer_enrollment_state': ','.join(self.offer_enrollment_states)},
                 expected_result=LearningUnitEnrollmentSerializer(
                     LearningUnitEnrollment.objects.filter(
                         offer_enrollment__enrollment_state=OfferEnrollmentState.PROVISORY.name

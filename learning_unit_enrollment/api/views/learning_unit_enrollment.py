@@ -23,13 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from rest_framework import generics
 
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from django_filters import rest_framework as filters
 
 from learning_unit_enrollment.api.serializers.learning_unit_enrollment import LearningUnitEnrollmentSerializer
+
+
+class CharListFilter(filters.CharFilter):
+    def filter(self, qs, value):
+        self.lookup_expr = 'in'
+        values = value.split(u',')
+        return super(CharListFilter, self).filter(qs, values)
 
 
 class LearningUnitEnrollmentFilter(filters.FilterSet):
@@ -39,7 +45,7 @@ class LearningUnitEnrollmentFilter(filters.FilterSet):
     )
     year = filters.NumberFilter(field_name="learning_unit_year__academic_year__year")
     learning_unit_enrollment_state = filters.CharFilter(field_name="enrollment_state")
-    offer_enrollment_state = filters.CharFilter(field_name="offer_enrollment__enrollment_state")
+    offer_enrollment_state = CharListFilter(field_name="offer_enrollment__enrollment_state")
 
     class Meta:
         model = LearningUnitEnrollment
