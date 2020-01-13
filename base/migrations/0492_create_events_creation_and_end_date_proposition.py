@@ -76,7 +76,7 @@ def reverse_migration(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0490_remove_learningunit_existing_proposal_in_epc'),
+        ('base', '0491_auto_20200107_1458'),
     ]
 
     operations = [

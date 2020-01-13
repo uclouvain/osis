@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0491_create_events_creation_and_end_date_proposition'),
+        ('base', '0492_create_events_creation_and_end_date_proposition'),
     ]
 
     operations = [
