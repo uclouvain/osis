@@ -50,7 +50,7 @@ def operation(request, learning_achievement_id, operation_str):
     lu_yr_id = achievement_fr.learning_unit_year.id
 
     achievement_en = find_learning_unit_achievement(
-        achievement_fr.code_name,
+        achievement_fr.consistency_id,
         achievement_fr.learning_unit_year,
         EN_CODE_LANGUAGE,
         achievement_fr.order
@@ -76,7 +76,7 @@ def execute_operation(achievements, operation_str):
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
-        if not next_luy.is_past() and an_achievement.code_name:
+        if not next_luy.is_past():
             last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
     return last_academic_year
 
@@ -86,7 +86,7 @@ def _postpone_operation(an_achievement, next_luy, operation_str):
         next_luy = next_luy.get_learning_unit_next_year()
         next_achievement = LearningAchievement.objects.filter(
             learning_unit_year=next_luy,
-            code_name=an_achievement.code_name,
+            consistency_id=an_achievement.consistency_id,
             language=an_achievement.language
         ).first()
         if next_achievement:
@@ -144,7 +144,7 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     form = LearningAchievementEditForm(
         request.POST or None,
         luy=learning_unit_yr,
-        consistency_id=learning_achievement_fr.consistency_id+1
+        consistency_id=_get_last_consistency_id(learning_unit_yr)+1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
@@ -156,6 +156,12 @@ def create(request, learning_unit_year_id, learning_achievement_id):
                'create': True}
 
     return render(request, "learning_unit/achievement_edit.html", context)
+
+
+def _get_last_consistency_id(learning_unit_year):
+    return LearningAchievement.objects.filter(
+        learning_unit_year=learning_unit_year
+    ).order_by("consistency_id").last().consistency_id
 
 
 def _save_and_redirect(request, form, learning_unit_year_id):
@@ -196,9 +202,11 @@ def create_first(request, learning_unit_year_id):
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
 
-    context = {'learning_unit_year': learning_unit_yr,
-               'form': form,
-               'language_code': FR_CODE_LANGUAGE}
+    context = {
+        'learning_unit_year': learning_unit_yr,
+        'form': form,
+        'language_code': FR_CODE_LANGUAGE
+    }
 
     return render(request, "learning_unit/achievement_edit.html", context)
 

@@ -47,6 +47,9 @@
         <input type="hidden" id="hdn_learning_achievement_id" value="{{ learning_achievement.id }}">
 
         {% bootstrap_form_errors form %}
+        <div class="form-group">
+            <span><strong>ID </strong>{{ form.consistency_id }}</span>
+        </div>
         {% bootstrap_field form.code_name %}
 
         <p id="code_exists_error_msg" hidden>

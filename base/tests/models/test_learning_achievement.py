@@ -77,13 +77,13 @@ class LearningAchievementTest(TestCase):
                                                           learning_unit_year=self.luy,
                                                           language=self.language_fr)
         self.assertEqual(learning_achievement.find_learning_unit_achievement(
-            luy_achievement_fr_1.code_name,
+            luy_achievement_fr_1.consistency_id,
             luy_achievement_fr_1.learning_unit_year,
             luy_achievement_fr_1.language.code,
             0
         ), luy_achievement_fr_1)
         self.assertIsNone(learning_achievement.find_learning_unit_achievement(
-            luy_achievement_fr_1.code_name,
+            luy_achievement_fr_1.consistency_id,
             luy_achievement_fr_1.learning_unit_year,
             luy_achievement_fr_1.language.code,
             100
