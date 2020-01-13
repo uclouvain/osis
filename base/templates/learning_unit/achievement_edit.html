@@ -48,8 +48,8 @@
 
         {% bootstrap_form_errors form %}
         <div class="input-group col-sm-2" style="margin-bottom: 10px;">
-          <span class="input-group-addon">ID</span>
-          <input type="text" class="form-control" value="{{ form.consistency_id }}" disabled>
+            <span><strong>ID </strong></span>
+            <span>{{ form.consistency_id }}</span>
         </div>
         {% bootstrap_field form.code_name %}
 
