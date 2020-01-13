@@ -25,6 +25,7 @@
 ##############################################################################
 from rest_framework import generics
 
+from backoffice.settings.rest_framework.pagination import LimitOffsetPaginationForEnrollments
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from django_filters import rest_framework as filters
 
@@ -61,6 +62,9 @@ class LearningUnitEnrollmentList(generics.ListAPIView):
     """
        Return a list of all the training with optional filtering.
     """
+
+    pagination_class = LimitOffsetPaginationForEnrollments  # TODO :: remove this when xls will be produced in Osis
+
     queryset = LearningUnitEnrollment.objects.select_related(
         'offer_enrollment__student__person',
         'learning_unit_year__academic_year',

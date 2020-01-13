@@ -11,6 +11,7 @@ from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.mixin.default_api_tests_cases_mixin import APIDefaultTestsCasesHttpGetMixin, APIFilterTestCaseData
 from learning_unit_enrollment.api.serializers.learning_unit_enrollment import LearningUnitEnrollmentSerializer
+from learning_unit_enrollment.api.views.learning_unit_enrollment import LearningUnitEnrollmentList
 
 
 class EnrollmentsListByStudentTestCase(APIDefaultTestsCasesHttpGetMixin):
@@ -133,3 +134,11 @@ class LearningUnitEnrollmentSerializerTestCase(TestCase):
             self.serializer.data['learning_unit_acronym'],
             self.learning_unit_acronym
         )
+
+    def test_pagination_max_limit(self):
+        error_msg = """
+            Used from Osis-portal to generate Excel file of all students enrolled to a Full/partim learniing unit.
+            We need to fetch all enrollments because the Excel file is generated from the content page in Osis-portal.
+            This test and the pagination_class can be removed when the Excel file will be generated in Osis.
+        """
+        self.assertEqual(LearningUnitEnrollmentList.pagination_class.max_limit, 1000, error_msg)
