@@ -220,7 +220,8 @@ class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
         LearningAchievementFactory(learning_unit_year=luy,
                                    text=a_text,
                                    code_name="1",
-                                   language=self.language_fr)
+                                   language=self.language_fr,
+                                   consistency_id=1)
         TranslatedTextFactory(reference=luy.id, entity='learning_unit_year',
                               language="fr-be", text=a_text,
                               text_label=self.text_label)

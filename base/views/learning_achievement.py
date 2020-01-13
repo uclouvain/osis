@@ -119,7 +119,8 @@ def update(request, learning_unit_year_id, learning_achievement_id):
     form = LearningAchievementEditForm(
         request.POST or None,
         luy=learning_unit_year,
-        code=learning_achievement.code_name
+        code=learning_achievement.code_name,
+        consistency_id=learning_achievement.consistency_id
     )
 
     if form.is_valid():
@@ -142,7 +143,8 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     learning_achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     form = LearningAchievementEditForm(
         request.POST or None,
-        luy=learning_unit_yr
+        luy=learning_unit_yr,
+        consistency_id=learning_achievement_fr.consistency_id+1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
@@ -188,7 +190,8 @@ def create_first(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     form = LearningAchievementEditForm(
         request.POST or None,
-        luy=learning_unit_yr
+        luy=learning_unit_yr,
+        consistency_id=1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)

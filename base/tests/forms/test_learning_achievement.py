@@ -45,7 +45,6 @@ class TestLearningAchievementForm(TestCase):
             learning_unit_year=cls.learning_unit_year,
             language=cls.language_fr,
             code_name='TEST',
-            consistency_id=1
         )
 
     def test_should_not_raise_validation_error_case_update_same_achievement(self):
@@ -54,12 +53,12 @@ class TestLearningAchievementForm(TestCase):
             'code_name': self.learning_achievement.code_name,
             'postpone': 0,
             'text_fr': text,
-            'consistency_id': 1
         }
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
             data=data,
-            code=self.learning_achievement.code_name
+            code=self.learning_achievement.code_name,
+            consistency_id=self.learning_achievement.consistency_id
         )
         self.assertTrue(form.is_valid(), form.errors)
         self.assertTrue(self.learning_achievement.text, text)
@@ -68,11 +67,11 @@ class TestLearningAchievementForm(TestCase):
         data = {
             'code_name': self.learning_achievement.code_name,
             'postpone': 0,
-            'consistency_id': self.learning_achievement.consistency_id
         }
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
             data=data,
+            consistency_id=2
         )
         self.assertFalse(form.is_valid(), form.errors)
         self.assertDictEqual(

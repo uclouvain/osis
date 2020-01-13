@@ -296,13 +296,11 @@ class TestLearningAchievementActions(TestCase):
         self.assertTrue(mock_translated_text_update_or_create.called)
 
     def test_learning_achievement_create(self):
-        achievement_fr = LearningAchievementFactory(language=self.language_fr,
-                                                    learning_unit_year=self.luy)
-
-        response = self.client.get(reverse('achievement_create',
-                                           args=[self.luy.id, achievement_fr.id]),
-                                   data={'language_code': self.language_fr.code})
-
+        achievement_fr = LearningAchievementFactory(language=self.language_fr, learning_unit_year=self.luy)
+        response = self.client.get(
+            reverse('achievement_create', args=[self.luy.id, achievement_fr.id]),
+            data={'language_code': self.language_fr.code}
+        )
         self.assertTemplateUsed(response, 'learning_unit/achievement_edit.html')
         context = response.context
         self.assertIsInstance(context['form'], LearningAchievementEditForm)
