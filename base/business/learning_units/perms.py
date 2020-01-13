@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
-from base.business.event_perms import EventPermLearningUnitFacultyManagerEdition
+from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import starting_academic_year
@@ -359,7 +359,7 @@ def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, r
 def _can_be_updated_by_faculty_manager(learning_unit_year):
     if not learning_unit_year.learning_container_year:
         return False
-    return EventPermLearningUnitFacultyManagerEdition(obj=learning_unit_year, raise_exception=False).is_open()
+    return event_perms.EventPermLearningUnitFacultyManagerEdition(obj=learning_unit_year, raise_exception=False).is_open()
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):
@@ -600,16 +600,15 @@ def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise
 
 def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
     result = True
-    max_limit = starting_academic_year().year + 6
-    if person.is_faculty_manager and not person.is_central_manager:
-        n_year = starting_academic_year().next().year
 
+    if person.is_faculty_manager and not person.is_central_manager:
+        event_perm = event_perms.EventPermCreationOrEndDateProposalFacultyManager()
     elif person.is_central_manager:
-        n_year = starting_academic_year().year
+        event_perm = event_perms.EventPermCreationOrEndDateProposalCentralManager()
     else:
         return False
 
-    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year >= max_limit:
+    if learning_unit_year.academic_year not in event_perm.get_academic_years():
         result = False
 
     can_raise_exception(

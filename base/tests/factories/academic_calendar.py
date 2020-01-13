@@ -80,3 +80,22 @@ class AcademicCalendarCreationEndDateProposalCentralManagerFactory(AcademicCalen
 
 class AcademicCalendarCreationEndDateProposalFacultyManagerFactory(AcademicCalendarFactory):
     reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
+
+
+def generate_creation_or_end_date_proposal_calendars(academic_years):
+    [
+        AcademicCalendarCreationEndDateProposalCentralManagerFactory(
+            data_year=academic_year,
+            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+        )
+        for academic_year in academic_years
+    ]
+    [
+        AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
+            data_year=academic_year,
+            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+            end_date=datetime.datetime(academic_year.year, 9, 14)
+        )
+        for academic_year in academic_years
+    ]
