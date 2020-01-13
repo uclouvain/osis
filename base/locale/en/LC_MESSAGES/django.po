@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 12:43+0100\n"
+"POT-Creation-Date: 2020-01-10 15:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,7 +387,8 @@ msgid "Assistants"
 msgstr ""
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of full UE"
+"At least a partim volume value is greater than corresponding volume of full "
+"UE"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
@@ -941,9 +942,6 @@ msgid "Execute selected action"
 msgstr ""
 
 msgid "Existing acronym"
-msgstr ""
-
-msgid "Existing proposal in epc"
 msgstr ""
 
 msgid "Export"
@@ -1723,6 +1721,9 @@ msgstr ""
 msgid "Offers enrollments"
 msgstr ""
 
+msgid "Ok"
+msgstr ""
+
 msgid "On the file: direct access or access with additional training"
 msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
@@ -2487,10 +2488,6 @@ msgstr ""
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
-msgid ""
-"The faculty manager cannot modify general information which are lower than N"
-msgstr ""
-
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -2648,9 +2645,6 @@ msgstr ""
 msgid "The teaching material has been saved with success"
 msgstr ""
 
-msgid "The user cannot modify data which are greater than N+1"
-msgstr ""
-
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
@@ -2674,6 +2668,9 @@ msgid "The user has not permission to create education groups."
 msgstr ""
 
 msgid "The user has not permission to delete education groups."
+msgstr ""
+
+msgid "The user is not allowed to change education group content."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
@@ -2788,6 +2785,12 @@ msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
+msgstr ""
+
+msgid ""
+"To search a string strictly beginning with a substring, put '^' as first "
+"character. To ensure that a string is ending with a substring, put '$' as "
+"last character."
 msgstr ""
 
 msgid "Total"

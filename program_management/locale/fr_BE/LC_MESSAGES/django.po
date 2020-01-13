@@ -327,6 +327,9 @@ msgstr "Activité cyclique dispensée en"
 msgid "Please cut or copy an item before attach it"
 msgstr "Veuillez copier ou couper un élément avant de le coller"
 
+msgid "Please select an item before adding it"
+msgstr "Veuillez sélectionner un élément avant de l'ajouter"
+
 msgid "Prerequisite"
 msgid_plural "Prerequisites"
 msgstr[0] "Prérequis"
