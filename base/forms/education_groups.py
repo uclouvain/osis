@@ -131,10 +131,9 @@ class EducationGroupFilter(FilterSet):
     @staticmethod
     def filter_education_group_year_field(queryset, name, value):
         if value:
-            filter_field = name
+            filter_field = "{}__iregex".format(name)
             value = value.replace("[", "\\[")
             value = value.replace("]", "\\]")
             search_string = r"({})".format(value)
-            filter_field += "__iregex"
             queryset = queryset.filter(**{filter_field: search_string})
         return queryset
