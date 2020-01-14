@@ -52,7 +52,7 @@ from education_group.api.serializers.education_group import EducationGroupSerial
 
 FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
-TITLE_EDPH3 = "Edph training 3"
+TITLE_EDPH3 = "Edph training 3 [120], sciences"
 
 
 class TestEducationGroupSearchView(TestCase):
@@ -225,11 +225,15 @@ class TestEducationGroupDataSearchFilter(TestCase):
     def test_search_with_acronym_regex(self):
         search_strings = ['^EDPH',
                           'H3$',
-                          '^H3$']
+                          '^H3$',
+                          'EDP.3',
+                          'E*3']
         result_expected = [
             [self.education_group_edph2, self.education_group_edph3],
             [self.education_group_edph3],
-            []
+            [],
+            [self.education_group_edph3],
+            [self.education_group_edph3]
         ]
         for idx, search_string in enumerate(search_strings):
             response = self.client.get(self.url, data={"acronym": search_string})
@@ -303,13 +307,19 @@ class TestEducationGroupDataSearchFilter(TestCase):
 
     def test_search_with_title_regex(self):
         search_strings = ['^Edph training ',
-                          '3$',
-                          '^ph trai']
+                          ', sciences$',
+                          '^ph trai',
+                          '120',
+                          '[120]'
+                          ]
         result_expected = [
             [self.education_group_edph2, self.education_group_edph3],
             [self.education_group_edph3],
-            []
+            [],
+            [self.education_group_edph3],
+            [self.education_group_edph3],
         ]
+
         for idx, search_string in enumerate(search_strings):
             response = self.client.get(self.url, data={"title": search_string})
 
