@@ -2787,12 +2787,6 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
-msgid ""
-"To search a string strictly beginning with a substring, put '^' as first "
-"character. To ensure that a string is ending with a substring, put '$' as "
-"last character."
-msgstr ""
-
 msgid "Total"
 msgstr ""
 

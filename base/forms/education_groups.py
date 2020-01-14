@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
+from base.forms.utils.filter_field import filter_field_by_regex
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -130,10 +131,4 @@ class EducationGroupFilter(FilterSet):
 
     @staticmethod
     def filter_education_group_year_field(queryset, name, value):
-        if value:
-            filter_field = "{}__iregex".format(name)
-            value = value.replace("[", "\\[")
-            value = value.replace("]", "\\]")
-            search_string = r"({})".format(value)
-            queryset = queryset.filter(**{filter_field: search_string})
-        return queryset
+        return filter_field_by_regex(queryset, name, value)

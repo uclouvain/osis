@@ -2923,14 +2923,6 @@ msgstr "Intitulé propre au partim"
 msgid "To complete"
 msgstr "A compléter"
 
-msgid ""
-"To search a string strictly beginning with a substring, put '^' as first "
-"character. To ensure that a string is ending with a substring, put '$' as "
-"last character."
-msgstr ""
-"Pour chercher une chaine de caractères commencant par une sous-chaine, mettre '^' comme premier caractère. "
-"Pour chercher une chaine terminant par une sous-chaîne, mettre '$' comme dernier caractère."
-
 msgid "Total"
 msgstr "Total"
 
