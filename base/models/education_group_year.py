@@ -48,6 +48,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
+from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
@@ -65,7 +66,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
         'education_group', 'enrollment_campus',
         'main_teaching_campus', 'primary_language'
     )
-    search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk']
+    search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk', 'id']
 
     actions = [
         'resend_messages_to_queue',
@@ -961,6 +962,9 @@ def search(**kwargs):
     if kwargs.get("partial_acronym"):
         qs = qs.filter(partial_acronym__icontains=kwargs['partial_acronym'])
 
+    if kwargs.get("enrollment_states"):
+        qs = qs.filter(offerenrollment__enrollment_state__in=kwargs['enrollment_states'])
+
     return qs.select_related('education_group_type', 'academic_year')
 
 
@@ -975,7 +979,8 @@ def find_with_enrollments_count(learning_unit_year):
 
 
 def _count_education_group_enrollments_by_id(education_groups_years):
-    educ_groups = search(id=[educ_group.id for educ_group in education_groups_years]) \
+    educ_groups = search(id=[educ_group.id for educ_group in education_groups_years],
+                         enrollment_states=[SUBSCRIBED, PROVISORY]) \
         .annotate(count_formation_enrollments=Count('offerenrollment')).values('id', 'count_formation_enrollments')
     return {obj['id']: obj['count_formation_enrollments'] for obj in educ_groups}
 
