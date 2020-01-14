@@ -29,6 +29,7 @@ import string
 import factory.fuzzy
 
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from education_group.models.enums.constraint_type import CREDITS
 from education_group.tests.factories.group import GroupFactory
@@ -46,8 +47,9 @@ def generate_title(group_year):
 
 class GroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "education_group.group_year"
+        model = "education_group.GroupYear"
 
+    partial_acronym = factory.Sequence(lambda n: 'PGy %d' % n)
     acronym = factory.Sequence(lambda n: 'Gy %d' % n)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
@@ -59,3 +61,4 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     title_en = factory.LazyAttribute(generate_title)
     remark_fr = factory.fuzzy.FuzzyText(length=255)
     remark_en = factory.fuzzy.FuzzyText(length=255)
+    academic_year = factory.SubFactory(AcademicYearFactory, id=factory.SelfAttribute("..group.start_year"))

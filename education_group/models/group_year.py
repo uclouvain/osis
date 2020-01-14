@@ -30,23 +30,34 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from education_group.models.enums.constraint_type import ConstraintTypes
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class GroupYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('acronym', 'title_fr', 'group', 'education_group_type', 'changed')
-    list_filter = ('education_group_type', )
-    raw_id_fields = (
-        'education_group_type', 'group',
-    )
-    search_fields = ['acronym', 'title_fr', 'group__pk', 'id']
+class GroupYearManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'group'
+        )
 
 
-class GroupYear(SerializableModel):
+class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
+    list_display = ('acronym', 'partial_acronym', 'title_fr', 'group', 'education_group_type', 'academic_year',
+                    'changed')
+    list_filter = ('education_group_type', 'academic_year')
+    search_fields = ['acronym', 'partial_acronym', 'title_fr', 'group__pk', 'id']
+
+
+class GroupYear(models.Model):
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
+    partial_acronym = models.CharField(
+        max_length=15,
+        db_index=True,
+        null=True,
+        verbose_name=_("Acronym/Short title"),
+    )
     acronym = models.CharField(
         max_length=40,
         db_index=True,
@@ -107,3 +118,28 @@ class GroupYear(SerializableModel):
         default="",
         verbose_name=_("remark in english")
     )
+
+    academic_year = models.ForeignKey(
+        'base.AcademicYear',
+        verbose_name=_('Academic year'),
+        on_delete=models.PROTECT
+    )
+
+    objects = GroupYearManager()
+
+    def __str__(self):
+        return "{} ({})".format(self.acronym,
+                                self.academic_year)
+
+    def save(self, *args, **kwargs):
+
+        if self.academic_year.year < self.group.start_year.year:
+            raise AttributeError(
+                _('Please enter an academic year greater or equal to group start year.')
+            )
+        if self.group.end_year and self.academic_year.year > self.group.end_year.year:
+            raise AttributeError(
+                _('Please enter an academic year less or equal to group end year.')
+            )
+
+        super().save(*args, **kwargs)

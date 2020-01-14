@@ -25,6 +25,7 @@
 ##############################################################################
 from unittest import mock
 
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -116,6 +117,17 @@ class TestViewAttributions(TestCase):
         context = response.context
         self.assertQuerysetEqual(context["attributions"], [self.attribution], transform=lambda obj: obj)
         self.assertEqual(context["learning_unit_year"], self.luy)
+
+    def test_tab_active_url(self):
+        url = reverse("learning_unit_attributions", args=[self.luy.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_attributions')
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.luy.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
 class TestGetChargeRepartitionWarningMessage(TestCase):
@@ -215,6 +227,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
                                     self.attribution_full.tutor.person.last_name)
         tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
         self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
-                                      "volume of parent learning unit for this professor") % {
+                                      "volume of full UE for this professor") % {
                                         "tutor": tutor_name_with_function}])
 
