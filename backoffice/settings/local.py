@@ -54,21 +54,3 @@ APPS_TO_TEST += OPTIONAL_APPS
 MIDDLEWARE += OPTIONAL_MIDDLEWARES
 INTERNAL_IPS += OPTIONAL_INTERNAL_IPS
 SITE_ID = 1
-
-QUEUES = {
-   'QUEUE_URL': os.environ.get('RABBITMQ_HOST', 'localhost'),
-   'QUEUE_USER': os.environ.get('RABBITMQ_USER', 'guest'),
-   'QUEUE_PASSWORD': os.environ.get('RABBITMQ_PASSWORD', 'guest'),
-   'QUEUE_PORT': int(os.environ.get('RABBITMQ_PORT', 5672)),
-   'QUEUE_CONTEXT_ROOT': os.environ.get('RABBITMQ_CONTEXT_ROOT', '/'),
-   'QUEUES_NAME': {
-       'MIGRATIONS_TO_PRODUCE': 'osis_portal',
-       'MIGRATIONS_TO_CONSUME': 'osis',
-       'SCORE_ENCODING_PDF_REQUEST': 'score_encoding_pdf_request',
-       'SCORE_ENCODING_PDF_RESPONSE': 'score_encoding_pdf_response',
-       'APPLICATION_OSIS_PORTAL': 'application_osis_portal',
-       'ATTRIBUTION_RESPONSE': 'attribution_response',
-       'IUFC_TO_EPC': 'rabbitIUFCInscrRequest',
-       'EPC_TO_IUFC': 'rabbitIUFCInscrResponse'
-   }
-}
