@@ -491,7 +491,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     weighting = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_('Weighting')
     )
     default_learning_unit_enrollment = models.BooleanField(
