@@ -24,20 +24,20 @@
 #
 ##############################################################################
 
-from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class GroupAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('start_year', 'end_year', 'changed')
-    search_fields = ('groupyear__acronym', 'groupyear__partial_acronym')
+class GroupAdmin(VersionAdmin, OsisModelAdmin):
+    list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
+    search_fields = ('groupyear__acronym', 'groupyear__partial_acronym',)
 
 
-class Group(SerializableModel):
+class Group(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
@@ -56,7 +56,19 @@ class Group(SerializableModel):
         on_delete=models.PROTECT
     )
 
-    def clean(self):
-        super().clean()
+    def save(self, *args, **kwargs):
         if self.end_year and self.start_year.year > self.end_year.year:
-            raise ValidationError(_('End year must be greater than the start year, or equal'))
+            raise AttributeError(_('End year must be greater than the start year, or equal'))
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return "{}".format(self.most_recent_acronym or '')
+
+    @cached_property
+    def most_recent_acronym(self):
+        try:
+            most_recent_group = sorted(self.groupyear_set.all(), key=lambda x: x.academic_year.start_date)
+            return most_recent_group[-1].acronym
+        except IndexError:
+            return None

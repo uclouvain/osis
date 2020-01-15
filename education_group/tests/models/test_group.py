@@ -24,49 +24,69 @@
 #
 ##############################################################################
 
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory
 from education_group.models.group import Group
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group import GroupFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
-class GroupTest(TestCase):
-    def setUp(self):
-        self.academic_year_1999 = AcademicYearFactory(year=1999)
-        self.academic_year_2000 = AcademicYearFactory(year=2000)
+class TestGroup(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year_1 = AcademicYearFactory()
+        cls.academic_year_2 = AcademicYearFactory(year=cls.academic_year_1.year+3)
 
-    def test_clean_case_start_year_greater_than_end_year_error(self):
+    def test_most_recent_acronym_no_group_year(self):
+        group = GroupFactory()
+        group_in_db = Group.objects.get(pk=group.id)  # Necessary otherwise the groupyear_set collection is empty
+        self.assertIsNone(group_in_db.most_recent_acronym, "")
+
+    def test_most_recent_acronym(self):
+        a_group = GroupFactory(start_year=self.academic_year_1)
+        GroupYearFactory(group=a_group, academic_year=self.academic_year_1)
+        most_recent_group_yr = GroupYearFactory(group=a_group, academic_year=self.academic_year_2)
+        group_in_db = Group.objects.get(pk=a_group.id)  # Necessary otherwise the groupyear_set collection is empty
+
+        self.assertEqual(group_in_db.most_recent_acronym,
+                         GroupYear.objects.get(pk=most_recent_group_yr.id).acronym)
+
+
+class TestGroupSave(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year_1999 = AcademicYearFactory(year=1999)
+        cls.academic_year_2000 = AcademicYearFactory(year=2000)
+
+    def test_save_case_start_year_greater_than_end_year_error(self):
         group = GroupFactory.build(
             start_year=self.academic_year_2000,
             end_year=self.academic_year_1999
         )
-        with self.assertRaises(ValidationError):
-            group.clean()
+        with self.assertRaises(AttributeError):
+            group.save()
             self.assertFalse(
                 Group.objects.get(start_year=self.academic_year_2000, end_year=self.academic_year_1999).exists()
             )
 
-    def test_clean_case_start_year_equals_to_end_year_no_error(self):
+    def test_save_case_start_year_equals_to_end_year_no_error(self):
         group = GroupFactory.build(
             start_year=self.academic_year_2000,
             end_year=self.academic_year_2000
         )
-        group.clean()
         group.save()
 
         self.assertTrue(
             Group.objects.filter(start_year=self.academic_year_2000, end_year=self.academic_year_2000).exists()
         )
 
-    def test_clean_case_start_year_lower_to_end_year_no_error(self):
+    def test_save_case_start_year_lower_to_end_year_no_error(self):
         group = GroupFactory.build(
             start_year=self.academic_year_1999,
             end_year=self.academic_year_2000
         )
-        group.clean()
         group.save()
 
         self.assertTrue(
