@@ -76,7 +76,7 @@ def reverse_migration(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0491_auto_20200107_1458'),
+        ('base', '0492_populate_empty_english_title_in_education_group_year'),
     ]
 
     operations = [
