@@ -26,6 +26,7 @@
 import itertools
 from unittest import mock
 
+from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import PermissionDenied
@@ -327,7 +328,7 @@ class TestLearningAchievementPostponement(TestCase):
         cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
         cls.person_entity = PersonEntityFactory(person=cls.person)
         EntityVersionFactory(entity=cls.person_entity.entity)
-        cls.academic_years = [AcademicYearFactory(year=get_current_year()+i) for i in range(0, 5)]
+        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.max_la_number = 2*len(cls.academic_years)
         cls.learning_unit = LearningUnitFactory(start_year=cls.academic_years[0], end_year=cls.academic_years[-1])
         cls.learning_container = LearningContainerFactory()
@@ -357,7 +358,10 @@ class TestLearningAchievementPostponement(TestCase):
 
     def test_learning_achievement_deletion_with_postponement(self):
         self._create_achievements(code_name=1)
-        achievement = LearningAchievement.objects.filter(language__code=FR_CODE_LANGUAGE).first()
+        achievement = LearningAchievement.objects.filter(
+            learning_unit_year=self.learning_unit_years[0],
+            language__code=FR_CODE_LANGUAGE
+        ).first()
         operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
         self.client.post(operation_url, data={
             'achievement_id': achievement.id,
@@ -366,14 +370,25 @@ class TestLearningAchievementPostponement(TestCase):
         self.assertFalse(LearningAchievement.objects.all().exists())
 
     def test_learning_achievement_move_up_with_postponement(self):
+        self._create_ordered_achievements([1, 2])
         self._move_achievement(consistency_id=2, operation=UP)
         self.assertEqual(LearningAchievement.objects.filter(consistency_id=1, order=1).count(), self.max_la_number)
         self.assertEqual(LearningAchievement.objects.filter(consistency_id=2, order=0).count(), self.max_la_number)
 
     def test_learning_achievement_move_down_with_postponement(self):
+        self._create_ordered_achievements([1, 2])
         self._move_achievement(consistency_id=1, operation=DOWN)
         self.assertEqual(LearningAchievement.objects.filter(consistency_id=1, order=1).count(), self.max_la_number)
         self.assertEqual(LearningAchievement.objects.filter(consistency_id=2, order=0).count(), self.max_la_number)
+
+    def test_learning_achievement_stop_postponement_when_future_order_is_different(self):
+        self._create_ordered_achievements([1, 2])
+        last_postponed_luy = self.learning_unit_years[-2]
+        for la in LearningAchievement.objects.filter(order=0, learning_unit_year=self.learning_unit_years[-1]):
+            la.to(1)
+        response = self._move_achievement(consistency_id=1, operation=DOWN)
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(str(last_postponed_luy.academic_year), str(messages_list[0]))
 
     def test_no_learning_unit_year_is_created_after_postponement(self):
         self.learning_unit_years.pop().delete()
@@ -392,16 +407,18 @@ class TestLearningAchievementPostponement(TestCase):
         })
         return create_response
 
-    def _move_achievement(self, consistency_id, operation):
-        for luy, id, lang in itertools.product(self.learning_unit_years, [1,2], [self.language_fr, self.language_en]):
+    def _create_ordered_achievements(self, ids):
+        for luy, id, lang in itertools.product(self.learning_unit_years, ids, [self.language_fr, self.language_en]):
             LearningAchievementFactory(consistency_id=id, learning_unit_year=luy, language=lang, order=id-1)
+
+    def _move_achievement(self, consistency_id, operation):
         operation_url = reverse('achievement_management', args=[self.learning_unit_years[0].id])
         achievement_to_move = LearningAchievement.objects.get(
             consistency_id=consistency_id,
             learning_unit_year=self.learning_unit_years[0],
             language=self.language_fr
         )
-        self.client.post(operation_url, data={
+        return self.client.post(operation_url, data={
             'achievement_id': achievement_to_move.id,
             'action': operation
         })
