@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
@@ -50,7 +49,7 @@ class LearningAchievement(AbstractAchievement):
     )
     order_with_respect_to = ('learning_unit_year', 'language')
 
-    class Meta:
+    class Meta(AbstractAchievement.Meta):
         unique_together = ("consistency_id", "learning_unit_year", "language")
 
     def __str__(self):

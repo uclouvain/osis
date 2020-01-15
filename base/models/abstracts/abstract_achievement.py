@@ -49,5 +49,5 @@ class AbstractAchievement(OrderedModel):
     )
     consistency_id = models.IntegerField(default=1, validators=[MinValueValidator(1)])
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         abstract = True
