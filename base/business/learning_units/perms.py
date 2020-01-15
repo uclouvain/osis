@@ -359,7 +359,10 @@ def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, r
 def _can_be_updated_by_faculty_manager(learning_unit_year):
     if not learning_unit_year.learning_container_year:
         return False
-    return event_perms.EventPermLearningUnitFacultyManagerEdition(obj=learning_unit_year, raise_exception=False).is_open()
+    return event_perms.EventPermLearningUnitFacultyManagerEdition(
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):
