@@ -388,16 +388,8 @@ class TestManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.learning_unit_year_1 = LearningUnitYearFactory()
-
-        cls.learning_unit_year_without_container = LearningUnitYearFactory(
-            learning_container_year=None
-        )
-
-        cls.group_element_year_1 = GroupElementYearFactory(
-            child_branch=None,
-            child_leaf=cls.learning_unit_year_1
-        )
-
+        cls.learning_unit_year_without_container = LearningUnitYearFactory(learning_container_year=None)
+        cls.group_element_year_1 = GroupElementYearFactory(child_branch=None, child_leaf=cls.learning_unit_year_1)
         cls.group_element_year_without_container = GroupElementYearFactory(
             child_branch=None,
             child_leaf=cls.learning_unit_year_without_container
@@ -631,3 +623,71 @@ class TestGroupElementYearProperty(TestCase):
 
         self.assertEqual(self.group_element_year.verbose, "{}".format(
             self.group_element_year.child.title))
+
+
+class TestManagerGetAdjacencyList(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root_element_a = EducationGroupYearFactory()
+        cls.level_1 = GroupElementYearFactory(parent=cls.root_element_a)
+        cls.level_11 = GroupElementYearFactory(parent=cls.level_1.child_branch)
+        cls.level_2 = GroupElementYearFactory(parent=cls.root_element_a)
+
+        cls.root_element_b = EducationGroupYearFactory()
+
+    def test_case_root_elements_ids_args_is_not_a_correct_instance(self):
+        with self.assertRaises(Exception):
+            GroupElementYear.objects.get_adjacency_list('bad_args')
+
+    def test_case_root_elements_ids_is_empty(self):
+        adjacency_list = GroupElementYear.objects.get_adjacency_list(root_elements_ids=[])
+        self.assertEqual(len(adjacency_list), 0)
+
+    def test_case_filter_by_root_elements_ids(self):
+        adjacency_list = GroupElementYear.objects.get_adjacency_list([self.root_element_a.pk])
+        self.assertEqual(len(adjacency_list), 3)
+
+        expected_first_elem = {
+            'starting_node_id': self.root_element_a.pk,
+            'id': self.level_1.pk,
+            'child_branch_id':  self.level_1.child_branch_id,
+            'child_leaf_id': None,
+            'parent_id': self.level_1.parent_id,
+            'level': 0,
+        }
+        self.assertDictEqual(adjacency_list[0], expected_first_elem)
+
+
+class TestManagerGetReverseAdjacencyList(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root_element_a = EducationGroupYearFactory()
+        cls.level_1 = GroupElementYearFactory(parent=cls.root_element_a)
+        cls.level_11 = GroupElementYearFactory(parent=cls.level_1.child_branch)
+        cls.level_2 = GroupElementYearFactory(
+            parent=cls.root_element_a,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(),
+        )
+
+    def test_case_root_elements_ids_args_is_not_a_correct_instance(self):
+        with self.assertRaises(Exception):
+            GroupElementYear.objects.get_reverse_adjacency_list('bad_args')
+
+    def test_case_root_elements_ids_is_empty(self):
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_ids=[])
+        self.assertEqual(len(reverse_adjacency_list), 0)
+
+    def test_case_filter_by_root_elements_ids(self):
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list([self.level_2.child_leaf_id])
+        self.assertEqual(len(reverse_adjacency_list), 1)
+
+        expected_first_elem = {
+            'starting_node_id': self.level_2.child_leaf_id,
+            'id': self.level_2.pk,
+            'child_branch_id':  self.level_2.child_branch_id,
+            'child_leaf_id': self.level_2.child_leaf_id,
+            'parent_id': self.level_2.parent_id,
+            'level': 0,
+        }
+        self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)
