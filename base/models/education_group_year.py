@@ -52,10 +52,10 @@ from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
+from cms.enums.entity_name import OFFER_YEAR
+from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
-from cms.models.translated_text import TranslatedText
-from cms.enums.entity_name import OFFER_YEAR
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -491,7 +491,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     weighting = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_('Weighting')
     )
     default_learning_unit_enrollment = models.BooleanField(

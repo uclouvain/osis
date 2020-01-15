@@ -103,6 +103,9 @@ msgstr "Are you sure you want to remove %(acronym)s ?"
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
 
+msgid "At least an education group year, a group year, a learning unit year or a learning class year has to be set"
+msgstr ""
+
 msgid "Block"
 msgstr ""
 
@@ -239,6 +242,10 @@ msgstr ""
 msgid "Official"
 msgstr ""
 
+msgid ""
+"Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
+msgstr ""
+
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -273,6 +280,9 @@ msgid "Periodic courses taught during"
 msgstr ""
 
 msgid "Please cut or copy an item before attach it"
+msgstr ""
+
+msgid "Please select an item before adding it"
 msgstr ""
 
 msgid "Prerequisite"

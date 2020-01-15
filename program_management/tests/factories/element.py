@@ -28,22 +28,36 @@ import string
 
 import factory.fuzzy
 
-from base.models.enums import offer_enrollment_state
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.student import StudentFactory
+from base.tests.factories.learning_class_year import LearningClassYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
-class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
+class ElementFactory(factory.DjangoModelFactory):
     class Meta:
-        model = "base.OfferEnrollment"
+        model = 'program_management.Element'
 
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                               datetime.datetime(2017, 3, 1))
-    date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                                       datetime.datetime(2017, 3, 1))
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    offer_year = factory.SubFactory(OfferYearFactory)
-    student = factory.SubFactory(StudentFactory)
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+
+    education_group_year = None
+    group_year = None
+    learning_unit_year = None
+    learning_class_year = None
+
+
+class ElementEducationGroupYearFactory(ElementFactory):
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
-    enrollment_state = offer_enrollment_state.SUBSCRIBED
+
+
+class ElementGroupYearFactory(ElementFactory):
+    group_year = factory.SubFactory(GroupYearFactory)
+
+
+class ElementLearningUnitYearFactory(ElementFactory):
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
+
+
+class ElementLearningClassYearFactory(ElementFactory):
+    learning_class_year = factory.SubFactory(LearningClassYearFactory)
