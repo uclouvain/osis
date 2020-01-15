@@ -9,14 +9,27 @@ class Migration(migrations.Migration):
         ('base', '0493_auto_20200106_1543'),
     ]
 
+    def empty_code_name_to_none(apps, schema_editor):
+        learning_achievement_model = apps.get_model("base", "LearningAchievement")
+        learning_achievement_model.objects.filter(
+            code_name__in=['.', '']
+        ).update(
+            code_name=None
+        )
+
+    def fill_null_code_name(apps, schema_editor):
+        learning_achievement_model = apps.get_model("base", "LearningAchievement")
+        learning_achievement_model.objects.filter(
+            code_name=None
+        ).update(
+            code_name='.'
+        )
+
     operations = [
         migrations.AlterField(
             model_name='learningachievement',
             name='code_name',
             field=models.CharField(blank=True, max_length=100, null=True, verbose_name='code'),
         ),
-        migrations.RunSQL(
-            sql="UPDATE base_learningachievement SET code_name=NULL where code_name='.' or code_name=''",
-            reverse_sql="UPDATE base_learningachievement SET code_name='.' where code_name is NULL"
-        ),
+        migrations.RunPython(empty_code_name_to_none, reverse_code=fill_null_code_name)
     ]
