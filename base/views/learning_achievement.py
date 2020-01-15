@@ -36,6 +36,7 @@ from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications
 from base.views.learning_units import perms
@@ -73,41 +74,59 @@ def operation(request, learning_achievement_id, operation_str):
 def execute_operation(achievements, operation_str):
     last_academic_year = None
     for an_achievement in achievements:
-        current_order = an_achievement.order
+        curr_order = an_achievement.order
         next_luy = an_achievement.learning_unit_year
+        neighbouring_achievements = _get_neighbouring_achievements(an_achievement)
         func = getattr(an_achievement, operation_str)
         func()
         if not next_luy.is_past():
-            last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str, current_order)
+            last_academic_year = _postpone_operation(neighbouring_achievements, next_luy, operation_str, curr_order)
     return last_academic_year
 
 
-def _postpone_operation(an_achievement, next_luy, operation_str, current_order):
+def _get_neighbouring_achievements(achievement):
+    kwargs = {'learning_unit_year': achievement.learning_unit_year, 'language': achievement.language}
+    previous_achievement = get_object_or_none(LearningAchievement, order=achievement.order-1, **kwargs)
+    next_achievement = get_object_or_none(LearningAchievement, order=achievement.order+1, **kwargs)
+    return previous_achievement, achievement, next_achievement
+
+
+def _postpone_operation(neighbouring_achievements, next_luy, operation_str, curr_order):
+    _, achievement, _ = neighbouring_achievements
     while next_luy.get_learning_unit_next_year():
         current_luy = next_luy
         next_luy = next_luy.get_learning_unit_next_year()
-        next_achievement = LearningAchievement.objects.filter(
+        next_luy_achievement = LearningAchievement.objects.filter(
             learning_unit_year=next_luy,
-            consistency_id=an_achievement.consistency_id,
-            language=an_achievement.language
+            consistency_id=achievement.consistency_id,
+            language=achievement.language
         ).first()
-        if next_achievement and _operation_is_postponable(next_achievement, operation_str, current_order):
-            getattr(next_achievement, operation_str)()
+        if next_luy_achievement and \
+                _operation_is_postponable(next_luy_achievement, neighbouring_achievements, operation_str, curr_order):
+            getattr(next_luy_achievement, operation_str)()
         else:
             return current_luy.academic_year
     return next_luy.academic_year
 
 
-def _operation_is_postponable(next_achievement, operation_str, current_order):
-    # order operation is postponable only if achievement order is the same in future years
-    if operation_str in [UP, DOWN]:
-        return LearningAchievement.objects.filter(
-            consistency_id=next_achievement.consistency_id,
-            learning_unit_year=next_achievement.learning_unit_year,
-            language=next_achievement.language,
-            order=current_order
-        ).exists()
+def _operation_is_postponable(next_luy_achievement, neighbouring_achievements, operation_str, current_order):
+    # order operation is postponable only if neighbouring achievements order is the same in future years
+    previous_achievement, achievement, next_achievement = neighbouring_achievements
+    if operation_str in [DOWN, UP]:
+        neighbour_current_order = current_order+1 if operation_str == DOWN else current_order-1
+        neighbour_achievement = next_achievement if operation_str == DOWN else previous_achievement
+        return _has_same_order_in_future(achievement, current_order, next_luy_achievement) and \
+            _has_same_order_in_future(neighbour_achievement, neighbour_current_order, next_luy_achievement)
     return True
+
+
+def _has_same_order_in_future(achievement, current_order, next_luy_achievement):
+    return LearningAchievement.objects.filter(
+        consistency_id=achievement.consistency_id,
+        learning_unit_year=next_luy_achievement.learning_unit_year,
+        language=achievement.language,
+        order=current_order
+    ).exists()
 
 
 @login_required
