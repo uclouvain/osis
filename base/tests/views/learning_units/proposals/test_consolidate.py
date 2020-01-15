@@ -34,10 +34,10 @@ from django.test.utils import override_settings
 from rest_framework.reverse import reverse
 from waffle.testutils import override_flag
 
+import base.models as mdl_base
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_PEDAGOGY_FR_ONLY, \
     CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SUMMARY
 from base.business.learning_units.edition import _descriptive_fiche_and_achievements_update
-import base.models as mdl_base
 from base.models.enums import proposal_state, learning_unit_year_subtypes, \
     proposal_type
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
