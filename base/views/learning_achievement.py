@@ -144,7 +144,7 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     form = LearningAchievementEditForm(
         request.POST or None,
         luy=learning_unit_yr,
-        consistency_id=_get_last_consistency_id(learning_unit_yr)+1
+        consistency_id=_get_last_consistency_id(learning_unit_yr.learning_unit)+1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
@@ -158,9 +158,9 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     return render(request, "learning_unit/achievement_edit.html", context)
 
 
-def _get_last_consistency_id(learning_unit_year):
+def _get_last_consistency_id(learning_unit):
     return LearningAchievement.objects.filter(
-        learning_unit_year=learning_unit_year
+        learning_unit_year__learning_unit=learning_unit
     ).order_by("consistency_id").last().consistency_id
 
 
@@ -197,7 +197,7 @@ def create_first(request, learning_unit_year_id):
     form = LearningAchievementEditForm(
         request.POST or None,
         luy=learning_unit_yr,
-        consistency_id=1
+        consistency_id=_get_last_consistency_id(learning_unit_yr.learning_unit)+1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
