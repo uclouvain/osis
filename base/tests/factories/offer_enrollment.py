@@ -28,10 +28,10 @@ import string
 
 import factory.fuzzy
 
+from base.models.enums import offer_enrollment_state
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.student import StudentFactory
-from base.models.enums import offer_enrollment_state
 
 
 class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
