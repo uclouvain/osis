@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0493_auto_20200106_1543'),
+        ('base', '0496_auto_20200106_1543'),
     ]
 
     def empty_code_name_to_none(apps, schema_editor):

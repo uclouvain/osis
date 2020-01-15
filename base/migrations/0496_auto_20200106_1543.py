@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('reference', '0002_auto_20190308_1450'),
-        ('base', '0492_learningachievement_consistency_id'),
+        ('base', '0495_learningachievement_consistency_id'),
     ]
 
     operations = [
