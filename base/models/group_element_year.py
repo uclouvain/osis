@@ -125,7 +125,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )            
             SELECT * FROM adjacency_query ORDER BY starting_node_id, level;        
-        """
+        """ % ','.join(["%s"] * len(root_elements_ids))
 
         with connection.cursor() as cursor:
             cursor.execute(adjacency_query, root_elements_ids)
@@ -136,6 +136,7 @@ class GroupElementYearManager(models.Manager):
                     'child_branch_id': row[2],
                     'child_leaf_id': row[3],
                     'parent_id': row[4],
+                    'child_id': row[2] or row[3],
                     'level': row[5],
                 } for row in cursor.fetchall()
             ]
@@ -189,6 +190,7 @@ class GroupElementYearManager(models.Manager):
                     'child_branch_id': row[2],
                     'child_leaf_id': row[3],
                     'parent_id': row[4],
+                    'child_id': row[2] or row[3],
                     'level': row[5],
                 } for row in cursor.fetchall()
             ]

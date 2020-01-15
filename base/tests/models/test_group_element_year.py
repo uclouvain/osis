@@ -634,6 +634,7 @@ class TestManagerGetAdjacencyList(TestCase):
         cls.level_2 = GroupElementYearFactory(parent=cls.root_element_a)
 
         cls.root_element_b = EducationGroupYearFactory()
+        GroupElementYearFactory(parent=cls.root_element_b)
 
     def test_case_root_elements_ids_args_is_not_a_correct_instance(self):
         with self.assertRaises(Exception):
@@ -653,9 +654,14 @@ class TestManagerGetAdjacencyList(TestCase):
             'child_branch_id':  self.level_1.child_branch_id,
             'child_leaf_id': None,
             'parent_id': self.level_1.parent_id,
+            'child_id': self.level_1.child_branch_id,
             'level': 0,
         }
         self.assertDictEqual(adjacency_list[0], expected_first_elem)
+
+    def test_case_multiple_root_elements_ids(self):
+        adjacency_list = GroupElementYear.objects.get_adjacency_list([self.root_element_a.pk, self.root_element_b.pk])
+        self.assertEqual(len(adjacency_list), 4)
 
 
 class TestManagerGetReverseAdjacencyList(TestCase):
@@ -685,9 +691,10 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         expected_first_elem = {
             'starting_node_id': self.level_2.child_leaf_id,
             'id': self.level_2.pk,
-            'child_branch_id':  self.level_2.child_branch_id,
+            'child_branch_id': None,
             'child_leaf_id': self.level_2.child_leaf_id,
             'parent_id': self.level_2.parent_id,
+            'child_id': self.level_2.child_branch_id,
             'level': 0,
         }
         self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)
