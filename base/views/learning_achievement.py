@@ -73,25 +73,41 @@ def operation(request, learning_achievement_id, operation_str):
 def execute_operation(achievements, operation_str):
     last_academic_year = None
     for an_achievement in achievements:
+        current_order = an_achievement.order
         next_luy = an_achievement.learning_unit_year
         func = getattr(an_achievement, operation_str)
         func()
         if not next_luy.is_past():
-            last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
+            last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str, current_order)
     return last_academic_year
 
 
-def _postpone_operation(an_achievement, next_luy, operation_str):
+def _postpone_operation(an_achievement, next_luy, operation_str, current_order):
     while next_luy.get_learning_unit_next_year():
+        current_luy = next_luy
         next_luy = next_luy.get_learning_unit_next_year()
         next_achievement = LearningAchievement.objects.filter(
             learning_unit_year=next_luy,
             consistency_id=an_achievement.consistency_id,
             language=an_achievement.language
         ).first()
-        if next_achievement:
+        if next_achievement and _operation_is_postponable(next_achievement, operation_str, current_order):
             getattr(next_achievement, operation_str)()
+        else:
+            return current_luy.academic_year
     return next_luy.academic_year
+
+
+def _operation_is_postponable(next_achievement, operation_str, current_order):
+    # order operation is postponable only if achievement order is the same in future years
+    if operation_str in [UP, DOWN]:
+        return LearningAchievement.objects.filter(
+            consistency_id=next_achievement.consistency_id,
+            learning_unit_year=next_achievement.learning_unit_year,
+            language=next_achievement.language,
+            order=current_order
+        ).exists()
+    return True
 
 
 @login_required
