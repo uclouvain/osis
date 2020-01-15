@@ -51,6 +51,7 @@ from base.tests.factories.business.learning_units import GenerateContainer, Gene
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory, \
     PersonWithPermissionsFactory, UEFacultyManagerFactory
