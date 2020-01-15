@@ -157,7 +157,9 @@
                                 </div>
                             </div>
                             <div class="col-md-1">
-                                {{ achievement.code_name|default:""}}
+                                <span style="display: inline-block; width: 70%; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ achievement.code_name|default:""}}
+                                </span>
                                 {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
                                     <a class="trigger_modal pull-right" href="#"
                                        data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
