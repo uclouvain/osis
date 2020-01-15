@@ -159,9 +159,12 @@ def create(request, learning_unit_year_id, learning_achievement_id):
 
 
 def _get_last_consistency_id(learning_unit):
-    return LearningAchievement.objects.filter(
-        learning_unit_year__learning_unit=learning_unit
-    ).order_by("consistency_id").last().consistency_id
+    try:
+        return LearningAchievement.objects.filter(
+            learning_unit_year__learning_unit=learning_unit
+        ).order_by("consistency_id").last().consistency_id
+    except AttributeError:
+        return 0
 
 
 def _save_and_redirect(request, form, learning_unit_year_id):
