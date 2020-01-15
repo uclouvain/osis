@@ -35,7 +35,8 @@ from base.business.learning_units.perms import is_eligible_to_modify_end_year_by
     is_eligible_to_modify_by_proposal, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
-from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars, \
+    generate_modification_transformation_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -65,6 +66,7 @@ class TestPerms(TestCase):
         cls.central_manager.linked_entities = [cls.lcy.requirement_entity.id]
 
         generate_creation_or_end_date_proposal_calendars(academic_years)
+        generate_modification_transformation_proposal_calendars(academic_years)
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):

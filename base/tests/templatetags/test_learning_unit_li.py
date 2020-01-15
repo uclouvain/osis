@@ -51,7 +51,7 @@ from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, is_v
     li_delete_all_lu
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    generate_creation_or_end_date_proposal_calendars
+    generate_creation_or_end_date_proposal_calendars, generate_modification_transformation_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -96,6 +96,7 @@ class LearningUnitTagLiEditTest(TestCase):
             cls.current_academic_year, cls.next_academic_yr, anac_2, anac_3, anac_4, cls.later_academic_year
         ]
         generate_creation_or_end_date_proposal_calendars(academic_years)
+        generate_modification_transformation_proposal_calendars(academic_years)
 
         cls.lcy = LearningContainerYearFactory(
             academic_year=cls.next_academic_yr,
