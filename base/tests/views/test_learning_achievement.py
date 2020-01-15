@@ -178,10 +178,15 @@ class TestLearningAchievementActions(TestCase):
         cls.person_entity = PersonEntityFactory(person=cls.superperson)
 
         cls.academic_year = create_current_academic_year()
+        AcademicYearFactory.produce_in_future(quantity=2)
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
             learning_container_year__requirement_entity=cls.person_entity.entity,
+        )
+        cls.future_luy = LearningUnitYearFactory(
+            academic_year=cls.academic_year.next(),
+            learning_unit=cls.luy.learning_unit,
         )
 
     def setUp(self):
@@ -306,6 +311,21 @@ class TestLearningAchievementActions(TestCase):
         self.assertEqual(context['language_code'], self.language_fr.code)
         self.assertTrue(context['create'], self.language_fr.code)
 
+    def test_learning_achievement_create_existing_learning_achievement_in_future(self):
+        achievement_fr = LearningAchievementFactory(language=self.language_fr, learning_unit_year=self.luy)
+        future_achievement_fr = LearningAchievementFactory(
+            language=self.language_fr,
+            learning_unit_year=self.future_luy,
+            consistency_id=achievement_fr.consistency_id+1
+        )
+        response = self.client.get(
+            reverse('achievement_create', args=[self.luy.id, achievement_fr.id]),
+            data={'language_code': self.language_fr.code}
+        )
+        self.assertTemplateUsed(response, 'learning_unit/achievement_edit.html')
+        self.assertIsInstance(response.context['form'], LearningAchievementEditForm)
+        self.assertEqual(response.context['form'].consistency_id, future_achievement_fr.consistency_id+1)
+
     def test_learning_achievement_create_first(self):
         response = self.client.get(reverse('achievement_create_first', args=[self.luy.id]),
                                    data={'language_code': FR_CODE_LANGUAGE})
@@ -315,6 +335,13 @@ class TestLearningAchievementActions(TestCase):
         self.assertIsInstance(context['form'], LearningAchievementEditForm)
         self.assertEqual(context['learning_unit_year'], self.luy)
         self.assertEqual(context['language_code'], FR_CODE_LANGUAGE)
+
+    def test_learning_achievement_create_first_existing_learning_achievement_in_future(self):
+        future_achievement = LearningAchievementFactory(learning_unit_year=self.future_luy)
+        response = self.client.get(reverse('achievement_create_first', args=[self.luy.id]))
+        self.assertTemplateUsed(response, 'learning_unit/achievement_edit.html')
+        self.assertIsInstance(response.context['form'], LearningAchievementEditForm)
+        self.assertEqual(response.context['form'].consistency_id, future_achievement.consistency_id+1)
 
 
 class TestLearningAchievementPostponement(TestCase):
