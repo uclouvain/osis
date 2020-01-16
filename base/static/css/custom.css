@@ -252,7 +252,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 
 /*  Sidenav styles */
 .side-container {
-    height: 94%;
+    height: calc(100% - 50px);
     width: 0;
     position: fixed;
     top: 0;
@@ -262,7 +262,7 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
 }
 
 .sidenav {
-    padding-top: 60px;
+    margin-top: 50px;
     height: 100%;
     width: 100%;
     background-color: #ffffff;
