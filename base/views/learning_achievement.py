@@ -96,11 +96,11 @@ def _postpone_operation(neighbouring_achievements, next_luy, operation_str, curr
     while next_luy.get_learning_unit_next_year():
         current_luy = next_luy
         next_luy = next_luy.get_learning_unit_next_year()
-        next_luy_achievement = LearningAchievement.objects.filter(
+        next_luy_achievement = LearningAchievement.objects.get(
             learning_unit_year=next_luy,
             consistency_id=achievement.consistency_id,
             language=achievement.language
-        ).first()
+        )
         if next_luy_achievement and \
                 _operation_is_postponable(next_luy_achievement, neighbouring_achievements, operation_str, curr_order):
             getattr(next_luy_achievement, operation_str)()
