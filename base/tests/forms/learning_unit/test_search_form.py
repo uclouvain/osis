@@ -53,6 +53,7 @@ from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
 NAMUR = "Namur"
+TITLE = "Title luy"
 
 
 class TestSearchForm(TestCase):
@@ -65,6 +66,7 @@ class TestSearchForm(TestCase):
         ExternalLearningUnitYearFactory(
             learning_unit_year__academic_year=cls.academic_years[0],
             learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            learning_unit_year__learning_container_year__common_title=TITLE,
             mobility=True,
             co_graduation=False,
         )
@@ -151,6 +153,22 @@ class TestSearchForm(TestCase):
     def test_initial_value_learning_unit_filter_with_entity_subordinated(self):
         lu_filter = LearningUnitFilter()
         self.assertTrue(lu_filter.form.fields['with_entity_subordinated'].initial)
+
+    def test_search_on_title(self):
+        title_search = [
+            TITLE,
+            "{}$".format(TITLE[-2:]),
+            "^{}".format(TITLE[3:]),
+            ]
+        for title in title_search:
+            self.data.update({
+                "full_title": title,
+                "academic_year": str(self.academic_years[0].id),
+            })
+
+            learning_unit_filter = LearningUnitFilter(self.data)
+            self.assertTrue(learning_unit_filter.is_valid())
+            self.assertEqual(learning_unit_filter.qs.count(), 1)
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
