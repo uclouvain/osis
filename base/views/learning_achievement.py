@@ -86,8 +86,8 @@ def execute_operation(achievements, operation_str):
 
 def _get_neighbouring_achievements(achievement):
     kwargs = {'learning_unit_year': achievement.learning_unit_year, 'language': achievement.language}
-    previous_achievement = get_object_or_none(LearningAchievement, order=achievement.order-1, **kwargs)
-    next_achievement = get_object_or_none(LearningAchievement, order=achievement.order+1, **kwargs)
+    previous_achievement = get_object_or_none(LearningAchievement, order=achievement.order - 1, **kwargs)
+    next_achievement = get_object_or_none(LearningAchievement, order=achievement.order + 1, **kwargs)
     return previous_achievement, achievement, next_achievement
 
 
@@ -96,7 +96,8 @@ def _postpone_operation(neighbouring_achievements, next_luy, operation_str, curr
     while next_luy.get_learning_unit_next_year():
         current_luy = next_luy
         next_luy = next_luy.get_learning_unit_next_year()
-        next_luy_achievement = LearningAchievement.objects.get(
+        next_luy_achievement = get_object_or_none(
+            LearningAchievement,
             learning_unit_year=next_luy,
             consistency_id=achievement.consistency_id,
             language=achievement.language
@@ -113,7 +114,7 @@ def _operation_is_postponable(next_luy_achievement, neighbouring_achievements, o
     # order operation is postponable only if neighbouring achievements order is the same in future years
     previous_achievement, achievement, next_achievement = neighbouring_achievements
     if operation_str in [DOWN, UP]:
-        neighbour_current_order = current_order+1 if operation_str == DOWN else current_order-1
+        neighbour_current_order = current_order + 1 if operation_str == DOWN else current_order - 1
         neighbour_achievement = next_achievement if operation_str == DOWN else previous_achievement
         return _has_same_order_in_future(achievement, current_order, next_luy_achievement) and \
             _has_same_order_in_future(neighbour_achievement, neighbour_current_order, next_luy_achievement)
