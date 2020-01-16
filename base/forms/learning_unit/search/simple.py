@@ -194,6 +194,5 @@ class LearningUnitFilter(FilterSet):
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
         return queryset
 
-    @staticmethod
-    def filter_learning_unit_year_field(queryset, name, value):
+    def filter_learning_unit_year_field(self, queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
