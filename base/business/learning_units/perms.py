@@ -608,13 +608,13 @@ def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise
 
 
 def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
-    if person.is_faculty_manager and not person.is_central_manager:
-        result = event_perms.EventPermCreationOrEndDateProposalFacultyManager(
+    if person.is_central_manager:
+        result = event_perms.EventPermCreationOrEndDateProposalCentralManager(
             obj=learning_unit_year,
             raise_exception=False
         ).is_open()
-    elif person.is_central_manager:
-        result = event_perms.EventPermCreationOrEndDateProposalCentralManager(
+    elif person.is_faculty_manager:
+        result = event_perms.EventPermCreationOrEndDateProposalFacultyManager(
             obj=learning_unit_year,
             raise_exception=False
         ).is_open()
@@ -643,13 +643,13 @@ def is_eligible_to_modify_by_proposal(learning_unit_year, person, raise_exceptio
 
 
 def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
-    if person.is_faculty_manager and not person.is_central_manager:
-        result = event_perms.EventPermModificationOrTransformationProposalFacultyManager(
+    if person.is_central_manager:
+        result = event_perms.EventPermModificationOrTransformationProposalCentralManager(
             obj=learning_unit_year,
             raise_exception=False
         ).is_open()
-    elif person.is_central_manager:
-        result = event_perms.EventPermModificationOrTransformationProposalCentralManager(
+    elif person.is_faculty_manager:
+        result = event_perms.EventPermModificationOrTransformationProposalFacultyManager(
             obj=learning_unit_year,
             raise_exception=False
         ).is_open()
