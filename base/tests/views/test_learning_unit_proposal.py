@@ -705,9 +705,9 @@ class TestEditProposal(TestCase):
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
 
-        cls.person = person_factory.PersonWithPermissionsFactory("can_edit_learning_unit_proposal")
-        requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
-        PersonEntityFactory(entity=requirement_entity_of_luy, person=cls.person)
+        cls.person = person_factory.FacultyManagerFactory("can_edit_learning_unit_proposal")
+        cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
+        PersonEntityFactory(entity=cls.requirement_entity_of_luy, person=cls.person)
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.entity)
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
@@ -728,13 +728,25 @@ class TestEditProposal(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, 'access_denied.html')
 
-    def test_edit_proposal_get(self):
+    def test_edit_proposal_get_regular_user_with_permission(self):
+        person = person_factory.PersonWithPermissionsFactory("can_edit_learning_unit_proposal")
+        self.client.force_login(person.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
+    def test_edit_proposal_get_as_faculty_manager(self):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'learning_unit/proposal/update_modification.html')
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_edit_proposal_get_as_central_manager_with_instance(self):
+        central_manager = person_factory.CentralManagerFactory("can_edit_learning_unit_proposal")
+        PersonEntityFactory(person=central_manager, entity=self.requirement_entity_of_luy)
+        self.client.logout()
+        self.client.force_login(central_manager.user)
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'learning_unit/proposal/update_modification.html')

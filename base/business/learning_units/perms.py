@@ -237,22 +237,25 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
 def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
     if person.is_central_manager:
         return True
-    if proposal.state != ProposalState.FACULTY.name:
-        can_raise_exception(
-            raise_exception,
-            False,
-            MSG_NOT_PROPOSAL_STATE_FACULTY
-        )
-        return False
-    if proposal.type == ProposalType.MODIFICATION.name and \
-       proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
-        can_raise_exception(
-            raise_exception,
-            False,
-            MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
-        )
-        return False
-    return True
+    elif person.is_faculty_manager:
+        if proposal.state != ProposalState.FACULTY.name:
+            can_raise_exception(
+                raise_exception,
+                False,
+                MSG_NOT_PROPOSAL_STATE_FACULTY
+            )
+            return False
+        if proposal.type == ProposalType.MODIFICATION.name and \
+           proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
+            can_raise_exception(
+                raise_exception,
+                False,
+                MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
+            )
+            return False
+        return True
+
+    return False
 
 
 def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception=False):
