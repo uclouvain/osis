@@ -30,6 +30,7 @@ from unittest.mock import patch
 from django.contrib.messages import INFO
 from django.contrib.messages import SUCCESS, ERROR
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.translation import gettext_lazy as _
 from factory import fuzzy
 
@@ -58,7 +59,6 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from reference.tests.factories.language import LanguageFactory
-from django.test.utils import override_settings
 
 
 class TestLearningUnitProposalCancel(TestCase):
