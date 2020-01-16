@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-CHARACTER_TP_ESCAPE = [
+CHARACTER_TO_ESCAPE = [
     '[',
     ']',
     '(',
@@ -35,7 +35,7 @@ CHARACTER_TP_ESCAPE = [
 def filter_field_by_regex(queryset, name, value):
     if value:
         filter_field = "{}__iregex".format(name)
-        for character in CHARACTER_TP_ESCAPE:
+        for character in CHARACTER_TO_ESCAPE:
             value = value.replace(character, "\\{}".format(character))
 
         search_string = r"({})".format(value)
