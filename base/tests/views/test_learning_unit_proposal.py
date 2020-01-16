@@ -53,6 +53,7 @@ from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, organization as organization_factory, \
     person as person_factory
+from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, \
     AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -693,6 +694,7 @@ class TestEditProposal(TestCase):
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.current_academic_year = cls.academic_years[0]
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        generate_modification_transformation_proposal_calendars(cls.academic_years)
         cls.language = LanguageFactory(code='FR')
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)

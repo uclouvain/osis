@@ -34,7 +34,6 @@ from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
 from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
-from base.models.academic_year import starting_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
@@ -245,8 +244,12 @@ def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_
                 MSG_NOT_PROPOSAL_STATE_FACULTY
             )
             return False
+
         if proposal.type == ProposalType.MODIFICATION.name and \
-           proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
+                not event_perms.EventPermModificationOrTransformationProposalFacultyManager(
+                    obj=proposal.learning_unit_year,
+                    raise_exception=False
+                ).is_open():
             can_raise_exception(
                 raise_exception,
                 False,

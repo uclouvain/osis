@@ -45,7 +45,8 @@ from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OT
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
+    generate_modification_transformation_proposal_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
@@ -247,6 +248,10 @@ class PermsTestCase(TestCase):
             state=proposal_state.ProposalState.CENTRAL.name,
             type=proposal_type.ProposalType.SUPPRESSION.name,
             learning_unit_year=luy
+        )
+
+        generate_modification_transformation_proposal_calendars(
+            [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
         for manager in faculty_managers:
