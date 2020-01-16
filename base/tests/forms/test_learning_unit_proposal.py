@@ -41,7 +41,7 @@ from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROU
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories import academic_calendar as academic_calendar_factories
+from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -69,7 +69,7 @@ class TestSave(TestCase):
             AcademicYearFactory(year=cls.current_academic_year.year - 10),
             AcademicYearFactory(year=cls.current_academic_year.year + 10)
         )
-
+        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
         today = datetime.date.today()
         cls.an_entity = EntityFactory(organization=cls.an_organization)
         cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.FACULTY,
@@ -301,14 +301,6 @@ class TestSave(TestCase):
         self.assertTrue('entity' in form.errors[1])
 
     def test_academic_year_range_creation_proposal_central_manager(self):
-        self.academic_calendars = [
-            academic_calendar_factories.AcademicCalendarCreationEndDateProposalCentralManagerFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            )
-            for academic_year in self.academic_years
-        ]
         LanguageFactory(code="FR")
         central_manager = CentralManagerFactory()
         form = learning_unit_create_2.FullForm(
@@ -326,14 +318,6 @@ class TestSave(TestCase):
         )
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
-        self.academic_calendars = [
-            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year, 9, 14)
-            )
-            for academic_year in self.academic_years
-        ]
         LanguageFactory(code="FR")
         faculty_manager = FacultyManagerFactory()
         form = learning_unit_create_2.FullForm(
