@@ -40,9 +40,9 @@ from base.models.enums import learning_unit_year_subtypes, learning_container_ye
     entity_type, learning_unit_year_periodicity
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.tests.factories import academic_calendar as academic_calendar_factories
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory, person as factory_person, user as factory_user
+from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
 from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
@@ -73,6 +73,7 @@ class LearningUnitViewTestCase(TestCase):
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.current_academic_year = cls.academic_years[0]
         cls.next_academic_year = cls.academic_years[1]
+        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
 
         cls.language = LanguageFactory(code='FR')
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
@@ -130,14 +131,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_get_proposal_learning_unit_creation_form_with_central_user(self):
-        self.academic_calendars = [
-            academic_calendar_factories.AcademicCalendarCreationEndDateProposalCentralManagerFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            )
-            for academic_year in self.academic_years
-        ]
         central_manager_person = CentralManagerFactory()
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
@@ -154,14 +147,6 @@ class LearningUnitViewTestCase(TestCase):
         )
 
     def test_get_proposal_learning_unit_creation_form_with_faculty_user(self):
-        self.academic_calendars = [
-            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year, 9, 14)
-            )
-            for academic_year in self.academic_years
-        ]
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
         response = self.client.get(url)
@@ -184,14 +169,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(count_proposition_by_author, 1)
 
     def test_post_proposal_learning_unit_creation_form_with_faculty_user(self):
-        self.academic_calendars = [
-            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year, 9, 14)
-            )
-            for academic_year in self.academic_years
-        ]
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
         response = self.client.post(url, data=self.get_valid_data())
@@ -250,14 +227,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(lcy_errors['common_title'], [_('You must either set the common title or the specific title')])
 
     def test_proposal_learning_unit_add_with_valid_data_for_faculty_manager(self):
-        self.academic_calendars = [
-            academic_calendar_factories.AcademicCalendarCreationEndDateProposalFacultyManagerFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year, 9, 14)
-            )
-            for academic_year in self.academic_years
-        ]
         learning_unit_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)
         self.assertTrue(learning_unit_form.is_valid(), learning_unit_form.errors)
         self.client.force_login(self.faculty_person.user)
