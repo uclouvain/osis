@@ -602,17 +602,18 @@ def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise
 
 
 def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
-    result = True
-
     if person.is_faculty_manager and not person.is_central_manager:
-        event_perm = event_perms.EventPermCreationOrEndDateProposalFacultyManager()
+        result = event_perms.EventPermCreationOrEndDateProposalFacultyManager(
+            obj=learning_unit_year,
+            raise_exception=False
+        ).is_open()
     elif person.is_central_manager:
-        event_perm = event_perms.EventPermCreationOrEndDateProposalCentralManager()
+        result = event_perms.EventPermCreationOrEndDateProposalCentralManager(
+            obj=learning_unit_year,
+            raise_exception=False
+        ).is_open()
     else:
         return False
-
-    if learning_unit_year.academic_year not in event_perm.get_academic_years():
-        result = False
 
     can_raise_exception(
         raise_exception, result,
