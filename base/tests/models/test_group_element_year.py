@@ -629,12 +629,12 @@ class TestManagerGetAdjacencyList(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_element_a = EducationGroupYearFactory()
-        cls.level_1 = GroupElementYearFactory(parent=cls.root_element_a)
-        cls.level_11 = GroupElementYearFactory(parent=cls.level_1.child_branch)
-        cls.level_2 = GroupElementYearFactory(parent=cls.root_element_a)
+        cls.level_1 = GroupElementYearFactory(parent=cls.root_element_a, order=0)
+        cls.level_11 = GroupElementYearFactory(parent=cls.level_1.child_branch, order=0)
+        cls.level_2 = GroupElementYearFactory(parent=cls.root_element_a, order=1)
 
         cls.root_element_b = EducationGroupYearFactory()
-        GroupElementYearFactory(parent=cls.root_element_b)
+        GroupElementYearFactory(parent=cls.root_element_b, order=0)
 
     def test_case_root_elements_ids_args_is_not_a_correct_instance(self):
         with self.assertRaises(Exception):
@@ -655,6 +655,7 @@ class TestManagerGetAdjacencyList(TestCase):
             'child_leaf_id': None,
             'parent_id': self.level_1.parent_id,
             'child_id': self.level_1.child_branch_id,
+            'order': 0,
             'level': 0,
         }
         self.assertDictEqual(adjacency_list[0], expected_first_elem)
@@ -674,6 +675,7 @@ class TestManagerGetReverseAdjacencyList(TestCase):
             parent=cls.root_element_a,
             child_branch=None,
             child_leaf=LearningUnitYearFactory(),
+            order=5
         )
 
     def test_case_root_elements_ids_args_is_not_a_correct_instance(self):
@@ -694,7 +696,8 @@ class TestManagerGetReverseAdjacencyList(TestCase):
             'child_branch_id': None,
             'child_leaf_id': self.level_2.child_leaf_id,
             'parent_id': self.level_2.parent_id,
-            'child_id': self.level_2.child_branch_id,
+            'child_id': self.level_2.child_leaf_id,
+            'order': self.level_2.order,
             'level': 0,
         }
         self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)

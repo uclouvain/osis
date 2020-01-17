@@ -108,7 +108,14 @@ class GroupElementYearManager(models.Manager):
         adjacency_query = """
             WITH RECURSIVE 
                 adjacency_query AS (
-                    SELECT parent_id as starting_node_id, id, child_branch_id, child_leaf_id, parent_id, 0 AS level
+                    SELECT 
+                        parent_id as starting_node_id, 
+                        id, 
+                        child_branch_id, 
+                        child_leaf_id, 
+                        parent_id, 
+                        "order", 
+                        0 AS level
                     FROM base_groupelementyear
                     WHERE parent_id IN (%s)
                     
@@ -119,12 +126,14 @@ class GroupElementYearManager(models.Manager):
                            child.child_branch_id,
                            child.child_leaf_id,
                            child.parent_id,
+                           child.order,
                            parent.level + 1                           
                 
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )            
-            SELECT * FROM adjacency_query ORDER BY starting_node_id, level;        
+            SELECT * FROM adjacency_query 
+            ORDER BY starting_node_id, level, "order";        
         """ % ','.join(["%s"] * len(root_elements_ids))
 
         with connection.cursor() as cursor:
@@ -137,7 +146,8 @@ class GroupElementYearManager(models.Manager):
                     'child_leaf_id': row[3],
                     'parent_id': row[4],
                     'child_id': row[2] or row[3],
-                    'level': row[5],
+                    'order': row[5],
+                    'level': row[6],
                 } for row in cursor.fetchall()
             ]
 
@@ -154,7 +164,8 @@ class GroupElementYearManager(models.Manager):
                            gey.id, 
                            gey.child_branch_id, 
                            gey.child_leaf_id, 
-                           gey.parent_id, 
+                           gey.parent_id,
+                           gey.order,
                            edyc.academic_year_id,
                            0 AS level
                     FROM base_groupelementyear gey
@@ -168,6 +179,7 @@ class GroupElementYearManager(models.Manager):
                             parent.child_branch_id,
                             parent.child_leaf_id,
                             parent.parent_id,
+                            parent.order,
                             edyp.academic_year_id,
                             child.level + 1
                     FROM base_groupelementyear AS parent
@@ -175,10 +187,10 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
                 )
                             
-            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, level
+            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
-            ORDER BY starting_node_id, level DESC;
+            ORDER BY starting_node_id,  level DESC, "order";
         """
         with connection.cursor() as cursor:
             parameters = {"child_ids": ",".join([str(id) for id in child_ids]), "academic_year_id": academic_year_id}
@@ -191,7 +203,8 @@ class GroupElementYearManager(models.Manager):
                     'child_leaf_id': row[3],
                     'parent_id': row[4],
                     'child_id': row[2] or row[3],
-                    'level': row[5],
+                    'order': row[5],
+                    'level': row[6],
                 } for row in cursor.fetchall()
             ]
 
