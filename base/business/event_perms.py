@@ -112,6 +112,24 @@ class EventPermCreationOrEndDateProposalFacultyManager(EventPerm):
     error_msg = _("Creation or end date modification proposal not allowed for faculty managers during this period.")
 
 
+class EventPermCreationOrEndDateProposalRegularUser(EventPerm):
+    def is_open(self):
+        return False
+
+    @classmethod
+    def get_open_academic_calendars_queryset(cls) -> QuerySet:
+        return AcademicCalendar.objects.none()
+
+
+def generate_event_perm_creation_end_date_proposal(person, obj=None, raise_exception=True):
+    if person.is_central_manager:
+        return EventPermCreationOrEndDateProposalCentralManager(obj, raise_exception)
+    elif person.is_faculty_manager:
+        return EventPermCreationOrEndDateProposalFacultyManager(obj, raise_exception)
+    else:
+        return EventPermCreationOrEndDateProposalRegularUser(obj, raise_exception)
+
+
 class EventPermModificationOrTransformationProposalCentralManager(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS

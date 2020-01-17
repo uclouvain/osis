@@ -38,6 +38,7 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm, Creation
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     entity_type, learning_unit_year_periodicity
+from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
@@ -67,7 +68,7 @@ class LearningUnitViewTestCase(TestCase):
             user=cls.faculty_user
         )
         cls.super_user = factory_user.SuperUserFactory()
-        cls.person = factory_person.PersonFactory(user=cls.super_user)
+        cls.person = factory_person.CentralManagerFactory(user=cls.super_user)
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 7)
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
@@ -104,6 +105,7 @@ class LearningUnitViewTestCase(TestCase):
             "periodicity": learning_unit_year_periodicity.ANNUAL,
             "entity": self.entity_version.id,
             "folder_id": 1,
+            "state": ProposalState.FACULTY.name,
             'requirement_entity': self.entity_version.id,
             'allocation_entity': self.entity_version.id,
             'additional_entity_1': '',
