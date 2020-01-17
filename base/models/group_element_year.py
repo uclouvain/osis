@@ -191,9 +191,9 @@ class GroupElementYearManager(models.Manager):
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
             ORDER BY starting_node_id,  level DESC, "order";
-        """
+        """ % {'child_ids': ','.join(["%s"] * len(child_ids)), 'academic_year_id': "%s"}
         with connection.cursor() as cursor:
-            parameters = {"child_ids": ",".join([str(id) for id in child_ids]), "academic_year_id": academic_year_id}
+            parameters = child_ids + [academic_year_id, academic_year_id]
             cursor.execute(reverse_adjacency_query, parameters)
             return [
                 {

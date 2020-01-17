@@ -671,6 +671,11 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         cls.root_element_a = EducationGroupYearFactory()
         cls.level_1 = GroupElementYearFactory(parent=cls.root_element_a)
         cls.level_11 = GroupElementYearFactory(parent=cls.level_1.child_branch)
+        cls.level_111 = GroupElementYearFactory(
+            parent=cls.level_11.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(),
+        )
         cls.level_2 = GroupElementYearFactory(
             parent=cls.root_element_a,
             child_branch=None,
@@ -686,7 +691,7 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_ids=[])
         self.assertEqual(len(reverse_adjacency_list), 0)
 
-    def test_case_filter_by_root_elements_ids(self):
+    def test_case_filter_by_child_ids(self):
         reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list([self.level_2.child_leaf_id])
         self.assertEqual(len(reverse_adjacency_list), 1)
 
@@ -701,3 +706,10 @@ class TestManagerGetReverseAdjacencyList(TestCase):
             'level': 0,
         }
         self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)
+
+    def test_case_multiple_child_ids(self):
+        adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list([
+            self.level_2.child_leaf_id,
+            self.level_111.child_leaf_id
+        ])
+        self.assertEqual(len(adjacency_list), 4)
