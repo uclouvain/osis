@@ -1,3 +1,5 @@
+from django.forms import model_to_dict
+
 from base.models.group_element_year import GroupElementYear
 from program_management.contrib.mixins import PersistentBusinessObject
 from program_management.contrib.node import Node
@@ -6,15 +8,16 @@ from program_management.contrib.node import Node
 class LinkFactory:
     def get_link(self, group_element_year: GroupElementYear):
         # Can be a relative link / concrete link
-        return Link(group_element_year)
+        group_element_year_dict = model_to_dict(group_element_year)
+        return Link(group_element_year_dict)
 
 
 factory = LinkFactory()
 
 
 class Link(PersistentBusinessObject):
-    parent: Node = None
-    child: Node = None
+    parent = None
+    child = None
 
     map_with_database = {
         GroupElementYear: {

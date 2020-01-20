@@ -1,26 +1,15 @@
 from typing import List
 
-from django.db.models import Model
-
 from base.models.group_element_year import GroupElementYear
-from program_management.contrib.mixins import FetchedBusinessObject
 from program_management.contrib import node, link
 from program_management.models.element import Element
 
 
-class EducationGroupVersion(Model):
-    pass
-
-
-class EducationGroupProgram(FetchedBusinessObject):
-    root_group: node.Node = None
-
-    def __init__(self, pk: int = None):
-        super(EducationGroupProgram, self).__init__(pk=pk)
+class EducationGroupProgram:
+    root_group = None
 
     def fetch(self):
         self = fetch(self.pk_value)
-
 
 
 class EducationGroupProgramList:
@@ -38,7 +27,7 @@ class EducationGroupProgramList:
 
 
 class EducationGroupProgramVersion(EducationGroupProgram):
-    version: EducationGroupVersion = None
+    version = None
 
 
 def fetch(tree_root_id):
@@ -54,7 +43,7 @@ def fetch(tree_root_id):
 
 
 def __fetch_tree_nodes(tree_structure):
-    element_ids = [ link['child_id'] for link in tree_structure ]
+    element_ids = [link['child_id'] for link in tree_structure]
     element_qs = Element.objects.filter(pk__in=element_ids).select_related(
         'education_group_year',
         'group_year',
@@ -63,17 +52,22 @@ def __fetch_tree_nodes(tree_structure):
     )
     return {element.pk: node.factory.get_node(element) for element in element_qs}
 
+
 def __fetch_tree_links(tree_structure):
-    group_element_year_ids = [ link['id'] for link in tree_structure ]
+    group_element_year_ids = [link['id'] for link in tree_structure]
     group_element_year_qs = GroupElementYear.objects.filter(pk__in=group_element_year_ids)
-    return {'_'.join([gey.parent_id, gey.child.pk]) : link.factory.get_link(gey) for gey in group_element_year_qs}  # TODO: Change when migration is done : child.pk must become child_id
+    return {
+        '_'.join([str(gey.parent_id), str(gey.child.pk)]): link.factory.get_link(gey)  # TODO: Change when migration is done : child.pk must become child_id
+        for gey in group_element_year_qs
+    }
 
 
 def __build_tree(root_node, tree_structure, nodes, links):
-    tree = EducationGroupProgram(pk=root_node.pk)
+    tree = EducationGroupProgram()
     tree.root_group = root_node
     tree.children = __build_children(root_node, tree_structure, nodes, links)
     return tree
+
 
 def __build_children(root, tree_structure, nodes, links):
     children = []

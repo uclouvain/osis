@@ -13,9 +13,9 @@ class BusinessObject(ABC):
     # Permet de savoir à partir de quels modèles est composé l'objet business
     # Permet de connaître les attributs de l'objet business
     # Permet de lier les attributs de l'objet business aux attributs en DB
-    map_with_database: Dict[Model, Dict[BusinessFieldName, ModelFieldName]] = None
+    map_with_database = None
 
-    _map_all_fields: Dict[BusinessFieldName, ModelFieldName] = None
+    _map_all_fields = None
 
     def __init__(self):
         assert self.map_with_database is not None
@@ -43,7 +43,7 @@ class BusinessObject(ABC):
         return self._map_all_fields
 
     @property
-    def map_field_name_with_model_class(self) -> Dict[BusinessFieldName: Model]:
+    def map_field_name_with_model_class(self):
         if not self._map_field_name_with_model_class:
             self._map_field_name_with_model_class = {
                 business_field_name: model_class
@@ -65,9 +65,9 @@ class FetchedBusinessObject(BusinessObject):
 
     # Permet d'identifier l'identifiant unique de l'objet business
     # Cette clé étant mappée avec une PK d'une table en DB ("master object")
-    main_queryset_model_class: Model = None
+    main_queryset_model_class = None
 
-    pk_value: int = None
+    pk_value = None
 
     _object = None
 
@@ -106,7 +106,7 @@ class FetchedBusinessObject(BusinessObject):
 
 class PersistentBusinessObject(BusinessObject):
 
-    fields_to_persist: List[ModelFieldName] = None
+    fields_to_persist = None
 
     def __init__(self, initial_values=None):
         super(PersistentBusinessObject, self).__init__()
@@ -114,9 +114,9 @@ class PersistentBusinessObject(BusinessObject):
 
     def _set_initial_values(self, initial_values):
         if initial_values:
-            self._raise_if_field_to_set_does_not_exist(initial_values)
-            self._raise_if_missing_fields_to_set(initial_values)
-            for key, value in initial_values:
+            # self._raise_if_field_to_set_does_not_exist(initial_values)
+            # self._raise_if_missing_fields_to_set(initial_values)
+            for key, value in initial_values.items():
                 setattr(self, key, value)
 
     def _raise_if_field_to_set_does_not_exist(self, initial_values):

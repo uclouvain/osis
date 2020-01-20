@@ -36,9 +36,10 @@ class TestFetchTree(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_node = ElementEducationGroupYearFactory()
-        cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node)
+        cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)  # TODO: Change to root_node when migration of group_element_year is done
         cls.link_level_2 = GroupElementYearFactory(
             parent=cls.link_level_1.child_branch,
+            child_branch=None,
             child_leaf=LearningUnitYearFactory()
         )
 
@@ -48,7 +49,7 @@ class TestFetchTree(TestCase):
             tree.fetch(unknown_tree_root_id)
 
     def test_case_tree_root_with_multiple_level(self):
-        education_group_program_tree = tree.fetch(self.root_node.pk)
+        education_group_program_tree = tree.fetch(self.root_node.education_group_year.pk)  #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
         self.assertIsInstance(education_group_program_tree, tree.EducationGroupProgram)
 
         self.assertIsInstance(education_group_program_tree.root_group, node.NodeEductionGroupYear)

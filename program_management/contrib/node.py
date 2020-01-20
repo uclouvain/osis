@@ -1,6 +1,8 @@
 from abc import ABC
 from typing import List
 
+from django.forms import model_to_dict
+
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from education_group.models.group_year import GroupYear
@@ -21,19 +23,27 @@ class NodeFactory:
         }[element.node_type]
         return node_cls(element)
 
+
 factory = NodeFactory()
 
 
 class Node(ABC):
-    children: List[Link] = None
+    children = None
 
 
 class NodeEductionGroupYear(Node, PersistentBusinessObject):      # TODO: Remove when migration is done
     map_with_database = {
         EducationGroupYear: {
-            # à compléter ...
+           'acronym': 'acronym',
+           'title': 'title',
+            # A Compléter
         }
     }
+
+    def __init__(self, element: Element):
+        initial_values = model_to_dict(element.education_group_year)
+        super().__init__(initial_values)
+        self.pk = element.education_group_year_id  # TODO: Make better than this
 
 
 class NodeGroupYear(Node, PersistentBusinessObject):
@@ -53,7 +63,7 @@ class NodeLearningUnitYear(Node, PersistentBusinessObject):
         },
     }
 
-    academic_year: AcademicYearBusiness = None
+    academic_year = None
 
     @property
     def year(self):
