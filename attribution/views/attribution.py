@@ -71,6 +71,7 @@ def learning_unit_attributions(request, learning_unit_year_id):
     context["can_manage_attribution"] = business_perms.is_eligible_to_manage_attributions(
         context["learning_unit_year"], request.user.person
     )
+    context["tab_active"] = "learning_unit_attributions"  # Corresponds to url_name
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
     return render(request, "attribution/attributions.html", context)
@@ -109,6 +110,6 @@ def get_charge_repartition_warning_messages(learning_container_year):
             tutor_name_with_function = "{} ({})".format(tutor_name,
                                                         getattr(Functions, charges[0]["attribution__function"]).value)
             msg = _("The sum of volumes for the partims for professor %(tutor)s is superior to the "
-                    "volume of parent learning unit for this professor") % {"tutor": tutor_name_with_function}
+                    "volume of full UE for this professor") % {"tutor": tutor_name_with_function}
             msgs.append(msg)
     return msgs

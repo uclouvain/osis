@@ -24,6 +24,7 @@
 #
 ##############################################################################
 
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
@@ -37,54 +38,57 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 
 
 class TestLearningUnitFormationsTab(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(current=True)
-        self.learning_container_year = LearningContainerYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.learning_container_year = LearningContainerYearFactory(
             container_type=LearningContainerYearType.COURSE.name,
-            academic_year=self.academic_year
+            academic_year=cls.academic_year
         )
-        self.person = PersonWithPermissionsFactory('can_access_learningunit')
-        self.learning_unit_year = LearningUnitYearFullFactory(
-            learning_container_year=self.learning_container_year,
-            academic_year=self.academic_year
+        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+        cls.learning_unit_year = LearningUnitYearFullFactory(
+            learning_container_year=cls.learning_container_year,
+            academic_year=cls.academic_year
         )
 
-        self.education_group_year = EducationGroupYearFactory(
-            academic_year=self.academic_year
+        cls.education_group_year = EducationGroupYearFactory(
+            academic_year=cls.academic_year
         )
-        self.group_element_year = GroupElementYearFactory(
-            parent=self.education_group_year,
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
             child_branch=None,
-            child_leaf=self.learning_unit_year
+            child_leaf=cls.learning_unit_year
         )
 
-        self.education_group_year_formation_parent = EducationGroupYearFactory(
-            academic_year=self.academic_year
+        cls.education_group_year_formation_parent = EducationGroupYearFactory(
+            academic_year=cls.academic_year
         )
         GroupElementYearFactory(
-            parent=self.education_group_year_formation_parent,
-            child_branch=self.education_group_year
+            parent=cls.education_group_year_formation_parent,
+            child_branch=cls.education_group_year
         )
 
-        self.education_group_year_formation_great_parent_1 = EducationGroupYearFactory(
-            academic_year=self.academic_year
+        cls.education_group_year_formation_great_parent_1 = EducationGroupYearFactory(
+            academic_year=cls.academic_year
         )
         GroupElementYearFactory(
-            parent=self.education_group_year_formation_great_parent_1,
-            child_branch=self.education_group_year_formation_parent
+            parent=cls.education_group_year_formation_great_parent_1,
+            child_branch=cls.education_group_year_formation_parent
         )
-        self.education_group_year_formation_great_parent_2 = EducationGroupYearFactory(
-            academic_year=self.academic_year
+        cls.education_group_year_formation_great_parent_2 = EducationGroupYearFactory(
+            academic_year=cls.academic_year
         )
         GroupElementYearFactory(
-            parent=self.education_group_year_formation_great_parent_2,
-            child_branch=self.education_group_year_formation_parent
+            parent=cls.education_group_year_formation_great_parent_2,
+            child_branch=cls.education_group_year_formation_parent
         )
 
+    def setUp(self):
         self.client.force_login(self.person.user)
+        self.url = reverse("learning_unit_formations", args=[self.learning_unit_year.id])
 
     def test_formations_tab(self):
-        self.url = reverse("learning_unit_formations", args=[self.learning_unit_year.id])
+
         response = self.client.get(self.url)
         self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.education_group_year.pk),
                               [self.education_group_year_formation_parent])
@@ -98,3 +102,13 @@ class TestLearningUnitFormationsTab(TestCase):
             list(response.context['group_elements_years']),
             [self.group_element_year]
         )
+
+    def test_tab_active_url(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
