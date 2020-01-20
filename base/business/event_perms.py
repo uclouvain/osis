@@ -88,6 +88,15 @@ class EventPerm(ABC):
         return cls.get_open_academic_calendars_queryset().values_list('data_year', flat=True)
 
 
+class EventPermClosed(EventPerm):
+    def is_open(self):
+        return False
+
+    @classmethod
+    def get_open_academic_calendars_queryset(cls) -> QuerySet:
+        return AcademicCalendar.objects.none()
+
+
 class EventPermEducationGroupEdition(EventPerm):
     model = EducationGroupYear
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
@@ -112,22 +121,13 @@ class EventPermCreationOrEndDateProposalFacultyManager(EventPerm):
     error_msg = _("Creation or end date modification proposal not allowed for faculty managers during this period.")
 
 
-class EventPermCreationOrEndDateProposalRegularUser(EventPerm):
-    def is_open(self):
-        return False
-
-    @classmethod
-    def get_open_academic_calendars_queryset(cls) -> QuerySet:
-        return AcademicCalendar.objects.none()
-
-
 def generate_event_perm_creation_end_date_proposal(person, obj=None, raise_exception=True):
     if person.is_central_manager:
         return EventPermCreationOrEndDateProposalCentralManager(obj, raise_exception)
     elif person.is_faculty_manager:
         return EventPermCreationOrEndDateProposalFacultyManager(obj, raise_exception)
     else:
-        return EventPermCreationOrEndDateProposalRegularUser(obj, raise_exception)
+        return EventPermClosed(obj, raise_exception)
 
 
 class EventPermModificationOrTransformationProposalCentralManager(EventPerm):
@@ -140,3 +140,12 @@ class EventPermModificationOrTransformationProposalFacultyManager(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS
     error_msg = _("Modification or transformation proposal not allowed for faculty managers during this period.")
+
+
+def generate_event_perm_modification_transformation_proposal(person, obj=None, raise_exception=True):
+    if person.is_central_manager:
+        return EventPermModificationOrTransformationProposalCentralManager(obj, raise_exception)
+    elif person.is_faculty_manager:
+        return EventPermModificationOrTransformationProposalFacultyManager(obj, raise_exception)
+    else:
+        return EventPermClosed(obj, raise_exception)

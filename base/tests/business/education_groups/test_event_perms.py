@@ -87,7 +87,7 @@ class TestEventPermInit(TestCase):
             event_perms.EventPermEducationGroupEdition(obj=luy, raise_exception=False)
 
 
-class TestEventPermPropositions(TestCase):
+class TestEventPermPropositionsCreationEndDate(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -113,4 +113,33 @@ class TestEventPermPropositions(TestCase):
     def test_event_perm_creation_end_date_proposal_faculty_manager(self):
         person = person_factory.FacultyManagerFactory()
         event_perm = event_perms.generate_event_perm_creation_end_date_proposal(person)
+        self.assertTrue(event_perm.is_open())
+
+
+class TestEventPermPropositionsModificationTransformation(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS,
+            data_year=cls.current_academic_year
+        )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS,
+            data_year=cls.current_academic_year
+        )
+
+    def test_event_perm_modification_transformation_proposal_regular_user(self):
+        person = person_factory.PersonFactory()
+        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(person)
+        self.assertFalse(event_perm.is_open())
+
+    def test_event_perm_modification_transformation_proposal_central_manager(self):
+        person = person_factory.CentralManagerFactory()
+        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(person)
+        self.assertTrue(event_perm.is_open())
+
+    def test_event_perm_modification_transformation_proposal_faculty_manager(self):
+        person = person_factory.FacultyManagerFactory()
+        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(person)
         self.assertTrue(event_perm.is_open())

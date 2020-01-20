@@ -637,18 +637,11 @@ def is_eligible_to_modify_by_proposal(learning_unit_year, person, raise_exceptio
 
 
 def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
-    if person.is_central_manager:
-        result = event_perms.EventPermModificationOrTransformationProposalCentralManager(
-            obj=learning_unit_year,
-            raise_exception=False
-        ).is_open()
-    elif person.is_faculty_manager:
-        result = event_perms.EventPermModificationOrTransformationProposalFacultyManager(
-            obj=learning_unit_year,
-            raise_exception=False
-        ).is_open()
-    else:
-        return False
+    result = event_perms.generate_event_perm_modification_transformation_proposal(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
 
     can_raise_exception(
         raise_exception, result, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
