@@ -259,7 +259,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = person_factory.PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
+        cls.person = person_factory.CentralManagerFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
 
@@ -302,6 +302,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
             "academic_year": cls.next_academic_year.id,
             "entity": cls.entity_version.id,
             "folder_id": "1",
+            "state": ProposalState.FACULTY.name
         }
 
     def setUp(self):
