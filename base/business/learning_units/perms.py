@@ -354,7 +354,13 @@ def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise
 
 
 def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
-    result = person.is_central_manager or _can_be_updated_by_faculty_manager(learning_unit_year)
+    business_check = person.is_central_manager or learning_unit_year.learning_container_year
+    calendar_check = event_perms.generate_event_perm_learning_unit_faculty_manager_edition(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
+    result = business_check and calendar_check
     can_raise_exception(
         raise_exception,
         result,
@@ -364,9 +370,7 @@ def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, r
 
 
 def _can_be_updated_by_faculty_manager(learning_unit_year):
-    if not learning_unit_year.learning_container_year:
-        return False
-    return event_perms.EventPermLearningUnitFacultyManagerEdition(
+    return learning_unit_year.learning_container_year and event_perms.EventPermLearningUnitFacultyManagerEdition(
         obj=learning_unit_year,
         raise_exception=False
     ).is_open()

@@ -97,6 +97,11 @@ class EventPermClosed(EventPerm):
         return AcademicCalendar.objects.none()
 
 
+class EventPermOpened(EventPerm):
+    def is_open(self):
+        return True
+
+
 class EventPermEducationGroupEdition(EventPerm):
     model = EducationGroupYear
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
@@ -107,6 +112,15 @@ class EventPermLearningUnitFacultyManagerEdition(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
     error_msg = _("This learning unit is not editable by faculty managers during this period.")
+
+
+def generate_event_perm_learning_unit_faculty_manager_edition(person, obj=None, raise_exception=True):
+    if person.is_central_manager:
+        return EventPermOpened(obj, raise_exception)
+    elif person.is_faculty_manager:
+        return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
+    else:
+        return EventPermClosed(obj, raise_exception)
 
 
 class EventPermCreationOrEndDateProposalCentralManager(EventPerm):
