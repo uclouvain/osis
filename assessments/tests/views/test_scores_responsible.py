@@ -57,10 +57,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
 
         cls.tutor = TutorFactory()
         cls.user = cls.tutor.person.user
-        cls.academic_year = AcademicYearFactory(
-            year=datetime.date.today().year,
-            start_date=datetime.date.today() - datetime.timedelta(days=5)
-        )
+        cls.academic_year = AcademicYearFactory(current=True)
 
         # FIXME: Old structure model [To remove]
         cls.structure = structure.StructureFactory()
@@ -106,10 +103,11 @@ class ScoresResponsibleSearchTestCase(TestCase):
             learning_unit_year=cls.learning_unit_year_children,
             score_responsible=True
         )
+        cls.url = reverse('scores_responsible_list')
+        cls.user.groups.add(group)
 
     def setUp(self):
         self.client.force_login(self.user)
-        self.url = reverse('scores_responsible_list')
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
@@ -209,6 +207,7 @@ class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
             structure=cls.structure,
             entity=cls.root_entity,
         )
+        cls.entity_manager.person.user.groups.add(group)
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
@@ -282,6 +281,7 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             administration_entity=cls.root_entity
         )
         cls.program_manager = ProgramManagerFactory(education_group=cls.education_group_year.education_group)
+        cls.program_manager.person.user.groups.add(group)
         offer_enrollment = OfferEnrollmentFactory(education_group_year=cls.education_group_year)
         LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
 
@@ -329,6 +329,7 @@ class ScoresResponsibleAddTestCase(TestCase):
             structure=cls.structure,
             entity=cls.root_entity,
         )
+        cls.entity_manager.person.user.groups.add(group)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             acronym="LBIR1210",
