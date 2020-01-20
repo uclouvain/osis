@@ -89,10 +89,10 @@ def _filter_required_teaching_material(learning_units):
 
 def _build_line(learning_unit):
     # Fetch data in CMS and convert
-    bibliography = _html_list_to_string(html.unescape(learning_unit.bibliography)) if learning_unit.bibliography else ""
-    online_resources_fr = _hyperlinks_to_string(html.unescape(learning_unit.online_resources_fr)) \
+    bibliography = html_list_to_string(html.unescape(learning_unit.bibliography)) if learning_unit.bibliography else ""
+    online_resources_fr = hyperlinks_to_string(html.unescape(learning_unit.online_resources_fr)) \
         if learning_unit.online_resources_fr else ""
-    online_resources_en = _hyperlinks_to_string(html.unescape(learning_unit.online_resources_en)) \
+    online_resources_en = hyperlinks_to_string(html.unescape(learning_unit.online_resources_en)) \
         if learning_unit.online_resources_en else ""
     return(
         learning_unit.acronym,
@@ -106,7 +106,7 @@ def _build_line(learning_unit):
     )
 
 
-def _hyperlinks_to_string(text):
+def hyperlinks_to_string(text):
     """ Extract all hyperlinks and append them to a string using a 'title - [url]' format """
     converted_resources = ""
     soup = BeautifulSoup(text, "html5lib")
@@ -121,7 +121,7 @@ def _hyperlinks_to_string(text):
     return converted_resources
 
 
-def _html_list_to_string(text):
+def html_list_to_string(text):
     """ Extract lists and append them to a string keeping the structure """
     converted_text = ""
     soup = BeautifulSoup(text, "html5lib")

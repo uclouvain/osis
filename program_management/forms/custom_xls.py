@@ -41,6 +41,8 @@ class CustomXlsForm(forms.Form):
     proposition = forms.BooleanField(required=False, label=_('Proposals'))
     english_title = forms.BooleanField(required=False, label=_('Title in English'))
     language = forms.BooleanField(required=False, label=_('Language'))
+    description_fiche = forms.BooleanField(required=False, label=_('Description fiche'))
+    specifications = forms.BooleanField(required=False, label=_('Specifications'))
 
     def get_optional_data(self):
         data = []

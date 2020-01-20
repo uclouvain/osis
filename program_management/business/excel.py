@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import html
 import itertools
+import re
 from collections import namedtuple, defaultdict
 
-from django.db.models import QuerySet, Prefetch, OuterRef, Exists
+from django.conf import settings
+from django.db.models import QuerySet, Prefetch, Exists, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
@@ -39,18 +42,26 @@ from attribution.business import attribution_charge_new
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.business.learning_unit_xls import volume_information, annotate_qs, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
+from base.business.learning_units.xls_generator import html_list_to_string, hyperlinks_to_string
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR, AND
 from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import fetch_row_sql, GroupElementYear, get_all_group_elements_in_tree
+from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 from base.models.proposal_learning_unit import find_by_learning_unit_year
+from base.models.teaching_material import TeachingMaterial
+from cms.models.translated_text import TranslatedText
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
-    STYLED_CELLS, STYLE_NO_GRAY, COLORED_ROWS
+    STYLED_CELLS, STYLE_NO_GRAY, COLORED_ROWS, ROW_HEIGHT
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.forms.custom_xls import CustomXlsForm
+
+
+ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
 BOLD_FONT = Font(bold=True)
 
@@ -115,6 +126,35 @@ optional_header_for_volume = [
 optional_header_for_quadrimester = [_('Quadrimester')]
 optional_header_for_session_derogation = [_('Session derogation')]
 optional_header_for_language = [_('Language')]
+optional_header_for_description_fiche = [
+    _('Content'), "{} EN".format(_('Content')),
+    _('Teaching methods'), "{} EN".format(_('Teaching methods')),
+    _('Evaluation methods'), "{} EN".format(_('Evaluation methods')),
+    _('Other informations'), "{} EN".format(_('Other informations')),
+    _('Online resources'), "{} EN".format(_('Online resources')),
+    _('Teaching material'),
+    _('bibliography').title(),
+    _('Mobility'),
+]
+
+optional_header_for_specifications = [
+    _('Themes discussed'), "{} EN".format(_('Themes discussed')),
+    _('Prerequisite'), "{} EN".format(_('Prerequisite')),
+    _('Learning achievements'), "{} EN".format(_('Learning achievements')),
+]
+
+DescriptionFicheCols = namedtuple(
+    'DescriptionFicheCols',
+    ['resume', 'resume_en', 'teaching_methods', 'teaching_methods_en', 'evaluation_methods', 'evaluation_methods_en',
+     'other_informations', 'other_informations_en', 'online_resources', 'online_resources_en', 'teaching_materials',
+     'bibliography', 'mobility']
+)
+
+SpecificationsCols = namedtuple(
+    'SpecificationsLine',
+    ['prerequisite', 'prerequisite_en', 'themes_discussed', 'themes_discussed_en',
+     'achievements_fr', 'achievements_en']
+)
 
 LEGEND_WB_STYLE = 'colored_cells'
 LEGEND_WB_CONTENT = 'content'
@@ -501,51 +541,62 @@ class EducationGroupYearLearningUnitsContainedToExcel:
                 continue
             self.learning_unit_years_parent.append(grp)
         self.custom_xls_form = custom_xls_form
+        ids = []
+        for luy in self.learning_unit_years_parent:
+            ids.append(luy.id)
 
-    def get_queryset(self):
-        q = EducationGroupYear.objects.filter(id=self.egy.id)
-        prefetch_content = Prefetch(
-            'groupelementyear_set',
-            queryset=GroupElementYear.objects.select_related(
-                'child_leaf__learning_container_year',
-                'child_branch'
-            )
-        )
-        return q.prefetch_related(prefetch_content)
+        self.qs = GroupElementYear.objects.filter(id__in=ids)
+        description_fiche = False
+        specifications = False
+
+        if custom_xls_form.is_valid():
+            description_fiche = True if 'description_fiche' in custom_xls_form.fields else False
+            specifications = True if 'specifications' in custom_xls_form.fields else False
+
+        if description_fiche or specifications:
+            self.qs = _annotate_with_description_fiche_specifications(self.qs, description_fiche, specifications)
 
     def _to_workbook(self):
-        return generate_ue_contained_for_workbook(self.learning_unit_years_parent,
-                                                  self.custom_xls_form)
+        return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs)
 
     def to_excel(self, ):
         return save_virtual_workbook(self._to_workbook())
 
 
-def generate_ue_contained_for_workbook(learning_unit_years_parent, custom_xls_form: CustomXlsForm):
-    data = _build_excel_lines_ues(custom_xls_form, learning_unit_years_parent)
+def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, qs: QuerySet):
+    data = _build_excel_lines_ues(custom_xls_form, qs)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
 
     return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
-                                        data.get('colored_cells'))
+                                        data.get('colored_cells'),
+                                        data.get('row_height'))
 
 
-def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, learning_unit_years_parent):
+def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet):
     content = _get_headers(custom_xls_form)
 
     optional_data_needed = _optional_data(custom_xls_form)
     colored_cells = defaultdict(list)
     idx = 1
 
-    for gey in learning_unit_years_parent:
+    for gey in qs:
         luy = gey.child_leaf
-        content.append(_get_optional_data(_fix_data(gey, luy), luy, optional_data_needed))
+        content.append(_get_optional_data(_fix_data(gey, luy), luy, optional_data_needed, gey))
         if getattr(luy, "proposallearningunit", None):
             colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
         idx += 1
 
     colored_cells[Style(font=BOLD_FONT)].append(0)
-    return {'content': content, 'colored_cells': colored_cells}
+    return {
+        'content': content,
+        'colored_cells': colored_cells,
+        'row_height':
+            {'height': 30,
+             'start': 2,
+             'stop': (len(content)) + 1}
+            if optional_data_needed['has_description_fiche'] or optional_data_needed['has_specifications'] else {}
+    }
 
 
 def _optional_data(custom_xls_form):
@@ -586,7 +637,7 @@ def _fix_data(gey: GroupElementYear, luy: LearningUnitYear):
     return data
 
 
-def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cells):
+def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cells, row_height={}):
     workbook = Workbook()
     worksheet_title = _clean_worksheet_title(_("List UE"))
     header, *content = [tuple(line) for line in excel_lines]
@@ -597,6 +648,8 @@ def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cell
         CONTENT_KEY: content,
         STYLED_CELLS: {},
         COLORED_ROWS: colored_cells,
+        ROW_HEIGHT: row_height,
+
     }
     _build_worksheet(worksheet_data, workbook, 0)
     if need_proposal_legend:
@@ -634,7 +687,7 @@ def _get_attribution_line(a_person_teacher):
     return ""
 
 
-def _get_optional_data(data, luy, optional_data_needed):
+def _get_optional_data(data, luy, optional_data_needed, gey):
     if optional_data_needed['has_required_entity']:
         data.append(luy.learning_container_year.requirement_entity)
     if optional_data_needed['has_allocation_entity']:
@@ -682,4 +735,153 @@ def _get_optional_data(data, luy, optional_data_needed):
         data.append(luy.complete_title_english)
     if optional_data_needed['has_language']:
         data.append(luy.language)
+    if optional_data_needed['has_description_fiche']:
+        description_fiche = _build_description_fiche_cols(luy, gey)
+        for k, v in zip(description_fiche._fields, description_fiche):
+            data.append(v)
+    if optional_data_needed['has_specifications']:
+        specifications_data = _build_specifications_cols(luy, gey)
+        for k, v in zip(specifications_data._fields, specifications_data):
+            data.append(v)
     return data
+
+
+def _annotate_with_description_fiche_specifications(group_element_years, description_fiche=False, specifications=False):
+
+    sq = TranslatedText.objects.filter(
+        reference=OuterRef('child_leaf__pk'),
+        entity=LEARNING_UNIT_YEAR)
+    if description_fiche:
+        group_element_years = group_element_years.annotate(bibliography=Subquery(
+            sq.filter(
+                text_label__label='bibliography',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(online_resources=Subquery(
+            sq.filter(
+                text_label__label='online_resources',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(online_resources_en=Subquery(
+            sq.filter(
+                text_label__label='online_resources',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        )).annotate(resume=Subquery(
+            sq.filter(
+                text_label__label='resume',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(resume_en=Subquery(
+            sq.filter(
+                text_label__label='resume',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        )).annotate(teaching_methods=Subquery(
+            sq.filter(
+                text_label__label='teaching_methods',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(teaching_methods_en=Subquery(
+            sq.filter(
+                text_label__label='teaching_methods',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        )).annotate(evaluation_methods=Subquery(
+            sq.filter(
+                text_label__label='evaluation_methods',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(evaluation_methods_en=Subquery(
+            sq.filter(
+                text_label__label='evaluation_methods',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        )).annotate(other_informations=Subquery(
+            sq.filter(
+                text_label__label='other_informations',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(other_informations_en=Subquery(
+            sq.filter(
+                text_label__label='other_informations',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        )).annotate(mobility=Subquery(
+            sq.filter(
+                text_label__label='mobility',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        ))
+
+    if specifications:
+        group_element_years = group_element_years.annotate(prerequisite=Subquery(
+            sq.filter(
+                text_label__label='prerequisite',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(prerequisite_en=Subquery(
+            sq.filter(
+                text_label__label='prerequisite',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        )).annotate(themes_discussed=Subquery(
+            sq.filter(
+                text_label__label='themes_discussed',
+                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
+        )).annotate(themes_discussed_en=Subquery(
+            sq.filter(
+                text_label__label='themes_discussed',
+                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+        ))
+
+    return group_element_years
+
+
+def _build_validate_html_list_to_string(value_param, method):
+
+    if method is None or method not in (html_list_to_string, hyperlinks_to_string):
+        return value_param
+
+    if value_param:
+        # string must never be longer than 32,767 characters
+        # truncate if necessary
+        value = value_param[:32767]
+        value = method(html.unescape(value)) if value else ""
+        if next(ILLEGAL_CHARACTERS_RE.finditer(value), None):
+            return "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING'))
+        return value
+
+    return ""
+
+
+def _build_specifications_cols(luy, gey):
+    achievements_fr = LearningAchievement.objects.filter(
+        learning_unit_year_id=luy.id,
+        language__code=settings.LANGUAGE_CODE_FR[:2].upper()).order_by('order')
+
+    achievements_en = LearningAchievement.objects.filter(
+        learning_unit_year_id=luy.id,
+        language__code=settings.LANGUAGE_CODE_EN[:2].upper()).order_by('order')
+
+    return SpecificationsCols(
+        prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html_list_to_string),
+        prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html_list_to_string),
+        themes_discussed=_build_validate_html_list_to_string(gey.themes_discussed, html_list_to_string),
+        themes_discussed_en=_build_validate_html_list_to_string(gey.themes_discussed_en, html_list_to_string),
+        achievements_fr=_build_validate_html_list_to_string(
+            '\n'.join("{} -{}".format(a.code_name, a.text) for a in achievements_fr), html_list_to_string
+        ),
+        achievements_en=_build_validate_html_list_to_string(
+            '\n'.join("{} -{}".format(a.code_name, a.text) for a in achievements_en), html_list_to_string
+        )
+    )
+
+
+def _build_description_fiche_cols(luy, gey):
+    teaching_materials = TeachingMaterial.objects.filter(learning_unit_year_id=luy.id).order_by('order')
+    return DescriptionFicheCols(
+        resume=_build_validate_html_list_to_string(gey.resume, html_list_to_string),
+        resume_en=_build_validate_html_list_to_string(gey.resume_en, html_list_to_string),
+        teaching_methods=_build_validate_html_list_to_string(gey.teaching_methods, html_list_to_string),
+        teaching_methods_en=_build_validate_html_list_to_string(gey.teaching_methods_en, html_list_to_string),
+        evaluation_methods=_build_validate_html_list_to_string(gey.evaluation_methods, html_list_to_string),
+        evaluation_methods_en=_build_validate_html_list_to_string(gey.evaluation_methods_en, html_list_to_string),
+        other_informations=_build_validate_html_list_to_string(gey.other_informations, html_list_to_string),
+        other_informations_en=_build_validate_html_list_to_string(gey.other_informations_en, html_list_to_string),
+        online_resources=_build_validate_html_list_to_string(gey.online_resources, hyperlinks_to_string),
+        online_resources_en=_build_validate_html_list_to_string(gey.online_resources_en, hyperlinks_to_string),
+        teaching_materials=_build_validate_html_list_to_string(
+            '\n'.join("{} - {}".format(_('Mandatory') if a.mandatory else _('Non-mandatory'), a.title)
+                      for a in teaching_materials),
+            html_list_to_string
+        ),
+        bibliography=_build_validate_html_list_to_string(gey.bibliography, html_list_to_string),
+        mobility=_build_validate_html_list_to_string(gey.mobility, html_list_to_string)
+    )
