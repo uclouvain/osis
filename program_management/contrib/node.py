@@ -1,25 +1,39 @@
 from abc import ABC
 from typing import List
 
+from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from education_group.models.group_year import GroupYear
 from program_management.contrib.academic_year import AcademicYearBusiness
 from program_management.contrib.mixins import PersistentBusinessObject
+from program_management.models.element import Element
+from program_management.models.enums import node_type
+
+
+class NodeFactory:
+    def get_node(self, element: Element):
+        node_cls = {
+            node_type.EDUCATION_GROUP: NodeEductionGroupYear,   # TODO: Remove when migration is done
+
+            node_type.GROUP: NodeGroupYear,
+            node_type.LEARNING_UNIT: NodeLearningUnitYear,
+            node_type.LEARNING_CLASS: NodeLearningClassYear
+        }[element.node_type]
+        return node_cls(element)
+
+factory = NodeFactory()
 
 
 class Node(ABC):
     children: List[Link] = None
 
 
-# class NodeLink:
-#     node: Node = None
-#     children_links: List[Link] = None
-#
-#
-#
-# class NodeLink:
-#     node: Node = None
-#     link: Link = None
+class NodeEductionGroupYear(Node, PersistentBusinessObject):      # TODO: Remove when migration is done
+    map_with_database = {
+        EducationGroupYear: {
+            # à compléter ...
+        }
+    }
 
 
 class NodeGroupYear(Node, PersistentBusinessObject):
