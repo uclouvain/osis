@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import itertools
 import json
 import random
 from decimal import Decimal
@@ -1070,6 +1071,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_english'], LearningUnitSpecificationsForm)
         self.assertCountEqual(response.context['achievements_FR'], [learning_unit_achievements_fr])
         self.assertCountEqual(response.context['achievements_EN'], [learning_unit_achievements_en])
+        self.assertCountEqual(
+            response.context['achievements'],
+            list(itertools.zip_longest([learning_unit_achievements_fr], [learning_unit_achievements_en]))
+        )
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'

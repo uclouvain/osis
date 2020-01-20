@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from copy import deepcopy
 from decimal import Decimal
 
@@ -127,6 +128,10 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update(get_specifications_context(learning_unit_year, request))
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
+    context["achievements"] = list(itertools.zip_longest(
+        context.get("achievements_FR", []),
+        context.get("achievements_EN", [])
+    ))
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
     context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
     return render(request, "learning_unit/specifications.html", context)
