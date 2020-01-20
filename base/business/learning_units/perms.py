@@ -246,7 +246,8 @@ def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_
             return False
 
         if proposal.type == ProposalType.MODIFICATION.name and \
-                not event_perms.EventPermModificationOrTransformationProposalFacultyManager(
+                not event_perms.generate_event_perm_modification_transformation_proposal(
+                    person=person,
                     obj=proposal.learning_unit_year,
                     raise_exception=False
                 ).is_open():
