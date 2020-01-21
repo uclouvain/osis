@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0498_auto_20200120_1535'),
+        ('base', '0497_auto_20200108_1213'),
         ('education_group', '0003_groupyear_academic_year'),
     ]
 
