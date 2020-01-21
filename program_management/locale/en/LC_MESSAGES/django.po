@@ -249,7 +249,7 @@ msgid "Official"
 msgstr ""
 
 msgid "Online resources"
-msgstr "Ressources en ligne"
+msgstr ""
 
 msgid ""
 "Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
