@@ -41,7 +41,9 @@ from base.models.enums import learning_unit_year_periodicity, learning_container
     learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
+    AcademicCalendarLearningUnitCentralEditionFactory, AcademicCalendarLearningUnitFacultyEditionFactory, \
+    generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -65,7 +67,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = PersonFactory(user=cls.user)
+        cls.person = CentralManagerFactory(user=cls.user)
         cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
         cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
@@ -84,6 +86,13 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
 
         cls.a_superuser = SuperUserFactory()
         cls.a_superperson = PersonFactory(user=cls.a_superuser)
+        [
+            AcademicCalendarLearningUnitCentralEditionFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            ) for academic_year in cls.list_of_academic_years
+        ]
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -127,11 +136,15 @@ class TestEditLearningUnit(TestCase):
         today = datetime.date.today()
         an_academic_year = create_current_academic_year()
 
-        AcademicCalendarFactory(
+        AcademicCalendarLearningUnitFacultyEditionFactory(
             data_year=an_academic_year,
             start_date=datetime.datetime(an_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14)
+        )
+        AcademicCalendarLearningUnitCentralEditionFactory(
+            data_year=an_academic_year,
+            start_date=datetime.datetime(an_academic_year.year - 6, 9, 15),
+            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14)
         )
 
         cls.requirement_entity = EntityVersionFactory(
@@ -371,6 +384,8 @@ class TestLearningUnitVolumesManagement(TestCase):
         )
 
         cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        generate_learning_unit_edition_calendars(cls.academic_years)
+
         cls.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
         cls.generated_container_year = cls.generate_container.generated_container_years[0]
 

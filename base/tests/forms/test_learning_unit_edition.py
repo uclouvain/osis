@@ -23,12 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 
 from django.test import TestCase
 
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes, learning_container_year_types
+from base.tests.factories.academic_calendar import AcademicCalendarLearningUnitCentralEditionFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin
+from base.tests.factories.person import CentralManagerFactory
 
 
 class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
@@ -49,24 +52,33 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             learning_unit_year_subtype=learning_unit_year_subtypes.FULL,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
+        cls.person_central = CentralManagerFactory()
+
+        [
+            AcademicCalendarLearningUnitCentralEditionFactory(
+                data_year=academic_year,
+                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+            ) for academic_year in cls.list_of_academic_years
+        ]
 
     def test_edit_end_date_send_dates_with_end_date_not_defined(self):
-        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
+        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_academic_years_after_now)
 
     def test_edit_end_date_send_dates_with_end_date_defined(self):
         self.learning_unit.end_year = self.last_academic_year
-        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
+        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_academic_years_after_now)
 
     def test_edit_end_date_send_dates_with_end_date_of_learning_unit_inferior_to_current_academic_year(self):
         self.learning_unit.end_year = self.oldest_academic_year
-        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
+        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertEqual(form.fields['academic_year'].disabled, True)
 
     def test_edit_end_date(self):
         self.learning_unit.end_year = self.last_academic_year
         form_data = {"academic_year": self.starting_academic_year.pk}
-        form = LearningUnitEndDateForm(form_data, learning_unit_year=self.learning_unit_year)
+        form = LearningUnitEndDateForm(form_data, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['academic_year'], self.starting_academic_year)

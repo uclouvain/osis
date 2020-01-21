@@ -74,6 +74,14 @@ class AcademicCalendarEducationGroupEditionFactory(AcademicCalendarFactory):
     reference = academic_calendar_type.EDUCATION_GROUP_EDITION
 
 
+class AcademicCalendarLearningUnitCentralEditionFactory(AcademicCalendarFactory):
+    reference = academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
+
+
+class AcademicCalendarLearningUnitFacultyEditionFactory(AcademicCalendarFactory):
+    reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+
+
 class AcademicCalendarCreationEndDateProposalCentralManagerFactory(AcademicCalendarFactory):
     reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
 
@@ -123,6 +131,25 @@ def generate_modification_transformation_proposal_calendars(academic_years):
             data_year=academic_year,
             start_date=datetime.datetime(academic_year.year - 1, 9, 15),
             end_date=datetime.datetime(academic_year.year, 9, 14)
+        )
+        for academic_year in academic_years
+    ]
+
+
+def generate_learning_unit_edition_calendars(academic_years):
+    [
+        AcademicCalendarLearningUnitFacultyEditionFactory(
+            data_year=academic_year,
+            start_date=datetime.datetime(academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
+        )
+        for academic_year in academic_years
+    ]
+    [
+        AcademicCalendarLearningUnitCentralEditionFactory(
+            data_year=academic_year,
+            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+            end_date=datetime.datetime(academic_year.year + 1, 9, 14)
         )
         for academic_year in academic_years
     ]

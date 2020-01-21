@@ -80,8 +80,13 @@ class EventPerm(ABC):
         return cls.get_open_academic_calendars_queryset().exists()
 
     @classmethod
-    def get_academic_years(cls) -> QuerySet:
-        return AcademicYear.objects.filter(pk__in=cls.get_academic_years_ids())
+    def get_academic_years(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
+        qs = AcademicYear.objects.filter(pk__in=cls.get_academic_years_ids())
+        if min_academic_y:
+            qs = qs.filter(year__gte=min_academic_y)
+        if max_academic_y:
+            qs = qs.filter(year__lte=max_academic_y)
+        return qs
 
     @classmethod
     def get_academic_years_ids(cls) -> QuerySet:
@@ -114,9 +119,15 @@ class EventPermLearningUnitFacultyManagerEdition(EventPerm):
     error_msg = _("This learning unit is not editable by faculty managers during this period.")
 
 
-def generate_event_perm_learning_unit_faculty_manager_edition(person, obj=None, raise_exception=True):
+class EventPermLearningUnitCentralManagerEdition(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
+    error_msg = _("This learning unit is not editable by central managers during this period.")
+
+
+def generate_event_perm_learning_unit_edition(person, obj=None, raise_exception=True):
     if person.is_central_manager:
-        return EventPermOpened(obj, raise_exception)
+        return EventPermLearningUnitCentralManagerEdition(obj, raise_exception)
     elif person.is_faculty_manager:
         return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
     else:

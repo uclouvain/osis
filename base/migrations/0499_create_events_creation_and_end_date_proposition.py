@@ -18,6 +18,16 @@ def create_calendar_events_propositions(apps, schema_editor):
             academic_calendar_mdl.objects.create(
                 academic_year=anac,
                 data_year=anac,
+                title="Modification UE par gestionnaires centraux",
+                description="Période de modification des UE par les gestionnaires centraux",
+                start_date=date(year - 6, 9, 15),
+                end_date=date(year + 1, 9, 14),
+                highlight_title="Modification UE par gestionnaires centraux",
+                reference=academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
+            )
+            academic_calendar_mdl.objects.create(
+                academic_year=anac,
+                data_year=anac,
                 title="Propositions création / fin enseignmt gest centr",
                 description="Période d'ouverture des propositions de création ou fin d'enseignement par les "
                             "gestionnaires centraux",
@@ -70,6 +80,16 @@ def reverse_migration(apps, schema_editor):
     for year in data_years_to_delete:
         try:
             anac = academic_year_mdl.objects.get(year=year)
+            academic_calendar_mdl.objects.filter(
+                academic_year=anac,
+                data_year=anac,
+                title="Modification UE par gestionnaires centraux",
+                description="Période de modification des UE par les gestionnaires centraux",
+                start_date=date(year - 6, 9, 15),
+                end_date=date(year + 1, 9, 14),
+                highlight_title="Modification UE par gestionnaires centraux",
+                reference=academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
+            ).delete()
             academic_calendar_mdl.objects.filter(
                 academic_year=anac,
                 data_year=anac,
