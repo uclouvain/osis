@@ -848,11 +848,7 @@ def _build_specifications_cols(luy, gey):
     achievements_fr = LearningAchievement.objects.filter(
         learning_unit_year_id=luy.id,
         language__code=settings.LANGUAGE_CODE_FR[:2].upper()).order_by('order')
-    if luy.id == 156936:
-        print(achievements_fr)
-        for a in achievements_fr:
-            print(a.code_name)
-            print(a.text)
+
     achievements_en = LearningAchievement.objects.filter(
         learning_unit_year_id=luy.id,
         language__code=settings.LANGUAGE_CODE_EN[:2].upper()).order_by('order')
@@ -870,10 +866,11 @@ def _build_specifications_cols(luy, gey):
 def _build_achievements(achievements):
     achievements_str = ""
     for achievement in achievements:
-        if achievement.code_name:
-            achievements_str += "{} -".format(achievement.code_name)
-        achievements_str += _build_validate_html_list_to_string(achievement.text, html_list_to_string).lstrip('\n')
-        achievements_str += '\n'
+        if achievement.text and achievement.text.strip() != "":
+            if achievement.code_name:
+                achievements_str += "{} -".format(achievement.code_name)
+            achievements_str += _build_validate_html_list_to_string(achievement.text, html_list_to_string).lstrip('\n')
+            achievements_str += '\n'
     return achievements_str.rstrip('\n')
 
 
