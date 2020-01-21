@@ -848,7 +848,11 @@ def _build_specifications_cols(luy, gey):
     achievements_fr = LearningAchievement.objects.filter(
         learning_unit_year_id=luy.id,
         language__code=settings.LANGUAGE_CODE_FR[:2].upper()).order_by('order')
-
+    if luy.id == 156936:
+        print(achievements_fr)
+        for a in achievements_fr:
+            print(a.code_name)
+            print(a.text)
     achievements_en = LearningAchievement.objects.filter(
         learning_unit_year_id=luy.id,
         language__code=settings.LANGUAGE_CODE_EN[:2].upper()).order_by('order')
@@ -858,13 +862,19 @@ def _build_specifications_cols(luy, gey):
         themes_discussed_en=_build_validate_html_list_to_string(gey.themes_discussed_en, html_list_to_string),
         prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html_list_to_string),
         prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html_list_to_string),
-        achievements_fr=_build_validate_html_list_to_string(
-            '\n'.join("{} -{}".format(a.code_name, a.text) for a in achievements_fr), html_list_to_string
-        ),
-        achievements_en=_build_validate_html_list_to_string(
-            '\n'.join("{} -{}".format(a.code_name, a.text) for a in achievements_en), html_list_to_string
-        )
+        achievements_fr=_build_achievements(achievements_fr),
+        achievements_en=_build_achievements(achievements_en),
     )
+
+
+def _build_achievements(achievements):
+    achievements_str = ""
+    for achievement in achievements:
+        if achievement.code_name:
+            achievements_str += "{} -".format(achievement.code_name)
+        achievements_str += _build_validate_html_list_to_string(achievement.text, html_list_to_string).lstrip('\n')
+        achievements_str += '\n'
+    return achievements_str.rstrip('\n')
 
 
 def _build_description_fiche_cols(luy, gey):
@@ -893,10 +903,10 @@ def _build_description_fiche_cols(luy, gey):
 def html_list_to_string(text):
     converted_text = ""
     soup = BeautifulSoup(text, "html5lib")
-    for element in soup.find_all(['ul', 'ol', 'li', 'p']):
-        if element.name in ['ul', 'ol', 'p']:
+    for element in soup.find_all(['ul', 'ol', 'li', 'p', 'div']):
+        if element.name in ['ul', 'ol', 'p', 'div']:
             converted_text += "\n" if converted_text != "" else ""
-        if element.name in ['li', 'p']:
+        if element.name in ['li', 'p', 'div']:
             converted_text += "{}\n".format(element.get_text())
 
     # strip tags when no list has been found
