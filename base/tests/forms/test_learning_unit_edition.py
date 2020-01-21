@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
 from django.test import TestCase
 
 from base.forms.learning_unit.edition import LearningUnitDailyManagementEndDateForm
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes, learning_container_year_types
-from base.tests.factories.academic_calendar import AcademicCalendarLearningUnitCentralEditionFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.business.learning_units import LearningUnitsMixin
 from base.tests.factories.person import CentralManagerFactory
 
@@ -53,14 +52,7 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
         cls.person_central = CentralManagerFactory()
-
-        [
-            AcademicCalendarLearningUnitCentralEditionFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            ) for academic_year in cls.list_of_academic_years
-        ]
+        generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def test_edit_end_date_send_dates_with_end_date_not_defined(self):
         form = LearningUnitDailyManagementEndDateForm(
