@@ -81,16 +81,18 @@ class EventPerm(ABC):
 
     @classmethod
     def get_academic_years(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
-        qs = AcademicYear.objects.filter(pk__in=cls.get_academic_years_ids())
-        if min_academic_y:
-            qs = qs.filter(year__gte=min_academic_y)
-        if max_academic_y:
-            qs = qs.filter(year__lte=max_academic_y)
-        return qs
+        return AcademicYear.objects.filter(
+            pk__in=cls.get_academic_years_ids(min_academic_y=min_academic_y, max_academic_y=max_academic_y)
+        )
 
     @classmethod
-    def get_academic_years_ids(cls) -> QuerySet:
-        return cls.get_open_academic_calendars_queryset().values_list('data_year', flat=True)
+    def get_academic_years_ids(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
+        qs = cls.get_open_academic_calendars_queryset()
+        if min_academic_y:
+            qs = qs.filter(data_year__gte=min_academic_y)
+        if max_academic_y:
+            qs = qs.filter(data_year__lte=max_academic_y)
+        return qs.values_list('data_year', flat=True)
 
 
 class EventPermClosed(EventPerm):
