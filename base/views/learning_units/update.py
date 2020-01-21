@@ -67,7 +67,7 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
 
     learning_unit_to_edit = learning_unit_year.learning_unit
     form = LearningUnitDailyManagementEndDateForm(
-        request.POST or None, learning_unit_year=learning_unit_year, person=person, proposal_context=False
+        request.POST or None, learning_unit_year=learning_unit_year, person=person
     )
     if form.is_valid():
         try:
