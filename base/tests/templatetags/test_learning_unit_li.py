@@ -50,7 +50,8 @@ from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, is_v
     MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, \
     li_delete_all_lu
 from base.tests.business.test_perms import create_person_with_permission_and_group
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
+    generate_creation_or_end_date_proposal_calendars, generate_modification_transformation_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -86,10 +87,17 @@ class LearningUnitTagLiEditTest(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.next_academic_yr = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
-        AcademicYearFactory(year=cls.current_academic_year.year + 2)
-        AcademicYearFactory(year=cls.current_academic_year.year + 3)
-        AcademicYearFactory(year=cls.current_academic_year.year + 4)
+        anac_2 = AcademicYearFactory(year=cls.current_academic_year.year + 2)
+        anac_3 = AcademicYearFactory(year=cls.current_academic_year.year + 3)
+        anac_4 = AcademicYearFactory(year=cls.current_academic_year.year + 4)
         cls.later_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 5)
+
+        academic_years = [
+            cls.current_academic_year, cls.next_academic_yr, anac_2, anac_3, anac_4, cls.later_academic_year
+        ]
+        generate_creation_or_end_date_proposal_calendars(academic_years)
+        generate_modification_transformation_proposal_calendars(academic_years)
+
         cls.lcy = LearningContainerYearFactory(
             academic_year=cls.next_academic_yr,
             container_type=learning_container_year_types.COURSE,
@@ -462,11 +470,11 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_container_year=lcy
         )
 
-        self._end_year_permission_assert(faculty_person, learning_unit_yr)
+        self._assert_no_permission_end_year(faculty_person, learning_unit_yr)
         central_person = CentralManagerFactory()
         self.assertFalse(can_modify_end_year_by_proposal(learning_unit_yr, central_person, False))
 
-    def test_can_modify_end_year_by_proposal_n_year(self):
+    def test_faculty_mgr_can_not_modify_end_year_by_proposal_n_year(self):
         faculty_person = FacultyManagerFactory()
         lcy = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                            container_type=learning_container_year_types.COURSE)
@@ -476,9 +484,18 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_unit=LearningUnitFactory(),
             learning_container_year=lcy
         )
+        self._assert_no_permission_end_year(faculty_person, learning_unit_yr)
 
-        self._end_year_permission_assert(faculty_person, learning_unit_yr)
+    def test_central_mgr_can_modify_end_year_by_proposal_n_year(self):
         central_person = CentralManagerFactory()
+        lcy = LearningContainerYearFactory(academic_year=self.current_academic_year,
+                                           container_type=learning_container_year_types.COURSE)
+        learning_unit_yr = LearningUnitYearFactory(
+            academic_year=self.current_academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_unit=LearningUnitFactory(),
+            learning_container_year=lcy
+        )
         self.assertTrue(can_modify_end_year_by_proposal(learning_unit_yr, central_person, True))
 
     def test_can_modify_end_year_by_proposal_n_year_plus_one(self):
@@ -606,7 +623,7 @@ class LearningUnitTagLiEditTest(TestCase):
 
         }
 
-    def _end_year_permission_assert(self, a_person, luy):
+    def _assert_no_permission_end_year(self, a_person, luy):
         self.assertFalse(can_modify_end_year_by_proposal(luy, a_person, False))
         with self.assertRaises(PermissionDenied) as perm_ex:
             can_modify_end_year_by_proposal(luy, a_person, True)

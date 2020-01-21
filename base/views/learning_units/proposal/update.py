@@ -73,7 +73,6 @@ def update_learning_unit_proposal(request, learning_unit_year_id):
 
 def _update_or_create_proposal(request, learning_unit_year, proposal=None):
     person = get_object_or_404(Person, user=request.user)
-
     proposal_base_form = ProposalBaseForm(request.POST or None, person, learning_unit_year, proposal)
 
     if request.method == 'POST':
