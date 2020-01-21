@@ -27,7 +27,8 @@ from django.test import TestCase
 
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from program_management.contrib import tree, node
+from program_management.contrib import tree
+from program_management.contrib.models import node, education_group_program
 from program_management.models.element import Element
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
 
@@ -50,7 +51,11 @@ class TestFetchTree(TestCase):
 
     def test_case_tree_root_with_multiple_level(self):
         education_group_program_tree = tree.fetch(self.root_node.education_group_year.pk)  #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
-        self.assertIsInstance(education_group_program_tree, tree.EducationGroupProgram)
+        self.assertIsInstance(education_group_program_tree, education_group_program.EducationGroupProgram)
 
         self.assertIsInstance(education_group_program_tree.root_group, node.NodeEductionGroupYear)
         self.assertEqual(len(education_group_program_tree.root_group.children), 1)
+        self.assertEqual(
+            education_group_program_tree.root_group.children[0].child.acronym,
+            self.link_level_1.child_branch.acronym
+        )

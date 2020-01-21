@@ -1,36 +1,10 @@
-from typing import List
-
 from base.models.group_element_year import GroupElementYear
-from program_management.contrib import node, link
+from program_management.contrib.models import node, link
+from program_management.contrib.models.education_group_program import EducationGroupProgram
 from program_management.models.element import Element
 
 
-class EducationGroupProgram:
-    root_group = None
-
-    def fetch(self):
-        self = fetch(self.pk_value)
-
-
-class EducationGroupProgramList:
-
-    @staticmethod
-    def get_queryset():
-        return []
-
-    @staticmethod
-    def get_list() -> List[EducationGroupProgram]:
-        result = []
-        for obj in EducationGroupProgramList.get_queryset():
-            result.append(EducationGroupProgram(obj))
-        return result
-
-
-class EducationGroupProgramVersion(EducationGroupProgram):
-    version = None
-
-
-def fetch(tree_root_id):
+def fetch(tree_root_id) -> EducationGroupProgram:
     root_node = node.factory.get_node(
         Element.objects.get(education_group_year_id=tree_root_id)
         # TODO: Change when migration is done : Element.objects.get(group_year_id=tree_root_id)
@@ -42,15 +16,33 @@ def fetch(tree_root_id):
     return __build_tree(root_node, structure, nodes, links)
 
 
+# TODO: Change when migration is done : Use this __fetch_tree_nodes
+# def __fetch_tree_nodes(tree_structure):
+#     element_ids = [link['child_id'] for link in tree_structure]
+#     element_qs = Element.objects.filter(pk__in=element_ids).select_related(
+#         'education_group_year',
+#         'group_year',
+#         'learning_unit_year',
+#         'learning_class_year'
+#     )
+#     return {element.pk: node.factory.get_node(element) for element in element_qs}
+
 def __fetch_tree_nodes(tree_structure):
-    element_ids = [link['child_id'] for link in tree_structure]
-    element_qs = Element.objects.filter(pk__in=element_ids).select_related(
-        'education_group_year',
-        'group_year',
-        'learning_unit_year',
-        'learning_class_year'
+    """ This version is temporary see function above as definitive one"""
+    ids = [link['id'] for link in tree_structure]
+    group_element_year_qs = GroupElementYear.objects.filter(pk__in=ids).select_related(
+        'child_branch',
+        'child_leaf',
     )
-    return {element.pk: node.factory.get_node(element) for element in element_qs}
+    nodes = {}
+    for gey in group_element_year_qs:
+        if gey.child_branch_id:
+            element = Element(education_group_year=gey.child_branch)
+            nodes[gey.child_branch_id] = node.factory.get_node(element)
+        elif gey.child_leaf:
+            element = Element(learning_unit_year=gey.child_leaf)
+            nodes[gey.child_leaf_id] = node.factory.get_node(element)
+    return nodes
 
 
 def __fetch_tree_links(tree_structure):
@@ -63,9 +55,8 @@ def __fetch_tree_links(tree_structure):
 
 
 def __build_tree(root_node, tree_structure, nodes, links):
-    tree = EducationGroupProgram()
-    tree.root_group = root_node
-    tree.children = __build_children(root_node, tree_structure, nodes, links)
+    root_node.children = __build_children(root_node, tree_structure, nodes, links)
+    tree = EducationGroupProgram(root_node)
     return tree
 
 
@@ -76,7 +67,7 @@ def __build_children(root, tree_structure, nodes, links):
         child_node = nodes[child_structure['child_id']]
         child_node.children = __build_children(child_node, tree_structure, nodes, links)
 
-        link_node = links['_'.join([child_structure['parent_id'], child_structure['child_id']])]
+        link_node = links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
         link_node.parent = root
         link_node.child = child_node
         children.append(link_node)
