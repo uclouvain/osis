@@ -104,7 +104,7 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
     return \
         check_lu_permission(person, 'base.can_edit_learningunit', raise_exception) and \
         is_year_editable(learning_unit_year, raise_exception) and \
-        _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
+        _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception) and \
         is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception) and \
         _check_proposal_edition(learning_unit_year, raise_exception)
@@ -123,7 +123,7 @@ def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exce
 def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=False):
     return conjunction(
         is_person_linked_to_entity_in_charge_of_lu,
-        is_academic_year_in_range_to_create_partim,
+        _is_learning_unit_year_in_state_to_create_partim,
         is_learning_unit_year_full,
         is_external_learning_unit_cograduation
     )(learning_unit_year, person, raise_exception)
@@ -345,7 +345,7 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
     return proposal_learning_unit.is_learning_unit_in_proposal(learning_unit_year.learning_unit)
 
 
-def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise_exception=False):
+def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person, raise_exception=False):
     business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
         (person.is_faculty_manager and learning_unit_year.learning_container_year)
 
@@ -358,7 +358,7 @@ def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise
     return business_check and calendar_check
 
 
-def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
+def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception):
     business_check = person.is_central_manager or learning_unit_year.learning_container_year
 
     calendar_check = event_perms.generate_event_perm_learning_unit_faculty_manager_edition(
