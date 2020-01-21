@@ -390,7 +390,7 @@ class EntityVersionTest(TestCase):
 
         entity_parent = EntityFactory(organization=self.organization)
         entity_version_parent = EntityVersionFactory(entity=entity_parent, entity_type='FACULTY')
-        EntityVersionFactory(parent=entity_parent)
+        EntityVersionFactory(parent=entity_parent, entity_type='OTHER')
 
         PersonEntityFactory(person=person, entity=entity_attached)
         PersonEntityFactory(person=person, entity=entity_ilv)
