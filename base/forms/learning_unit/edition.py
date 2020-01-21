@@ -40,11 +40,10 @@ class LearningUnitEndDateForm(forms.Form):
                                            label=_('Last year of organization')
                                            )
 
-    def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, proposal_context=False, **kwargs):
+    def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
         self.learning_unit = learning_unit_year.learning_unit
         self.learning_unit_year = learning_unit_year
         self.person = person
-        self.proposal_context = proposal_context
         super().__init__(data, *args, **kwargs)
         end_year = self.learning_unit.end_year
 
@@ -58,6 +57,10 @@ class LearningUnitEndDateForm(forms.Form):
         if max_year:
             self.fields['academic_year'].required = True
 
+    @classmethod
+    def get_event_perm_generator(cls):
+        raise NotImplementedError
+
     def _set_initial_value(self, end_year):
         self.fields['academic_year'].initial = end_year
 
@@ -68,11 +71,7 @@ class LearningUnitEndDateForm(forms.Form):
                     self.learning_unit.end_year)
             )
 
-        if self.proposal_context:
-            event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
-        else:
-            event_perm = event_perms.generate_event_perm_learning_unit_edition(self.person)
-
+        event_perm = self.get_event_perm_generator()(self.person)
         luy_current_year = self.learning_unit_year.academic_year.year
         academic_years = event_perm.get_academic_years(min_academic_y=luy_current_year, max_academic_y=max_year)
 
@@ -81,3 +80,15 @@ class LearningUnitEndDateForm(forms.Form):
     def save(self, update_learning_unit_year=True):
         return edit_learning_unit_end_date(self.learning_unit, self.cleaned_data['academic_year'],
                                            update_learning_unit_year)
+
+
+class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
+    @classmethod
+    def get_event_perm_generator(cls):
+        return event_perms.generate_event_perm_creation_end_date_proposal
+
+
+class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
+    @classmethod
+    def get_event_perm_generator(cls):
+        return event_perms.generate_event_perm_learning_unit_edition

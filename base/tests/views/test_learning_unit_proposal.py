@@ -40,7 +40,7 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
-from base.forms.learning_unit.edition import LearningUnitEndDateForm
+from base.forms.learning_unit.edition import LearningUnitProposalEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.models import proposal_learning_unit
 from base.models.academic_year import AcademicYear
@@ -318,7 +318,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(response.context['person'], self.person)
 
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
-        self.assertIsInstance(response.context['form_end_date'], LearningUnitEndDateForm)
+        self.assertIsInstance(response.context['form_end_date'], LearningUnitProposalEndDateForm)
         self.assertCountEqual(
             list(response.context['form_end_date'].fields['academic_year'].queryset),
             list(AcademicYear.objects.filter(
@@ -842,7 +842,7 @@ class TestEditProposal(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'learning_unit/proposal/update_suppression.html')
-        self.assertIsInstance(response.context['form_end_date'], LearningUnitEndDateForm)
+        self.assertIsInstance(response.context['form_end_date'], LearningUnitProposalEndDateForm)
         self.assertCountEqual(
             list(response.context['form_end_date'].fields['academic_year'].queryset),
             list(AcademicYear.objects.filter(
