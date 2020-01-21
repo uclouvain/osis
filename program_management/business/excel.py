@@ -42,7 +42,7 @@ from attribution.business import attribution_charge_new
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.business.learning_unit_xls import volume_information, annotate_qs, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
-from base.business.learning_units.xls_generator import html_list_to_string, hyperlinks_to_string
+from base.business.learning_units.xls_generator import hyperlinks_to_string, strip_tags
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR, AND
 from base.models.enums.proposal_type import ProposalType
@@ -59,7 +59,7 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
     STYLED_CELLS, STYLE_NO_GRAY, COLORED_ROWS, ROW_HEIGHT
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.forms.custom_xls import CustomXlsForm
-
+from bs4 import BeautifulSoup
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -139,7 +139,7 @@ optional_header_for_description_fiche = [
 
 optional_header_for_specifications = [
     _('Themes discussed'), "{} EN".format(_('Themes discussed')),
-    _('Prerequisite'), "{} EN".format(_('Prerequisite')),
+    _('Pre-condition'), "{} EN".format(_('Pre-condition')),
     _('Learning achievements'), "{} EN".format(_('Learning achievements')),
 ]
 
@@ -151,9 +151,11 @@ DescriptionFicheCols = namedtuple(
 )
 
 SpecificationsCols = namedtuple(
-    'SpecificationsLine',
-    ['prerequisite', 'prerequisite_en', 'themes_discussed', 'themes_discussed_en',
-     'achievements_fr', 'achievements_en']
+    'SpecificationsLine', [
+        'themes_discussed', 'themes_discussed_en',
+        'prerequisite', 'prerequisite_en',
+        'achievements_fr', 'achievements_en'
+    ]
 )
 
 LEGEND_WB_STYLE = 'colored_cells'
@@ -852,10 +854,10 @@ def _build_specifications_cols(luy, gey):
         language__code=settings.LANGUAGE_CODE_EN[:2].upper()).order_by('order')
 
     return SpecificationsCols(
-        prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html_list_to_string),
-        prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html_list_to_string),
         themes_discussed=_build_validate_html_list_to_string(gey.themes_discussed, html_list_to_string),
         themes_discussed_en=_build_validate_html_list_to_string(gey.themes_discussed_en, html_list_to_string),
+        prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html_list_to_string),
+        prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html_list_to_string),
         achievements_fr=_build_validate_html_list_to_string(
             '\n'.join("{} -{}".format(a.code_name, a.text) for a in achievements_fr), html_list_to_string
         ),
@@ -886,3 +888,18 @@ def _build_description_fiche_cols(luy, gey):
         bibliography=_build_validate_html_list_to_string(gey.bibliography, html_list_to_string),
         mobility=_build_validate_html_list_to_string(gey.mobility, html_list_to_string)
     )
+
+
+def html_list_to_string(text):
+    converted_text = ""
+    soup = BeautifulSoup(text, "html5lib")
+    for element in soup.find_all(['ul', 'ol', 'li', 'p']):
+        if element.name in ['ul', 'ol', 'p']:
+            converted_text += "\n" if converted_text != "" else ""
+        if element.name in ['li', 'p']:
+            converted_text += "{}\n".format(element.get_text())
+
+    # strip tags when no list has been found
+    if converted_text == "":
+        return strip_tags(text)
+    return converted_text

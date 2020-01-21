@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import html
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 
-from base.business.learning_units.xls_generator import html_list_to_string, hyperlinks_to_string
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -45,7 +45,7 @@ from program_management.business.excel import EducationGroupYearLearningUnitsPre
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, ILLEGAL_CHARACTERS_RE
+    _build_validate_html_list_to_string, html_list_to_string
 from program_management.forms.custom_xls import CustomXlsForm
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
@@ -523,6 +523,15 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
         data = _build_excel_lines_ues(custom_form, exl.qs)
         self.assertDictEqual(data.get('row_height'), {'height': 30, 'start': 2, 'stop': 4})
+
+    def test_html_list_to_string(self):
+        ch = '''<ul>
+                    <li>Cfr. Student corner</li>
+                </ul>            
+                <p>Cfr. Syllabus</p>            
+                '''
+        expected = "Cfr. Student corner\n\nCfr. Syllabus\n"
+        self.assertEqual(html_list_to_string(html.unescape(ch)), expected)
 
 
 def get_expected_data(gey, luy):

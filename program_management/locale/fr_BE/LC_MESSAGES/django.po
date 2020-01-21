@@ -281,6 +281,9 @@ msgstr ""
 msgid "No result!"
 msgstr "Aucun résultat!"
 
+msgid "Non-mandatory"
+msgstr "Facultatif"
+
 msgid "Official"
 msgstr "Officiel"
 
@@ -338,6 +341,9 @@ msgstr "Veuillez copier ou couper un élément avant de le coller"
 
 msgid "Please select an item before adding it"
 msgstr "Veuillez sélectionner un élément avant de l'ajouter"
+
+msgid "Pre-condition"
+msgstr "Préalable"
 
 msgid "Prerequisite"
 msgid_plural "Prerequisites"
