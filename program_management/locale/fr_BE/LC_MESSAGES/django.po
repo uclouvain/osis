@@ -197,6 +197,9 @@ msgstr "Elément sélectionné %(element)s"
 msgid "English comment"
 msgstr "Commentaire anglais"
 
+msgid "Evaluation methods"
+msgstr "Mode d'évaluation des acquis des étudiants"
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -281,6 +284,9 @@ msgstr "Aucun résultat!"
 msgid "Official"
 msgstr "Officiel"
 
+msgid "Online resources"
+msgstr "Ressources en ligne"
+
 msgid ""
 "Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
 msgstr ""
@@ -314,6 +320,9 @@ msgstr[1] ""
 
 msgid "Optional"
 msgstr "Au choix"
+
+msgid "Other informations"
+msgstr "Autres informations"
 
 msgid "Paste"
 msgstr "Coller"
@@ -358,6 +367,9 @@ msgstr "Coordonnées de l'étudiant.e"
 
 msgid "Student's signature"
 msgstr "Signature de l'étudiant.e"
+
+msgid "Teaching methods"
+msgstr "Méthodes d'enseignement"
 
 #, python-format
 msgid "The %(acronym)s has been moved"
@@ -433,6 +445,9 @@ msgstr "La racine n'existe pas dans l'année academique suivante."
 
 msgid "The user is not allowed to change education group content."
 msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
+
+msgid "Themes discussed"
+msgstr "Thèmes abordés"
 
 msgid ""
 "This form must be signed by the designated authority and delivered to the "

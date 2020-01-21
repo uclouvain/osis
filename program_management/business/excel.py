@@ -827,12 +827,13 @@ def _annotate_with_description_fiche_specifications(group_element_years, descrip
 def _build_validate_html_list_to_string(value_param, method):
 
     if method is None or method not in (html_list_to_string, hyperlinks_to_string):
-        return value_param
+        return value_param.strip()
 
     if value_param:
         # string must never be longer than 32,767 characters
         # truncate if necessary
-        value = value_param[:32767]
+        value = value_param.strip()
+        value = value[:32767]
         value = method(html.unescape(value)) if value else ""
         if next(ILLEGAL_CHARACTERS_RE.finditer(value), None):
             return "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING'))

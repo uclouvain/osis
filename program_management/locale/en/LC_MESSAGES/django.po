@@ -166,6 +166,9 @@ msgstr ""
 msgid "English comment"
 msgstr ""
 
+msgid "Evaluation methods"
+msgstr ""
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -242,6 +245,9 @@ msgstr ""
 msgid "Official"
 msgstr ""
 
+msgid "Online resources"
+msgstr "Ressources en ligne"
+
 msgid ""
 "Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
 msgstr ""
@@ -268,6 +274,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Optional"
+msgstr ""
+
+msgid "Other informations"
 msgstr ""
 
 msgid "Paste"
@@ -312,6 +321,9 @@ msgid "Student's contact information"
 msgstr ""
 
 msgid "Student's signature"
+msgstr ""
+
+msgid "Teaching methods"
 msgstr ""
 
 #, python-format
@@ -378,6 +390,9 @@ msgid "The root does not exist in the next academic year."
 msgstr ""
 
 msgid "The user is not allowed to change education group content."
+msgstr ""
+
+msgid "Themes discussed"
 msgstr ""
 
 msgid ""
