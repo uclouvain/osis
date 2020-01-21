@@ -105,8 +105,8 @@ msgid ""
 msgstr ""
 
 msgid ""
-"'^' Means starts with. '$' Means ends by. '.' Remplace one character. '*' "
-"Remplace one or more characters."
+"'^' Means starts with. '$' Means ends by. '.' Replace one character. '*' "
+"Replace one or more characters."
 msgstr ""
 
 msgid "1st quadri"
