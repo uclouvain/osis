@@ -43,8 +43,7 @@ from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
 from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
-    AcademicCalendarLearningUnitCentralEditionFactory, \
-    AcademicCalendarLearningUnitFacultyEditionFactory
+    generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, \
     create_past_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -91,21 +90,7 @@ class PermsTestCase(TestCase):
             learning_unit=LearningUnitFactory(start_year=create_past_academic_year(), end_year=cls.academic_yr)
         )
         academic_years = [cls.academic_yr, cls.academic_yr_1, cls.academic_yr_2]
-
-        [
-            AcademicCalendarLearningUnitCentralEditionFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            ) for academic_year in academic_years
-        ]
-        [
-            AcademicCalendarLearningUnitFacultyEditionFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 2, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            ) for academic_year in academic_years
-        ]
+        generate_learning_unit_edition_calendars(academic_years)
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in ALL_TYPES:
@@ -576,21 +561,7 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.academic_years[LEARNING_UNIT_CREATION_SPAN_YEARS] = cls.current_acy
         cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
-
-        [
-            AcademicCalendarLearningUnitCentralEditionFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            ) for academic_year in cls.academic_years
-        ]
-        [
-            AcademicCalendarLearningUnitFacultyEditionFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 2, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            ) for academic_year in cls.academic_years
-        ]
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
         cls.faculty_manager = FacultyManagerFactory()
         cls.central_manager = CentralManagerFactory()

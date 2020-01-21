@@ -42,7 +42,6 @@ from base.models.enums import learning_unit_year_periodicity, learning_container
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    AcademicCalendarLearningUnitCentralEditionFactory, AcademicCalendarLearningUnitFacultyEditionFactory, \
     generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
@@ -86,13 +85,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
 
         cls.a_superuser = SuperUserFactory()
         cls.a_superperson = PersonFactory(user=cls.a_superuser)
-        [
-            AcademicCalendarLearningUnitCentralEditionFactory(
-                data_year=academic_year,
-                start_date=datetime.datetime(academic_year.year - 6, 9, 15),
-                end_date=datetime.datetime(academic_year.year + 1, 9, 14)
-            ) for academic_year in cls.list_of_academic_years
-        ]
+        generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -135,17 +128,7 @@ class TestEditLearningUnit(TestCase):
     def setUpTestData(cls):
         today = datetime.date.today()
         an_academic_year = create_current_academic_year()
-
-        AcademicCalendarLearningUnitFacultyEditionFactory(
-            data_year=an_academic_year,
-            start_date=datetime.datetime(an_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14)
-        )
-        AcademicCalendarLearningUnitCentralEditionFactory(
-            data_year=an_academic_year,
-            start_date=datetime.datetime(an_academic_year.year - 6, 9, 15),
-            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14)
-        )
+        generate_learning_unit_edition_calendars([an_academic_year])
 
         cls.requirement_entity = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
