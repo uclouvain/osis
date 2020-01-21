@@ -38,7 +38,7 @@ def create_current_academic_year():
 
 def create_past_academic_year():
     current_year = get_current_year()
-    year = random.randrange(2000, current_year)  # randrage never picks upper limit, so year will never = current_year
+    year = random.randrange(2000, current_year)  # randrange never picks upper limit, so year will never = current_year
     return AcademicYearFactory(year=year)
 
 
