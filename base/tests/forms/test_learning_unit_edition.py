@@ -51,7 +51,7 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             learning_unit_year_subtype=learning_unit_year_subtypes.FULL,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
-        cls.person_central = CentralManagerFactory()
+        cls.person_central = CentralManagerFactory('can_edit_learningunit')
         generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def test_edit_end_date_send_dates_with_end_date_not_defined(self):
