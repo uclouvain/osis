@@ -346,20 +346,27 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
 
 
 def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise_exception=False):
-    if person.is_central_manager:
-        return not is_learning_unit_year_in_past(learning_unit_year, person)
-    elif person.is_faculty_manager:
-        return _can_be_updated_by_faculty_manager(learning_unit_year)
-    return False
+    business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
+        (person.is_faculty_manager and learning_unit_year.learning_container_year)
 
-
-def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
-    business_check = person.is_central_manager or learning_unit_year.learning_container_year
     calendar_check = event_perms.generate_event_perm_learning_unit_faculty_manager_edition(
         person=person,
         obj=learning_unit_year,
         raise_exception=False
     ).is_open()
+
+    return business_check and calendar_check
+
+
+def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
+    business_check = person.is_central_manager or learning_unit_year.learning_container_year
+
+    calendar_check = event_perms.generate_event_perm_learning_unit_faculty_manager_edition(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
+
     result = business_check and calendar_check
     can_raise_exception(
         raise_exception,
