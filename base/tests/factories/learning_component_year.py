@@ -38,14 +38,17 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
 
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     acronym = factory.Sequence(lambda n: '%d' % n)
-    type = factory.Iterator(learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES,
-                            getter=operator.itemgetter(0))
+    type = factory.Iterator(learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES, getter=operator.itemgetter(0))
     comment = factory.Sequence(lambda n: 'Comment-%d' % n)
-    planned_classes = factory.fuzzy.FuzzyInteger(10)
-    hourly_volume_total_annual = None
-    hourly_volume_partial_q1 = None
-    hourly_volume_partial_q2 = None
-    repartition_volume_requirement_entity = Decimal(0)
+    planned_classes = factory.fuzzy.FuzzyInteger(1, 10)
+    hourly_volume_total_annual = factory.LazyAttribute(
+        lambda obj: obj.hourly_volume_partial_q1 + obj.hourly_volume_partial_q2
+    )
+    hourly_volume_partial_q1 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
+    hourly_volume_partial_q2 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
+    repartition_volume_requirement_entity = factory.LazyAttribute(
+        lambda obj: (obj.hourly_volume_partial_q1 + obj.hourly_volume_partial_q2) * obj.planned_classes
+    )
     repartition_volume_additional_entity_1 = Decimal(0)
     repartition_volume_additional_entity_2 = Decimal(0)
 

@@ -32,7 +32,7 @@ from selenium.webdriver.common.by import By
 from base.models.entity_version import EntityVersion
 from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, \
     Checkbox, Select2Field, Link, \
-    CkeditorField, RadioField, Field, SelectEntityVersionField
+    CkeditorField, RadioField, Field, SelectEntityVersionField, CharField
 
 
 class AjaxModal(pypom.Page, ABC):
@@ -160,7 +160,7 @@ class NewLearningUnitPage(pypom.Page):
         By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[3]/div/span")
     entite_dattribution = Select2Field(
         By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[4]/div/span")
-    save_button = Link("LearningUnitPage", By.ID, 'btn-confirm', 2)
+    save_button = Link("LearningUnitPage", By.ID, 'btn-confirm', 4)
 
 
 class NewLearningUnitProposalPage(NewLearningUnitPage):
@@ -177,9 +177,9 @@ class NewLearningUnitProposalPage(NewLearningUnitPage):
 
     @dossier.setter
     def dossier(self, value):
-        value_0 = EntityVersion.objects.get(acronym=value[:3]).pk
-        self._dossier_0 = value_0
-        self._dossier_1 = value[3:]
+        value_0 = EntityVersion.objects.get(acronym=value[:4]).pk
+        self._dossier_0 = str(value_0)
+        self._dossier_1 = value[4:]
 
 
 class EditLearningUnitProposalPage(NewLearningUnitProposalPage):
@@ -257,6 +257,12 @@ class LearningUnitEditPage(pypom.Page):
     volume_q1_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_partial_q1")
     volume_q2_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-hourly_volume_partial_q2")
     volume_q2_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_partial_q2")
+    volume_total_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-hourly_volume_total_annual")
+    volume_total_pour_la_partie_pratique = InputField(By.ID, "id_component-1-hourly_volume_total_annual")
+    classes_prevues_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-planned_classes")
+    classes_prevues_pour_la_partie_pratique = InputField(By.ID, "id_component-1-planned_classes")
+    volume_entites_de_charges_pour_la_partie_magistrale = InputField(By.ID, "id_component-0-repartition_volume_requirement_entity")
+    volume_entites_de_charges_pour_la_partie_pratique = InputField(By.ID, "id_component-1-repartition_volume_requirement_entity")
     quadrimestre = SelectField(By.ID, "id_quadrimester")
     session_derogation = SelectField(By.ID, "id_session")
 
@@ -272,14 +278,14 @@ class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
 
     proposal_search = Link('SearchLearningUnitPage', By.ID, 'lnk_proposal_search', 1)
 
-    anac = SelectField(By.ID, 'id_academic_year_id')
+    anac = SelectField(By.ID, 'id_academic_year')
     acronym = InputField(By.ID, 'id_acronym')
     code = InputField(By.ID, 'id_acronym')
     tutor = InputField(By.ID, 'id_tutor')
     sigle_dossier = SelectField(By.ID, "id_entity_folder_id")
 
-    requirement_entity = InputField(By.ID, 'id_requirement_entity_acronym')
-    ent_charge = InputField(By.ID, 'id_requirement_entity_acronym')
+    requirement_entity = InputField(By.ID, 'id_requirement_entity')
+    ent_charge = InputField(By.ID, 'id_requirement_entity')
     container_type = SelectField(By.ID, 'id_container_type')
     clear_button = ButtonField(By.ID, 'btn_clear_filter')
 
@@ -305,11 +311,29 @@ class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
         '#modalConsolidate > div > div > div.modal-footer > button.btn.btn-primary', 4
     )
 
+    _results_selector = (By.CSS_SELECTOR, '#table_learning_units > tbody > tr')
+
+    class LearningUnitElement(pypom.Region):
+        acronym = CharField(By.CSS_SELECTOR, "td:nth-child(2)")
+        type = CharField(By.CSS_SELECTOR, "td:nth-child(4)")
+        requirement_entity = CharField(By.CSS_SELECTOR, "td:nth-child(6)")
+
+    class ProposalLearningUnitElement(pypom.Region):
+        acronym = CharField(By.CSS_SELECTOR, "td:nth-child(3)")
+
+    @property
+    def results(self):
+        return [self.LearningUnitElement(self, element) for element in self.find_elements(*self._results_selector)]
+
+    @property
+    def proposal_results(self):
+        return [self.ProposalLearningUnitElement(self, element) for element in self.find_elements(*self._results_selector)]
+
     def count_result(self):
         text = self.find_element(By.CSS_SELECTOR, "#main > div.panel.panel-default > div > strong").text
         return text.split()[0]
 
-    def find_acronym_in_table(self, row: int=1):
+    def find_acronym_in_table(self, row: int = 1):
         selector = '#table_learning_units > tbody > tr:nth-child({}) > td.col-acronym > a'.format(row)
         return self.find_element(By.CSS_SELECTOR, selector).text
 
@@ -383,9 +407,9 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
     def rigth_click_node_tree(self, acronym, parent=None):
         node = self.find_node_tree_by_acronym(acronym, parent)
 
-        actionChains = ActionChains(self.driver)
+        action_chains = ActionChains(self.driver)
         child = node.find_element(By.CSS_SELECTOR, 'a')
-        actionChains.context_click(child).perform()
+        action_cains.context_click(child).perform()
         return child
 
     def attach_node_tree(self, acronym, parent=None):
@@ -461,7 +485,7 @@ class SearchEntityPage(CommonPageMixin, pypom.Page):
 
     search = ButtonField(By.ID, "bt_submit_entity_search")
 
-    def find_acronym_in_table(self, row: int=1):
+    def find_acronym_in_table(self, row: int = 1):
         return self.find_element(By.ID, 'td_entity_%d' % row).text
 
 
@@ -475,7 +499,7 @@ class SearchOrganizationPage(CommonPageMixin, pypom.Page):
 
     search = ButtonField(By.ID, "bt_submit_organization_search")
 
-    def find_acronym_in_table(self, row: int=1):
+    def find_acronym_in_table(self, row: int = 1):
         return self.find_element(By.ID, 'td_organization_%d' % row).text
 
 
@@ -488,7 +512,7 @@ class SearchStudentPage(CommonPageMixin, pypom.Page):
 
     search = ButtonField(By.ID, "bt_submit_student_search")
 
-    def find_registration_id_in_table(self, row: int=1):
+    def find_registration_id_in_table(self, row: int = 1):
         return self.find_element(By.ID, 'td_student_%d' % row).text
 
     def find_name_in_table(self):

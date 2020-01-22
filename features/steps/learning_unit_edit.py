@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
 import time
 from datetime import datetime, timedelta
 
@@ -32,9 +33,13 @@ from selenium.webdriver.common.by import By
 from waffle.models import Flag
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.campus import Campus
+from base.models.entity_version import EntityVersion
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES, FACULTY
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person_entity import PersonEntity
 from features.steps.utils.pages import LearningUnitPage
 
 use_step_matcher("parse")
@@ -53,6 +58,58 @@ def step_impl(context: Context):
 @given("Aller sur la page de detail de l'ue: {acronym} en {year}")
 def step_impl(context: Context, acronym: str, year: str):
     luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=int(year[:4]))
+    url = reverse('learning_unit', args=[luy.pk])
+
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+
+@given("Aller sur la page de detail de l'ue: {acronym}")
+def step_impl(context: Context, acronym: str):
+    year = current_academic_year().year + 1
+    luy = LearningUnitYear.objects.get(acronym=acronym)
+    url = reverse('learning_unit', args=[luy.pk])
+
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@given("Aller sur la page de detail d'une UE ne faisant pas partie de la faculté")
+def step_impl(context: Context):
+    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
+    entities = [ev.entity for ev in entities_version]
+    luy = LearningUnitYear.objects.exclude(learning_container_year__requirement_entity__in=entities).order_by("?")[0]
+    url = reverse('learning_unit', args=[luy.pk])
+
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@given("Aller sur la page de detail d'une UE faisant partie de la faculté")
+def step_impl(context: Context):
+    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
+    entities = [ev.entity for ev in entities_version]
+    luy = LearningUnitYear.objects.filter(
+        learning_container_year__requirement_entity__in=entities,
+        academic_year=current_academic_year()
+    ).order_by("?")[0]
+    context.learning_unit_year = luy
+    url = reverse('learning_unit', args=[luy.pk])
+
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@given("Aller sur la page de detail d'une UE faisant partie de la faculté l'année suivante")
+def step_impl(context: Context):
+    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
+    entities = [ev.entity for ev in entities_version]
+    luy = LearningUnitYear.objects.filter(
+        learning_container_year__requirement_entity__in=entities,
+        academic_year__year=current_academic_year().year + 1
+    ).order_by("?")[0]
+    context.learning_unit_year = luy
     url = reverse('learning_unit', args=[luy.pk])
 
     context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
@@ -84,6 +141,53 @@ def step_impl(context: Context, value: str, field: str):
         setattr(context.current_page, slug_field, value)
     else:
         raise AttributeError(context.current_page.__class__.__name__ + " has no " + slug_field)
+
+
+
+@step("Encoder année suivante")
+def step_impl(context: Context):
+    year = current_academic_year().year + 1
+    context.current_page.anac = str(AcademicYear.objects.get(year=year))
+
+
+@step("Encoder Anac de fin supérieure")
+def step_impl(context: Context):
+    current_acy = current_academic_year()
+    academic_year = AcademicYear.objects.filter(year__gt=current_acy.year, year__lt=current_acy.year+6).order_by("?")[0]
+    context.anac = academic_year
+    context.current_page.anac_de_fin = str(academic_year)
+
+
+@step("Encoder Dossier")
+def step_impl(context: Context):
+    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
+    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
+    random_entity_version = random.choice(faculties)
+    value = "{}12".format(random_entity_version.acronym)
+    context.current_page.dossier = value
+
+
+@step("Encoder Lieu d’enseignement")
+def step_impl(context: Context):
+    random_campus = Campus.objects.all().order_by("?")[0]
+    context.current_page.lieu_denseignement = random_campus.id
+
+
+@step("Encoder Entité resp. cahier des charges")
+def step_impl(context: Context):
+    ev = EntityVersion.objects.get(entity__personentity__person=context.user.person)
+    entities_version = [ev] + list(ev.descendants)
+    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
+    random_entity_version = random.choice(faculties)
+    context.current_page.entite_resp_cahier_des_charges = random_entity_version.acronym
+
+
+@step("Encoder Entité d’attribution")
+def step_impl(context: Context):
+    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
+    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
+    random_entity_version = random.choice(faculties)
+    context.current_page.entite_dattribution = random_entity_version.acronym
 
 
 @step("Cliquer sur le bouton « Enregistrer »")
@@ -176,6 +280,18 @@ def step_impl(context, value):
     context.test.assertEqual(context.current_page.find_element(By.ID, "id_periodicity").text, value)
 
 
+@step("Rechercher la même UE dans une année supérieure")
+def step_impl(context: Context):
+    luy = LearningUnitYear.objects.filter(
+        learning_unit=context.learning_unit_year.learning_unit,
+        academic_year__year__gt=context.learning_unit_year.academic_year.year
+    ).first()
+    url = reverse('learning_unit', args=[luy.pk])
+
+    context.current_page = LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
 @step("Rechercher {acronym} en 2020-21")
 def step_impl(context, acronym):
     luy = LearningUnitYear.objects.get(acronym=acronym, academic_year__year=2020)
@@ -199,6 +315,15 @@ def step_impl(context, acronym: str):
     context.current_page.wait_for_page_to_load()
     for i in range(2019, 2025):
         string_to_check = "{} ({}-".format(acronym, i)
+        context.test.assertIn(string_to_check, context.current_page.success_messages.text)
+
+
+@then("Vérifier que le partim a bien été créé de 2019-20 à 2024-25.")
+def step_impl(context):
+    context.current_page = LearningUnitPage(context.browser, context.browser.current_url)
+    context.current_page.wait_for_page_to_load()
+    for i in range(2019, 2021):
+        string_to_check = "{}3 ({}-".format(context.learning_unit_year.acronym, i)
         context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
 
@@ -226,13 +351,10 @@ def step_impl(context: Context):
 
 
 @step("les flags d'éditions des UEs sont désactivés.")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    flag = Flag.objects.get(name='learning_achievement_update')
-    flag.authenticated = True
-    flag.save()
+def step_impl(context: Context):
+    Flag.objects.update_or_create(name='learning_achievement_update', defaults={"authenticated": True})
+    Flag.objects.update_or_create(name='learning_unit_create', defaults={"authenticated": True})
+    Flag.objects.update_or_create(name='learning_unit_proposal_create', defaults={"authenticated": True})
 
 
 @step("Cliquer sur le menu Proposition de création")
@@ -303,7 +425,7 @@ def step_impl(context):
     """
     context.current_page.find_element(
         By.CSS_SELECTOR,
-        '#table_learning_units > tbody > tr:nth-child(1) > td.sorting_1 > input'
+        '#table_learning_units > tbody > tr:nth-child(1) > td:nth-child(1) > input'
     ).click()
     time.sleep(1)
 

@@ -189,12 +189,6 @@ def step_impl(context: Context):
     context.test.assertTrue(os.path.exists(full_path), full_path)
 
 
-@when("suspend")
-def step_impl(context: Context):
-    import time
-    time.sleep(10)
-
-
 def update_xlsx(filename):
     wb = load_workbook(filename)
 
