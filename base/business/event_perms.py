@@ -89,9 +89,9 @@ class EventPerm(ABC):
     def get_academic_years_ids(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
         qs = cls.get_open_academic_calendars_queryset()
         if min_academic_y:
-            qs = qs.filter(data_year__gte=min_academic_y)
+            qs = qs.filter(data_year__year__gte=min_academic_y)
         if max_academic_y:
-            qs = qs.filter(data_year__lte=max_academic_y)
+            qs = qs.filter(data_year__year__lte=max_academic_y)
         return qs.values_list('data_year', flat=True)
 
 
