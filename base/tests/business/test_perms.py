@@ -36,15 +36,14 @@ from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    generate_modification_transformation_proposal_calendars
+from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
+    generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, \
     create_past_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -90,24 +89,8 @@ class PermsTestCase(TestCase):
             subtype=FULL,
             learning_unit=LearningUnitFactory(start_year=create_past_academic_year(), end_year=cls.academic_yr)
         )
-        AcademicCalendarFactory(
-            data_year=cls.academic_yr,
-            start_date=datetime.datetime(cls.academic_yr.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.academic_yr.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
-        AcademicCalendarFactory(
-            data_year=cls.academic_yr_1,
-            start_date=datetime.datetime(cls.academic_yr.year - 1, 9, 15),
-            end_date=datetime.datetime(cls.academic_yr.year + 2, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
-        AcademicCalendarFactory(
-            data_year=cls.academic_yr_2,
-            start_date=datetime.datetime(cls.academic_yr.year, 9, 15),
-            end_date=datetime.datetime(cls.academic_yr.year + 3, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        academic_years = [cls.academic_yr, cls.academic_yr_1, cls.academic_yr_2]
+        generate_learning_unit_edition_calendars(academic_years)
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in ALL_TYPES:
@@ -578,25 +561,7 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.academic_years[LEARNING_UNIT_CREATION_SPAN_YEARS] = cls.current_acy
         cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
-
-        AcademicCalendarFactory(
-            data_year=cls.current_acy,
-            start_date=datetime.datetime(cls.current_acy.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.current_acy.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
-        AcademicCalendarFactory(
-            data_year=AcademicYear.objects.get(year=cls.current_acy.year + 1),
-            start_date=datetime.datetime(cls.current_acy.year - 1, 9, 15),
-            end_date=datetime.datetime(cls.current_acy.year + 2, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
-        AcademicCalendarFactory(
-            data_year=AcademicYear.objects.get(year=cls.current_acy.year + 2),
-            start_date=datetime.datetime(cls.current_acy.year, 9, 15),
-            end_date=datetime.datetime(cls.current_acy.year + 3, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
         cls.faculty_manager = FacultyManagerFactory()
         cls.central_manager = CentralManagerFactory()

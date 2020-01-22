@@ -349,7 +349,7 @@ def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person,
     business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
         (person.is_faculty_manager and learning_unit_year.learning_container_year)
 
-    calendar_check = event_perms.generate_event_perm_learning_unit_faculty_manager_edition(
+    calendar_check = event_perms.generate_event_perm_learning_unit_edition(
         person=person,
         obj=learning_unit_year,
         raise_exception=False
@@ -361,7 +361,7 @@ def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person,
 def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception):
     business_check = person.is_central_manager or learning_unit_year.learning_container_year
 
-    calendar_check = event_perms.generate_event_perm_learning_unit_faculty_manager_edition(
+    calendar_check = event_perms.generate_event_perm_learning_unit_edition(
         person=person,
         obj=learning_unit_year,
         raise_exception=False

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -43,15 +42,13 @@ from base.business.learning_units.perms import MSG_NO_ELIGIBLE_TO_MODIFY_END_DAT
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, is_valid_proposal, MSG_IS_NOT_A_PROPOSAL, \
     MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, \
     li_delete_all_lu
 from base.tests.business.test_perms import create_person_with_permission_and_group
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    generate_creation_or_end_date_proposal_calendars, generate_modification_transformation_proposal_calendars
+from base.tests.factories import academic_calendar as acad_calendar_factory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -95,8 +92,9 @@ class LearningUnitTagLiEditTest(TestCase):
         academic_years = [
             cls.current_academic_year, cls.next_academic_yr, anac_2, anac_3, anac_4, cls.later_academic_year
         ]
-        generate_creation_or_end_date_proposal_calendars(academic_years)
-        generate_modification_transformation_proposal_calendars(academic_years)
+        acad_calendar_factory.generate_creation_or_end_date_proposal_calendars(academic_years)
+        acad_calendar_factory.generate_modification_transformation_proposal_calendars(academic_years)
+        acad_calendar_factory.generate_learning_unit_edition_calendars(academic_years)
 
         cls.lcy = LearningContainerYearFactory(
             academic_year=cls.next_academic_yr,
@@ -224,12 +222,6 @@ class LearningUnitTagLiEditTest(TestCase):
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
         current_academic_yr = AcademicYear.objects.get(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
-        AcademicCalendarFactory(
-            data_year=current_academic_yr,
-            start_date=datetime.datetime(current_academic_yr.year - 2, 9, 15),
-            end_date=datetime.datetime(current_academic_yr.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
         learning_unit_year_without_proposal = LearningUnitYearFactory(
             academic_year=current_academic_yr,
         )
