@@ -40,3 +40,42 @@ class EducationGroupProgram:
         for link in node.children:
             self._save_children(link.child)
             link.save()
+
+    def get_node(self, path: str) -> Node:
+        """
+        Return the corresponding node based on identifier (path) generated at instantiate of tree
+        :param path: str
+        :return: Node
+        """
+        try:
+            return next(node for node in self.get_all_nodes() if node.path == path)
+        except StopIteration:
+            raise NodeNotFoundException
+
+    def get_all_nodes(self):
+        """
+        Return a flat list of all nodes which are in the tree
+        :return: list of Node
+        """
+        return [self.root_group] + nodes_from_root(self.root_group)
+
+    def add_node(self, node: Node, path: str = None, **kwargs):
+        """
+        Add a node to the tree
+        :param node: Node to add on the tree
+        :param path: [Optional] The position where the node must be added
+        """
+        parent = self.get_node(path) if path else self.root_group
+        parent.add_child(node, **kwargs)
+
+
+def nodes_from_root(root: Node):
+    nodes = [root]
+    for link in root.children:
+        nodes.extend(nodes_from_root(link.child))
+    return nodes
+
+
+class NodeNotFoundException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__("The node cannot be found on the current tree")

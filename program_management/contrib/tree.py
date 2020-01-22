@@ -1,3 +1,5 @@
+import copy
+
 from base.models.group_element_year import GroupElementYear
 from program_management.contrib.models import node, link
 from program_management.contrib.models.education_group_program import EducationGroupProgram
@@ -64,10 +66,13 @@ def __build_children(root, tree_structure, nodes, links):
     children = []
 
     for child_structure in [structure for structure in tree_structure if structure['parent_id'] == root.pk]:
-        child_node = nodes[child_structure['child_id']]
+        child_node = copy.deepcopy(nodes[child_structure['child_id']])
+        child_node.path = child_structure['path']
         child_node.children = __build_children(child_node, tree_structure, nodes, links)
 
-        link_node = links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
+        link_node = copy.deepcopy(
+            links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
+        )
         link_node.parent = root
         link_node.child = child_node
         children.append(link_node)

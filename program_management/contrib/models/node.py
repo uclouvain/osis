@@ -8,7 +8,7 @@ from program_management.models.enums import node_type
 class NodeFactory:
     def get_node(self, element: Element):
         node_cls = {
-            node_type.EDUCATION_GROUP: NodeEductionGroupYear,   # TODO: Remove when migration is done
+            node_type.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
             node_type.GROUP: NodeGroupYear,
             node_type.LEARNING_UNIT: NodeLearningUnitYear,
@@ -21,19 +21,21 @@ factory = NodeFactory()
 
 
 class Node(serializers.Serializer):
-    children = Link(read_only=True, many=True, default=list())
+    path = serializers.CharField(read_only=True, default='')
+    children = Link(many=True, default=list())
 
-    def add_child(self, node):
-        link_to_append = Link(parent=self, child=node)
-        self.children = Link(data=self.children.data + [link_to_append], many=True)
+    def add_child(self, node, **kwargs):
+        link_to_append = Link(parent=self, child=node, data=kwargs)
+        if link_to_append.is_valid():
+            self.children += [link_to_append]
 
     def __getattr__(self, attr):
         if attr in self.get_fields().keys():
-            return self.data[attr]
-        return super().__getattr__(attr)
+            return self[attr].value
+        return super().__getattribute__(attr)
 
 
-class NodeEductionGroupYear(Node):      # TODO: Remove when migration is done
+class NodeEducationGroupYear(Node):      # TODO: Remove when migration is done
     pk = serializers.IntegerField(read_only=True, source='education_group_year.pk')
     acronym = serializers.CharField(source='education_group_year.acronym')
     title = serializers.CharField(source='education_group_year.title')

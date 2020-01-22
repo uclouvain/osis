@@ -657,6 +657,7 @@ class TestManagerGetAdjacencyList(TestCase):
             'child_id': self.level_1.child_branch_id,
             'order': 0,
             'level': 0,
+            'path': "|".join([str(self.level_1.parent_id), str(self.level_1.child_branch_id)])
         }
         self.assertDictEqual(adjacency_list[0], expected_first_elem)
 

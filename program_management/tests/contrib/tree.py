@@ -53,9 +53,22 @@ class TestFetchTree(TestCase):
         education_group_program_tree = tree.fetch(self.root_node.education_group_year.pk)  #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
         self.assertIsInstance(education_group_program_tree, education_group_program.EducationGroupProgram)
 
-        self.assertIsInstance(education_group_program_tree.root_group, node.NodeEductionGroupYear)
+        self.assertIsInstance(education_group_program_tree.root_group, node.NodeEducationGroupYear)
         self.assertEqual(len(education_group_program_tree.root_group.children), 1)
         self.assertEqual(
             education_group_program_tree.root_group.children[0].child.acronym,
             self.link_level_1.child_branch.acronym
+        )
+
+    def test_case_ensure_path_id_is_correctly_set(self):
+        education_group_program_tree = tree.fetch(self.root_node.education_group_year.pk)
+        self.assertIsInstance(education_group_program_tree, education_group_program.EducationGroupProgram)
+
+        expected_path_id = "|".join([
+            str(self.root_node.education_group_year.pk),
+            str(self.link_level_1.child_branch.pk)
+        ])
+        self.assertEqual(
+            education_group_program_tree.root_group.children[0].child.path,
+            expected_path_id
         )

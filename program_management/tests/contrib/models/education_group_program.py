@@ -26,8 +26,10 @@
 from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from program_management.contrib import tree
 from program_management.contrib.models import node
-from program_management.contrib.models.education_group_program import EducationGroupProgram
+from program_management.contrib.models.education_group_program import EducationGroupProgram, NodeNotFoundException
 from program_management.contrib.models.node import Node
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
 
@@ -56,5 +58,44 @@ class TestCreateEducationGroupProgram(TestCase):
 
         self.assertEquals(GroupElementYear.objects.all().count(), 0)
 
-    def test_create_education_group_program_ensure_links_are_correctly_saved(self):
-        pass
+
+class TestGetNodesEducationGroupProgram(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        root_node
+        |-link_1_lvl_1--- A
+                         |-link_1_lvl_2--- B
+        |-link_2_lvl_1--- B
+
+        :return:
+        """
+        cls.root_node = ElementEducationGroupYearFactory()
+        cls.link_1_lvl_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)
+        cls.link_1_lvl_2 = GroupElementYearFactory(parent=cls.link_1_lvl_1.child_branch)
+
+        cls.link_1_lvl_2 = GroupElementYearFactory(
+            parent=cls.root_node.education_group_year,
+            child_branch=cls.link_1_lvl_2.child_branch
+        )
+
+    def setUp(self):
+        self.tree = tree.fetch(self.root_node.education_group_year_id)  # TODO:  Replace to root_node.pk when migration is done
+
+    def test_get_all_nodes_case_from_root_node(self):
+        all_nodes = self.tree.get_all_nodes()
+
+        self.assertIsInstance(all_nodes, list)
+        self.assertEquals(len(all_nodes), 5)
+
+    def test_get_specific_node_case_path_not_exist(self):
+        with self.assertRaises(NodeNotFoundException):
+            self.tree.get_node("dummy_path")
+
+    def test_get_specific_node_case_path_exist(self):
+        path = "|".join([str(self.link_1_lvl_1.parent_id), str(self.link_1_lvl_1.child_branch_id)])
+
+        node = self.tree.get_node(path)
+        self.assertEquals(node.pk, self.link_1_lvl_1.child_branch_id)
+        self.assertEquals(node.acronym, self.link_1_lvl_1.child_branch.acronym)
+

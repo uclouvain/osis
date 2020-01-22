@@ -115,7 +115,16 @@ class GroupElementYearManager(models.Manager):
                         child_leaf_id, 
                         parent_id, 
                         "order", 
-                        0 AS level
+                        0 AS level,
+                        CAST(parent_id || '|' || 
+                            ( 
+                                CASE 
+                                WHEN child_branch_id is not null 
+                                    THEN child_branch_id
+                                    ELSE child_leaf_id
+                                END
+                            ) as varchar(1000)
+                        ) As path
                     FROM base_groupelementyear
                     WHERE parent_id IN (%s)
                     
@@ -127,8 +136,17 @@ class GroupElementYearManager(models.Manager):
                            child.child_leaf_id,
                            child.parent_id,
                            child.order,
-                           parent.level + 1                           
-                
+                           parent.level + 1,
+                           CAST(
+                                parent.path || '|' || 
+                                    ( 
+                                        CASE 
+                                        WHEN child.child_branch_id is not null 
+                                            THEN child.child_branch_id
+                                            ELSE child.child_leaf_id
+                                        END
+                                    ) as varchar(1000)
+                               ) as path
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )            
@@ -148,6 +166,7 @@ class GroupElementYearManager(models.Manager):
                     'child_id': row[2] or row[3],
                     'order': row[5],
                     'level': row[6],
+                    'path': row[7],
                 } for row in cursor.fetchall()
             ]
 
