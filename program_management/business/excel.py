@@ -40,6 +40,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 
 from attribution.business import attribution_charge_new
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.business.learning_unit_xls import volume_information, annotate_qs, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
 from base.business.learning_units.xls_generator import hyperlinks_to_string, strip_tags
@@ -748,80 +749,18 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
     return data
 
 
-def _annotate_with_description_fiche_specifications(group_element_years, description_fiche=False, specifications=False):
-
+def _annotate_with_description_fiche_specifications(group_elt_yrs_param, description_fiche=False, specifications=False):
+    group_element_years = group_elt_yrs_param
     sq = TranslatedText.objects.filter(
         reference=OuterRef('child_leaf__pk'),
         entity=LEARNING_UNIT_YEAR)
     if description_fiche:
-        group_element_years = group_element_years.annotate(bibliography=Subquery(
-            sq.filter(
-                text_label__label='bibliography',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(online_resources=Subquery(
-            sq.filter(
-                text_label__label='online_resources',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(online_resources_en=Subquery(
-            sq.filter(
-                text_label__label='online_resources',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        )).annotate(resume=Subquery(
-            sq.filter(
-                text_label__label='resume',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(resume_en=Subquery(
-            sq.filter(
-                text_label__label='resume',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        )).annotate(teaching_methods=Subquery(
-            sq.filter(
-                text_label__label='teaching_methods',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(teaching_methods_en=Subquery(
-            sq.filter(
-                text_label__label='teaching_methods',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        )).annotate(evaluation_methods=Subquery(
-            sq.filter(
-                text_label__label='evaluation_methods',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(evaluation_methods_en=Subquery(
-            sq.filter(
-                text_label__label='evaluation_methods',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        )).annotate(other_informations=Subquery(
-            sq.filter(
-                text_label__label='other_informations',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(other_informations_en=Subquery(
-            sq.filter(
-                text_label__label='other_informations',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        )).annotate(mobility=Subquery(
-            sq.filter(
-                text_label__label='mobility',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        ))
+        annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
+        group_element_years = group_element_years.annotate(**annotations)
 
     if specifications:
-        group_element_years = group_element_years.annotate(prerequisite=Subquery(
-            sq.filter(
-                text_label__label='prerequisite',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(prerequisite_en=Subquery(
-            sq.filter(
-                text_label__label='prerequisite',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        )).annotate(themes_discussed=Subquery(
-            sq.filter(
-                text_label__label='themes_discussed',
-                language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        )).annotate(themes_discussed_en=Subquery(
-            sq.filter(
-                text_label__label='themes_discussed',
-                language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        ))
+        annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
+        group_element_years = group_element_years.annotate(**annotations)
 
     return group_element_years
 
@@ -910,3 +849,17 @@ def html_list_to_string(text):
     if converted_text == "":
         return strip_tags(text)
     return converted_text
+
+
+def build_annotations(sq: QuerySet, fr_labels: list, en_labels: list):
+    annotations = {label_fr: Subquery(
+        sq.filter(text_label__label=label_fr, language=settings.LANGUAGE_CODE_FR).values('text')[:1])
+        for label_fr in fr_labels}
+
+    annotations.update({
+        "{}_en".format(label_en): Subquery(
+            sq.filter(text_label__label="{}_en".format(label_en), language=settings.LANGUAGE_CODE_EN).values(
+                'text')[:1])
+        for label_en in en_labels}
+    )
+    return annotations
