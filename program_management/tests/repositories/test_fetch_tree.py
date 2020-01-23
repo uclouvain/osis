@@ -27,10 +27,10 @@ from django.test import TestCase
 
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from program_management.contrib import tree
-from program_management.contrib.models import node, education_group_program
+from program_management.domain import program_tree, node
 from program_management.models.element import Element
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
+from program_management.repositories import fetch_tree
 
 
 class TestFetchTree(TestCase):
@@ -47,28 +47,28 @@ class TestFetchTree(TestCase):
     def test_case_tree_root_not_exist(self):
         unknown_tree_root_id = -1
         with self.assertRaises(Element.DoesNotExist):
-            tree.fetch(unknown_tree_root_id)
+            fetch_tree.fetch(unknown_tree_root_id)
 
     def test_case_tree_root_with_multiple_level(self):
-        education_group_program_tree = tree.fetch(self.root_node.education_group_year.pk)  #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
-        self.assertIsInstance(education_group_program_tree, education_group_program.EducationGroupProgram)
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)  #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
+        self.assertIsInstance(education_group_program_tree, program_tree.ProgramTree)
 
-        self.assertIsInstance(education_group_program_tree.root_group, node.NodeEducationGroupYear)
-        self.assertEqual(len(education_group_program_tree.root_group.children), 1)
+        self.assertIsInstance(education_group_program_tree.root_node, node.NodeEducationGroupYear)
+        self.assertEqual(len(education_group_program_tree.root_node.children), 1)
         self.assertEqual(
-            education_group_program_tree.root_group.children[0].child.acronym,
+            education_group_program_tree.root_node.children[0].child.acronym,
             self.link_level_1.child_branch.acronym
         )
 
-    def test_case_ensure_path_id_is_correctly_set(self):
-        education_group_program_tree = tree.fetch(self.root_node.education_group_year.pk)
-        self.assertIsInstance(education_group_program_tree, education_group_program.EducationGroupProgram)
+    def test_case_ensure_path_is_correctly_set(self):
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+        self.assertIsInstance(education_group_program_tree,  program_tree.ProgramTree)
 
         expected_path_id = "|".join([
             str(self.root_node.education_group_year.pk),
             str(self.link_level_1.child_branch.pk)
         ])
         self.assertEqual(
-            education_group_program_tree.root_group.children[0].child.path,
+            education_group_program_tree.root_node.children[0].child.path,
             expected_path_id
         )

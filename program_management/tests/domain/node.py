@@ -23,3 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.test import TestCase
+
+from program_management.domain.node import NodeGroupYear, NodeLearningUnitYear
+
+
+class TestAddChildNode(TestCase):
+    def test_add_child_to_node(self):
+        group_year_node = NodeGroupYear(0, "LDROI200G", "Tronc commun", 2018)
+        learning_unit_year_node = NodeLearningUnitYear(2, "LDROI100", "Introduction", 2018)
+
+        group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
+        self.assertEquals(len(group_year_node.children), 1)
+
+        self.assertEquals(group_year_node.children[0].relative_credits, 5)
+        self.assertEquals(group_year_node.children[0].comment, 'Dummy comment')

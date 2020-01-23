@@ -23,59 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.contrib.models.node import Node
+from program_management.domain import node
 
 
-class EducationGroupProgram:
-    def __init__(self, root_group: Node):
-        if not isinstance(root_group, Node):
+class ProgramTree:
+    def __init__(self, root_node: node.Node):
+        if not isinstance(root_node, node.Node):
             raise Exception('root_group args must be an instance of Node')
-        self.root_group = root_group
+        self.root_node = root_node
 
-    def save(self):
-        if self.root_group is not None:
-            self._save_children(self.root_group)
-
-    def _save_children(self, node: Node):
-        for link in node.children:
-            self._save_children(link.child)
-            link.save()
-
-    def get_node(self, path: str) -> Node:
+    def get_node(self, path: str) -> node.Node:
         """
         Return the corresponding node based on identifier (path) generated at instantiate of tree
         :param path: str
         :return: Node
         """
         try:
-            return next(node for node in self.get_all_nodes() if node.path == path)
+            return next(n for n in self.get_all_nodes() if n.path == path)
         except StopIteration:
-            raise NodeNotFoundException
+            raise node.NodeNotFoundException
 
     def get_all_nodes(self):
         """
         Return a flat list of all nodes which are in the tree
         :return: list of Node
         """
-        return [self.root_group] + nodes_from_root(self.root_group)
+        return [self.root_node] + _nodes_from_root(self.root_node)
 
-    def add_node(self, node: Node, path: str = None, **kwargs):
+    def add_node(self, node: node.Node, path: str = None, **kwargs):
         """
         Add a node to the tree
         :param node: Node to add on the tree
         :param path: [Optional] The position where the node must be added
         """
-        parent = self.get_node(path) if path else self.root_group
+        parent = self.get_node(path) if path else self.root_node
         parent.add_child(node, **kwargs)
 
 
-def nodes_from_root(root: Node):
+def _nodes_from_root(root: node.Node):
     nodes = [root]
     for link in root.children:
-        nodes.extend(nodes_from_root(link.child))
+        nodes.extend(_nodes_from_root(link.child))
     return nodes
-
-
-class NodeNotFoundException(Exception):
-    def __init__(self, *args, **kwargs):
-        super().__init__("The node cannot be found on the current tree")

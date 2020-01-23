@@ -23,20 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
-
-from program_management.contrib.models.node import NodeGroupYear, NodeLearningUnitYear
 
 
-class TestAddChildNode(TestCase):
-    def test_add_child_to_node(self):
-        group_year_node = NodeGroupYear()
-        learning_unit_year_node = NodeLearningUnitYear()
-
-        group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
-        self.assertEquals(len(group_year_node.children), 1)
-
-        self.assertEquals(group_year_node.children[0].relative_credits, 5)
-        self.assertEquals(group_year_node.children[0].comment, 'Dummy comment')
+class LinkFactory:
+    def get_link(self, *args, **kwargs):
+        return Link(*args, **kwargs)
 
 
+factory = LinkFactory()
+
+
+class Link:
+    def __init__(self, parent, child, **kwargs):
+        self.parent = parent
+        self.child = child
+        self.relative_credits = kwargs.get('relative_credits')
+        self.min_credits = kwargs.get('min_credits')
+        self.max_credits = kwargs.get('max_credits')
+        self.is_mandatory = kwargs.get('is_mandatory')
+        self.block = kwargs.get('block')
+        self.comment = kwargs.get('comment')
+        self.comment_english = kwargs.get('comment_english')
+        self.own_comment = kwargs.get('own_comment')
+        self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
+        self.link_type = kwargs.get('link_type')
