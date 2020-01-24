@@ -48,7 +48,6 @@ from base.tests.business.test_perms import create_person_with_permission_and_gro
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -62,6 +61,7 @@ from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class LearningUnitYearDeletion(TestCase):

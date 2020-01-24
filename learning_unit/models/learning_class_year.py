@@ -40,7 +40,11 @@ only_letters_validator = RegexValidator(r'^[a-zA-Z]*$', _('Only letters are allo
 
 class LearningClassYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
+    learning_component_year = models.ForeignKey(
+        'base.LearningComponentYear',
+        on_delete=models.PROTECT,
+        related_name='class_componentyear'
+    )
     acronym = models.CharField(max_length=3, validators=[only_letters_validator])
     description = models.CharField(max_length=100, blank=True)
 
