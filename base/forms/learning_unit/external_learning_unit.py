@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
-from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm, ATTRIBUTION_READ_ONLY_FIELDS
+from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, LearningUnitPartimModelForm, \
     merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField, split_acronym, ExternalPartimAcronymField
@@ -319,7 +319,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
-        self.disable_fields(ATTRIBUTION_READ_ONLY_FIELDS)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
 
     @property
