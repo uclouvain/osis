@@ -129,8 +129,9 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
         new_academic_year = AcademicYear.objects.max_adjournment(delta=1)
 
     lu_parent = last_learning_unit_year.parent
-    if last_learning_unit_year.is_partim() and lu_parent and \
-            _get_actual_end_year(lu_parent.learning_unit).year < new_academic_year.year:
+    if last_learning_unit_year.is_partim() and lu_parent:
+        actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
+        if actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -579,14 +580,14 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
         "The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
         "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s"
     ) % {
-        'field': COMPONENT_DETAILS[field_diff].lower(),
-        'acronym': current_component.learning_unit_year.acronym,
-        'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
-        'year': current_component.learning_unit_year.academic_year,
-        'value': normalize_fraction(current_value) if current_value is not None else NO_DATA,
-        'next_year': next_year_component.learning_unit_year.academic_year,
-        'next_value': normalize_fraction(next_value) if next_value is not None else NO_DATA
-    }
+               'field': COMPONENT_DETAILS[field_diff].lower(),
+               'acronym': current_component.learning_unit_year.acronym,
+               'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
+               'year': current_component.learning_unit_year.academic_year,
+               'value': normalize_fraction(current_value) if current_value is not None else NO_DATA,
+               'next_year': next_year_component.learning_unit_year.academic_year,
+               'next_value': normalize_fraction(next_value) if next_value is not None else NO_DATA
+           }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):
