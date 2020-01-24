@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
-from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
+from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm, ATTRIBUTION_READ_ONLY_FIELDS
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, LearningUnitPartimModelForm, \
     merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField, split_acronym, ExternalPartimAcronymField
@@ -57,6 +57,11 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
         self.fields["container_type"].choices = ((EXTERNAL, _("External")),)
         self.fields['container_type'].disabled = True
         self.fields['container_type'].required = False
+
+        self.fields['type_declaration_vacant'].disabled = True
+        self.fields['type_declaration_vacant'].required = False
+        self.fields['is_vacant'].disabled = True
+        self.fields['is_vacant'].required = False
 
     @staticmethod
     def clean_container_type():
@@ -312,6 +317,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
+        self.disable_fields(ATTRIBUTION_READ_ONLY_FIELDS)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
 
     @property
