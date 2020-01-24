@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('learning_unit', '0001_initial'),
+        ('program_management', '0002_auto_20200124_2055'),
         ('base', '0497_auto_20200108_1213'),
     ]
 
