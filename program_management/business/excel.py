@@ -738,13 +738,13 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
         data.append(luy.complete_title_english)
     if optional_data_needed['has_language']:
         data.append(luy.language)
-    if optional_data_needed['has_description_fiche']:
-        description_fiche = _build_description_fiche_cols(luy, gey)
-        for k, v in zip(description_fiche._fields, description_fiche):
-            data.append(v)
     if optional_data_needed['has_specifications']:
         specifications_data = _build_specifications_cols(luy, gey)
         for k, v in zip(specifications_data._fields, specifications_data):
+            data.append(v)
+    if optional_data_needed['has_description_fiche']:
+        description_fiche = _build_description_fiche_cols(luy, gey)
+        for k, v in zip(description_fiche._fields, description_fiche):
             data.append(v)
     return data
 

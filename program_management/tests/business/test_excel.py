@@ -43,6 +43,10 @@ from base.tests.factories.tutor import TutorFactory
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
+    optional_header_for_required_entity, optional_header_for_active, optional_header_for_allocation_entity, \
+    optional_header_for_description_fiche, optional_header_for_english_title, optional_header_for_language, \
+    optional_header_for_periodicity, optional_header_for_quadrimester, optional_header_for_session_derogation, \
+    optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
     _build_validate_html_list_to_string, html_list_to_string
@@ -230,12 +234,30 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_header_lines_with_optional_titles(self):
-        custom_xls_form = CustomXlsForm({'proposition': 'on',
-                                         'credits': 'on',
-                                         'volume': 'on'})
+        custom_xls_form = CustomXlsForm({
+            'required_entity': 'on',
+            'allocation_entity': 'on',
+            'credits': 'on',
+            'periodicity': 'on',
+            'active': 'on',
+            'quadrimester': 'on',
+            'session_derogation': 'on',
+            'volume': 'on',
+            'teacher_list': 'on',
+            'proposition': 'on',
+            'english_title': 'on',
+            'language': 'on',
+            'specifications': 'on',
+            'description_fiche': 'on',
+        }
+        )
 
         expected_headers = \
-            FIX_TITLES + optional_header_for_credits + optional_header_for_volume + optional_header_for_proposition
+            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity +  \
+            optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
+            optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
+            optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
+            optional_header_for_language + optional_header_for_specifications + optional_header_for_description_fiche
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_get_attribution_line(self):
