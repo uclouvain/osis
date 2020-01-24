@@ -6,15 +6,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program_management', '0002_auto_20200124_2055'),
+        ('learning_unit', '0001_initial'),
         ('base', '0497_auto_20200108_1213'),
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='learningachievement',
-            options={'ordering': ('order',)},
-        ),
         migrations.DeleteModel(
             name='LearningClassYear',
         ),

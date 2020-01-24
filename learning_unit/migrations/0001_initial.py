@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('base', '0498_auto_20200124_2055'),
     ]
 
     operations = [
