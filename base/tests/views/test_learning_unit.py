@@ -656,7 +656,7 @@ class LearningUnitViewTestCase(TestCase):
 
         response = client.get(reverse("learning_unit", args=[learning_unit_year.id]))
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, self.access_denied)
+        self.assertTemplateUsed(response, "access_denied.html")
 
         a_user_without_perms.user_permissions.add(
             Permission.objects.get(codename='can_access_externallearningunityear'))
