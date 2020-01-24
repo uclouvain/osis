@@ -544,6 +544,9 @@ msgstr "a comme prérequis"
 msgid "has the following prerequisites"
 msgstr "a des prérequis"
 
+msgid "in English"
+msgstr "en anglais"
+
 msgid "is a prerequisite of"
 msgstr "est un prérequis de"
 

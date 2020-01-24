@@ -128,20 +128,20 @@ optional_header_for_quadrimester = [_('Quadrimester')]
 optional_header_for_session_derogation = [_('Session derogation')]
 optional_header_for_language = [_('Language')]
 optional_header_for_description_fiche = [
-    _('Content'), "{} EN".format(_('Content')),
-    _('Teaching methods'), "{} EN".format(_('Teaching methods')),
-    _('Evaluation methods'), "{} EN".format(_('Evaluation methods')),
-    _('Other informations'), "{} EN".format(_('Other informations')),
-    _('Online resources'), "{} EN".format(_('Online resources')),
+    _('Content'), "{} {}".format(_('Content'), _('in English')),
+    _('Teaching methods'), "{} {}".format(_('Teaching methods'), _('in English')),
+    _('Evaluation methods'), "{} {}".format(_('Evaluation methods'), _('in English')),
+    _('Other informations'), "{} {}".format(_('Other informations'), _('in English')),
+    _('Online resources'), "{} {}".format(_('Online resources'), _('in English')),
     _('Teaching material'),
     _('bibliography').title(),
     _('Mobility'),
 ]
 
 optional_header_for_specifications = [
-    _('Themes discussed'), "{} EN".format(_('Themes discussed')),
-    _('Pre-condition'), "{} EN".format(_('Pre-condition')),
-    _('Learning achievements'), "{} EN".format(_('Learning achievements')),
+    _('Themes discussed'), "{} {}".format(_('Themes discussed'), _('in English')),
+    _('Pre-condition'), "{} {}".format(_('Pre-condition'), _('in English')),
+    _('Learning achievements'), "{} {}".format(_('Learning achievements'), _('in English')),
 ]
 
 DescriptionFicheCols = namedtuple(
