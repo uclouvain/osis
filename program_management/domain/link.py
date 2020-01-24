@@ -40,8 +40,9 @@ class Link:
         self.relative_credits = kwargs.get('relative_credits')
         self.min_credits = kwargs.get('min_credits')
         self.max_credits = kwargs.get('max_credits')
-        self.is_mandatory = kwargs.get('is_mandatory')
+        self.is_mandatory = kwargs.get('is_mandatory') or False
         self.block = kwargs.get('block')
+        self.access_condition = kwargs.get('access_condition') or False
         self.comment = kwargs.get('comment')
         self.comment_english = kwargs.get('comment_english')
         self.own_comment = kwargs.get('own_comment')
