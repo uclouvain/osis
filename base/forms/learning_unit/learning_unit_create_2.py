@@ -55,7 +55,10 @@ FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year",
                                   "type_declaration_vacant",
                                   "is_vacant",
                                   "attribution_procedure"}
-PROPOSAL_READ_ONLY_FIELDS = {"container_type"}
+PROPOSAL_READ_ONLY_FIELDS = {"container_type",
+                             "type_declaration_vacant",
+                             "is_vacant",
+                             "attribution_procedure"}
 
 FACULTY_OPEN_FIELDS = {
     'quadrimester',
