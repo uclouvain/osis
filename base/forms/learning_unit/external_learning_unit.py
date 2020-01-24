@@ -93,6 +93,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             self.fields['academic_year'].empty_label = None
         else:
             self.data['acronym_0'] = self.instance.acronym[0]
+        self.fields['attribution_procedure'].disabled = True
+        self.fields['attribution_procedure'].required = False
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
