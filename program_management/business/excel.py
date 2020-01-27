@@ -59,8 +59,9 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY, COLORED_ROWS, ROW_HEIGHT
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
-from bs4 import BeautifulSoup
+
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -640,7 +641,7 @@ def _fix_data(gey: GroupElementYear, luy: LearningUnitYear):
     return data
 
 
-def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cells, row_height={}):
+def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cells, row_height=dict()):
     workbook = Workbook()
     worksheet_title = _clean_worksheet_title(_("List UE"))
     header, *content = [tuple(line) for line in excel_lines]
@@ -767,7 +768,7 @@ def _annotate_with_description_fiche_specifications(group_elt_yrs_param, descrip
 
 def _build_validate_html_list_to_string(value_param, method):
 
-    if method is None or method not in (html_list_to_string, hyperlinks_to_string):
+    if method is None or method not in (hyperlinks_to_string, html2text):
         return value_param.strip()
 
     if value_param:
@@ -793,10 +794,10 @@ def _build_specifications_cols(luy, gey):
         language__code=settings.LANGUAGE_CODE_EN[:2].upper()).order_by('order')
 
     return SpecificationsCols(
-        themes_discussed=_build_validate_html_list_to_string(gey.themes_discussed, html_list_to_string),
-        themes_discussed_en=_build_validate_html_list_to_string(gey.themes_discussed_en, html_list_to_string),
-        prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html_list_to_string),
-        prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html_list_to_string),
+        themes_discussed=_build_validate_html_list_to_string(gey.themes_discussed, html2text),
+        themes_discussed_en=_build_validate_html_list_to_string(gey.themes_discussed_en, html2text),
+        prerequisite=_build_validate_html_list_to_string(gey.prerequisite, html2text),
+        prerequisite_en=_build_validate_html_list_to_string(gey.prerequisite_en, html2text),
         achievements_fr=_build_achievements(achievements_fr),
         achievements_en=_build_achievements(achievements_en),
     )
@@ -808,7 +809,7 @@ def _build_achievements(achievements):
         if achievement.text and achievement.text.strip() != "":
             if achievement.code_name:
                 achievements_str += "{} -".format(achievement.code_name)
-            achievements_str += _build_validate_html_list_to_string(achievement.text, html_list_to_string).lstrip('\n')
+            achievements_str += _build_validate_html_list_to_string(achievement.text, html2text).lstrip('\n')
             achievements_str += '\n'
     return achievements_str.rstrip('\n')
 
@@ -816,39 +817,24 @@ def _build_achievements(achievements):
 def _build_description_fiche_cols(luy, gey):
     teaching_materials = TeachingMaterial.objects.filter(learning_unit_year_id=luy.id).order_by('order')
     return DescriptionFicheCols(
-        resume=_build_validate_html_list_to_string(gey.resume, html_list_to_string),
-        resume_en=_build_validate_html_list_to_string(gey.resume_en, html_list_to_string),
-        teaching_methods=_build_validate_html_list_to_string(gey.teaching_methods, html_list_to_string),
-        teaching_methods_en=_build_validate_html_list_to_string(gey.teaching_methods_en, html_list_to_string),
-        evaluation_methods=_build_validate_html_list_to_string(gey.evaluation_methods, html_list_to_string),
-        evaluation_methods_en=_build_validate_html_list_to_string(gey.evaluation_methods_en, html_list_to_string),
-        other_informations=_build_validate_html_list_to_string(gey.other_informations, html_list_to_string),
-        other_informations_en=_build_validate_html_list_to_string(gey.other_informations_en, html_list_to_string),
+        resume=_build_validate_html_list_to_string(gey.resume, html2text),
+        resume_en=_build_validate_html_list_to_string(gey.resume_en, html2text),
+        teaching_methods=_build_validate_html_list_to_string(gey.teaching_methods, html2text),
+        teaching_methods_en=_build_validate_html_list_to_string(gey.teaching_methods_en, html2text),
+        evaluation_methods=_build_validate_html_list_to_string(gey.evaluation_methods, html2text),
+        evaluation_methods_en=_build_validate_html_list_to_string(gey.evaluation_methods_en, html2text),
+        other_informations=_build_validate_html_list_to_string(gey.other_informations, html2text),
+        other_informations_en=_build_validate_html_list_to_string(gey.other_informations_en, html2text),
         online_resources=_build_validate_html_list_to_string(gey.online_resources, hyperlinks_to_string),
         online_resources_en=_build_validate_html_list_to_string(gey.online_resources_en, hyperlinks_to_string),
         teaching_materials=_build_validate_html_list_to_string(
-            '\n'.join("{} - {}".format(_('Mandatory') if a.mandatory else _('Non-mandatory'), a.title)
-                      for a in teaching_materials),
-            html_list_to_string
+            ''.join("<p>{} - {}</p>".format(_('Mandatory') if a.mandatory else _('Non-mandatory'), a.title)
+                    for a in teaching_materials),
+            html2text
         ),
-        bibliography=_build_validate_html_list_to_string(gey.bibliography, html_list_to_string),
-        mobility=_build_validate_html_list_to_string(gey.mobility, html_list_to_string)
+        bibliography=_build_validate_html_list_to_string(gey.bibliography, html2text),
+        mobility=_build_validate_html_list_to_string(gey.mobility, html2text)
     )
-
-
-def html_list_to_string(text):
-    converted_text = ""
-    soup = BeautifulSoup(text, "html5lib")
-    for element in soup.find_all(['ul', 'ol', 'li', 'p', 'div']):
-        if element.name in ['ul', 'ol', 'p', 'div']:
-            converted_text += "\n" if converted_text != "" else ""
-        if element.name in ['li', 'p', 'div']:
-            converted_text += "{}\n".format(element.get_text())
-
-    # strip tags when no list has been found
-    if converted_text == "":
-        return strip_tags(text)
-    return converted_text
 
 
 def build_annotations(sq: QuerySet, fr_labels: list, en_labels: list):
