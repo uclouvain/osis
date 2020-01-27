@@ -1,3 +1,4 @@
+from abc import ABC
 from enum import Enum
 from typing import List
 
@@ -16,7 +17,7 @@ class BusinessValidationMessage:
     level: MessageLevel = None
 
 
-class BusinessValidationMixin:
+class BusinessValidator(ABC):
 
     _messages: List[BusinessValidationMessage] = None
 
@@ -27,8 +28,20 @@ class BusinessValidationMixin:
     def messages(self) -> List[BusinessValidationMessage]:
         return self._messages
 
+    @property
+    def error_messages(self) -> List[BusinessValidationMessage]:
+        return [msg for msg in self.messages if msg.level == MessageLevel.ERROR]
+
+    @property
+    def warning_messages(self) -> List[BusinessValidationMessage]:
+        return [msg for msg in self.messages if msg.level == MessageLevel.WARNING]
+
+    @property
+    def success_messages(self):
+        return [msg for msg in self.messages if msg.level == MessageLevel.SUCCESS]
+
     def is_valid(self) -> bool:
-        return True
+        return not self.error_messages
 
     def add_message(self, msg: BusinessValidationMessage):
         self._messages.append(msg)
