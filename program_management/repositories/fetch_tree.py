@@ -52,7 +52,6 @@ def fetch(tree_root_id) -> ProgramTree:
 
 
 def __fetch_tree_nodes(tree_structure):
-    """ This version is temporary see function above as definitive one"""
     ids = [link['id'] for link in tree_structure]
     group_element_year_qs = GroupElementYear.objects.filter(pk__in=ids).annotate(
         node_id=Case(
@@ -131,7 +130,6 @@ def __build_children(root, tree_structure, nodes, links):
 
     for child_structure in [structure for structure in tree_structure if structure['parent_id'] == root.pk]:
         child_node = copy.deepcopy(nodes[child_structure['child_id']])
-        child_node.path = child_structure['path']
         child_node.children = __build_children(child_node, tree_structure, nodes, links)
 
         link_node = copy.deepcopy(

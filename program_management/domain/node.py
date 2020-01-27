@@ -45,9 +45,8 @@ factory = NodeFactory()
 
 
 class Node:
-    def __init__(self, node_id: int, path: str = None, children: List[Link] = None):
+    def __init__(self, node_id: int, children: List[Link] = None):
         self.node_id = node_id
-        self.path = path
         if children is None:
             children = []
         self.children = children
@@ -60,34 +59,52 @@ class Node:
     def pk(self):
         return self.node_id
 
+    @property
+    def descendents(self):
+        return _get_descendents(self)
+
+
+def _get_descendents(root_node: Node, current_path: str = None):
+    _descendents = {}
+    if current_path is None:
+        current_path = str(root_node.pk)
+
+    for link in root_node.children:
+        child_path = "|".join([current_path, str(link.child.pk)])
+        _descendents = {
+            **{child_path: link.child},
+            **_get_descendents(link.child, current_path=child_path)
+        }
+    return _descendents
+
 
 class NodeEducationGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, path: str = None, children: List[Link] = None):
-        super().__init__(node_id, path, children)
+    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None):
+        super().__init__(node_id, children)
         self.acronym = acronym
         self.title = title
         self.year = year
 
 
 class NodeGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, path: str = None, children: List[Link] = None):
-        super().__init__(node_id, path, children)
+    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None):
+        super().__init__(node_id, children)
         self.acronym = acronym
         self.title = title
         self.year = year
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, path: str = None, children: List[Link] = None):
-        super().__init__(node_id, path, children)
+    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None):
+        super().__init__(node_id, children)
         self.acronym = acronym
         self.title = title
         self.year = year
 
 
 class NodeLearningClassYear(Node):
-    def __init__(self, node_id: int, year, path: str, children: List[Link] = None):
-        super().__init__(node_id, path, children)
+    def __init__(self, node_id: int, year, children: List[Link] = None):
+        super().__init__(node_id, children)
         self.year = year
 
 

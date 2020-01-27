@@ -39,8 +39,8 @@ class ProgramTree:
         :return: Node
         """
         try:
-            return next(n for n in self.get_all_nodes() if n.path == path)
-        except StopIteration:
+            return self.root_node.descendents[path]
+        except KeyError:
             raise node.NodeNotFoundException
 
     def get_all_nodes(self):

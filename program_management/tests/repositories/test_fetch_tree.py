@@ -59,16 +59,3 @@ class TestFetchTree(TestCase):
             education_group_program_tree.root_node.children[0].child.acronym,
             self.link_level_1.child_branch.acronym
         )
-
-    def test_case_ensure_path_is_correctly_set(self):
-        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
-        self.assertIsInstance(education_group_program_tree,  program_tree.ProgramTree)
-
-        expected_path_id = "|".join([
-            str(self.root_node.education_group_year.pk),
-            str(self.link_level_1.child_branch.pk)
-        ])
-        self.assertEqual(
-            education_group_program_tree.root_node.children[0].child.path,
-            expected_path_id
-        )
