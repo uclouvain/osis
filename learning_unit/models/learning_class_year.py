@@ -27,10 +27,10 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models import osis_model_admin
 
 
-class LearningClassYearAdmin(OsisModelAdmin):
+class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym')
     search_fields = ['acronym']
 
