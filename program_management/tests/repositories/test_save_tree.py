@@ -67,16 +67,28 @@ class TestSaveTree(TestCase):
 
         save_tree.save(tree)
 
-        self.assertTrue(GroupElementYear.objects.all().count(), 3)
+        self.assertEquals(GroupElementYear.objects.all().count(), 2)
 
     def test_case_tree_save_with_some_existing_part(self):
         self.root_node.add_child(self.common_core_node)
         tree = ProgramTree(self.root_node)
 
         save_tree.save(tree)
-        self.assertTrue(GroupElementYear.objects.all().count(), 2)
+        self.assertEquals(GroupElementYear.objects.all().count(), 1)
 
         # Append UE to common core
         self.common_core_node.add_child(self.learning_unit_year_node)
         save_tree.save(tree)
-        self.assertTrue(GroupElementYear.objects.all().count(), 3)
+        self.assertEquals(GroupElementYear.objects.all().count(), 2)
+
+    def test_case_tree_save_after_detach_element(self):
+        self.root_node.add_child(self.common_core_node)
+        tree = ProgramTree(self.root_node)
+
+        save_tree.save(tree)
+        self.assertEquals(GroupElementYear.objects.all().count(), 1)
+
+        path_to_detach = "|".join([str(self.root_node.pk), str(self.common_core_node.pk)])
+        tree.detach_node(path_to_detach)
+        save_tree.save(tree)
+        self.assertEquals(GroupElementYear.objects.all().count(), 0)

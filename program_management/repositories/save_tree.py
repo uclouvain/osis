@@ -23,19 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Q
+
 from base.models.group_element_year import GroupElementYear
 from program_management.domain import program_tree
 from program_management.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
 
 
 def save(tree: program_tree.ProgramTree) -> None:
-    return _save_links(tree.root_node)
+    _update_or_create_links(tree.root_node)
+    _delete_links(tree.root_node)
 
 
-def _save_links(node: Node):
+def _update_or_create_links(node: Node):
     for link in node.children:
-        _save_links(link.child)
-
         # methode update_or_create doesn't work with outer-join on PostgreSQL
         group_element_year, _ = GroupElementYear.objects.get_or_create(
             parent_id=link.parent.pk,
@@ -54,3 +55,16 @@ def _save_links(node: Node):
         group_element_year.quadrimester_derogation = link.quadrimester_derogation
         group_element_year.link_type = link.link_type
         group_element_year.save()
+
+        _update_or_create_links(link.child)
+
+
+def _delete_links(node: Node):
+    child_ids = [link.child.pk for link in node.children]
+
+    GroupElementYear.objects.filter(parent_id=node.pk).exclude(
+        Q(child_branch_id__in=child_ids) | Q(child_leaf_id__in=child_ids)   # TODO: Quick fix before migration
+    ).delete()
+
+    for link in node.children:
+        _delete_links(link.child)

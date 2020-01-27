@@ -34,12 +34,15 @@ class ProgramTree:
 
     def get_node(self, path: str) -> node.Node:
         """
-        Return the corresponding node based on identifier (path) generated at instantiate of tree
+        Return the corresponding node based on path of tree
         :param path: str
         :return: Node
         """
         try:
-            return self.root_node.descendents[path]
+            return {
+                str(self.root_node.pk): self.root_node,
+                **self.root_node.descendents
+            }[path]
         except KeyError:
             raise node.NodeNotFoundException
 
