@@ -43,14 +43,19 @@ from base.tests.factories.tutor import TutorFactory
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
+    optional_header_for_required_entity, optional_header_for_active, optional_header_for_allocation_entity, \
+    optional_header_for_description_fiche, optional_header_for_english_title, optional_header_for_language, \
+    optional_header_for_periodicity, optional_header_for_quadrimester, optional_header_for_session_derogation, \
+    optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, html_list_to_string
+    _build_validate_html_list_to_string
 from program_management.forms.custom_xls import CustomXlsForm
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from openpyxl.styles import Style, Font
 from program_management.business.excel import EducationGroupYearLearningUnitsContainedToExcel
+from program_management.business.utils import html2text
 from unittest import mock
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -61,7 +66,7 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
 CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                    'Les différentes structures moléculaires\n'
+                                    'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
 CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
@@ -230,12 +235,30 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_header_lines_with_optional_titles(self):
-        custom_xls_form = CustomXlsForm({'proposition': 'on',
-                                         'credits': 'on',
-                                         'volume': 'on'})
+        custom_xls_form = CustomXlsForm({
+            'required_entity': 'on',
+            'allocation_entity': 'on',
+            'credits': 'on',
+            'periodicity': 'on',
+            'active': 'on',
+            'quadrimester': 'on',
+            'session_derogation': 'on',
+            'volume': 'on',
+            'teacher_list': 'on',
+            'proposition': 'on',
+            'english_title': 'on',
+            'language': 'on',
+            'specifications': 'on',
+            'description_fiche': 'on',
+        }
+        )
 
         expected_headers = \
-            FIX_TITLES + optional_header_for_credits + optional_header_for_volume + optional_header_for_proposition
+            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity +  \
+            optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
+            optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
+            optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
+            optional_header_for_language + optional_header_for_specifications + optional_header_for_description_fiche
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_get_attribution_line(self):
@@ -482,7 +505,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         achievement_1_fr = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_fr)
         achievement_2_fr = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_fr)
         achievement_1_en = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en)
-        achievement_2_en = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en)
+        LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en, text="    ")
+        LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en, text="    ", code_name=None)
 
         initialize_cms_specifications_data_description_fiche(self.gey)
         specifications_data = _build_specifications_cols(self.luy, self.gey)
@@ -491,21 +515,19 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(specifications_data.prerequisite_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
         self.assertEqual(specifications_data.themes_discussed, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
         self.assertEqual(specifications_data.themes_discussed_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
-
         self.assertEqual(specifications_data.achievements_fr, "{} -{}\n{} -{}".format(
             achievement_1_fr.code_name, achievement_1_fr.text,
             achievement_2_fr.code_name, achievement_2_fr.text)
                          )
-        self.assertEqual(specifications_data.achievements_en, "{} -{}\n{} -{}".format(
-            achievement_1_en.code_name, achievement_1_en.text,
-            achievement_2_en.code_name, achievement_2_en.text)
+        self.assertEqual(specifications_data.achievements_en, "{} -{}".format(
+            achievement_1_en.code_name, achievement_1_en.text)
                          )
 
     def test_build_validate_html_list_to_string(self):
-        self.assertEqual(_build_validate_html_list_to_string(None, html_list_to_string), "")
+        self.assertEqual(_build_validate_html_list_to_string(None, html2text), "")
 
     def test_build_validate_html_list_to_string_illegal_character(self):
-        self.assertEqual(_build_validate_html_list_to_string("", html_list_to_string),
+        self.assertEqual(_build_validate_html_list_to_string("", html2text),
                          "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING')))
 
     def test_build_validate_html_list_to_string_wrong_method(self):
@@ -525,13 +547,22 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertDictEqual(data.get('row_height'), {'height': 30, 'start': 2, 'stop': 4})
 
     def test_html_list_to_string(self):
-        ch = '''<ul>
+        ch = '''<head></head>
+                <body>
+                <style type="text/css"></style>
+                <ul>
                     <li>Cfr. Student corner</li>
                 </ul>            
-                <p>Cfr. Syllabus</p>            
+                <p>Cfr. Syllabus</p>
+                <script>alert('coucou');</script>    
+                </body>        
                 '''
-        expected = "Cfr. Student corner\n\nCfr. Syllabus\n"
-        self.assertEqual(html_list_to_string(html.unescape(ch)), expected)
+        expected = "Cfr. Student corner\nCfr. Syllabus"
+        self.assertEqual(html2text(html.unescape(ch)), expected)
+
+    def test_convert(self):
+        res = html2text(html.unescape("<p>Introduire aux m&eacute;thodes d&#39;analyse</p>"))
+        self.assertEqual(res, "Introduire aux méthodes d'analyse")
 
 
 def get_expected_data(gey, luy):

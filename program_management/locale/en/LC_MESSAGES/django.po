@@ -481,6 +481,9 @@ msgstr ""
 msgid "has the following prerequisites"
 msgstr ""
 
+msgid "in English"
+msgstr ""
+
 msgid "is a prerequisite of"
 msgstr ""
 
