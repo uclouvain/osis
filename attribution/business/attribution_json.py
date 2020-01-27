@@ -118,7 +118,7 @@ def _split_attribution_by_learning_unit_year(attribution):
                 'is_substitute': bool(attribution.substitute)
         }).update({
             allocation_charge_key: str(attrib_charge.allocation_charge) if attrib_charge.allocation_charge is not None
-            else None
+            else '0.0'
         })
 
     return attribution_splitted.values()

@@ -115,7 +115,7 @@ class AttributionJsonTest(TestCase):
         self.assertEqual(attrib_tutor_2['attributions'][0]['acronym'], "LBIR1210B")
         self.assertEqual(attrib_tutor_2['attributions'][0]['function'], function.CO_HOLDER)
         self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.LECTURING], "7.5")
-        self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.PRACTICAL_EXERCISES], None)
+        self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.PRACTICAL_EXERCISES], "0.0")
 
     def test_learning_unit_in_charge_false(self):
         self.l_container.in_charge = False
