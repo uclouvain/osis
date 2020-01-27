@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
-from unittest import mock
+from unittest import mock, skip
 
 from django.contrib.auth.models import Group
 from django.test import TestCase
@@ -343,6 +343,7 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
         learning_units = {learning_unit_year.learning_unit for learning_unit_year in form.save()}
         self.assertEqual(len(learning_units), 1)
 
+    @skip  # Due to disabling attribution field in forms
     def test_save_ensure_fields_to_not_postpone(self):
         # Update fields to not postpone for next learning unit year
         next_learning_unit_year = LearningUnitYear.objects.get(
