@@ -50,7 +50,7 @@ class ProgramTree:
         """
         return [self.root_node] + _nodes_from_root(self.root_node)
 
-    def add_node(self, node: node.Node, path: str = None, **kwargs):
+    def attach_node(self, node: node.Node, path: str = None, **kwargs):
         """
         Add a node to the tree
         :param node: Node to add on the tree
@@ -58,6 +58,18 @@ class ProgramTree:
         """
         parent = self.get_node(path) if path else self.root_node
         parent.add_child(node, **kwargs)
+
+    def detach_node(self, path: str):
+        """
+        Detach a node from tree
+        :param path: The path node to detach
+        :return:
+        """
+        parent_path, *node_id = path.rsplit('|', 1)
+        parent = self.get_node(parent_path)
+        if node_id is None:
+            raise Exception("You cannot detach root node")
+        parent.detach_child(node_id)
 
 
 def _nodes_from_root(root: node.Node):

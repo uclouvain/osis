@@ -51,10 +51,6 @@ class Node:
             children = []
         self.children = children
 
-    def add_child(self, node, **kwargs):
-        child = Link(parent=self, child=node, **kwargs)
-        self.children.append(child)
-
     @property
     def pk(self):
         return self.node_id
@@ -62,6 +58,13 @@ class Node:
     @property
     def descendents(self):
         return _get_descendents(self)
+
+    def add_child(self, node, **kwargs):
+        child = Link(parent=self, child=node, **kwargs)
+        self.children.append(child)
+
+    def detach_child(self, node_id):
+        self.children = [link for link in self.children if link.child.pk == node_id]
 
 
 def _get_descendents(root_node: Node, current_path: str = None):
