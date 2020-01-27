@@ -54,11 +54,18 @@ class TestGetNodeProgramTree(TestCase):
         with self.assertRaises(node.NodeNotFoundException):
             self.tree.get_node(path='dummy_path')
 
-    def test_get_node_case_valid_path(self):
+    def test_get_node_case_children_path(self):
         valid_path = "|".join([str(self.root_node.pk), str(self.subgroup_node.pk)])
         result_node = self.tree.get_node(path=valid_path)
 
         self.assertEquals(result_node.pk, self.subgroup_node.pk)
+
+    def test_get_node_case_root_node_path(self):
+        result_node = self.tree.get_node(path=str(self.root_node.pk))
+        self.assertEquals(
+            result_node.pk,
+            self.root_node.pk
+        )
 
 
 class TestAttachNodeProgramTree(TestCase):

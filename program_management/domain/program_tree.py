@@ -70,7 +70,7 @@ class ProgramTree:
         """
         parent_path, *node_id = path.rsplit('|', 1)
         parent = self.get_node(parent_path)
-        if node_id is None:
+        if not node_id:
             raise Exception("You cannot detach root node")
         parent.detach_child(node_id)
 
