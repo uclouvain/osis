@@ -44,10 +44,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models.language import Language
 
-ATTRIBUTION_READ_ONLY_FIELDS = {"type_declaration_vacant",
-                                "is_vacant",
-                                "attribution_procedure"}
-
 FULL_READ_ONLY_FIELDS = {"acronym",
                          "academic_year",
                          "container_type",
