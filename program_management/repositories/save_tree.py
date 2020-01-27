@@ -31,11 +31,11 @@ from program_management.domain.node import Node, NodeEducationGroupYear, NodeLea
 
 
 def save(tree: program_tree.ProgramTree) -> None:
-    _update_or_create_links(tree.root_node)
-    _delete_links(tree.root_node)
+    __update_or_create_links(tree.root_node)
+    __delete_links(tree.root_node)
 
 
-def _update_or_create_links(node: Node):
+def __update_or_create_links(node: Node):
     for link in node.children:
         # methode update_or_create doesn't work with outer-join on PostgreSQL
         group_element_year, _ = GroupElementYear.objects.get_or_create(
@@ -56,10 +56,10 @@ def _update_or_create_links(node: Node):
         group_element_year.link_type = link.link_type
         group_element_year.save()
 
-        _update_or_create_links(link.child)
+        __update_or_create_links(link.child)
 
 
-def _delete_links(node: Node):
+def __delete_links(node: Node):
     child_ids = [link.child.pk for link in node.children]
 
     GroupElementYear.objects.filter(parent_id=node.pk).exclude(
@@ -67,4 +67,4 @@ def _delete_links(node: Node):
     ).delete()
 
     for link in node.children:
-        _delete_links(link.child)
+        __delete_links(link.child)
