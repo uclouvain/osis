@@ -23,33 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from .base import *
 
-OPTIONAL_APPS = (
-    'attribution',
-    'assistant',
-    'continuing_education',
-    'dissertation',
-    'internship',
-    'assessments',
-    'cms',
-    'webservices',
-    'behave_django',
-    'backoffice'
-)
-OPTIONAL_MIDDLEWARES = ()
-OPTIONAL_INTERNAL_IPS = ()
+CHARACTER_TO_ESCAPE = [
+    '[',
+    ']',
+    '(',
+    ')'
+]
 
-if os.environ.get("ENABLE_DEBUG_TOOLBAR", "False").lower() == "true":
-    OPTIONAL_APPS += ('debug_toolbar',)
-    OPTIONAL_MIDDLEWARES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-    OPTIONAL_INTERNAL_IPS += ('127.0.0.1',)
-    DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': 'base.middlewares.toolbar.show_toolbar',
-        'JQUERY_URL': os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js"),
-    }
 
-INSTALLED_APPS += OPTIONAL_APPS
-APPS_TO_TEST += OPTIONAL_APPS
-MIDDLEWARE += OPTIONAL_MIDDLEWARES
-INTERNAL_IPS += OPTIONAL_INTERNAL_IPS
+def filter_field_by_regex(queryset, name, value):
+    if value:
+        filter_field = "{}__iregex".format(name)
+        for character in CHARACTER_TO_ESCAPE:
+            value = value.replace(character, "\\{}".format(character))
+
+        search_string = r"({})".format(value)
+        queryset = queryset.filter(**{filter_field: search_string})
+    return queryset
