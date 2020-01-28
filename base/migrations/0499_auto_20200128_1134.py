@@ -55,5 +55,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_partial_title),
+        migrations.RunPython(create_partial_title, reverse_migration),
     ]
