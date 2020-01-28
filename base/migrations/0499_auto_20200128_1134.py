@@ -34,18 +34,8 @@ def reverse_migration(apps, schema_editor):
         education_group_type__name__in=TrainingType.finality_types()
     )
     for education_group_year in education_group_years:
-        if education_group_year.education_group_type.name in [TrainingType.MASTER_MA_120.name,
-                                                              TrainingType.MASTER_MA_180_240.name]:
-            education_group_year.partial_title = ""
-            education_group_year.partial_title_english = ""
-        if education_group_year.education_group_type.name in [TrainingType.MASTER_MD_120.name,
-                                                              TrainingType.MASTER_MD_180_240.name]:
-            education_group_year.partial_title = ""
-            education_group_year.partial_title_english = ""
-        if education_group_year.education_group_type.name in [TrainingType.MASTER_MS_120.name,
-                                                              TrainingType.MASTER_MS_180_240.name]:
-            education_group_year.partial_title = ""
-            education_group_year.partial_title_english = ""
+        education_group_year.partial_title = ""
+        education_group_year.partial_title_english = ""
         education_group_year.save()
 
 
