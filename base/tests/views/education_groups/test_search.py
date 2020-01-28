@@ -225,15 +225,12 @@ class TestEducationGroupDataSearchFilter(TestCase):
     def test_search_with_acronym_regex(self):
         search_strings = ['^EDPH',
                           'H3$',
-                          '^H3$',
-                          'EDP.3',
-                          'E*3']
+                          '^H3$'
+                          ]
         result_expected = [
             [self.education_group_edph2, self.education_group_edph3],
             [self.education_group_edph3],
-            [],
-            [self.education_group_edph3],
-            [self.education_group_edph3]
+            []
         ]
         for idx, search_string in enumerate(search_strings):
             response = self.client.get(self.url, data={"acronym": search_string})

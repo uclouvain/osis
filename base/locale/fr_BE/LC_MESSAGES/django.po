@@ -117,10 +117,9 @@ msgstr ""
 "%(year)s"
 
 msgid ""
-"'^' Means starts with. '$' Means ends by. '.' Replace one character. '*' "
-"Replace one or more characters."
+"'^' Means starts with. '$' Means ends by."
 msgstr ""
-"'^' commence par. '$' Termine par '.' Remplace un caractère. '*' Remplace un ou plusieurs caractères"
+"'^' commence par. '$' Termine par."
 
 msgid "1st quadri"
 msgstr "1er quadri"
