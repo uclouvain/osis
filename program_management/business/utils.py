@@ -25,9 +25,10 @@
 ##############################################################################
 import html
 
-
-LINE_BREAK_SPACE_CHARACTERS = [chr(13), chr(13), chr(9), chr(13), chr(13), chr(13), chr(13), chr(13)]
-TAG_TO_BE_REPLACE_BY_EMPTY_LINE = ['<br>',  '<tr',  '<td', '</p>', 'span>', 'li>', '</h', 'div>']
+LINE_BREAK_SPACE_CHARACTERS = [chr(13), chr(13), chr(9), chr(13), chr(13), chr(13), chr(13), chr(13), chr(13)]
+TAG_TO_BE_REPLACE_BY_EMPTY_LINE = ['<br>',  '<tr',  '<td', '</p>', 'span>', 'li>', '</h', 'div>', '<br />']
+TAGS_NOT_TREATED = ['<script', '<noscript', '<style', '<!--']
+TAGS_TO_TREAT = ['</style', '</script>', '</noscript>', '-->']
 
 
 def html2text(html_text):
@@ -60,14 +61,14 @@ def html2text(html_text):
 
 
 def _check_tag_ok(starting_idx, html_text_to_convert, tag_ok):
-    if html_text_to_convert[starting_idx:starting_idx + 7].lower() == '<script' or \
-            html_text_to_convert[starting_idx:starting_idx + 9].lower() == '<noscript' or \
-            html_text_to_convert[starting_idx:starting_idx + 6].lower() == '<style':
-        return False
-    if html_text_to_convert[starting_idx:starting_idx + 7].lower() == '</style' or \
-            html_text_to_convert[starting_idx:starting_idx + 9].lower() == '</script>' or \
-            html_text_to_convert[starting_idx:starting_idx + 11].lower() == '</noscript>':
-        return True
+
+    for tag in TAGS_NOT_TREATED:
+        if html_text_to_convert[starting_idx:starting_idx + len(tag)].lower() == tag:
+            return False
+
+    for tag in TAGS_TO_TREAT:
+        if html_text_to_convert[starting_idx:starting_idx + len(tag)].lower() == tag:
+            return True
     return tag_ok
 
 
