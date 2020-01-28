@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import itertools
 import json
 import random
 from decimal import Decimal
@@ -78,7 +79,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -105,6 +105,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
@@ -259,6 +260,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
         faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
         cls.user = faculty_manager.user
+        cls.access_denied = "access_denied.html"
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -272,7 +274,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         a_user_without_perms = UserFactory()
         self.client.force_login(a_user_without_perms)
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_create_partim_form_invalid_http_methods(self):
@@ -284,7 +286,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
                 side_effect=lambda *args: False)
     def test_create_partim_when_user_not_linked_to_entity_charge(self, mock_is_pers_linked_to_entity_charge):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
@@ -1070,6 +1072,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_english'], LearningUnitSpecificationsForm)
         self.assertCountEqual(response.context['achievements_FR'], [learning_unit_achievements_fr])
         self.assertCountEqual(response.context['achievements_EN'], [learning_unit_achievements_en])
+        self.assertCountEqual(
+            response.context['achievements'],
+            list(itertools.zip_longest([learning_unit_achievements_fr], [learning_unit_achievements_en]))
+        )
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
@@ -1221,6 +1227,7 @@ class TestLearningUnitComponents(TestCase):
         cls.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
         cls.a_superuser = SuperUserFactory()
         cls.person = PersonFactory(user=cls.a_superuser)
+        cls.learning_unit_year = cls.generated_container.generated_container_years[0].learning_unit_year_full
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
@@ -1229,9 +1236,7 @@ class TestLearningUnitComponents(TestCase):
     def test_learning_unit_components(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
-
-        response = self.client.get(reverse(learning_unit_components, args=[learning_unit_year.id]))
+        response = self.client.get(reverse(learning_unit_components, args=[self.learning_unit_year.id]))
 
         self.assertTemplateUsed(response, 'learning_unit/components.html')
         components = response.context['components']
@@ -1244,6 +1249,17 @@ class TestLearningUnitComponents(TestCase):
             volumes = component['volumes']
             self.assertEqual(volumes[VOLUME_Q1], None)
             self.assertEqual(volumes[VOLUME_Q2], None)
+
+    def test_tab_active_url(self):
+        url = reverse("learning_unit_components", args=[self.learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
 class TestLearningAchievements(TestCase):

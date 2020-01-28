@@ -46,9 +46,9 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
-from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, \
-    is_valid_proposal, MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, \
-    li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
+from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, is_valid_proposal, MSG_IS_NOT_A_PROPOSAL, \
+    MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_cancel_proposal, li_edit_proposal, li_consolidate_proposal, \
+    li_delete_all_lu
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory

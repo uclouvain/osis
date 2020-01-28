@@ -23,34 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
+import factory.fuzzy
 
-from osis_common.models import osis_model_admin
-
-
-class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
-    list_display = ('learning_component_year', 'acronym')
-    search_fields = ['acronym']
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 
 
-class LearningClassYear(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
-    acronym = models.CharField(max_length=3)
-    description = models.CharField(max_length=100, blank=True, null=True)
-
+class LearningClassYearFactory(factory.django.DjangoModelFactory):
     class Meta:
-        permissions = (
-            ("can_access_learningclassyear", "Can access learning class year"),
-        )
+        model = "learning_unit.LearningClassYear"
 
-    def __str__(self):
-        return u'{}-{}'.format(self.learning_component_year.acronym, self.acronym)
-
-
-def find_by_id(learning_class_year_id):
-    return LearningClassYear.objects.get(pk=learning_class_year_id)
-
-
-def find_by_learning_component_year(a_learning_component_year):
-    return LearningClassYear.objects.filter(learning_component_year=a_learning_component_year).order_by("acronym")
+    learning_component_year = factory.SubFactory(LearningComponentYearFactory)
+    acronym = factory.fuzzy.FuzzyInteger(99)

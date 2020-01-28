@@ -24,41 +24,42 @@
 #
 ##############################################################################
 
+from django.conf import settings
 from django.db import IntegrityError, transaction, Error
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context
+from base.business.learning_unit import CMS_LABEL_SUMMARY, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
+    CMS_LABEL_PEDAGOGY_FR_ONLY, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import get_academic_year_postponement_range
+from base.business.learning_units.pedagogy import postpone_teaching_materials
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
 from base.enums.component_detail import COMPONENT_DETAILS
-from base.models import learning_class_year, academic_year
+from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
+from base.forms.learning_unit_specifications import update_future_luy
+from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.learning_achievement import LearningAchievement
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
-from cms.models.translated_text import TranslatedText
-from osis_common.utils.numbers import normalize_fraction
-from base.business.learning_units.pedagogy import postpone_teaching_materials
-from base.business.learning_unit import get_academic_year_postponement_range
-from base.forms.learning_unit_specifications import update_future_luy
-from django.conf import settings
-from base.business.learning_unit import CMS_LABEL_SUMMARY, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
-    CMS_LABEL_PEDAGOGY_FR_ONLY, CMS_LABEL_SPECIFICATIONS
-from cms.models.translated_text import TranslatedText
-from cms.models.text_label import TextLabel
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
-from base.models.learning_achievement import LearningAchievement
+from cms.models.text_label import TextLabel
+from cms.models.translated_text import TranslatedText
+from learning_unit.models.learning_class_year import LearningClassYear
+from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
+NO_DATA = _('No data')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -129,7 +130,8 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
-        if _get_actual_end_year(lu_parent.learning_unit).year < new_academic_year.year:
+        actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
+        if actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -230,7 +232,10 @@ def _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year)
 
 
 def _duplicate_learning_class_year(new_component):
-    for old_learning_class in learning_class_year.find_by_learning_component_year(new_component.copied_from):
+    learning_class_years = LearningClassYear.objects.filter(
+        learning_component_year=new_component.copied_from
+    ).order_by("acronym")
+    for old_learning_class in learning_class_years:
         update_related_object(old_learning_class, 'learning_component_year', new_component)
 
 
@@ -420,7 +425,7 @@ def _get_differences(obj1, obj2, fields_to_compare):
 
 def _get_translated_value(value):
     if value is None:
-        return _('No data')
+        return NO_DATA
     if isinstance(value, bool):
         return _('yes') if value else _('no')
     return value
@@ -453,9 +458,9 @@ def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
                             "and year %(next_year)s - %(next_value)s") % {
                               'field': _(entity_type.lower()),
                               'year': lcy.academic_year,
-                              'value': current_entity.most_recent_acronym if current_entity else _('No data'),
+                              'value': current_entity.most_recent_acronym if current_entity else NO_DATA,
                               'next_year': next_lcy.academic_year,
-                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('No data')
+                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else NO_DATA
                           })
     return error_list
 
@@ -575,14 +580,14 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
         "The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
         "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s"
     ) % {
-        'field': COMPONENT_DETAILS[field_diff].lower(),
-        'acronym': current_component.learning_unit_year.acronym,
-        'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
-        'year': current_component.learning_unit_year.academic_year,
-        'value': normalize_fraction(current_value) if current_value is not None else _('No data'),
-        'next_year': next_year_component.learning_unit_year.academic_year,
-        'next_value': normalize_fraction(next_value) if next_value is not None else _('No data')
-    }
+               'field': COMPONENT_DETAILS[field_diff].lower(),
+               'acronym': current_component.learning_unit_year.acronym,
+               'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
+               'year': current_component.learning_unit_year.academic_year,
+               'value': normalize_fraction(current_value) if current_value is not None else NO_DATA,
+               'next_year': next_year_component.learning_unit_year.academic_year,
+               'next_value': normalize_fraction(next_value) if next_value is not None else NO_DATA
+           }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):
@@ -621,14 +626,12 @@ def update_partim_acronym(acronym_full, luy_to_update):
 def _update_luy_achievements_in_future(ac_year_postponement_range, lu_to_consolidate):
     for code, label in settings.LANGUAGES:
         language = Language.objects.get(code=code[:2].upper())
-        texts = LearningAchievement.objects.filter(
+        achievements = LearningAchievement.objects.filter(
             learning_unit_year_id=lu_to_consolidate.id,
-            language=language)
-        for achievement in texts:
-            update_future_luy_achievement(ac_year_postponement_range,
-                                          achievement,
-                                          achievement.code_name,
-                                          achievement.code_name)
+            language=language
+        )
+        for achievement in achievements:
+            update_future_luy_achievement(ac_year_postponement_range, achievement)
 
 
 def _update_descriptive_fiche(ac_year_postponement_range, lu_to_consolidate, luy_to_update):
