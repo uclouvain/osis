@@ -564,6 +564,12 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         res = html2text(html.unescape("<p>Introduire aux m&eacute;thodes d&#39;analyse</p>"))
         self.assertEqual(res, "Introduire aux méthodes d'analyse")
 
+    def test_keep_UES_tree_order_in_qs(self):
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, CustomXlsForm({}))
+        expected_ids_following_tree_order = [lu.id for lu in exl.learning_unit_years_parent]
+        ids_ordered_for_xls = [lu.id for lu in list(exl.qs)]
+        self.assertCountEqual(expected_ids_following_tree_order, ids_ordered_for_xls)
+
 
 def get_expected_data(gey, luy):
     expected = [luy.acronym,

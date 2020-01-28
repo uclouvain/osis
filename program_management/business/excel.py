@@ -29,7 +29,7 @@ import re
 from collections import namedtuple, defaultdict
 
 from django.conf import settings
-from django.db.models import QuerySet, Prefetch, Exists, Subquery, OuterRef
+from django.db.models import QuerySet, Prefetch, Exists, Subquery, OuterRef, Case, When
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
@@ -545,11 +545,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
                 continue
             self.learning_unit_years_parent.append(grp)
         self.custom_xls_form = custom_xls_form
-        ids = []
-        for luy in self.learning_unit_years_parent:
-            ids.append(luy.id)
-
-        self.qs = GroupElementYear.objects.filter(id__in=ids)
+        self._get_ordered_queryset()
         description_fiche = False
         specifications = False
 
@@ -559,6 +555,13 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 
         if description_fiche or specifications:
             self.qs = _annotate_with_description_fiche_specifications(self.qs, description_fiche, specifications)
+
+    def _get_ordered_queryset(self):
+        ids = []
+        for luy in self.learning_unit_years_parent:
+            ids.append(luy.id)
+        preserved = Case(*[When(pk=pk, then=pos) for pos, pk in enumerate(ids)])
+        self.qs = GroupElementYear.objects.filter(id__in=ids).order_by(preserved)
 
     def _to_workbook(self):
         return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs)
