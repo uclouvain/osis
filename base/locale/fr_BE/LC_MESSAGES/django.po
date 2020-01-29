@@ -688,7 +688,7 @@ msgstr ""
 "période."
 
 msgid "Creation or end date proposal by central managers"
-msgstr ""
+msgstr "Proposition de création ou de date de fin par gestionnaires centraux"
 
 msgid "Creation or end date proposal by faculty managers"
 msgstr "Proposition de création ou de date de fin par gestionnaires facultaires"
