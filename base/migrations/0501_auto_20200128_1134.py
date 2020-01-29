@@ -22,6 +22,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='educationgroupyear',
             name='partial_title_english',
-            field=models.CharField(blank=True, default='', max_length=240, verbose_name='Partial title in English'),
+            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Partial title in English'),
+        ),
+        migrations.AlterField(
+            model_name='educationgroupyear',
+            name='title_english',
+            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Title in English'),
         ),
     ]

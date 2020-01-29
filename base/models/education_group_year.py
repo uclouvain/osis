@@ -188,7 +188,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     title_english = models.CharField(
-        max_length=240,
+        max_length=255,
         blank=True,
         default="",
         verbose_name=_("Title in English")
@@ -202,7 +202,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     partial_title_english = models.CharField(
-        max_length=240,
+        max_length=255,
         blank=True,
         default="",
         verbose_name=_("Partial title in English")
