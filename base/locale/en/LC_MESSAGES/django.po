@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-24 13:26+0100\n"
+"POT-Creation-Date: 2020-01-29 10:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,6 +102,9 @@ msgstr ""
 msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
+msgstr ""
+
+msgid "'^' Means starts with. '$' Means ends by."
 msgstr ""
 
 msgid "1st quadri"
@@ -639,6 +642,22 @@ msgid "Create contact"
 msgstr ""
 
 msgid "Creation"
+msgstr ""
+
+msgid ""
+"Creation or end date modification proposal not allowed for central managers "
+"during this period."
+msgstr ""
+
+msgid ""
+"Creation or end date modification proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+
+msgid "Creation or end date proposal by central managers"
+msgstr ""
+
+msgid "Creation or end date proposal by faculty managers"
 msgstr ""
 
 msgid "Cred. rel./abs."
@@ -1316,6 +1335,9 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr ""
 
+msgid "Learning unit edition by central managers"
+msgstr ""
+
 msgid "Learning unit edition by faculty managers"
 msgstr ""
 
@@ -1573,6 +1595,22 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
+msgid "Modification or transformation proposal by central managers"
+msgstr ""
+
+msgid "Modification or transformation proposal by faculty managers"
+msgstr ""
+
+msgid ""
+"Modification or transformation proposal not allowed for central managers "
+"during this period."
+msgstr ""
+
+msgid ""
+"Modification or transformation proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -1726,9 +1764,6 @@ msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
 
 msgid "One of the partial volumes must have a value to 0."
-msgstr ""
-
-msgid "Only letters are allowed."
 msgstr ""
 
 msgid ""
@@ -2544,12 +2579,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The learning unit %(luy)s is in proposal, can not save the change from the "
-"year %(academic_year)s"
-msgstr ""
-
-#, python-format
-msgid ""
 "The learning unit has been updated (the report has not been done from "
 "%(year)s because the learning unit is in proposal)."
 msgstr ""
@@ -2755,6 +2784,10 @@ msgstr ""
 
 #, python-format
 msgid "This label %s does not exist"
+msgstr ""
+
+msgid ""
+"This learning unit is not editable by central managers during this period."
 msgstr ""
 
 msgid ""
