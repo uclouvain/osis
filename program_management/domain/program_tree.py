@@ -23,65 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.contrib.validation import BusinessValidator
 from program_management.domain import node
-
-
-class AddNodeValidator(BusinessValidator):
-    tree: ProgramTree = None
-    node_to_add: node.Node = None
-    where_to_add: str = None
-
-    def __init__(self, tree: ProgramTree, node_to_add: Node, where_to_add: str):
-        super(AddNodeValidator, self).__init__()
-        self.tree = tree
-        self.node_to_add = node_to_add
-        self.where_to_add = where_to_add
-
-
-class AuthorizedRelationshipValidator(AddNodeValidator):
-    pass  # Implements rules based on AuthorizedRelationhips
-
-
-class AddOptionsValidator(AddNodeValidator):
-    pass  # cf. _check_attach_options_rules
-
-
-class AddFinalityEndDateValidator(AddNodeValidator):
-    pass  # cf. _check_end_year_constraints_on_2m
-
-
-class NodeDuplicationValidator(AddNodeValidator):
-    pass  # cf. _check_new_attach_is_not_duplication
-
-
-class AddGroupYearNodeValidator(BusinessValidator):
-    validators = [
-        AuthorizedRelationshipValidator,
-        AddOptionsValidator,
-        AddFinalityEndDateValidator,
-        NodeDuplicationValidator,
-    ]
-
-
-class AddLearningUnitYearNodeValidator(BusinessValidator):
-    validators = [
-        #     ...
-    ]
-
-
-class AddNodeValidatorFactory:
-    def get_add_node_validator(self, tree: ProgramTree, node_to_add: node.Node, where_to_add: str):
-        add_node_validator_class = {
-            node.NodeEducationGroupYear: AddGroupYearNodeValidator,
-            node.NodeGroupYear: AddGroupYearNodeValidator,
-            node.NodeLearningUnitYear: AddLearningUnitYearNodeValidator,
-            # node.NodeLearningClassYear: ???,
-        }[node_to_add.__class__]
-        return add_node_validator_class(tree, node_to_add, where_to_add)
-
-
-factory = AddNodeValidatorFactory()
+from program_management.repositories.tree.validators.attach_node import factory as attach_node_validator_factory
 
 
 class ProgramTree:
@@ -90,6 +33,7 @@ class ProgramTree:
             raise Exception('root_group args must be an instance of Node')
         self.root_node = root_node
 
+    # TODO :: typer "path" (pour plus de lisibilité dans le code)
     def get_node(self, path: str) -> node.Node:
         """
         Return the corresponding node based on path of tree
@@ -118,8 +62,12 @@ class ProgramTree:
         :param path: [Optional] The position where the node must be added
         """
         parent = self.get_node(path) if path else self.root_node
-        factory.get_add_node_validator(self, node, path)
-        parent.add_child(node, **kwargs)
+        validator = attach_node_validator_factory.get_attach_node_validator(self, node, path)
+        validator.validate()
+        if validator.is_valid():
+            parent.add_child(node, **kwargs)
+        else:
+            return validator.error_messages
 
     def detach_node(self, path: str):
         """
