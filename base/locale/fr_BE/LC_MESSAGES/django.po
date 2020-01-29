@@ -116,6 +116,9 @@ msgstr ""
 "%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
 "%(year)s"
 
+msgid "'^' Means starts with. '$' Means ends by."
+msgstr "^' Commence par. '$' Termine par."
+
 msgid "1st quadri"
 msgstr "1er quadri"
 
@@ -1792,9 +1795,6 @@ msgstr ""
 
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
-
-msgid "Only letters are allowed."
-msgstr "Uniquement des lettres sont acceptées"
 
 msgid ""
 "Only program managers of the education group OR central manager linked to "
