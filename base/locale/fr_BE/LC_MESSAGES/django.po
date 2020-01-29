@@ -1659,10 +1659,10 @@ msgid "Modification"
 msgstr "Modification"
 
 msgid "Modification or transformation proposal by central managers"
-msgstr ""
+msgstr "Proposition de modification ou de transformation par gestionnaire central"
 
 msgid "Modification or transformation proposal by faculty managers"
-msgstr ""
+msgstr "Proposition de modification ou de transformation par gestionnaire facultaire"
 
 msgid ""
 "Modification or transformation proposal not allowed for central managers "
