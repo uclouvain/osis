@@ -17,16 +17,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='educationgroupyear',
             name='partial_title',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Partial title in French'),
+            field=models.CharField(blank=True, default='', max_length=240, verbose_name='Partial title in French'),
         ),
         migrations.AddField(
             model_name='educationgroupyear',
             name='partial_title_english',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Partial title in English'),
+            field=models.CharField(blank=True, default='', max_length=240, verbose_name='Partial title in English'),
+        ),
+        migrations.AlterField(
+            model_name='educationgroupyear',
+            name='title',
+            field=models.CharField(max_length=240, verbose_name='Title in French'),
         ),
         migrations.AlterField(
             model_name='educationgroupyear',
             name='title_english',
-            field=models.CharField(blank=True, default='', max_length=255, verbose_name='Title in English'),
+            field=models.CharField(blank=True, default='', max_length=240, verbose_name='Title in English'),
         ),
     ]
