@@ -2647,6 +2647,14 @@ msgstr ""
 "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
 "le changement à partir de l'année %(academic_year)s"
 
+#, python-format
+msgid ""
+"The learning unit has been updated (the report has not been done from "
+"%(year)s because the learning unit is in proposal)."
+msgstr ""
+"L'unité d'enseignement a été modifiée (le report n'a pas été effectué à "
+"partir de %(year)s parce que l'UE est en proposition)"
+
 msgid "The learning unit has been updated (with report)."
 msgstr "L'unité d'enseignement a été modifiée (avec report)."
 
