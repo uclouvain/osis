@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-28 13:20+0100\n"
+"POT-Creation-Date: 2020-01-29 10:04+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -672,6 +672,31 @@ msgstr "Créer contact"
 
 msgid "Creation"
 msgstr "Création"
+
+#, fuzzy
+#| msgid "This education group is not editable during this period."
+msgid ""
+"Creation or end date modification proposal not allowed for central managers "
+"during this period."
+msgstr ""
+"La période de modification des formations n'est pas ouverte durant cette "
+"période."
+
+#, fuzzy
+#| msgid ""
+#| "This learning unit is not editable by faculty managers during this period."
+msgid ""
+"Creation or end date modification proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
+"facultaires durant cette période."
+
+msgid "Creation or end date proposal by central managers"
+msgstr ""
+
+msgid "Creation or end date proposal by faculty managers"
+msgstr "Proposition de création ou de date de fin par gestionnaires facultaires"
 
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
@@ -1371,6 +1396,9 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
+msgid "Learning unit edition by central managers"
+msgstr "Modification UE par gestionnaires centraux"
+
 msgid "Learning unit edition by faculty managers"
 msgstr "Modification UE par gestionnaires facultaires"
 
@@ -1634,6 +1662,29 @@ msgstr "Liste au choix Partenariat mobilité"
 
 msgid "Modification"
 msgstr "Modification"
+
+msgid "Modification or transformation proposal by central managers"
+msgstr ""
+
+msgid "Modification or transformation proposal by faculty managers"
+msgstr ""
+
+#, fuzzy
+#| msgid ""
+#| "This learning unit is not editable by faculty managers during this period."
+msgid ""
+"Modification or transformation proposal not allowed for central managers "
+"during this period."
+msgstr ""
+"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
+"facultaires durant cette période."
+
+msgid ""
+"Modification or transformation proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+"Propositions de modification ou de transformation interdite pour les gestionnaires "
+"facultaires durant cette période."
 
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
@@ -2641,14 +2692,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The learning unit %(luy)s is in proposal, can not save the change from the "
-"year %(academic_year)s"
-msgstr ""
-"L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
-"le changement à partir de l'année %(academic_year)s"
-
-#, python-format
-msgid ""
 "The learning unit has been updated (the report has not been done from "
 "%(year)s because the learning unit is in proposal)."
 msgstr ""
@@ -2891,6 +2934,12 @@ msgstr "Ce champ est obligatoire."
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
+
+msgid ""
+"This learning unit is not editable by central managers during this period."
+msgstr ""
+"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
+"centraux durant cette période."
 
 msgid ""
 "This learning unit is not editable by faculty managers during this period."
