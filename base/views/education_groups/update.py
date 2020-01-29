@@ -76,7 +76,7 @@ def update_education_group(request, root_id, education_group_year_id):
     education_group_year.root = root_id
 
     if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
-       and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
+            and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
         return _update_certificate_aims(request, root_id, education_group_year)
 
     groupelementyear_formset = GroupElementYearFormset(
@@ -201,10 +201,14 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
-
+    has_content = len(groupelementyear_formset.queryset) > 0
     if request.method == 'POST':
-        if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
-            return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+        if form_education_group_year.is_valid() and (has_content and groupelementyear_formset.is_valid()):
+            return _common_success_redirect(
+                request,
+                form_education_group_year,
+                root, groupelementyear_formset if has_content else None
+            )
         else:
             show_error_message_for_form_invalid(request)
 
