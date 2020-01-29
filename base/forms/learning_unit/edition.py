@@ -28,7 +28,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
-from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
 
 
@@ -45,7 +45,7 @@ class LearningUnitEndDateForm(forms.Form):
         self.learning_unit_year = learning_unit_year
         self.person = person
         super().__init__(data, *args, **kwargs)
-        self.fields['academic_year'].empty_label = self.EMPTY_LABEL.capitalize()
+        self.fields['academic_year'].empty_label = self.EMPTY_LABEL
         self.fields['academic_year'].required = self.REQUIRED
         end_year = self.learning_unit.end_year
 
@@ -91,7 +91,7 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
 
 
 class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
-    EMPTY_LABEL = _("no planned end")
+    EMPTY_LABEL = NO_PLANNED_END_DISPLAY
     REQUIRED = False
 
     @classmethod
