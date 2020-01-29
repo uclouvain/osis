@@ -62,7 +62,7 @@ class ProposalLearningUnitFilter(FilterSet):
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr="icontains",
+        lookup_expr="iregex",
         max_length=40,
         required=False,
         label=_('Code'),
