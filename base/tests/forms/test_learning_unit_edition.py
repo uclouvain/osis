@@ -87,3 +87,18 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['academic_year'], self.starting_academic_year)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
+
+    def test_get_next_academic_years(self):
+        from base.business.learning_units.edition import get_next_academic_years
+        from base.tests.factories.academic_year import AcademicYearFactory
+        learning_unit_with_end_year = self.setup_learning_unit(self.starting_academic_year,
+                                                               AcademicYearFactory(year=self.last_year.year - 1))
+        cases = [
+            {"learning_unit": self.learning_unit, "last_year": self.last_year, "expected_result": None},
+            {"learning_unit": learning_unit_with_end_year, "last_year": self.last_year, "expected_result": 1},
+        ]
+
+        for case in cases:
+            with self.subTest():
+                self.assertEqual(case["expected_result"],
+                                 get_next_academic_years(case["learning_unit"], case["last_year"]))
