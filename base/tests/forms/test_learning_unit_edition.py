@@ -94,8 +94,8 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         learning_unit_with_end_year = self.setup_learning_unit(self.starting_academic_year,
                                                                AcademicYearFactory(year=self.last_year.year - 1))
         cases = [
-            {"learning_unit": self.learning_unit, "last_year": self.last_year, "expected_result": None},
-            {"learning_unit": learning_unit_with_end_year, "last_year": self.last_year, "expected_result": 1},
+            {"learning_unit": self.learning_unit, "last_year": self.last_year.year, "expected_result": None},
+            {"learning_unit": learning_unit_with_end_year, "last_year": self.last_year.year, "expected_result": 1},
         ]
 
         for case in cases:
