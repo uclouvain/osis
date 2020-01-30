@@ -41,9 +41,7 @@ class PrerequisiteItemGroup:
     def __init__(self, operator: str, prerequisite_items: List[PrerequisiteItem] = None):
         assert operator in [prerequisite_operator.OR, prerequisite_operator.AND]
         self.operator = operator
-
-        if prerequisite_items is None:
-            self.prerequisite_items = []
+        self.prerequisite_items = prerequisite_items or []
 
     def add_prerequisite_item(self, acronym: str, year: int):
         self.prerequisite_items.append(PrerequisiteItem(acronym, year))
@@ -57,8 +55,7 @@ class Prerequisite:
         assert main_operator in [prerequisite_operator.OR, prerequisite_operator.AND]
         self.main_operator = main_operator
 
-        if prerequisite_item_groups is None:
-            self.prerequisite_item_groups = []
+        self.prerequisite_item_groups = prerequisite_item_groups or []
 
     def add_prerequisite_item_group(self, group: PrerequisiteItemGroup):
         self.prerequisite_item_groups.append(group)

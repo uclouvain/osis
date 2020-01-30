@@ -27,7 +27,8 @@ from django.test import TestCase
 
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from program_management.domain import program_tree, node
+from base.tests.factories.prerequisite import PrerequisiteFactory
+from program_management.domain import program_tree, node, prerequisite
 from program_management.models.element import Element
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
 from program_management.repositories import fetch_tree
@@ -59,3 +60,32 @@ class TestFetchTree(TestCase):
             education_group_program_tree.root_node.children[0].child.acronym,
             self.link_level_1.child_branch.acronym
         )
+
+    def test_case_fetch_tree_leaf_have_some_prerequisites(self):
+        PrerequisiteFactory(
+            education_group_year=self.root_node.education_group_year,
+            learning_unit_year=self.link_level_2.child_leaf,
+            items__groups=(
+                (
+                    LearningUnitYearFactory(
+                        acronym='LDROI1200', academic_year=self.link_level_2.child_leaf.academic_year
+                    ),
+                ),
+                (
+                    LearningUnitYearFactory(
+                        acronym='LAGRO1600', academic_year=self.link_level_2.child_leaf.academic_year
+                    ),
+                    LearningUnitYearFactory(
+                        acronym='LBIR2300', academic_year=self.link_level_2.child_leaf.academic_year
+                    )
+                )
+            )
+        )
+
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+
+        self.assertIsInstance(leaf, node.NodeLearningUnitYear)
+        self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
+        expected_str = '(LDROI1200) AND (LAGRO1600 OR LBIR2300)'
+        self.assertEquals(str(leaf.prerequisite), expected_str)

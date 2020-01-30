@@ -25,11 +25,15 @@
 ##############################################################################
 
 import copy
+import itertools
 
-from django.db.models import Case, Value, F, When, IntegerField, CharField
+from django.db.models import Case, Value, F, When, IntegerField, CharField, Subquery, OuterRef
 
+from base.models.enums import prerequisite_operator
 from base.models.group_element_year import GroupElementYear
-from program_management.domain import node, link
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.prerequisite_item import PrerequisiteItem
+from program_management.domain import node, link, prerequisite
 from program_management.domain.program_tree import ProgramTree
 from program_management.models.element import Element
 from program_management.models.enums import node_type
@@ -48,7 +52,8 @@ def fetch(tree_root_id) -> ProgramTree:
     structure = GroupElementYear.objects.get_adjacency_list([root_node.pk])
     nodes = __fetch_tree_nodes(structure)
     links = __fetch_tree_links(structure)
-    return __build_tree(root_node, structure, nodes, links)
+    prerequisites = __fetch_tree_prerequisites(tree_root_id, nodes)
+    return __build_tree(root_node, structure, nodes, links, prerequisites)
 
 
 def __fetch_tree_nodes(tree_structure):
@@ -119,18 +124,59 @@ def __fetch_tree_links(tree_structure):
     return tree_links
 
 
-def __build_tree(root_node, tree_structure, nodes, links):
-    root_node.children = __build_children(root_node, tree_structure, nodes, links)
+def __fetch_tree_prerequisites(tree_root_id: int, nodes: dict):
+    node_leaf_ids = [n.pk for n in nodes.values() if isinstance(n, node.NodeLearningUnitYear)]
+
+    prerequisite_item_qs = PrerequisiteItem.objects.filter(
+        prerequisite__education_group_year_id=tree_root_id,
+        prerequisite__learning_unit_year_id__in=node_leaf_ids
+    ).annotate(
+        acronym=Subquery(
+            LearningUnitYear.objects.filter(
+                learning_unit_id=OuterRef('learning_unit_id'),
+                academic_year_id=OuterRef('prerequisite__learning_unit_year__academic_year_id'),
+            ).values('acronym')[:1]
+        ),
+        year=F('prerequisite__learning_unit_year__academic_year__year'),
+        main_operator=F('prerequisite__main_operator'),
+        learning_unit_year_id=F('prerequisite__learning_unit_year_id')
+    ).order_by('learning_unit_year_id', 'group_number', 'position')\
+     .values('learning_unit_year_id', 'main_operator', 'group_number', 'position', 'acronym', 'year')
+
+    prerequisites_dict = {}
+    for node_id, prequisite_items in itertools.groupby(prerequisite_item_qs, key=lambda p: p['learning_unit_year_id']):
+        prequisite_items = list(prequisite_items)
+
+        preq = prerequisite.Prerequisite(main_operator=prequisite_items[0]['main_operator'])
+        prerequisites_dict.setdefault(node_id, preq)
+        for _, p_items in itertools.groupby(prequisite_items, key=lambda p: p['group_number']):
+            operator_item = prerequisite_operator.OR if preq.main_operator == prerequisite_operator.AND else \
+                prerequisite_operator.AND
+            p_group_items = prerequisite.PrerequisiteItemGroup(
+                operator=operator_item,
+                prerequisite_items=[
+                    prerequisite.PrerequisiteItem(p_item['acronym'], p_item['year']) for p_item in p_items
+                ]
+            )
+            prerequisites_dict[node_id].add_prerequisite_item_group(p_group_items)
+
+    return prerequisites_dict
+
+
+def __build_tree(root_node, tree_structure, nodes, links, prerequisites):
+    root_node.children = __build_children(root_node, tree_structure, nodes, links, prerequisites)
     tree = ProgramTree(root_node)
     return tree
 
 
-def __build_children(root, tree_structure, nodes, links):
+def __build_children(root, tree_structure, nodes, links, prerequisites):
     children = []
 
     for child_structure in [structure for structure in tree_structure if structure['parent_id'] == root.pk]:
         child_node = copy.deepcopy(nodes[child_structure['child_id']])
-        child_node.children = __build_children(child_node, tree_structure, nodes, links)
+        child_node.children = __build_children(child_node, tree_structure, nodes, links, prerequisites)
+        if isinstance(child_node, node.NodeLearningUnitYear) and child_node.pk in prerequisites:
+            child_node.prerequisite = prerequisites[child_node.pk]
 
         link_node = copy.deepcopy(
             links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]

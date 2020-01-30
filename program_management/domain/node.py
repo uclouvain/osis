@@ -26,6 +26,7 @@
 from typing import List
 
 from program_management.domain.link import Link
+from program_management.domain.prerequisite import Prerequisite
 from program_management.models.enums import node_type
 
 
@@ -103,6 +104,10 @@ class NodeLearningUnitYear(Node):
         self.acronym = acronym
         self.title = title
         self.year = year
+        self.prerequisite = None
+
+    def add_prerequisite(self, prerequisite: Prerequisite):
+        self.prerequisite = prerequisite
 
 
 class NodeLearningClassYear(Node):
