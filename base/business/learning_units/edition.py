@@ -283,10 +283,8 @@ def _get_new_end_year(new_academic_year):
 
 
 def get_next_academic_years(learning_unit_to_edit, year):
-    end_date = learning_unit_to_edit.end_year.year + 1 if learning_unit_to_edit.end_year \
-        else compute_max_academic_year_adjournment() + 1
-    range_years = list(range(end_date, year + 1))
-    return AcademicYear.objects.filter(year__in=range_years).order_by('year')
+    end_date = learning_unit_to_edit.end_year.year + 1 if learning_unit_to_edit.end_year else None
+    return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
