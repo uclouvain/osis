@@ -93,10 +93,11 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         from base.tests.factories.academic_year import AcademicYearFactory
         from base.models.academic_year import AcademicYear
         max_adjournment_year = AcademicYear.objects.max_adjournment().year
+        learning_unit_without_end_year = self.setup_learning_unit(self.starting_academic_year)
         learning_unit_with_end_year = self.setup_learning_unit(self.starting_academic_year,
                                                                AcademicYearFactory(year=max_adjournment_year - 1))
         cases = [
-            {"learning_unit": self.learning_unit, "last_year": max_adjournment_year, "expected_result": 0},
+            {"learning_unit": learning_unit_without_end_year, "last_year": max_adjournment_year, "expected_result": 0},
             {"learning_unit": learning_unit_with_end_year, "last_year": max_adjournment_year, "expected_result": 1},
         ]
 
