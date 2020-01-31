@@ -91,11 +91,13 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
     def test_get_next_academic_years(self):
         from base.business.learning_units.edition import get_next_academic_years
         from base.tests.factories.academic_year import AcademicYearFactory
+        from base.models.academic_year import AcademicYear
+        max_adjournment_year = AcademicYear.objects.max_adjournment().year
         learning_unit_with_end_year = self.setup_learning_unit(self.starting_academic_year,
-                                                               AcademicYearFactory(year=self.last_year.year - 1))
+                                                               AcademicYearFactory(year=max_adjournment_year - 1))
         cases = [
-            {"learning_unit": self.learning_unit, "last_year": self.last_year.year, "expected_result": None},
-            {"learning_unit": learning_unit_with_end_year, "last_year": self.last_year.year, "expected_result": 1},
+            {"learning_unit": self.learning_unit, "last_year": max_adjournment_year, "expected_result": 0},
+            {"learning_unit": learning_unit_with_end_year, "last_year": max_adjournment_year, "expected_result": 1},
         ]
 
         for case in cases:
