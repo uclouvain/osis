@@ -203,7 +203,7 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     html_page = "education_group/update_groups.html"
     has_content = len(groupelementyear_formset.queryset) > 0
     if request.method == 'POST':
-        if form_education_group_year.is_valid() and (has_content and groupelementyear_formset.is_valid()):
+        if form_education_group_year.is_valid() and (not has_content and groupelementyear_formset.is_valid()):
             return _common_success_redirect(
                 request,
                 form_education_group_year,
