@@ -100,12 +100,14 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             {"name": "without_end_year",
              "learning_unit": learning_unit_without_end_year,
              "last_year": max_adjournment_year,
-             "expected_result": 0
+             "expected_result": 0,
+             "expected_queryset": AcademicYear.objects.none()
              },
             {"name": "with_end_year",
              "learning_unit": learning_unit_with_end_year,
              "last_year": max_adjournment_year,
-             "expected_result": 1
+             "expected_result": 1,
+             "expected_queryset": AcademicYear.objects.filter(year=max_adjournment_year).order_by('year')
              },
         ]
 
@@ -113,3 +115,4 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             with self.subTest(case["name"]):
                 result = get_next_academic_years(case["learning_unit"], case["last_year"])
                 self.assertEqual(case["expected_result"], result.count(), result)
+                self.assertEqual(set(case["expected_queryset"]), set(result))
