@@ -40,9 +40,8 @@ from attribution.views.manage_my_courses import list_my_attributions_summary_edi
 from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -59,14 +58,17 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.user = cls.person.user
         cls.tutor = TutorFactory(person=cls.person)
         cls.current_ac_year = create_current_academic_year()
-        start_year = AcademicYearFactory(year=cls.current_ac_year.year + 1)
-        end_year = AcademicYearFactory(year=cls.current_ac_year.year + 5)
-        ac_year_in_future = GenerateAcademicYear(start_year=start_year, end_year=end_year)
-        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_ac_year,
-                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        ac_year_in_past = AcademicYearFactory.produce_in_past(cls.current_ac_year.year)
+        ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_ac_year.year)
+
+        cls.academic_calendar = OpenAcademicCalendarFactory(
+            academic_year=cls.current_ac_year,
+            data_year=ac_year_in_future[1],  # This is n+1
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
 
         # Create multiple attribution in different academic years
-        for ac_year in [cls.current_ac_year] + ac_year_in_future.academic_years:
+        for ac_year in ac_year_in_past + [cls.current_ac_year] + ac_year_in_future:
             learning_container_year = LearningContainerYearFactory(
                 academic_year=ac_year
             )
@@ -104,7 +106,6 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
-        self.assertTrue("learning_unit_years_with_errors" in context)
         # Ensure that we only see UE of current year + 1
         for luy, error in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year + 1)

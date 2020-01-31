@@ -29,6 +29,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from attribution.views.perms import tutor_can_view_educational_information
+from base.business import event_perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information
 from base.models import academic_year, entity_calendar
@@ -47,20 +48,20 @@ from base.views.learning_units.perms import PermissionDecorator
 @login_required
 def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
-    current_ac = academic_year.current_academic_year()
+    event_perm = event_perms.EventPermSummaryCourseSubmission()
     learning_unit_years = find_learning_unit_years_by_academic_year_tutor_attributions(
-        academic_year=current_ac.next(),
+        academic_years=event_perm.get_academic_years(),
         tutor=tutor
     )
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
-        ac_year=current_ac,
+        ac_year=academic_year.current_academic_year(),
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     )
     errors = (can_user_edit_educational_information(user=tutor.person.user, learning_unit_year_id=luy.id)
               for luy in learning_unit_years)
     context = {
-        'learning_unit_years_with_errors': zip(learning_unit_years, errors),
+        'learning_unit_years_with_errors': list(zip(learning_unit_years, errors)),
         'entity_calendars': entity_calendars,
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)

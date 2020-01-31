@@ -176,3 +176,9 @@ def generate_event_perm_modification_transformation_proposal(person, obj=None, r
         return EventPermModificationOrTransformationProposalFacultyManager(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)
+
+
+class EventPermSummaryCourseSubmission(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+    error_msg = _("Summary course submission is not allowed for tutors during this period.")
