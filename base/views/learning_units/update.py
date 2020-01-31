@@ -37,7 +37,7 @@ from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_year_with_context
 from base.business.learning_units.edition import ConsistencyError
-from base.forms.learning_unit.edition import LearningUnitEndDateForm
+from base.forms.learning_unit.edition import LearningUnitDailyManagementEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
@@ -47,6 +47,7 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITI
 from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
     show_error_message_for_form_invalid
 from base.views.learning_unit import learning_unit_components
@@ -66,7 +67,9 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
     context = get_learning_unit_identification_context(learning_unit_year_id, person)
 
     learning_unit_to_edit = learning_unit_year.learning_unit
-    form = LearningUnitEndDateForm(request.POST or None, learning_unit_year=learning_unit_year)
+    form = LearningUnitDailyManagementEndDateForm(
+        request.POST or None, learning_unit_year=learning_unit_year, person=person
+    )
     if form.is_valid():
         try:
             result = form.save()
@@ -119,7 +122,7 @@ def update_learning_unit(request, learning_unit_year_id):
     if request.method == 'POST':
         if postponement_form.is_valid():
             # Update current learning unit year
-            _save_form_and_display_messages(request, postponement_form)
+            _save_form_and_display_messages(request, postponement_form, learning_unit_year)
             return redirect('learning_unit', learning_unit_year_id=learning_unit_year_id)
         else:
             show_error_message_for_form_invalid(request)
@@ -146,7 +149,7 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     volume_edition_formset_container = VolumeEditionFormsetContainer(request, context['learning_units'], person)
 
     if volume_edition_formset_container.is_valid() and not request.is_ajax():
-        _save_form_and_display_messages(request, volume_edition_formset_container)
+        _save_form_and_display_messages(request, volume_edition_formset_container, context['learning_unit_year'])
         if form_type == "full":
             return HttpResponseRedirect(reverse(learning_unit_components, args=[learning_unit_year_id]))
         else:
@@ -173,12 +176,24 @@ def _get_learning_units_for_context(luy, with_family=False):
         )
 
 
-def _save_form_and_display_messages(request, form):
+def _save_form_and_display_messages(request, form, learning_unit_year):
     records = None
+    existing_proposal = ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=learning_unit_year.learning_unit
+    ).order_by('learning_unit_year__academic_year__year')
     try:
         records = form.save()
         display_warning_messages(request, getattr(form, 'warnings', []))
-        if bool(int(request.POST.get('postponement', 0))):
+
+        is_postponement = bool(int(request.POST.get('postponement', 0)))
+
+        if is_postponement and existing_proposal:
+            display_success_messages(
+                request,
+                _('The learning unit has been updated (the report has not been done from %(year)s because the learning '
+                  'unit is in proposal).') % {'year': existing_proposal[0].learning_unit_year.academic_year}
+            )
+        elif is_postponement:
             display_success_messages(request, _('The learning unit has been updated (with report).'))
         else:
             display_success_messages(request, _('The learning unit has been updated (without report).'))

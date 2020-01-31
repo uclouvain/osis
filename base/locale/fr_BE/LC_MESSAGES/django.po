@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-23 18:22+0100\n"
+"POT-Creation-Date: 2020-01-28 14:38+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -115,6 +115,9 @@ msgid ""
 msgstr ""
 "%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
 "%(year)s"
+
+msgid "'^' Means starts with. '$' Means ends by."
+msgstr "^' Commence par. '$' Termine par."
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -669,6 +672,26 @@ msgstr "Créer contact"
 
 msgid "Creation"
 msgstr "Création"
+
+msgid ""
+"Creation or end date modification proposal not allowed for central managers "
+"during this period."
+msgstr ""
+"Les propositions de création ou de date de fin sont interdites pour les gestionnaires centraux durant cette "
+"période."
+
+msgid ""
+"Creation or end date modification proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+"Les propositions de création ou de date de fin sont interdites pour les gestionnaires facultaires durant cette "
+"période."
+
+msgid "Creation or end date proposal by central managers"
+msgstr "Proposition de création ou de date de fin par gestionnaires centraux"
+
+msgid "Creation or end date proposal by faculty managers"
+msgstr "Proposition de création ou de date de fin par gestionnaires facultaires"
 
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
@@ -1371,6 +1394,9 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr "Unité d'enseignement %(acronym)s mise à jour avec succès."
 
+msgid "Learning unit edition by central managers"
+msgstr "Modification UE par gestionnaires centraux"
+
 msgid "Learning unit edition by faculty managers"
 msgstr "Modification UE par gestionnaires facultaires"
 
@@ -1635,6 +1661,26 @@ msgstr "Liste au choix Partenariat mobilité"
 msgid "Modification"
 msgstr "Modification"
 
+msgid "Modification or transformation proposal by central managers"
+msgstr "Proposition de modification ou de transformation par gestionnaire central"
+
+msgid "Modification or transformation proposal by faculty managers"
+msgstr "Proposition de modification ou de transformation par gestionnaire facultaire"
+
+msgid ""
+"Modification or transformation proposal not allowed for central managers "
+"during this period."
+msgstr ""
+"Les propositions de modification ou de transformation sont interdites pour les gestionnaires centraux durant cette "
+"période."
+
+msgid ""
+"Modification or transformation proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+"Les propositions de modification ou de transformation sont interdites pour les gestionnaires facultaires durant cette "
+"période."
+
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
@@ -1796,9 +1842,6 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-msgid "Only letters are allowed."
-msgstr "Uniquement des lettres sont acceptées"
-
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -1900,6 +1943,12 @@ msgstr "Code non valide"
 
 msgid "Partial deliberation"
 msgstr "Sous-épreuve"
+
+msgid "Partial title in English"
+msgstr "Intitulé partiel en anglais"
+
+msgid "Partial title in French"
+msgstr "Intitulé partiel en français"
 
 msgid "Partim"
 msgstr "Partim"
@@ -2650,11 +2699,11 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The learning unit %(luy)s is in proposal, can not save the change from the "
-"year %(academic_year)s"
+"The learning unit has been updated (the report has not been done from "
+"%(year)s because the learning unit is in proposal)."
 msgstr ""
-"L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder "
-"le changement à partir de l'année %(academic_year)s"
+"L'unité d'enseignement a été modifiée (le report n'a pas été effectué à "
+"partir de %(year)s parce que l'UE est en proposition)"
 
 msgid "The learning unit has been updated (with report)."
 msgstr "L'unité d'enseignement a été modifiée (avec report)."
@@ -2891,6 +2940,12 @@ msgstr "Ce champ est obligatoire."
 #, python-format
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
+
+msgid ""
+"This learning unit is not editable by central managers during this period."
+msgstr ""
+"Cette unité d'enseignement n'est pas modifiable par les gestionnaires "
+"centraux durant cette période."
 
 msgid ""
 "This learning unit is not editable by faculty managers during this period."
