@@ -23,12 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.shortcuts import get_object_or_404
 
 from base.models import entity_calendar, academic_year
-from base.models.entity import Entity
 from base.models.enums import academic_calendar_type
-from base.models.person import Person
 
 
 def find_summary_course_submission_dates_for_entity_version(entity_version):
@@ -37,8 +34,3 @@ def find_summary_course_submission_dates_for_entity_version(entity_version):
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         entity=entity_version.entity
     )
-
-
-def can_user_edit_educational_information_submission_dates_for_entity(a_user, an_entity):
-    person = get_object_or_404(Person, user=a_user)
-    return person.is_faculty_manager and person.is_attached_entities(Entity.objects.filter(pk=an_entity.pk))

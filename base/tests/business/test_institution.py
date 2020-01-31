@@ -25,23 +25,16 @@
 ##############################################################################
 import datetime
 
-from django.contrib.auth.models import Group
-from django.http import Http404
 from django.test import TestCase
 from django.utils import timezone
 
-from base.business.institution import find_summary_course_submission_dates_for_entity_version, \
-    can_user_edit_educational_information_submission_dates_for_entity
+from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models.enums import academic_calendar_type
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.group import FacultyManagerGroupFactory
-from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import UserFactory
 
 
 class FindSummaryCourseSubmissionDatesTestCase(TestCase):
@@ -100,38 +93,3 @@ class FindSummaryCourseSubmissionDatesTestCase(TestCase):
         )
         self.assertEqual(default_entity_dates, {'start_date': self.academic_calendar.start_date,
                                                 'end_date': self.academic_calendar.end_date})
-
-
-class TestUserCanEditEntityCalendarEducationalInformation(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        person_entity = PersonEntityFactory()
-        cls.user = person_entity.person.user
-        cls.entity = person_entity.entity
-        FacultyManagerGroupFactory()
-        cls.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-
-        cls.user_not_faculty_manager = PersonEntityFactory(entity=cls.entity).person.user
-
-        cls.user_with_no_person = UserFactory()
-
-        cls.entity_not_linked_to = EntityFactory()
-
-    def test_when_user_not_linked_to_person(self):
-        with self.assertRaises(Http404):
-            can_user_edit_educational_information_submission_dates_for_entity(self.user_with_no_person, self.entity)
-
-    def test_when_not_faculty_manager(self):
-        can_user_edit = can_user_edit_educational_information_submission_dates_for_entity(self.user_not_faculty_manager,
-                                                                                          self.entity)
-        self.assertFalse(can_user_edit)
-
-    def test_when_faculty_manager_but_not_linked_to_entity(self):
-        can_user_edit = can_user_edit_educational_information_submission_dates_for_entity(self.user,
-                                                                                          self.entity_not_linked_to)
-        self.assertFalse(can_user_edit)
-
-    def test_when_faculty_manager_and_linked_to_entity(self):
-        can_user_edit = can_user_edit_educational_information_submission_dates_for_entity(self.user,
-                                                                                          self.entity)
-        self.assertTrue(can_user_edit)
