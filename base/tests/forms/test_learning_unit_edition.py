@@ -100,5 +100,5 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
 
         for case in cases:
             with self.subTest():
-                self.assertEqual(case["expected_result"],
-                                 get_next_academic_years(case["learning_unit"], case["last_year"]).count())
+                result = get_next_academic_years(case["learning_unit"], case["last_year"])
+                self.assertEqual(case["expected_result"], result.count(), result)
