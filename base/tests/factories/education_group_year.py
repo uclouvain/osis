@@ -65,6 +65,8 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     partial_acronym = ""
     title = factory.LazyAttribute(generate_title)
     title_english = factory.LazyAttribute(generate_title)
+    partial_title = ""
+    partial_title_english = ""
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
