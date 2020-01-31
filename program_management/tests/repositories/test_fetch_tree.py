@@ -25,9 +25,11 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.domain import program_tree, node, prerequisite
 from program_management.models.element import Element
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
@@ -119,3 +121,21 @@ class TestFetchTree(TestCase):
         self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
         self.assertTrue(leaf.is_prerequisite)
 
+    def test_case_fetch_tree_leaf_node_have_a_proposal(self):
+        proposal_types = ProposalType.get_names()
+        for p_type in proposal_types:
+            proposal = ProposalLearningUnitFactory(learning_unit_year=self.link_level_2.child_leaf)
+            with self.subTest(msg=p_type):
+                proposal.type = p_type
+                proposal.save()
+
+                education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+                leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+                self.assertTrue(leaf.has_proposal)
+                self.assertEquals(leaf.proposal_type, p_type)
+
+    def test_case_fetch_tree_leaf_node_have_no_proposal(self):
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+        self.assertFalse(leaf.has_proposal)
+        self.assertIsNone(leaf.proposal_type)

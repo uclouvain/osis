@@ -81,8 +81,13 @@ def __fetch_tree_nodes(tree_structure):
             When(child_branch_id__isnull=True, then=F('child_leaf__academic_year__year')),
             default=F('child_branch__academic_year__year'),
             output_field=IntegerField()
+        ),
+        proposal_type=Case(
+            When(child_branch_id__isnull=True, then=F('child_leaf__proposallearningunit__type')),
+            default=None,
+            output_field=CharField()
         )
-    ).values('node_id', 'type', 'acronym', 'title', 'year')
+    ).values('node_id', 'type', 'acronym', 'title', 'year', 'proposal_type')
     nodes = {}
     for gey_dict in group_element_year_qs:
         nodes[gey_dict['node_id']] = node.factory.get_node(**gey_dict)

@@ -57,9 +57,9 @@ class TestProgramTreeViewSerializer(TestCase):
         self.subgroup2.add_child(self.ldroi100a)
         self.tree = ProgramTree(root_node=self.root_node)
 
-    def test_serialize_program_tree_ensure_context_have_root_id_keys(self):
+    def test_serialize_program_tree_ensure_context_have_root_keys(self):
         serializer = ProgramTreeViewSerializer(self.tree)
-        self.assertEquals(serializer.context['root_id'], self.tree.root_node.pk)
+        self.assertEquals(serializer.context['root'], self.tree.root_node)
 
     def test_serialize_program_tree_assert_keys_of_root_element(self):
         serializer = ProgramTreeViewSerializer(self.tree)
@@ -67,15 +67,15 @@ class TestProgramTreeViewSerializer(TestCase):
 
         self.assertListEqual(list(serializer.data.keys()), expected_keys)
 
-    def test_serialize_program_tree_assert_first_child_element(self):
+    def test_serialize_program_tree_assert_node_child_element(self):
         serializer = ProgramTreeViewSerializer(self.tree)
 
         self.assertIsInstance(serializer.data['children'], list)
-        self.assertEquals(serializer.data['children'][0]['text'], self.common_core.title)
+        self.assertEquals(serializer.data['children'][0]['text'], self.common_core.acronym)
         self.assertEquals(serializer.data['children'][0]['icon'], None)
         self.assertIsInstance(serializer.data['children'][0]['children'], list)
 
-    def test_serialize_program_tree_assert_keys_of_a_attr(self):
+    def test_serialize_program_tree_assert_keys_of_node_a_attr(self):
         serializer = ProgramTreeViewSerializer(self.tree)
         expected_keys = [
             "href", "root", "element_id", "element_type", "title", "attach_url", "detach_url",
