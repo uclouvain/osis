@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-29 10:04+0100\n"
+"POT-Creation-Date: 2020-01-30 11:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1864,6 +1864,12 @@ msgid "Partial acronym is invalid"
 msgstr ""
 
 msgid "Partial deliberation"
+msgstr ""
+
+msgid "Partial title in English"
+msgstr ""
+
+msgid "Partial title in French"
 msgstr ""
 
 msgid "Partim"
