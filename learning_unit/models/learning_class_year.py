@@ -32,7 +32,7 @@ from osis_common.models import osis_model_admin
 
 class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym')
-    search_fields = ['acronym']
+    search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
 
 
 only_letters_validator = RegexValidator(r'^[a-zA-Z]*$', _('Only letters are allowed.'))
