@@ -680,13 +680,8 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def verbose_credit(self):
-        if self.is_finality:
-            title = self.partial_title_english \
-                if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN \
-                else self.partial_title
-        else:
-            title = self.title_english if self.title_english and translation.get_language() == LANGUAGE_CODE_EN \
-                else self.title
+        title = self.title_english if self.title_english and translation.get_language() == LANGUAGE_CODE_EN \
+            else self.title
         return "{} ({} {})".format(title, self.credits or 0, _("credits"))
 
     @property
