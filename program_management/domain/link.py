@@ -23,18 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models.enums.link_type import LinkTypes
+from program_management.domain import node
+from program_management.models.enums.node_type import NodeType
 
 
 class LinkFactory:
-    def get_link(self, *args, **kwargs):
-        return Link(*args, **kwargs)
+    def get_link(self, parent: node.Node, child: node.Node, **kwargs):
+        if parent.type == NodeType.LEARNING_UNIT.name:
+            return LinkWithChildLeaf(parent, child, **kwargs)
+        else:
+            return LinkWithChildBranch(parent, child, **kwargs)
 
 
 factory = LinkFactory()
 
 
 class Link:
-    def __init__(self, parent, child, **kwargs):
+
+    parent: node.Node = None
+    child: node.Node = None
+    relative_credits: int = None
+    min_credits: int = None
+    max_credits: int = None
+    is_mandatory: int = None
+    block: str = None
+    access_condition = None  # TODO :: typing
+    comment: str = None
+    comment_english: str = None
+    own_comment: str = None
+    quadrimester_derogation = None  # TODO :: typing
+    link_type: LinkTypes = None  # TODO :: Move Enum from model to business
+
+    def __init__(self, parent: node.Node, child: node.Node, **kwargs):
         self.parent = parent
         self.child = child
         self.relative_credits = kwargs.get('relative_credits')
@@ -48,3 +69,12 @@ class Link:
         self.own_comment = kwargs.get('own_comment')
         self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
         self.link_type = kwargs.get('link_type')
+
+
+class LinkWithChildLeaf(Link):
+    def __init__(self, parent: node.Node, child: node.Node, **kwargs):
+        super(LinkWithChildLeaf, self).__init__(parent, child, **kwargs)
+
+
+class LinkWithChildBranch(Link):
+    pass

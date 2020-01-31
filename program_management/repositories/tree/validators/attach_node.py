@@ -23,30 +23,59 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.contrib.validation import BusinessValidator, BusinessListValidator
+from program_management.contrib.validation import BusinessValidator, BusinessListValidator, BusinessValidationMessage
 from program_management.domain import node
 from program_management.domain.program_tree import ProgramTree
+from django.utils.translation import gettext as _
+from program_management.domain.authorized_relationship import AuthorizedRelationshipList
 
 
-# class AttachNodeValidator(BusinessValidator):
-#     # tree: ProgramTree = None
-#     # node_to_add: node.Node = None
-#     # where_to_add: str = None
-#     #
-#     # def __init__(self, tree: ProgramTree, node_to_add: node.Node, where_to_add: str):
-#     #     super(AttachNodeValidator, self).__init__()
-#     #     self.tree = tree
-#     #     self.node_to_add = node_to_add
-#     #     self.where_to_add = where_to_add
-#
-#     def validate(self, tree: ProgramTree, node_to_add: node.Node, where_to_add: str):
-#         raise NotImplementedError()
-
-
+#  TODO :: unit tests on validation
 class AuthorizedRelationshipValidator(BusinessValidator):
-    # TODO :: comment gérer l'utilisation de ces données? (Business ne peut pas faire appel à modèle)
+
+    tree: ProgramTree = None
+    node_to_add: node.Node = None
+    parent: node.Node = None
+    authorized_relationships: AuthorizedRelationshipList = None
+
+    def __init__(
+            self,
+            tree: ProgramTree,
+            node_to_add: node.Node,
+            path: str,
+            authorized_relationships: AuthorizedRelationshipList = None
+    ):
+        super(AuthorizedRelationshipValidator, self).__init__()
+        self.tree = tree
+        self.node_to_add = node_to_add
+        self.parent = tree.get_node(path)
+        self.authorized_relationships = authorized_relationships
+
     def validate(self):
-        pass  # Implements rules based on AuthorizedRelationhips
+        if self.authorized_relationships.is_minimum_children_types_reached(self.parent, self.node_to_add):
+            self.add_error_message(
+                _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
+                  "has already reached the limit.") % {
+                    'child_types': self.node_to_add.node_type.value,
+                    'parent': self.parent
+                }
+            )
+
+        if self.authorized_relationships.is_maximum_children_types_reached(self.parent, self.node_to_add):
+            self.add_error_message(
+                _("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                    "types": ', '.join(self.authorized_relationships.get_authorized_children_types(self.parent))
+                }
+            )
+
+        if not self.authorized_relationships.is_authorized(self.parent, self.node_to_add):
+            self.add_error_message(
+                _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                    'child_types': self.node_to_add,
+                    'parent': self.parent,
+                    'parent_type': self.parent.node_type.value,
+                }
+            )
 
 
 class AttachOptionsValidator(BusinessValidator):

@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from collections import Counter
+from typing import List, Dict
 
-from program_management.domain.link import Link
+from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.link_type import LinkTypes
+from program_management.domain.link import Link, factory as link_factory
 from program_management.domain.prerequisite import Prerequisite
 from program_management.models.enums import node_type
 
@@ -46,22 +49,42 @@ factory = NodeFactory()
 
 
 class Node:
-    def __init__(self, node_id: int, children: List[Link] = None):
+
+    children: List[Link] = None
+    node_type: EducationGroupTypesEnum = None  # TODO :: rename to 'type'
+
+    def __init__(self, node_id: int, node_type: EducationGroupTypesEnum = None, children: List[Link] = None):
         self.node_id = node_id
         if children is None:
             children = []
         self.children = children
+        self.node_type = node_type
 
     @property
     def pk(self):
         return self.node_id
 
+    @@property
+    def children_types(self) -> List[EducationGroupTypesEnum]:
+        list_child_nodes_types = []
+        for link in self.children:
+            if link.link_type == LinkTypes.REFERENCE.name:
+                childs_of_child = link.child.children
+                list_child_nodes_types += [link.child.node_type for link in childs_of_child]
+            else:
+                list_child_nodes_types.append(link.child.node_type)
+        return list_child_nodes_types
+
     @property
     def descendents(self):
         return _get_descendents(self)
 
+    @property
+    def counter_child_nodes_types(self) -> Counter[EducationGroupTypesEnum]:
+        return Counter(self.children_types)
+
     def add_child(self, node, **kwargs):
-        child = Link(parent=self, child=node, **kwargs)
+        child = link_factory.get_link(parent=self, child=node, **kwargs)
         self.children.append(child)
 
     def detach_child(self, node_id):
