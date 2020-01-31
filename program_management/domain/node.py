@@ -105,8 +105,17 @@ class NodeLearningUnitYear(Node):
         self.title = title
         self.year = year
         self.prerequisite = None
+        self.is_prerequisite_of = []
 
-    def add_prerequisite(self, prerequisite: Prerequisite):
+    @property
+    def has_prerequisite(self):
+        return bool(self.prerequisite)
+
+    @property
+    def is_prerequisite(self):
+        return bool(self.is_prerequisite_of)
+
+    def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite
 
 

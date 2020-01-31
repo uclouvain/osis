@@ -37,6 +37,12 @@ from program_management.repositories import fetch_tree
 class TestFetchTree(TestCase):
     @classmethod
     def setUpTestData(cls):
+        """
+            root_node
+            |-link_level_1
+              |-link_level_2
+                |-- leaf
+        """
         cls.root_node = ElementEducationGroupYearFactory()
         cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)  # TODO: Change to root_node when migration of group_element_year is done
         cls.link_level_2 = GroupElementYearFactory(
@@ -89,3 +95,27 @@ class TestFetchTree(TestCase):
         self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
         expected_str = '(LDROI1200) AND (LAGRO1600 OR LBIR2300)'
         self.assertEquals(str(leaf.prerequisite), expected_str)
+        self.assertTrue(leaf.has_prerequisite)
+
+    def test_case_fetch_tree_leaf_is_prerequisites_of(self):
+        new_link = GroupElementYearFactory(
+            parent=self.link_level_1.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory()
+        )
+        # Add prerequisite between two node
+        PrerequisiteFactory(
+            education_group_year=self.root_node.education_group_year,
+            learning_unit_year=self.link_level_2.child_leaf,
+            items__groups=((new_link.child_leaf,),)
+        )
+
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[1].child
+
+        self.assertIsInstance(leaf, node.NodeLearningUnitYear)
+        self.assertIsInstance(leaf.is_prerequisite_of, list)
+        self.assertEquals(len(leaf.is_prerequisite_of), 1)
+        self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
+        self.assertTrue(leaf.is_prerequisite)
+
