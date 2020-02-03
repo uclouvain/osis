@@ -53,6 +53,7 @@ from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
 NAMUR = "Namur"
+TITLE = "Title luy"
 
 
 class TestSearchForm(TestCase):
@@ -122,6 +123,23 @@ class TestSearchForm(TestCase):
         self.assertTrue(learning_unit_filter.is_valid())
         self.assertEqual(learning_unit_filter.qs.count(), 1)
 
+    def test_search_on_external_title(self):
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=self.academic_years[0],
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            learning_unit_year__learning_container_year__common_title=TITLE,
+        )
+
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
+            "container_type": learning_container_year_types.EXTERNAL,
+            "title": TITLE
+        })
+
+        learning_unit_filter = ExternalLearningUnitFilter(self.data)
+        self.assertTrue(learning_unit_filter.is_valid())
+        self.assertEqual(learning_unit_filter.qs.count(), 1)
+
     def test_dropdown_init(self):
         country = CountryFactory()
 
@@ -151,6 +169,21 @@ class TestSearchForm(TestCase):
     def test_initial_value_learning_unit_filter_with_entity_subordinated(self):
         lu_filter = LearningUnitFilter()
         self.assertTrue(lu_filter.form.fields['with_entity_subordinated'].initial)
+
+    def test_search_on_title(self):
+        LearningUnitYearFactory(
+            academic_year=self.academic_years[0],
+            learning_container_year__common_title=TITLE,
+        )
+
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
+            "title": TITLE
+        })
+
+        learning_unit_filter = LearningUnitFilter(self.data)
+        self.assertTrue(learning_unit_filter.is_valid())
+        self.assertEqual(learning_unit_filter.qs.count(), 1)
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
@@ -208,18 +241,20 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,
                                                             faculty_borrowing=entity.id))
         self.assertCountEqual(result, [obj.id for obj in self.luys_in_different_faculty_than_education_group[:1]])
-        
-        data = {
-            "academic_year": self.academic_year.id,
-            "faculty_borrowing_acronym": entity.most_recent_acronym
-        }
+        acronyms = [entity.most_recent_acronym, entity.most_recent_acronym.lower()]
+        for acronym in acronyms:
+            with self.subTest(msg=acronym):
+                data = {
+                    "academic_year": self.academic_year.id,
+                    "faculty_borrowing_acronym": acronym
+                }
 
-        borrowed_filter = BorrowedLearningUnitSearch(data)
+                borrowed_filter = BorrowedLearningUnitSearch(data)
 
-        borrowed_filter.is_valid()
-        results = list(borrowed_filter.qs)
+                borrowed_filter.is_valid()
+                results = list(borrowed_filter.qs)
 
-        self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
+                self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
 
     def test_with_faculty_borrowing_set_and_no_entity_version(self):
         group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])
