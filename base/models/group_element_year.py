@@ -170,16 +170,46 @@ class GroupElementYearManager(models.Manager):
                 } for row in cursor.fetchall()
             ]
 
-    def get_reverse_adjacency_list(self, child_ids, academic_year_id=None):
-        if not isinstance(child_ids, list):
-            raise Exception('child_ids must be an instance of list')
-        if not child_ids:
+    def get_reverse_adjacency_list(self, child_leaf_ids=None, child_branch_ids=None, academic_year_id=None):
+        if child_leaf_ids is None:
+            child_leaf_ids = []
+        if child_branch_ids is None:
+            child_branch_ids = []
+        if child_leaf_ids and not isinstance(child_leaf_ids, list):
+            raise Exception('child_leaf_ids must be an instance of list')
+        if child_branch_ids and not isinstance(child_branch_ids, list):
+            raise Exception('child_branch_ids must be an instance of list')
+        if not child_leaf_ids and not child_branch_ids:
             return []
+
+        # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
+        where_statement_leaf = ""
+        if child_leaf_ids:
+            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
+            }
+
+        where_statement_branch = ""
+        if child_branch_ids:
+            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_branch_ids))
+            }
+
+        if child_leaf_ids and child_branch_ids:
+            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
+        elif child_leaf_ids and not child_branch_ids:
+            where_statement = where_statement_leaf
+        else:
+            where_statement = where_statement_branch
 
         reverse_adjacency_query = """
             WITH RECURSIVE 
                 reverse_adjacency_query AS (
-                    SELECT gey.child_leaf_id as starting_node_id,
+                    SELECT 
+                        CASE 
+                            WHEN gey.child_leaf_id is not null then gey.child_leaf_id
+                            ELSE gey.child_branch_id
+                        END as starting_node_id,
                            gey.id, 
                            gey.child_branch_id, 
                            gey.child_leaf_id, 
@@ -189,7 +219,7 @@ class GroupElementYearManager(models.Manager):
                            0 AS level
                     FROM base_groupelementyear gey
                     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE child_leaf_id IN (%(child_ids)s)
+                    WHERE %(where_statement)s
                 
                     UNION ALL
                 
@@ -210,9 +240,12 @@ class GroupElementYearManager(models.Manager):
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
             ORDER BY starting_node_id,  level DESC, "order";
-        """ % {'child_ids': ','.join(["%s"] * len(child_ids)), 'academic_year_id': "%s"}
+        """ % {
+            'where_statement': where_statement,
+            'academic_year_id': "%s"
+        }
         with connection.cursor() as cursor:
-            parameters = child_ids + [academic_year_id, academic_year_id]
+            parameters = child_leaf_ids + child_branch_ids + [academic_year_id, academic_year_id]
             cursor.execute(reverse_adjacency_query, parameters)
             return [
                 {
@@ -582,7 +615,10 @@ def fetch_row_sql(root_ids):
 
 
 def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> list:
-    return GroupElementYear.objects.get_reverse_adjacency_list([child_leaf_id], academic_year_id)
+    return GroupElementYear.objects.get_reverse_adjacency_list(
+        child_leaf_ids=[child_leaf_id],
+        academic_year_id=academic_year_id
+    )
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):
