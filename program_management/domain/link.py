@@ -25,17 +25,17 @@
 ##############################################################################
 from base.models.enums.link_type import LinkTypes
 from program_management.models.enums.node_type import NodeType
-from typing import TYPE_CHECKING
-
-
-if TYPE_CHECKING:
-    from program_management.domain.node import Node
 
 
 class Link:
 
-    parent: 'Node' = None
-    child: 'Node' = None
+    # TODO :: Typing for Node (cyclic import)
+    # Solution 1 : if TYPE_CHECKING: from program_management.domain.node import Node + replace Node -> 'Node'
+    # Solution 2 : Node = TypeVar("Node", bound="program_management.domain.node.Node")
+    # Solution 3 : Node = TypeAlias('program_management.domain.node.Node')  # must be fully qualified name?
+    # Solution 4 : creates an interface used by Node and Link
+    parent = None
+    child = None
     relative_credits: int = None
     min_credits: int = None
     max_credits: int = None
@@ -48,7 +48,7 @@ class Link:
     quadrimester_derogation = None  # TODO :: typing
     link_type: LinkTypes = None  # TODO :: Move Enum from model to business
 
-    def __init__(self, parent: 'Node', child: 'Node', **kwargs):
+    def __init__(self, parent, child, **kwargs):
         self.parent = parent
         self.child = child
         self.relative_credits = kwargs.get('relative_credits')
@@ -75,7 +75,7 @@ class LinkWithChildBranch(Link):
 
 class LinkFactory:
 
-    def get_link(self, parent: 'Node', child: 'Node', **kwargs) -> Link:
+    def get_link(self, parent, child, **kwargs) -> Link:
         if parent.node_type == NodeType.LEARNING_UNIT:
             return LinkWithChildLeaf(parent, child, **kwargs)
         else:
