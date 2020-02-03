@@ -26,7 +26,7 @@
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Value, CharField, F
+from django.db.models import Value, CharField
 from rest_framework import serializers
 
 from base.business.education_groups import general_information_sections
@@ -41,7 +41,7 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.business.group_element_years import group_element_year_tree
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
-from webservices.business import EVALUATION_KEY, get_evaluation_text
+from webservices.business import EVALUATION_KEY
 
 WS_SECTIONS_TO_SKIP = [EVALUATION_KEY, CONTACT_INTRO]
 
@@ -143,7 +143,15 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             ),
             translated_label=Value(translated_text_label.label, output_field=CharField())
         )
-        return translated_text, translated_text_label
+        try:
+            translated_text = translated_text.values('label', 'translated_label', 'text').get()
+        except ObjectDoesNotExist:
+            translated_text = {
+                'label': self._get_correct_label_name(egy, section),
+                'translated_label': translated_text_label.label,
+                'text': None,
+            }
+        return translated_text
 
     @staticmethod
     def _get_correct_label_name(egy, section):
@@ -154,21 +162,17 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         return section
 
     def _get_evaluation_text(self, language, common_egy, has_common_eval):
+        evaluation_text = self._get_section_cms(self.instance, language, EVALUATION_KEY)
         if has_common_eval:
-            try:
-                _, text = get_evaluation_text(self.instance, language)
-            except TranslatedText.DoesNotExist:
-                text = None
-            translated_text, _ = self._get_section_cms(common_egy, language, EVALUATION_KEY)
-            translated_text.annotate(
-                free_text=Value(text, output_field=CharField())
-            )
+            evaluation_common = self._get_section_cms(common_egy, language, EVALUATION_KEY)
+            evaluation_common.update({'free_text': evaluation_text['text']})
+            evaluation_text = evaluation_common
         else:
-            translated_text, _ = self._get_section_cms(self.instance, language, EVALUATION_KEY)
-            translated_text.annotate(
-                free_text=F('text')
-            )
-        return translated_text.values('label', 'translated_label', 'text', 'free_text').first()
+            evaluation_text.update({
+                'free_text': evaluation_text['text'],
+                'text': None
+            })
+        return evaluation_text
 
     @staticmethod
     def _get_intro_offers(obj):
