@@ -43,6 +43,8 @@ from webservices.api.serializers.section import SectionSerializer, AchievementSe
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text
 
+WS_SECTIONS_TO_SKIP = [EVALUATION_KEY, CONTACT_INTRO]
+
 
 class GeneralInformationSerializer(serializers.ModelSerializer):
     language = serializers.CharField(read_only=True)
@@ -89,11 +91,10 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             CONTACTS: ContactsSectionSerializer
         }
         extra_intro_offers = self._get_intro_offers(obj)
-        try:
+
+        has_common_eval = EVALUATION_KEY in pertinent_sections['common']
+        if has_common_eval and EVALUATION_KEY in pertinent_sections['specific']:
             pertinent_sections['common'].remove(EVALUATION_KEY)
-            has_common_eval = True
-        except ValueError:
-            has_common_eval = False
 
         for common_section in pertinent_sections['common']:
             sections.append(self._get_translated_text(common_egy, common_section, language))
@@ -103,7 +104,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             if serializer:
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
-            elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
+            elif specific_section not in WS_SECTIONS_TO_SKIP:
                 sections.append(self._get_translated_text(obj, specific_section, language))
             elif specific_section == EVALUATION_KEY:
                 sections.append(self._get_evaluation_text(language, common_egy, has_common_eval))
