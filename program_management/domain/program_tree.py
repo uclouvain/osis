@@ -24,14 +24,20 @@
 #
 ##############################################################################
 from program_management.domain import node
-from program_management.repositories.tree.validators.attach_node import factory as attach_node_validator_factory
+from program_management.domain.authorized_relationship import AuthorizedRelationshipList
+from program_management.domain.tree import factory as attach_node_validator_factory
 
 
 class ProgramTree:
-    def __init__(self, root_node: node.Node):
+
+    root_node: node.Node = None
+    authorized_relationships: AuthorizedRelationshipList = None
+
+    def __init__(self, root_node: node.Node, authorized_relationships: AuthorizedRelationshipList = None):
         if not isinstance(root_node, node.Node):
             raise Exception('root_group args must be an instance of Node')
         self.root_node = root_node
+        self.authorized_relationships = authorized_relationships or []
 
     # TODO :: typer "path" (pour plus de lisibilité dans le code)
     def get_node(self, path: str) -> node.Node:

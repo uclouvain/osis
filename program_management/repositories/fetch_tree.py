@@ -37,6 +37,7 @@ from program_management.domain import node, link, prerequisite
 from program_management.domain.program_tree import ProgramTree
 from program_management.models.element import Element
 from program_management.models.enums import node_type
+from program_management.repositories import fetch_authorized_relationship
 
 
 def fetch(tree_root_id) -> ProgramTree:
@@ -165,7 +166,7 @@ def __fetch_tree_prerequisites(tree_root_id: int, nodes: dict):
 
 def __build_tree(root_node, tree_structure, nodes, links, prerequisites):
     root_node.children = __build_children(root_node, tree_structure, nodes, links, prerequisites)
-    tree = ProgramTree(root_node)
+    tree = ProgramTree(root_node, authorized_relationships=fetch_authorized_relationship.fetch())
     return tree
 
 

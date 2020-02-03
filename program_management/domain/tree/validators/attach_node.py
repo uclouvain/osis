@@ -36,23 +36,23 @@ class AuthorizedRelationshipValidator(BusinessValidator):
     tree: ProgramTree = None
     node_to_add: node.Node = None
     parent: node.Node = None
-    authorized_relationships: AuthorizedRelationshipList = None
+    # authorized_relationships: AuthorizedRelationshipList = None
 
     def __init__(
             self,
             tree: ProgramTree,
             node_to_add: node.Node,
             path: str,
-            authorized_relationships: AuthorizedRelationshipList = None
+            # authorized_relationships: AuthorizedRelationshipList = None
     ):
         super(AuthorizedRelationshipValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add
         self.parent = tree.get_node(path)
-        self.authorized_relationships = authorized_relationships
+        # self.authorized_relationships = authorized_relationships
 
     def validate(self):
-        if self.authorized_relationships.is_minimum_children_types_reached(self.parent, self.node_to_add):
+        if self.tree.authorized_relationships.is_minimum_children_types_reached(self.parent, self.node_to_add):
             self.add_error_message(
                 _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                   "has already reached the limit.") % {
@@ -61,14 +61,14 @@ class AuthorizedRelationshipValidator(BusinessValidator):
                 }
             )
 
-        if self.authorized_relationships.is_maximum_children_types_reached(self.parent, self.node_to_add):
+        if self.tree.authorized_relationships.is_maximum_children_types_reached(self.parent, self.node_to_add):
             self.add_error_message(
                 _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-                    "types": ', '.join(self.authorized_relationships.get_authorized_children_types(self.parent))
+                    "types": ', '.join(self.tree.authorized_relationships.get_authorized_children_types(self.parent))
                 }
             )
 
-        if not self.authorized_relationships.is_authorized(self.parent, self.node_to_add):
+        if not self.tree.authorized_relationships.is_authorized(self.parent, self.node_to_add):
             self.add_error_message(
                 _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                     'child_types': self.node_to_add,
