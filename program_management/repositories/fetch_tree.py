@@ -25,6 +25,7 @@
 ##############################################################################
 
 import copy
+from typing import List
 
 from django.db.models import Case, Value, F, When, IntegerField, CharField
 
@@ -52,6 +53,33 @@ def fetch(tree_root_id) -> ProgramTree:
     links = __fetch_tree_links(structure)
     prerequisites = __fetch_tree_prerequisites(tree_root_id, nodes)
     return __build_tree(root_node, structure, nodes, links, prerequisites)
+
+
+def fetch_trees_from_children(child_branch_ids: list, child_leaf_ids: list = None) -> List[ProgramTree]:
+    # FIXME :: simplify the code (child_branch, chlid_leaf, if else)
+    if not child_branch_ids and not child_leaf_ids:
+        return []
+    if child_branch_ids:
+        assert isinstance(child_branch_ids, list)
+    if child_leaf_ids:
+        assert isinstance(child_leaf_ids, list)
+    qs = GroupElementYear.objects.get_reverse_adjacency_list(
+        child_branch_ids=child_branch_ids,
+        child_leaf_ids=child_leaf_ids
+    )
+    if not qs:
+        root_ids = child_branch_ids
+    else:
+        all_parents = set(obj['parent_id'] for obj in qs)
+        parent_by_child_branch = {
+            obj['child_id']: obj['parent_id'] for obj in qs
+        }
+        root_ids = set(
+            parent_id for parent_id in all_parents
+            if not parent_by_child_branch.get(parent_id)
+        )
+    # TODO :: performance (get all trees in one single query)
+    return [fetch(root_id) for root_id in root_ids]
 
 
 def __fetch_tree_nodes(tree_structure):

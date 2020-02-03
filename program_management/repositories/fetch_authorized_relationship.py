@@ -25,24 +25,23 @@
 ##############################################################################
 from program_management.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship
-from django.db.models import Case, Value, F, When, IntegerField, CharField, Subquery, OuterRef
 
 
 def fetch() -> AuthorizedRelationshipList:
     authorized_relationships = []
-    qs = ModelRelationship.objects.all().annotate(
-        parent_type=F('parent_type__name'),
-        child_type=F('child_type__name'),
-        min_constraint=F('min_count_authorized'),
-        max_constraint=F('max_count_authorized'),
+    qs = ModelRelationship.objects.all().values(
+        'parent_type__name',
+        'child_type__name',
+        'min_count_authorized',
+        'max_count_authorized',
     )
     for obj in qs:
         authorized_relationships.append(
             AuthorizedRelationship(
-                obj.parent_type,
-                obj.child_type,
-                obj.min_constraint,
-                obj.max_constraint,
+                obj['parent_type__name'],
+                obj['child_type__name'],
+                obj['min_count_authorized'],
+                obj['max_count_authorized'],
             )
         )
     return AuthorizedRelationshipList(authorized_relationships)

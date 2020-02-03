@@ -60,11 +60,14 @@ class Node:
         self.children = children
         self.node_type = node_type
 
+    def __eq__(self, other):
+        return self.node_id == other.node_id
+
     @property
     def pk(self):
         return self.node_id
 
-    @@property
+    @property
     def children_types(self) -> List[EducationGroupTypesEnum]:
         list_child_nodes_types = []
         for link in self.children:
@@ -80,7 +83,7 @@ class Node:
         return _get_descendents(self)
 
     @property
-    def counter_child_nodes_types(self) -> Counter[EducationGroupTypesEnum]:
+    def counter_child_nodes_types(self) -> Counter:
         return Counter(self.children_types)
 
     def add_child(self, node, **kwargs):

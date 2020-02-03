@@ -26,6 +26,8 @@
 from django.test import TestCase
 
 from base.models.enums.proposal_type import ProposalType
+from base.models.group_element_year import GroupElementYear
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -69,6 +71,7 @@ class TestFetchTree(TestCase):
             self.link_level_1.child_branch.acronym
         )
 
+    # TODO : move this into test_fetch_prerequisite
     def test_case_fetch_tree_leaf_have_some_prerequisites(self):
         PrerequisiteFactory(
             education_group_year=self.root_node.education_group_year,
@@ -139,3 +142,72 @@ class TestFetchTree(TestCase):
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
         self.assertFalse(leaf.has_proposal)
         self.assertIsNone(leaf.proposal_type)
+
+
+class TestFetchTreesFromChildren(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2020)
+        cls.root_node = ElementEducationGroupYearFactory(education_group_year__academic_year=cls.academic_year)
+        cls.link_level_1 = GroupElementYearFactory(
+            parent=cls.root_node.education_group_year,
+            child_branch__academic_year=cls.academic_year
+        )
+        cls.link_level_2 = GroupElementYearFactory(
+            parent=cls.link_level_1.child_branch,
+            child_branch__academic_year=cls.academic_year
+        )
+
+    def test_when_bad_arg(self):
+        with self.assertRaises(Exception):
+            fetch_tree.fetch_trees_from_children("I'm not a list arg")
+
+    def test_when_child_list_is_empty(self):
+        result = fetch_tree.fetch_trees_from_children([])
+        self.assertEqual(result, [])
+
+    def test_when_child_is_root(self):
+        children_ids = [self.link_level_1.parent.id]
+        result = fetch_tree.fetch_trees_from_children(children_ids)
+        expected_result = [fetch_tree.fetch(self.root_node.education_group_year.id)]
+        self.assertListEqual(result, expected_result)
+
+    def test_when_child_has_only_one_root_id(self):
+        children_ids = [self.link_level_2.child_branch.id]
+        result = fetch_tree.fetch_trees_from_children(children_ids)
+        expected_result = [fetch_tree.fetch(self.root_node.education_group_year.id)]
+        self.assertListEqual(result, expected_result)
+
+    def test_when_child_is_learning_unit(self):
+        link_level_3 = GroupElementYearFactory(
+            parent=self.link_level_2.child_branch,
+            child_leaf=LearningUnitYearFactory(academic_year=self.academic_year),
+            child_branch=None,
+        )
+        children_ids = [link_level_3.child_leaf.id]
+        result = fetch_tree.fetch_trees_from_children([], child_leaf_ids=children_ids)
+        expected_result = [fetch_tree.fetch(self.root_node.education_group_year.id)]
+        self.assertListEqual(result, expected_result)
+
+    def test_when_child_has_many_root_ids(self):
+        root_node_2 = ElementEducationGroupYearFactory(education_group_year__academic_year=self.academic_year)
+        root_node_3 = ElementEducationGroupYearFactory(education_group_year__academic_year=self.academic_year)
+        child = self.link_level_2.child_branch
+        GroupElementYearFactory(
+            parent=root_node_2.education_group_year,
+            child_branch=child
+        )
+        GroupElementYearFactory(
+            parent=root_node_3.education_group_year,
+            child_branch=child
+        )
+        result = fetch_tree.fetch_trees_from_children([child.id])
+        expected_result = [
+            fetch_tree.fetch(self.root_node.education_group_year.id),
+            fetch_tree.fetch(root_node_2.education_group_year.id),
+            fetch_tree.fetch(root_node_3.education_group_year.id),
+        ]
+        self.assertEqual(len(result), len(expected_result))
+        for tree in expected_result:
+            self.assertIn(tree, result)
