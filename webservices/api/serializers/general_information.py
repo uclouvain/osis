@@ -97,7 +97,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             pertinent_sections['common'].remove(EVALUATION_KEY)
 
         for common_section in pertinent_sections['common']:
-            sections.append(self._get_translated_text(common_egy, common_section, language))
+            sections.append(self._get_section_cms(common_egy, common_section, language))
 
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
@@ -105,26 +105,15 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
             elif specific_section not in WS_SECTIONS_TO_SKIP:
-                sections.append(self._get_translated_text(obj, specific_section, language))
+                sections.append(self._get_section_cms(obj, specific_section, language))
             elif specific_section == EVALUATION_KEY:
                 sections.append(self._get_evaluation_text(language, common_egy, has_common_eval))
 
         for offer in extra_intro_offers:
-            sections.append(self._get_translated_text(offer, 'intro', language))
+            sections.append(self._get_section_cms(offer, 'intro', language))
 
         datas += SectionSerializer(sections, many=True).data
         return datas
-
-    def _get_translated_text(self, egy, section, language):
-        translated_text, translated_text_label = self._get_section_cms(egy, language, section)
-        try:
-            return translated_text.values('label', 'translated_label', 'text').get()
-        except ObjectDoesNotExist:
-            return {
-                'label': self._get_correct_label_name(egy, section),
-                'translated_label': translated_text_label.label,
-                'text': None
-            }
 
     def _get_section_cms(self, egy, language, section):
         translated_text_label = TranslatedTextLabel.objects.get(
