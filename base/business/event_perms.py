@@ -27,6 +27,7 @@ from abc import ABC
 
 from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -93,6 +94,17 @@ class EventPerm(ABC):
         if max_academic_y:
             qs = qs.filter(data_year__year__lte=max_academic_y)
         return qs.values_list('data_year', flat=True)
+
+    @classmethod
+    def get_current_or_previous_opened_calendar_academic_year(cls, date=None) -> QuerySet:
+        if not date:
+            date = timezone.now()
+        qs = AcademicCalendar.objects.filter(start_date__lt=date).order_by('end_date')
+
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+
+        return qs.last().data_year if qs.last() else None
 
 
 class EventPermClosed(EventPerm):
