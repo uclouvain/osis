@@ -115,7 +115,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    def _get_section_cms(self, egy, language, section):
+    def _get_section_cms(self, egy, section, language):
         translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
