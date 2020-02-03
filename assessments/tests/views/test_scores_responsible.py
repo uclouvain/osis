@@ -68,6 +68,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.root_entity = entities_hierarchy.get('root_entity')
         cls.child_one_entity = entities_hierarchy.get('child_one_entity')
         cls.child_two_entity = entities_hierarchy.get('child_two_entity')
+        cls.learning_unit_yr_req_entity_acronym = entities_hierarchy.get('child_one_entity_version').acronym
 
         cls.entity_manager = EntityManagerFactory(
             person=cls.tutor.person,
@@ -186,6 +187,24 @@ class ScoresResponsibleSearchTestCase(TestCase):
             str(response.content, encoding='utf8'),
             {'object_list': expected_response}
         )
+
+    def test_case_search_by_requirement_entity(self):
+        data = {
+            'acronym': '',
+            'learning_unit_title': '',
+            'tutor': '',
+            'scores_responsible': '',
+            'requirement_entity': self.learning_unit_yr_req_entity_acronym
+        }
+        data.update({'requirement_entity': self.learning_unit_yr_req_entity_acronym})
+
+        response = self.client.get(self.url, data=data)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        qs_result = response.context['object_list']
+
+        self.assertEqual(qs_result.count(), 1)
+        self.assertEqual(qs_result.first(), self.learning_unit_year)
 
 
 class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):
