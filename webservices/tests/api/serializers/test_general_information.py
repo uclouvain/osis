@@ -158,7 +158,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 'acronym': self.egy.acronym
             }
         ).data['sections'][0]
-        self.assertEqual(evaluation_section['content'], None)
+        self.assertIsNone(evaluation_section['content'])
         self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
 
     def test_case_text_not_existing(self):
@@ -178,7 +178,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 'acronym': self.egy.acronym
             }
         ).data['sections'][0]
-        self.assertEqual(welcome_introduction_section['content'], None)
+        self.assertIsNone(welcome_introduction_section['content'])
 
     def test_get_intro_offers(self):
         gey = GroupElementYearFactory(
@@ -186,11 +186,39 @@ class GeneralInformationSerializerTestCase(TestCase):
             child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
             child_branch__partial_acronym="TESTTC"
         )
-        intro_offer_section = self._adapt_section_and_cms(gey, self.egy)
-        self.assertEqual(intro_offer_section['content'], None)
+        intro_offer_section = self._adapt_cms_and_rules_for_intro_section_only(gey, self.egy)
+        self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testtc')
 
-    def _adapt_section_and_cms(self, gey, egy):
+    def test_get_intro_option_offer(self):
+        gey = GroupElementYearFactory(
+            parent=self.egy,
+            child_branch__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
+        )
+        gey_option = GroupElementYearFactory(
+            parent=gey.child_branch,
+            child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
+            child_branch__partial_acronym="TESTOPTION"
+        )
+        intro_offer_section = self._adapt_cms_and_rules_for_intro_section_only(gey_option, self.egy)
+        self.assertIsNone(intro_offer_section['content'])
+        self.assertEqual(intro_offer_section['id'], 'intro-testoption')
+
+    def test_get_intro_finality_offer(self):
+        egy = EducationGroupYearFactory(
+            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+            academic_year=self.egy.academic_year
+        )
+        gey = GroupElementYearFactory(
+            parent=egy,
+            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
+            child_branch__partial_acronym="TESTFINA"
+        )
+        intro_offer_section = self._adapt_cms_and_rules_for_intro_section_only(gey, egy)
+        self.assertIsNone(intro_offer_section['content'])
+        self.assertEqual(intro_offer_section['id'], 'intro-testfina')
+
+    def _adapt_cms_and_rules_for_intro_section_only(self, gey, egy):
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             egy.education_group_type.name
         ] = {
@@ -213,31 +241,3 @@ class GeneralInformationSerializerTestCase(TestCase):
                 'acronym': egy.acronym
             }
         ).data['sections'][0]
-
-    def test_get_intro_option_offer(self):
-        gey = GroupElementYearFactory(
-            parent=self.egy,
-            child_branch__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
-        )
-        gey_option = GroupElementYearFactory(
-            parent=gey.child_branch,
-            child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
-            child_branch__partial_acronym="TESTOPTION"
-        )
-        intro_offer_section = self._adapt_section_and_cms(gey_option, self.egy)
-        self.assertEqual(intro_offer_section['content'], None)
-        self.assertEqual(intro_offer_section['id'], 'intro-testoption')
-
-    def test_get_intro_finality_offer(self):
-        egy = EducationGroupYearFactory(
-            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
-            academic_year=self.egy.academic_year
-        )
-        gey = GroupElementYearFactory(
-            parent=egy,
-            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
-            child_branch__partial_acronym="TESTFINA"
-        )
-        intro_offer_section = self._adapt_section_and_cms(gey, egy)
-        self.assertEqual(intro_offer_section['content'], None)
-        self.assertEqual(intro_offer_section['id'], 'intro-testfina')
