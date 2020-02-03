@@ -448,8 +448,6 @@ components:
           type: string
         partial_title:
           type: string
-        partial_title_english:
-          type: string
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'

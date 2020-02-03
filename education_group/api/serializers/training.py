@@ -24,6 +24,7 @@
 #
 ##############################################################################
 
+from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -46,6 +47,7 @@ class TrainingListSerializer(EducationGroupTitleSerializer, serializers.Hyperlin
     )
     administration_entity = serializers.CharField(source='administration_entity_version.acronym', read_only=True)
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    partial_title = serializers.SerializerMethodField(read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -61,8 +63,14 @@ class TrainingListSerializer(EducationGroupTitleSerializer, serializers.Hyperlin
             'academic_year',
             'administration_entity',
             'management_entity',
-            'partial_title',
-            'partial_title_english'
+            'partial_title'
+        )
+
+    def get_partial_title(self, training):
+        language = self.context.get('language')
+        return getattr(
+            training,
+            'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
 
 
