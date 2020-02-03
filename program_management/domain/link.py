@@ -24,25 +24,18 @@
 #
 ##############################################################################
 from base.models.enums.link_type import LinkTypes
-from program_management.domain import node
 from program_management.models.enums.node_type import NodeType
+from typing import TYPE_CHECKING
 
 
-class LinkFactory:
-    def get_link(self, parent: node.Node, child: node.Node, **kwargs):
-        if parent.type == NodeType.LEARNING_UNIT.name:
-            return LinkWithChildLeaf(parent, child, **kwargs)
-        else:
-            return LinkWithChildBranch(parent, child, **kwargs)
-
-
-factory = LinkFactory()
+if TYPE_CHECKING:
+    from program_management.domain.node import Node
 
 
 class Link:
 
-    parent: node.Node = None
-    child: node.Node = None
+    parent: 'Node' = None
+    child: 'Node' = None
     relative_credits: int = None
     min_credits: int = None
     max_credits: int = None
@@ -55,7 +48,7 @@ class Link:
     quadrimester_derogation = None  # TODO :: typing
     link_type: LinkTypes = None  # TODO :: Move Enum from model to business
 
-    def __init__(self, parent: node.Node, child: node.Node, **kwargs):
+    def __init__(self, parent: 'Node', child: 'Node', **kwargs):
         self.parent = parent
         self.child = child
         self.relative_credits = kwargs.get('relative_credits')
@@ -72,9 +65,21 @@ class Link:
 
 
 class LinkWithChildLeaf(Link):
-    def __init__(self, parent: node.Node, child: node.Node, **kwargs):
-        super(LinkWithChildLeaf, self).__init__(parent, child, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(LinkWithChildLeaf, self).__init__(*args, **kwargs)
 
 
 class LinkWithChildBranch(Link):
     pass
+
+
+class LinkFactory:
+
+    def get_link(self, parent: 'Node', child: 'Node', **kwargs) -> Link:
+        if parent.node_type == NodeType.LEARNING_UNIT:
+            return LinkWithChildLeaf(parent, child, **kwargs)
+        else:
+            return LinkWithChildBranch(parent, child, **kwargs)
+
+
+factory = LinkFactory()
