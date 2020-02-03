@@ -25,28 +25,45 @@
 ##############################################################################
 from typing import List
 
-from program_management.contrib.validation import BusinessValidationMessage
+from program_management.contrib.validation import BusinessValidationMessage, MessageLevel
 from program_management.domain.node import Node
 from program_management.domain.program_tree import ProgramTree
-from program_management.repositories import fetch_authorized_relationship
-from program_management.repositories.tree.validators.attach_node import AuthorizedRelationshipValidator
+from program_management.domain.tree.validators import attach_node as attach_node_validator
+from django.utils.translation import gettext as _
+
+from program_management.domain.tree.validators.attach_node import AuthorizedRelationshipValidator
+from program_management.repositories import fetch_tree
 
 
 def attach_node(tree: ProgramTree, node: Node, path: str = None) -> List[BusinessValidationMessage]:
-    error_messages = []
-    authorized_relationships = fetch_authorized_relationship.fetch()
-    for tree in __get_trees_using_node_as_reference(tree.get_node(path)):
-        validator = AuthorizedRelationshipValidator(tree, node, path, authorized_relationships)
-        validator.validate()
-        error_messages += validator.error_messages
+    position_to_attach = tree.get_node(path)
 
-    validator = AuthorizedRelationshipValidator(tree, node, path, authorized_relationships)
+    error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
+
+    validator = attach_node_validator.factory.get_attach_node_validator(tree, node, position_to_attach)
     validator.validate()
     error_messages += validator.error_messages
-    # TODO :: gérer les success messages
-    # TODO :: ajouter l'appel aux auxtres validators ; AuthorizedRelationshipValidator devrait se trouver dans un même BusinessListValidator ??
-    return
+
+    if not error_messages:
+        return [BusinessValidationMessage(_('Success message'), MessageLevel.SUCCESS)]
+
+    return error_messages
+
+
+def __validate_trees_using_node_as_reference_link(
+        tree: ProgramTree,
+        node_to_attach: Node,
+        path: str
+) -> List[BusinessValidationMessage]:
+    error_messages = []
+    for tree in __get_trees_using_node_as_reference(tree.get_node(path)):
+        validator = AuthorizedRelationshipValidator(tree, node_to_attach, path)
+        validator.validate()
+        error_messages += validator.error_messages
+    return error_messages
 
 
 def __get_trees_using_node_as_reference(node: Node) -> List[ProgramTree]:
-    pass  # Using fetch_tree() for multiple programTree
+    # TODO :: filter children with only link==REFERENCE
+    children_ids = [node.node_id]
+    return fetch_tree.fetch_trees_from_children(children_ids)

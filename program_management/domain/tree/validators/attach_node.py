@@ -27,7 +27,6 @@ from program_management.contrib.validation import BusinessValidator, BusinessLis
 from program_management.domain import node
 from program_management.domain.program_tree import ProgramTree
 from django.utils.translation import gettext as _
-from program_management.domain.authorized_relationship import AuthorizedRelationshipList
 
 
 #  TODO :: unit tests on validation
@@ -36,20 +35,12 @@ class AuthorizedRelationshipValidator(BusinessValidator):
     tree: ProgramTree = None
     node_to_add: node.Node = None
     parent: node.Node = None
-    # authorized_relationships: AuthorizedRelationshipList = None
 
-    def __init__(
-            self,
-            tree: ProgramTree,
-            node_to_add: node.Node,
-            path: str,
-            # authorized_relationships: AuthorizedRelationshipList = None
-    ):
+    def __init__(self, tree: ProgramTree, node_to_add: node.Node, path: str):
         super(AuthorizedRelationshipValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add
         self.parent = tree.get_node(path)
-        # self.authorized_relationships = authorized_relationships
 
     def validate(self):
         if self.tree.authorized_relationships.is_minimum_children_types_reached(self.parent, self.node_to_add):
