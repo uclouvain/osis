@@ -151,9 +151,9 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         return section
 
     def _get_evaluation_text(self, language, common_egy, has_common_eval):
-        evaluation_text = self._get_section_cms(self.instance, language, EVALUATION_KEY)
+        evaluation_text = self._get_section_cms(self.instance, EVALUATION_KEY, language)
         if has_common_eval:
-            evaluation_common = self._get_section_cms(common_egy, language, EVALUATION_KEY)
+            evaluation_common = self._get_section_cms(common_egy, EVALUATION_KEY, language)
             evaluation_common.update({'free_text': evaluation_text['text']})
             evaluation_text = evaluation_common
         else:

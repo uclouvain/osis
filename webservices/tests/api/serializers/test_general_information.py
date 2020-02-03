@@ -43,7 +43,7 @@ class GeneralInformationSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = EducationGroupYearFactory()
-        common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
+        cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
@@ -58,10 +58,11 @@ class GeneralInformationSerializerTestCase(TestCase):
                 text_label__label=section
             )
             TranslatedTextFactory(
-                reference=common_egy.id,
+                reference=cls.common_egy.id,
                 entity=OFFER_YEAR,
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text=section.upper() + "_TEXT_COMMON"
             )
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
@@ -72,7 +73,8 @@ class GeneralInformationSerializerTestCase(TestCase):
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text=section.upper() + "_TEXT"
             )
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
@@ -109,8 +111,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         self.assertEqual(type(self.serializer.data['sections']), list)
         self.assertEqual(
             len(self.serializer.data['sections']),
-            len(self.pertinent_sections['common'] + self.pertinent_sections['specific']) - 1
-            # EVALUATION SPECIFIC AND COMMON IN ONLY ONE ENTRY
+            len(self.pertinent_sections['common'] + self.pertinent_sections['specific'])
         )
         for section in self.serializer.data['sections']:
             if section['id'] == EVALUATION_KEY:
@@ -119,3 +120,42 @@ class GeneralInformationSerializerTestCase(TestCase):
             else:
                 self.assertTrue(isinstance(section, collections.OrderedDict))
                 self.assertListEqual(list(section.keys()), expected_fields)
+
+    def test_get_both_evaluation_texts(self):
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[
+            self.egy.education_group_type.name
+        ] = {
+            'specific': [EVALUATION_KEY],
+            'common': [EVALUATION_KEY]
+        }
+        TranslatedTextFactory(
+            reference=self.common_egy.id,
+            entity=OFFER_YEAR,
+            language=self.language,
+            text_label__label=EVALUATION_KEY,
+            text="EVALUATION_TEXT_COMMON"
+        )
+        evaluation_section = GeneralInformationSerializer(
+            self.egy, context={
+                'language': self.language,
+                'acronym': self.egy.acronym
+            }
+        ).data['sections'][0]
+        self.assertEqual(evaluation_section['content'], 'EVALUATION_TEXT_COMMON')
+        self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
+
+    def test_get_only_specific_evaluation(self):
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[
+            self.egy.education_group_type.name
+        ] = {
+            'specific': [EVALUATION_KEY],
+            'common': []
+        }
+        evaluation_section = GeneralInformationSerializer(
+            self.egy, context={
+                'language': self.language,
+                'acronym': self.egy.acronym
+            }
+        ).data['sections'][0]
+        self.assertEqual(evaluation_section['content'], None)
+        self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
