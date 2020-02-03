@@ -180,64 +180,76 @@ class GeneralInformationSerializerTestCase(TestCase):
         ).data['sections'][0]
         self.assertIsNone(welcome_introduction_section['content'])
 
-    def test_get_intro_offers(self):
-        gey = GroupElementYearFactory(
-            parent=self.egy,
-            child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
-            child_branch__partial_acronym="TESTTC"
-        )
-        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
-        self.assertIsNone(intro_offer_section['content'])
-        self.assertEqual(intro_offer_section['id'], 'intro-testtc')
 
-    def test_get_intro_option_offer(self):
-        gey = GroupElementYearFactory(
-            parent=self.egy,
-            child_branch__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
-        )
-        gey_option = GroupElementYearFactory(
-            parent=gey.child_branch,
-            child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
-            child_branch__partial_acronym="TESTOPTION"
-        )
-        intro_offer_section = self._get_pertinent_intro_section(gey_option, self.egy)
-        self.assertIsNone(intro_offer_section['content'])
-        self.assertEqual(intro_offer_section['id'], 'intro-testoption')
-
-    def test_get_intro_finality_offer(self):
-        egy = EducationGroupYearFactory(
-            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
-            academic_year=self.egy.academic_year
-        )
-        gey = GroupElementYearFactory(
-            parent=egy,
-            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
-            child_branch__partial_acronym="TESTFINA"
-        )
-        intro_offer_section = self._get_pertinent_intro_section(gey, egy)
-        self.assertIsNone(intro_offer_section['content'])
-        self.assertEqual(intro_offer_section['id'], 'intro-testfina')
-
-    def _get_pertinent_intro_section(self, gey, egy):
+class IntroOffersSectionTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
+        cls.language = settings.LANGUAGE_CODE_EN
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
-            egy.education_group_type.name
+            cls.egy.education_group_type.name
         ] = {
             'specific': [],
             'common': []
         }
-        TranslatedTextLabelFactory(
-            text_label__label=INTRODUCTION,
-            language=self.language,
-        )
-        TranslatedTextFactory(
-            text_label__label=INTRODUCTION,
-            language=self.language,
-            entity=OFFER_YEAR,
-            reference=gey.child_branch.id
-        )
-        return GeneralInformationSerializer(
-            egy, context={
-                'language': self.language,
-                'acronym': egy.acronym
-            }
-        ).data['sections'][0]
+
+
+def test_get_intro_offers(self):
+    gey = GroupElementYearFactory(
+        parent=self.egy,
+        child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
+        child_branch__partial_acronym="TESTTC"
+    )
+    intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+    self.assertIsNone(intro_offer_section['content'])
+    self.assertEqual(intro_offer_section['id'], 'intro-testtc')
+
+
+def test_get_intro_option_offer(self):
+    gey = GroupElementYearFactory(
+        parent=self.egy,
+        child_branch__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
+    )
+    gey_option = GroupElementYearFactory(
+        parent=gey.child_branch,
+        child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
+        child_branch__partial_acronym="TESTOPTION"
+    )
+    intro_offer_section = self._get_pertinent_intro_section(gey_option, self.egy)
+    self.assertIsNone(intro_offer_section['content'])
+    self.assertEqual(intro_offer_section['id'], 'intro-testoption')
+
+
+def test_get_intro_finality_offer(self):
+    egy = EducationGroupYearFactory(
+        education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+        academic_year=self.egy.academic_year
+    )
+    gey = GroupElementYearFactory(
+        parent=egy,
+        child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
+        child_branch__partial_acronym="TESTFINA"
+    )
+    intro_offer_section = self._get_pertinent_intro_section(gey, egy)
+    self.assertIsNone(intro_offer_section['content'])
+    self.assertEqual(intro_offer_section['id'], 'intro-testfina')
+
+
+def _get_pertinent_intro_section(self, gey, egy):
+    TranslatedTextLabelFactory(
+        text_label__label=INTRODUCTION,
+        language=self.language,
+    )
+    TranslatedTextFactory(
+        text_label__label=INTRODUCTION,
+        language=self.language,
+        entity=OFFER_YEAR,
+        reference=gey.child_branch.id
+    )
+    return GeneralInformationSerializer(
+        egy, context={
+            'language': self.language,
+            'acronym': egy.acronym
+        }
+    ).data['sections'][0]
