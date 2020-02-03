@@ -25,9 +25,11 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.domain import program_tree, node, prerequisite
 from program_management.models.element import Element
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
@@ -37,6 +39,12 @@ from program_management.repositories import fetch_tree
 class TestFetchTree(TestCase):
     @classmethod
     def setUpTestData(cls):
+        """
+            root_node
+            |-link_level_1
+              |-link_level_2
+                |-- leaf
+        """
         cls.root_node = ElementEducationGroupYearFactory()
         cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)  # TODO: Change to root_node when migration of group_element_year is done
         cls.link_level_2 = GroupElementYearFactory(
@@ -89,3 +97,45 @@ class TestFetchTree(TestCase):
         self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
         expected_str = '(LDROI1200) AND (LAGRO1600 OR LBIR2300)'
         self.assertEquals(str(leaf.prerequisite), expected_str)
+        self.assertTrue(leaf.has_prerequisite)
+
+    def test_case_fetch_tree_leaf_is_prerequisites_of(self):
+        new_link = GroupElementYearFactory(
+            parent=self.link_level_1.child_branch,
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory()
+        )
+        # Add prerequisite between two node
+        PrerequisiteFactory(
+            education_group_year=self.root_node.education_group_year,
+            learning_unit_year=self.link_level_2.child_leaf,
+            items__groups=((new_link.child_leaf,),)
+        )
+
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[1].child
+
+        self.assertIsInstance(leaf, node.NodeLearningUnitYear)
+        self.assertIsInstance(leaf.is_prerequisite_of, list)
+        self.assertEquals(len(leaf.is_prerequisite_of), 1)
+        self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
+        self.assertTrue(leaf.is_prerequisite)
+
+    def test_case_fetch_tree_leaf_node_have_a_proposal(self):
+        proposal_types = ProposalType.get_names()
+        for p_type in proposal_types:
+            proposal = ProposalLearningUnitFactory(learning_unit_year=self.link_level_2.child_leaf)
+            with self.subTest(msg=p_type):
+                proposal.type = p_type
+                proposal.save()
+
+                education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+                leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+                self.assertTrue(leaf.has_proposal)
+                self.assertEquals(leaf.proposal_type, p_type)
+
+    def test_case_fetch_tree_leaf_node_have_no_proposal(self):
+        education_group_program_tree = fetch_tree.fetch(self.root_node.education_group_year.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+        self.assertFalse(leaf.has_proposal)
+        self.assertIsNone(leaf.proposal_type)

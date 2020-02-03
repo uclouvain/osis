@@ -106,7 +106,7 @@ def _get_descendents(root_node: Node, current_path: str = None):
 
 
 class NodeEducationGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None):
+    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
         super().__init__(node_id, children)
         self.acronym = acronym
         self.title = title
@@ -114,7 +114,7 @@ class NodeEducationGroupYear(Node):
 
 
 class NodeGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None):
+    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
         super().__init__(node_id, children)
         self.acronym = acronym
         self.title = title
@@ -122,14 +122,28 @@ class NodeGroupYear(Node):
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None):
-        super().__init__(node_id, children)
+    def __init__(self, node_id: int, acronym, title, year, proposal_type=None, **kwargs):
+        super().__init__(node_id, [])
         self.acronym = acronym
         self.title = title
         self.year = year
+        self.proposal_type = proposal_type
         self.prerequisite = None
+        self.is_prerequisite_of = []
 
-    def add_prerequisite(self, prerequisite: Prerequisite):
+    @property
+    def has_prerequisite(self):
+        return bool(self.prerequisite)
+
+    @property
+    def is_prerequisite(self):
+        return bool(self.is_prerequisite_of)
+
+    @property
+    def has_proposal(self):
+        return bool(self.proposal_type)
+
+    def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite
 
 
