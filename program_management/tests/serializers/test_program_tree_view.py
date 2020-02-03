@@ -71,6 +71,10 @@ class TestProgramTreeViewSerializer(TestCase):
         serializer = ProgramTreeViewSerializer(self.tree)
 
         self.assertIsInstance(serializer.data['children'], list)
+        self.assertEquals(
+            serializer.data['children'][0]['path'],
+            "|".join([str(self.root_node.pk), str(self.common_core.pk)]),
+        )
         self.assertEquals(serializer.data['children'][0]['text'], self.common_core.acronym)
         self.assertEquals(serializer.data['children'][0]['icon'], None)
         self.assertIsInstance(serializer.data['children'][0]['children'], list)

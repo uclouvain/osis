@@ -23,24 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import CreateView
 
-from program_management.domain import program_tree
-from program_management.serializers.node_view import ChildrenField
+from base.views.mixins import AjaxTemplateMixin
 
 
-class ProgramTreeViewSerializer(serializers.Serializer):
-    text = serializers.CharField(source='root_node.title')
-    icon = serializers.SerializerMethodField()
-    children = ChildrenField(source='root_node.children', many=True)
-
-    def __init__(self, instance: program_tree.ProgramTree, **kwargs):
-        kwargs['context'] = {
-            **kwargs.get('context', {}),
-            'root': instance.root_node,
-            'path': str(instance.root_node.pk)
-        }
-        super().__init__(instance, **kwargs)
-
-    def get_icon(self, tree: program_tree.ProgramTree):
-        return None
+class CreateLinkView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
+    pass
+    # SEE : CreateGroupElementYearView

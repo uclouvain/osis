@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from urllib.parse import urlencode
+
 from django.utils.translation import gettext_lazy as _
 from django.templatetags.static import static
 from django.urls import reverse
@@ -36,9 +38,13 @@ from program_management.models.enums import node_type
 
 class ChildrenField(serializers.Serializer):
     def to_representation(self, value: link.Link):
+        context = {
+            **self.context,
+            'path': "|".join([self.context['path'], str(value.child.pk)])
+        }
         if isinstance(value.child, node.NodeLearningUnitYear):
-            return LeafViewSerializer(value, context=self.context).data
-        return NodeViewSerializer(value, context=self.context).data
+            return LeafViewSerializer(value, context=context).data
+        return NodeViewSerializer(value, context=context).data
 
 
 class NodeViewAttributeSerializer(serializers.Serializer):
@@ -79,17 +85,19 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         return reverse('education_group_read', args=[self.get_root(obj), obj.child.pk])
 
     def get_attach_url(self, obj: link.Link):
-        return reverse('education_group_attach', args=[self.get_root(obj), obj.child.pk]),
+        return reverse('tree_attach_node', args=[self.get_root(obj)]) + "?" + urlencode({
+            'to_path': self.context['path']
+        })
 
     def get_detach_url(self, obj: link.Link):
-        reverse('group_element_year_delete', args=[
-            self.get_root(obj), obj.child.pk, obj.child.pk  #TODO FIX PATH : utiliser le path au lieu de self.group_element_year.pk
-        ]) if obj else '#',
+        return reverse('tree_detach_node', args=[self.get_root(obj)]) + "?" + urlencode({
+            'path': self.context['path']
+        })
 
     def get_modify_url(self, obj: link.Link):
-        reverse('group_element_year_update', args=[
-            self.get_root(obj), obj.child.pk, obj.child.pk   #TODO FIX PATH : utiliser le path au lieu de self.group_element_year.pk
-        ]) if obj else '#',
+        return reverse('tree_update_link', args=[self.get_root(obj)]) + "?" + urlencode({
+            'path': self.context['path']
+        })
 
     def get_search_url(self, obj: link.Link):
         # if attach.can_attach_learning_units(self.education_group_year):
@@ -129,9 +137,19 @@ class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
         }.get(obj.child.proposal_type) or ""
 
 
-class NodeViewSerializer(serializers.Serializer):
-    text = serializers.CharField(source='child.acronym')
+class CommonNodeViewSerializer(serializers.Serializer):
+    path = serializers.SerializerMethodField()
     icon = serializers.SerializerMethodField()
+
+    def get_path(self, obj: link.Link):
+        return self.context['path']
+
+    def get_icon(self, obj: link.Link):
+        return None
+
+
+class NodeViewSerializer(CommonNodeViewSerializer):
+    text = serializers.CharField(source='child.acronym')
     children = ChildrenField(source='child.children', many=True)
     a_attr = NodeViewAttributeSerializer(source='*')
 
@@ -141,9 +159,8 @@ class NodeViewSerializer(serializers.Serializer):
         return None
 
 
-class LeafViewSerializer(serializers.Serializer):
+class LeafViewSerializer(CommonNodeViewSerializer):
     text = serializers.SerializerMethodField()
-    icon = serializers.SerializerMethodField()
     a_attr = LeafViewAttributeSerializer(source='*')
 
     def get_text(self, obj: link.Link):

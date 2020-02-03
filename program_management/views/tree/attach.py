@@ -23,24 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import CreateView
+from django.utils.translation import gettext_lazy as _
 
-from program_management.domain import program_tree
-from program_management.serializers.node_view import ChildrenField
+from base.views.mixins import AjaxTemplateMixin
+from program_management.forms.tree.attach import AttachNodeForm
 
 
-class ProgramTreeViewSerializer(serializers.Serializer):
-    text = serializers.CharField(source='root_node.title')
-    icon = serializers.SerializerMethodField()
-    children = ChildrenField(source='root_node.children', many=True)
+class AttachNodeView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
+    template_name = "tree/attach_confirmation.html"
+    form_class = AttachNodeForm
 
-    def __init__(self, instance: program_tree.ProgramTree, **kwargs):
-        kwargs['context'] = {
-            **kwargs.get('context', {}),
-            'root': instance.root_node,
-            'path': str(instance.root_node.pk)
-        }
-        super().__init__(instance, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
-    def get_icon(self, tree: program_tree.ProgramTree):
-        return None
+    def get_form_kwargs(self):
+        # GET ELEMENT FROM CACHE for <from_path>
+        kwargs = super().get_form_kwargs()
+        return kwargs
+
+    def get_success_message(self, cleaned_data):
+        return _('Attach OK')

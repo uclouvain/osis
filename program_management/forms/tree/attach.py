@@ -23,24 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
-
-from program_management.domain import program_tree
-from program_management.serializers.node_view import ChildrenField
+from django import forms
 
 
-class ProgramTreeViewSerializer(serializers.Serializer):
-    text = serializers.CharField(source='root_node.title')
-    icon = serializers.SerializerMethodField()
-    children = ChildrenField(source='root_node.children', many=True)
+class AttachNodeForm(forms.Form):
+    from_path = forms.CharField(widget=forms.HiddenInput)
+    to_path = forms.CharField(widget=forms.HiddenInput)
 
-    def __init__(self, instance: program_tree.ProgramTree, **kwargs):
-        kwargs['context'] = {
-            **kwargs.get('context', {}),
-            'root': instance.root_node,
-            'path': str(instance.root_node.pk)
-        }
-        super().__init__(instance, **kwargs)
-
-    def get_icon(self, tree: program_tree.ProgramTree):
-        return None

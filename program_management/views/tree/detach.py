@@ -23,24 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import CreateView
+from django.utils.translation import gettext_lazy as _
 
-from program_management.domain import program_tree
-from program_management.serializers.node_view import ChildrenField
+from base.views.mixins import AjaxTemplateMixin
+from program_management.forms.tree.detach import DetachNodeForm
 
 
-class ProgramTreeViewSerializer(serializers.Serializer):
-    text = serializers.CharField(source='root_node.title')
-    icon = serializers.SerializerMethodField()
-    children = ChildrenField(source='root_node.children', many=True)
+class DetachNodeView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
+    template_name = "tree/detach_confirmation.html"
+    form_class = DetachNodeForm
 
-    def __init__(self, instance: program_tree.ProgramTree, **kwargs):
-        kwargs['context'] = {
-            **kwargs.get('context', {}),
-            'root': instance.root_node,
-            'path': str(instance.root_node.pk)
-        }
-        super().__init__(instance, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
-    def get_icon(self, tree: program_tree.ProgramTree):
-        return None
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        return kwargs
+
+    def get_success_message(self, cleaned_data):
+        return _('Detach OK')
