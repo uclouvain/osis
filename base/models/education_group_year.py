@@ -360,7 +360,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     diploma_printing_title = models.CharField(
-        max_length=140,
+        max_length=240,
         blank=True,
         default="",
         verbose_name=_('Diploma title')
