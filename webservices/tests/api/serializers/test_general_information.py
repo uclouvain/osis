@@ -30,8 +30,9 @@ from django.test import TestCase
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
-    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS
+    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS, WELCOME_INTRODUCTION
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
@@ -49,9 +50,6 @@ class GeneralInformationSerializerTestCase(TestCase):
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES]
         }
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[
-            cls.egy.education_group_type.name
-        ] = cls.pertinent_sections
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
                 language=cls.language,
@@ -83,12 +81,18 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
+        GroupElementYearFactory(parent=cls.egy, block='1')
         cls.serializer = GeneralInformationSerializer(
             cls.egy, context={
                 'language': cls.language,
                 'acronym': cls.egy.acronym
             }
         )
+
+    def setUp(self):
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[
+            self.egy.education_group_type.name
+        ] = self.pertinent_sections
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -122,9 +126,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 self.assertListEqual(list(section.keys()), expected_fields)
 
     def test_get_both_evaluation_texts(self):
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[
-            self.egy.education_group_type.name
-        ] = {
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
             'specific': [EVALUATION_KEY],
             'common': [EVALUATION_KEY]
         }
@@ -145,9 +147,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
 
     def test_get_only_specific_evaluation(self):
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[
-            self.egy.education_group_type.name
-        ] = {
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
             'specific': [EVALUATION_KEY],
             'common': []
         }
@@ -159,3 +159,22 @@ class GeneralInformationSerializerTestCase(TestCase):
         ).data['sections'][0]
         self.assertEqual(evaluation_section['content'], None)
         self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
+
+    def test_case_text_not_existing(self):
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[
+            self.egy.education_group_type.name
+        ] = {
+            'specific': [WELCOME_INTRODUCTION],
+            'common': []
+        }
+        TranslatedTextLabelFactory(
+            language=self.language,
+            text_label__label=WELCOME_INTRODUCTION
+        )
+        welcome_introduction_section = GeneralInformationSerializer(
+            self.egy, context={
+                'language': self.language,
+                'acronym': self.egy.acronym
+            }
+        ).data['sections'][0]
+        self.assertEqual(welcome_introduction_section['content'], None)
