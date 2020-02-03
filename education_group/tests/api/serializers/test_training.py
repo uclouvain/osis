@@ -65,6 +65,8 @@ class TrainingListSerializerTestCase(TestCase):
             'academic_year',
             'administration_entity',
             'management_entity',
+            'partial_title',
+            'partial_title_english'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -115,6 +117,8 @@ class TrainingDetailSerializerTestCase(TestCase):
             'academic_year',
             'administration_entity',
             'management_entity',
+            'partial_title',
+            'partial_title_english',
             'partial_deliberation',
             'admission_exam',
             'funding',

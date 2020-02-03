@@ -61,6 +61,8 @@ class TrainingListSerializer(EducationGroupTitleSerializer, serializers.Hyperlin
             'academic_year',
             'administration_entity',
             'management_entity',
+            'partial_title',
+            'partial_title_english'
         )
 
 
