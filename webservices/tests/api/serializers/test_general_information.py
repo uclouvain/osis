@@ -49,7 +49,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
-            'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
+            'specific': [DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES]
         }
         for section in cls.pertinent_sections['common']:
@@ -126,41 +126,6 @@ class GeneralInformationSerializerTestCase(TestCase):
                 self.assertTrue(isinstance(section, collections.OrderedDict))
                 self.assertListEqual(list(section.keys()), expected_fields)
 
-    def test_get_both_evaluation_texts(self):
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
-            'specific': [EVALUATION_KEY],
-            'common': [EVALUATION_KEY]
-        }
-        TranslatedTextFactory(
-            reference=self.common_egy.id,
-            entity=OFFER_YEAR,
-            language=self.language,
-            text_label__label=EVALUATION_KEY,
-            text="EVALUATION_TEXT_COMMON"
-        )
-        evaluation_section = GeneralInformationSerializer(
-            self.egy, context={
-                'language': self.language,
-                'acronym': self.egy.acronym
-            }
-        ).data['sections'][0]
-        self.assertEqual(evaluation_section['content'], 'EVALUATION_TEXT_COMMON')
-        self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
-
-    def test_get_only_specific_evaluation(self):
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
-            'specific': [EVALUATION_KEY],
-            'common': []
-        }
-        evaluation_section = GeneralInformationSerializer(
-            self.egy, context={
-                'language': self.language,
-                'acronym': self.egy.acronym
-            }
-        ).data['sections'][0]
-        self.assertIsNone(evaluation_section['content'])
-        self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
-
     def test_case_text_not_existing(self):
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             self.egy.education_group_type.name
@@ -179,6 +144,57 @@ class GeneralInformationSerializerTestCase(TestCase):
             }
         ).data['sections'][0]
         self.assertIsNone(welcome_introduction_section['content'])
+
+
+class EvaluationSectionTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
+        cls.language = settings.LANGUAGE_CODE_EN
+        TranslatedTextLabelFactory(
+            language=cls.language,
+            text_label__label=EVALUATION_KEY
+        )
+        TranslatedTextFactory(
+            reference=cls.egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language,
+            text_label__label=EVALUATION_KEY,
+            text=EVALUATION_KEY.upper() + "_TEXT"
+        )
+
+    def test_get_both_evaluation_texts(self):
+        TranslatedTextFactory(
+            reference=self.common_egy.id,
+            entity=OFFER_YEAR,
+            language=self.language,
+            text_label__label=EVALUATION_KEY,
+            text="EVALUATION_TEXT_COMMON"
+        )
+        evaluation_section = self._get_evaluation_cms(specific=[EVALUATION_KEY], common=[EVALUATION_KEY])
+        self.assertEqual(evaluation_section['content'], 'EVALUATION_TEXT_COMMON')
+        self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
+
+    def test_get_only_specific_evaluation(self):
+        evaluation_section = self._get_evaluation_cms(specific=[EVALUATION_KEY])
+        self.assertIsNone(evaluation_section['content'])
+        self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
+
+    def _get_evaluation_cms(self, common=None, specific=None):
+        if common is None:
+            common = []
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
+            'specific': specific or [],
+            'common': common or []
+        }
+        evaluation_section = GeneralInformationSerializer(
+            self.egy, context={
+                'language': self.language,
+                'acronym': self.egy.acronym
+            }
+        ).data['sections'][0]
+        return evaluation_section
 
 
 class IntroOffersSectionTestCase(TestCase):
