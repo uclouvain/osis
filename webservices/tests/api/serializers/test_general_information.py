@@ -183,13 +183,12 @@ class EvaluationSectionTestCase(TestCase):
             'specific': specific or [],
             'common': common or []
         }
-        evaluation_section = GeneralInformationSerializer(
+        return GeneralInformationSerializer(
             self.egy, context={
                 'language': self.language,
                 'acronym': self.egy.acronym
             }
         ).data['sections'][0]
-        return evaluation_section
 
 
 class IntroOffersSectionTestCase(TestCase):
