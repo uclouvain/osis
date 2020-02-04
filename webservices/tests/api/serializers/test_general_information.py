@@ -237,16 +237,13 @@ class IntroOffersSectionTestCase(TestCase):
 
 
     def test_get_intro_finality_offer(self):
-        egy = EducationGroupYearFactory(
-            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
-            academic_year=self.egy.academic_year
-        )
         gey = GroupElementYearFactory(
-            parent=egy,
+            parent__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+            parent__academic_year=self.egy.academic_year,
             child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
             child_branch__partial_acronym="TESTFINA"
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey, egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey, gey.parent)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testfina')
 
