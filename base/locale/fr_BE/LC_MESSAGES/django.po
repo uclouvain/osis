@@ -1944,6 +1944,12 @@ msgstr "Code non valide"
 msgid "Partial deliberation"
 msgstr "Sous-épreuve"
 
+msgid "Partial title in English"
+msgstr "Intitulé partiel en anglais"
+
+msgid "Partial title in French"
+msgstr "Intitulé partiel en français"
+
 msgid "Partim"
 msgstr "Partim"
 
@@ -3176,6 +3182,9 @@ msgstr "Accueil"
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
+
+msgid "Year of concerned data"
+msgstr "Anac des données impactées"
 
 msgid "Yes"
 msgstr "Oui"

@@ -1866,6 +1866,12 @@ msgstr ""
 msgid "Partial deliberation"
 msgstr ""
 
+msgid "Partial title in English"
+msgstr ""
+
+msgid "Partial title in French"
+msgstr ""
+
 msgid "Partim"
 msgstr ""
 
@@ -3024,6 +3030,9 @@ msgstr ""
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
+msgstr ""
+
+msgid "Year of concerned data"
 msgstr ""
 
 msgid "Yes"
