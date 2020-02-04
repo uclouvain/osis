@@ -25,9 +25,9 @@
 ##############################################################################
 from django import forms
 
-from program_management.domain.program_tree import ProgramTree
+from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
 from program_management.models.enums import node_type
-from program_management.repositories import fetch_node
+from program_management.DomainDrivenDesign.repositories import fetch_node
 
 
 class AttachNodeForm(forms.Form):

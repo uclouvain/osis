@@ -24,12 +24,12 @@
 #
 ##############################################################################
 from collections import Counter
-from typing import List, Dict
+from typing import List
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
-from program_management.domain.link import Link, factory as link_factory
-from program_management.domain.prerequisite import Prerequisite
+from program_management.DomainDrivenDesign.domain.link import Link, factory as link_factory
+from program_management.DomainDrivenDesign.domain import Prerequisite
 from program_management.models.enums import node_type
 
 

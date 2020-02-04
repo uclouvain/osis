@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.domain import node
-from program_management.domain.authorized_relationship import AuthorizedRelationshipList
+from program_management.DomainDrivenDesign.domain import node
+from program_management.DomainDrivenDesign.domain.authorized_relationship import AuthorizedRelationshipList
 
 
 class ProgramTree:
@@ -70,7 +70,7 @@ class ProgramTree:
         :param path: [Optional] The position where the node must be added
         """
         # Avoid circular import
-        from program_management.domain.tree.validators.attach_node import factory as attach_node_validator_factory
+        from program_management.DomainDrivenDesign.domain.tree.validators.attach_node import factory as attach_node_validator_factory
         parent = self.get_node(path) if path else self.root_node
         validator = attach_node_validator_factory.get_attach_node_validator(self, node, path)
         validator.validate()

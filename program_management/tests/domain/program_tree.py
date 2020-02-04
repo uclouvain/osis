@@ -25,9 +25,9 @@
 ##############################################################################
 from django.test import TestCase
 
-from program_management.domain import node
-from program_management.domain.node import Node, NodeGroupYear
-from program_management.domain.program_tree import ProgramTree
+from program_management.DomainDrivenDesign.domain import node
+from program_management.DomainDrivenDesign.domain.node import Node, NodeGroupYear
+from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
 
 
 class TestInitProgramTree(TestCase):

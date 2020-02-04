@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
+from program_management.DomainDrivenDesign.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship
 
 

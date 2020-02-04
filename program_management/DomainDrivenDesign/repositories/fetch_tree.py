@@ -31,10 +31,10 @@ from django.db.models import Case, F, When, IntegerField
 
 from base.models.group_element_year import GroupElementYear
 
-from program_management.domain import node
-from program_management.domain.program_tree import ProgramTree
-from program_management.repositories import fetch_node
-from program_management.repositories import fetch_prerequisite, fetch_authorized_relationship
+from program_management.DomainDrivenDesign.domain import node
+from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
+from program_management.DomainDrivenDesign.repositories import fetch_node, fetch_prerequisite, \
+    fetch_authorized_relationship
 
 
 def fetch(tree_root_id) -> ProgramTree:

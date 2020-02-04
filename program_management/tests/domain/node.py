@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
-from program_management.domain.node import NodeGroupYear, NodeLearningUnitYear
+from program_management.DomainDrivenDesign.domain.node import NodeGroupYear, NodeLearningUnitYear
 
 
 class TestAddChildNode(TestCase):

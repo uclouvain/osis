@@ -26,7 +26,7 @@
 from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
-from program_management.domain.node import Node
+from program_management.DomainDrivenDesign.domain.node import Node
 
 
 class AuthorizedRelationship:

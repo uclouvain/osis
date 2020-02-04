@@ -25,8 +25,8 @@
 ##############################################################################
 from django.test import TestCase
 
-from program_management.domain.node import NodeGroupYear, NodeLearningUnitYear
-from program_management.domain.program_tree import ProgramTree
+from program_management.DomainDrivenDesign.domain.node import NodeGroupYear, NodeLearningUnitYear
+from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
 from program_management.serializers.program_tree_view import ProgramTreeViewSerializer
 
 

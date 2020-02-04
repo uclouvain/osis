@@ -32,7 +32,7 @@ from django.db.models import Subquery, OuterRef, F
 from base.models.enums import prerequisite_operator
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem
-from program_management.domain import prerequisite
+from program_management.DomainDrivenDesign.domain import prerequisite
 
 
 def fetch_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
