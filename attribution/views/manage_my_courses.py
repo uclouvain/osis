@@ -80,7 +80,7 @@ def list_my_attributions_summary_editable(request):
             )
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
-        ac_year=current_or_previous_opened_calendar.data_year,
+        ac_year=data_year,
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     )
     errors = (can_user_edit_educational_information(user=tutor.person.user, learning_unit_year_id=luy.id)
