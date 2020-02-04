@@ -31,7 +31,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.domain import program_tree, node, prerequisite
-from program_management.models.element import Element
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
 from program_management.repositories import fetch_tree
 
@@ -55,7 +54,7 @@ class TestFetchTree(TestCase):
 
     def test_case_tree_root_not_exist(self):
         unknown_tree_root_id = -1
-        with self.assertRaises(Element.DoesNotExist):
+        with self.assertRaises(node.NodeNotFoundException):
             fetch_tree.fetch(unknown_tree_root_id)
 
     def test_case_tree_root_with_multiple_level(self):

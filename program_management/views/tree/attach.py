@@ -40,8 +40,11 @@ class AttachNodeView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
         return context
 
     def get_form_kwargs(self):
-        # GET ELEMENT FROM CACHE for <from_path>
         kwargs = super().get_form_kwargs()
+        kwargs['data'] = {
+            **kwargs['data'],
+            'node_id': ''        # GET ELEMENT FROM CACHE for <from_path>
+        }
         return kwargs
 
     def get_success_message(self, cleaned_data):

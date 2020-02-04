@@ -26,27 +26,18 @@
 
 import copy
 
-from django.db.models import Case, Value, F, When, IntegerField, CharField
+from django.db.models import Case, F, When, IntegerField
 
 from base.models.group_element_year import GroupElementYear
 
 from program_management.domain import node, link, prerequisite
 from program_management.domain.program_tree import ProgramTree
-from program_management.models.element import Element
-from program_management.models.enums import node_type
-from program_management.repositories import fetch_prerequisite
+from program_management.repositories import fetch_prerequisite, fetch_node
 
 
 def fetch(tree_root_id) -> ProgramTree:
-    root_node = node.factory.get_node(
-        **Element.objects.filter(education_group_year_id=tree_root_id).annotate(
-            type=Value(node_type.EDUCATION_GROUP, output_field=CharField()),
-            acronym=F('education_group_year__acronym'),
-            title=F('education_group_year__title'),
-            year=F('education_group_year__academic_year__year'),
-            node_id=F('education_group_year__pk')
-        ).values('node_id', 'type', 'acronym', 'title', 'year').get()
-    )
+    root_node = fetch_node.fetch_node_education_group_year(tree_root_id)
+
     structure = GroupElementYear.objects.get_adjacency_list([root_node.pk])
     nodes = __fetch_tree_nodes(structure)
     links = __fetch_tree_links(structure)
@@ -56,42 +47,8 @@ def fetch(tree_root_id) -> ProgramTree:
 
 def __fetch_tree_nodes(tree_structure):
     ids = [link['id'] for link in tree_structure]
-    group_element_year_qs = GroupElementYear.objects.filter(pk__in=ids).annotate(
-        node_id=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf_id')),
-            default=F('child_branch_id'),
-            output_field=IntegerField()
-        ),
-        type=Case(
-            When(child_branch_id__isnull=True, then=Value(node_type.LEARNING_UNIT)),
-            default=Value(node_type.EDUCATION_GROUP),
-            output_field=CharField()
-        ),
-        acronym=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf__acronym')),
-            default=F('child_branch__acronym'),
-            output_field=CharField()
-        ),
-        title=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf__specific_title')),
-            default=F('child_branch__title'),
-            output_field=CharField()
-        ),
-        year=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf__academic_year__year')),
-            default=F('child_branch__academic_year__year'),
-            output_field=IntegerField()
-        ),
-        proposal_type=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf__proposallearningunit__type')),
-            default=None,
-            output_field=CharField()
-        )
-    ).values('node_id', 'type', 'acronym', 'title', 'year', 'proposal_type')
-    nodes = {}
-    for gey_dict in group_element_year_qs:
-        nodes[gey_dict['node_id']] = node.factory.get_node(**gey_dict)
-    return nodes
+    nodes_list = fetch_node.fetch_multiple(ids)
+    return {n.pk: n for n in nodes_list}
 
 
 def __fetch_tree_links(tree_structure):

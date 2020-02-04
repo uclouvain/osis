@@ -25,8 +25,23 @@
 ##############################################################################
 from django import forms
 
+from program_management.domain.program_tree import ProgramTree
+from program_management.models.enums import node_type
+from program_management.repositories import fetch_node
+
 
 class AttachNodeForm(forms.Form):
-    from_path = forms.CharField(widget=forms.HiddenInput)
+    node_id = forms.IntegerField(widget=forms.HiddenInput)
     to_path = forms.CharField(widget=forms.HiddenInput)
 
+    def save(self):
+        root_id, _ = self.cleaned_data['to_path'].split('|', 1)
+        # According to cache class
+        node = fetch_node.fetch_by_type(node_type.EDUCATION_GROUP, self.cleaned_data['node_id'])
+
+        tree = ProgramTree(root_id)
+        tree.attach_node(
+            node,
+            path=self.cleaned_data.pop('to_path'),
+            **self.cleaned_data
+        )
