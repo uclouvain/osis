@@ -898,6 +898,9 @@ msgstr "Ouverture informations pédagoqiques"
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue de formations."
 
+msgid "Email"
+msgstr "Email"
+
 msgid "End"
 msgstr "Fin"
 
@@ -2111,6 +2114,9 @@ msgstr "Production du diplôme / certificat"
 msgid "Profes. integration"
 msgstr "Intégration prof."
 
+msgid "Professional"
+msgstr "Professionnel"
+
 msgid "Professional internship"
 msgstr "Stage professionnel"
 
@@ -2321,6 +2327,9 @@ msgstr "Stage de recherche"
 
 msgid "Reserved for interns"
 msgstr "Réservé aux internes"
+
+msgid "Residential"
+msgstr "Domicile"
 
 msgid "Result"
 msgstr "Résultat"
