@@ -98,13 +98,13 @@ msgstr "Modifiable"
 msgid ""
 "For the learning units %(data_year)s : The summary edition period is ended "
 "since %(end_date)s."
-msgstr "Pour les unités d'enseignement %(data_year)s : La période de modification des fiches descriptive est terminée depuis le %(end_date)s."
+msgstr "Pour les unités d'enseignement %(data_year)s : La période de modification des fiches descriptives est terminée depuis le %(end_date)s."
 
 #, python-format
 msgid ""
 "For the learning units %(data_year)s : The summary edition period will open "
 "on %(start_date)s."
-msgstr "Pour les unités d'enseignement %(data_year)s : La période de modification des fiches descriptive commencera le %(start_date)s."
+msgstr "Pour les unités d'enseignement %(data_year)s : La période de modification des fiches descriptives commencera le %(start_date)s."
 
 msgid "Function"
 msgstr "Fonction"
