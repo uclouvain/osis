@@ -34,7 +34,7 @@ from attribution.views.perms import tutor_can_view_educational_information
 from base.business import event_perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
     find_educational_information_submission_dates_of_learning_unit_year, can_user_edit_educational_information
-from base.models import academic_year, entity_calendar
+from base.models import entity_calendar
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
@@ -80,7 +80,7 @@ def list_my_attributions_summary_editable(request):
             )
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
-        ac_year=academic_year.current_academic_year(),
+        ac_year=current_or_previous_opened_calendar.data_year,
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     )
     errors = (can_user_edit_educational_information(user=tutor.person.user, learning_unit_year_id=luy.id)

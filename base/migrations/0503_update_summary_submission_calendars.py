@@ -7,7 +7,7 @@ from django.db import migrations
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 
 
-def create_calendar_events_propositions(apps, schema_editor):
+def update_summary_submission_calendars(apps, schema_editor):
     academic_calendar_mdl = apps.get_model("base", "AcademicCalendar")
     academic_calendar_items = academic_calendar_mdl.objects.filter(reference=SUMMARY_COURSE_SUBMISSION)
 
@@ -35,5 +35,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_calendar_events_propositions, reverse_migration),
+        migrations.RunPython(update_summary_submission_calendars, reverse_migration),
     ]
