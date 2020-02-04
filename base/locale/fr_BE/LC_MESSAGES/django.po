@@ -1803,7 +1803,7 @@ msgid "Not enrolled"
 msgstr "Pas inscrit"
 
 msgid "Not in period to edit description fiche."
-msgstr "Vous n'êtes pas en période d'édition des fiches descriptives."
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
 
 msgid "Not in range of years which can be edited by you"
 msgstr ""
