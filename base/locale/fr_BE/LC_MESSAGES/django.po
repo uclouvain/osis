@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-31 11:23+0100\n"
+"POT-Creation-Date: 2020-02-03 11:29+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3187,6 +3187,9 @@ msgstr "Accueil"
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
+
+msgid "Year of concerned data"
+msgstr "Anac des données impactées"
 
 msgid "Yes"
 msgstr "Oui"
