@@ -112,7 +112,9 @@
                 {% if object_list_count %}
                     <div class="row">
                         <div class="col-md-6">
-                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'Trainings'|lower %} </strong>
+                            <strong style="margin-left:10px;color:grey;">
+                                {% blocktrans with start_index=object_list.start_index end_index=object_list.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
+                            </strong>
                         </div>
                         <div class="col-md-6">
                             <button id="dLabel" class="btn btn-default pull-right" type="button"
@@ -144,7 +146,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
+                            <span  style="margin-right: 10px">
+                                {% pagination_size_select %}
+                            </span>
                         </div>
+
                     </div>
 
 
@@ -191,7 +197,7 @@
             ];
 
             initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ object_list.number }},
-                50, "{% url 'education_groups' %}", columnDefs);
+            {{items_per_page}}, "{% url 'education_groups' %}", columnDefs);
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params

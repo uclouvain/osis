@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 11:29+0100\n"
+"POT-Creation-Date: 2020-02-04 11:14+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -91,6 +91,11 @@ msgstr "%(number_notifications)s notification(s) non lu(s)"
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
+msgstr ""
+"%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 #, python-format
 msgid "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"

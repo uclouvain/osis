@@ -42,6 +42,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.person import Person
+from base.templatetags.pagination import get_paginator_size
 from base.utils.cache import cache_filter
 from base.views.common import paginate_queryset
 from education_group.api.serializers.education_group import EducationGroupSerializer
@@ -73,8 +74,8 @@ def education_groups(request):
             _get_filter_keys(filter_form.form),
             {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')}
         )
-
-    object_list_paginated = paginate_queryset(objects_qs, request.GET)
+    items_per_page = get_paginator_size(request)
+    object_list_paginated = paginate_queryset(objects_qs, request.GET, items_per_page)
     if request.is_ajax():
         serializer = EducationGroupSerializer(object_list_paginated, context={'request': request}, many=True)
         return JsonResponse({'object_list': serializer.data})
@@ -84,7 +85,8 @@ def education_groups(request):
         'object_list': object_list_paginated,
         'object_list_count': objects_qs.count(),
         'enums': education_group_categories,
-        'person': person
+        'person': person,
+        'items_per_page': items_per_page,
     }
     return render(request, "education_group/search.html", context)
 
