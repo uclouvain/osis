@@ -671,5 +671,3 @@ msgstr "programme(s)"
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
 
-#~ msgid "Learning unit title"
-#~ msgstr "Titre de l'unité d'apprentissage"
