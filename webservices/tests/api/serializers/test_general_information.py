@@ -32,7 +32,7 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
     COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS, WELCOME_INTRODUCTION, INTRODUCTION
 from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
+from base.tests.factories.education_group_year import EducationGroupYearCommonFactory, \
     TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
@@ -172,27 +172,22 @@ class EvaluationSectionTestCase(TestCase):
             text_label__label=EVALUATION_KEY,
             text="EVALUATION_TEXT_COMMON"
         )
-        evaluation_section = GeneralInformationSerializer(
-            self.egy, context={
-                'language': self.language,
-                'acronym': self.egy.acronym
-            }
-        ).data['sections'][0]
+        evaluation_section = self._get_evaluation_cms(specific=[EVALUATION_KEY], common=[EVALUATION_KEY])
         self.assertEqual(evaluation_section['content'], 'EVALUATION_TEXT_COMMON')
         self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
 
     def test_get_only_specific_evaluation(self):
-        egy = TrainingFactory(education_group_type__name=TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name)
-        evaluation_section = GeneralInformationSerializer(
-            egy, context={
-                'language': self.language,
-                'acronym': egy.acronym
-            }
-        ).data['sections'][0]
+        evaluation_section = self._get_evaluation_cms(specific=[EVALUATION_KEY])
         self.assertIsNone(evaluation_section['content'])
         self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
 
     def _get_evaluation_cms(self, common=None, specific=None):
+        if common is None:
+            common = []
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
+            'specific': specific or [],
+            'common': common or []
+        }
         evaluation_section = GeneralInformationSerializer(
             self.egy, context={
                 'language': self.language,
@@ -225,7 +220,6 @@ class IntroOffersSectionTestCase(TestCase):
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testtc')
 
-
     def test_get_intro_option_offer(self):
         gey = GroupElementYearFactory(
             parent=self.egy,
@@ -240,18 +234,19 @@ class IntroOffersSectionTestCase(TestCase):
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testoption')
 
-
     def test_get_intro_finality_offer(self):
-        gey = GroupElementYearFactory(
-            parent__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
-            parent__academic_year=self.egy.academic_year,
-            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
-            child_branch__partial_acronym="TESTFINA"
+        g = GroupElementYearFactory(
+            parent=self.egy,
+            child_branch__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey, gey.parent)
+        gey = GroupElementYearFactory(
+            parent=g.parent,
+            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
+            child_branch__partial_acronym="TESTFINA",
+        )
+        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testfina')
-
 
     def _get_pertinent_intro_section(self, gey, egy):
         TranslatedTextLabelFactory(
