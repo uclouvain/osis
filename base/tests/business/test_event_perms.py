@@ -33,22 +33,17 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, 
 from base.tests.factories.academic_year import AcademicYearFactory
 
 
-class TestLearningUnitProposalCancel(TestCase):
+class TestEventPerms(TestCase):
     def test_get_current_or_previous_opened_calendar_academic_years_calendar_opened(self):
-        """
-            Create 3 closed calendars, 2 in past and 1 in future, and 1 opened calendar.
-            Check that we get data_year from the opened calendar.
-        """
         AcademicCalendarFactory(
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
             data_year=AcademicYearFactory(year=2017),
             start_date=datetime.date.today() - datetime.timedelta(weeks=104),
             end_date=datetime.date.today() - datetime.timedelta(weeks=100)
         )
-        academic_year_2018 = AcademicYearFactory(year=2018)
         AcademicCalendarFactory(
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-            data_year=academic_year_2018,
+            data_year=AcademicYearFactory(year=2018),
             start_date=datetime.date.today() - datetime.timedelta(weeks=52),
             end_date=datetime.date.today() - datetime.timedelta(weeks=48)
         )
@@ -61,25 +56,20 @@ class TestLearningUnitProposalCancel(TestCase):
         opened_calendar = OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertEqual(
-            opened_calendar.data_year,
-            event_perm.get_current_or_previous_opened_calendar_academic_year()
+            opened_calendar,
+            event_perm.get_current_or_previous_opened_calendar()
         )
 
     def test_get_current_or_previous_opened_calendar_academic_years_calendar_closed(self):
-        """
-            Create 3 closed calendars, 2 in past and 1 in future.
-            Check that we get data_year from the closest past calendar.
-        """
         AcademicCalendarFactory(
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
             data_year=AcademicYearFactory(year=2017),
             start_date=datetime.date.today() - datetime.timedelta(weeks=104),
             end_date=datetime.date.today() - datetime.timedelta(weeks=100)
         )
-        academic_year_2018 = AcademicYearFactory(year=2018)
-        AcademicCalendarFactory(
+        previous_calendar = AcademicCalendarFactory(
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-            data_year=academic_year_2018,
+            data_year=AcademicYearFactory(year=2018),
             start_date=datetime.date.today() - datetime.timedelta(weeks=52),
             end_date=datetime.date.today() - datetime.timedelta(weeks=48)
         )
@@ -91,8 +81,8 @@ class TestLearningUnitProposalCancel(TestCase):
         )
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertEqual(
-            academic_year_2018,
-            event_perm.get_current_or_previous_opened_calendar_academic_year()
+            previous_calendar,
+            event_perm.get_current_or_previous_opened_calendar()
         )
 
     def test_get_current_or_previous_opened_calendar_academic_years_only_future_calendar(self):
@@ -104,11 +94,77 @@ class TestLearningUnitProposalCancel(TestCase):
         )
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertIsNone(
-            event_perm.get_current_or_previous_opened_calendar_academic_year()
+            event_perm.get_current_or_previous_opened_calendar()
         )
 
     def test_get_current_or_previous_opened_calendar_academic_years_no_calendar(self):
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertIsNone(
-            event_perm.get_current_or_previous_opened_calendar_academic_year()
+            event_perm.get_current_or_previous_opened_calendar()
+        )
+        self.assertIsNone(
+            event_perm.get_current_or_next_opened_calendar()
+        )
+
+    def test_get_current_or_next_opened_calendar_academic_years_calendar_opened(self):
+        AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2019),
+            start_date=datetime.date.today() - datetime.timedelta(weeks=52),
+            end_date=datetime.date.today() - datetime.timedelta(weeks=48)
+        )
+        AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2020),
+            start_date=datetime.date.today() + datetime.timedelta(weeks=48),
+            end_date=datetime.date.today() + datetime.timedelta(weeks=52)
+        )
+        AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2021),
+            start_date=datetime.date.today() + datetime.timedelta(weeks=100),
+            end_date=datetime.date.today() + datetime.timedelta(weeks=104)
+        )
+        opened_calendar = OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        event_perm = event_perms.EventPermSummaryCourseSubmission()
+        self.assertEqual(
+            opened_calendar,
+            event_perm.get_current_or_next_opened_calendar()
+        )
+
+    def test_get_current_or_next_opened_calendar_academic_years_calendar_closed(self):
+        AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2019),
+            start_date=datetime.date.today() - datetime.timedelta(weeks=52),
+            end_date=datetime.date.today() - datetime.timedelta(weeks=48)
+        )
+        next_calendar = AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2020),
+            start_date=datetime.date.today() + datetime.timedelta(weeks=48),
+            end_date=datetime.date.today() + datetime.timedelta(weeks=52)
+        )
+        AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2021),
+            start_date=datetime.date.today() + datetime.timedelta(weeks=100),
+            end_date=datetime.date.today() + datetime.timedelta(weeks=104)
+        )
+        event_perm = event_perms.EventPermSummaryCourseSubmission()
+        self.assertEqual(
+            next_calendar,
+            event_perm.get_current_or_next_opened_calendar()
+        )
+
+    def test_get_current_or_next_opened_calendar_academic_years_only_future_calendar(self):
+        AcademicCalendarFactory(
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+            data_year=AcademicYearFactory(year=2018),
+            start_date=datetime.date.today() - datetime.timedelta(weeks=52),
+            end_date=datetime.date.today() - datetime.timedelta(weeks=48)
+        )
+        event_perm = event_perms.EventPermSummaryCourseSubmission()
+        self.assertIsNone(
+            event_perm.get_current_or_next_opened_calendar()
         )

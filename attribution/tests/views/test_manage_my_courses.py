@@ -27,12 +27,15 @@ import datetime
 from unittest import mock
 from unittest.mock import patch
 
+from django.contrib import messages
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
 from django.http import HttpResponse, HttpResponseNotFound
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
@@ -66,11 +69,12 @@ class ManageMyCoursesViewTestCase(TestCase):
             data_year=ac_year_in_future[1],  # This is n+1
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-
+        requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
         for ac_year in ac_year_in_past + [cls.current_ac_year] + ac_year_in_future:
             learning_container_year = LearningContainerYearFactory(
-                academic_year=ac_year
+                academic_year=ac_year,
+                requirement_entity=requirement_entity
             )
             learning_unit_year = LearningUnitYearFactory(
                 summary_locked=False,
@@ -109,6 +113,47 @@ class ManageMyCoursesViewTestCase(TestCase):
         # Ensure that we only see UE of current year + 1
         for luy, error in context["learning_unit_years_with_errors"]:
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year + 1)
+            self.assertFalse(error.errors)
+
+    def test_list_my_attributions_summary_editable_after_period(self):
+        self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
+        self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
+        self.academic_calendar.save()
+
+        next_calendar = AcademicCalendarFactory(
+            start_date=datetime.date.today() + datetime.timedelta(weeks=48),
+            end_date=datetime.date.today() + datetime.timedelta(weeks=52),
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
+
+        context = response.context
+        self.assertIsInstance(context['entity_calendars'], dict)
+
+        # Ensure that we only see UE of current year + 1
+        for luy, error in context["learning_unit_years_with_errors"]:
+            self.assertEqual(luy.academic_year.year, self.current_ac_year.year + 1)
+            self.assertEqual(error.errors[0], _("Not in period to edit description fiche."))
+
+        msg = [{'message': m.message, 'level': m.level} for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            msg[0].get('message'),
+            _('For the learning units %(data_year)s : The summary edition period is ended since %(end_date)s.') % {
+                "data_year": self.academic_calendar.data_year,
+                "end_date": self.academic_calendar.end_date.strftime('%d-%m-%Y'),
+            }
+        )
+        self.assertEqual(msg[0].get('level'), messages.INFO)
+        self.assertEqual(
+            msg[1].get('message'),
+            _('For the learning units %(data_year)s : The summary edition period will open on %(start_date)s.') % {
+                "data_year": next_calendar.data_year,
+                "start_date": next_calendar.start_date.strftime('%d-%m-%Y'),
+            }
+        )
+        self.assertEqual(msg[1].get('level'), messages.INFO)
 
 
 @override_flag('educational_information_block_action', active=True)

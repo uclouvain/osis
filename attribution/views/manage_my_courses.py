@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from attribution.views.perms import tutor_can_view_educational_information
@@ -49,10 +51,33 @@ from base.views.learning_units.perms import PermissionDecorator
 def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
     event_perm = event_perms.EventPermSummaryCourseSubmission()
+
+    current_or_previous_opened_calendar = event_perm.get_current_or_previous_opened_calendar()
+    data_year = current_or_previous_opened_calendar.data_year
     learning_unit_years = find_learning_unit_years_by_academic_year_tutor_attributions(
-        academic_years=event_perm.get_academic_years(),
+        academic_years=[data_year],
         tutor=tutor
     )
+
+    if not event_perm.is_open():
+        messages.add_message(
+            request,
+            messages.INFO,
+            _('For the learning units %(data_year)s : The summary edition period is ended since %(end_date)s.') % {
+                "data_year": data_year,
+                "end_date": current_or_previous_opened_calendar.end_date.strftime('%d-%m-%Y'),
+            }
+        )
+        next_opened_calendar = event_perm.get_current_or_next_opened_calendar()
+        if next_opened_calendar:
+            messages.add_message(
+                request,
+                messages.INFO,
+                _('For the learning units %(data_year)s : The summary edition period will open on %(start_date)s.') % {
+                    "data_year": next_opened_calendar.data_year,
+                    "start_date": next_opened_calendar.start_date.strftime('%d-%m-%Y'),
+                }
+            )
 
     entity_calendars = entity_calendar.build_calendar_by_entities(
         ac_year=academic_year.current_academic_year(),
