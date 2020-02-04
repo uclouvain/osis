@@ -40,10 +40,10 @@ from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.business.group_element_years import group_element_year_tree
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer, ContactsSectionSerializer
+    AdmissionConditionSectionSerializer, ContactsSectionSerializer, EvaluationSectionSerializer
 from webservices.business import EVALUATION_KEY
 
-WS_SECTIONS_TO_SKIP = [EVALUATION_KEY, CONTACT_INTRO]
+WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
 
 class GeneralInformationSerializer(serializers.ModelSerializer):
@@ -88,12 +88,12 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
             ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
-            CONTACTS: ContactsSectionSerializer
+            CONTACTS: ContactsSectionSerializer,
+            EVALUATION_KEY: EvaluationSectionSerializer
         }
         extra_intro_offers = self._get_intro_offers(obj)
 
-        has_common_eval = EVALUATION_KEY in pertinent_sections['common']
-        if has_common_eval and EVALUATION_KEY in pertinent_sections['specific']:
+        if EVALUATION_KEY in pertinent_sections['common']:
             pertinent_sections['common'].remove(EVALUATION_KEY)
 
         for common_section in pertinent_sections['common']:
@@ -106,8 +106,6 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 datas.append(serializer.data)
             elif specific_section not in WS_SECTIONS_TO_SKIP:
                 sections.append(self._get_section_cms(obj, specific_section, language))
-            elif specific_section == EVALUATION_KEY:
-                sections.append(self._get_evaluation_text(language, common_egy, has_common_eval))
 
         for offer in extra_intro_offers:
             sections.append(self._get_section_cms(offer, 'intro', language))
@@ -148,19 +146,6 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         elif 'common' in egy.acronym and section != EVALUATION_KEY:
             return section + '-commun'
         return section
-
-    def _get_evaluation_text(self, language, common_egy, has_common_eval):
-        evaluation_text = self._get_section_cms(self.instance, EVALUATION_KEY, language)
-        if has_common_eval:
-            evaluation_common = self._get_section_cms(common_egy, EVALUATION_KEY, language)
-            evaluation_common.update({'free_text': evaluation_text['text']})
-            evaluation_text = evaluation_common
-        else:
-            evaluation_text.update({
-                'free_text': evaluation_text['text'],
-                'text': None
-            })
-        return evaluation_text
 
     @staticmethod
     def _get_intro_offers(obj):
