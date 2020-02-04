@@ -66,7 +66,7 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         cls.academic_calendar = OpenAcademicCalendarFactory(
             academic_year=cls.current_ac_year,
-            data_year=ac_year_in_future[1],  # This is n+1
+            data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
         requirement_entity = EntityVersionFactory().entity
@@ -110,9 +110,9 @@ class ManageMyCoursesViewTestCase(TestCase):
 
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
-        # Ensure that we only see UE of current year + 1
+
         for luy, error in context["learning_unit_years_with_errors"]:
-            self.assertEqual(luy.academic_year.year, self.current_ac_year.year + 1)
+            self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
     def test_list_my_attributions_summary_editable_after_period(self):
@@ -132,9 +132,8 @@ class ManageMyCoursesViewTestCase(TestCase):
         context = response.context
         self.assertIsInstance(context['entity_calendars'], dict)
 
-        # Ensure that we only see UE of current year + 1
         for luy, error in context["learning_unit_years_with_errors"]:
-            self.assertEqual(luy.academic_year.year, self.current_ac_year.year + 1)
+            self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertEqual(error.errors[0], _("Not in period to edit description fiche."))
 
         msg = [{'message': m.message, 'level': m.level} for m in get_messages(response.wsgi_request)]
