@@ -24,14 +24,22 @@
 #
 ##############################################################################
 from program_management.domain import node
-from program_management.repositories.tree.validators.attach_node import factory as attach_node_validator_factory
+from program_management.domain.authorized_relationship import AuthorizedRelationshipList
 
 
 class ProgramTree:
-    def __init__(self, root_node: node.Node):
+
+    root_node: node.Node = None
+    authorized_relationships: AuthorizedRelationshipList = None
+
+    def __init__(self, root_node: node.Node, authorized_relationships: AuthorizedRelationshipList = None):
         if not isinstance(root_node, node.Node):
             raise Exception('root_group args must be an instance of Node')
         self.root_node = root_node
+        self.authorized_relationships = authorized_relationships or []
+
+    def __eq__(self, other):
+        return self.root_node == other.root_node
 
     # TODO :: typer "path" (pour plus de lisibilité dans le code)
     def get_node(self, path: str) -> node.Node:
@@ -61,6 +69,8 @@ class ProgramTree:
         :param node: Node to add on the tree
         :param path: [Optional] The position where the node must be added
         """
+        # Avoid circular import
+        from program_management.domain.tree.validators.attach_node import factory as attach_node_validator_factory
         parent = self.get_node(path) if path else self.root_node
         validator = attach_node_validator_factory.get_attach_node_validator(self, node, path)
         validator.validate()

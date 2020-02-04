@@ -686,14 +686,16 @@ class TestManagerGetReverseAdjacencyList(TestCase):
 
     def test_case_root_elements_ids_args_is_not_a_correct_instance(self):
         with self.assertRaises(Exception):
-            GroupElementYear.objects.get_reverse_adjacency_list('bad_args')
+            GroupElementYear.objects.get_reverse_adjacency_list(child_leaf_ids='bad_args')
 
     def test_case_root_elements_ids_is_empty(self):
-        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_ids=[])
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_leaf_ids=[])
         self.assertEqual(len(reverse_adjacency_list), 0)
 
     def test_case_filter_by_child_ids(self):
-        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list([self.level_2.child_leaf_id])
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(
+            child_leaf_ids=[self.level_2.child_leaf_id]
+        )
         self.assertEqual(len(reverse_adjacency_list), 1)
 
         expected_first_elem = {
@@ -709,8 +711,36 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)
 
     def test_case_multiple_child_ids(self):
-        adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list([
+        adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_leaf_ids=[
             self.level_2.child_leaf_id,
             self.level_111.child_leaf_id
         ])
         self.assertEqual(len(adjacency_list), 4)
+
+    def test_case_child_is_education_group_instance(self):
+        level_2bis = GroupElementYearFactory(
+            parent=self.root_element_a,
+            order=6
+        )
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(
+            child_branch_ids=[level_2bis.child_branch.id]
+        )
+        self.assertEqual(len(reverse_adjacency_list), 1)
+
+    def test_case_child_leaf_and_child_branch_have_same_id(self):
+        id = 123456
+        # with parent
+        link_with_leaf = GroupElementYearFactory(
+            child_branch=None,
+            child_leaf=LearningUnitYearFactory(id=id),
+            parent=self.root_element_a,
+        )
+        # Without parent
+        link_with_branch = GroupElementYearFactory(
+            child_branch__id=id,
+        )
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(
+            child_branch_ids=[link_with_leaf.child_leaf.id, link_with_branch.child_branch.id]
+        )
+        self.assertEqual(len(reverse_adjacency_list), 1)
+        self.assertNotEqual(len(reverse_adjacency_list), 2)

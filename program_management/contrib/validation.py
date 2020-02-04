@@ -15,7 +15,11 @@ class MessageLevel(Enum):
 
 class BusinessValidationMessage:
     message: str = None
-    level: MessageLevel = None
+    level: MessageLevel = MessageLevel.ERROR.name
+
+    def __init__(self, message: str, level: MessageLevel = None):
+        self.message = message
+        self.level = level
 
 
 class BusinessValidator(ABC):
@@ -39,6 +43,7 @@ class BusinessValidator(ABC):
 
     @property
     def success_messages(self):
+        # TODO :: quid de la responsabilité des succes messages? Qui s'en occupe?
         return [msg for msg in self.messages if msg.level == MessageLevel.SUCCESS]
 
     def is_valid(self) -> bool:
@@ -47,6 +52,9 @@ class BusinessValidator(ABC):
 
     def add_message(self, msg: BusinessValidationMessage):
         self._messages.append(msg)
+
+    def add_error_message(self, msg: str):
+        self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.ERROR))
 
     def add_messages(self, messages: List[BusinessValidationMessage]):
         for msg in messages:
