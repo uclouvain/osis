@@ -70,7 +70,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
         cls.luy = LearningUnitYearFullFactory(
             academic_year=cls.academic_year,
             internship_subtype=None,
-            acronym="EFAC0000",
+            acronym="EFAC1000",
             learning_container_year__container_type=EXTERNAL,
             learning_container_year__requirement_entity=person_entity.entity,
         )
