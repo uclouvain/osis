@@ -133,14 +133,13 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             translated_label=Value(translated_text_label.label, output_field=CharField())
         )
         try:
-            translated_text = translated_text.values('label', 'translated_label', 'text').get()
+            return translated_text.values('label', 'translated_label', 'text').get()
         except ObjectDoesNotExist:
-            translated_text = {
+            return {
                 'label': self._get_correct_label_name(egy, section),
                 'translated_label': translated_text_label.label,
                 'text': None,
             }
-        return translated_text
 
     @staticmethod
     def _get_correct_label_name(egy, section):
