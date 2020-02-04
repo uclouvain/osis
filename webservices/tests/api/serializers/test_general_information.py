@@ -182,8 +182,6 @@ class EvaluationSectionTestCase(TestCase):
         self.assertEqual(evaluation_section['free_text'], 'EVALUATION_TEXT')
 
     def _get_evaluation_cms(self, common=None, specific=None):
-        if common is None:
-            common = []
         general_information_sections.SECTIONS_PER_OFFER_TYPE[self.egy.education_group_type.name] = {
             'specific': specific or [],
             'common': common or []
