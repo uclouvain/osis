@@ -62,7 +62,6 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section,
-                text=section.upper() + "_TEXT_COMMON"
             )
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
@@ -73,9 +72,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
                 language=cls.language,
-                text_label__label=section,
-                text=section.upper() + "_TEXT"
-            )
+                text_label__label=section,            )
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
                 text_label__label=label,
