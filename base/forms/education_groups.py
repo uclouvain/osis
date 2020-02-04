@@ -117,6 +117,7 @@ class EducationGroupFilter(FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.form.fields['academic_year'].initial = starting_academic_year()
         self.form.fields['category'].initial = education_group_categories.TRAINING
@@ -132,3 +133,9 @@ class EducationGroupFilter(FilterSet):
     @staticmethod
     def filter_education_group_year_field(queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
+
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return EducationGroupYear.objects.none()
+        return EducationGroupYear.objects.all()

@@ -113,7 +113,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <strong style="margin-left:10px;color:grey;">
-                                {% blocktrans with start_index=object_list.start_index end_index=object_list.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
+                                {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
                             </strong>
                         </div>
                         <div class="col-md-6">
@@ -167,7 +167,7 @@
                         </thead>
                     </table>
                     <div class="text-center">
-                        {% bootstrap_pagination object_list extra=request.GET.urlencode %}
+                        {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
                     </div>
                 {% endif %}
             </div>
@@ -196,7 +196,7 @@
                 {"name": "code", "targets": 5, "data": "code"}
             ];
 
-            initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ object_list.number }},
+            initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
             {{items_per_page}}, "{% url 'education_groups' %}", columnDefs);
         });
 
