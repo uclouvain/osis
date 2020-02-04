@@ -233,7 +233,7 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
     def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_occurrence_found(self):
         result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_years=[self.current_academic_year],
+            academic_year=self.current_academic_year,
             tutor=self.tutor
         )
         self.assertIsInstance(result, QuerySet)
@@ -246,7 +246,7 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
         AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor)
 
         result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_years=[self.current_academic_year],
+            academic_year=self.current_academic_year,
             tutor=self.tutor
         )
         self.assertIsInstance(result, QuerySet)
@@ -258,7 +258,7 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
         self.learning_unit_year.save()
 
         result = find_learning_unit_years_by_academic_year_tutor_attributions(
-            academic_years=[self.current_academic_year],
+            academic_year=self.current_academic_year,
             tutor=self.tutor
         )
         self.assertIsInstance(result, QuerySet)

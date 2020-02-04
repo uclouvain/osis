@@ -55,7 +55,7 @@ def list_my_attributions_summary_editable(request):
     current_or_previous_opened_calendar = event_perm.get_current_or_previous_opened_calendar()
     data_year = current_or_previous_opened_calendar.data_year
     learning_unit_years = find_learning_unit_years_by_academic_year_tutor_attributions(
-        academic_years=[data_year],
+        academic_year=data_year,
         tutor=tutor
     )
 
