@@ -99,7 +99,7 @@ class EventPerm(ABC):
     def get_previous_opened_calendar(cls, date=None) -> AcademicCalendar:
         if not date:
             date = timezone.now()
-        qs = AcademicCalendar.objects.filter(end_date__lt=date).order_by('end_date')
+        qs = AcademicCalendar.objects.filter(end_date__lte=date).order_by('end_date')
 
         if cls.event_reference:
             qs = qs.filter(reference=cls.event_reference)
@@ -110,7 +110,7 @@ class EventPerm(ABC):
     def get_next_opened_calendar(cls, date=None) -> AcademicCalendar:
         if not date:
             date = timezone.now()
-        qs = AcademicCalendar.objects.filter(start_date__gt=date).order_by('start_date')
+        qs = AcademicCalendar.objects.filter(start_date__gte=date).order_by('start_date')
 
         if cls.event_reference:
             qs = qs.filter(reference=cls.event_reference)
