@@ -31,7 +31,7 @@ from django.db.models import F, Value, Case, When, IntegerField, CharField
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
-from program_management.DomainDrivenDesign.domain import node
+from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
 
 

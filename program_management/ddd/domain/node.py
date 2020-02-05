@@ -28,8 +28,8 @@ from typing import List
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
-from program_management.DomainDrivenDesign.domain.link import Link, factory as link_factory
-from program_management.DomainDrivenDesign.domain.prerequisite import Prerequisite
+from program_management.ddd.domain.link import Link, factory as link_factory
+from program_management.ddd.domain.prerequisite import Prerequisite
 from program_management.models.enums.node_type import NodeType
 
 

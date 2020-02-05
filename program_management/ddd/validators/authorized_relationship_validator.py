@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.DomainDrivenDesign.contrib.validation import BusinessValidator
-from program_management.DomainDrivenDesign.domain import node
-from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
+from program_management.ddd.contrib.validation import BusinessValidator
+from program_management.ddd.domain import node
+from program_management.ddd.domain.program_tree import ProgramTree
 from django.utils.translation import gettext as _
 
 

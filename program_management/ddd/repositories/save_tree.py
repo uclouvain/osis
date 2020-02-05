@@ -26,8 +26,8 @@
 from django.db.models import Q
 
 from base.models.group_element_year import GroupElementYear
-from program_management.DomainDrivenDesign.domain import program_tree
-from program_management.DomainDrivenDesign.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
+from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
 
 
 # TODO :: gérer automatiquement les erreurs liées au modèle pour les remonter vers la couche business (contraintes d'unicité, valeur des champs, etc)

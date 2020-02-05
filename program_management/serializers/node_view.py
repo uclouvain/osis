@@ -32,7 +32,7 @@ from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.DomainDrivenDesign.domain import link, node
+from program_management.ddd.domain import link, node
 from program_management.models.enums import node_type
 
 

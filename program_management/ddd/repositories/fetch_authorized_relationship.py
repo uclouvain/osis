@@ -23,9 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.DomainDrivenDesign.contrib.validation import BusinessValidator
+from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
+from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship
 
 
-class NodeDuplicationValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. _check_new_attach_is_not_duplication
+def fetch() -> AuthorizedRelationshipList:
+    authorized_relationships = []
+    qs = ModelRelationship.objects.all().values(
+        'parent_type__name',
+        'child_type__name',
+        'min_count_authorized',
+        'max_count_authorized',
+    )
+    for obj in qs:
+        authorized_relationships.append(
+            AuthorizedRelationship(
+                obj['parent_type__name'],
+                obj['child_type__name'],
+                obj['min_count_authorized'],
+                obj['max_count_authorized'],
+            )
+        )
+    return AuthorizedRelationshipList(authorized_relationships)

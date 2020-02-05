@@ -26,7 +26,7 @@
 from django.test import TestCase
 
 from base.models.enums import prerequisite_operator
-from program_management.DomainDrivenDesign.domain import prerequisite
+from program_management.ddd.domain import prerequisite
 
 
 class TestPrerequisiteItem(TestCase):

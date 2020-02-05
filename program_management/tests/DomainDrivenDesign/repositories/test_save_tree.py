@@ -29,9 +29,9 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from program_management.DomainDrivenDesign.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
-from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.repositories import save_tree
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.repositories import save_tree
 
 
 class TestSaveTree(TestCase):

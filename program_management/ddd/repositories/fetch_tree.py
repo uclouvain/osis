@@ -31,9 +31,9 @@ from django.db.models import Case, F, When, IntegerField
 
 from base.models.group_element_year import GroupElementYear
 
-from program_management.DomainDrivenDesign.domain import node, link
-from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.repositories import fetch_node, fetch_prerequisite, \
+from program_management.ddd.domain import node, link
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.repositories import fetch_node, fetch_prerequisite, \
     fetch_authorized_relationship
 
 

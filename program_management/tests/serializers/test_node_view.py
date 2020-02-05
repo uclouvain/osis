@@ -32,8 +32,8 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.DomainDrivenDesign.domain.link import Link
-from program_management.DomainDrivenDesign.domain.node import NodeGroupYear, NodeLearningUnitYear
+from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
 from program_management.models.enums import node_type
 from program_management.serializers.node_view import NodeViewAttributeSerializer, LeafViewAttributeSerializer, \
     NodeViewSerializer, LeafViewSerializer

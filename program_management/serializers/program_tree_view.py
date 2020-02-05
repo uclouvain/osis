@@ -25,7 +25,7 @@
 ##############################################################################
 from rest_framework import serializers
 
-from program_management.DomainDrivenDesign.domain import program_tree
+from program_management.ddd.domain import program_tree
 from program_management.serializers.node_view import ChildrenField
 
 

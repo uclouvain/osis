@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.DomainDrivenDesign.contrib.validation import BusinessValidator
+from program_management.ddd.contrib.validation import BusinessValidator
 
 
 class MinimumEditableYearValidator(BusinessValidator):

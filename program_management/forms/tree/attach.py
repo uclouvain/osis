@@ -25,10 +25,10 @@
 ##############################################################################
 from django import forms
 
-from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.service import attach_node_service
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.service import attach_node_service
 from program_management.models.enums.node_type import NodeType
-from program_management.DomainDrivenDesign.repositories import fetch_node
+from program_management.ddd.repositories import fetch_node
 
 
 class AttachNodeForm(forms.Form):

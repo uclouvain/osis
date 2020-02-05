@@ -23,19 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.DomainDrivenDesign.contrib.validation import BusinessListValidator
-from program_management.DomainDrivenDesign.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, Node, \
+from program_management.ddd.contrib.validation import BusinessListValidator
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, Node, \
     NodeGroupYear
-from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.validators.attach_finality_end_date_validator import \
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.validators.attach_finality_end_date_validator import \
     AttachFinalityEndDateValidator
-from program_management.DomainDrivenDesign.validators.attach_option_validator import AttachOptionsValidator
-from program_management.DomainDrivenDesign.validators.authorized_relationship_validator import \
+from program_management.ddd.validators.attach_option_validator import AttachOptionsValidator
+from program_management.ddd.validators.authorized_relationship_validator import \
     AuthorizedRelationshipValidator, AuthorizedRelationshipLearningUnitValidator
-from program_management.DomainDrivenDesign.validators.minimum_editable_year_validator import \
+from program_management.ddd.validators.minimum_editable_year_validator import \
     MinimumEditableYearValidator
-from program_management.DomainDrivenDesign.validators.node_duplication_validator import NodeDuplicationValidator
-from program_management.DomainDrivenDesign.validators.parent_leaf_forbidden_validator import ParentIsNotLeafValidator
+from program_management.ddd.validators.node_duplication_validator import NodeDuplicationValidator
+from program_management.ddd.validators.parent_leaf_forbidden_validator import ParentIsNotLeafValidator
 
 
 class AttachNodeValidatorList(BusinessListValidator):

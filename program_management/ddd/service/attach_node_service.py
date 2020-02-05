@@ -25,13 +25,13 @@
 ##############################################################################
 from typing import List
 
-from program_management.DomainDrivenDesign.contrib.validation import BusinessValidationMessage, MessageLevel
-from program_management.DomainDrivenDesign.domain.node import Node
-from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.validators._router import get_business_list_validator_class
+from program_management.ddd.contrib.validation import BusinessValidationMessage, MessageLevel
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.validators._router import get_business_list_validator_class
 from django.utils.translation import gettext as _
 
-from program_management.DomainDrivenDesign.repositories import fetch_tree
+from program_management.ddd.repositories import fetch_tree
 
 
 def attach_node(tree: ProgramTree, node: Node, path: str = None) -> List[BusinessValidationMessage]:

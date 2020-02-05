@@ -31,10 +31,10 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from program_management.DomainDrivenDesign.domain import prerequisite
-from program_management.DomainDrivenDesign.domain import program_tree, node
+from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain import program_tree, node
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
-from program_management.DomainDrivenDesign.repositories import fetch_tree
+from program_management.ddd.repositories import fetch_tree
 
 
 class TestFetchTree(TestCase):

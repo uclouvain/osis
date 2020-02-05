@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.DomainDrivenDesign.contrib.validation import BusinessListValidator
-from program_management.DomainDrivenDesign.validators._validator_groups import AttachNodeValidatorList
+from program_management.ddd.contrib.validation import BusinessListValidator
+from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
 
 BusinessListValidatorClass = BusinessListValidator.__class__
 
