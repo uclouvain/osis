@@ -29,7 +29,7 @@ from typing import List
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
 from program_management.DomainDrivenDesign.domain.link import Link, factory as link_factory
-from program_management.DomainDrivenDesign.domain import Prerequisite
+from program_management.DomainDrivenDesign.domain.prerequisite import Prerequisite
 from program_management.models.enums import node_type
 
 
@@ -50,8 +50,8 @@ factory = NodeFactory()
 
 class Node:
 
-    children: List[Link] = None
-    node_type: EducationGroupTypesEnum = None  # TODO :: rename to 'type'
+    children = None
+    node_type = None  # TODO :: rename to 'type'
 
     def __init__(self, node_id: int, node_type: EducationGroupTypesEnum = None, children: List[Link] = None):
         self.node_id = node_id
@@ -126,7 +126,7 @@ class NodeGroupYear(Node):
 
 class NodeLearningUnitYear(Node):
     def __init__(self, node_id: int, acronym, title, year, proposal_type=None, **kwargs):
-        super().__init__(node_id, [])
+        super().__init__(node_id)
         self.acronym = acronym
         self.title = title
         self.year = year

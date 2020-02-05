@@ -29,8 +29,8 @@ from program_management.DomainDrivenDesign.domain.authorized_relationship import
 
 class ProgramTree:
 
-    root_node: node.Node = None
-    authorized_relationships: AuthorizedRelationshipList = None
+    root_node = None
+    authorized_relationships = None
 
     def __init__(self, root_node: node.Node, authorized_relationships: AuthorizedRelationshipList = None):
         if not isinstance(root_node, node.Node):

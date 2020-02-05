@@ -14,8 +14,8 @@ class MessageLevel(Enum):
 
 
 class BusinessValidationMessage:
-    message: str = None
-    level: MessageLevel = MessageLevel.ERROR.name
+    message = None
+    level = MessageLevel.ERROR.name
 
     def __init__(self, message: str, level: MessageLevel = None):
         self.message = message
@@ -24,7 +24,7 @@ class BusinessValidationMessage:
 
 class BusinessValidator(ABC):
 
-    _messages: List[BusinessValidationMessage] = None
+    _messages = None
 
     def __init__(self, *args, **kwargs):
         self._messages = []
@@ -66,7 +66,7 @@ class BusinessValidator(ABC):
 
 
 class BusinessListValidator(BusinessValidator):
-    validators: List[BusinessValidator.__class__] = None
+    validators = None
 
     validator_args = None
     validator_kwargs = None

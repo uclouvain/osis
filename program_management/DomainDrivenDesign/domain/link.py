@@ -36,17 +36,17 @@ class Link:
     # Solution 4 : creates an interface used by Node and Link
     parent = None
     child = None
-    relative_credits: int = None
-    min_credits: int = None
-    max_credits: int = None
-    is_mandatory: int = None
-    block: str = None
+    relative_credits = None
+    min_credits = None
+    max_credits = None
+    is_mandatory = None
+    block = None
     access_condition = None  # TODO :: typing
-    comment: str = None
-    comment_english: str = None
-    own_comment: str = None
+    comment = None
+    comment_english = None
+    own_comment = None
     quadrimester_derogation = None  # TODO :: typing
-    link_type: LinkTypes = None  # TODO :: Move Enum from model to business
+    link_type = None  # TODO :: Move Enum from model to business
 
     def __init__(self, parent, child, **kwargs):
         self.parent = parent

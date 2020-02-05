@@ -32,9 +32,9 @@ from django.utils.translation import gettext as _
 #  TODO :: unit tests on validation
 class AuthorizedRelationshipValidator(BusinessValidator):
 
-    tree: ProgramTree = None
-    node_to_add: node.Node = None
-    parent: node.Node = None
+    tree = None
+    node_to_add = None
+    parent = None
 
     def __init__(self, tree: ProgramTree, node_to_add: node.Node, path: str):
         super(AuthorizedRelationshipValidator, self).__init__()
@@ -71,7 +71,7 @@ class AuthorizedRelationshipValidator(BusinessValidator):
 
 class AttachOptionsValidator(BusinessValidator):
     def validate(self):
-            pass  # cf. _check_attach_options_rules
+        pass  # cf. _check_attach_options_rules
 
 
 class AttachFinalityEndDateValidator(BusinessValidator):

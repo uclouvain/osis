@@ -30,10 +30,10 @@ from program_management.DomainDrivenDesign.domain.node import Node
 
 
 class AuthorizedRelationship:
-    parent_type: EducationGroupTypesEnum = None  # TODO :: move EducationGroupTypesEnum from model to business
-    child_type: EducationGroupTypesEnum = None
-    min_contraint: int = None
-    max_constraint: int = None
+    parent_type = None  # TODO :: move EducationGroupTypesEnum from model to business
+    child_type = None
+    min_contraint = None
+    max_constraint = None
 
     def __init__(
             self,
@@ -50,7 +50,7 @@ class AuthorizedRelationship:
 
 #  TODO :: unit tests functions
 class AuthorizedRelationshipList:
-    authorized_relationships: List[AuthorizedRelationship] = None
+    authorized_relationships = None
 
     def __init__(self, authorized_relationships: List[AuthorizedRelationship]):
         self.authorized_relationships = authorized_relationships
