@@ -33,6 +33,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
     ConsistencyError
+from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models import learning_unit_year as mdl_luy
 from base.models import teaching_material as mdl_teaching_material
@@ -508,7 +509,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self.assertEqual(str(context.exception),
                          _('The selected end year (%(partim_end_year)s) is greater '
                            'than the end year of the parent %(lu_parent)s') % {
-                             'partim_end_year': academic_year.find_academic_year_by_year(max_end_year.year + 1),
+                             'partim_end_year': NO_PLANNED_END_DISPLAY,
                              'lu_parent': learning_unit_full_annual.acronym
                          })
 
