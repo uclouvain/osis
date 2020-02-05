@@ -126,7 +126,7 @@ def clean_attribute_initial_value(attribute_name, attribute_value):
         clean_attribute_value = language.find_by_id(attribute_value)
     elif attribute_name in ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']:
         clean_attribute_value = get_by_internal_id(attribute_value)
-    elif attribute_name == "end_year":
+    elif attribute_name == "end_year" and attribute_value:
         clean_attribute_value = AcademicYear.objects.filter(pk=attribute_value).first()
     return clean_attribute_value
 
