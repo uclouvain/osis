@@ -37,7 +37,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
     serializer_class = EducationGroupTreeSerializer
     filter_backends = []
     paginator = None
-    lookup_fields = ('academic_year__year', 'acronym',)
+    lookup_fields = ('academic_year__year', 'acronym__iexact',)
     lookup_url_kwargs = ('year', 'acronym',)
 
     def get_object(self):
