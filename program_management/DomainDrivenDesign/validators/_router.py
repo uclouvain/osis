@@ -24,13 +24,12 @@
 #
 ##############################################################################
 from program_management.DomainDrivenDesign.contrib.validation import BusinessListValidator
-from program_management.DomainDrivenDesign.validators._validator_groups import factory
-
+from program_management.DomainDrivenDesign.validators._validator_groups import AttachNodeValidatorList
 
 BusinessListValidatorClass = BusinessListValidator.__class__
 
 
-def get_business_list_validator_class(feature: str) -> BusinessListValidatorClass:
+def get_business_list_validator_class(feature: str):
     return {
-        'attach_node': factory.get_attach_node_validator(),
+        'attach_node': AttachNodeValidatorList,
     }[feature]

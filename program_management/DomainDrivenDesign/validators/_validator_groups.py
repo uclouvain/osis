@@ -38,35 +38,31 @@ from program_management.DomainDrivenDesign.validators.node_duplication_validator
 from program_management.DomainDrivenDesign.validators.parent_leaf_forbidden_validator import ParentIsNotLeafValidator
 
 
-class AttachGroupYearNodeValidator(BusinessListValidator):
-    validators = [
-        ParentIsNotLeafValidator,
-        AuthorizedRelationshipValidator,
-        AttachOptionsValidator,
-        AttachFinalityEndDateValidator,
-        NodeDuplicationValidator,
-        MinimumEditableYearValidator,
-    ]
+class AttachNodeValidatorList(BusinessListValidator):
 
+    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
 
-class AttachLearningUnitYearNodeValidator(BusinessListValidator):
-    validators = [
-        ParentIsNotLeafValidator,
-        AuthorizedRelationshipLearningUnitValidator,
-        NodeDuplicationValidator,
-        MinimumEditableYearValidator,
-    ]
-
-
-class AttachNodeValidatorFactory:
-    def get_attach_node_validator(self, tree: ProgramTree, node_to_add: Node, where_to_add: str):
         if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):
-            attach_node_validator_class = AttachGroupYearNodeValidator
+
+            self.validators = [
+                ParentIsNotLeafValidator,
+                AuthorizedRelationshipValidator,
+                AttachOptionsValidator,
+                AttachFinalityEndDateValidator,
+                NodeDuplicationValidator,
+                MinimumEditableYearValidator,
+            ]
+
         elif isinstance(node_to_add, NodeLearningUnitYear):
-            attach_node_validator_class = AttachLearningUnitYearNodeValidator
+
+            self.validators = [
+                ParentIsNotLeafValidator,
+                AuthorizedRelationshipLearningUnitValidator,
+                NodeDuplicationValidator,
+                MinimumEditableYearValidator,
+            ]
+
         else:
             raise AttributeError("Unknown instance of node")
-        return attach_node_validator_class(validator_args=[tree, node_to_add, where_to_add])
 
-
-factory = AttachNodeValidatorFactory()
+        super(AttachNodeValidatorList, self).__init__(validator_args=[tree, node_to_add, path])

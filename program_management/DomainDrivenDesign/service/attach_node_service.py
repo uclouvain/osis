@@ -28,10 +28,9 @@ from typing import List
 from program_management.DomainDrivenDesign.contrib.validation import BusinessValidationMessage, MessageLevel
 from program_management.DomainDrivenDesign.domain.node import Node
 from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.validators import attach_node as attach_node_validator
+from program_management.DomainDrivenDesign.validators._router import get_business_list_validator_class
 from django.utils.translation import gettext as _
 
-from program_management.DomainDrivenDesign.validators.attach_node import AuthorizedRelationshipValidator
 from program_management.DomainDrivenDesign.repositories import fetch_tree
 
 
@@ -40,7 +39,7 @@ def attach_node(tree: ProgramTree, node: Node, path: str = None) -> List[Busines
 
     error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
 
-    validator = attach_node_validator.factory.get_attach_node_validator(tree, node, position_to_attach)
+    validator = get_business_list_validator_class("attach_node")(tree, node, position_to_attach)
     validator.validate()
     error_messages += validator.error_messages
 
