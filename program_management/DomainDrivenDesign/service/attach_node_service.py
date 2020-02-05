@@ -28,10 +28,10 @@ from typing import List
 from program_management.DomainDrivenDesign.contrib.validation import BusinessValidationMessage, MessageLevel
 from program_management.DomainDrivenDesign.domain.node import Node
 from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.DomainDrivenDesign.domain.tree.validators import attach_node as attach_node_validator
+from program_management.DomainDrivenDesign.validators import attach_node as attach_node_validator
 from django.utils.translation import gettext as _
 
-from program_management.DomainDrivenDesign.domain.tree.validators.attach_node import AuthorizedRelationshipValidator
+from program_management.DomainDrivenDesign.validators.attach_node import AuthorizedRelationshipValidator
 from program_management.DomainDrivenDesign.repositories import fetch_tree
 
 
