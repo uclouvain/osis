@@ -212,7 +212,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
             'partial_acronym': self.mini_training.partial_acronym.lower(),
             'year': self.mini_training.academic_year.year
         }
-        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)
+        url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -288,6 +288,6 @@ class GroupTreeViewTestCase(APITestCase):
             'partial_acronym': self.common_core.partial_acronym.lower(),
             'year': self.common_core.academic_year.year
         }
-        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)
+        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs=url_kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
