@@ -51,7 +51,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(source='academic_year.year', read_only=True)
     education_group_type = serializers.CharField(source='education_group_type.name', read_only=True)
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-    sections = serializers.SerializerMethodField(read_only=True)
+    sections = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupYear

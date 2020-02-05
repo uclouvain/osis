@@ -53,31 +53,20 @@ class SectionSerializer(serializers.Serializer):
         )
 
 
-class SpecialSectionSerializer(serializers.Serializer):
+class AchievementSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     label = serializers.CharField(source='id', read_only=True)
-    content = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        fields = (
-            'id',
-            'label',
-            'content',
-        )
-
-
-class AchievementSectionSerializer(SpecialSectionSerializer):
-    class Meta(SpecialSectionSerializer.Meta):
-        fields = SpecialSectionSerializer.fields
+    content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         egy = self.context.get('egy')
         return AchievementsSerializer(egy, context=self.context).data
 
 
-class AdmissionConditionSectionSerializer(SpecialSectionSerializer):
-    class Meta(SpecialSectionSerializer.Meta):
-        fields = SpecialSectionSerializer.fields
+class AdmissionConditionSectionSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    label = serializers.CharField(source='id', read_only=True)
+    content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         # FIXME: Bachelor has no admissioncondition
@@ -112,23 +101,21 @@ class AdmissionConditionSectionSerializer(SpecialSectionSerializer):
             return AdmissionCondition.objects.create(education_group_year=self.get_education_group_year())
 
 
-class ContactsSectionSerializer(SpecialSectionSerializer):
-    class Meta(SpecialSectionSerializer.Meta):
-        fields = SpecialSectionSerializer.fields
+class ContactsSectionSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    label = serializers.CharField(source='id', read_only=True)
+    content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         egy = self.context.get('egy')
         return ContactsSerializer(egy, context=self.context).data
 
 
-class EvaluationSectionSerializer(SpecialSectionSerializer):
-    free_text = serializers.SerializerMethodField(read_only=True, required=False)
-    label = serializers.SerializerMethodField(read_only=True)
-
-    class Meta(SpecialSectionSerializer.Meta):
-        fields = SpecialSectionSerializer.Meta.fields + (
-            'free_text',
-        )
+class EvaluationSectionSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    content = serializers.SerializerMethodField()
+    free_text = serializers.SerializerMethodField()
+    label = serializers.SerializerMethodField()
 
     def get_label(self, obj):
         return TranslatedTextLabel.objects.get(
