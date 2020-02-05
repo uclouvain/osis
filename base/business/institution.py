@@ -23,14 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from base.models import entity_calendar, academic_year
+from base.models import entity_calendar
 from base.models.enums import academic_calendar_type
 
 
-def find_summary_course_submission_dates_for_entity_version(entity_version):
+def find_summary_course_submission_dates_for_entity_version(entity_version, ac_year):
     return entity_calendar.find_interval_dates_for_entity(
-        ac_year=academic_year.current_academic_year(),
+        ac_year=ac_year,
         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         entity=entity_version.entity
     )

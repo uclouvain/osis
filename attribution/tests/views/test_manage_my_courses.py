@@ -62,7 +62,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.tutor = TutorFactory(person=cls.person)
         cls.current_ac_year = create_current_academic_year()
         ac_year_in_past = AcademicYearFactory.produce_in_past(cls.current_ac_year.year)
-        ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_ac_year.year)
+        cls.ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_ac_year.year)
 
         cls.academic_calendar = OpenAcademicCalendarFactory(
             academic_year=cls.current_ac_year,
@@ -71,7 +71,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         )
         requirement_entity = EntityVersionFactory().entity
         # Create multiple attribution in different academic years
-        for ac_year in ac_year_in_past + [cls.current_ac_year] + ac_year_in_future:
+        for ac_year in ac_year_in_past + [cls.current_ac_year] + cls.ac_year_in_future:
             learning_container_year = LearningContainerYearFactory(
                 academic_year=ac_year,
                 requirement_entity=requirement_entity
@@ -104,7 +104,6 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_list_my_attributions_summary_editable(self):
-        """In this test, we ensure that user see only UE of (CURRENT YEAR + 1) and not erlier/older UE"""
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
@@ -153,6 +152,22 @@ class ManageMyCoursesViewTestCase(TestCase):
             }
         )
         self.assertEqual(msg[1].get('level'), messages.INFO)
+
+    def test_list_my_attributions_summary_editable_next_data_year(self):
+        self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=1)
+        self.academic_calendar.end_date = datetime.date.today() + datetime.timedelta(weeks=4)
+        self.academic_calendar.academic_year = self.ac_year_in_future[1]  # This is n+1
+        self.academic_calendar.data_year = self.ac_year_in_future[1]  # This is n+1
+        self.academic_calendar.save()
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
+
+        context = response.context
+
+        for luy, error in context["learning_unit_years_with_errors"]:
+            self.assertEqual(luy.academic_year.year, self.ac_year_in_future[1].year)
+            self.assertFalse(error.errors)
 
 
 @override_flag('educational_information_block_action', active=True)
