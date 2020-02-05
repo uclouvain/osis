@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from base.models.enums.link_type import LinkTypes
-from education_group.enums.node_type import NodeType
+from program_management.models.enums.node_type import NodeType
 
 
 class Link:
@@ -76,7 +76,7 @@ class LinkWithChildBranch(Link):
 class LinkFactory:
 
     def get_link(self, parent, child, **kwargs) -> Link:
-        if parent and parent.node_type == NodeType.LEARNING_UNIT:
+        if parent and parent.node_type == NodeType.LEARNING_UNIT.name:
             return LinkWithChildLeaf(parent, child, **kwargs)
         else:
             return LinkWithChildBranch(parent, child, **kwargs)

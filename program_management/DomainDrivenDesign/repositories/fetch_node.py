@@ -32,13 +32,13 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from program_management.DomainDrivenDesign.domain import node
-from program_management.models.enums import node_type
+from program_management.models.enums.node_type import NodeType
 
 
 def fetch_by_type(type, element_id: int) -> node.Node:
-    if type == node_type.EDUCATION_GROUP:
+    if type == NodeType.EDUCATION_GROUP.name:
         return fetch_node_education_group_year(element_id)
-    elif type == node_type.LEARNING_UNIT:
+    elif type == NodeType.LEARNING_UNIT.name:
         return fetch_node_learning_unit_year(element_id)
 
 
@@ -62,8 +62,8 @@ def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
     aggregate_qs = GroupElementYear.objects.filter(pk__in=element_ids)\
         .annotate(
             node_type=Case(
-                When(child_branch_id__isnull=False, then=Value(node_type.EDUCATION_GROUP)),
-                When(child_leaf_id__isnull=False, then=Value(node_type.LEARNING_UNIT)),
+                When(child_branch_id__isnull=False, then=Value(NodeType.EDUCATION_GROUP.name)),
+                When(child_leaf_id__isnull=False, then=Value(NodeType.LEARNING_UNIT.name)),
                 default=Value('Unknown'),
                 output_field=CharField()
             ),
@@ -78,8 +78,8 @@ def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
     union_qs = None
     for result_aggregate in aggregate_qs:
         qs_function = {
-            node_type.EDUCATION_GROUP: __fetch_multiple_node_education_group_year,
-            node_type.LEARNING_UNIT: __fetch_multiple_node_learning_unit_year,
+            NodeType.EDUCATION_GROUP.name: __fetch_multiple_node_education_group_year,
+            NodeType.LEARNING_UNIT.name: __fetch_multiple_node_learning_unit_year,
         }[result_aggregate['node_type']]
         qs = qs_function(result_aggregate['node_ids']) \
             .values('node_id', 'type', 'acronym', 'title', 'year', 'proposal_type')
@@ -94,7 +94,7 @@ def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
 def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]):
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         node_id=F('pk'),
-        type=Value(node_type.EDUCATION_GROUP, output_field=CharField()),
+        type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
         node_acronym=F('acronym'),
         node_title=F('title'),
         year=F('academic_year__year'),
@@ -106,7 +106,7 @@ def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]):
 def __fetch_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
     return LearningUnitYear.objects.filter(pk__in=node_learning_unit_year_ids).annotate_full_title().annotate(
         node_id=F('pk'),
-        type=Value(node_type.LEARNING_UNIT, output_field=CharField()),
+        type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
         node_acronym=F('acronym'),
         node_title=F('full_title'),
         year=F('academic_year__year'),

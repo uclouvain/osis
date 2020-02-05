@@ -23,7 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-EDUCATION_GROUP = 'EDUCATION_GROUP'
-GROUP = 'GROUP'
-LEARNING_UNIT = 'LEARNING_UNIT'
-LEARNING_CLASS = 'LEARNING_CLASS'
+from base.models.utils.utils import ChoiceEnum
+
+
+class NodeType(ChoiceEnum):
+    EDUCATION_GROUP = 'EDUCATION_GROUP'
+    GROUP = 'GROUP'
+    LEARNING_UNIT = 'LEARNING_UNIT'
+    LEARNING_CLASS = 'LEARNING_CLASS'

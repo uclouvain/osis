@@ -26,22 +26,24 @@
 from django import forms
 
 from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
-from program_management.models.enums import node_type
+from program_management.DomainDrivenDesign.service import attach_node_service
+from program_management.models.enums.node_type import NodeType
 from program_management.DomainDrivenDesign.repositories import fetch_node
 
 
 class AttachNodeForm(forms.Form):
     node_id = forms.IntegerField(widget=forms.HiddenInput)
+    node_type = forms.ChoiceField(choices=NodeType.choices())
     to_path = forms.CharField(widget=forms.HiddenInput)
 
     def save(self):
-        root_id, _ = self.cleaned_data['to_path'].split('|', 1)
-        # According to cache class
-        node = fetch_node.fetch_by_type(node_type.EDUCATION_GROUP, self.cleaned_data['node_id'])
+        node = fetch_node.fetch_by_type(self.cleaned_data['node_type'], self.cleaned_data['node_id'])
 
+        root_id, _ = self.cleaned_data['to_path'].split('|', 1)
         tree = ProgramTree(root_id)
-        tree.attach_node(
+        attach_node_service.attach_node(
+            tree,
             node,
-            path=self.cleaned_data.pop('to_path'),
-            **self.cleaned_data
+            self.cleaned_data.pop('to_path'),
+            # **self.cleaned_data
         )

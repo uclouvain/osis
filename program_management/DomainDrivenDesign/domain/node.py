@@ -30,17 +30,17 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
 from program_management.DomainDrivenDesign.domain.link import Link, factory as link_factory
 from program_management.DomainDrivenDesign.domain.prerequisite import Prerequisite
-from program_management.models.enums import node_type
+from program_management.models.enums.node_type import NodeType
 
 
 class NodeFactory:
     def get_node(self, type, **kwargs):
         node_cls = {
-            node_type.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
+            NodeType.EDUCATION_GROUP.name: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
-            node_type.GROUP: NodeGroupYear,
-            node_type.LEARNING_UNIT: NodeLearningUnitYear,
-            node_type.LEARNING_CLASS: NodeLearningClassYear
+            NodeType.GROUP.name: NodeGroupYear,
+            NodeType.LEARNING_UNIT.name: NodeLearningUnitYear,
+            NodeType.LEARNING_CLASS.name: NodeLearningClassYear
         }[type]
         return node_cls(**kwargs)
 
