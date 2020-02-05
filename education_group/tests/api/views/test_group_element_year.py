@@ -209,7 +209,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
     def test_get_result_with_lowercase_acronym(self):
         url_kwargs = {
-            'acronym': self.mini_training.partial_acronym.lower(),
+            'partial_acronym': self.mini_training.partial_acronym.lower(),
             'year': self.mini_training.academic_year.year
         }
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)
@@ -285,7 +285,7 @@ class GroupTreeViewTestCase(APITestCase):
 
     def test_get_result_with_lowercase_acronym(self):
         url_kwargs = {
-            'acronym': self.common_core.partial_acronym.lower(),
+            'partial_acronym': self.common_core.partial_acronym.lower(),
             'year': self.common_core.academic_year.year
         }
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)

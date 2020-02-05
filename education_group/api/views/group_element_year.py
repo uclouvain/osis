@@ -69,7 +69,7 @@ class MiniTrainingTreeView(EducationGroupTreeView):
         Return the tree of the mini-training
     """
     name = 'minitrainings_tree'
-    lookup_fields = ('academic_year__year', 'partial_acronym',)
+    lookup_fields = ('academic_year__year', 'partial_acronym__iexact',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=Categories.MINI_TRAINING.name
@@ -81,7 +81,7 @@ class GroupTreeView(EducationGroupTreeView):
         Return the tree of the group
     """
     name = 'groups_tree'
-    lookup_fields = ('academic_year__year', 'partial_acronym',)
+    lookup_fields = ('academic_year__year', 'partial_acronym__iexact',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=Categories.GROUP.name
