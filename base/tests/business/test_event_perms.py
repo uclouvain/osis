@@ -41,7 +41,7 @@ class TestEventPerms(TestCase):
             start_date=datetime.date.today() - datetime.timedelta(weeks=104),
             end_date=datetime.date.today() - datetime.timedelta(weeks=100)
         )
-        AcademicCalendarFactory(
+        previous_calendar = AcademicCalendarFactory(
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
             data_year=AcademicYearFactory(year=2018),
             start_date=datetime.date.today() - datetime.timedelta(weeks=52),
@@ -53,11 +53,11 @@ class TestEventPerms(TestCase):
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52)
         )
-        opened_calendar = OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertEqual(
-            opened_calendar,
-            event_perm.get_current_or_previous_opened_calendar()
+            previous_calendar,
+            event_perm.get_previous_opened_calendar()
         )
 
     def test_get_current_or_previous_opened_calendar_academic_years_calendar_closed(self):
@@ -82,7 +82,7 @@ class TestEventPerms(TestCase):
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertEqual(
             previous_calendar,
-            event_perm.get_current_or_previous_opened_calendar()
+            event_perm.get_previous_opened_calendar()
         )
 
     def test_get_current_or_previous_opened_calendar_academic_years_only_future_calendar(self):
@@ -94,16 +94,16 @@ class TestEventPerms(TestCase):
         )
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertIsNone(
-            event_perm.get_current_or_previous_opened_calendar()
+            event_perm.get_previous_opened_calendar()
         )
 
     def test_get_current_or_previous_opened_calendar_academic_years_no_calendar(self):
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertIsNone(
-            event_perm.get_current_or_previous_opened_calendar()
+            event_perm.get_previous_opened_calendar()
         )
         self.assertIsNone(
-            event_perm.get_current_or_next_opened_calendar()
+            event_perm.get_next_opened_calendar()
         )
 
     def test_get_current_or_next_opened_calendar_academic_years_calendar_opened(self):
@@ -113,7 +113,7 @@ class TestEventPerms(TestCase):
             start_date=datetime.date.today() - datetime.timedelta(weeks=52),
             end_date=datetime.date.today() - datetime.timedelta(weeks=48)
         )
-        AcademicCalendarFactory(
+        next_calendar = AcademicCalendarFactory(
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
             data_year=AcademicYearFactory(year=2020),
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
@@ -125,11 +125,11 @@ class TestEventPerms(TestCase):
             start_date=datetime.date.today() + datetime.timedelta(weeks=100),
             end_date=datetime.date.today() + datetime.timedelta(weeks=104)
         )
-        opened_calendar = OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        OpenAcademicCalendarFactory(reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertEqual(
-            opened_calendar,
-            event_perm.get_current_or_next_opened_calendar()
+            next_calendar,
+            event_perm.get_next_opened_calendar()
         )
 
     def test_get_current_or_next_opened_calendar_academic_years_calendar_closed(self):
@@ -154,7 +154,7 @@ class TestEventPerms(TestCase):
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertEqual(
             next_calendar,
-            event_perm.get_current_or_next_opened_calendar()
+            event_perm.get_next_opened_calendar()
         )
 
     def test_get_current_or_next_opened_calendar_academic_years_only_future_calendar(self):
@@ -166,5 +166,5 @@ class TestEventPerms(TestCase):
         )
         event_perm = event_perms.EventPermSummaryCourseSubmission()
         self.assertIsNone(
-            event_perm.get_current_or_next_opened_calendar()
+            event_perm.get_next_opened_calendar()
         )

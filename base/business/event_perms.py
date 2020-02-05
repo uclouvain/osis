@@ -96,10 +96,10 @@ class EventPerm(ABC):
         return qs.values_list('data_year', flat=True)
 
     @classmethod
-    def get_current_or_previous_opened_calendar(cls, date=None) -> AcademicCalendar:
+    def get_previous_opened_calendar(cls, date=None) -> AcademicCalendar:
         if not date:
             date = timezone.now()
-        qs = AcademicCalendar.objects.filter(start_date__lt=date).order_by('end_date')
+        qs = AcademicCalendar.objects.filter(end_date__lt=date).order_by('end_date')
 
         if cls.event_reference:
             qs = qs.filter(reference=cls.event_reference)
@@ -107,10 +107,10 @@ class EventPerm(ABC):
         return qs.last()
 
     @classmethod
-    def get_current_or_next_opened_calendar(cls, date=None) -> AcademicCalendar:
+    def get_next_opened_calendar(cls, date=None) -> AcademicCalendar:
         if not date:
             date = timezone.now()
-        qs = AcademicCalendar.objects.filter(end_date__gt=date).order_by('start_date')
+        qs = AcademicCalendar.objects.filter(start_date__gt=date).order_by('start_date')
 
         if cls.event_reference:
             qs = qs.filter(reference=cls.event_reference)
