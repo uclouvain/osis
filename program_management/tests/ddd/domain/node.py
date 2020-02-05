@@ -26,6 +26,7 @@
 from django.test import TestCase
 
 from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
 class TestAddChildNode(TestCase):
@@ -61,3 +62,39 @@ class TestDescendentsPropertyNode(TestCase):
         ]
         self.assertTrue(all(k in expected_keys for k in self.root_node.descendents.keys()))
 
+
+class TestEq(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.node_id = 1
+        cls.node = NodeGroupYearFactory(node_id=1)
+
+    def test_when_nodes_group_year_are_equal(self):
+        node_with_same_id = NodeGroupYearFactory(node_id=self.node_id)
+        self.assertTrue(self.node == node_with_same_id)
+
+    def test_when_nodes_group_year_are_not_equal(self):
+        node_with_different_id = NodeGroupYearFactory(node_id=self.node_id + 1)
+        self.assertFalse(self.node == node_with_different_id)
+
+    def test_when_nodes_learning_unit_are_equal(self):
+        node_with_same_id = NodeLearningUnitYearFactory(node_id=self.node_id)
+        self.assertTrue(self.node == node_with_same_id)
+
+    def test_when_nodes_learning_unit_are_not_equal(self):
+        node_with_different_id = NodeLearningUnitYearFactory(node_id=self.node_id + 1)
+        self.assertFalse(self.node == node_with_different_id)
+
+
+class TestStr(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.acronym = 'Acronym'
+        cls.node_group_year = NodeGroupYearFactory(acronym=cls.acronym)
+        cls.node_learning_unit = NodeLearningUnitYearFactory(acronym=cls.acronym)
+
+    def test_node_group_year_str(self):
+        self.assertEqual(str(self.node_group_year), self.acronym)
+
+    def test_node_learning_unit_str(self):
+        self.assertEqual(str(self.node_learning_unit), self.acronym)
