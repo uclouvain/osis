@@ -79,7 +79,6 @@ def entities_search(request):
 @login_required
 def entity_read(request, entity_version_id):
     entity_version = get_object_or_404(EntityVersion, id=entity_version_id)
-
     entity_parent = entity_version.get_parent_version()
     descendants = entity_version.descendants
 
@@ -88,18 +87,17 @@ def entity_read(request, entity_version_id):
         data_year = event_perm.get_academic_years().get()
     else:
         data_year = event_perm.get_previous_opened_calendar().data_year
-
     calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(
         entity_version=entity_version,
         ac_year=data_year
     )
+
     context = {
         'entity_version': entity_version,
         'entity_parent': entity_parent,
         'descendants': descendants,
         'calendar_summary_course_submission': calendar_summary_course_submission
     }
-
     return render(request, "entity/identification.html", context)
 
 
