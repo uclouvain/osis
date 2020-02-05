@@ -47,8 +47,11 @@ class FindSummaryCourseSubmissionDatesTestCase(TestCase):
         cls.parent_entity = EntityFactory()
         cls.child_entity = EntityFactory()
         cls.child_entity_bis = EntityFactory()
-        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
-                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        cls.academic_calendar = AcademicCalendarFactory(
+            academic_year=cls.current_academic_year,
+            data_year=cls.current_academic_year,
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
         cls.parent_entity_version = EntityVersionFactory(start_date=cls.current_academic_year.start_date,
                                                          end_date=cls.current_academic_year.end_date,
                                                          entity=cls.parent_entity)

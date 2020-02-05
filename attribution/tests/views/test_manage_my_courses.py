@@ -282,14 +282,17 @@ class ManageMyCoursesMixin(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
-                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-                                                        start_date=datetime.date(
-                                                            cls.current_academic_year.year - 1, 9, 30),
-                                                        end_date=datetime.date(
-                                                            cls.current_academic_year.year + 1, 9, 30)
-                                                        )
+        cls.academic_calendar = AcademicCalendarFactory(
+            academic_year=cls.current_academic_year,
+            data_year=cls.current_academic_year,
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+        )
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        cls.academic_calendar = OpenAcademicCalendarFactory(
+            academic_year=cls.academic_year_in_future,
+            data_year=cls.academic_year_in_future,
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+        )
         a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
         cls.learning_unit_year = LearningUnitYearFactory(
             subtype=FULL,
