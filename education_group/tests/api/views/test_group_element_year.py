@@ -137,8 +137,6 @@ class TrainingTreeViewTestCase(APITestCase):
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data)
-        self.assertFalse('detail' in response.data)
 
 
 class MiniTrainingTreeViewTestCase(APITestCase):
@@ -217,8 +215,6 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data)
-        self.assertFalse('detail' in response.data)
 
 
 class GroupTreeViewTestCase(APITestCase):
@@ -295,5 +291,3 @@ class GroupTreeViewTestCase(APITestCase):
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs=url_kwargs)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data)
-        self.assertFalse('detail' in response.data)
