@@ -381,6 +381,15 @@ def build_initial_data(learning_unit_year, entity):
 
 
 class TestProposalLearningUnitFilter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce(None, 2, 5)
+        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+
     def test_initial_value_with_entity_subordinated(self):
         proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
         self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
+        self.assertEqual(
+            proposal_filter.form.fields['academic_year'].initial,
+            self.academic_years[3]  # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
+        )

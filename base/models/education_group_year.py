@@ -183,7 +183,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     title = models.CharField(
-        max_length=255,
+        max_length=240,
         verbose_name=_("Title in French")
     )
 
@@ -192,6 +192,20 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         default="",
         verbose_name=_("Title in English")
+    )
+
+    partial_title = models.CharField(
+        max_length=240,
+        blank=True,
+        default="",
+        verbose_name=_("Partial title in French")
+    )
+
+    partial_title_english = models.CharField(
+        max_length=240,
+        blank=True,
+        default="",
+        verbose_name=_("Partial title in English")
     )
 
     academic_year = models.ForeignKey(
@@ -672,9 +686,14 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def verbose_title(self):
-        if self.title_english and translation.get_language() == LANGUAGE_CODE_EN:
-            return self.title_english
-        return self.title
+        if self.is_finality:
+            if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN:
+                return self.partial_title_english
+            return self.partial_title
+        else:
+            if self.title_english and translation.get_language() == LANGUAGE_CODE_EN:
+                return self.title_english
+            return self.title
 
     @property
     def verbose_type(self):
