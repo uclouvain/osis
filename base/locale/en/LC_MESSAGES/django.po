@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 09:41+0100\n"
+"POT-Creation-Date: 2020-02-03 11:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,6 +102,9 @@ msgstr ""
 msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
+msgstr ""
+
+msgid "'^' Means starts with. '$' Means ends by."
 msgstr ""
 
 msgid "1st quadri"
@@ -387,7 +390,8 @@ msgid "Assistants"
 msgstr ""
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of full UE"
+"At least a partim volume value is greater than corresponding volume of full "
+"UE"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
@@ -640,6 +644,22 @@ msgstr ""
 msgid "Creation"
 msgstr ""
 
+msgid ""
+"Creation or end date modification proposal not allowed for central managers "
+"during this period."
+msgstr ""
+
+msgid ""
+"Creation or end date modification proposal not allowed for faculty managers "
+"during this period."
+msgstr ""
+
+msgid "Creation or end date proposal by central managers"
+msgstr ""
+
+msgid "Creation or end date proposal by faculty managers"
+msgstr ""
+
 msgid "Cred. rel./abs."
 msgstr ""
 
@@ -837,6 +857,9 @@ msgstr ""
 msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
+msgid "Email"
+msgstr ""
+
 msgid "End"
 msgstr ""
 
@@ -941,9 +964,6 @@ msgid "Execute selected action"
 msgstr ""
 
 msgid "Existing acronym"
-msgstr ""
-
-msgid "Existing proposal in epc"
 msgstr ""
 
 msgid "Export"
@@ -1318,6 +1338,9 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr ""
 
+msgid "Learning unit edition by central managers"
+msgstr ""
+
 msgid "Learning unit edition by faculty managers"
 msgstr ""
 
@@ -1472,9 +1495,6 @@ msgstr ""
 msgid "Management of organizational structure."
 msgstr ""
 
-msgid "Management of organizations"
-msgstr ""
-
 msgid ""
 "Management of students' path from their registration until their diploma."
 msgstr ""
@@ -1576,6 +1596,22 @@ msgid "Mobility partnership list choice"
 msgstr ""
 
 msgid "Modification"
+msgstr ""
+
+msgid "Modification or transformation proposal by central managers"
+msgstr ""
+
+msgid "Modification or transformation proposal by faculty managers"
+msgstr ""
+
+msgid ""
+"Modification or transformation proposal not allowed for central managers "
+"during this period."
+msgstr ""
+
+msgid ""
+"Modification or transformation proposal not allowed for faculty managers "
+"during this period."
 msgstr ""
 
 #, python-format
@@ -1733,9 +1769,6 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-msgid "Only letters are allowed."
-msgstr ""
-
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -1834,6 +1867,12 @@ msgid "Partial acronym is invalid"
 msgstr ""
 
 msgid "Partial deliberation"
+msgstr ""
+
+msgid "Partial title in English"
+msgstr ""
+
+msgid "Partial title in French"
 msgstr ""
 
 msgid "Partim"
@@ -1985,6 +2024,9 @@ msgid "Producing certificat"
 msgstr ""
 
 msgid "Profes. integration"
+msgstr ""
+
+msgid "Professional"
 msgstr ""
 
 msgid "Professional internship"
@@ -2194,6 +2236,9 @@ msgid "Research internship"
 msgstr ""
 
 msgid "Reserved for interns"
+msgstr ""
+
+msgid "Residential"
 msgstr ""
 
 msgid "Result"
@@ -2549,8 +2594,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The learning unit %(luy)s is in proposal, can not save the change from the "
-"year %(academic_year)s"
+"The learning unit has been updated (the report has not been done from "
+"%(year)s because the learning unit is in proposal)."
 msgstr ""
 
 msgid "The learning unit has been updated (with report)."
@@ -2675,6 +2720,9 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
+msgid "The user is not allowed to change education group content."
+msgstr ""
+
 msgid "The user is not attached to the management entity"
 msgstr ""
 
@@ -2751,6 +2799,10 @@ msgstr ""
 
 #, python-format
 msgid "This label %s does not exist"
+msgstr ""
+
+msgid ""
+"This learning unit is not editable by central managers during this period."
 msgstr ""
 
 msgid ""
@@ -2984,6 +3036,9 @@ msgstr ""
 
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
+msgstr ""
+
+msgid "Year of concerned data"
 msgstr ""
 
 msgid "Yes"

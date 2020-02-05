@@ -30,7 +30,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 
 class LearningClassYearFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "base.LearningClassYear"
+        model = "learning_unit.LearningClassYear"
 
     learning_component_year = factory.SubFactory(LearningComponentYearFactory)
     acronym = factory.fuzzy.FuzzyInteger(99)

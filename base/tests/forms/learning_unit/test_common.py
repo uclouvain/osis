@@ -37,6 +37,8 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
 
+KWARGS = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
 
 class LearningUnitCheckAcronymViewTestCase(TestCase):
     @classmethod
@@ -48,27 +50,12 @@ class LearningUnitCheckAcronymViewTestCase(TestCase):
 
         cls.a_superuser = SuperUserFactory()
         cls.person = PersonFactory(user=cls.a_superuser)
+        cls.url = reverse('check_acronym', kwargs={'subtype': FULL})
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
 
     def test_learning_unit_check_acronym(self):
-        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-
-        url = reverse('check_acronym', kwargs={'subtype': FULL})
-        get_data = {'acronym': 'goodacronym', 'year_id': self.academic_years[0].id}
-        response = self.client.get(url, get_data, **kwargs)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'valid': False,
-             'existing_acronym': False,
-             'existed_acronym': False,
-             'first_using': "",
-             'last_using': ""}
-        )
-
         learning_unit_container_year = LearningContainerYearFactory(
             academic_year=self.academic_years[0]
         )
@@ -81,7 +68,7 @@ class LearningUnitCheckAcronymViewTestCase(TestCase):
         learning_unit_year.save()
 
         get_data = {'acronym': 'LCHIM1210', 'year_id': self.academic_years[0].id}
-        response = self.client.get(url, get_data, **kwargs)
+        response = self.client.get(self.url, get_data, **KWARGS)
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -102,7 +89,7 @@ class LearningUnitCheckAcronymViewTestCase(TestCase):
         learning_unit_year.save()
 
         get_data = {'acronym': 'LCHIM1211', 'year_id': self.academic_years[6].id}
-        response = self.client.get(url, get_data, **kwargs)
+        response = self.client.get(self.url, get_data, **KWARGS)
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
@@ -112,4 +99,24 @@ class LearningUnitCheckAcronymViewTestCase(TestCase):
              'existed_acronym': True,
              'first_using': "",
              'last_using': str(self.academic_years[0])}
+        )
+
+    def test_learning_unit_check_acronym_no_numeric_part(self):
+        get_data = {'acronym': 'goodacronym', 'year_id': self.academic_years[0].id}
+        self._assert_invalid_acronym(get_data)
+
+    def test_learning_unit_check_acronym_numeric_part_starts_with_0(self):
+        get_data = {'acronym': 'LCHIM0211', 'year_id': self.academic_years[0].id}
+        self._assert_invalid_acronym(get_data)
+
+    def _assert_invalid_acronym(self, get_data):
+        response = self.client.get(self.url, get_data, **KWARGS)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'valid': False,
+             'existing_acronym': False,
+             'existed_acronym': False,
+             'first_using': "",
+             'last_using': ""}
         )

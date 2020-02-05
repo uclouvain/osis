@@ -57,12 +57,12 @@ class GroupYear(models.Model):
         max_length=15,
         db_index=True,
         null=True,
-        verbose_name=_("Acronym/Short title"),
+        verbose_name=_("code"),
     )
     acronym = models.CharField(
         max_length=40,
         db_index=True,
-        verbose_name=_("code"),
+        verbose_name=_("Acronym/Short title"),
     )
     education_group_type = models.ForeignKey(
         'base.EducationGroupType',
