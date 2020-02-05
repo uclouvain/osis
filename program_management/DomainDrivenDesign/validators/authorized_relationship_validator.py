@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.DomainDrivenDesign.contrib.validation import BusinessValidator, BusinessListValidator
+from program_management.DomainDrivenDesign.contrib.validation import BusinessValidator
 from program_management.DomainDrivenDesign.domain import node
 from program_management.DomainDrivenDesign.domain.program_tree import ProgramTree
 from django.utils.translation import gettext as _
@@ -69,65 +69,6 @@ class AuthorizedRelationshipValidator(BusinessValidator):
             )
 
 
-class AttachOptionsValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. _check_attach_options_rules
-
-
-class AttachFinalityEndDateValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. _check_end_year_constraints_on_2m
-
-
-class NodeDuplicationValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. _check_new_attach_is_not_duplication
-
-
-class ParentIsNotLeafValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. AttachPermission._check_if_leaf
-
-
-class MinimumEditableYearValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. AttachPermission._check_year_is_editable
-
-
 class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
     def validate(self):
         pass  # cf. AttachLearningUnitYearStrategy.id_valid
-
-
-class AttachGroupYearNodeValidator(BusinessListValidator):
-    validators = [
-        ParentIsNotLeafValidator,
-        AuthorizedRelationshipValidator,
-        AttachOptionsValidator,
-        AttachFinalityEndDateValidator,
-        NodeDuplicationValidator,
-        MinimumEditableYearValidator,
-    ]
-
-
-class AttachLearningUnitYearNodeValidator(BusinessListValidator):
-    validators = [
-        ParentIsNotLeafValidator,
-        AuthorizedRelationshipLearningUnitValidator,
-        NodeDuplicationValidator,
-        MinimumEditableYearValidator,
-    ]
-
-
-class AttachNodeValidatorFactory:
-    def get_attach_node_validator(self, tree: ProgramTree, node_to_add: node.Node, where_to_add: str):
-        if isinstance(node_to_add, node.NodeEducationGroupYear) or isinstance(node_to_add, node.NodeGroupYear):
-            attach_node_validator_class = AttachGroupYearNodeValidator
-        elif isinstance(node_to_add, node.NodeLearningUnitYear):
-            attach_node_validator_class = AttachLearningUnitYearNodeValidator
-        else:
-            raise AttributeError("Unknown instance of node")
-        return attach_node_validator_class(validator_args=[tree, node_to_add, where_to_add])
-
-
-factory = AttachNodeValidatorFactory()
