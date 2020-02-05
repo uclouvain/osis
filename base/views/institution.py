@@ -93,9 +93,14 @@ def entity_read(request, entity_version_id):
         entity_version=entity_version,
         ac_year=data_year
     )
+    context = {
+        'entity_version': entity_version,
+        'entity_parent': entity_parent,
+        'descendants': descendants,
+        'calendar_summary_course_submission': calendar_summary_course_submission
+    }
 
-    # TODO Remove locals
-    return render(request, "entity/identification.html", locals())
+    return render(request, "entity/identification.html", context)
 
 
 @login_required
