@@ -71,13 +71,13 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
 
 @RenderToExcel("xls_administrative", _create_xls_administrative_data)
 @RenderToExcel("xls", _create_xls)
-class EducationGroupSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
+class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
     model = EducationGroupYear
     template_name = "education_group/search.html"
     raise_exception = True
 
     filterset_class = EducationGroupFilter
-    permission_required = 'base.can_access_educationgroup'
+    permission_required = 'base.can_access_education_group'
     cache_exclude_params = 'xls_status'
 
     serializer_class = EducationGroupSerializer
