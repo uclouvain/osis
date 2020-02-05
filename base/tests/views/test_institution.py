@@ -95,6 +95,7 @@ class EntityViewTestCase(APITestCase):
         context = response.context
         self.assertEqual(context['entity_version'], self.entity_version)
         self.assertEqual(context['entity_parent'], self.parent_entity_version)
+        self.assertFalse(context['descendants'])
         self.assertDictEqual(
             context['calendar_summary_course_submission'],
             {
