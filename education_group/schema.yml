@@ -448,6 +448,16 @@ components:
           type: string
         partial_title:
           type: string
+      required:
+        - url
+        - acronym
+        - education_group_type
+        - education_group_type_text
+        - code
+        - title
+        - academic_year
+        - administration_entity
+        - management_entity
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'
