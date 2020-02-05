@@ -29,7 +29,6 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from django.utils.translation import gettext as _
 
 
-#  TODO :: unit tests on validation
 class AuthorizedRelationshipValidator(BusinessValidator):
 
     tree = None
@@ -43,28 +42,37 @@ class AuthorizedRelationshipValidator(BusinessValidator):
         self.parent = tree.get_node(path)
 
     def validate(self):
+        if not self.tree.authorized_relationships.is_authorized(self.parent, self.node_to_add):
+            self.add_error_message(
+                _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                    'child_types': self.node_to_add.node_type.value,
+                    'parent': self.parent,
+                    'parent_type': self.parent.node_type.value,
+                }
+            )
+
+
+# TODO :: ne pas hériter de la classe? Et lister AttachAuthorizedRelationshipValidator + AuthorizedRelationshipValidator dans le BusinessListVaidator?
+class AttachAuthorizedRelationshipValidator(AuthorizedRelationshipValidator):
+    def validate(self):
+        super(AttachAuthorizedRelationshipValidator, self).validate()
+        if self.tree.authorized_relationships.is_maximum_children_types_reached(self.parent, self.node_to_add):
+            self.add_error_message(
+                _("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                    "types": str(self.tree.authorized_relationships.get_authorized_children_types(self.parent))
+                }
+            )
+
+
+class DetachAuthorizedRelationshipValidator(AuthorizedRelationshipValidator):
+    def validate(self):
+        super(DetachAuthorizedRelationshipValidator, self).validate()
         if self.tree.authorized_relationships.is_minimum_children_types_reached(self.parent, self.node_to_add):
             self.add_error_message(
                 _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                   "has already reached the limit.") % {
                     'child_types': self.node_to_add.node_type.value,
                     'parent': self.parent
-                }
-            )
-
-        if self.tree.authorized_relationships.is_maximum_children_types_reached(self.parent, self.node_to_add):
-            self.add_error_message(
-                _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-                    "types": ', '.join(self.tree.authorized_relationships.get_authorized_children_types(self.parent))
-                }
-            )
-
-        if not self.tree.authorized_relationships.is_authorized(self.parent, self.node_to_add):
-            self.add_error_message(
-                _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-                    'child_types': self.node_to_add,
-                    'parent': self.parent,
-                    'parent_type': self.parent.node_type.value,
                 }
             )
 

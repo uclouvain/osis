@@ -21,6 +21,11 @@ class BusinessValidationMessage:
         self.message = message
         self.level = level
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return other == self.message
+        return other.message == self.message
+
 
 class BusinessValidator(ABC):
 

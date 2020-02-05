@@ -31,7 +31,7 @@ from program_management.ddd.validators.attach_finality_end_date import \
     AttachFinalityEndDateValidator
 from program_management.ddd.validators.attach_option import AttachOptionsValidator
 from program_management.ddd.validators.authorized_relationship import \
-    AuthorizedRelationshipValidator, AuthorizedRelationshipLearningUnitValidator
+    AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
 from program_management.ddd.validators.minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators.node_duplication import NodeDuplicationValidator
@@ -46,7 +46,7 @@ class AttachNodeValidatorList(BusinessListValidator):
 
             self.validators = [
                 ParentIsNotLeafValidator,
-                AuthorizedRelationshipValidator,
+                AttachAuthorizedRelationshipValidator,
                 AttachOptionsValidator,
                 AttachFinalityEndDateValidator,
                 NodeDuplicationValidator,

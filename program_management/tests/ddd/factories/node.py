@@ -29,7 +29,7 @@ import random
 
 import factory.fuzzy
 
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -55,15 +55,17 @@ class NodeFactory(factory.Factory):
 
     create_django_objects_in_db = False
 
+    # @factory.post_generation
+    # def __remove_unused(self):
+    #     delattr(self, 'create_django_objects_in_db')
+
 
 class NodeEducationGroupYearFactory(NodeFactory):
-
     class Meta:
         model = NodeEducationGroupYear
         abstract = False
-
     node_id = factory.LazyAttribute(generate_group_year_node_id)
-    node_type = factory.Iterator(TrainingType.choices(), getter=operator.itemgetter(0))
+    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
     children = None
 
 
@@ -74,7 +76,7 @@ class NodeGroupYearFactory(NodeFactory):
         abstract = False
 
     node_id = factory.LazyAttribute(generate_group_year_node_id)
-    node_type = factory.Iterator(EducationGroupTypesEnum.choices(), getter=operator.itemgetter(0))
+    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
     children = None
 
 

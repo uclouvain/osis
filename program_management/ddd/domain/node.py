@@ -50,6 +50,7 @@ factory = NodeFactory()
 
 class Node:
 
+    acronym = None
     children = None
     node_type = None  # TODO :: rename to 'type'
 
@@ -62,6 +63,9 @@ class Node:
 
     def __eq__(self, other):
         return self.node_id == other.node_id
+
+    def __str__(self):
+        return '%(acronym)s' % {'acronym': self.acronym}
 
     @property
     def pk(self):
@@ -110,7 +114,7 @@ def _get_descendents(root_node: Node, current_path: str = None):
 
 class NodeEducationGroupYear(Node):
     def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
-        super().__init__(node_id, children)
+        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'))
         self.acronym = acronym
         self.title = title
         self.year = year
@@ -118,7 +122,7 @@ class NodeEducationGroupYear(Node):
 
 class NodeGroupYear(Node):
     def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
-        super().__init__(node_id, children)
+        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'))
         self.acronym = acronym
         self.title = title
         self.year = year
@@ -126,7 +130,7 @@ class NodeGroupYear(Node):
 
 class NodeLearningUnitYear(Node):
     def __init__(self, node_id: int, acronym, title, year, proposal_type=None, **kwargs):
-        super().__init__(node_id)
+        super().__init__(node_id, node_type=kwargs.get('node_type'))
         self.acronym = acronym
         self.title = title
         self.year = year
