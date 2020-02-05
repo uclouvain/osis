@@ -27,15 +27,15 @@ from program_management.ddd.contrib.validation import BusinessListValidator
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, Node, \
     NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators.attach_finality_end_date_validator import \
+from program_management.ddd.validators.attach_finality_end_date import \
     AttachFinalityEndDateValidator
-from program_management.ddd.validators.attach_option_validator import AttachOptionsValidator
-from program_management.ddd.validators.authorized_relationship_validator import \
+from program_management.ddd.validators.attach_option import AttachOptionsValidator
+from program_management.ddd.validators.authorized_relationship import \
     AuthorizedRelationshipValidator, AuthorizedRelationshipLearningUnitValidator
-from program_management.ddd.validators.minimum_editable_year_validator import \
+from program_management.ddd.validators.minimum_editable_year import \
     MinimumEditableYearValidator
-from program_management.ddd.validators.node_duplication_validator import NodeDuplicationValidator
-from program_management.ddd.validators.parent_leaf_forbidden_validator import ParentIsNotLeafValidator
+from program_management.ddd.validators.node_duplication import NodeDuplicationValidator
+from program_management.ddd.validators.parent_as_leaf import ParentIsNotLeafValidator
 
 
 class AttachNodeValidatorList(BusinessListValidator):
