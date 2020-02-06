@@ -31,9 +31,10 @@ from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
 from attribution.models.attribution import Attribution
-from base.models.entity import search
+from base.business.entity import get_entities_ids
+from base.forms.learning_unit.search.simple import filter_by_entities
 from base.models.entity_version import EntityVersion
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 
 
 class ScoresResponsibleFilter(django_filters.FilterSet):
@@ -59,7 +60,12 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         method='filter_requirement',
         label=_('Req. Entity'),
     )
-
+    with_entity_subordinated = django_filters.BooleanFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        label=_('Include subordinate entities'),
+        widget=forms.CheckboxInput,
+        initial='True'
+    )
     order_by_field = 'ordering'
     ordering = django_filters.OrderingFilter(
         fields=(
@@ -80,7 +86,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
                                attribution__score_responsible=True)
 
     def filter_requirement(self, queryset, name, value):
-        return queryset.filter(learning_container_year__requirement_entity=search(acronym=value).first())
+        return filter_by_entities(name, queryset, value, self.form.cleaned_data['with_entity_subordinated'])
 
     class Meta:
         model = LearningUnitYear
@@ -119,7 +125,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
-
+        queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
         return queryset.select_related('learning_container_year').prefetch_related(
             Prefetch(
                 'attribution_set',
