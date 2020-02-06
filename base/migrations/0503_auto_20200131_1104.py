@@ -15,9 +15,4 @@ class Migration(migrations.Migration):
             name='label',
             field=models.CharField(choices=[('RESIDENTIAL', 'Residential'), ('PROFESSIONAL', 'Professional')], default='Professional', max_length=20),
         ),
-        migrations.AlterField(
-            model_name='educationgroupyear',
-            name='diploma_printing_title',
-            field=models.CharField(blank=True, default='', max_length=240, verbose_name='Diploma title'),
-        ),
     ]
