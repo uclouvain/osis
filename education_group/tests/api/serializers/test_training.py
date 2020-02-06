@@ -155,7 +155,6 @@ class TrainingDetailSerializerTestCase(TestCase):
             'enrollment_enabled',
             'credits',
             'remark',
-            'remark_english',
             'min_constraint',
             'max_constraint',
             'constraint_type',
