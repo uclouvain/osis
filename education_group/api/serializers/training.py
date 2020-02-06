@@ -99,6 +99,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
     rate_code_text = serializers.CharField(source='get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='get_active_display', read_only=True)
+    remark = serializers.SerializerMethodField(read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
@@ -140,7 +141,6 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'enrollment_enabled',
             'credits',
             'remark',
-            'remark_english',
             'min_constraint',
             'max_constraint',
             'constraint_type',
@@ -159,4 +159,11 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'active_text',
             'enrollment_campus',
             'main_teaching_campus',
+        )
+
+    def get_remark(self, training):
+        language = self.context.get('language')
+        return getattr(
+            training,
+            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )

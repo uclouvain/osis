@@ -549,8 +549,6 @@ components:
               minimum: 1
             remark:
               type: string
-            remark_english:
-              type: string
             min_constraint:
               type: integer
               minimum: 1
