@@ -29,15 +29,17 @@ from django.test import TestCase
 from base.models.admission_condition import AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory, \
-    TrainingFactory
+    TrainingFactory, EducationGroupYearCommonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer, ContactsSectionSerializer
-from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
+    AdmissionConditionSectionSerializer, ContactsSectionSerializer, EvaluationSectionSerializer
+from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA, EVALUATION_KEY
 
 
 class SectionSerializerTestCase(TestCase):
@@ -66,7 +68,6 @@ class SectionSerializerTestCase(TestCase):
             'id',
             'label',
             'content',
-            'free_text'
         ]
         self.assertListEqual(list(serializer.data.keys()), expected_fields)
 
@@ -168,3 +169,59 @@ class ContactsSectionSerializerTestCase(TestCase):
             'content'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+
+class EvaluationSectionSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.academic_year)
+        cls.language = settings.LANGUAGE_CODE_EN
+        TranslatedTextLabelFactory(
+            language=cls.language,
+            text_label__label=EVALUATION_KEY
+        )
+        TranslatedTextFactory(
+            reference=cls.common_egy.id,
+            entity=OFFER_YEAR,
+            language=cls.language,
+            text_label__label=EVALUATION_KEY,
+            text="EVALUATION_TEXT_COMMON"
+        )
+
+    def test_get_both_evaluation_texts(self):
+        egy = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=self.academic_year
+        )
+        TranslatedTextFactory(
+            reference=egy.id,
+            entity=OFFER_YEAR,
+            language=self.language,
+            text_label__label=EVALUATION_KEY,
+            text=EVALUATION_KEY.upper() + "_TEXT"
+        )
+
+        serializer = EvaluationSectionSerializer(
+            {'id': EVALUATION_KEY}, context={'egy': egy, 'lang': self.language}
+        ).data
+        self.assertEqual(serializer['content'], 'EVALUATION_TEXT_COMMON')
+        self.assertEqual(serializer['free_text'], 'EVALUATION_TEXT')
+
+    def test_get_only_specific_evaluation_for_iufc_offers(self):
+        egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            academic_year=self.academic_year,
+            acronym='TEST1FC'
+        )
+        TranslatedTextFactory(
+            reference=egy.id,
+            text_label__label=EVALUATION_KEY,
+            language=self.language,
+            text='EVALUATION_TEXT_FC'
+        )
+        serializer = EvaluationSectionSerializer(
+            {'id': EVALUATION_KEY}, context={'egy': egy, 'lang': self.language}
+        ).data
+        self.assertIsNone(serializer['content'])
+        self.assertEqual(serializer['free_text'], 'EVALUATION_TEXT_FC')
