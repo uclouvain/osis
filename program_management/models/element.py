@@ -32,6 +32,7 @@ from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from program_management.models.enums import node_type
+from program_management.models.enums.node_type import NodeType
 
 
 class ElementManager(models.Manager):
@@ -85,10 +86,10 @@ class Element(models.Model):
 
     def __str__(self):
         field = {
-            node_type.EDUCATION_GROUP: self.education_group_year,
-            node_type.GROUP: self.group_year,
-            node_type.LEARNING_UNIT: self.learning_unit_year,
-            node_type.LEARNING_CLASS: self.learning_class_year,
+            NodeType.EDUCATION_GROUP: self.education_group_year,
+            NodeType.GROUP: self.group_year,
+            NodeType.LEARNING_UNIT: self.learning_unit_year,
+            NodeType.LEARNING_CLASS: self.learning_class_year,
         }[self.node_type]
         return str(field)
 
@@ -116,10 +117,10 @@ class Element(models.Model):
     @property
     def node_type(self):
         if self.education_group_year:
-            return node_type.EDUCATION_GROUP
+            return NodeType.EDUCATION_GROUP
         elif self.group_year:
-            return node_type.GROUP
+            return NodeType.GROUP
         elif self.learning_unit_year:
-            return node_type.LEARNING_UNIT
+            return NodeType.LEARNING_UNIT
         elif self.learning_class_year:
-            return node_type.LEARNING_CLASS
+            return NodeType.LEARNING_CLASS

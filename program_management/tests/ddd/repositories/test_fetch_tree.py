@@ -25,6 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -210,3 +211,17 @@ class TestFetchTreesFromChildren(TestCase):
         self.assertEqual(len(result), len(expected_result))
         for tree in expected_result:
             self.assertIn(tree, result)
+
+    def test_when_link_type_is_reference(self):
+        parent_node_type_reference = ElementEducationGroupYearFactory(
+            education_group_year__academic_year=self.academic_year
+        )
+        child = self.link_level_2.child_branch
+        GroupElementYearFactory(
+            parent=parent_node_type_reference.education_group_year,
+            child_branch=child,
+            link_type=LinkTypes.REFERENCE.name
+        )
+        result = fetch_tree.fetch_trees_from_children(child_branch_ids=[child.id], link_type=LinkTypes.REFERENCE)
+        expected_result = [fetch_tree.fetch(parent_node_type_reference.education_group_year.id)]
+        self.assertListEqual(result, expected_result)

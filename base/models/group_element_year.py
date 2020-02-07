@@ -170,7 +170,13 @@ class GroupElementYearManager(models.Manager):
                 } for row in cursor.fetchall()
             ]
 
-    def get_reverse_adjacency_list(self, child_leaf_ids=None, child_branch_ids=None, academic_year_id=None):
+    def get_reverse_adjacency_list(
+            self,
+            child_leaf_ids=None,
+            child_branch_ids=None,
+            academic_year_id=None,
+            link_type: LinkTypes = None
+    ):
         if child_leaf_ids is None:
             child_leaf_ids = []
         if child_branch_ids is None:
@@ -202,6 +208,8 @@ class GroupElementYearManager(models.Manager):
         else:
             where_statement = where_statement_branch
 
+        # filters_statement = ' AND ' + ' AND '.join(['%s = %s' {}])
+
         reverse_adjacency_query = """
             WITH RECURSIVE 
                 reverse_adjacency_query AS (
@@ -219,7 +227,8 @@ class GroupElementYearManager(models.Manager):
                            0 AS level
                     FROM base_groupelementyear gey
                     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE %(where_statement)s
+                    WHERE %(where_statement)s 
+                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
                 
                     UNION ALL
                 
@@ -242,10 +251,16 @@ class GroupElementYearManager(models.Manager):
             ORDER BY starting_node_id,  level DESC, "order";
         """ % {
             'where_statement': where_statement,
-            'academic_year_id': "%s"
+            'academic_year_id': "%s",
+            'link_type': '%s',
         }
         with connection.cursor() as cursor:
-            parameters = child_leaf_ids + child_branch_ids + [academic_year_id, academic_year_id]
+            parameters = child_leaf_ids + child_branch_ids + [
+                link_type.name if link_type else None,
+                link_type.name if link_type else None,
+                academic_year_id,
+                academic_year_id
+            ]
             cursor.execute(reverse_adjacency_query, parameters)
             return [
                 {

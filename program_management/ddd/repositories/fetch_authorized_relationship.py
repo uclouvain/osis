@@ -44,4 +44,5 @@ def fetch() -> AuthorizedRelationshipList:
                 obj['max_count_authorized'],
             )
         )
-    return AuthorizedRelationshipList(authorized_relationships)
+    if authorized_relationships:
+        return AuthorizedRelationshipList(authorized_relationships)

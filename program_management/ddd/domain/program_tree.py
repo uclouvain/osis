@@ -36,7 +36,7 @@ class ProgramTree:
         if not isinstance(root_node, node.Node):
             raise Exception('root_group args must be an instance of Node')
         self.root_node = root_node
-        self.authorized_relationships = authorized_relationships or AuthorizedRelationshipList([])
+        self.authorized_relationships = authorized_relationships
 
     def __eq__(self, other):
         return self.root_node == other.root_node

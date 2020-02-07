@@ -47,7 +47,7 @@ def fetch(tree_root_id) -> ProgramTree:
     return __build_tree(root_node, structure, nodes, links, prerequisites)
 
 
-def fetch_trees_from_children(child_branch_ids: list, child_leaf_ids: list = None) -> List[ProgramTree]:
+def fetch_trees_from_children(child_branch_ids: list, child_leaf_ids: list = None, link_type=None) -> List[ProgramTree]:
     # FIXME :: simplify the code (child_branch, chlid_leaf, if else)
     if not child_branch_ids and not child_leaf_ids:
         return []
@@ -57,7 +57,8 @@ def fetch_trees_from_children(child_branch_ids: list, child_leaf_ids: list = Non
         assert isinstance(child_leaf_ids, list)
     qs = GroupElementYear.objects.get_reverse_adjacency_list(
         child_branch_ids=child_branch_ids,
-        child_leaf_ids=child_leaf_ids
+        child_leaf_ids=child_leaf_ids,
+        link_type=link_type,
     )
     if not qs:
         root_ids = child_branch_ids

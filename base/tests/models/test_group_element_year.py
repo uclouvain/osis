@@ -728,19 +728,42 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         self.assertEqual(len(reverse_adjacency_list), 1)
 
     def test_case_child_leaf_and_child_branch_have_same_id(self):
-        id = 123456
+        common_id = 123456
         # with parent
         link_with_leaf = GroupElementYearFactory(
             child_branch=None,
-            child_leaf=LearningUnitYearFactory(id=id),
+            child_leaf=LearningUnitYearFactory(id=common_id),
             parent=self.root_element_a,
         )
         # Without parent
         link_with_branch = GroupElementYearFactory(
-            child_branch__id=id,
+            child_branch__id=common_id,
         )
         reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(
             child_branch_ids=[link_with_leaf.child_leaf.id, link_with_branch.child_branch.id]
         )
         self.assertEqual(len(reverse_adjacency_list), 1)
         self.assertNotEqual(len(reverse_adjacency_list), 2)
+
+    def test_case_filter_link_type(self):
+        link_reference = GroupElementYearFactory(
+            parent__academic_year=self.level_1.child_branch.academic_year,
+            child_branch=self.level_1.child_branch,
+            order=6,
+            link_type=LinkTypes.REFERENCE.name
+        )
+        link_not_reference = GroupElementYearFactory(
+            parent__academic_year=self.level_1.child_branch.academic_year,
+            child_branch=self.level_1.child_branch,
+            order=6,
+            link_type=None
+        )
+        # self.assertEqual(GroupElementYear.objects.filter(child_branch=link_reference.child_branch).count(), 2)
+        reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(
+            child_branch_ids=[self.level_1.child_branch.id],
+            link_type=LinkTypes.REFERENCE,
+        )
+        result_parent_ids = [rec['parent_id'] for rec in reverse_adjacency_list]
+        # result_child_ids = [rec['child_id'] for rec in reverse_adjacency_list]
+        self.assertIn(link_reference.parent.id, result_parent_ids)
+        self.assertNotIn(link_not_reference.parent.id, result_parent_ids)
