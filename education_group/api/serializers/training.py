@@ -81,7 +81,8 @@ class TrainingListSerializer(TrainingBaseListSerializer):
         )
 
     def to_representation(self, instance):
-        if instance.education_group_type.name not in education_group_types.TrainingType.finality_types():
+        if instance.education_group_type.name not in education_group_types.TrainingType.finality_types()\
+                and self.fields.get('partial_title'):
             self.fields.pop('partial_title')
         return super().to_representation(instance)
 
