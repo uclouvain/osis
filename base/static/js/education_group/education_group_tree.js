@@ -15,6 +15,12 @@ $(document).ready(function () {
         $documentTree.bind("select_node.jstree", function (event, data) {
             document.location.href = data.node.a_attr.href;
         });
+
+        var selected_node_id = $documentTree.jstree().get_selected(true)[0].id;
+        if (selected_node_id != undefined) {
+            document.getElementById(selected_node_id).scrollIntoView();
+        }
+
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
             $(this).jstree('close_all');
