@@ -31,13 +31,13 @@ from base.api.serializers.campus import CampusDetailSerializer
 from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
 
 
-class TrainingListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
+class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
@@ -47,7 +47,6 @@ class TrainingListSerializer(EducationGroupTitleSerializer, serializers.Hyperlin
     )
     administration_entity = serializers.CharField(source='administration_entity_version.acronym', read_only=True)
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
-    partial_title = serializers.SerializerMethodField(read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -63,7 +62,15 @@ class TrainingListSerializer(EducationGroupTitleSerializer, serializers.Hyperlin
             'academic_year',
             'administration_entity',
             'management_entity',
-            'partial_title'
+        )
+
+
+class TrainingListSerializer(TrainingBaseListSerializer):
+    partial_title = serializers.SerializerMethodField(read_only=True)
+
+    class Meta(TrainingBaseListSerializer.Meta):
+        fields = TrainingBaseListSerializer.Meta.fields + (
+            'partial_title',
         )
 
     def get_partial_title(self, training):
@@ -72,6 +79,11 @@ class TrainingListSerializer(EducationGroupTitleSerializer, serializers.Hyperlin
             training,
             'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
+
+    def to_representation(self, instance):
+        if instance.education_group_type.name not in education_group_types.TrainingType.finality_types():
+            self.fields.pop('partial_title')
+        return super().to_representation(instance)
 
 
 class TrainingDetailSerializer(TrainingListSerializer):
