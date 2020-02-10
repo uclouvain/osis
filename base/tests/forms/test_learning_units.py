@@ -92,7 +92,7 @@ class TestLearningUnitForm(TestCase):
         """
         list_lu_year = [
             LearningUnitYearFactory(acronym="LUY%d" % i, learning_container_year=container, academic_year=ac)
-            for i, container in enumerate(list_containers)
+            for i, container in enumerate(list_containers, 1)
         ]
         return list_lu_year
 
