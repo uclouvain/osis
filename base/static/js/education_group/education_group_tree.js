@@ -18,7 +18,8 @@ $(document).ready(function () {
 
         var selected_node_id = $documentTree.jstree().get_selected(true)[0].id;
         if (selected_node_id != undefined) {
-            document.getElementById(selected_node_id).scrollIntoView();
+            var scrollpos = localStorage.getItem('scrollpos');
+            document.getElementById('scrollableDiv').scrollTo(0,scrollpos);
         }
 
         // if the tree has never been loaded, execute close_all by default.
@@ -303,4 +304,8 @@ $(document).mouseup(function () {
 $("a[id^='quick-search']").click(function (event) {
     event.preventDefault();
     $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
+});
+
+$("#scrollableDiv").on("scroll", function() {
+   localStorage.setItem('scrollpos', $("#scrollableDiv")[0].scrollTop);
 });
