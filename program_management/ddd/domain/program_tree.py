@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Set
+
 from program_management.ddd.domain import node
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
 
@@ -41,6 +43,25 @@ class ProgramTree:
     def __eq__(self, other):
         return self.root_node == other.root_node
 
+    def is_used_as_reference_link(self, child_node: node.Node) -> bool:
+        """
+        :return: True only if the link between the child_node given in parameter and her parent is of type REFERENCE.
+        """
+        for tree_node in self.get_all_nodes():
+            for link in tree_node.children:
+                if link.child == child_node and link.is_reference:
+                    return True
+        return False
+
+    # TODO :: unit test
+    def get_parents_as_reference_link(self, child_node: node.Node) -> List[node.Node]:
+        result = []
+        for tree_node in self.get_all_nodes():
+            for link in tree_node.children:
+                if link.child == child_node and link.is_reference:
+                    result.append(link.parent)
+        return result
+
     # TODO :: typer "path" (pour plus de lisibilité dans le code)
     def get_node(self, path: str) -> node.Node:
         """
@@ -56,12 +77,15 @@ class ProgramTree:
         except KeyError:
             raise node.NodeNotFoundException
 
-    def get_all_nodes(self):
+    # def get_path(self, node: node.Node) -> str:
+
+    # TODO :: unit test (set and not list)
+    def get_all_nodes(self) -> Set[node.Node]:
         """
         Return a flat list of all nodes which are in the tree
         :return: list of Node
         """
-        return [self.root_node] + _nodes_from_root(self.root_node)
+        return set([self.root_node] + _nodes_from_root(self.root_node))
 
     def attach_node(self, node: node.Node, path: str = None, **kwargs):
         """

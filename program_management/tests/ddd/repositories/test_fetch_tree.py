@@ -170,8 +170,7 @@ class TestFetchTreesFromChildren(TestCase):
     def test_when_child_is_root(self):
         children_ids = [self.link_level_1.parent.id]
         result = fetch_tree.fetch_trees_from_children(children_ids)
-        expected_result = [fetch_tree.fetch(self.root_node.education_group_year.id)]
-        self.assertListEqual(result, expected_result)
+        self.assertListEqual(result, [])
 
     def test_when_child_has_only_one_root_id(self):
         children_ids = [self.link_level_2.child_branch.id]

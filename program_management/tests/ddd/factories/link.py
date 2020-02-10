@@ -46,4 +46,11 @@ class LinkFactory(factory.Factory):
     is_mandatory = FuzzyBoolean()
     link_type = None
 
+    @factory.post_generation
+    def _add_children(self, create, extracted, ** kwargs):
+        if not self.parent.children:
+            self.parent.children = [self]
+        else:
+            self.parent.children.append(self)
+
     # authorized_relation = True

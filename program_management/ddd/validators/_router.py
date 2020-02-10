@@ -26,10 +26,8 @@
 from program_management.ddd.contrib.validation import BusinessListValidator
 from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
 
-BusinessListValidatorClass = BusinessListValidator.__class__
 
-
-def get_business_list_validator_class(feature: str):
+def get_business_validator(feature: str, validator_args=None, validator_kwargs=None) -> BusinessListValidator:
     return {
-        'attach_node': AttachNodeValidatorList,
+        'attach_node': AttachNodeValidatorList(*validator_args, **validator_kwargs),
     }[feature]

@@ -64,6 +64,9 @@ class Node:
     def __eq__(self, other):
         return self.node_id == other.node_id
 
+    def __hash__(self):
+        return hash(self.node_id)
+
     def __str__(self):
         return '%(acronym)s' % {'acronym': self.acronym}
 
