@@ -105,10 +105,10 @@ def _get_descendents(root_node: Node, current_path: str = None):
 
     for link in root_node.children:
         child_path = "|".join([current_path, str(link.child.pk)])
-        _descendents = {
+        _descendents.update({
             **{child_path: link.child},
             **_get_descendents(link.child, current_path=child_path)
-        }
+        })
     return _descendents
 
 

@@ -40,8 +40,9 @@ from program_management.ddd.repositories import fetch_node, fetch_prerequisite, 
 def fetch(tree_root_id) -> ProgramTree:
     root_node = fetch_node.fetch_node_education_group_year(tree_root_id)
 
-    structure = GroupElementYear.objects.get_adjacency_list([root_node.pk])
+    structure = GroupElementYear.objects.get_adjacency_list([tree_root_id])
     nodes = __fetch_tree_nodes(structure)
+    nodes.update({root_node.pk: root_node})
     links = __fetch_tree_links(structure)
     prerequisites = __fetch_tree_prerequisites(tree_root_id, nodes)
     return __build_tree(root_node, structure, nodes, links, prerequisites)
@@ -124,17 +125,27 @@ def __fetch_tree_prerequisites(tree_root_id: int, nodes: dict):
 
 
 def __build_tree(root_node, tree_structure, nodes, links, prerequisites):
-    root_node.children = __build_children(root_node, tree_structure, nodes, links, prerequisites)
+    root_node.children = __build_children(str(root_node.pk), tree_structure, nodes, links, prerequisites)
     tree = ProgramTree(root_node, authorized_relationships=fetch_authorized_relationship.fetch())
     return tree
 
 
-def __build_children(root, tree_structure, nodes, links, prerequisites):
+def __build_children(root_path, tree_structure, nodes, links, prerequisites):
     children = []
 
-    for child_structure in [structure for structure in tree_structure if structure['parent_id'] == root.pk]:
+    childs_structure = [
+        structure for structure in tree_structure
+        if structure['path'] == "|".join([root_path, str(structure['child_id'])])
+    ]
+    for child_structure in childs_structure:
         child_node = copy.deepcopy(nodes[child_structure['child_id']])
-        child_node.children = __build_children(child_node, tree_structure, nodes, links, prerequisites)
+        child_node.children = __build_children(
+            "|".join([root_path, str(child_node.pk)]),
+            tree_structure,
+            nodes,
+            links,
+            prerequisites
+        )
 
         if isinstance(child_node, node.NodeLearningUnitYear):
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
@@ -143,7 +154,7 @@ def __build_children(root, tree_structure, nodes, links, prerequisites):
         link_node = copy.deepcopy(
             links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
         )
-        link_node.parent = root
+        link_node.parent = copy.deepcopy(nodes[child_structure['parent_id']])
         link_node.child = child_node
         children.append(link_node)
     return children

@@ -23,29 +23,91 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic import CreateView
+from django.core.exceptions import SuspiciousOperation
+from django.forms import formset_factory
+from django.http import Http404
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views.generic.base import TemplateView
 
+from base.models.education_group_year import EducationGroupYear
+from base.utils.cache import ElementCache
+from base.views.common import display_warning_messages, display_success_messages
 from base.views.mixins import AjaxTemplateMixin
-from program_management.forms.tree.attach import AttachNodeForm
+from program_management.business.group_element_years.management import fetch_elements_selected
+from program_management.ddd.domain import node
+from program_management.ddd.repositories import fetch_tree
+from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet
+from program_management.models.enums.node_type import NodeType
 
 
-class AttachNodeView(SuccessMessageMixin, AjaxTemplateMixin, CreateView):
-    template_name = "tree/attach_confirmation.html"
-    form_class = AttachNodeForm
+class AttachNodeView(AjaxTemplateMixin, TemplateView):
+    template_name = "tree/attach_inner.html"
+
+    @cached_property
+    def tree(self):
+        root_id, *_ = self.request.GET['to_path'].split('|', 1)
+        return fetch_tree.fetch(root_id)
+
+    @cached_property
+    def elements_to_attach(self):
+        return fetch_elements_selected(self.request.GET, self.request.user)
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'to_path' not in request.GET:
+            raise SuspiciousOperation('Missing to_path parameter')
+        try:
+            self.tree.get_node(request.GET['to_path'])
+        except node.NodeNotFoundException:
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_formset_class(self):
+        return formset_factory(
+            form=AttachNodeForm,
+            formset=AttachNodeFormSet,
+            extra=len(self.elements_to_attach)
+        )
+
+    def get_formset_kwargs(self):
+        formset_kwargs = []
+        for idx, element in enumerate(self.elements_to_attach):
+            formset_kwargs.append({
+                'node_id': element.pk,
+                'node_type': NodeType.EDUCATION_GROUP.name if isinstance(element, EducationGroupYear) else
+                NodeType.LEARNING_UNIT.name,
+                'tree': self.tree,
+                'to_path': self.request.GET['to_path']
+            })
+        return formset_kwargs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+        context_data = super().get_context_data(**kwargs)
+        if self.elements_to_attach:
+            context_data['formset'] = kwargs.pop('formset', None) or self.get_formset_class()(
+                form_kwargs=self.get_formset_kwargs()
+            )
+        else:
+            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
+        return context_data
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['data'] = {
-            **kwargs['data'],
-            'node_id': ''        # GET ELEMENT FROM CACHE for <from_path>
-        }
-        return kwargs
+    def post(self, request, *args, **kwargs):
+        formset = self.get_formset_class()(self.request.POST or None, form_kwargs=self.get_formset_kwargs())
+        if formset.is_valid():
+            return self.form_valid(formset)
+        else:
+            return self.form_invalid(formset)
 
-    def get_success_message(self, cleaned_data):
-        return _('Attach OK')
+    def form_valid(self, formset):
+        formset.save()
+        ElementCache(self.request.user).clear()
+        display_success_messages(
+            self.request,
+            _("The content of %(acronym)s has been updated.") % {
+                "acronym": self.tree.get_node(self.request.GET['to_path']).acronym
+            }
+        )
+        return None
+
+    def form_invalid(self, formset):
+        return self.render_to_response(self.get_context_data(formset=formset))
