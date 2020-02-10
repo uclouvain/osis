@@ -15,7 +15,7 @@ class MessageLevel(Enum):
 
 class BusinessValidationMessage:
     message = None
-    level = MessageLevel.ERROR.name
+    level = MessageLevel.ERROR
 
     def __init__(self, message: str, level: MessageLevel = None):
         self.message = message
@@ -25,6 +25,9 @@ class BusinessValidationMessage:
         if isinstance(other, str):
             return other == self.message
         return other.message == self.message
+
+    def __str__(self):
+        return "%(level)s %(msg)s" % {'level': self.level, 'msg': self.message}
 
 
 class BusinessValidator(ABC):
@@ -79,7 +82,7 @@ class BusinessListValidator(BusinessValidator):
     def __init__(self, validator_args=None, validator_kwargs=None):
         super(BusinessListValidator, self).__init__()
         self.validator_args = validator_args
-        self.validator_kwargs = validator_kwargs
+        self.validator_kwargs = validator_kwargs or {}
 
     def validate(self):
         for validator_class in self.validators:

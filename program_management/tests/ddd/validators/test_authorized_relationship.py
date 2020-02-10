@@ -62,16 +62,14 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
 
     def test_success(self):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
-        path_to_attach = "|".join([str(self.root_node.pk)])
-        validator = AttachAuthorizedRelationshipValidator(tree, self.common_core_node, path_to_attach)
+        validator = AttachAuthorizedRelationshipValidator(tree, self.common_core_node, self.root_node)
         self.assertTrue(validator.is_valid())
 
     def test_when_maximum_children_reached(self):
         root_node = copy.deepcopy(self.root_node)
         root_node.add_child(self.common_core_node)
         tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=self.authorized_relationships)
-        path_to_attach = "|".join([str(self.root_node.pk)])
-        validator = AttachAuthorizedRelationshipValidator(tree, self.common_core_node, path_to_attach)
+        validator = AttachAuthorizedRelationshipValidator(tree, self.common_core_node, root_node)
 
         self.assertFalse(validator.is_valid())
 
@@ -83,12 +81,11 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
 
     def test_when_unauthorized_relation(self):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
-        path_to_attach = "|".join([str(self.root_node.pk)])
         unauthorized_node_to_attach = NodeEducationGroupYearFactory(
             year=self.academic_year.year,
             create_django_objects_in_db=True
         )
-        validator = AttachAuthorizedRelationshipValidator(tree, unauthorized_node_to_attach, path_to_attach)
+        validator = AttachAuthorizedRelationshipValidator(tree, unauthorized_node_to_attach, self.root_node)
         self.assertFalse(validator.is_valid())
         error_msg = _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
             'child_types': unauthorized_node_to_attach.node_type.value,
@@ -124,16 +121,14 @@ class TestDetachAuthorizedRelationshipValidator(TestCase):
 
     def test_success(self):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
-        path_to_attach = "|".join([str(self.root_node.pk)])
-        validator = DetachAuthorizedRelationshipValidator(tree, self.common_core_node, path_to_attach)
+        validator = DetachAuthorizedRelationshipValidator(tree, self.common_core_node, self.root_node)
         self.assertTrue(validator.is_valid())
 
     def test_when_minimum_children_reached(self):
         root_node = copy.deepcopy(self.root_node)
         root_node.add_child(self.common_core_node)
         tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=self.authorized_relationships)
-        path_to_attach = "|".join([str(root_node.pk)])
-        validator = DetachAuthorizedRelationshipValidator(tree, self.common_core_node, path_to_attach)
+        validator = DetachAuthorizedRelationshipValidator(tree, self.common_core_node, root_node)
         self.assertFalse(validator.is_valid())
         error_msg = _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
                       "has already reached the limit.") % {
@@ -145,12 +140,11 @@ class TestDetachAuthorizedRelationshipValidator(TestCase):
     # TODO duplicated test
     def test_when_unauthorized_relation(self):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
-        path_to_attach = "|".join([str(self.root_node.pk)])
         unauthorized_node_to_attach = NodeEducationGroupYearFactory(
             year=self.academic_year.year,
             create_django_objects_in_db=True
         )
-        validator = AttachAuthorizedRelationshipValidator(tree, unauthorized_node_to_attach, path_to_attach)
+        validator = AttachAuthorizedRelationshipValidator(tree, unauthorized_node_to_attach, self.root_node)
         self.assertFalse(validator.is_valid())
         error_msg = _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
             'child_types': unauthorized_node_to_attach.node_type.value,
