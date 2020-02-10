@@ -35,11 +35,11 @@ class AuthorizedRelationshipValidator(BusinessValidator):
     node_to_add = None
     parent = None
 
-    def __init__(self, tree: ProgramTree, node_to_add: node.Node, path: str):
+    def __init__(self, tree: ProgramTree, node_to_add: node.Node, position_to_add: node.Node):
         super(AuthorizedRelationshipValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add
-        self.parent = tree.get_node(path)
+        self.parent = position_to_add
 
     def validate(self):
         if not self.tree.authorized_relationships.is_authorized(self.parent, self.node_to_add):

@@ -65,4 +65,4 @@ class AttachNodeValidatorList(BusinessListValidator):
         else:
             raise AttributeError("Unknown instance of node")
 
-        super(AttachNodeValidatorList, self).__init__(validator_args=[tree, node_to_add, path])
+        super(AttachNodeValidatorList, self).__init__(validator_args=[tree, node_to_add, tree.get_node(path)])
