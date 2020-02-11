@@ -27,9 +27,12 @@ import itertools
 from collections import OrderedDict
 
 from dal import autocomplete
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
 from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
@@ -86,6 +89,8 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
         person = get_object_or_404(Person, user=self.request.user)
         context = super().get_context_data(**kwargs)
         starting_ac = starting_academic_year()
+        if context["paginator"].count == 0:
+            messages.add_message(self.request, messages.WARNING, _('No result!'))
         context.update({
             'person': person,
             'form': context["filter"].form,
@@ -96,6 +101,14 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
         })
 
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        # Look for a 'format=json' GET argument
+        if self.request.is_ajax():
+            serializer = EducationGroupSerializer(context["page_obj"], context={'request': self.request}, many=True)
+            return JsonResponse({'object_list': serializer.data})
+        else:
+            return super().render_to_response(context)
 
 
 class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):

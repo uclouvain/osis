@@ -170,8 +170,8 @@ class TestEducationGroupDataSearchFilter(TestCase):
     def tearDown(self):
         self.patch.stop()
 
-    def test_post_request(self):
-        response = self.client.post(self.url, data={})
+    def test_get_request(self):
+        response = self.client.get(self.url, data={})
 
         self.assertTemplateUsed(response, "education_group/search.html")
 
