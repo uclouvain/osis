@@ -40,7 +40,7 @@ from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
 from program_management.templatetags.group_element_year import get_action_with_permission
-                       
+
 register = template.Library()
 
 
