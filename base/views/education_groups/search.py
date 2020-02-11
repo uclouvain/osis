@@ -77,7 +77,7 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
 class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
     model = EducationGroupYear
     template_name = "education_group/search.html"
-    raise_exception = True
+    raise_exception = False
 
     filterset_class = EducationGroupFilter
     permission_required = 'base.can_access_education_group'
@@ -103,7 +103,6 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
         return context
 
     def render_to_response(self, context, **response_kwargs):
-        # Look for a 'format=json' GET argument
         if self.request.is_ajax():
             serializer = EducationGroupSerializer(context["page_obj"], context={'request': self.request}, many=True)
             return JsonResponse({'object_list': serializer.data})
