@@ -43,16 +43,6 @@ class ProgramTree:
     def __eq__(self, other):
         return self.root_node == other.root_node
 
-    def is_used_as_reference_link(self, child_node: node.Node) -> bool:
-        """
-        :return: True only if the link between the child_node given in parameter and her parent is of type REFERENCE.
-        """
-        for tree_node in self.get_all_nodes():
-            for link in tree_node.children:
-                if link.child == child_node and link.is_reference:
-                    return True
-        return False
-
     # TODO :: unit test
     def get_parents_as_reference_link(self, child_node: node.Node) -> List[node.Node]:
         result = []

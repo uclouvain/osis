@@ -45,11 +45,9 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
 
         cls.root_node = NodeEducationGroupYearFactory(
             year=cls.academic_year.year,
-            create_django_objects_in_db=True
         )
         cls.common_core_node = NodeEducationGroupYearFactory(
             year=cls.academic_year.year,
-            create_django_objects_in_db=True
         )
         cls.authorized_relationships = AuthorizedRelationshipList([
             AuthorizedRelationship(
@@ -60,6 +58,7 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
             )
         ])
 
+    # TODO :: créer un miwin de Test pour la couche des validator (fetch doit être mocké)
     def test_success(self):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
         validator = AttachAuthorizedRelationshipValidator(tree, self.common_core_node, self.root_node)
@@ -83,7 +82,6 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
         unauthorized_node_to_attach = NodeEducationGroupYearFactory(
             year=self.academic_year.year,
-            create_django_objects_in_db=True
         )
         validator = AttachAuthorizedRelationshipValidator(tree, unauthorized_node_to_attach, self.root_node)
         self.assertFalse(validator.is_valid())
@@ -104,11 +102,9 @@ class TestDetachAuthorizedRelationshipValidator(TestCase):
 
         cls.root_node = NodeEducationGroupYearFactory(
             year=cls.academic_year.year,
-            create_django_objects_in_db=True
         )
         cls.common_core_node = NodeEducationGroupYearFactory(
             year=cls.academic_year.year,
-            create_django_objects_in_db=True
         )
         cls.authorized_relationships = AuthorizedRelationshipList([
             AuthorizedRelationship(
@@ -142,7 +138,6 @@ class TestDetachAuthorizedRelationshipValidator(TestCase):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
         unauthorized_node_to_attach = NodeEducationGroupYearFactory(
             year=self.academic_year.year,
-            create_django_objects_in_db=True
         )
         validator = AttachAuthorizedRelationshipValidator(tree, unauthorized_node_to_attach, self.root_node)
         self.assertFalse(validator.is_valid())
