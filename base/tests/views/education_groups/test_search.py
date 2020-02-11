@@ -45,8 +45,9 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory,
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
 from base.utils.cache import RequestCache
 from education_group.api.serializers.education_group import EducationGroupSerializer
 
@@ -462,3 +463,23 @@ class TestEducationGroupTypeAutoComplete(TestCase):
         }
         self.assertEqual(len(json_response["results"]), 1)
         self.assertEqual(json_response["results"][0], expected_response)
+
+
+class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce()
+        cls.egys = EducationGroupYearFactory.create_batch(4)
+        cls.url = reverse("education_groups")
+        cls.get_data = {
+            "academic_year": str(cls.egys[0].academic_year.id),
+        }
+        cls.tuples_xls_status_value_with_xls_method_function = (
+            ("xls", "base.views.education_groups.search.create_xls"),
+            ("xls_administrative", "base.views.education_groups.search.create_xls_administrative_data"),
+        )
+
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
