@@ -33,11 +33,11 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
 class TestPrerequisiteForm(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.luy_1 = LearningUnitYearFactory()
-        cls.luy_2 = LearningUnitYearFactory()
-        cls.prerequisite = PrerequisiteFactory()
+    def setUp(self):
+        self.luy_1 = LearningUnitYearFactory()
+        self.luy_2 = LearningUnitYearFactory()
+        self.prerequisite = PrerequisiteFactory()
+        self.prerequisite_pk = self.prerequisite.pk
 
     def test_prerequisite_form_with_prerequisites(self):
         form = LearningUnitPrerequisiteForm(
@@ -48,10 +48,10 @@ class TestPrerequisiteForm(TestCase):
             }
         )
         self.assertTrue(form.is_valid())
-        self.assertTrue(self.prerequisite)
+        form.save()
+        self.assertTrue(Prerequisite.objects.filter(pk=self.prerequisite_pk))
 
     def test_prerequisite_form_without_prerequisites(self):
-        prerequisite_pk = self.prerequisite.pk
         form = LearningUnitPrerequisiteForm(
             instance=self.prerequisite,
             luys_that_can_be_prerequisite=[self.luy_1, self.luy_2],
@@ -61,4 +61,4 @@ class TestPrerequisiteForm(TestCase):
         )
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertFalse(Prerequisite.objects.filter(pk=prerequisite_pk))
+        self.assertFalse(Prerequisite.objects.filter(pk=self.prerequisite_pk))
