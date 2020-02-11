@@ -33,7 +33,6 @@ from django.utils.translation import gettext_lazy as _
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
-from base.utils.cache import ElementCache
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
@@ -54,6 +53,13 @@ class TestAttachNodeView(TestCase):
         fetch_tree_patcher.start()
         self.addCleanup(fetch_tree_patcher.stop)
 
+        self.fetch_from_cache_patcher = mock.patch(
+            'program_management.business.group_element_years.management.fetch_elements_selected',
+            return_value=[]
+        )
+        self.fetch_from_cache_patcher.start()
+        self.addCleanup(self.fetch_from_cache_patcher.stop)
+
     def setUpTreeData(self):
         """
            |BIR1BA
@@ -71,17 +77,23 @@ class TestAttachNodeView(TestCase):
         root_node.add_child(subgroup)
         return ProgramTree(root_node)
 
-    def test_when_path_parameter_is_not_set(self):
+    def test_valid_http_method_when_user_is_not_logged(self):
+        self.client.logout()
+
+        allowed_method = ['get', 'post']
+        for method in allowed_method:
+            response = getattr(self.client, method)(self.url)
+            self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_get_method_when_path_parameter_is_not_set(self):
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, HttpResponseBadRequest.status_code)
 
-    def test_when_path_destination_is_invalid(self):
+    def test_get_method_when_path_destination_is_invalid(self):
         response = self.client.get(self.url + "?to_path=555")
         self.assertEquals(response.status_code, HttpResponseNotFound.status_code)
 
-    def test_when_no_data_selected_on_cache(self):
-        ElementCache(self.person.user).clear()
-
+    def test_get_method_when_no_data_selected_on_cache(self):
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url + "?to_path=" + to_path)
         self.assertEquals(response.status_code, HttpResponse.status_code)
@@ -90,16 +102,13 @@ class TestAttachNodeView(TestCase):
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])
 
-    def test_when_education_group_year_element_is_selected(self):
+    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
         subgroup_to_attach = GroupFactory(
             academic_year__year=self.tree.root_node.year,
             education_group_type__name=GroupType.SUB_GROUP.name,
         )
-
-        ElementCache(self.person.user).save_element_selected(
-            subgroup_to_attach,
-            action=ElementCache.ElementCacheAction.COPY.value
-        )
+        mock_cache_elems.return_value = [subgroup_to_attach]
 
         # To path :  BIR1BA ---> COMMON_CORE
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
@@ -107,9 +116,29 @@ class TestAttachNodeView(TestCase):
         self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
+        self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
         self.assertEquals(len(response.context['formset'].forms), 1)
         self.assertIsInstance(response.context['formset'].forms[0], AttachNodeForm)
 
-    def test_when_multiple_education_group_year_element_are_selected(self):
-        pass
+    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    def test_get_method_when_multiple_education_group_year_element_are_selected(self, mock_cache_elems):
+        subgroup_to_attach = GroupFactory(
+            academic_year__year=self.tree.root_node.year,
+            education_group_type__name=GroupType.SUB_GROUP.name,
+        )
+        subgroup_to_attach_2 = GroupFactory(
+            academic_year__year=self.tree.root_node.year,
+            education_group_type__name=GroupType.SUB_GROUP.name,
+        )
+        mock_cache_elems.return_value = [subgroup_to_attach, subgroup_to_attach_2]
+
+        # To path :  BIR1BA ---> LBIR101G
+        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.get(self.url + "?to_path=" + to_path)
+        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, 'tree/attach_inner.html')
+
+        self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
+        self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
+        self.assertEquals(len(response.context['formset'].forms), 2)

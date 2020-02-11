@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 from django.forms import formset_factory
 from django.http import Http404
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
@@ -34,7 +36,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_success_messages
 from base.views.mixins import AjaxTemplateMixin
-from program_management.business.group_element_years.management import fetch_elements_selected
+from program_management.business.group_element_years import management
 from program_management.ddd.domain import node
 from program_management.ddd.repositories import fetch_tree
 from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet
@@ -51,8 +53,9 @@ class AttachNodeView(AjaxTemplateMixin, TemplateView):
 
     @cached_property
     def elements_to_attach(self):
-        return fetch_elements_selected(self.request.GET, self.request.user)
+        return management.fetch_elements_selected(self.request.GET, self.request.user)
 
+    @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         if 'to_path' not in request.GET:
             raise SuspiciousOperation('Missing to_path parameter')
