@@ -27,26 +27,37 @@ from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
 from program_management.ddd.repositories import save_tree
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestSaveTree(TestCase):
     def setUp(self):
         academic_year = AcademicYearFactory(current=True)
+        training = TrainingFactory(academic_year=academic_year)
+        common_core = GroupFactory(academic_year=academic_year)
+        learning_unit_year = LearningUnitYearFactory(academic_year=academic_year)
 
-        self.root_node = NodeEducationGroupYearFactory(
-            year=academic_year.year,
-            create_django_objects_in_db=True
+        self.root_node = NodeEducationGroupYear(
+            node_id=training.pk,
+            acronym=training.acronym,
+            title=training.title,
+            year=training.academic_year.year
         )
-        self.common_core_node = NodeEducationGroupYearFactory(
-            year=academic_year.year,
-            create_django_objects_in_db=True
+        self.common_core_node = NodeEducationGroupYear(
+            node_id=common_core.pk,
+            acronym=common_core.acronym,
+            title=common_core.title,
+            year=common_core.academic_year.year
         )
-        self.learning_unit_year_node = NodeLearningUnitYearFactory(
-            year=academic_year.year,
-            create_django_objects_in_db=True
+        self.learning_unit_year_node = NodeLearningUnitYear(
+            node_id=learning_unit_year.pk,
+            acronym=learning_unit_year.acronym,
+            title=learning_unit_year.specific_title,
+            year=learning_unit_year.academic_year.year
         )
 
     def test_case_tree_save_from_scratch(self):

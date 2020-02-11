@@ -53,8 +53,8 @@ def attach_node(tree: ProgramTree, node: Node, path: str = None) -> List[Busines
     error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
 
     validator = AttachNodeValidatorList(tree, node, path)
-    validator.validate()
-    error_messages += validator.error_messages
+    if not validator.is_valid():
+        error_messages += validator.error_messages
 
     if not error_messages:
         return [BusinessValidationMessage(_('Success message'), MessageLevel.SUCCESS)]
