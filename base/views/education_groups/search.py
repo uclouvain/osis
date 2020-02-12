@@ -29,7 +29,6 @@ from collections import OrderedDict
 from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -99,15 +98,7 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
             'items_per_page': context["paginator"].per_page,
             'enums': education_group_categories,
         })
-
         return context
-
-    def render_to_response(self, context, **response_kwargs):
-        if self.request.is_ajax():
-            serializer = EducationGroupSerializer(context["page_obj"], context={'request': self.request}, many=True)
-            return JsonResponse({'object_list': serializer.data})
-        else:
-            return super().render_to_response(context)
 
 
 class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):

@@ -28,8 +28,8 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
-from django.http import HttpResponseForbidden, HttpResponse
-from django.test import TestCase, RequestFactory
+from django.http import HttpResponseForbidden
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -49,7 +49,6 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.user import UserFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
 from base.utils.cache import RequestCache
-from education_group.api.serializers.education_group import EducationGroupSerializer
 
 FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
@@ -400,27 +399,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
-
-    def test_search_case_get_ajax_request(self):
-        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-
-        response = self.client.get(self.url, data={
-                "academic_year": self.current_academic_year.id,
-                "acronym": self.education_group_arke2a.acronym,
-                "management_entity": self.envi_entity_v.acronym,
-                "with_entity_subordinated": True
-            }, **kwargs)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        data_serialized = EducationGroupSerializer(
-            [self.education_group_arke2a],
-            many=True,
-            context={'request': RequestFactory().get(self.url)}
-        )
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'object_list': data_serialized.data}
-        )
 
 
 class TestEducationGroupTypeAutoComplete(TestCase):
