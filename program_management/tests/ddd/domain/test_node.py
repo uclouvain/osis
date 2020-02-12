@@ -25,7 +25,9 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
@@ -99,3 +101,50 @@ class TestStr(TestCase):
 
     def test_node_learning_unit_str(self):
         self.assertEqual(str(self.node_learning_unit), 'Acronym (2019)')
+
+
+class TestGetChildrenTypes(TestCase):
+
+    def test_when_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual([], node.get_children_types())
+
+    def test_when_link_type_is_none__incudes_reference_kwarg_true(self):
+        link = LinkFactory(link_type=None)
+        child_node_type = link.child.node_type
+        result = link.parent.get_children_types(include_nodes_used_as_reference=True)
+        self.assertListEqual(
+            [child_node_type],
+            result
+        )
+
+    def test_when_link_type_is_reference__incudes_reference_kwarg_true(self):
+        error_msg = """
+            A 'REFERENCE' link means that we should ignore the child node, 
+            and consider the children of the child as there were direct children
+        """
+        link0 = LinkFactory(link_type=LinkTypes.REFERENCE)
+        link1 = LinkFactory(parent=link0.child, link_type=None)
+        result = link0.parent.get_children_types(include_nodes_used_as_reference=True)
+        self.assertListEqual(
+            [link1.child.node_type],
+            result,
+            error_msg
+        )
+        self.assertNotIn(link0.child.node_type, result, error_msg)
+
+    def test_when_2_levels_link_type_reference(self):
+        error_msg = """
+            A 'REFERENCE' link means that we should ignore the child node, 
+            and consider the children of the child as there were direct children
+        """
+        link0 = LinkFactory(link_type=LinkTypes.REFERENCE)
+        link1 = LinkFactory(parent=link0.child, link_type=LinkTypes.REFERENCE)
+        link2 = LinkFactory(parent=link1.child, link_type=None)
+        result = link0.parent.get_children_types(include_nodes_used_as_reference=True)
+        self.assertListEqual(
+            [link2.child.node_type],
+            result,
+            error_msg
+        )
+        self.assertNotIn(link0.child.node_type, result, error_msg)

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import Counter
 from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
@@ -80,12 +81,14 @@ class AuthorizedRelationshipList:
         auth_relation = self.__get_authorized_relationship(parent_node, child_node)
         if not auth_relation:
             return True
-        current_count = parent_node.counter_child_nodes_types[child_node.node_type]
+        counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
+        current_count = counter[child_node.node_type]
         return current_count == auth_relation.min_constraint
 
     def is_maximum_children_types_reached(self, parent_node: Node, child_node: Node):
         auth_relation = self.__get_authorized_relationship(parent_node, child_node)
         if not auth_relation:
             return True
-        current_count = parent_node.counter_child_nodes_types[child_node.node_type]
+        counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
+        current_count = counter[child_node.node_type]
         return current_count == auth_relation.max_constraint

@@ -79,13 +79,16 @@ class Node:
     def children_as_nodes(self):   # TODO :: typing -> List[Node]
         return [link.child for link in self.children]
 
-    @property
-    def children_types(self) -> List[EducationGroupTypesEnum]:
+    def get_children_types(self, include_nodes_used_as_reference=False) -> List[EducationGroupTypesEnum]:
+        if not include_nodes_used_as_reference:
+            return [link.child.node_type for link in self.children]
+
         list_child_nodes_types = []
         for link in self.children:
-            if link.link_type == LinkTypes.REFERENCE.name:
-                childs_of_child = link.child.children
-                list_child_nodes_types += [link.child.node_type for link in childs_of_child]
+            if link.link_type == LinkTypes.REFERENCE:
+                list_child_nodes_types += link.child.get_children_types(
+                    include_nodes_used_as_reference=include_nodes_used_as_reference
+                )
             else:
                 list_child_nodes_types.append(link.child.node_type)
         return list_child_nodes_types
@@ -93,10 +96,6 @@ class Node:
     @property
     def descendents(self):
         return _get_descendents(self)
-
-    @property
-    def counter_child_nodes_types(self) -> Counter:
-        return Counter(self.children_types)
 
     def add_child(self, node, **kwargs):
         child = link_factory.get_link(parent=self, child=node, **kwargs)
