@@ -146,7 +146,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         """
-        BIR1BA
+        GERM2MA
         |--Common Core
            |-- Learning unit year
         """
@@ -216,9 +216,10 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         """
-        BIR1BA
+        GERM2M
         |--Common Core
-           |-- Learning unit year
+           |-- GERM2MA
+              |-- Learning unit year
         """
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(
