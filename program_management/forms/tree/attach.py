@@ -64,5 +64,5 @@ class AttachNodeForm(forms.Form):
             self.tree,
             self.node,
             self.to_path,
-            # **self.cleaned_data
+            **self.cleaned_data
         )
