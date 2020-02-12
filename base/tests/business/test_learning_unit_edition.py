@@ -31,6 +31,9 @@ from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
+from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
+    ConsistencyError
+from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report
 from base.models import academic_year
 from base.models import learning_unit_year as mdl_luy
@@ -42,7 +45,6 @@ from base.models.enums import learning_unit_year_subtypes, learning_unit_year_pe
     quadrimesters, vacant_declaration_type, entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
-from base.models.learning_class_year import LearningClassYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -52,11 +54,12 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from cms.models.translated_text import TranslatedText
+from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from reference.tests.factories.language import LanguageFactory
 
 
@@ -506,7 +509,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self.assertEqual(str(context.exception),
                          _('The selected end year (%(partim_end_year)s) is greater '
                            'than the end year of the parent %(lu_parent)s') % {
-                             'partim_end_year': academic_year.find_academic_year_by_year(max_end_year.year + 1),
+                             'partim_end_year': NO_PLANNED_END_DISPLAY,
                              'lu_parent': learning_unit_full_annual.acronym
                          })
 
@@ -779,6 +782,8 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         cls.setup_academic_years()
         cls.other_language = LanguageFactory()
         cls.other_campus = CampusFactory()
+        cls.faculty_remark = "Faculty remark"
+        cls.my_course = "My course"
 
     def setUp(self):
         self.learning_container_year = LearningContainerYearFactory(academic_year=self.starting_academic_year)
@@ -802,7 +807,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
 
     def test_with_learning_unit_fields_to_update(self):
         fields_to_update = {
-            "faculty_remark": "Faculty remark",
+            "faculty_remark": self.faculty_remark,
             "other_remark": "Other remark"
         }
         update_learning_unit_year_with_report(self.learning_unit_year, fields_to_update, {})
@@ -812,7 +817,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
     def test_with_learning_unit_year_fields_to_update(self):
         fields_to_update = {
             "specific_title": "Mon cours",
-            "specific_title_english": "My course",
+            "specific_title_english": self.my_course,
             "credits": Decimal('45.00'),
             "internship_subtype": internship_subtypes.PROFESSIONAL_INTERNSHIP,
             "status": False,
@@ -850,10 +855,10 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
                                                                           learning_unit_year_periodicity.ANNUAL)
 
         learning_unit_fields_to_update = {
-            "faculty_remark": "Faculty remark"
+            "faculty_remark": self.faculty_remark
         }
         learning_unit_year_fields_to_update = {
-            "specific_title_english": "My course",
+            "specific_title_english": self.my_course,
             "credits": 45,
             "attribution_procedure": attribution_procedure.EXTERNAL
         }
@@ -894,10 +899,10 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         )
 
         learning_unit_fields_to_update = {
-            "faculty_remark": "Faculty remark"
+            "faculty_remark": self.faculty_remark
         }
         learning_unit_year_fields_to_update = {
-            "specific_title_english": "My course",
+            "specific_title_english": self.my_course,
             "credits": 45,
             "attribution_procedure": attribution_procedure.EXTERNAL
         }
