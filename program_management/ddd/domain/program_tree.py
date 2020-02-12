@@ -34,6 +34,9 @@ class ProgramTree:
     root_node = None
     authorized_relationships = None
 
+    read_only = False  # TODO :: ??? Used to perform validations on actions without executing the action ???
+
+    # TODO :: load authorized_relationship into the __init__ ? (not use it as kwarg?)
     def __init__(self, root_node: node.Node, authorized_relationships: AuthorizedRelationshipList = None):
         if not isinstance(root_node, node.Node):
             raise Exception('root_group args must be an instance of Node')
@@ -77,21 +80,20 @@ class ProgramTree:
         """
         return set([self.root_node] + _nodes_from_root(self.root_node))
 
-    def attach_node(self, node: node.Node, path: str = None, **kwargs):
+    def attach_node(self, node: node.Node, path: str = None, **link_attributes):
         """
         Add a node to the tree
         :param node: Node to add on the tree
         :param path: [Optional] The position where the node must be added
         """
         # Avoid circular import
-        from program_management.ddd.validators.attach_node import factory as attach_node_validator_factory
+        from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
         parent = self.get_node(path) if path else self.root_node
-        validator = attach_node_validator_factory.get_attach_node_validator(self, node, path)
-        validator.validate()
+        path = path or str(self.root_node.node_id)
+        validator = AttachNodeValidatorList(self, node, path)
         if validator.is_valid():
-            parent.add_child(node, **kwargs)
-        else:
-            return validator.error_messages
+            parent.add_child(node, **link_attributes)
+        return validator.messages
 
     def detach_node(self, path: str):
         """

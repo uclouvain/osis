@@ -29,7 +29,8 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.contrib.validation import MessageLevel
+from program_management.ddd.contrib.validation import MessageLevel, BusinessValidationMessage
+from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators import _validator_groups
 from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
@@ -49,10 +50,20 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         cls.root_path = str(cls.root_node.node_id)
         cls.node_to_attach = NodeEducationGroupYearFactory()
 
-    def test_validator_list_called(self):
-        self.mock_validator(_validator_groups.AttachNodeValidatorList, ['error message text'])
+    @patch.object(program_tree.ProgramTree, 'attach_node')
+    def test_when_attach_node_action_is_valid(self, mock_attach_node):
+        validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
+        mock_attach_node.return_value = [validator_message]
         result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
-        self.assertEqual('error message text', result[0])
+        self.assertEqual(result[0], validator_message)
+        self.assertEqual(len(result), 1)
+
+    @patch.object(program_tree.ProgramTree, 'attach_node')
+    def test_when_attach_node_action_is_not_valid(self, mock_attach_node):
+        validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
+        mock_attach_node.return_value = [validator_message]
+        result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
     @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
@@ -81,7 +92,7 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
             ProgramTreeFactory(root_node=link1.parent),
             ProgramTreeFactory(root_node=link2.parent)
         ]
-        self.mock_validator(AttachNodeValidatorList, [])
+        self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         self.mock_validator(AttachAuthorizedRelationshipValidator, [])
 
         result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)

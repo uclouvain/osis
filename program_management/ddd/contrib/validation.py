@@ -34,12 +34,14 @@ class BusinessValidator(ABC):
 
     _messages = None
 
+    success_messages = None
+
     def __init__(self, *args, **kwargs):
         self._messages = []
 
     @property
     def messages(self) -> List[BusinessValidationMessage]:
-        return self._messages
+        return self._messages + (self.success_messages or [])
 
     @property
     def error_messages(self) -> List[BusinessValidationMessage]:
@@ -49,16 +51,12 @@ class BusinessValidator(ABC):
     def warning_messages(self) -> List[BusinessValidationMessage]:
         return [msg for msg in self.messages if msg.level == MessageLevel.WARNING]
 
-    @property
-    def success_messages(self):
-        # TODO :: quid de la responsabilité des succes messages? Qui s'en occupe?
-        return [msg for msg in self.messages if msg.level == MessageLevel.SUCCESS]
-
     def is_valid(self) -> bool:
         self.validate()  # TODO :: utiliser _validation_done attr?
         return not self.error_messages
 
     def add_message(self, msg: BusinessValidationMessage):
+        assert msg.level != MessageLevel.SUCCESS, "please redefine the 'success_messages' property instead"
         self._messages.append(msg)
 
     def add_error_message(self, msg: str):
@@ -81,6 +79,7 @@ class BusinessListValidator(BusinessValidator):
 
     def __init__(self, validator_args=None, validator_kwargs=None):
         super(BusinessListValidator, self).__init__()
+        assert self.success_messages, "Please set the 'success_messages' attribute"
         self.validator_args = validator_args
         self.validator_kwargs = validator_kwargs or {}
 

@@ -36,9 +36,14 @@ from program_management.ddd.validators.minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators.node_duplication import NodeDuplicationValidator
 from program_management.ddd.validators.parent_as_leaf import ParentIsNotLeafValidator
+from django.utils.translation import gettext as _
 
 
 class AttachNodeValidatorList(BusinessListValidator):
+
+    success_messages = [
+        _('Success message')
+    ]
 
     def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
 

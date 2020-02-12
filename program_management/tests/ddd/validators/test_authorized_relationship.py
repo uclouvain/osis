@@ -58,7 +58,6 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
             )
         ])
 
-    # TODO :: créer un miwin de Test pour la couche des validator (fetch doit être mocké)
     def test_success(self):
         tree = ProgramTreeFactory(root_node=self.root_node, authorized_relationships=self.authorized_relationships)
         validator = AttachAuthorizedRelationshipValidator(tree, self.common_core_node, self.root_node)
