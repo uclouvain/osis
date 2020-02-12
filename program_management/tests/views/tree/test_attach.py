@@ -142,3 +142,40 @@ class TestAttachNodeView(TestCase):
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
         self.assertEquals(len(response.context['formset'].forms), 2)
+
+    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid')
+    def test_post_method_case_formset_invalid(self, mock_formset_is_valid, mock_cache_elems):
+        subgroup_to_attach = GroupFactory(
+            academic_year__year=self.tree.root_node.year,
+            education_group_type__name=GroupType.SUB_GROUP.name,
+        )
+        mock_cache_elems.return_value = [subgroup_to_attach]
+        mock_formset_is_valid.return_value = False
+
+        # To path :  BIR1BA ---> LBIR101G
+        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.post(self.url + "?to_path=" + to_path)
+
+        self.assertTemplateUsed(response, 'tree/attach_inner.html')
+        self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
+        self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
+
+    @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid', return_value=True)
+    @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.save', return_value=None)
+    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    def test_post_method_case_formset_valid(self, mock_cache_elems, *mocks_args):
+        subgroup_to_attach = GroupFactory(
+            academic_year__year=self.tree.root_node.year,
+            education_group_type__name=GroupType.SUB_GROUP.name,
+        )
+        mock_cache_elems.return_value = [subgroup_to_attach]
+
+        # To path :  BIR1BA ---> LBIR101G
+        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.post(self.url + "?to_path=" + to_path)
+
+        msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
+        self.assertEqual(msgs, [_("The content of %(acronym)s has been updated.") % {
+                "acronym": self.tree.root_node.children[1].child.acronym
+            }])

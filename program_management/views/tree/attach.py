@@ -27,6 +27,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import SuspiciousOperation
 from django.forms import formset_factory
 from django.http import Http404
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -110,7 +112,9 @@ class AttachNodeView(AjaxTemplateMixin, TemplateView):
                 "acronym": self.tree.get_node(self.request.GET['to_path']).acronym
             }
         )
-        return None
+        return redirect(
+            reverse('education_group_read', args=[self.tree.root_node.node_id, self.tree.root_node.node_id])
+        )
 
     def form_invalid(self, formset):
         return self.render_to_response(self.get_context_data(formset=formset))
