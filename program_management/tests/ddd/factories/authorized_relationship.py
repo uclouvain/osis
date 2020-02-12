@@ -25,20 +25,30 @@
 ##############################################################################
 import factory.fuzzy
 
+from base.models.enums.education_group_types import TrainingType
+from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
+
+
+class AuthorizedRelationshipFactory(factory.Factory):
+
+    class Meta:
+        model = AuthorizedRelationship
+        abstract = False
+
+    parent_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    child_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    min_constraint = factory.fuzzy.FuzzyInteger(0, 10)
+    max_constraint = factory.fuzzy.FuzzyInteger(0, 10)
+
 
 def generate_auth_relation(obj):
-    if obj.authorized_relationships:
-        return obj.authorized_relationships
-    return
+    return [AuthorizedRelationshipFactory()]
 
 
 class AuthorizedRelationshipListFactory(factory.Factory):
 
     class Meta:
-        model = 'program_management.ddd.domain.authorized_relationship.AuthorizedRelationshipList'
+        model = AuthorizedRelationshipList
         abstract = False
 
     authorized_relationships = factory.LazyAttribute(generate_auth_relation)
-
-
-
