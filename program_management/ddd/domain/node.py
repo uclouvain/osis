@@ -51,7 +51,7 @@ factory = NodeFactory()
 class Node:
 
     acronym = None
-    children = None
+    children = None  # TODO :: typing :: children: List[Link] = None
     node_type = None  # TODO :: rename to 'type'
 
     def __init__(self, node_id: int, node_type: EducationGroupTypesEnum = None, children: List[Link] = None):
@@ -73,6 +73,10 @@ class Node:
     @property
     def pk(self):
         return self.node_id
+
+    @property
+    def children_as_nodes(self):   # TODO :: typing -> List[Node]
+        return [link.child for link in self.children]
 
     @property
     def children_types(self) -> List[EducationGroupTypesEnum]:

@@ -41,7 +41,7 @@ class BusinessValidator(ABC):
 
     @property
     def messages(self) -> List[BusinessValidationMessage]:
-        return self._messages + self.success_messages or []
+        return self._messages + (self.success_messages or [])
 
     @property
     def error_messages(self) -> List[BusinessValidationMessage]:

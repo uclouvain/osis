@@ -25,9 +25,13 @@
 ##############################################################################
 from django.test import TestCase
 
+from program_management.ddd.contrib.validation import MessageLevel
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import Node, NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
 class TestInitProgramTree(TestCase):
@@ -68,27 +72,45 @@ class TestGetNodeProgramTree(TestCase):
         )
 
 
-class TestAttachNodeProgramTree(TestCase):
+class TestAttachNodeProgramTree(TestCase, ValidatorPatcherMixin):
     def setUp(self):
-        root_node = Node(0)
+        root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTree(root_node)
 
     def test_attach_node_case_no_path_specified(self):
-        subgroup_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)
+        self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
+        subgroup_node = NodeGroupYearFactory()
         self.tree.attach_node(subgroup_node)
-
-        self.assertEquals(self.tree.root_node.children[0].child.pk, subgroup_node.pk)
+        self.assertIn(subgroup_node, self.tree.root_node.children_as_nodes)
 
     def test_attach_node_case_path_specified_found(self):
-        subgroup_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)
+        self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
+        subgroup_node = NodeGroupYearFactory()
         self.tree.attach_node(subgroup_node)
 
-        node_to_attach = NodeGroupYear(5, "LSUBG200G", "Sous groupe", 2018)
+        node_to_attach = NodeGroupYearFactory()
         path = "|".join([str(self.tree.root_node.pk), str(subgroup_node.pk)])
         self.tree.attach_node(node_to_attach, path=path)
 
-        self.assertEquals(len(self.tree.get_node(path).children), 1)
-        self.assertEquals(self.tree.get_node(path).children[0].child.pk, node_to_attach.pk)
+        self.assertIn(node_to_attach, self.tree.get_node(path).children_as_nodes)
+
+    def test_when_validator_list_is_valid(self):
+        self.mock_validator(AttachNodeValidatorList, ['Success message text'], level=MessageLevel.SUCCESS)
+        path = str(self.tree.root_node.node_id)
+        child_to_attach = NodeGroupYearFactory()
+        result = self.tree.attach_node(child_to_attach, path=path)
+        self.assertEqual(result[0], 'Success message text')
+        self.assertEqual(1, len(result))
+        self.assertIn(child_to_attach, self.tree.root_node.children_as_nodes)
+
+    def test_when_validator_list_is_not_valid(self):
+        self.mock_validator(AttachNodeValidatorList, ['error message text'], level=MessageLevel.ERROR)
+        path = str(self.tree.root_node.node_id)
+        child_to_attach = NodeGroupYearFactory()
+        result = self.tree.attach_node(child_to_attach, path=path)
+        self.assertEqual(result[0], 'error message text')
+        self.assertEqual(1, len(result))
+        self.assertNotIn(child_to_attach, self.tree.root_node.children_as_nodes)
 
 
 class TestDetachNodeProgramTree(TestCase):

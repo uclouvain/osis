@@ -89,6 +89,7 @@ class ProgramTree:
         # Avoid circular import
         from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
         parent = self.get_node(path) if path else self.root_node
+        path = path or str(self.root_node.node_id)
         validator = AttachNodeValidatorList(self, node, path)
         if validator.is_valid():
             parent.add_child(node, **link_attributes)
