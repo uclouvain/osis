@@ -63,6 +63,9 @@ class Link:
         self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
         self.link_type = kwargs.get('link_type')
 
+    def __str__(self):
+        return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
+
     def is_reference(self):
         return self.link_type == LinkTypes.REFERENCE
 

@@ -89,12 +89,13 @@ class TestEq(TestCase):
 class TestStr(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.acronym = 'Acronym'
-        cls.node_group_year = NodeGroupYearFactory(acronym=cls.acronym)
-        cls.node_learning_unit = NodeLearningUnitYearFactory(acronym=cls.acronym)
+        acronym = 'Acronym'
+        year = 2019
+        cls.node_group_year = NodeGroupYearFactory(acronym=acronym, year=year)
+        cls.node_learning_unit = NodeLearningUnitYearFactory(acronym=acronym, year=year)
 
     def test_node_group_year_str(self):
-        self.assertEqual(str(self.node_group_year), self.acronym)
+        self.assertEqual(str(self.node_group_year), 'Acronym (2019)')
 
     def test_node_learning_unit_str(self):
-        self.assertEqual(str(self.node_learning_unit), self.acronym)
+        self.assertEqual(str(self.node_learning_unit), 'Acronym (2019)')

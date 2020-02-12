@@ -80,20 +80,24 @@ class ProgramTree:
         """
         return set([self.root_node] + _nodes_from_root(self.root_node))
 
-    def attach_node(self, node: node.Node, path: str = None, **link_attributes):
+    def attach_node(self, node_to_attach: node.Node, path: str = None, **link_attributes):
         """
         Add a node to the tree
-        :param node: Node to add on the tree
+        :param node_to_attach: Node to add on the tree
         :param path: [Optional] The position where the node must be added
         """
-        # Avoid circular import
-        from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
+        is_valid, messages = self.clean_attach_node(node_to_attach, path)
+        if is_valid:
+            parent.add_child(node_to_attach, **link_attributes)
+        return messages
+
+    def clean_attach_node(self, node, path):
+        # Avoid circular import
+        from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
         validator = AttachNodeValidatorList(self, node, path)
-        if validator.is_valid():
-            parent.add_child(node, **link_attributes)
-        return validator.messages
+        return validator.is_valid(), validator.messages
 
     def detach_node(self, path: str):
         """

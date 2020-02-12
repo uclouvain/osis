@@ -53,6 +53,7 @@ class Node:
     acronym = None
     children = None  # TODO :: typing :: children: List[Link] = None
     node_type = None  # TODO :: rename to 'type'
+    year = None
 
     def __init__(self, node_id: int, node_type: EducationGroupTypesEnum = None, children: List[Link] = None):
         self.node_id = node_id
@@ -68,7 +69,7 @@ class Node:
         return hash(self.node_id)
 
     def __str__(self):
-        return '%(acronym)s' % {'acronym': self.acronym}
+        return '%(acronym)s (%(year)s)' % {'acronym': self.acronym, 'year': self.year}
 
     @property
     def pk(self):
