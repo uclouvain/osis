@@ -49,7 +49,7 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         cls.root_path = str(cls.root_node.node_id)
         cls.node_to_attach = NodeEducationGroupYearFactory()
 
-    def test_validator_list_called(self):
+    def test_when_attach_node_ivalidator_list_called(self):
         self.mock_validator(_validator_groups.AttachNodeValidatorList, ['error message text'])
         result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
         self.assertEqual('error message text', result[0])
@@ -81,7 +81,7 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
             ProgramTreeFactory(root_node=link1.parent),
             ProgramTreeFactory(root_node=link2.parent)
         ]
-        self.mock_validator(AttachNodeValidatorList, [])
+        self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         self.mock_validator(AttachAuthorizedRelationshipValidator, [])
 
         result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
