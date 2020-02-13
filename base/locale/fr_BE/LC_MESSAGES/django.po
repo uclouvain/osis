@@ -7,7 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+
 "POT-Creation-Date: 2020-02-04 11:14+0100\n"
+
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -902,6 +904,9 @@ msgstr "Ouverture informations pédagoqiques"
 
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue de formations."
+
+msgid "Email"
+msgstr "Email"
 
 msgid "End"
 msgstr "Fin"
@@ -1808,7 +1813,7 @@ msgid "Not enrolled"
 msgstr "Pas inscrit"
 
 msgid "Not in period to edit description fiche."
-msgstr "Vous n'êtes pas en période d'édition des fiches descriptives."
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
 
 msgid "Not in range of years which can be edited by you"
 msgstr ""
@@ -2116,6 +2121,9 @@ msgstr "Production du diplôme / certificat"
 msgid "Profes. integration"
 msgstr "Intégration prof."
 
+msgid "Professional"
+msgstr "Professionnel"
+
 msgid "Professional internship"
 msgstr "Stage professionnel"
 
@@ -2327,6 +2335,9 @@ msgstr "Stage de recherche"
 msgid "Reserved for interns"
 msgstr "Réservé aux internes"
 
+msgid "Residential"
+msgstr "Domicile"
+
 msgid "Result"
 msgstr "Résultat"
 
@@ -2503,6 +2514,10 @@ msgstr "Succès"
 
 msgid "Summary course submission"
 msgstr "Soumission des fiches descriptives"
+
+msgid "Summary course submission is not allowed for tutors during this period."
+msgstr ""
+"La modification des fiches descriptives n'est pas autorisée pour les enseignants durant cette période."
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -3362,7 +3377,7 @@ msgstr ""
 "Code composé de:\n"
 "site: 1 lettre\n"
 "partie alphabétique: 2 à 4 lettres\n"
-"partie numérique: 4 chiffres"
+"partie numérique: 4 chiffres, dont le premier ne peut pas être 0"
 
 msgid "activate to sort column ascending"
 msgstr "activer pour trier la colonne par ordre croissant"
@@ -3481,7 +3496,7 @@ msgstr ""
 "Code composé de:\n"
 "site: 1 lettre\n"
 "partie alphabétique: 2 à 4 lettres\n"
-"partie numérique: 4 chiffres\n"
+"partie numérique: 4 chiffres , dont le premier ne peut pas être 0\n"
 "Subdivision: 1 caractère"
 
 msgid "fac. level"

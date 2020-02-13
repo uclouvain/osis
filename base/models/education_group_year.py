@@ -360,7 +360,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     diploma_printing_title = models.CharField(
-        max_length=140,
+        max_length=240,
         blank=True,
         default="",
         verbose_name=_('Diploma title')
@@ -686,9 +686,14 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def verbose_title(self):
-        if self.title_english and translation.get_language() == LANGUAGE_CODE_EN:
-            return self.title_english
-        return self.title
+        if self.is_finality:
+            if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN:
+                return self.partial_title_english
+            return self.partial_title
+        else:
+            if self.title_english and translation.get_language() == LANGUAGE_CODE_EN:
+                return self.title_english
+            return self.title
 
     @property
     def verbose_type(self):
