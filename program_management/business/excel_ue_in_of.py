@@ -62,7 +62,7 @@ BOLD_FONT = Font(bold=True)
 
 optional_header_for_required_entity = [_('Req. Entity')]
 optional_header_for_proposition = [_('Proposal type'), _('Proposal status')]
-optional_header_for_credits = [_('Absolute credits'), _('Relative credits')]
+optional_header_for_credits = [_('Relative credits'), _('Absolute credits')]
 optional_header_for_allocation_entity = [_('Alloc. Ent.')]
 optional_header_for_english_title = [_('Title in English')]
 optional_header_for_teacher_list = [_('List of teachers'), "{} ({})".format(_('List of teachers'), _('emails'))]
