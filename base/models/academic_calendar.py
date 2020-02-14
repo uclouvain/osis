@@ -86,7 +86,7 @@ class AcademicCalendar(SerializableModel):
     highlight_title = models.CharField(max_length=50, blank=True, null=True)
     highlight_description = models.CharField(max_length=255, blank=True, null=True)
     highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(choices=academic_calendar_type.CALENDAR_TYPES, max_length=50)
+    reference = models.CharField(choices=academic_calendar_type.CALENDAR_TYPES, max_length=70)
 
     objects = AcademicCalendarQuerySet.as_manager()
 
@@ -133,6 +133,10 @@ def find_highlight_academic_calendar():
 
 def get_by_reference_and_academic_year(a_reference, an_academic_year):
     return get_object_or_none(AcademicCalendar, reference=a_reference, academic_year=an_academic_year)
+
+
+def get_by_reference_and_data_year(a_reference, data_year):
+    return get_object_or_none(AcademicCalendar, reference=a_reference, data_year=data_year)
 
 
 def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, a_reference):

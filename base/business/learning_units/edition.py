@@ -41,6 +41,7 @@ from base.business.utils.model import update_instance_model_from_data, update_re
 from base.enums.component_detail import COMPONENT_DETAILS
 from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
 from base.forms.learning_unit_specifications import update_future_luy
+from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
@@ -48,16 +49,17 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_achievement import LearningAchievement
-from base.models.learning_class_year import LearningClassYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
+NO_DATA = _('No data')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -123,16 +125,19 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
+    no_planned_end = None
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
         new_academic_year = AcademicYear.objects.max_adjournment(delta=1)
+        no_planned_end = NO_PLANNED_END_DISPLAY
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
-        if _get_actual_end_year(lu_parent.learning_unit).year < new_academic_year.year:
+        actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
+        if actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
-                    'partim_end_year': new_academic_year,
+                    'partim_end_year': new_academic_year if not no_planned_end else no_planned_end,
                     'lu_parent': lu_parent.acronym
                 }
             )
@@ -280,8 +285,8 @@ def _get_new_end_year(new_academic_year):
 
 
 def get_next_academic_years(learning_unit_to_edit, year):
-    range_years = list(range(learning_unit_to_edit.end_year.year + 1, year + 1))
-    return AcademicYear.objects.filter(year__in=range_years).order_by('year')
+    end_date = learning_unit_to_edit.end_year.year + 1 if learning_unit_to_edit.end_year else None
+    return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -421,7 +426,7 @@ def _get_differences(obj1, obj2, fields_to_compare):
 
 def _get_translated_value(value):
     if value is None:
-        return _('No data')
+        return NO_DATA
     if isinstance(value, bool):
         return _('yes') if value else _('no')
     return value
@@ -445,9 +450,9 @@ def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
                             "and year %(next_year)s - %(next_value)s") % {
                               'field': _(entity_type.lower()),
                               'year': lcy.academic_year,
-                              'value': current_entity.most_recent_acronym if current_entity else _('No data'),
+                              'value': current_entity.most_recent_acronym if current_entity else NO_DATA,
                               'next_year': next_lcy.academic_year,
-                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('No data')
+                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else NO_DATA
                           })
     return error_list
 
@@ -567,14 +572,14 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
         "The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
         "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s"
     ) % {
-        'field': COMPONENT_DETAILS[field_diff].lower(),
-        'acronym': current_component.learning_unit_year.acronym,
-        'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
-        'year': current_component.learning_unit_year.academic_year,
-        'value': normalize_fraction(current_value) if current_value is not None else _('No data'),
-        'next_year': next_year_component.learning_unit_year.academic_year,
-        'next_value': normalize_fraction(next_value) if next_value is not None else _('No data')
-    }
+               'field': COMPONENT_DETAILS[field_diff].lower(),
+               'acronym': current_component.learning_unit_year.acronym,
+               'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
+               'year': current_component.learning_unit_year.academic_year,
+               'value': normalize_fraction(current_value) if current_value is not None else NO_DATA,
+               'next_year': next_year_component.learning_unit_year.academic_year,
+               'next_value': normalize_fraction(next_value) if next_value is not None else NO_DATA
+           }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-29 14:57+0100\n"
+"POT-Creation-Date: 2020-02-11 11:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,9 @@ msgstr ""
 
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
+msgstr ""
+
+msgid "Absolute credits"
 msgstr ""
 
 msgid "Ac yr."
@@ -166,6 +169,9 @@ msgstr ""
 msgid "English comment"
 msgstr ""
 
+msgid "Evaluation methods"
+msgstr ""
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -239,7 +245,13 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
+msgid "Non-mandatory"
+msgstr ""
+
 msgid "Official"
+msgstr ""
+
+msgid "Online resources"
 msgstr ""
 
 msgid ""
@@ -270,6 +282,9 @@ msgstr[1] ""
 msgid "Optional"
 msgstr ""
 
+msgid "Other informations"
+msgstr ""
+
 msgid "Paste"
 msgstr ""
 
@@ -283,6 +298,9 @@ msgid "Please cut or copy an item before attach it"
 msgstr ""
 
 msgid "Please select an item before adding it"
+msgstr ""
+
+msgid "Pre-condition"
 msgstr ""
 
 msgid "Prerequisite"
@@ -302,6 +320,9 @@ msgstr ""
 msgid "Registration form for the content of"
 msgstr ""
 
+msgid "Relative credits"
+msgstr ""
+
 msgid "Save"
 msgstr ""
 
@@ -312,6 +333,9 @@ msgid "Student's contact information"
 msgstr ""
 
 msgid "Student's signature"
+msgstr ""
+
+msgid "Teaching methods"
 msgstr ""
 
 #, python-format
@@ -378,6 +402,9 @@ msgid "The root does not exist in the next academic year."
 msgstr ""
 
 msgid "The user is not allowed to change education group content."
+msgstr ""
+
+msgid "Themes discussed"
 msgstr ""
 
 msgid ""
@@ -458,6 +485,9 @@ msgid "has as prerequisite"
 msgstr ""
 
 msgid "has the following prerequisites"
+msgstr ""
+
+msgid "in English"
 msgstr ""
 
 msgid "is a prerequisite of"

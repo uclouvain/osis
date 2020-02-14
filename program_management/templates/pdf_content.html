@@ -170,17 +170,6 @@
                     </td>
                 </tr>
             {% endif %}
-            <tr>
-                <td>
-                    <img src="{% static 'img/education_group_year/mandatory.png' %}" height="10" width="10">
-                    {{ root.verbose_credit }}
-                    {% if root.verbose_remark %}
-                        <div style="word-break: keep-all;margin-left: 14px;">
-                            {{ root.verbose_remark }}
-                        </div>
-                    {% endif %}
-                </td>
-            </tr>
             {{ tree|pdf_tree_list }}
             </tbody>
         </table>
