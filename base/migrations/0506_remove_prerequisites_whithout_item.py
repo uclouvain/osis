@@ -14,7 +14,7 @@ def reverse_migration(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0504_auto_20200203_1441'),
+        ('base', '0505_update_summary_submission_calendars'),
     ]
 
     operations = [
