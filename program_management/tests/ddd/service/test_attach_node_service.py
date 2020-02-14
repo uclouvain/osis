@@ -108,8 +108,14 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         self.assertEqual(result[0].level, MessageLevel.SUCCESS)
 
     @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_save_tree_is_called(self, mock_fetch):
+    def test_when_commit_is_true(self, mock_fetch):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path, commit=True)
         self.assertTrue(mock_fetch.called)
         self.assertTrue(self.mock_save.called)
+
+    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
+    def test_when_commit_is_false(self, mock_fetch):
+        self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
+        attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path, commit=False)
+        self.assertFalse(self.mock_save.called)

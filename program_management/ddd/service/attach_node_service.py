@@ -33,12 +33,19 @@ from program_management.ddd.repositories import fetch_tree, save_tree
 from program_management.ddd.validators.authorized_relationship import AttachAuthorizedRelationshipValidator
 
 
-def attach_node(tree: ProgramTree, node: Node, path: str = None, **link_attributes) -> List[BusinessValidationMessage]:
+def attach_node(
+        tree: ProgramTree,
+        node: Node,
+        path: str = None,
+        commit=True,
+        **link_attributes
+) -> List[BusinessValidationMessage]:
     error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
     if error_messages:
         return error_messages
     success_messages = tree.attach_node(node, path, **link_attributes)
-    save_tree.save(tree)
+    if commit:
+        save_tree.save(tree)
     return success_messages
 
 
