@@ -40,8 +40,7 @@ from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.business.group_element_years import group_element_year_tree
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer, ContactsSectionSerializer, EvaluationSectionSerializer
-from webservices.business import EVALUATION_KEY
+    AdmissionConditionSectionSerializer, ContactsSectionSerializer
 
 WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
@@ -89,12 +88,8 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
             ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
             CONTACTS: ContactsSectionSerializer,
-            EVALUATION_KEY: EvaluationSectionSerializer
         }
         extra_intro_offers = self._get_intro_offers(obj)
-
-        if EVALUATION_KEY in pertinent_sections['common']:
-            pertinent_sections['common'].remove(EVALUATION_KEY)
 
         for common_section in pertinent_sections['common']:
             sections.append(self._get_section_cms(common_egy, common_section, language))
@@ -143,7 +138,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     def _get_correct_label_name(egy, section):
         if section == INTRODUCTION:
             return 'intro-' + egy.partial_acronym.lower()
-        elif 'common' in egy.acronym and section != EVALUATION_KEY:
+        elif 'common' in egy.acronym:
             return section + '-commun'
         return section
 
