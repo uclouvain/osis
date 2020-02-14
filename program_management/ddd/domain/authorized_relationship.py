@@ -56,9 +56,10 @@ class AuthorizedRelationshipList:
     def __init__(self, authorized_relationships: List[AuthorizedRelationship]):
         assert authorized_relationships, "You must set at least 1 authorized relation (list can't be empty)"
         assert isinstance(authorized_relationships, list)
+        assert isinstance(authorized_relationships[0], AuthorizedRelationship)
         self.authorized_relationships = authorized_relationships
 
-    def __get_authorized_relationship(self, parent_node: Node, child_node: Node) -> AuthorizedRelationship:
+    def _get_authorized_relationship(self, parent_node: Node, child_node: Node) -> AuthorizedRelationship:
         return next(
             (
                 auth_rel for auth_rel in self.authorized_relationships
@@ -78,17 +79,15 @@ class AuthorizedRelationshipList:
         )
 
     def is_minimum_children_types_reached(self, parent_node: Node, child_node: Node):
-        auth_relation = self.__get_authorized_relationship(parent_node, child_node)
-        if not auth_relation:
-            return True
+        if not self.is_authorized(parent_node, child_node):
+            return False
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
-        return current_count == auth_relation.min_constraint
+        return current_count == self._get_authorized_relationship(parent_node, child_node).min_constraint
 
     def is_maximum_children_types_reached(self, parent_node: Node, child_node: Node):
-        auth_relation = self.__get_authorized_relationship(parent_node, child_node)
-        if not auth_relation:
-            return True
+        if not self.is_authorized(parent_node, child_node):
+            return False
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
-        return current_count == auth_relation.max_constraint
+        return current_count == self._get_authorized_relationship(parent_node, child_node).max_constraint

@@ -115,8 +115,103 @@ class TestGetAuthorizedChildrenTypes(TestCase):
         cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
 
     def test_result_is_a_set_instance(self):
-        error_msg = """Useful for performance"""
+        error_msg = """Using a set() for performance"""
         result = self.auth_relations.get_authorized_children_types(self.authorized_parent)
         self.assertIsInstance(result, set, error_msg)
 
-    # def test_
+    def test_when_child_type_unauthorized(self):
+        parent_without_authorized_children = NodeGroupYearFactory(node_type=TrainingType.ACCESS_CONTEST)
+        result = self.auth_relations.get_authorized_children_types(parent_without_authorized_children)
+        self.assertEqual(set(), result)
+
+    def test_when_child_type_authorized(self):
+        result = self.auth_relations.get_authorized_children_types(self.authorized_parent)
+        expected_result = {
+            self.authorized_child.node_type
+        }
+        self.assertSetEqual(expected_result, result)
+
+    def test_when_multiple_children_authorized(self):
+        another_authorized_relation = AuthorizedRelationshipFactory(
+            parent_type=TrainingType.BACHELOR, child_type=GroupType.SUB_GROUP
+        )
+        authorized_relations = AuthorizedRelationshipList([self.auth_relation, another_authorized_relation])
+        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        result = authorized_relations.get_authorized_children_types(self.authorized_parent)
+        expected_result = {
+            self.authorized_child.node_type,
+            another_authorized_child.node_type
+        }
+        self.assertSetEqual(expected_result, result)
+
+
+class TestIsMinimumChildrenTypesReached(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.auth_relation = AuthorizedRelationshipFactory(
+            parent_type=TrainingType.BACHELOR,
+            child_type=GroupType.COMMON_CORE,
+            min_constraint=1
+        )
+        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
+        cls.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+
+    def test_when_relation_is_not_authorized(self):
+        unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
+        result = self.auth_relations.is_minimum_children_types_reached(self.authorized_parent, unauthorized_child)
+        self.assertFalse(result)
+
+    def test_when_parent_has_no_children_yet(self):
+        another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        self.assertEqual([], another_authorized_parent.children)
+        result = self.auth_relations.is_minimum_children_types_reached(another_authorized_parent, self.authorized_child)
+        self.assertFalse(result)
+
+    def test_when_parent_has_children_but_minimum_is_not_reached(self):
+        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        self.authorized_parent.add_child(another_authorized_child)
+        result = self.auth_relations.is_minimum_children_types_reached(self.authorized_parent, another_authorized_child)
+        self.assertFalse(result)
+
+    def test_when_minimum_is_reached(self):
+        self.authorized_parent.add_child(self.authorized_child)
+        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+        result = self.auth_relations.is_minimum_children_types_reached(self.authorized_parent, another_authorized_child)
+        self.assertTrue(result)
+
+
+class TestIsMaximumChildrenTypesReached(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.auth_relation = AuthorizedRelationshipFactory(
+            parent_type=TrainingType.BACHELOR,
+            child_type=GroupType.COMMON_CORE,
+            max_constraint=1
+        )
+        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
+        cls.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+
+    def test_when_relation_is_not_authorized(self):
+        unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
+        result = self.auth_relations.is_maximum_children_types_reached(self.authorized_parent, unauthorized_child)
+        self.assertFalse(result)
+
+    def test_when_parent_has_no_children_yet(self):
+        another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        self.assertEqual([], another_authorized_parent.children)
+        result = self.auth_relations.is_maximum_children_types_reached(another_authorized_parent, self.authorized_child)
+        self.assertFalse(result)
+
+    def test_when_parent_has_children_but_maximum_is_not_reached(self):
+        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        self.authorized_parent.add_child(another_authorized_child)
+        result = self.auth_relations.is_maximum_children_types_reached(self.authorized_parent, another_authorized_child)
+        self.assertFalse(result)
+
+    def test_when_maximum_is_reached(self):
+        self.authorized_parent.add_child(self.authorized_child)
+        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+        result = self.auth_relations.is_maximum_children_types_reached(self.authorized_parent, another_authorized_child)
+        self.assertTrue(result)

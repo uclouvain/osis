@@ -93,7 +93,7 @@ class Node:
         return list_child_nodes_types
 
     @property
-    def descendents(self):
+    def descendents(self):   # TODO :: add unit tests
         return _get_descendents(self)
 
     def add_child(self, node, **kwargs):
