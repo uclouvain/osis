@@ -55,7 +55,6 @@ from program_management.business.group_element_years.group_element_year_tree imp
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.business.excel import clean_worksheet_title
-from base.models.enums.education_group_types import TrainingType, GroupType
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
