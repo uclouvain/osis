@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import Counter
 from typing import List
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum

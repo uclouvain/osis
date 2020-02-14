@@ -77,7 +77,7 @@ class TestAttachNodeView(TestCase):
         root_node.add_child(subgroup)
         return ProgramTree(root_node)
 
-    def test_valid_http_method_when_user_is_not_logged(self):
+    def test_allowed_http_method_when_user_is_not_logged(self):
         self.client.logout()
 
         allowed_method = ['get', 'post']

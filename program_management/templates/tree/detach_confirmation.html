@@ -26,15 +26,21 @@
 <div class="modal-content" id="form-modal-content">
     <div id="form-modal-body" class="modal-body">
         {% include 'template_messages.html' %}
-        <form method="post" id="form_detach_confirm" action="{{ request.get_full_path }}">
-            {% csrf_token %}
-            {{ form }}
-        </form>
+        {% if form %}
+            <form method="post" id="form_detach_confirm" action="{{ request.get_full_path }}">
+                {% csrf_token %}
+                {{ form }}
+            </form>
 
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-            <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
-                   onclick="$('#form_detach_confirm').submit();"/>
-        </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
+                       onclick="$('#form_detach_confirm').submit();"/>
+            </div>
+        {% else %}
+             <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+             </div>
+        {% endif %}
     </div>
 </div>

@@ -23,33 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import FormView
+from typing import List
 
-from base.views.mixins import AjaxTemplateMixin
-from program_management.ddd.repositories import fetch_tree
-from program_management.forms.tree.detach import DetachNodeForm
+from program_management.ddd.contrib.validation import BusinessValidationMessage
+from program_management.ddd.domain.program_tree import ProgramTree
 
 
-class DetachNodeView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
-    template_name = "tree/detach_confirmation.html"
-    form_class = DetachNodeForm
-
-    def get_form_kwargs(self):
-        return {
-            **super().get_form_kwargs(),
-            'tree': fetch_tree.fetch(self.kwargs['root_id']),
-        }
-
-    def get_initial(self):
-        return {
-            **super().get_initial(),
-            'path': self.request.GET.get('path')
-        }
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return ""
+def detach_node(tree: ProgramTree, path: str = None) -> List[BusinessValidationMessage]:
+    return tree.detach_node(path)
