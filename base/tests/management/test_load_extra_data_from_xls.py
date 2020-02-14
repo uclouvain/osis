@@ -28,7 +28,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from base.management.commands import load_extra_data_from_xls
+from osis_common.management.commands import load_extra_data_from_xls
 from base.models.entity import Entity
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
