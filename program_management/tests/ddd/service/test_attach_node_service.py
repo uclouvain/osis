@@ -32,7 +32,6 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.contrib.validation import MessageLevel, BusinessValidationMessage
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
-from program_management.ddd.validators import _validator_groups
 from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
 from program_management.ddd.validators.authorized_relationship import AttachAuthorizedRelationshipValidator
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -49,6 +48,14 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         cls.tree = ProgramTreeFactory(root_node=cls.root_node)
         cls.root_path = str(cls.root_node.node_id)
         cls.node_to_attach = NodeEducationGroupYearFactory()
+
+    def setUp(self):
+        self._path_save_tree()
+
+    def _path_save_tree(self):
+        patcher_save = patch("program_management.ddd.repositories.save_tree.save")
+        self.addCleanup(patcher_save.stop)
+        self.mock_save = patcher_save.start()
 
     @patch.object(program_tree.ProgramTree, 'attach_node')
     def test_when_attach_node_action_is_valid(self, mock_attach_node):
@@ -99,3 +106,10 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].message, _('Success message'))
         self.assertEqual(result[0].level, MessageLevel.SUCCESS)
+
+    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
+    def test_save_tree_is_called(self, mock_fetch):
+        self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
+        attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        self.assertTrue(mock_fetch.called)
+        self.assertTrue(self.mock_save.called)

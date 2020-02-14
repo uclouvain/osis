@@ -29,7 +29,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.contrib.validation import BusinessValidationMessage
 from program_management.ddd.domain.node import Node
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.repositories import fetch_tree
+from program_management.ddd.repositories import fetch_tree, save_tree
 from program_management.ddd.validators.authorized_relationship import AttachAuthorizedRelationshipValidator
 
 
@@ -37,7 +37,9 @@ def attach_node(tree: ProgramTree, node: Node, path: str = None, **link_attribut
     error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
     if error_messages:
         return error_messages
-    return tree.attach_node(node, path, **link_attributes)
+    success_messages = tree.attach_node(node, path, **link_attributes)
+    save_tree.save(tree)
+    return success_messages
 
 
 def __validate_trees_using_node_as_reference_link(
