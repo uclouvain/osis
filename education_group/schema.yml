@@ -704,6 +704,8 @@ components:
           format: uri
         acronym:
           type: string
+        code:
+          type: string
         title:
           type: string
         node_type:

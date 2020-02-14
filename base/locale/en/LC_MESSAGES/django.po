@@ -7,7 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 11:29+0100\n"
+"POT-Creation-Date: 2020-02-04 11:14+0100\n"
+
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,6 +83,10 @@ msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
+msgstr ""
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
 msgstr ""
 
 #, python-format
@@ -2416,6 +2421,9 @@ msgid "Success"
 msgstr ""
 
 msgid "Summary course submission"
+msgstr ""
+
+msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
 
 msgid "Suppression"
