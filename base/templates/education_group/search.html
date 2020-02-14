@@ -146,9 +146,9 @@
                                 {% csrf_token %}
                                 <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
-                            <span  style="margin-right: 10px">
-                                {% pagination_size_select %}
-                            </span>
+                            <div class="pull-right" style="margin-right: 10px">
+                                {% base_pagination_size_select %}
+                            </div>
                         </div>
 
                     </div>
