@@ -55,6 +55,7 @@ from program_management.business.group_element_years.group_element_year_tree imp
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.business.excel import clean_worksheet_title
+from base.models.enums.education_group_types import TrainingType, GroupType
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -127,7 +128,10 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 
     def __init__(self, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
         self.egy = egy
-        self.hierarchy = EducationGroupHierarchy(root=self.egy)
+
+        exclude_options = True if self.egy.is_master120 or self.egy.is_master180 else False
+
+        self.hierarchy = EducationGroupHierarchy(root=self.egy, exclude_options=exclude_options)
         self.learning_unit_years_parent = []
 
         for grp in self.hierarchy.included_group_element_years:
