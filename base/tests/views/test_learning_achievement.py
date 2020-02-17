@@ -253,8 +253,8 @@ class TestLearningAchievementActions(TestCase):
         msg = self._test_learning_achievement_save()
         expected_msg = "{}. {}.".format(
             _("The learning unit has been updated"),
-            _("The learning unit is in proposal, the report from %(year)s will be done at consolidation") % {
-                'year': self.luy.proposallearningunit.learning_unit_year.academic_year
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': self.luy.proposallearningunit.learning_unit_year.academic_year
             }
         )
         self.assertEqual(msg[0].get('message'), expected_msg)

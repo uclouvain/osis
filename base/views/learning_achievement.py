@@ -27,7 +27,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.achievement import get_anchor_reference, DELETE, DOWN, UP, \
@@ -35,10 +34,9 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
-from base.views.learning_unit import learning_unit_specifications
+from base.views.learning_unit import learning_unit_specifications, build_postponement_success_message
 from base.views.learning_units import perms
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
@@ -61,11 +59,11 @@ def operation(request, learning_achievement_id, operation_str):
     last_academic_year = execute_operation(filtered_achievements, operation_str)
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
         display_success_messages(
-            request, _build_postponement_success_message(None, lu_yr_id)
+            request, build_postponement_success_message(None, lu_yr_id)
         )
     else:
         display_success_messages(
-            request, _build_postponement_success_message(last_academic_year, lu_yr_id)
+            request, build_postponement_success_message(last_academic_year, lu_yr_id)
         )
 
     return HttpResponseRedirect(reverse(learning_unit_specifications,
@@ -208,38 +206,12 @@ def _save_and_redirect(request, form, learning_unit_year_id):
     achievement, last_academic_year = form.save()
     display_success_messages(
         request,
-        _build_postponement_success_message(
+        build_postponement_success_message(
             last_academic_year,
             learning_unit_year_id
         )
     )
     return HttpResponse()
-
-
-def _build_postponement_success_message(last_academic_year=None, learning_unit_year_id=None):
-    default_msg = _("The learning unit has been updated")
-    luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
-    proposal = ProposalLearningUnit.objects.filter(
-        learning_unit_year__learning_unit=luy.learning_unit
-    ).first()
-
-    if not proposal and last_academic_year:
-        msg = "{} {}.".format(
-            default_msg, _("and postponed until %(year)s") % {
-                'year': last_academic_year
-            }
-        )
-    elif proposal:
-        msg = "{}. {}.".format(
-            default_msg,
-            _("The learning unit is in proposal, the report from %(year)s will be done at consolidation") % {
-                'year': proposal.learning_unit_year.academic_year
-            }
-        )
-    else:
-        msg = "{}.".format(default_msg)
-
-    return msg
 
 
 @login_required
