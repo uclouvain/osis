@@ -169,7 +169,7 @@
 
         })();
 
-        gantt.config.tooltip_hide_timeout = 500;
+        gantt.config.tooltip_hide_timeout = 2500;
         gantt.templates.tooltip_text = function(start,end,task){
             days = task.duration + 1; // include end_date in duration
             if(days <= 1){
