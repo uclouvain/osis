@@ -59,13 +59,14 @@ def operation(request, learning_achievement_id, operation_str):
     anchor = get_anchor_reference(operation_str, achievement_fr)
     filtered_achievements = list(filter(None, [achievement_fr, achievement_en]))
     last_academic_year = execute_operation(filtered_achievements, operation_str)
-    default_success_msg = _("Operation on learning achievement has been successfully completed")
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
-        display_success_messages(request, _build_postponement_success_message(default_success_msg, None, lu_yr_id))
+        display_success_messages(
+            request, _build_postponement_success_message(None, lu_yr_id)
+        )
     else:
-        display_success_messages(request, _build_postponement_success_message(default_success_msg,
-                                                                              last_academic_year,
-                                                                              lu_yr_id))
+        display_success_messages(
+            request, _build_postponement_success_message(last_academic_year, lu_yr_id)
+        )
 
     return HttpResponseRedirect(reverse(learning_unit_specifications,
                                         kwargs={'learning_unit_year_id': lu_yr_id}) + anchor)
@@ -208,7 +209,6 @@ def _save_and_redirect(request, form, learning_unit_year_id):
     display_success_messages(
         request,
         _build_postponement_success_message(
-            _("Learning achievement content has been successfully saved"),
             last_academic_year,
             learning_unit_year_id
         )
@@ -216,15 +216,30 @@ def _save_and_redirect(request, form, learning_unit_year_id):
     return HttpResponse()
 
 
-def _build_postponement_success_message(default_msg, last_academic_year=None, learning_unit_year_id=None):
-    msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+def _build_postponement_success_message(last_academic_year=None, learning_unit_year_id=None):
+    default_msg = _("The learning unit has been updated")
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
-    if luy and ProposalLearningUnit.objects. \
-            filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
-        msg = "{}. {}".format(msg, _("It will be done at the consolidation"))
-    return msg % {
-        'year': last_academic_year
-    }
+    proposal = ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=luy.learning_unit
+    ).first()
+
+    if not proposal and last_academic_year:
+        msg = "{} {}.".format(
+            default_msg, _("and postponed until %(year)s") % {
+                'year': last_academic_year
+            }
+        )
+    elif proposal:
+        msg = "{}. {}.".format(
+            default_msg,
+            _("The learning unit is in proposal, the report from %(year)s will be done at consolidation") % {
+                'year': proposal.learning_unit_year.academic_year
+            }
+        )
+    else:
+        msg = "{}.".format(default_msg)
+
+    return msg
 
 
 @login_required

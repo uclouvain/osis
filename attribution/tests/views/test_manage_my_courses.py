@@ -29,7 +29,6 @@ from unittest.mock import patch
 
 from django.contrib import messages
 from django.contrib.auth.models import Permission
-from django.contrib.messages import get_messages
 from django.http import HttpResponse, HttpResponseNotFound
 from django.test import RequestFactory
 from django.test import TestCase
@@ -51,6 +50,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.utils.get_messages import get_messages_from_response
 from osis_common.utils.perms import BasePerm
 
 
@@ -135,7 +135,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertEqual(error.errors[0], _("Not in period to edit description fiche."))
 
-        msg = [{'message': m.message, 'level': m.level} for m in get_messages(response.wsgi_request)]
+        msg = get_messages_from_response(response)
         self.assertEqual(
             msg[0].get('message'),
             _('For the academic_year %(data_year)s, the summary edition period is ended since %(end_date)s.') % {
