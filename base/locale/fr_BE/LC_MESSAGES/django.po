@@ -3363,7 +3363,7 @@ msgstr "numéro de l'attendu"
 
 #, python-format
 msgid "and postponed until %(year)s"
-msgstr "et reporté jusque %(year)s"
+msgstr "et reportée jusque %(year)s"
 
 msgid "at"
 msgstr "à"
