@@ -104,10 +104,10 @@ def _post_learning_unit_pedagogy_form(request):
 
 
 def build_success_message(last_luy_reported, luy):
-    default_message = "The learning unit has been updated"
+    default_message = _("The learning unit has been updated")
     if last_luy_reported and is_pedagogy_data_must_be_postponed(luy):
         msg = "{} {}.".format(
-            _(default_message),
+            default_message,
             _("and postponed until %(year)s") % {
                 "year": last_luy_reported.academic_year
             }
