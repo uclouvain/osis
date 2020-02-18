@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 import json
+import urllib
 from collections import namedtuple, defaultdict
 
 from ckeditor.widgets import CKEditorWidget
@@ -192,7 +193,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
         search_query_string = self.request.GET.get("search_query", None)
         if search_query_string:
-            self.update_context_with_navigation_elements(search_query_string, context)
+            unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
+            self.update_context_with_navigation_elements(unquoted_search_query_string, context)
         return context
 
     @staticmethod

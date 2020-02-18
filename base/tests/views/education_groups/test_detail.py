@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import urllib
 from http import HTTPStatus
 
 import reversion
@@ -181,8 +182,10 @@ class EducationGroupRead(TestCase):
 
     def test_navigation(self):
         query_parameters = QueryDict(mutable=True)
-        query_parameters["search_query"] = 'academic_year={academic_year}&ordering=acronym&index=0'.format(
-            academic_year=self.education_group_child_1.academic_year.id
+        query_parameters["search_query"] = urllib.parse.quote_plus(
+            'academic_year={academic_year}&ordering=acronym&index=0'.format(
+                academic_year=self.education_group_child_1.academic_year.id
+            )
         )
         response = self.client.get(self.url, data=query_parameters)
 
