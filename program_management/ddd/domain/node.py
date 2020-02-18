@@ -76,11 +76,11 @@ class Node:
         return self.node_id
 
     @property
-    def all_children_as_nodes(self):  # TODO :: typing -> Set[Node]
+    def get_all_children_as_nodes(self):  # TODO :: typing -> Set[Node]
         result = set()
         for link in self.children:
             child = link.child
-            result |= child.all_children_as_nodes
+            result |= child.get_all_children_as_nodes()
             result.add(link.child)
         return result
 
