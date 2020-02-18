@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-29 14:57+0100\n"
+"POT-Creation-Date: 2020-02-11 11:00+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -92,6 +92,9 @@ msgstr ""
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
 "Une unité d'enseignement ne peut pas être un prérequis à elle-même : %(acronym)s"
+
+msgid "Absolute credits"
+msgstr "Crédits absolus"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -197,6 +200,9 @@ msgstr "Elément sélectionné %(element)s"
 msgid "English comment"
 msgstr "Commentaire anglais"
 
+msgid "Evaluation methods"
+msgstr "Mode d'évaluation des acquis des étudiants"
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -278,8 +284,14 @@ msgstr ""
 msgid "No result!"
 msgstr "Aucun résultat!"
 
+msgid "Non-mandatory"
+msgstr "Facultatif"
+
 msgid "Official"
 msgstr "Officiel"
+
+msgid "Online resources"
+msgstr "Ressources en ligne"
 
 msgid ""
 "Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
@@ -315,6 +327,9 @@ msgstr[1] ""
 msgid "Optional"
 msgstr "Au choix"
 
+msgid "Other informations"
+msgstr "Autres informations"
+
 msgid "Paste"
 msgstr "Coller"
 
@@ -329,6 +344,9 @@ msgstr "Veuillez copier ou couper un élément avant de le coller"
 
 msgid "Please select an item before adding it"
 msgstr "Veuillez sélectionner un élément avant de l'ajouter"
+
+msgid "Pre-condition"
+msgstr "Préalable"
 
 msgid "Prerequisite"
 msgid_plural "Prerequisites"
@@ -347,6 +365,9 @@ msgstr "NOMA"
 msgid "Registration form for the content of"
 msgstr "Formulaire d'inscription au contenu de"
 
+msgid "Relative credits"
+msgstr "Crédits relatifs"
+
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -358,6 +379,9 @@ msgstr "Coordonnées de l'étudiant.e"
 
 msgid "Student's signature"
 msgstr "Signature de l'étudiant.e"
+
+msgid "Teaching methods"
+msgstr "Méthodes d'enseignement"
 
 #, python-format
 msgid "The %(acronym)s has been moved"
@@ -433,6 +457,9 @@ msgstr "La racine n'existe pas dans l'année academique suivante."
 
 msgid "The user is not allowed to change education group content."
 msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
+
+msgid "Themes discussed"
+msgstr "Thèmes abordés"
 
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
@@ -522,6 +549,9 @@ msgstr "a comme prérequis"
 
 msgid "has the following prerequisites"
 msgstr "a des prérequis"
+
+msgid "in English"
+msgstr "en anglais"
 
 msgid "is a prerequisite of"
 msgstr "est un prérequis de"

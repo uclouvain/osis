@@ -29,8 +29,7 @@ from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import search, find_with_enrollments_count
-from base.models.enums import education_group_categories, duration_unit
-from base.models.enums import offer_enrollment_state
+from base.models.enums import education_group_categories, duration_unit, offer_enrollment_state, education_group_types
 from base.models.enums.constraint_type import CREDITS
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.validation_rule import ValidationRule
@@ -62,6 +61,11 @@ class EducationGroupYearTest(TestCase):
 
         cls.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
 
+        cls.education_group_type_finality = EducationGroupTypeFactory(
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.MASTER_MD_120.name
+        )
+
         cls.education_group_year_1 = EducationGroupYearFactory(academic_year=cls.academic_year,
                                                                education_group_type=cls.education_group_type_training)
         cls.education_group_year_2 = EducationGroupYearFactory(
@@ -76,6 +80,19 @@ class EducationGroupYearTest(TestCase):
                                                                education_group_type=cls.education_group_type_group)
         cls.education_group_year_6 = EducationGroupYearFactory(academic_year=cls.academic_year,
                                                                education_group_type=cls.education_group_type_training)
+        cls.education_group_year_MD = EducationGroupYearFactory(academic_year=cls.academic_year,
+                                                                education_group_type=cls.education_group_type_finality,
+                                                                title="Complete title",
+                                                                partial_title="Partial title",
+                                                                title_english="Complete title in English",
+                                                                partial_title_english="Partial title  in English",
+                                                                )
+        cls.education_group_year_MD_no_partial_title = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type=cls.education_group_type_finality,
+            partial_title="",
+            partial_title_english="",
+            )
 
         cls.educ_group_year_domain = EducationGroupYearDomainFactory(education_group_year=cls.education_group_year_2)
 
@@ -216,6 +233,25 @@ class EducationGroupYearTest(TestCase):
         self.assertFalse(self.education_group_year_4.is_mini_training())
         self.assertFalse(self.education_group_year_5.is_mini_training())
         self.assertFalse(self.education_group_year_6.is_mini_training())
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'),  ], LANGUAGE_CODE='fr-be')
+    def test_verbose_title_fr(self):
+        self.assertEqual(self.education_group_year_MD.verbose_title, self.education_group_year_MD.partial_title)
+        self.assertEqual(self.education_group_year_1.verbose_title, self.education_group_year_1.title)
+
+    @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
+    def test_verbose_title_en(self):
+        self.assertEqual(self.education_group_year_MD.verbose_title, self.education_group_year_MD.partial_title_english)
+        self.assertEqual(self.education_group_year_1.verbose_title,
+                         self.education_group_year_1.title_english or self.education_group_year_1.title)
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ], LANGUAGE_CODE='fr-be')
+    def test_verbose_title_fr_partial_title_empty(self):
+        self.assertEqual(self.education_group_year_MD_no_partial_title.verbose_title, "")
+
+    @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
+    def test_verbose_title_en_partial_title_empty(self):
+        self.assertEqual(self.education_group_year_MD_no_partial_title.verbose_title, "")
 
 
 class EducationGroupYearCleanTest(TestCase):
