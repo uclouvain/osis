@@ -50,8 +50,6 @@ factory = NodeFactory()
 class Node:
 
     acronym = None
-    children = None  # TODO :: typing :: children: List[Link] = None
-    node_type = None  # TODO :: rename to 'type'
     year = None
 
     def __init__(self, node_id: int, node_type: EducationGroupTypesEnum = None, children: List[Link] = None):
@@ -70,9 +68,21 @@ class Node:
     def __str__(self):
         return '%(acronym)s (%(year)s)' % {'acronym': self.acronym, 'year': self.year}
 
+    def __repr__(self):
+        return str(self)
+
     @property
     def pk(self):
         return self.node_id
+
+    @property
+    def all_children_as_nodes(self):  # TODO :: typing -> Set[Node]
+        result = set()
+        for link in self.children:
+            child = link.child
+            result |= child.all_children_as_nodes
+            result.add(link.child)
+        return result
 
     @property
     def children_as_nodes(self):   # TODO :: typing -> List[Node]

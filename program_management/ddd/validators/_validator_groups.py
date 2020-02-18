@@ -32,6 +32,7 @@ from program_management.ddd.validators.attach_finality_end_date import \
 from program_management.ddd.validators.attach_option import AttachOptionsValidator
 from program_management.ddd.validators.authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators.infinite_recursivity import InfiniteRecursivityValidator
 from program_management.ddd.validators.minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators.node_duplication import NodeDuplicationValidator
@@ -56,6 +57,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AttachFinalityEndDateValidator,
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
+                InfiniteRecursivityValidator,
             ]
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
@@ -65,6 +67,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AuthorizedRelationshipLearningUnitValidator,
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
+                InfiniteRecursivityValidator,
             ]
 
         else:

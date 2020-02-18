@@ -31,10 +31,6 @@ from django.utils.translation import gettext as _
 
 class AuthorizedRelationshipValidator(BusinessValidator):
 
-    tree = None
-    node_to_add = None
-    parent = None
-
     def __init__(self, tree: ProgramTree, node_to_add: node.Node, position_to_add: node.Node):
         super(AuthorizedRelationshipValidator, self).__init__()
         self.tree = tree

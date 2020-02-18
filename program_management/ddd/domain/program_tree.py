@@ -29,12 +29,13 @@ from program_management.ddd.domain import node
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
 
 
+PATH_SEPARATOR = '|'
+
+
 class ProgramTree:
 
     root_node = None
     authorized_relationships = None
-
-    read_only = False  # TODO :: ??? Used to perform validations on actions without executing the action ???
 
     # TODO :: load authorized_relationship into the __init__ ? (not use it as kwarg?)
     def __init__(self, root_node: node.Node, authorized_relationships: AuthorizedRelationshipList = None):
@@ -53,6 +54,17 @@ class ProgramTree:
             for link in tree_node.children:
                 if link.child == child_node and link.is_reference:
                     result.append(link.parent)
+        return result
+
+    # TODO :: unit test + RecursionError
+    def get_parents(self, path: str) -> List[node.Node]:
+        result = []
+        str_nodes = path.split(PATH_SEPARATOR)
+        if len(str_nodes) > 1:
+            result.append(self.get_node(path))
+            result += self.get_parents(PATH_SEPARATOR.join(str_nodes[:-1]))
+        else:
+            result.append(self.get_node(str_nodes[0]))
         return result
 
     # TODO :: typer "path" (pour plus de lisibilité dans le code)
@@ -105,15 +117,19 @@ class ProgramTree:
         :param path: The path node to detach
         :return:
         """
-        parent_path, *node_id = path.rsplit('|', 1)
+        parent_path, *node_id = path.rsplit(PATH_SEPARATOR, 1)
         parent = self.get_node(parent_path)
         if not node_id:
             raise Exception("You cannot detach root node")
         parent.detach_child(node_id)
 
 
-def _nodes_from_root(root: node.Node):
+def _nodes_from_root(root: node.Node):  # TODO :: reuse Node.all_children_as_nodes
     nodes = [root]
     for link in root.children:
         nodes.extend(_nodes_from_root(link.child))
     return nodes
+
+
+def build_path(*nodes):  # TODO : unit test
+    return '{}'.format(PATH_SEPARATOR).join((str(n.node_id) for n in nodes))
