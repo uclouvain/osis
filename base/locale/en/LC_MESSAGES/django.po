@@ -109,9 +109,6 @@ msgid ""
 "%(year)s"
 msgstr ""
 
-msgid "'^' Means starts with. '$' Means ends by."
-msgstr ""
-
 msgid "1st quadri"
 msgstr ""
 
