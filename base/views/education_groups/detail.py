@@ -201,9 +201,23 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         index = int(search_parameters["index"])
         qs = EducationGroupFilter(data=search_parameters).qs
 
-        context["next_element"] = qs[index + 1] if index >= 0 else None
-        context["previous_element"] = qs[index - 1] if index < 0 else None
+        context["next_element"] = EducationGroupGenericDetailView.get_next_element(qs, index)
+        context["previous_element"] = EducationGroupGenericDetailView.get_previous_element(qs, index)
         context["index"] = index
+
+    @staticmethod
+    def get_next_element(qs, index):
+        try:
+            return qs[index + 1] if index >= 0 else None
+        except IndexError:
+            return None
+
+    @staticmethod
+    def get_previous_element(qs, index):
+        try:
+            return qs[index - 1] if index < 0 else None
+        except IndexError:
+            return None
 
     def get(self, request, *args, **kwargs):
         default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])

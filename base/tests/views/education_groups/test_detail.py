@@ -194,6 +194,10 @@ class EducationGroupRead(TestCase):
         self.assertIsNone(
             context["previous_element"]
         )
+        self.assertEqual(
+            context["index"],
+            0
+        )
 
 
 class TestReadEducationGroup(TestCase):
@@ -389,6 +393,25 @@ class TestReadEducationGroup(TestCase):
         response = self.client.get(url)
 
         self.assertTrue(response.context['show_general_information'])
+
+    def test_navigation(self):
+        group = GroupFactory()
+        url = reverse("education_group_read", args=[group.pk, group.pk])
+        query_parameters = QueryDict(mutable=True)
+        query_parameters["search_query"] = 'ordering=acronym&index=0'
+        response = self.client.get(url, data=query_parameters)
+
+        context = response.context
+        self.assertIsNone(
+            context["next_element"]
+        )
+        self.assertIsNone(
+            context["previous_element"]
+        )
+        self.assertEqual(
+            context["index"],
+            0
+        )
 
 
 class EducationGroupDiplomas(TestCase):
