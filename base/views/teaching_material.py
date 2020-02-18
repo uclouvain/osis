@@ -26,16 +26,15 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units import perms
-from base.business.learning_units.pedagogy import delete_teaching_material, is_pedagogy_data_must_be_postponed
+from base.business.learning_units.pedagogy import delete_teaching_material
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import display_success_messages
+from base.views.learning_units.pedagogy import update as update_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
 
 
@@ -84,7 +83,7 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
     if request.method == 'POST':
         last_luy_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last()
         delete_teaching_material(teach_material)
-        display_success_messages(request, _build_success_message(last_luy_reported, learning_unit_yr))
+        display_success_messages(request, update_pedagogy.build_success_message(last_luy_reported, learning_unit_yr))
         return JsonResponse({})
     return render(request, "learning_unit/teaching_material/modal_delete.html", {})
 
@@ -92,30 +91,6 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
 def _save_and_return_response(request, form, learning_unit_year):
     form.save(learning_unit_year=learning_unit_year)
     last_luy_reported = learning_unit_year.find_gt_learning_units_year().last()
-    display_success_messages(request, _build_success_message(last_luy_reported, learning_unit_year))
+    display_success_messages(request, update_pedagogy.build_success_message(last_luy_reported, learning_unit_year))
     return JsonResponse({})
 
-
-def _build_success_message(last_luy_reported, learning_unit_year):
-    default_message = "The learning unit has been updated"
-    if last_luy_reported and is_pedagogy_data_must_be_postponed(learning_unit_year):
-        msg = "{} {}.".format(
-            _(default_message),
-            _("and postponed until %(year)s") % {
-                "year": last_luy_reported.academic_year
-            }
-        )
-    else:
-        msg = "{}.".format(default_message)
-        proposal = ProposalLearningUnit.objects.filter(
-            learning_unit_year__learning_unit=learning_unit_year.learning_unit
-        ).first()
-        if proposal:
-            msg = "{} {}.".format(
-                msg,
-                _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
-                  "consolidation") % {
-                    'proposal_year': proposal.learning_unit_year.academic_year
-                }
-            )
-    return msg

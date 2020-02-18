@@ -80,7 +80,7 @@ class TeachingMaterialCreateTestCase(TestCase):
         self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
-    @mock.patch('base.views.teaching_material.is_pedagogy_data_must_be_postponed')
+    @mock.patch('base.views.learning_units.pedagogy.update.is_pedagogy_data_must_be_postponed')
     def test_create_teaching_material_successfull_post_without_postponement(
             self, mock_is_pedagogy_data_must_be_postponed, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
