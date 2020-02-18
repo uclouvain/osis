@@ -107,7 +107,7 @@ class ProgramTree:
 
     def clean_attach_node(self, node, path):
         # Avoid circular import
-        from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
+        from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
         validator = AttachNodeValidatorList(self, node, path)
         return validator.is_valid(), validator.messages
 

@@ -29,7 +29,7 @@ from program_management.ddd.contrib.validation import MessageLevel
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import Node, NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 

@@ -32,7 +32,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.contrib.validation import MessageLevel, BusinessValidationMessage
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
-from program_management.ddd.validators._validator_groups import AttachNodeValidatorList
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.ddd.validators.authorized_relationship import AttachAuthorizedRelationshipValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
