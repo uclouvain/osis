@@ -30,9 +30,9 @@ from django.test import TestCase
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.validators.authorized_relationship import AuthorizedRelationshipValidator, \
+from program_management.ddd.validators._authorized_relationship import AuthorizedRelationshipValidator, \
     AttachAuthorizedRelationshipValidator, DetachAuthorizedRelationshipValidator
-from program_management.ddd.validators.infinite_recursivity import InfiniteRecursivityValidator
+from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityValidator
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory

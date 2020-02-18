@@ -30,7 +30,7 @@ from program_management.ddd.contrib.validation import BusinessValidationMessage
 from program_management.ddd.domain.node import Node
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import fetch_tree, save_tree
-from program_management.ddd.validators.authorized_relationship import AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
 
 
 def attach_node(

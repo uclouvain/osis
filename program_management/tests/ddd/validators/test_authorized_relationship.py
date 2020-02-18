@@ -29,7 +29,7 @@ from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
-from program_management.ddd.validators.authorized_relationship import AuthorizedRelationshipValidator, \
+from program_management.ddd.validators._authorized_relationship import AuthorizedRelationshipValidator, \
     AttachAuthorizedRelationshipValidator, DetachAuthorizedRelationshipValidator
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
