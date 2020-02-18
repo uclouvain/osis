@@ -27,22 +27,28 @@ from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain.node import Node
 from program_management.ddd.domain.program_tree import ProgramTree
 
 
 class AttachFinalityEndDateValidator(BusinessValidator):
+    """
+    In context of 2M, when we add a finality [or group which contains finality], we must ensure that
+    the end date of all 2M is greater or equals of all finalities.
+    """
 
-    def __init__(self, tree: ProgramTree, node_to_add: Node, *args):
+    def __init__(self, tree: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
         super(AttachFinalityEndDateValidator, self).__init__()
-        assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-        assert tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
-        self.node_to_add = node_to_add
+        msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
+        assert isinstance(tree_from_node_to_add, ProgramTree), msg  # TODO :: déplacer les asserts dans le validate() -> c'est une validation métier ? (ce qui signifie qu'on ne pourrait pas faire de déplacement d'options en dehors du contexte 2M)
+        self.node_to_add = tree_from_node_to_add.root_node
+        if self._get_all_finality_nodes():
+            assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
+            assert tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
         self.tree = tree
 
     def validate(self):
         if self._get_all_finality_nodes():
-            inconsistent_nodes = self._get_acronyms_where_end_date_differs_from_root()
+            inconsistent_nodes = self._get_acronyms_where_end_date_gte_root_end_date()
             if inconsistent_nodes:
                 self.add_error_message(
                     ngettext(
@@ -55,15 +61,15 @@ class AttachFinalityEndDateValidator(BusinessValidator):
                     }
                 )
 
-    def _get_all_finality_nodes(self):
+    def _get_all_finality_nodes(self):  # TODO :: déplacer dans ProgramTree en tant qu'attr ?
         all_finalities = set()
         finality_types = set(TrainingType.finality_types_enum())
         if self.node_to_add.node_type in finality_types:
             all_finalities.add(self.node_to_add)
-        return all_finalities | self.node_to_add.get_all_children_as_nodes(types=finality_types)
+        return all_finalities | self.node_to_add.get_all_children_as_nodes(filter_types=finality_types)
 
-    def _get_acronyms_where_end_date_differs_from_root(self):
+    def _get_acronyms_where_end_date_gte_root_end_date(self):
         return [
             finality.acronym for finality in self._get_all_finality_nodes()
-            if finality.end_date != self.tree.root_node.end_date
+            if finality.end_date > self.tree.root_node.end_date
         ]

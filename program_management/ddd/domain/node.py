@@ -82,14 +82,20 @@ class Node:
     def pk(self):
         return self.node_id
 
-    def get_all_children_as_nodes(self, types: Set[EducationGroupTypesEnum] = None):  # TODO :: typing -> Set[Node]
+    def get_all_children_as_nodes(
+            self,
+            filter_types: Set[EducationGroupTypesEnum] = None,
+            ignore_children_from: Set[EducationGroupTypesEnum] = None  # TODO :: unit tests
+    ):  # TODO :: typing -> Set[Node]
         result = set()
         for link in self.children:
             child = link.child
+            if ignore_children_from and child.node_type in ignore_children_from:
+                continue
             result |= child.get_all_children_as_nodes()
             result.add(link.child)
-        if types:
-            return set(n for n in result if n.node_type in types)
+        if filter_types:
+            return set(n for n in result if n.node_type in filter_types)
         return result
 
     @property
