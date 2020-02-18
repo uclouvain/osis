@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List, Set
 
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 from program_management.ddd.domain import node
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
 
@@ -85,12 +86,15 @@ class ProgramTree:
     # def get_path(self, node: node.Node) -> str:
 
     # TODO :: unit test (set and not list)
-    def get_all_nodes(self) -> Set[node.Node]:
+    def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set[node.Node]:
         """
         Return a flat list of all nodes which are in the tree
         :return: list of Node
         """
-        return set([self.root_node] + _nodes_from_root(self.root_node))
+        all_nodes = set([self.root_node] + _nodes_from_root(self.root_node))
+        if types:
+            return set(n for n in all_nodes if n.node_type in types)
+        return all_nodes
 
     def attach_node(self, node_to_attach: node.Node, path: str = None, **link_attributes):
         """

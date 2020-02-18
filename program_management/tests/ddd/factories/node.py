@@ -40,12 +40,17 @@ def generate_year(node):
     return random.randint(1999, 2099)
 
 
+def generate_end_date(node):
+    return node.year + 10
+
+
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
     acronym = factory.Sequence(lambda n: 'Acrony%02d' % n)
     title = factory.fuzzy.FuzzyText(length=240)
     year = factory.LazyAttribute(generate_year)
+    end_date = factory.LazyAttribute(generate_end_date)
 
 
 class NodeEducationGroupYearFactory(NodeFactory):

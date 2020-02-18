@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.link_type import LinkTypes
@@ -52,12 +52,19 @@ class Node:
     acronym = None
     year = None
 
-    def __init__(self, node_id: int, node_type: EducationGroupTypesEnum = None, children: List[Link] = None):
+    def __init__(
+            self,
+            node_id: int,
+            node_type: EducationGroupTypesEnum = None,
+            end_date: int = None,
+            children: List[Link] = None
+    ):
         self.node_id = node_id
         if children is None:
             children = []
         self.children = children
         self.node_type = node_type
+        self.end_date = end_date
 
     def __eq__(self, other):
         return self.node_id == other.node_id
@@ -75,13 +82,14 @@ class Node:
     def pk(self):
         return self.node_id
 
-    @property
-    def get_all_children_as_nodes(self):  # TODO :: typing -> Set[Node]
+    def get_all_children_as_nodes(self, types: Set[EducationGroupTypesEnum] = None):  # TODO :: typing -> Set[Node]
         result = set()
         for link in self.children:
             child = link.child
             result |= child.get_all_children_as_nodes()
             result.add(link.child)
+        if types:
+            return set(n for n in result if n.node_type in types)
         return result
 
     @property
@@ -130,7 +138,7 @@ def _get_descendents(root_node: Node, current_path: str = None):
 
 class NodeEducationGroupYear(Node):
     def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
-        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'))
+        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
         self.acronym = acronym
         self.title = title
         self.year = year
@@ -138,7 +146,7 @@ class NodeEducationGroupYear(Node):
 
 class NodeGroupYear(Node):
     def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
-        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'))
+        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
         self.acronym = acronym
         self.title = title
         self.year = year
@@ -146,7 +154,7 @@ class NodeGroupYear(Node):
 
 class NodeLearningUnitYear(Node):
     def __init__(self, node_id: int, acronym, title, year, proposal_type=None, **kwargs):
-        super().__init__(node_id, node_type=kwargs.get('node_type'))
+        super().__init__(node_id, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
         self.acronym = acronym
         self.title = title
         self.year = year
