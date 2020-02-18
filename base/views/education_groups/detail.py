@@ -217,7 +217,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
     @staticmethod
     def get_previous_element(qs, index):
         try:
-            return qs[index - 1] if index < 0 else None
+            return qs[index - 1] if index > 0 else None
         except IndexError:
             return None
 

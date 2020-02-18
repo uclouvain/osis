@@ -23,9 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+import urllib
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
+from django.template import Context
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
@@ -35,6 +39,7 @@ from base.business.learning_unit import get_all_attributions, get_components_ide
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
     learning_unit_proposal_permissions, is_eligible_for_modification
+from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
@@ -135,7 +140,36 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context["versions"] = self.get_versions()
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
         context["tab_active"] = "learning_unit"  # Corresponds to url_name
+
+        search_query_string = self.request.GET.get("search_query", None)
+        if search_query_string:
+            unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
+            self.update_context_with_navigation_elements(unquoted_search_query_string, context)
         return context
+
+    @staticmethod
+    def update_context_with_navigation_elements(search_query_string, context: Context):
+        search_parameters = QueryDict(search_query_string).dict()
+        index = int(search_parameters["index"])
+        qs = LearningUnitFilter(data=search_parameters).qs
+
+        context["next_element"] = DetailLearningUnitYearView.get_next_element(qs, index)
+        context["previous_element"] = DetailLearningUnitYearView.get_previous_element(qs, index)
+        context["index"] = index
+
+    @staticmethod
+    def get_next_element(qs, index):
+        try:
+            return qs[index + 1] if index >= 0 else None
+        except IndexError:
+            return None
+
+    @staticmethod
+    def get_previous_element(qs, index):
+        try:
+            return qs[index - 1] if index > 0 else None
+        except IndexError:
+            return None
 
     def get_context_permission(self, proposal):
         context = {

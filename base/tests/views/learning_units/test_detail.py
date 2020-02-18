@@ -27,7 +27,7 @@ import datetime
 
 import reversion
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, QueryDict
 from django.test import TestCase, Client
 from django.urls import reverse
 
@@ -52,8 +52,6 @@ from base.views.learning_units.detail import SEARCH_URL_PART
 class TestLearningUnitDetailView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_academic_year = AcademicYearFactory(current=True)
-        today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
         AcademicCalendarFactory(
@@ -256,3 +254,51 @@ class TestLearningUnitDetailView(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(len(response.context['learning_container_year_partims']), 3)
+
+    def test_navigation(self):
+        learning_unit_container_year = LearningContainerYearFactory(
+            academic_year=self.current_academic_year
+        )
+        learning_unit_year = LearningUnitYearFactory(
+            acronym="LCHIM1210",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.current_academic_year
+        )
+        partim_a = LearningUnitYearFactory(
+            acronym="LCHIM1210A",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.PARTIM,
+            academic_year=self.current_academic_year
+        )
+        LearningUnitYearFactory(
+            acronym="LCHIM1210B",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.PARTIM,
+            academic_year=self.current_academic_year
+        )
+        LearningUnitYearFactory(
+            acronym="LCHIM1210F",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.PARTIM,
+            academic_year=self.current_academic_year
+        )
+        url = reverse('learning_unit', args=[learning_unit_year.pk])
+
+        query_parameters = QueryDict(mutable=True)
+        query_parameters["search_query"] = 'ordering=acronym&index=0'
+        response = self.client.get(url, data=query_parameters)
+
+        context = response.context
+        self.assertEqual(
+            context["next_element"],
+            partim_a
+
+        )
+        self.assertIsNone(
+            context["previous_element"]
+        )
+        self.assertEqual(
+            context["index"],
+            0
+        )
