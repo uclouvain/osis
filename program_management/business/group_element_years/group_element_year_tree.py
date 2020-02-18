@@ -102,34 +102,28 @@ class EducationGroupHierarchy:
         return self._cache_entity_parent_root
 
     def _init_cache(self):
-        return fetch_all_group_elements_in_tree(self.education_group_year, self.get_queryset()) or {}
+        return fetch_all_group_elements_in_tree(self.education_group_year,
+                                                self.get_queryset(),
+                                                self.exclude_options) or {}
 
     def generate_children(self):
 
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             self._check_max_block(group_element_year.block)
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                if self.exclude_options and \
-                        group_element_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
-                    if EducationGroupYear.hierarchy.filter(pk=group_element_year.child_branch.pk).get_parents().\
-                            filter(education_group_type__name__in=TrainingType.finality_types()).exists():
-                        continue
-
                 node = EducationGroupHierarchy(self.root, group_element_year,
                                                cache_hierarchy=self.cache_hierarchy,
                                                tab_to_show=self.tab_to_show,
                                                pdf_content=self.pdf_content,
                                                max_block=self.max_block,
                                                cache_structure=self.cache_structure,
-                                               cache_entity_parent_root=self.cache_entity_parent_root,
-                                               exclude_options=self.exclude_options)
+                                               cache_entity_parent_root=self.cache_entity_parent_root)
                 self._check_max_block(node.max_block)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
                                       tab_to_show=self.tab_to_show, cache_structure=self.cache_structure,
-                                      cache_entity_parent_root=self.cache_entity_parent_root,
-                                      exclude_options=self.exclude_options)
+                                      cache_entity_parent_root=self.cache_entity_parent_root)
 
             else:
                 continue
