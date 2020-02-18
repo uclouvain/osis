@@ -41,14 +41,8 @@ class InfiniteRecursivityValidator(BusinessValidator):
     def validate(self):
         if self.node_to_add == self.tree.get_node(self.path):
             self.add_error_message(_('Cannot attach a node to himself.'))
-        # nodes = self._get_children_that_are_parents_too()
         if self.node_to_add in self.tree.get_parents(self.path):
             error_msg = 'The child %(child)s you want to attach is a parent of the node you want to attach.' % {
                 'child': self.node_to_add
             }
             self.add_error_message(_(error_msg))
-
-    # def _get_children_that_are_parents_too(self):
-    #     all_children = self.node_to_add.all_children_as_nodes | {self.node_to_add}
-    #     all_parents = self.tree.get_parents(self.path)
-    #     return set(all_parents).intersection(all_children)
