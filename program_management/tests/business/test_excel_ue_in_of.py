@@ -34,12 +34,15 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
+from base.models.enums import education_group_types
 from base.tests.factories.business.learning_units import GenerateContainer
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -469,6 +472,63 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         expected_ids_following_tree_order = [lu.id for lu in exl.learning_unit_years_parent]
         ids_ordered_for_xls = [lu.id for lu in list(exl.qs)]
         self.assertCountEqual(expected_ids_following_tree_order, ids_ordered_for_xls)
+
+
+class TestExcludeUEFromdWorkbook(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root = TrainingFactory(
+            acronym='DROI2M',
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120.name
+        )
+        academic_year = cls.root.academic_year
+        finality_list = GroupFactory(
+            acronym='LIST FINALITIES',
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
+            academic_year=academic_year
+        )
+
+        cls.formation_master_md = TrainingFactory(
+            acronym='DROI2MD',
+            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120.name,
+            academic_year=academic_year
+        )
+
+        common_core = GroupFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.COMMON_CORE.name,
+            academic_year=academic_year
+        )
+        options = GroupFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.OPTION_LIST_CHOICE.name,
+            academic_year=academic_year
+        )
+
+        cls.luy_in_common_core = LearningUnitYearFactory()
+        cls.luy_in_finality_options = LearningUnitYearFactory()
+
+        GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
+        GroupElementYearFactory(parent=finality_list, child_branch=cls.formation_master_md, child_leaf=None)
+        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=common_core, child_leaf=None)
+        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=options, child_leaf=None)
+        GroupElementYearFactory(parent=common_core,
+                                child_leaf=cls.luy_in_common_core,
+                                child_branch=None)
+        GroupElementYearFactory(parent=options,
+                                child_leaf=cls.luy_in_finality_options,
+                                child_branch=None)
+
+    def test_exclude_options_list_for_2M(self):
+        self._assert_correct_ue_present_in_xls(self.root, [self.luy_in_common_core.id])
+
+    def test_do_not_exclude_options_list_if_not_2M(self):
+        self._assert_correct_ue_present_in_xls(self.formation_master_md, [self.luy_in_common_core.id, self.luy_in_finality_options.id])
+
+    def _assert_correct_ue_present_in_xls(self, edy, expected_ue_ids_in_xls):
+        exl = EducationGroupYearLearningUnitsContainedToExcel(edy, CustomXlsForm({}))
+        ue_ids_in_xls = [lu.child_leaf.id for lu in list(exl.qs)]
+        self.assertCountEqual(expected_ue_ids_in_xls, ue_ids_in_xls)
 
 
 def get_expected_data(gey, luy):
