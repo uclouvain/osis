@@ -78,20 +78,13 @@ def update_view(request, learning_unit_year_id, teaching_material_id):
 
 
 def delete_view(request, learning_unit_year_id, teaching_material_id):
+    learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     teach_material = get_object_or_404(TeachingMaterial, pk=teaching_material_id,
                                        learning_unit_year_id=learning_unit_year_id)
     if request.method == 'POST':
         last_luy_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last()
         delete_teaching_material(teach_material)
-        if last_luy_reported and is_pedagogy_data_must_be_postponed(teach_material.learning_unit_year):
-            display_success_messages(
-                request,
-                _("The teaching material has been deleted up to %(last_year_reported)s with success") % {
-                    "last_year_reported": str(last_luy_reported.academic_year)
-                }
-            )
-        else:
-            display_success_messages(request, _("The teaching material has been deleted with success"))
+        display_success_messages(request, _build_success_message(last_luy_reported, learning_unit_yr))
         return JsonResponse({})
     return render(request, "learning_unit/teaching_material/modal_delete.html", {})
 
@@ -99,17 +92,30 @@ def delete_view(request, learning_unit_year_id, teaching_material_id):
 def _save_and_return_response(request, form, learning_unit_year):
     form.save(learning_unit_year=learning_unit_year)
     last_luy_reported = learning_unit_year.find_gt_learning_units_year().last()
+    display_success_messages(request, _build_success_message(last_luy_reported, learning_unit_year))
+    return JsonResponse({})
+
+
+def _build_success_message(last_luy_reported, learning_unit_year):
+    default_message = "The learning unit has been updated"
     if last_luy_reported and is_pedagogy_data_must_be_postponed(learning_unit_year):
-        display_success_messages(
-            request,
-            _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
-                "last_year_reported": str(last_luy_reported.academic_year)
+        msg = "{} {}.".format(
+            _(default_message),
+            _("and postponed until %(year)s") % {
+                "year": last_luy_reported.academic_year
             }
         )
     else:
-        msg = _("The teaching material has been saved with success")
-        if ProposalLearningUnit.objects. \
-                filter(learning_unit_year__learning_unit=learning_unit_year.learning_unit).exists():
-            msg = "{}. {}".format(msg, _('It will be done at the consolidation'))
-        display_success_messages(request, msg)
-    return JsonResponse({})
+        msg = "{}.".format(default_message)
+        proposal = ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=learning_unit_year.learning_unit
+        ).first()
+        if proposal:
+            msg = "{} {}.".format(
+                msg,
+                _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
+                  "consolidation") % {
+                    'proposal_year': proposal.learning_unit_year.academic_year
+                }
+            )
+    return msg
