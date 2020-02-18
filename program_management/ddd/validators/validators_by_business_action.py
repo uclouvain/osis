@@ -54,7 +54,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 ParentIsNotLeafValidator,
                 AttachAuthorizedRelationshipValidator,
                 AttachOptionsValidator,
-                AttachFinalityEndDateValidator,
+                AttachFinalityEndDateValidator,  # TODO :: move into service? Is working only if tree is 2M node...
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,

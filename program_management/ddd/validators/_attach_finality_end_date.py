@@ -33,7 +33,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 
 class AttachFinalityEndDateValidator(BusinessValidator):
 
-    def __init__(self, tree: ProgramTree, node_to_add: Node):
+    def __init__(self, tree: ProgramTree, node_to_add: Node, *args):
         super(AttachFinalityEndDateValidator, self).__init__()
         assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
         assert tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
