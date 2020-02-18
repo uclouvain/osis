@@ -29,7 +29,7 @@ from http import HTTPStatus
 import reversion
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, QueryDict
 from django.test import TestCase
 from django.urls import reverse
 
@@ -178,6 +178,22 @@ class EducationGroupRead(TestCase):
 
         response = self.client.get(self.url)
         self.assertEqual(len(response.context["versions"]), 2)
+
+    def test_navigation(self):
+        query_parameters = QueryDict(mutable=True)
+        query_parameters["search_query"] = 'academic_year={academic_year}&ordering=acronym&index=0'.format(
+            academic_year=self.education_group_child_1.academic_year.id
+        )
+        response = self.client.get(self.url, data=query_parameters)
+
+        context = response.context
+        self.assertEqual(
+            context["next_element"],
+            self.education_group_child_2
+        )
+        self.assertIsNone(
+            context["previous_element"]
+        )
 
 
 class TestReadEducationGroup(TestCase):

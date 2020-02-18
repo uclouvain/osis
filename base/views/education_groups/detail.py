@@ -32,9 +32,10 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Prefetch
-from django.http import HttpResponseRedirect
+from django.db.models import Prefetch, QuerySet
+from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import get_object_or_404
+from django.template import Context
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -49,6 +50,7 @@ from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
+from base.forms.education_groups import EducationGroupFilter
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
@@ -187,7 +189,21 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
+
+        search_query_string = self.request.GET.get("search_query", None)
+        if search_query_string:
+            self.update_context_with_navigation_elements(search_query_string, context)
         return context
+
+    @staticmethod
+    def update_context_with_navigation_elements(search_query_string, context: Context):
+        search_parameters = QueryDict(search_query_string).dict()
+        index = int(search_parameters["index"])
+        qs = EducationGroupFilter(data=search_parameters).qs
+
+        context["next_element"] = qs[index + 1] if index >= 0 else None
+        context["previous_element"] = qs[index - 1] if index < 0 else None
+        context["index"] = index
 
     def get(self, request, *args, **kwargs):
         default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
