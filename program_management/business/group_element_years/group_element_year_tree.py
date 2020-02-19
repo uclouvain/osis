@@ -480,6 +480,7 @@ class DetachPermission(LinkActionPermission):
                 })
             )
 
+    # FIXME :: DEPRECATED - Use DetachRootForbiddenValidator
     def _check_if_root(self):
         if self.link is None:
             self.errors.append(
