@@ -153,7 +153,7 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
 
     def get_credits(self, obj):
         learning_unit_year = obj.group_element_year.child_leaf
-        absolute_credits = learning_unit_year.credits if learning_unit_year else None
+        absolute_credits = learning_unit_year and learning_unit_year.credits
         return obj.group_element_year.relative_credits or absolute_credits
 
 
