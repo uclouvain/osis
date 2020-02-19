@@ -77,7 +77,8 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
     node_type = serializers.SerializerMethodField()
     subtype = serializers.SerializerMethodField()
 
-    def get_node_type(self, obj):
+    @staticmethod
+    def get_node_type(obj):
         if obj.education_group_year is None:
             return NodeType.LEARNING_UNIT.name
         return obj.education_group_year.education_group_type.category
@@ -144,14 +145,16 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
     block = serializers.SerializerMethodField()
     children = RecursiveField(many=True)
 
-    def get_block(self, obj):
+    @staticmethod
+    def get_block(obj):
         return sorted([int(block) for block in str(obj.group_element_year.block or '')])
 
     def get_comment(self, obj):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
         return getattr(obj.group_element_year, 'comment' + field_suffix)
 
-    def get_credits(self, obj):
+    @staticmethod
+    def get_credits(obj):
         learning_unit_year = obj.group_element_year.child_leaf
         absolute_credits = learning_unit_year and learning_unit_year.credits
         return obj.group_element_year.relative_credits or absolute_credits
