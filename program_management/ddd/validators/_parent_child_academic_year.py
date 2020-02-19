@@ -23,9 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
+
 from program_management.ddd.contrib.validation import BusinessValidator
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree import ProgramTree
 
 
+# Implemented from GroupElementYear._check_same_academic_year_parent_child_branch
 class ParentChildSameAcademicYearValidator(BusinessValidator):
+
+    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+        super(ParentChildSameAcademicYearValidator, self).__init__()
+        self.tree = tree
+        self.node_to_add = node_to_add
+        self.path = path
+
     def validate(self):
-        pass  # cf. GroupElementYear._check_same_academic_year_parent_child_branch
+        if self.tree.get_node(self.path).year != self.node_to_add.year:
+            self.add_error_message(
+                _("It is prohibited to attach a group, mini-training or training to an element of "
+                  "another academic year.")
+            )

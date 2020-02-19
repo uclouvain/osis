@@ -48,6 +48,7 @@ class AttachNodeValidatorList(BusinessListValidator):
 
     def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
 
+        # TODO :: instancier les validators directement, plutôt que d'avoir des classes (les paramètres changent)
         if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):
 
             self.validators = [
