@@ -31,6 +31,7 @@ from django.utils.translation import pgettext_lazy
 from base.models.utils.utils import ChoiceEnum
 
 
+# TODO :: move the file into the domain ? And rename EducationGroupTypesEnum to NodeTypeEnum
 class EducationGroupTypesEnum(ChoiceEnum):
     pass
 

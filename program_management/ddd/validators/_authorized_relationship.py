@@ -29,6 +29,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from django.utils.translation import gettext as _
 
 
+# Implemented from CheckAuthorizedRelationship (management.py)
 class AuthorizedRelationshipValidator(BusinessValidator):
 
     def __init__(self, tree: ProgramTree, node_to_add: node.Node, position_to_add: node.Node):

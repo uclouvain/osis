@@ -33,7 +33,7 @@ from django.utils.translation import gettext_lazy as _
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, education_group_types
-from base.models.enums.education_group_types import GroupType, MiniTrainingType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
@@ -758,12 +758,10 @@ class TestManagerGetReverseAdjacencyList(TestCase):
             order=6,
             link_type=None
         )
-        # self.assertEqual(GroupElementYear.objects.filter(child_branch=link_reference.child_branch).count(), 2)
         reverse_adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(
             child_branch_ids=[self.level_1.child_branch.id],
             link_type=LinkTypes.REFERENCE,
         )
         result_parent_ids = [rec['parent_id'] for rec in reverse_adjacency_list]
-        # result_child_ids = [rec['child_id'] for rec in reverse_adjacency_list]
         self.assertIn(link_reference.parent.id, result_parent_ids)
         self.assertNotIn(link_not_reference.parent.id, result_parent_ids)

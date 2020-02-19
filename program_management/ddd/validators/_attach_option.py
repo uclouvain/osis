@@ -32,6 +32,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 
 
 # TODO :: get a common mixin (merge with AttachFinalityEndDateValidator ?)
+# Implmented from _check_attach_options_rules
 class AttachOptionsValidator(BusinessValidator):
     """
     In context of MA/MD/MS when we add an option [or group which contains options],

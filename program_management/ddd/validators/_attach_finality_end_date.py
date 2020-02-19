@@ -32,6 +32,7 @@ from program_management.ddd.contrib.validation import BusinessValidator
 from program_management.ddd.domain.program_tree import ProgramTree
 
 
+# Implemented from _check_end_year_constraints_on_2m
 class AttachFinalityEndDateValidator(BusinessValidator):
     """
     In context of 2M, when we add a finality [or group which contains finality], we must ensure that
@@ -41,7 +42,7 @@ class AttachFinalityEndDateValidator(BusinessValidator):
     def __init__(self, tree_2m: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
         super(AttachFinalityEndDateValidator, self).__init__()
         msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
-        assert isinstance(tree_from_node_to_add, ProgramTree), msg  # TODO :: déplacer les asserts dans le validate() -> c'est une validation métier ? (ce qui signifie qu'on ne pourrait pas faire de déplacement d'options en dehors du contexte 2M)
+        assert isinstance(tree_from_node_to_add, ProgramTree), msg
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
             assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
             assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg

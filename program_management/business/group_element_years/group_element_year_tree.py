@@ -447,6 +447,7 @@ class AttachPermission(LinkActionPermission):
         self._check_if_leaf()
         return super().is_permitted()
 
+    # FIXME :: DEPRECATED - Use MinimumEditableYearValidator
     def _check_year_is_editable(self):
         if not education_group_perms._is_year_editable(self.root, False):
             self.errors.append(
@@ -455,6 +456,7 @@ class AttachPermission(LinkActionPermission):
                 })
             )
 
+    # FIXME :: DEPRECATED - Use ParentIsNotLeafValidator
     def _check_if_leaf(self):
         if self.link and self.link.child_leaf:
             self.errors.append(
