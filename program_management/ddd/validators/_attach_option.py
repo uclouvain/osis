@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -37,30 +38,31 @@ class AttachOptionsValidator(BusinessValidator):
     this options must exist in parent context (2m)
     """
 
-    def __init__(self, tree: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
+    def __init__(self, tree_2m: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
         super(AttachOptionsValidator, self).__init__()
         msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
         assert isinstance(tree_from_node_to_add, ProgramTree), msg
-        self.node_to_add = tree_from_node_to_add.root_node
-        if self._get_all_finality_nodes():
+        if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
             assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
-        self.tree = tree
+            assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
+        self.tree_from_node_to_add = tree_from_node_to_add
+        self.node_to_add = tree_from_node_to_add.root_node
+        self.tree_2m = tree_2m
 
-    def _get_all_finality_nodes(self):
-        all_finalities = set()
-        finality_types = set(TrainingType.finality_types_enum())
-        if self.node_to_add.node_type in finality_types:
-            all_finalities.add(self.node_to_add)
-        return all_finalities | self.node_to_add.get_all_children_as_nodes(filter_types=finality_types)
+    def get_options_from_finalities(self):
+        options_from_finalities = set()
+        for finality in self.tree_from_node_to_add.get_all_finalities():
+            options_from_finalities |= finality.get_all_children_as_nodes(filter_types={MiniTrainingType.OPTION})
+        if self.node_to_add.is_finality():
+            options_from_finalities |= self.node_to_add.get_all_children_as_nodes(
+                filter_types={MiniTrainingType.OPTION}
+            )
+        return options_from_finalities
 
     def validate(self):
-        if self._get_all_finality_nodes():
-            options_from_finalities = self.node_to_add.get_all_children_as_nodes(
-                filter_types={MiniTrainingType.OPTION},
-                ignore_children_from={MiniTrainingType.OPTION},
-            )
-            options_from_2m = self.tree.root_node.get_all_children_as_nodes(
+        options_from_finalities = self.get_options_from_finalities()
+        if options_from_finalities:
+            options_from_2m = self.tree_2m.root_node.get_all_children_as_nodes(
                 filter_types={MiniTrainingType.OPTION},
                 ignore_children_from=set(TrainingType.finality_types_enum())
             )
@@ -73,6 +75,6 @@ class AttachOptionsValidator(BusinessValidator):
                         len(missing_options)
                     ) % {
                         "acronym": ', '.join(option.acronym for option in missing_options),
-                        "root_acronym": self.tree.root_node.acronym
+                        "root_acronym": self.tree_2m.root_node.acronym
                     }
                 )
