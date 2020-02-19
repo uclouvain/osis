@@ -32,14 +32,29 @@ from django.urls import reverse
 from base.templatetags import navigation
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
-class TestNavigationEducationGroupYear(TestCase):
+class TestNavigationMixin:
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        education_group_years = EducationGroupYearFactory.create_batch(5, academic_year=cls.academic_year)
-        cls.education_group_years_sorted_by_acronym = sorted(education_group_years, key=lambda obj: obj.acronym)
+        cls.elements = cls.generate_elements()
+
+    @classmethod
+    def generate_elements(cls):
+        raise NotImplementedError
+
+    @property
+    def url_name(self):
+        raise NotImplementedError()
+
+    def _get_element_url(self, query_parameters: QueryDict, index):
+        raise NotImplementedError()
+
+    @property
+    def elements_sorted_by_acronym(self):
+        return sorted(self.elements, key=lambda obj: obj.acronym)
 
     def setUp(self):
         self.query_parameters = QueryDict(mutable=True)
@@ -52,22 +67,17 @@ class TestNavigationEducationGroupYear(TestCase):
     def test_navigation_when_no_search_query(self):
         context = navigation.navigation(
             QueryDict(),
-            self.education_group_years_sorted_by_acronym[0],
-            "education_group_read"
+            self.elements_sorted_by_acronym[0],
+            self.url_name
         )
-        expected_context = {
-            "current_element": self.education_group_years_sorted_by_acronym[0]
-        }
-        self.assertDictEqual(
-            context,
-            expected_context
-        )
+        expected_context = {"current_element": self.elements_sorted_by_acronym[0]}
+        self.assertDictEqual(context, expected_context)
 
     def test_first_element_should_not_have_previous_element(self):
         first_element_index = 0
         expected_context = {
-            "current_element": self.education_group_years_sorted_by_acronym[first_element_index],
-            "next_element": self.education_group_years_sorted_by_acronym[first_element_index + 1],
+            "current_element": self.elements_sorted_by_acronym[first_element_index],
+            "next_element": self.elements_sorted_by_acronym[first_element_index + 1],
             "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
             "previous_element": None,
             "previous_url": None,
@@ -75,12 +85,12 @@ class TestNavigationEducationGroupYear(TestCase):
         self.assertNavigationContextEquals(expected_context, first_element_index)
 
     def test_last_element_should_not_have_next_element(self):
-        last_element_index = len(self.education_group_years_sorted_by_acronym) - 1
+        last_element_index = len(self.elements_sorted_by_acronym) - 1
         expected_context = {
-            "current_element": self.education_group_years_sorted_by_acronym[last_element_index],
+            "current_element": self.elements_sorted_by_acronym[last_element_index],
             "next_element": None,
             "next_url": None,
-            "previous_element": self.education_group_years_sorted_by_acronym[last_element_index - 1],
+            "previous_element": self.elements_sorted_by_acronym[last_element_index - 1],
             "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, last_element_index)
@@ -88,10 +98,10 @@ class TestNavigationEducationGroupYear(TestCase):
     def test_inner_element_should_have_previous_and_next_element(self):
         inner_element_index = 2
         expected_context = {
-            "current_element": self.education_group_years_sorted_by_acronym[inner_element_index],
-            "next_element": self.education_group_years_sorted_by_acronym[inner_element_index + 1],
+            "current_element": self.elements_sorted_by_acronym[inner_element_index],
+            "next_element": self.elements_sorted_by_acronym[inner_element_index + 1],
             "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
-            "previous_element": self.education_group_years_sorted_by_acronym[inner_element_index - 1],
+            "previous_element": self.elements_sorted_by_acronym[inner_element_index - 1],
             "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
@@ -100,22 +110,55 @@ class TestNavigationEducationGroupYear(TestCase):
         self.query_parameters["index"] = index
         context = navigation.navigation(
             self.query_parameters,
-            self.education_group_years_sorted_by_acronym[index],
-            "education_group_read"
+            self.elements_sorted_by_acronym[index],
+            self.url_name
         )
-        self.assertDictEqual(
-            context,
-            expected_context
-        )
+        self.assertEqual(context["current_element"], expected_context["current_element"])
+        self.assertEqual(context["next_element"], expected_context["next_element"])
+        self.assertEqual(context["previous_element"], expected_context["previous_element"])
+        self.assertURLEqual(context["next_url"], expected_context["next_url"])
+        self.assertURLEqual(context["previous_url"], expected_context["previous_url"])
+
+
+class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
+    @classmethod
+    def generate_elements(cls):
+        return LearningUnitYearFactory.create_batch(5, academic_year=cls.academic_year)
+
+    @property
+    def url_name(self):
+        return 'learning_unit'
 
     def _get_element_url(self, query_parameters: QueryDict, index):
         query_parameters_with_updated_index = QueryDict(mutable=True)
         query_parameters_with_updated_index.update(query_parameters)
         query_parameters_with_updated_index["index"] = index
 
-        next_element = self.education_group_years_sorted_by_acronym[index]
+        next_element = self.elements_sorted_by_acronym[index]
 
         return "{}?{}".format(
-            reverse("education_group_read", args=[next_element.id, next_element.id]),
+            reverse(self.url_name, args=[next_element.id]),
+            query_parameters_with_updated_index.urlencode()
+        )
+
+
+class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
+    @classmethod
+    def generate_elements(cls):
+        return EducationGroupYearFactory.create_batch(5, academic_year=cls.academic_year)
+
+    @property
+    def url_name(self):
+        return 'education_group_read'
+
+    def _get_element_url(self, query_parameters: QueryDict, index):
+        query_parameters_with_updated_index = QueryDict(mutable=True)
+        query_parameters_with_updated_index.update(query_parameters)
+        query_parameters_with_updated_index["index"] = index
+
+        next_element = self.elements_sorted_by_acronym[index]
+
+        return "{}?{}".format(
+            reverse(self.url_name, args=[next_element.id, next_element.id]),
             query_parameters_with_updated_index.urlencode()
         )

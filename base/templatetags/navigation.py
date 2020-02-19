@@ -31,6 +31,8 @@ from django.urls import reverse
 
 from base.forms.education_groups import EducationGroupFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter
+from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
 
 
 @register.inclusion_tag('templatetags/navigation.html', takes_context=False)
@@ -41,8 +43,10 @@ def navigation(query_parameters: QueryDict, current_element, url_name):
     index = query_parameters.get("index")
     if search_query_string and index is not None:
         unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-        context.update(get_neighbor_elements(query_parameters, unquoted_search_query_string, int(index), url_name))
-
+        if isinstance(current_element, EducationGroupYear):
+            context.update(get_neighbor_elements(query_parameters, unquoted_search_query_string, int(index), url_name))
+        elif isinstance(current_element, LearningUnitYear):
+            context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name))
     return context
 
 
