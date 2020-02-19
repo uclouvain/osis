@@ -471,6 +471,7 @@ class DetachPermission(LinkActionPermission):
         self._check_if_prerequisites()
         return super().is_permitted()
 
+    # FIXME :: DEPRECATED - Use MinimumEditableYearValidator
     def _check_year_is_editable(self):
         if not education_group_perms._is_year_editable(self.root, False):
             self.errors.append(
@@ -498,6 +499,7 @@ class ModificationPermission(LinkActionPermission):
         self._check_if_root()
         return super().is_permitted()
 
+    # FIXME :: DEPRECATED - Use MinimumEditableYearValidator
     def _check_year_is_editable(self):
         if not education_group_perms._is_year_editable(self.root, False):
             self.errors.append(

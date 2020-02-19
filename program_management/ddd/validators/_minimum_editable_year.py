@@ -23,9 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+
 from program_management.ddd.contrib.validation import BusinessValidator
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree import ProgramTree
 
 
+# Implemented from AttachPermission._check_year_is_editable
 class MinimumEditableYearValidator(BusinessValidator):
+    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+        super(MinimumEditableYearValidator, self).__init__()
+        self.tree = tree
+        self.node_to_add = node_to_add
+        self.path = path
+
     def validate(self):
-        pass  # cf. AttachPermission._check_year_is_editable
+        if self.tree.root_node.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
+            self.add_error_message(
+                _("Cannot perform action on a education group before %(limit_year)s") % {
+                    "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
+                }
+            )
