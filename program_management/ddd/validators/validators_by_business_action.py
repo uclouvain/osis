@@ -52,7 +52,6 @@ class AttachNodeValidatorList(BusinessListValidator):
             self.validators = [
                 ParentIsNotLeafValidator,
                 AttachAuthorizedRelationshipValidator,
-                AttachOptionsValidator,
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,

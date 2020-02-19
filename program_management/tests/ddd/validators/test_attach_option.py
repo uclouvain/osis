@@ -34,7 +34,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestAttachFinalityEndDateValidator(TestCase):
+class TestAttachOptionsValidator(TestCase):
 
     def setUp(self):
         self.option = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)

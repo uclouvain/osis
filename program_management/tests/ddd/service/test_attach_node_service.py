@@ -34,6 +34,7 @@ from program_management.ddd.contrib.validation import MessageLevel, BusinessVali
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
+from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -129,7 +130,7 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         self.assertFalse(self.mock_save.called)
 
 
-class TestValidateEndDateFianality(TestCase, ValidatorPatcherMixin):
+class TestValidateEndDateAndOptionFinality(TestCase, ValidatorPatcherMixin):
     @classmethod
     def setUpTestData(cls):
         cls.root_node = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
@@ -151,7 +152,7 @@ class TestValidateEndDateFianality(TestCase, ValidatorPatcherMixin):
         """Unit test only for performance"""
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
 
-        attach_node_service._validate_end_date_finality(self.node_to_attach_not_finality)
+        attach_node_service._validate_end_date_and_option_finality(self.node_to_attach_not_finality)
         self.assertFalse(mock_fetch_2m_trees.called)
 
     @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
@@ -161,7 +162,7 @@ class TestValidateEndDateFianality(TestCase, ValidatorPatcherMixin):
         self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
-        result = attach_node_service._validate_end_date_finality(node_to_attach)
+        result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
@@ -174,7 +175,7 @@ class TestValidateEndDateFianality(TestCase, ValidatorPatcherMixin):
         self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
-        result = attach_node_service._validate_end_date_finality(not_finality)
+        result = attach_node_service._validate_end_date_and_option_finality(not_finality)
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
@@ -185,5 +186,16 @@ class TestValidateEndDateFianality(TestCase, ValidatorPatcherMixin):
         self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
 
-        result = attach_node_service._validate_end_date_finality(finality)
+        result = attach_node_service._validate_end_date_and_option_finality(finality)
         self.assertEqual([], result)
+
+    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
+    def test_when_option_validator_not_valid(self, mock_fetch_2m_trees):
+        mock_fetch_2m_trees.return_value = [self.tree_2m]
+        node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
+        self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
+        self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
+
+        result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
+        validator_msg = "Error attach option message"
+        self.assertEqual(result[0].message, validator_msg)

@@ -32,6 +32,7 @@ from program_management.ddd.domain.node import Node, NodeNotFoundException
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import fetch_tree, save_tree
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
+from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
 
 
@@ -43,7 +44,7 @@ def attach_node(
         **link_attributes
 ) -> List[BusinessValidationMessage]:
     error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
-    error_messages += _validate_end_date_finality(node)
+    error_messages += _validate_end_date_and_option_finality(node)
     if error_messages:
         return error_messages
     success_messages = tree.attach_node(node, path, **link_attributes)
@@ -69,7 +70,8 @@ def __validate_trees_using_node_as_reference_link(
     return error_messages
 
 
-def _validate_end_date_finality(node_to_attach: Node) -> List[BusinessValidationMessage]:
+def _validate_end_date_and_option_finality(node_to_attach: Node) -> List[BusinessValidationMessage]:
+    # TODO :: inclure le ftech dans le validateur? Et gérer cette boucle dans le validateur?
     error_messages = []
     tree_from_node_to_attach = fetch_tree.fetch(node_to_attach.node_id)
     finality_ids = [n.node_id for n in tree_from_node_to_attach.get_all_finalities()]
@@ -80,6 +82,9 @@ def _validate_end_date_finality(node_to_attach: Node) -> List[BusinessValidation
         ]
         for tree_2m in trees_2m:
             validator = AttachFinalityEndDateValidator(tree_2m, tree_from_node_to_attach)
+            if not validator.is_valid():
+                error_messages += validator.error_messages
+            validator = AttachOptionsValidator(tree_2m, tree_from_node_to_attach)
             if not validator.is_valid():
                 error_messages += validator.error_messages
     return error_messages
