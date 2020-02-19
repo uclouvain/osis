@@ -50,7 +50,11 @@ class TestNavigationEducationGroupYear(TestCase):
         )
 
     def test_navigation_when_no_search_query(self):
-        context = navigation.navigation(QueryDict(), self.education_group_years_sorted_by_acronym[0])
+        context = navigation.navigation(
+            QueryDict(),
+            self.education_group_years_sorted_by_acronym[0],
+            "education_group_read"
+        )
         expected_context = {
             "current_element": self.education_group_years_sorted_by_acronym[0]
         }
@@ -94,7 +98,11 @@ class TestNavigationEducationGroupYear(TestCase):
 
     def assertNavigationContextEquals(self, expected_context, index):
         self.query_parameters["index"] = index
-        context = navigation.navigation(self.query_parameters, self.education_group_years_sorted_by_acronym[index])
+        context = navigation.navigation(
+            self.query_parameters,
+            self.education_group_years_sorted_by_acronym[index],
+            "education_group_read"
+        )
         self.assertDictEqual(
             context,
             expected_context

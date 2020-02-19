@@ -33,28 +33,28 @@ from base.forms.education_groups import EducationGroupFilter
 
 
 @register.inclusion_tag('templatetags/navigation.html', takes_context=False)
-def navigation(query_parameters: QueryDict, current_element):
+def navigation(query_parameters: QueryDict, current_element, url_name):
     context = {"current_element": current_element}
 
     search_query_string = query_parameters.get("search_query")
     index = query_parameters.get("index")
     if search_query_string and index is not None:
         unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-        context.update(get_neighbor_elements(query_parameters, unquoted_search_query_string, int(index)))
+        context.update(get_neighbor_elements(query_parameters, unquoted_search_query_string, int(index), url_name))
 
     return context
 
 
-def get_neighbor_elements(query_parameters, search_query_string, index, ):
+def get_neighbor_elements(query_parameters, search_query_string, index, url_name):
     search_parameters = QueryDict(search_query_string).dict()
     qs = EducationGroupFilter(data=search_parameters).qs
     next_element = _get_next_element(qs, index)
     previous_element = _get_previous_element(qs, index)
     return {
         "next_element": next_element,
-        "next_url": _create_url(next_element, query_parameters, index + 1) if next_element else None,
+        "next_url": _create_url(next_element, query_parameters, index + 1, url_name) if next_element else None,
         "previous_element": previous_element,
-        "previous_url": _create_url(previous_element, query_parameters, index - 1) if previous_element else None
+        "previous_url": _create_url(previous_element, query_parameters, index - 1, url_name) if previous_element else None
     }
 
 
@@ -72,11 +72,11 @@ def _get_previous_element(qs, index):
         return None
 
 
-def _create_url(education_group_year, query_parameters: QueryDict, index):
+def _create_url(education_group_year, query_parameters: QueryDict, index, url_name):
     query_parameters_with_udpated_index = QueryDict(mutable=True)
     query_parameters_with_udpated_index.update(query_parameters)
     query_parameters_with_udpated_index["index"] = index
     return "{}?{}".format(
-        reverse("education_group_read", args=[education_group_year.id, education_group_year.id]),
+        reverse(url_name, args=[education_group_year.id, education_group_year.id]),
         query_parameters_with_udpated_index.urlencode()
     )

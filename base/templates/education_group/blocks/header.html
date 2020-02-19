@@ -25,7 +25,7 @@
 {% endcomment %}
 
 {% if not disabled_nav %}
-    {% navigation request.GET education_group_year %}
+    {% navigation request.GET education_group_year request.resolver_match.url_name %}
 {% else %}
     <h2>
         {% if education_group_year.education_group_type.category == "TRAINING" %}
