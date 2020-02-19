@@ -28,46 +28,46 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestParentChildSameAcademicYearValidator(TestCase):
+class TestParentIsNotLeafValidator(TestCase):
 
     def setUp(self):
-        self.year = 2019
-        self.tree = ProgramTreeFactory(root_node__year=self.year)
-        self.path_to_attach = build_path(self.tree.root_node)
+        link = LinkFactory(child=NodeLearningUnitYearFactory())
+        self.tree_with_child = ProgramTreeFactory(root_node=link.parent)
+        self.child = link.child
 
-    def test_when_year_equals(self):
-        validator = ParentChildSameAcademicYearValidator(
-            self.tree,
-            NodeGroupYearFactory(year=self.year),
-            self.path_to_attach
+    def test_when_trying_to_add_node_to_leaf(self):
+        position_to_add = build_path(self.tree_with_child.root_node, self.child)
+        validator = ParentIsNotLeafValidator(
+            self.tree_with_child,
+            NodeGroupYearFactory(),
+            position_to_add
+        )
+        self.assertFalse(validator.is_valid())
+        expected_result = _("Cannot add any element to learning unit")
+        self.assertEqual(expected_result, validator.error_messages[0])
+
+    def test_when_trying_to_add_leaf_to_leaf(self):
+        position_to_add = build_path(self.tree_with_child.root_node, self.child)
+        validator = ParentIsNotLeafValidator(
+            self.tree_with_child,
+            NodeLearningUnitYearFactory(),
+            position_to_add
+        )
+        self.assertFalse(validator.is_valid())
+        expected_result = _("Cannot add any element to learning unit")
+        self.assertEqual(expected_result, validator.error_messages[0])
+
+    def test_when_trying_to_add_leaf_to_group(self):
+        position_to_add = build_path(self.tree_with_child.root_node)
+        validator = ParentIsNotLeafValidator(
+            self.tree_with_child,
+            NodeLearningUnitYearFactory(),
+            position_to_add
         )
         self.assertTrue(validator.is_valid())
-
-    def test_when_year_of_node_to_attach_is_lower(self):
-        validator = ParentChildSameAcademicYearValidator(
-            self.tree,
-            NodeGroupYearFactory(year=self.year - 1),
-            self.path_to_attach
-        )
-        self.assertFalse(validator.is_valid())
-        expected_result = _(
-            "It is prohibited to attach a group, mini-training or training to an element of another academic year."
-        )
-        self.assertEqual(expected_result, validator.error_messages[0])
-
-    def test_when_year_of_node_to_attach_is_greater(self):
-        validator = ParentChildSameAcademicYearValidator(
-            self.tree,
-            NodeGroupYearFactory(year=self.year + 1),
-            self.path_to_attach
-        )
-        self.assertFalse(validator.is_valid())
-        expected_result = _(
-            "It is prohibited to attach a group, mini-training or training to an element of another academic year."
-        )
-        self.assertEqual(expected_result, validator.error_messages[0])

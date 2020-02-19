@@ -38,6 +38,7 @@ from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
 from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
+from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
 
 
 class AttachNodeValidatorList(BusinessListValidator):
@@ -57,6 +58,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
+                ParentChildSameAcademicYearValidator,
             ]
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
@@ -68,6 +70,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
                 DetachRootForbiddenValidator,
+                ParentChildSameAcademicYearValidator,
             ]
 
         else:

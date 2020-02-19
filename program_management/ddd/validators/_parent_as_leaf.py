@@ -23,9 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
+
 from program_management.ddd.contrib.validation import BusinessValidator
+from program_management.ddd.domain.node import Node, NodeLearningUnitYear
+from program_management.ddd.domain.program_tree import ProgramTree
 
 
+# Implemented from AttachPermission._check_if_leaf
 class ParentIsNotLeafValidator(BusinessValidator):
+
+    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+        super(ParentIsNotLeafValidator, self).__init__()
+        self.tree = tree
+        self.node_to_add = node_to_add
+        self.path = path
+
     def validate(self):
-        pass  # cf. AttachPermission._check_if_leaf
+        if isinstance(self.tree.get_node(self.path), NodeLearningUnitYear):
+            self.add_error_message(
+                _("Cannot add any element to learning unit")
+            )
