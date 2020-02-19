@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import TrainingType
@@ -36,30 +38,32 @@ class AttachFinalityEndDateValidator(BusinessValidator):
     the end date of all 2M is greater or equals of all finalities.
     """
 
-    def __init__(self, tree: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
+    def __init__(self, trees_2m: List[ProgramTree], tree_from_node_to_add: ProgramTree, *args):
         super(AttachFinalityEndDateValidator, self).__init__()
         msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
         assert isinstance(tree_from_node_to_add, ProgramTree), msg  # TODO :: déplacer les asserts dans le validate() -> c'est une validation métier ? (ce qui signifie qu'on ne pourrait pas faire de déplacement d'options en dehors du contexte 2M)
         self.node_to_add = tree_from_node_to_add.root_node
         if self._get_all_finality_nodes():
             assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-            assert tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
-        self.tree = tree
+            for tree in trees_2m:
+                assert tree.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
+        self.trees_2m = trees_2m
 
     def validate(self):
         if self._get_all_finality_nodes():
-            inconsistent_nodes = self._get_acronyms_where_end_date_gte_root_end_date()
-            if inconsistent_nodes:
-                self.add_error_message(
-                    ngettext(
-                        "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
-                        "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
-                        len(inconsistent_nodes)
-                    ) % {
-                        "acronym": ', '.join(inconsistent_nodes),
-                        "root_acronym": self.tree.root_node.acronym
-                    }
-                )
+            for tree_2m in self.trees_2m:
+                inconsistent_nodes = self._get_acronyms_where_end_date_gte_root_end_date(tree_2m)
+                if inconsistent_nodes:
+                    self.add_error_message(
+                        ngettext(
+                            "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
+                            "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+                            len(inconsistent_nodes)
+                        ) % {
+                            "acronym": ', '.join(inconsistent_nodes),
+                            "root_acronym": tree_2m.root_node.acronym
+                        }
+                    )
 
     def _get_all_finality_nodes(self):  # TODO :: déplacer dans ProgramTree en tant qu'attr ?
         all_finalities = set()
@@ -68,8 +72,8 @@ class AttachFinalityEndDateValidator(BusinessValidator):
             all_finalities.add(self.node_to_add)
         return all_finalities | self.node_to_add.get_all_children_as_nodes(filter_types=finality_types)
 
-    def _get_acronyms_where_end_date_gte_root_end_date(self):
+    def _get_acronyms_where_end_date_gte_root_end_date(self, tree_2m: ProgramTree):
         return [
             finality.acronym for finality in self._get_all_finality_nodes()
-            if finality.end_date > self.tree.root_node.end_date
+            if finality.end_date > tree_2m.root_node.end_date
         ]
