@@ -152,8 +152,9 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
         return getattr(obj.group_element_year, 'comment' + field_suffix)
 
     def get_credits(self, obj):
-        ue = obj.group_element_year.child_leaf
-        return obj.group_element_year.relative_credits or ue.credits if ue else None
+        learning_unit_year = obj.group_element_year.child_leaf
+        absolute_credits = learning_unit_year.credits if learning_unit_year else None
+        return obj.group_element_year.relative_credits or absolute_credits
 
 
 class EducationGroupTreeSerializer(CommonNodeTreeSerializer):

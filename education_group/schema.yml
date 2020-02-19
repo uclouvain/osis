@@ -743,6 +743,7 @@ components:
         - acronym
         - title
         - node_type
+        - subtype
         - credits
         - is_mandatory
         - block
