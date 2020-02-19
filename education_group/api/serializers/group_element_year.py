@@ -101,6 +101,8 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
 
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     partial_title = serializers.SerializerMethodField()
+    lecturing_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
+    practical_exercise_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
 
     def get_partial_title(self, obj):
         language = self.context.get('language')
@@ -122,10 +124,13 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
         if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
             for component in obj.learning_unit_year.learningcomponentyear_set.all():
-                data.update({
+                data[
                     'lecturing_volume' if component.type == LECTURING
-                    else 'practical_exercise_volume': component.hourly_volume_total_annual
-                })
+                    else 'practical_exercise_volume'
+                ] = component.hourly_volume_total_annual
+        else:
+            for key in ['lecturing_volume', 'practical_exercise_volume']:
+                data.pop(key)
         return data
 
 
