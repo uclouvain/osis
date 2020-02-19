@@ -29,6 +29,7 @@ from rest_framework.reverse import reverse
 
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.learning_component_year_type import LECTURING
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
@@ -93,7 +94,7 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
 
 
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
-    partial_title = serializers.SerializerMethodField(read_only=True)
+    partial_title = serializers.SerializerMethodField()
 
     def get_partial_title(self, obj):
         language = self.context.get('language')
@@ -106,11 +107,19 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
     def to_representation(self, obj):
         data = super().to_representation(obj)
-        if self.get_node_type(obj) != NodeType.TRAINING.name \
-            or (self.get_node_type(obj) == NodeType.TRAINING.name
+        node_type = self.get_node_type(obj)
+        if node_type != NodeType.TRAINING.name \
+            or (node_type == NodeType.TRAINING.name
                 and obj.education_group_year.education_group_type.name
                 not in education_group_types.TrainingType.finality_types()):
             data.pop('partial_title')
+
+        if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
+            for component in obj.learning_unit_year.learningcomponentyear_set.all():
+                data.update({
+                    'lecturing_volume' if component.type == LECTURING
+                    else 'practical_exercise_volume': component.hourly_volume_total_annual
+                })
         return data
 
 
