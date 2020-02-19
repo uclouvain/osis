@@ -45,7 +45,7 @@ class ChoiceEnum(Enum):
         return [x.name for x in cls]
 
 
-@deprecated('use method from osis_common utils')
+@deprecated
 def get_object_or_none(klass, *args, **kwargs):
     try:
         return get_object_or_404(klass, *args, **kwargs)
