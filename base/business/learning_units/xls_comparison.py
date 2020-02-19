@@ -205,37 +205,32 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
         translate_status(learning_unit_yr.status),
         learning_unit_yr.get_subtype_display() if learning_unit_yr.subtype else BLANK_VALUE,
         learning_unit_yr.get_internship_subtype_display() if learning_unit_yr.internship_subtype else BLANK_VALUE,
-        volume_format(learning_unit_yr.credits) if learning_unit_yr.credits else BLANK_VALUE,
-        learning_unit_yr.language.name if learning_unit_yr.language else BLANK_VALUE,
+        volume_format(learning_unit_yr.credits) or BLANK_VALUE,
+        learning_unit_yr.language.name or BLANK_VALUE,
         learning_unit_yr.get_periodicity_display() if learning_unit_yr.periodicity else BLANK_VALUE,
         get_translation(learning_unit_yr.quadrimester),
         get_translation(learning_unit_yr.session),
-        learning_unit_yr.learning_container_year.common_title
-        if learning_unit_yr.learning_container_year.common_title else BLANK_VALUE,
-        learning_unit_yr.specific_title if learning_unit_yr.specific_title else BLANK_VALUE,
-        learning_unit_yr.learning_container_year.common_title_english
-        if learning_unit_yr.learning_container_year.common_title_english else BLANK_VALUE,
-        learning_unit_yr.specific_title_english if learning_unit_yr.specific_title_english else BLANK_VALUE,
+        learning_unit_yr.learning_container_year.common_title or BLANK_VALUE,
+        learning_unit_yr.specific_title or BLANK_VALUE,
+        learning_unit_yr.learning_container_year.common_title_english or BLANK_VALUE,
+        learning_unit_yr.specific_title_english or BLANK_VALUE,
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.REQUIREMENT_ENTITY)),
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ALLOCATION_ENTITY)),
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1)),
         _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2)),
         _('Yes') if learning_unit_yr.professional_integration else _('No'),
         organization.name if organization else BLANK_VALUE,
-        learning_unit_yr.campus if learning_unit_yr.campus else BLANK_VALUE]
+        learning_unit_yr.campus or BLANK_VALUE]
     if partims:
         data.append(get_partims_as_str(learning_unit_yr.get_partims_related()))
     data.extend(
         [
-            learning_unit_yr.learning_unit.faculty_remark
-            if learning_unit_yr.learning_unit.faculty_remark else BLANK_VALUE,
-            learning_unit_yr.learning_unit.other_remark if learning_unit_yr.learning_unit.other_remark else BLANK_VALUE,
+            learning_unit_yr.learning_unit.faculty_remark or BLANK_VALUE,
+            learning_unit_yr.learning_unit.other_remark or BLANK_VALUE,
             _('Yes') if learning_unit_yr.learning_container_year.team else _('No'),
             _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'),
-            learning_unit_yr.learning_container_year.get_type_declaration_vacant_display()
-            if learning_unit_yr.learning_container_year.get_type_declaration_vacant_display() else BLANK_VALUE,
-            learning_unit_yr.get_attribution_procedure_display()
-            if learning_unit_yr.get_attribution_procedure_display() else BLANK_VALUE,
+            learning_unit_yr.learning_container_year.get_type_declaration_vacant_display() or BLANK_VALUE,
+            learning_unit_yr.get_attribution_procedure_display() or BLANK_VALUE,
         ]
     )
 
@@ -301,18 +296,15 @@ def get_border_columns(line):
 def _get_component_data_by_type(component):
     if component:
         return [
-            component.get(VOLUME_Q1) if component.get(VOLUME_Q1) else BLANK_VALUE,
-            component.get(VOLUME_Q2) if component.get(VOLUME_Q2) else BLANK_VALUE,
-            component.get(VOLUME_TOTAL) if component.get(VOLUME_TOTAL) else BLANK_VALUE,
-            component.get(REAL_CLASSES) if component.get(REAL_CLASSES) else 1,
-            component.get(PLANNED_CLASSES) if component.get(PLANNED_CLASSES) else BLANK_VALUE,
-            component.get(VOLUME_TOTAL_REQUIREMENT_ENTITIES)
-            if component.get(VOLUME_TOTAL_REQUIREMENT_ENTITIES) else BLANK_VALUE,
-            component.get(VOLUME_REQUIREMENT_ENTITY) if component.get(VOLUME_REQUIREMENT_ENTITY) else BLANK_VALUE,
-            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1)
-            if component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1) else BLANK_VALUE,
-            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2)
-            if component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2) else BLANK_VALUE,
+            component.get(VOLUME_Q1) or BLANK_VALUE,
+            component.get(VOLUME_Q2) or BLANK_VALUE,
+            component.get(VOLUME_TOTAL) or BLANK_VALUE,
+            component.get(REAL_CLASSES) or 1,
+            component.get(PLANNED_CLASSES) or BLANK_VALUE,
+            component.get(VOLUME_TOTAL_REQUIREMENT_ENTITIES) or BLANK_VALUE,
+            component.get(VOLUME_REQUIREMENT_ENTITY) or BLANK_VALUE,
+            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1) or BLANK_VALUE,
+            component.get(VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2) or BLANK_VALUE
         ]
     else:
         return [BLANK_VALUE, BLANK_VALUE, BLANK_VALUE, BLANK_VALUE, BLANK_VALUE, BLANK_VALUE, BLANK_VALUE,
