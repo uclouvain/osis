@@ -34,8 +34,7 @@ from base.business.learning_units.xls_comparison import prepare_xls_content, \
     XLS_FILENAME, XLS_DESCRIPTION, learning_unit_titles, WORKSHEET_TITLE, CELLS_MODIFIED_NO_BORDER, DATA, \
     _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
     get_representing_string
-from base.business.proposal_xls import components_titles, basic_titles
-from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
+from base.business.proposal_xls import components_titles, basic_titles, BLANK_VALUE
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1
@@ -80,36 +79,40 @@ class TestComparisonXls(TestCase):
         self.assertEqual(data[0][4], learning_unit_yr.get_subtype_display())
         self.assertEqual(
             data[0][5],
-            str(_(learning_unit_yr.get_internship_subtype_display())) if learning_unit_yr.internship_subtype else ''
+            str(_(learning_unit_yr.get_internship_subtype_display()))
+            if learning_unit_yr.internship_subtype else BLANK_VALUE
         )
         self.assertEqual(data[0][6], str(learning_unit_yr.credits))
-        self.assertEqual(data[0][7], learning_unit_yr.language.name if learning_unit_yr.language else '')
+        self.assertEqual(data[0][7], learning_unit_yr.language.name or BLANK_VALUE)
         self.assertEqual(data[0][8],
                          str(_(learning_unit_yr.get_periodicity_display())) if learning_unit_yr.periodicity else '')
-        self.assertEqual(data[0][9], str(_(learning_unit_yr.quadrimester)) if learning_unit_yr.quadrimester else '')
-        self.assertEqual(data[0][10], str(_(learning_unit_yr.session)) if learning_unit_yr.session else '')
-        self.assertEqual(data[0][11], learning_unit_yr.learning_container_year.common_title)
-        self.assertEqual(data[0][12], learning_unit_yr.specific_title)
-        self.assertEqual(data[0][13], learning_unit_yr.learning_container_year.common_title_english)
-        self.assertEqual(data[0][14], learning_unit_yr.specific_title_english)
-        self.assertEqual(data[0][15], learning_unit_yr.requirement_entity.most_recent_acronym)
-        self.assertEqual(data[0][16], learning_unit_yr.allocation_entity.most_recent_acronym)
-        self.assertEqual(data[0][17], learning_unit_yr.learning_container_year.additional_entity_1.most_recent_acronym)
-        self.assertEqual(data[0][18], learning_unit_yr.learning_container_year.additional_entity_2.most_recent_acronym)
+        self.assertEqual(data[0][9], str(_(learning_unit_yr.quadrimester)) or BLANK_VALUE)
+        self.assertEqual(data[0][10], str(_(learning_unit_yr.session)) or BLANK_VALUE)
+        self.assertEqual(data[0][11], learning_unit_yr.learning_container_year.common_title or BLANK_VALUE)
+        self.assertEqual(data[0][12], learning_unit_yr.specific_title or BLANK_VALUE)
+        self.assertEqual(data[0][13], learning_unit_yr.learning_container_year.common_title_english or BLANK_VALUE)
+        self.assertEqual(data[0][14], learning_unit_yr.specific_title_english or BLANK_VALUE)
+        self.assertEqual(data[0][15], learning_unit_yr.requirement_entity.most_recent_acronym or BLANK_VALUE)
+        self.assertEqual(data[0][16], learning_unit_yr.allocation_entity.most_recent_acronym or BLANK_VALUE)
+        self.assertEqual(data[0][17], learning_unit_yr.learning_container_year.additional_entity_1.most_recent_acronym
+                         or BLANK_VALUE)
+        self.assertEqual(data[0][18], learning_unit_yr.learning_container_year.additional_entity_2.most_recent_acronym
+                         or BLANK_VALUE)
         self.assertEqual(data[0][19], _('Yes') if learning_unit_yr.professional_integration else _('No'))
         if learning_unit_yr.campus:
             self.assertEqual(data[0][20], learning_unit_yr.campus.organization.name)
             self.assertEqual(data[0][21], learning_unit_yr.campus)
         else:
-            self.assertEqual(data[0][20], '')
-            self.assertEqual(data[0][21], '')
+            self.assertEqual(data[0][20], BLANK_VALUE)
+            self.assertEqual(data[0][21], BLANK_VALUE)
         self.assertEqual(data[0][22], self.partim.subdivision)
-        self.assertEqual(data[0][23], learning_unit_yr.learning_unit.faculty_remark)
-        self.assertEqual(data[0][24], learning_unit_yr.learning_unit.other_remark)
+        self.assertEqual(data[0][23], learning_unit_yr.learning_unit.faculty_remark or BLANK_VALUE)
+        self.assertEqual(data[0][24], learning_unit_yr.learning_unit.other_remark or BLANK_VALUE)
         self.assertEqual(data[0][25], _('Yes') if learning_unit_yr.learning_container_year.team else _('No'))
         self.assertEqual(data[0][26], _('Yes') if learning_unit_yr.learning_container_year.is_vacant else _('No'))
-        self.assertEqual(data[0][27], learning_unit_yr.learning_container_year.get_type_declaration_vacant_display())
-        self.assertEqual(data[0][28], learning_unit_yr.get_attribution_procedure_display())
+        self.assertEqual(data[0][27], learning_unit_yr.learning_container_year.get_type_declaration_vacant_display()
+                         or BLANK_VALUE)
+        self.assertEqual(data[0][28], learning_unit_yr.get_attribution_procedure_display() or BLANK_VALUE)
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_no_data(self, mock_generate_xls):
@@ -180,59 +183,50 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[4], translate_status(self.learning_unit_year_1.status))
         self.assertEqual(data[5], self.learning_unit_year_1.get_subtype_display())
         self.assertEqual(data[6],
-                         str(_(
-                             self.learning_unit_year_1.get_internship_subtype_display())) if self.learning_unit_year_1.internship_subtype else '')
+                         str(_(self.learning_unit_year_1.get_internship_subtype_display()))
+                         if self.learning_unit_year_1.internship_subtype else '-')
         self.assertEqual(data[7], str(self.learning_unit_year_1.credits))
-        self.assertEqual(data[8], self.learning_unit_year_1.language.name if self.learning_unit_year_1.language else '')
-        self.assertEqual(data[9],
-                         str(_(
-                             self.learning_unit_year_1.get_periodicity_display())) if self.learning_unit_year_1.periodicity else '')
-        self.assertEqual(data[10], str(
-            _(self.learning_unit_year_1.quadrimester)) if self.learning_unit_year_1.quadrimester else '')
-        self.assertEqual(data[11],
-                         str(_(self.learning_unit_year_1.session)) if self.learning_unit_year_1.session else '')
-        self.assertEqual(data[12], self.learning_unit_year_1.learning_container_year.common_title)
-        self.assertEqual(data[13], self.learning_unit_year_1.specific_title)
-        self.assertEqual(data[14], self.learning_unit_year_1.learning_container_year.common_title_english)
-        self.assertEqual(data[15], self.learning_unit_year_1.specific_title_english)
+        self.assertEqual(data[8], self.learning_unit_year_1.language.name or BLANK_VALUE)
+        self.assertEqual(data[9], str(_(self.learning_unit_year_1.get_periodicity_display())) or BLANK_VALUE)
+        self.assertEqual(data[10], str(_(self.learning_unit_year_1.quadrimester)) or BLANK_VALUE)
+        self.assertEqual(data[11], str(_(self.learning_unit_year_1.session)) or BLANK_VALUE)
+        self.assertEqual(data[12], self.learning_unit_year_1.learning_container_year.common_title or BLANK_VALUE)
+        self.assertEqual(data[13], self.learning_unit_year_1.specific_title or BLANK_VALUE)
+        self.assertEqual(data[14], self.learning_unit_year_1.learning_container_year.common_title_english
+                         or BLANK_VALUE)
+        self.assertEqual(data[15], self.learning_unit_year_1.specific_title_english or BLANK_VALUE)
 
-        self.assertEqual(data[16], self.learning_unit_year_1.entities.get(REQUIREMENT_ENTITY).acronym)
-        self.assertEqual(data[17], self.learning_unit_year_1.entities.get(ALLOCATION_ENTITY).acronym)
-        self.assertEqual(data[18], self.learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_1).acronym)
-        self.assertEqual(data[19], '')
+        self.assertEqual(data[16], self.learning_unit_year_1.entities.get(REQUIREMENT_ENTITY).acronym or BLANK_VALUE)
+        self.assertEqual(data[17], self.learning_unit_year_1.entities.get(ALLOCATION_ENTITY).acronym or BLANK_VALUE)
+        self.assertEqual(data[18], self.learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_1).acronym
+                         or BLANK_VALUE)
+        self.assertEqual(data[19], BLANK_VALUE)
         self.assertEqual(data[20], _('Yes') if self.learning_unit_year_1.professional_integration else _('No'))
         if self.learning_unit_year_1.campus:
             self.assertEqual(data[21], self.learning_unit_year_1.campus.organization.name)
             self.assertEqual(data[22], self.learning_unit_year_1.campus)
         else:
-            self.assertEqual(data[21], '')
-            self.assertEqual(data[22], '')
-        self.assertEqual(data[23], self.learning_unit_year_1.learning_unit.faculty_remark)
-        self.assertEqual(data[24], self.learning_unit_year_1.learning_unit.other_remark)
+            self.assertEqual(data[21], BLANK_VALUE)
+            self.assertEqual(data[22], BLANK_VALUE)
+        self.assertEqual(data[23], self.learning_unit_year_1.learning_unit.faculty_remark or BLANK_VALUE)
+        self.assertEqual(data[24], self.learning_unit_year_1.learning_unit.other_remark or BLANK_VALUE)
         self.assertEqual(data[25], _('Yes') if self.learning_unit_year_1.learning_container_year.team else _('No'))
         self.assertEqual(data[26], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
         self.assertEqual(data[27],
-                         self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display())
-        self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display())
+                         self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display()
+                         or BLANK_VALUE)
+        self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display() or BLANK_VALUE)
 
-        self.assertEqual(data[29], DEFAULT_ACRONYM_COMPONENT.get(lecturing_component.type))
-        self.assertEqual(data[30],
-                         lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0
-        self.assertEqual(data[31],
-                         lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0
-        self.assertEqual(data[32],
-                         lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0
-        self.assertEqual(data[33], lecturing_component.real_classes)
-        self.assertEqual(data[34], lecturing_component.planned_classes)
-        self.assertEqual(data[39], DEFAULT_ACRONYM_COMPONENT.get(practical_component.type))
-        self.assertEqual(data[40],
-                         practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0
-        self.assertEqual(data[41],
-                         practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0
-        self.assertEqual(data[42],
-                         practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0
-        self.assertEqual(data[43], practical_component.real_classes)
-        self.assertEqual(data[44], practical_component.planned_classes)
+        self.assertEqual(data[29], lecturing_component.hourly_volume_total_annual or BLANK_VALUE)
+        self.assertEqual(data[30], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE)
+        self.assertEqual(data[31], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE)
+        self.assertEqual(data[32], lecturing_component.real_classes or BLANK_VALUE)
+        self.assertEqual(data[33], lecturing_component.planned_classes or BLANK_VALUE)
+        self.assertEqual(data[38], practical_component.hourly_volume_total_annual or BLANK_VALUE)
+        self.assertEqual(data[39], practical_component.hourly_volume_partial_q1 or BLANK_VALUE)
+        self.assertEqual(data[40], practical_component.hourly_volume_partial_q2 or BLANK_VALUE)
+        self.assertEqual(data[41], practical_component.real_classes or BLANK_VALUE)
+        self.assertEqual(data[42], practical_component.planned_classes or BLANK_VALUE)
 
     def test_check_changes(self):
         line_number = 0
@@ -242,8 +236,8 @@ class TestPropositionComparisonXls(TestCase):
                                         line_number), ['C{}'.format(line_number)])
 
     def test_get_represen_string(self):
-        self.assertEqual(get_representing_string(None), "")
-        self.assertEqual(get_representing_string(""), "")
+        self.assertEqual(get_representing_string(None), BLANK_VALUE)
+        self.assertEqual(get_representing_string(""), BLANK_VALUE)
         self.assertEqual(get_representing_string("test"), "test")
 
 
