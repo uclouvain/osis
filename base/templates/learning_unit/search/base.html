@@ -228,7 +228,10 @@
                     "data": "acronym",
                     "render": function ( data, type, row, meta ) {
                         const params = new URLSearchParams();
-                        params.set("search_query", encodeURIComponent(window.location.search.replace("?", "")));
+                        params.set(
+                            "search_query",
+                            encodeURIComponent((new URLSearchParams(meta.settings.oAjaxData)).toString())
+                        );
                         params.set("index", startingIndex + meta["row"]);
 
                         const url = `${row['osis_url']}?${params.toString()}`;

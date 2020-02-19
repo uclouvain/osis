@@ -25,8 +25,5 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% with learning_unit_year.academic_year|slugify as current_yr %}
-    {% with current_id=learning_unit_year.id local_storage_key=local_storage_key|default:"learningUnitIds" acronym=learning_unit_year.acronym complete_title=learning_unit_year.complete_title current_yr=current_yr %}
-        {% include "template_nav_header.html" %}
-    {% endwith %}
-{% endwith %}
+{% navigation_lu  request.GET learning_unit_year request.resolver_match.url_name %}
+
