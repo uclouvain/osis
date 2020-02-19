@@ -1123,7 +1123,7 @@ class LearningUnitViewTestCase(TestCase):
         proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[2])
         msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
         expected_message = "{}. {}.".format(
-            "The learning unit has been updated",
+            _("The learning unit has been updated"),
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
