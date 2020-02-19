@@ -295,11 +295,15 @@ def get_border_columns(line):
 
 def _get_component_data_by_type(component):
     if component:
+        # FIXME :: Temporary solution - Waiting for real classes in OSIS
+        real_classes = component.get(REAL_CLASSES)
+        if component.get(PLANNED_CLASSES) > 0 and real_classes == 0:
+            real_classes = 1
         return [
             component.get(VOLUME_Q1) or BLANK_VALUE,
             component.get(VOLUME_Q2) or BLANK_VALUE,
             component.get(VOLUME_TOTAL) or BLANK_VALUE,
-            component.get(REAL_CLASSES) or 1,
+            real_classes or BLANK_VALUE,
             component.get(PLANNED_CLASSES) or BLANK_VALUE,
             component.get(VOLUME_TOTAL_REQUIREMENT_ENTITIES) or BLANK_VALUE,
             component.get(VOLUME_REQUIREMENT_ENTITY) or BLANK_VALUE,
