@@ -60,17 +60,14 @@
                     </div>
                     <div class="col-md-2">
                         {% bootstrap_label form.acronym.label %}
-                        {% include 'blocks/button/help_search_tooltip.html' %}
                         {% bootstrap_field form.acronym show_label=False %}
                     </div>
                     <div class="col-md-2">
                         {% bootstrap_label form.partial_acronym.label %}
-                        {% include 'blocks/button/help_search_tooltip.html' %}
                         {% bootstrap_field form.partial_acronym show_label=False %}
                     </div>
                     <div class="col-md-6">
                         {% bootstrap_label form.title.label %}
-                        {% include 'blocks/button/help_search_tooltip.html' %}
                         {% bootstrap_field form.title show_label=False %}
                     </div>
                 </div>
@@ -146,9 +143,9 @@
                                 {% csrf_token %}
                                 <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
-                            <span  style="margin-right: 10px">
-                                {% pagination_size_select %}
-                            </span>
+                            <div class="pull-right" style="margin-right: 10px">
+                                {% base_pagination_size_select %}
+                            </div>
                         </div>
 
                     </div>
