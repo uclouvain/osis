@@ -176,6 +176,7 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
             })
         return True
 
+    # FIXME :: DEPRECATED - Use NodeDuplicationValidator
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
             raise ValidationError(gettext("You can not add the same child several times."))

@@ -23,9 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
+
 from program_management.ddd.contrib.validation import BusinessValidator
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree import ProgramTree
 
 
+#  Implemented from _check_new_attach_is_not_duplication
 class NodeDuplicationValidator(BusinessValidator):
+
+    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+        super(NodeDuplicationValidator, self).__init__()
+        self.tree = tree
+        self.node_to_add = node_to_add
+        self.path = path
+
     def validate(self):
-        pass  # cf. _check_new_attach_is_not_duplication
+        if self.node_to_add in self.tree.get_node(self.path).children_as_nodes:
+            self.add_error_message(
+                _("You can not add the same child several times.")
+            )

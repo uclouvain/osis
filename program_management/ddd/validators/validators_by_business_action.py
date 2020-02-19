@@ -32,6 +32,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -65,6 +66,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
+                DetachRootForbiddenValidator,
             ]
 
         else:
