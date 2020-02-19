@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List, Set
 
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain.link import Link, factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite
@@ -81,6 +81,12 @@ class Node:
     @property
     def pk(self):
         return self.node_id
+
+    def is_finality(self):  # TODO :: unit test
+        return self.node_type in set(TrainingType.finality_types_enum())
+
+    def is_master_2m(self):  # TODO :: unit test
+        return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
     def get_all_children_as_nodes(
             self,

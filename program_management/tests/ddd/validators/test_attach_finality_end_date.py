@@ -50,18 +50,18 @@ class TestAttachFinalityEndDateValidator(TestCase):
     def test_init_when_tree_is_not_2m_and_node_to_attach_has_no_finality(self):
         not_tree_2m = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.ACCESS_CONTEST)
-        validator = AttachFinalityEndDateValidator([not_tree_2m], ProgramTreeFactory(root_node=node_to_attach))
+        validator = AttachFinalityEndDateValidator(not_tree_2m, ProgramTreeFactory(root_node=node_to_attach))
         self.assertTrue(validator.is_valid())
 
     def test_init_when_tree_is_not_2m_and_node_to_attach_has_finality(self):
         not_tree_2m = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
         with self.assertRaises(AssertionError):
             node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-            AttachFinalityEndDateValidator([not_tree_2m], ProgramTreeFactory(root_node=node_to_attach))
+            AttachFinalityEndDateValidator(not_tree_2m, ProgramTreeFactory(root_node=node_to_attach))
 
     def test_when_node_to_attach_is_finality_and_end_date_greater_than_2m(self):
         validator = AttachFinalityEndDateValidator(
-            [self.tree_2m],
+            self.tree_2m,
             ProgramTreeFactory(root_node=self.finality_node_greater_end_date)
         )
         self.assertFalse(validator.is_valid())
@@ -75,27 +75,12 @@ class TestAttachFinalityEndDateValidator(TestCase):
         }
         self.assertEqual(expected_msg, validator.error_messages[0])
 
-    def test_when_node_to_attach_is_finality_and_end_date_greater_than_multiple_2m(self):
-        other_tree_2m = ProgramTreeFactory(
-            root_node__node_type=TrainingType.PGRM_MASTER_180_240,
-            root_node__end_date=2090
-        )
-        validator = AttachFinalityEndDateValidator(
-            [self.tree_2m, other_tree_2m],
-            ProgramTreeFactory(root_node=self.finality_node_greater_end_date)
-        )
-
-        self.assertFalse(validator.is_valid())
-        self.assertEqual(len(validator.error_messages), 2)
-        self.assertIn(self.tree_2m.root_node.acronym, validator.error_messages[0].message)
-        self.assertIn(other_tree_2m.root_node.acronym, validator.error_messages[1].message)
-
     def test_when_node_to_attach_is_finality_and_end_date_lower(self):
         finality_node = NodeGroupYearFactory(
             node_type=TrainingType.MASTER_MA_120,
             end_date=self.tree_2m.root_node.end_date - 1
         )
-        validator = AttachFinalityEndDateValidator([self.tree_2m], ProgramTreeFactory(root_node=finality_node))
+        validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=finality_node))
         self.assertTrue(validator.is_valid())
 
     def test_when_node_to_attach_is_finality_and_end_date_equals(self):
@@ -103,13 +88,13 @@ class TestAttachFinalityEndDateValidator(TestCase):
             node_type=TrainingType.MASTER_MA_120,
             end_date=self.tree_2m.root_node.end_date
         )
-        validator = AttachFinalityEndDateValidator([self.tree_2m], ProgramTreeFactory(root_node=finality_node))
+        validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=finality_node))
         self.assertTrue(validator.is_valid())
 
     def test_when_node_to_attach_contains_finality_and_end_date_greater(self):
         node_to_attach = NodeGroupYearFactory()
         node_to_attach.add_child(self.finality_node_greater_end_date)
-        validator = AttachFinalityEndDateValidator([self.tree_2m], ProgramTreeFactory(root_node=node_to_attach))
+        validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=node_to_attach))
         self.assertFalse(validator.is_valid())
         expected_msg = ngettext(
             "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
@@ -128,7 +113,7 @@ class TestAttachFinalityEndDateValidator(TestCase):
             end_date=self.tree_2m.root_node.end_date
         )
         node_to_attach.add_child(finality_node)
-        validator = AttachFinalityEndDateValidator([self.tree_2m], ProgramTreeFactory(root_node=node_to_attach))
+        validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=node_to_attach))
         self.assertTrue(validator.is_valid())
 
     def test_validate_when_node_to_attach_is_not_finality(self):
@@ -136,7 +121,7 @@ class TestAttachFinalityEndDateValidator(TestCase):
             node_type=TrainingType.ACCESS_CONTEST,
             end_date=self.tree_2m.root_node.end_date + 1
         )
-        validator = AttachFinalityEndDateValidator([self.tree_2m], ProgramTreeFactory(root_node=not_finality_node))
+        validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=not_finality_node))
         self.assertTrue(validator.is_valid())
 
     def test_validate_when_node_to_attach_has_no_finality(self):
@@ -146,6 +131,6 @@ class TestAttachFinalityEndDateValidator(TestCase):
             end_date=self.tree_2m.root_node.end_date
         )
         node_to_attach.add_child(not_finality_node)
-        validator = AttachFinalityEndDateValidator([self.tree_2m], ProgramTreeFactory(root_node=node_to_attach))
+        validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=node_to_attach))
         test = validator.is_valid()
         self.assertTrue(test)

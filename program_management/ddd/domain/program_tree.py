@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List, Set
 
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from program_management.ddd.domain import node
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
 
@@ -47,6 +47,9 @@ class ProgramTree:
 
     def __eq__(self, other):
         return self.root_node == other.root_node
+
+    def is_master_2m(self):
+        return self.root_node.is_master_2m()
 
     # TODO :: unit test
     def get_parents_as_reference_link(self, child_node: node.Node) -> List[node.Node]:
@@ -95,6 +98,11 @@ class ProgramTree:
         if types:
             return set(n for n in all_nodes if n.node_type in types)
         return all_nodes
+
+    # TODO :: unit test
+    def get_all_finalities(self):
+        finality_types = set(TrainingType.finality_types_enum())
+        return self.get_all_nodes(types=finality_types)
 
     def attach_node(self, node_to_attach: node.Node, path: str = None, **link_attributes):
         """
