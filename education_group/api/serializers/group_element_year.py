@@ -115,7 +115,7 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
 
 class NodeTreeSerializer(CommonNodeTreeSerializer):
-    relative_credits = serializers.IntegerField(source='group_element_year.relative_credits', read_only=True)
+    credits = serializers.SerializerMethodField()
     is_mandatory = serializers.BooleanField(source='group_element_year.is_mandatory', read_only=True)
     access_condition = serializers.BooleanField(source='group_element_year.access_condition', read_only=True)
     comment = serializers.SerializerMethodField()
@@ -130,6 +130,10 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
     def get_comment(self, obj):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
         return getattr(obj.group_element_year, 'comment' + field_suffix)
+
+    def get_credits(self, obj):
+        ue = obj.group_element_year.child_leaf
+        return obj.group_element_year.relative_credits or ue.credits if ue else None
 
 
 class EducationGroupTreeSerializer(CommonNodeTreeSerializer):
