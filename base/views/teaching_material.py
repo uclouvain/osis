@@ -93,4 +93,3 @@ def _save_and_return_response(request, form, learning_unit_year):
     last_luy_reported = learning_unit_year.find_gt_learning_units_year().last()
     display_success_messages(request, update_pedagogy.build_success_message(last_luy_reported, learning_unit_year))
     return JsonResponse({})
-
