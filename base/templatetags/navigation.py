@@ -51,7 +51,6 @@ def update_context_with_navigation_elements(query_parameters, search_query_strin
     context["next_url"] = create_url(context["next_element"], query_parameters, index + 1) if context["next_element"] else None
     context["previous_element"] = get_previous_element(qs, index)
     context["previous_url"] = create_url(context["previous_element"], query_parameters, index - 1) if context["previous_element"] else None
-    context["index"] = index
     return context
 
 

@@ -34,46 +34,80 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
-class TestNavigation(TestCase):
+class TestNavigationEducationGroupYear(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
+        education_group_years = EducationGroupYearFactory.create_batch(5, academic_year=cls.academic_year)
+        cls.education_group_years_sorted_by_acronym = sorted(education_group_years, key=lambda obj: obj.acronym)
 
-    def test_navigation_for_education_group_year(self):
-        education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=self.academic_year)
-        education_group_child_1 = EducationGroupYearFactory(acronym="Child_1", academic_year=self.academic_year)
-        education_group_child_2 = EducationGroupYearFactory(acronym="Child_2", academic_year=self.academic_year)
-
-        query_parameters = QueryDict(mutable=True)
-        query_parameters["search_query"] = urllib.parse.quote_plus(
+    def setUp(self):
+        self.query_parameters = QueryDict(mutable=True)
+        self.query_parameters["search_query"] = urllib.parse.quote_plus(
             'academic_year={academic_year}&ordering=acronym'.format(
                 academic_year=self.academic_year.id
             )
         )
-        query_parameters["index"] = 0
 
-        context = navigation.navigation(query_parameters, education_group_child_1)
+    def test_navigation_when_no_search_query(self):
+        context = navigation.navigation(QueryDict(), self.education_group_years_sorted_by_acronym[0])
+        expected_context = {
+            "current_element": self.education_group_years_sorted_by_acronym[0]
+        }
+        self.assertDictEqual(
+            context,
+            expected_context
+        )
 
-        self.assertEqual(
-            context["next_element"],
-            education_group_child_2
-        )
-        query_parameters["index"] = 1
-        self.assertEqual(
-            context["next_url"],
-            "{}?{}".format(
-                reverse("education_group_read", args=[education_group_child_2.id, education_group_child_2.id]),
-                query_parameters.urlencode()
-            )
-        )
-        self.assertIsNone(
-            context["previous_element"]
-        )
-        self.assertIsNone(
-            context["previous_url"],
+    def test_first_element_should_not_have_previous_element(self):
+        first_element_index = 0
+        expected_context = {
+            "current_element": self.education_group_years_sorted_by_acronym[first_element_index],
+            "next_element": self.education_group_years_sorted_by_acronym[first_element_index + 1],
+            "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
+            "previous_element": None,
+            "previous_url": None,
+        }
+        self.assertNavigationContextEquals(expected_context, first_element_index)
 
+    def test_last_element_should_not_have_next_element(self):
+        last_element_index = len(self.education_group_years_sorted_by_acronym) - 1
+        expected_context = {
+            "current_element": self.education_group_years_sorted_by_acronym[last_element_index],
+            "next_element": None,
+            "next_url": None,
+            "previous_element": self.education_group_years_sorted_by_acronym[last_element_index - 1],
+            "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
+        }
+        self.assertNavigationContextEquals(expected_context, last_element_index)
+
+    def test_inner_element_should_have_previous_and_next_element(self):
+        inner_element_index = 2
+        expected_context = {
+            "current_element": self.education_group_years_sorted_by_acronym[inner_element_index],
+            "next_element": self.education_group_years_sorted_by_acronym[inner_element_index + 1],
+            "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
+            "previous_element": self.education_group_years_sorted_by_acronym[inner_element_index - 1],
+            "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
+        }
+        self.assertNavigationContextEquals(expected_context, inner_element_index)
+
+    def assertNavigationContextEquals(self, expected_context, index):
+        self.query_parameters["index"] = index
+        context = navigation.navigation(self.query_parameters, self.education_group_years_sorted_by_acronym[index])
+        self.assertDictEqual(
+            context,
+            expected_context
         )
-        self.assertEqual(
-            context["index"],
-            0
+
+    def _get_element_url(self, query_parameters: QueryDict, index):
+        query_parameters_with_updated_index = QueryDict(mutable=True)
+        query_parameters_with_updated_index.update(query_parameters)
+        query_parameters_with_updated_index["index"] = index
+
+        next_element = self.education_group_years_sorted_by_acronym[index]
+
+        return "{}?{}".format(
+            reverse("education_group_read", args=[next_element.id, next_element.id]),
+            query_parameters_with_updated_index.urlencode()
         )
