@@ -227,11 +227,9 @@
                     "targets": 1,
                     "data": "acronym",
                     "render": function ( data, type, row, meta ) {
-                        const search_query_params = new URLSearchParams(window.location.search);
-                        search_query_params.set("index", startingIndex + meta["row"]);
-
                         const params = new URLSearchParams();
-                        params.set("search_query", encodeURIComponent(search_query_params.toString().replace("?", "")));
+                        params.set("search_query", encodeURIComponent(window.location.search.replace("?", "")));
+                        params.set("index", startingIndex + meta["row"]);
 
                         const url = `${row['osis_url']}?${params.toString()}`;
                         const anchor = document.createElement("a");

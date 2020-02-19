@@ -180,28 +180,6 @@ class EducationGroupRead(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(len(response.context["versions"]), 2)
 
-    def test_navigation(self):
-        query_parameters = QueryDict(mutable=True)
-        query_parameters["search_query"] = urllib.parse.quote_plus(
-            'academic_year={academic_year}&ordering=acronym&index=0'.format(
-                academic_year=self.education_group_child_1.academic_year.id
-            )
-        )
-        response = self.client.get(self.url, data=query_parameters)
-
-        context = response.context
-        self.assertEqual(
-            context["next_element"],
-            self.education_group_child_2
-        )
-        self.assertIsNone(
-            context["previous_element"]
-        )
-        self.assertEqual(
-            context["index"],
-            0
-        )
-
 
 class TestReadEducationGroup(TestCase):
     @classmethod
@@ -396,25 +374,6 @@ class TestReadEducationGroup(TestCase):
         response = self.client.get(url)
 
         self.assertTrue(response.context['show_general_information'])
-
-    def test_navigation(self):
-        group = GroupFactory()
-        url = reverse("education_group_read", args=[group.pk, group.pk])
-        query_parameters = QueryDict(mutable=True)
-        query_parameters["search_query"] = 'ordering=acronym&index=0'
-        response = self.client.get(url, data=query_parameters)
-
-        context = response.context
-        self.assertIsNone(
-            context["next_element"]
-        )
-        self.assertIsNone(
-            context["previous_element"]
-        )
-        self.assertEqual(
-            context["index"],
-            0
-        )
 
 
 class EducationGroupDiplomas(TestCase):

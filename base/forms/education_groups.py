@@ -146,4 +146,5 @@ class EducationGroupFilter(FilterSet):
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
                 default=Value(''),
                 output_field=CharField()
-            ))
+            )
+        )

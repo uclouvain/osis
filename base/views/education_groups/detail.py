@@ -191,35 +191,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
 
-        search_query_string = self.request.GET.get("search_query", None)
-        if search_query_string:
-            unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-            self.update_context_with_navigation_elements(unquoted_search_query_string, context)
         return context
-
-    @staticmethod
-    def update_context_with_navigation_elements(search_query_string, context: Context):
-        search_parameters = QueryDict(search_query_string).dict()
-        index = int(search_parameters["index"])
-        qs = EducationGroupFilter(data=search_parameters).qs
-
-        context["next_element"] = EducationGroupGenericDetailView.get_next_element(qs, index)
-        context["previous_element"] = EducationGroupGenericDetailView.get_previous_element(qs, index)
-        context["index"] = index
-
-    @staticmethod
-    def get_next_element(qs, index):
-        try:
-            return qs[index + 1] if index >= 0 else None
-        except IndexError:
-            return None
-
-    @staticmethod
-    def get_previous_element(qs, index):
-        try:
-            return qs[index - 1] if index > 0 else None
-        except IndexError:
-            return None
 
     def get(self, request, *args, **kwargs):
         default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])

@@ -141,35 +141,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
         context["tab_active"] = "learning_unit"  # Corresponds to url_name
 
-        search_query_string = self.request.GET.get("search_query", None)
-        if search_query_string:
-            unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-            self.update_context_with_navigation_elements(unquoted_search_query_string, context)
         return context
-
-    @staticmethod
-    def update_context_with_navigation_elements(search_query_string, context: Context):
-        search_parameters = QueryDict(search_query_string).dict()
-        index = int(search_parameters["index"])
-        qs = LearningUnitFilter(data=search_parameters).qs
-
-        context["next_element"] = DetailLearningUnitYearView.get_next_element(qs, index)
-        context["previous_element"] = DetailLearningUnitYearView.get_previous_element(qs, index)
-        context["index"] = index
-
-    @staticmethod
-    def get_next_element(qs, index):
-        try:
-            return qs[index + 1] if index >= 0 else None
-        except IndexError:
-            return None
-
-    @staticmethod
-    def get_previous_element(qs, index):
-        try:
-            return qs[index - 1] if index > 0 else None
-        except IndexError:
-            return None
 
     def get_context_permission(self, proposal):
         context = {

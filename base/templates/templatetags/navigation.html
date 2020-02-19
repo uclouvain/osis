@@ -1,0 +1,43 @@
+{% load i18n %}
+{% load format %}
+
+<div class="row" style="margin:0 -15px 5px; padding:0;">
+    <div class="col-md-1">
+        <ul class="pager">
+            {% if previous_element %}
+                <li class="previous">
+                    <a id="previousNavLink" href="{{ previous_url  }}" data-toggle="tooltip" data-placement="top" title="{{ previous_element.acronym }}">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    </a>
+                </li>
+            {% else %}
+            <li class="previous disabled">
+                <a id="previousNavLink" data-toggle="tooltip" data-placement="top" title="">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <h2>{{ current_element.acronym|default_if_none:'' }} &mdash; {{ current_element.academic_year }}</h2>
+        <h4 style="margin-top: 0;">{{ current_element.title }}</h4>
+    </div>
+    <div class="col-md-1">
+        <ul class="pager">
+            {% if next_element %}
+                <li class="next">
+                    <a id="nextNavLink" href="{{ next_url  }}" data-toggle="tooltip" data-placement="top" title="{{ next_element.acronym }}">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="next disabled">
+                    <a id="nextNavLink" data-toggle="tooltip" data-placement="top" title="">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
