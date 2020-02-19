@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext as _
+
 from program_management.ddd.contrib.validation import BusinessListValidator
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, Node, \
     NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators._attach_finality_end_date import \
-    AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
@@ -37,7 +37,6 @@ from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
 from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
-from django.utils.translation import gettext as _
 
 
 class AttachNodeValidatorList(BusinessListValidator):
@@ -54,7 +53,6 @@ class AttachNodeValidatorList(BusinessListValidator):
                 ParentIsNotLeafValidator,
                 AttachAuthorizedRelationshipValidator,
                 AttachOptionsValidator,
-                AttachFinalityEndDateValidator,  # TODO :: move into service? Is working only if tree is 2M node...
                 NodeDuplicationValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
