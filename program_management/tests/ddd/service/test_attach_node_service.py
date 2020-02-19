@@ -198,4 +198,4 @@ class TestValidateEndDateAndOptionFinality(TestCase, ValidatorPatcherMixin):
 
         result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error attach option message"
-        self.assertEqual(result[0].message, validator_msg)
+        self.assertIn(validator_msg, result)
