@@ -710,6 +710,8 @@ components:
           type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
+        sub_type:
+          $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
           type: string
         credits:
@@ -762,6 +764,68 @@ components:
         - TRAINING
         - MINI_TRAINING
         - LEARNING_UNIT
+    LearningUnitTypeEnum:
+      type: string
+      enum:
+        - COURSE
+        - INTERNSHIP
+        - DISSERTATION
+        - OTHER_COLLECTIVE
+        - OTHER_INDIVIDUAL
+        - MASTER_THESIS
+        - EXTERNAL
+    EducationGroupTypeEnum:
+      type: array
+      enum:
+        - COMMON_CORE
+        - MINOR_LIST_CHOICE
+        - MAJOR_LIST_CHOICE
+        - OPTION_LIST_CHOICE
+        - FINALITY_120_LIST_CHOICE
+        - FINALITY_180_LIST_CHOICE
+        - MOBILITY_PARTNERSHIP_LIST_CHOICE
+        - COMPLEMENTARY_MODULE
+        - SUB_GROUP
+        - DEEPENING
+        - SOCIETY_MINOR
+        - ACCESS_MINOR
+        - OPEN_MINOR
+        - DISCIPLINARY_COMPLEMENT_MINOR
+        - FSA_SPECIALITY
+        - OPTION
+        - MOBILITY_PARTNERSHIP
+        - AGGREGATION
+        - CERTIFICATE_OF_PARTICIPATION
+        - CERTIFICATE_OF_SUCCESS
+        - CERTIFICATE_OF_HOLDING_CREDITS
+        - BACHELOR
+        - CERTIFICATE
+        - CAPAES
+        - RESEARCH_CERTIFICATE
+        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
+        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+        - ACCESS_CONTEST
+        - LANGUAGE_CLASS
+        - ISOLATED_CLASS
+        - PHD
+        - FORMATION_PHD
+        - JUNIOR_YEAR
+        - PGRM_MASTER_120
+        - MASTER_MA_120
+        - MASTER_MD_120
+        - MASTER_MS_120
+        - PGRM_MASTER_180_240
+        - MASTER_MA_180_240
+        - MASTER_MD_180_240
+        - MASTER_MS_180_240
+        - MASTER_M1
+        - MASTER_MC
+        - INTERNSHIP
+    NodeSubTypeEnum:
+      allOf:
+        - $ref: '#/components/schemas/LearningUnitTypeEnum'
+        - $ref: '#/components/schemas/EducationGroupTypeEnum'
+
     NodeLinkTypeEnum:
       type: string
       enum:

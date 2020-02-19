@@ -75,6 +75,7 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
     code = serializers.CharField(source='education_group_year.partial_acronym', read_only=True)
     title = serializers.SerializerMethodField()
     node_type = serializers.SerializerMethodField()
+    subtype = serializers.SerializerMethodField()
 
     def get_node_type(self, obj):
         if obj.education_group_year is None:
@@ -91,6 +92,11 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
         if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
             return getattr(obj.learning_unit_year, 'complete_title' + field_suffix)
         return getattr(obj.education_group_year, 'title' + field_suffix)
+
+    def get_subtype(self, obj):
+        if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
+            return obj.learning_unit_year.learning_container_year.container_type
+        return obj.education_group_year.education_group_type.name
 
 
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):

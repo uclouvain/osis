@@ -154,7 +154,8 @@ class EducationGroupHierarchy:
             .prefetch_related('child_branch__administration_entity__entityversion_set',
                               'child_branch__management_entity__entityversion_set',
                               'child_leaf__learning_container_year__requirement_entity__entityversion_set',
-                              'child_leaf__learning_container_year__allocation_entity__entityversion_set')\
+                              'child_leaf__learning_container_year__allocation_entity__entityversion_set',
+                              'child_leaf__learningcomponentyear_set')\
             .order_by("order", "parent__partial_acronym")
 
     def to_json(self):

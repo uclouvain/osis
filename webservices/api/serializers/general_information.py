@@ -26,7 +26,7 @@
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Value, CharField
+from django.db.models import Value, CharField, Case, When, F
 from rest_framework import serializers
 
 from base.business.education_groups import general_information_sections
@@ -123,8 +123,16 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
                 self._get_correct_label_name(egy, section),
                 output_field=CharField()
             ),
-            translated_label=Value(translated_text_label.label, output_field=CharField())
+            translated_label=Value(translated_text_label.label, output_field=CharField()),
+            translated_text=Case(
+                When(text__exact='', then=None),
+                default=F('text'),
+                output_field=CharField()
+            )
+        ).values('label', 'translated_label', 'translated_text').annotate(
+            text=F('translated_text')
         )
+
         try:
             return translated_text.values('label', 'translated_label', 'text').get()
         except ObjectDoesNotExist:
