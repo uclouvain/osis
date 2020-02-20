@@ -24,15 +24,18 @@
 #
 ############################################################################
 import urllib
+from unittest import mock
 
 from django.http import QueryDict
 from django.test import TestCase
 from django.urls import reverse
 
+from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.templatetags import navigation
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.views.learning_units.search.common import SearchTypes
 
 
 class TestNavigationMixin:
@@ -140,6 +143,24 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
             reverse(self.url_name, args=[next_element.id]),
             query_parameters_with_updated_index.urlencode()
         )
+
+    def test_filter_called_depending_on_search_type(self):
+        self.query_parameters["search_type"] = SearchTypes.EXTERNAL_SEARCH.value
+        self.query_parameters["index"] = 0
+
+        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_forms",
+                                              return_value=LearningUnitFilter)
+        self.mocked_filter_form = self.filter_form_patcher.start()
+
+        navigation.navigation(
+            self.query_parameters,
+            self.elements_sorted_by_acronym[0],
+            self.url_name
+        )
+
+        self.assertTrue(self.mocked_filter_form.called)
+
+        self.filter_form_patcher.stop()
 
 
 class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):

@@ -233,6 +233,7 @@
                             encodeURIComponent((new URLSearchParams(meta.settings.oAjaxData)).toString())
                         );
                         params.set("index", startingIndex + meta["row"]);
+                        params.set("search_type", "{{ search_type.value }}");
 
                         const url = `${row['osis_url']}?${params.toString()}`;
                         const anchor = document.createElement("a");

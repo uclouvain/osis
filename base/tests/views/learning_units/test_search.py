@@ -31,7 +31,7 @@ from django.urls import reverse
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.views.learning_units.search.common import BORROWED_COURSE
+from base.views.learning_units.search.common import SearchTypes
 
 
 class TestSearchBorrowedLearningUnits(TestCase):
@@ -60,7 +60,7 @@ class TestSearchBorrowedLearningUnits(TestCase):
         response = self.client.get(self.url)
 
         context = response.context
-        self.assertEqual(context["search_type"], BORROWED_COURSE)
+        self.assertEqual(context["search_type"], SearchTypes.BORROWED_COURSE)
         self.assertTemplateUsed(response, "learning_unit/search/base.html")
 
 

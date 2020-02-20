@@ -25,6 +25,7 @@
 ##############################################################################
 import collections
 import itertools
+from enum import Enum
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
@@ -44,12 +45,14 @@ from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.common import remove_from_session
 
-SIMPLE_SEARCH = 1
-SERVICE_COURSES_SEARCH = 2
-PROPOSAL_SEARCH = 3
-SUMMARY_LIST = 4
-BORROWED_COURSE = 5
-EXTERNAL_SEARCH = 6
+
+class SearchTypes(Enum):
+    SIMPLE_SEARCH = 1
+    SERVICE_COURSES_SEARCH = 2
+    PROPOSAL_SEARCH = 3
+    SUMMARY_LIST = 4
+    BORROWED_COURSE = 5
+    EXTERNAL_SEARCH = 6
 
 
 class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
@@ -83,9 +86,9 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
 
     def _save_search_type_in_session(self):
         remove_from_session(self.request, 'search_url')
-        if self.search_type == EXTERNAL_SEARCH:
+        if self.search_type == SearchTypes.EXTERNAL_SEARCH:
             self.request.session['ue_search_type'] = str(_('External learning units'))
-        elif self.search_type == SIMPLE_SEARCH:
+        elif self.search_type == SearchTypes.SIMPLE_SEARCH:
             self.request.session['ue_search_type'] = None
         else:
             self.request.session['ue_search_type'] = str(_get_search_type_label(self.search_type))
@@ -98,9 +101,9 @@ def _get_filter(form, search_type):
 
 def _get_search_type_label(search_type):
     return {
-        PROPOSAL_SEARCH: _('Proposals'),
-        SERVICE_COURSES_SEARCH: _('Service courses'),
-        BORROWED_COURSE: _('Borrowed courses')
+        SearchTypes.PROPOSAL_SEARCH: _('Proposals'),
+        SearchTypes.SERVICE_COURSES_SEARCH: _('Service courses'),
+        SearchTypes.BORROWED_COURSE: _('Borrowed courses')
     }.get(search_type, _('Learning units'))
 
 

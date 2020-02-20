@@ -30,9 +30,15 @@ from django.template.defaulttags import register
 from django.urls import reverse
 
 from base.forms.education_groups import EducationGroupFilter
+from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
+from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
+from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter
+from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.views.learning_units.search.common import SearchTypes
 
 
 @register.inclusion_tag('templatetags/navigation.html', takes_context=False)
@@ -41,12 +47,13 @@ def navigation(query_parameters: QueryDict, current_element, url_name):
 
     search_query_string = query_parameters.get("search_query")
     index = query_parameters.get("index")
+    search_type = query_parameters.get("search_type")
     if search_query_string and index is not None:
         unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
         if isinstance(current_element, EducationGroupYear):
             context.update(get_neighbor_elements(query_parameters, unquoted_search_query_string, int(index), url_name))
         elif isinstance(current_element, LearningUnitYear):
-            context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name))
+            context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name, search_type))
     return context
 
 
@@ -56,16 +63,18 @@ def navigation_lu(query_parameters: QueryDict, current_element, url_name):
 
     search_query_string = query_parameters.get("search_query")
     index = query_parameters.get("index")
+    search_type = query_parameters.get("search_type")
     if search_query_string and index is not None:
         unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-        context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name))
+        context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name, search_type))
 
     return context
 
 
-def get_neighbor_elements_lu(query_parameters, search_query_string, index, url_name):
+def get_neighbor_elements_lu(query_parameters, search_query_string, index, url_name, search_type):
     search_parameters = QueryDict(search_query_string).dict()
-    qs = LearningUnitFilter(data=search_parameters).qs
+    filter_form_class = _get_learning_unit_forms(search_type)
+    qs = filter_form_class(data=search_parameters).qs
     next_element = _get_next_element(qs, index)
     previous_element = _get_previous_element(qs, index)
     return {
@@ -74,6 +83,18 @@ def get_neighbor_elements_lu(query_parameters, search_query_string, index, url_n
         "previous_element": previous_element,
         "previous_url": _create_url_lu(previous_element, query_parameters, index - 1, url_name) if previous_element else None
     }
+
+
+def _get_learning_unit_forms(search_type):
+    map_search_type_to_filter_form = {
+        SearchTypes.SIMPLE_SEARCH.value: LearningUnitFilter,
+        SearchTypes.SERVICE_COURSES_SEARCH.value: ServiceCourseFilter,
+        SearchTypes.PROPOSAL_SEARCH.value: ProposalLearningUnitFilter,
+        SearchTypes.SUMMARY_LIST.value: LearningUnitDescriptionFicheFilter,
+        SearchTypes.BORROWED_COURSE.value: BorrowedLearningUnitSearch,
+        SearchTypes.EXTERNAL_SEARCH.value: ExternalLearningUnitFilter,
+    }
+    return map_search_type_to_filter_form.get(int(search_type), LearningUnitFilter)
 
 
 def get_neighbor_elements(query_parameters, search_query_string, index, url_name):

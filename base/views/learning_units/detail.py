@@ -23,13 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-import urllib
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
-from django.http import QueryDict
 from django.shortcuts import get_object_or_404
-from django.template import Context
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
@@ -39,7 +36,6 @@ from base.business.learning_unit import get_all_attributions, get_components_ide
 from base.business.learning_unit_proposal import get_difference_of_proposal
 from base.business.learning_units.perms import is_eligible_to_create_partim, learning_unit_year_permissions, \
     learning_unit_proposal_permissions, is_eligible_for_modification
-from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
