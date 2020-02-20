@@ -430,21 +430,21 @@ def _build_description_fiche_cols(luy, gey):
     )
 
 
-def build_annotations(sq: QuerySet, fr_labels: list, en_labels: list):
+def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
     annotations = {
         lbl: Subquery(
-            _build_subquery_tex_label(sq, lbl, settings.LANGUAGE_CODE_FR))
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
         for lbl in fr_labels
     }
 
     annotations.update({
         "{}_en".format(lbl): Subquery(
-            _build_subquery_tex_label(sq, lbl, settings.LANGUAGE_CODE_EN))
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
         for lbl in en_labels}
     )
     return annotations
 
 
-def _build_subquery_tex_label(sq, cms_text_label, lang):
-    return sq.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
+def _build_subquery_text_label(qs, cms_text_label, lang):
+    return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
         'text')[:1]
