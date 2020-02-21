@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Set
+from typing import List, Set, Dict
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain.link import Link, factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite
+from base.models.enums.proposal_type import ProposalType
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.prerequisite import Prerequisite, PrerequisiteExpression
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.business_types import *
 
 
 class NodeFactory:
@@ -57,7 +60,7 @@ class Node:
             node_id: int,
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
-            children: List[Link] = None
+            children: List['Link'] = None
     ):
         self.node_id = node_id
         if children is None:
@@ -82,17 +85,17 @@ class Node:
     def pk(self):
         return self.node_id
 
-    def is_finality(self):  # TODO :: unit test
+    def is_finality(self) -> bool:  # TODO :: unit test
         return self.node_type in set(TrainingType.finality_types_enum())
 
-    def is_master_2m(self):  # TODO :: unit test
+    def is_master_2m(self) -> bool:  # TODO :: unit test
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
     def get_all_children_as_nodes(
             self,
             filter_types: Set[EducationGroupTypesEnum] = None,
             ignore_children_from: Set[EducationGroupTypesEnum] = None  # TODO :: unit tests
-    ):  # TODO :: typing -> Set[Node]
+    ) -> Set['Node']:
         result = set()
         for link in self.children:
             child = link.child
@@ -105,7 +108,7 @@ class Node:
         return result
 
     @property
-    def children_as_nodes(self):   # TODO :: typing -> List[Node]
+    def children_as_nodes(self) -> List['Node']:
         return [link.child for link in self.children]
 
     def get_children_types(self, include_nodes_used_as_reference=False) -> List[EducationGroupTypesEnum]:
@@ -123,18 +126,18 @@ class Node:
         return list_child_nodes_types
 
     @property
-    def descendents(self):   # TODO :: add unit tests
+    def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def add_child(self, node, **kwargs):
+    def add_child(self, node: 'Node', **kwargs):
         child = link_factory.get_link(parent=self, child=node, **kwargs)
         self.children.append(child)
 
-    def detach_child(self, node_id):
+    def detach_child(self, node_id: int):
         self.children = [link for link in self.children if link.child.pk == node_id]
 
 
-def _get_descendents(root_node: Node, current_path: str = None):
+def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
     _descendents = {}
     if current_path is None:
         current_path = str(root_node.pk)
@@ -149,7 +152,7 @@ def _get_descendents(root_node: Node, current_path: str = None):
 
 
 class NodeEducationGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
+    def __init__(self, node_id: int, acronym: str, title, year, children: List['Link'] = None, **kwargs):
         super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
         self.acronym = acronym
         self.title = title
@@ -157,7 +160,7 @@ class NodeEducationGroupYear(Node):
 
 
 class NodeGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, children: List[Link] = None, **kwargs):
+    def __init__(self, node_id: int, acronym, title, year, children: List['Link'] = None, **kwargs):
         super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
         self.acronym = acronym
         self.title = title
@@ -167,23 +170,23 @@ class NodeGroupYear(Node):
 class NodeLearningUnitYear(Node):
     def __init__(self, node_id: int, acronym, title, year, proposal_type=None, **kwargs):
         super().__init__(node_id, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
-        self.acronym = acronym
-        self.title = title
-        self.year = year
-        self.proposal_type = proposal_type
-        self.prerequisite = None
-        self.is_prerequisite_of = []
+        self.acronym: str = acronym
+        self.title: str = title
+        self.year: str = year
+        self.proposal_type: ProposalType = proposal_type
+        self.prerequisite: PrerequisiteExpression = None  # FIXME : Should be of type Prerequisite?
+        self.is_prerequisite_of: List['NodeLearningUnitYear'] = []
 
     @property
-    def has_prerequisite(self):
+    def has_prerequisite(self) -> bool:
         return bool(self.prerequisite)
 
     @property
-    def is_prerequisite(self):
+    def is_prerequisite(self) -> bool:
         return bool(self.is_prerequisite_of)
 
     @property
-    def has_proposal(self):
+    def has_proposal(self) -> bool:
         return bool(self.proposal_type)
 
     def set_prerequisite(self, prerequisite: Prerequisite):
@@ -191,7 +194,7 @@ class NodeLearningUnitYear(Node):
 
 
 class NodeLearningClassYear(Node):
-    def __init__(self, node_id: int, year, children: List[Link] = None):
+    def __init__(self, node_id: int, year: int, children: List['Link'] = None):
         super().__init__(node_id, children)
         self.year = year
 

@@ -28,6 +28,9 @@ from typing import List
 from base.models.enums import prerequisite_operator
 
 
+PrerequisiteExpression = str  # Example : "(Prerequisite1 OR Prerequisite2) AND (prerequisite3)"
+
+
 class PrerequisiteItem:
     def __init__(self, acronym: str, year: int):
         self.acronym = acronym
@@ -60,7 +63,7 @@ class Prerequisite:
     def add_prerequisite_item_group(self, group: PrerequisiteItemGroup):
         self.prerequisite_item_groups.append(group)
 
-    def __str__(self):
+    def __str__(self) -> PrerequisiteExpression:
         str_format = "({})" if len(self.prerequisite_item_groups) > 1 else "{}"
         return str(" " + self.main_operator + " ").join(
             str_format.format(group) for group in self.prerequisite_item_groups

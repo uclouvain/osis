@@ -27,8 +27,8 @@
 from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
+from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain.program_tree import ProgramTree
 
 
 # TODO :: get a common mixin (merge with AttachFinalityEndDateValidator ?)
@@ -39,7 +39,7 @@ class AttachOptionsValidator(BusinessValidator):
     this options must exist in parent context (2m)
     """
 
-    def __init__(self, tree_2m: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
+    def __init__(self, tree_2m: 'ProgramTree', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachOptionsValidator, self).__init__()
         msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
         assert isinstance(tree_from_node_to_add, ProgramTree), msg

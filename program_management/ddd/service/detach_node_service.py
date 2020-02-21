@@ -25,9 +25,9 @@
 ##############################################################################
 from typing import List
 
+from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessValidationMessage
-from program_management.ddd.domain.program_tree import ProgramTree
 
 
-def detach_node(tree: ProgramTree, path: str = None) -> List[BusinessValidationMessage]:
+def detach_node(tree: 'ProgramTree', path: 'Path' = None) -> List[BusinessValidationMessage]:
     return tree.detach_node(path)

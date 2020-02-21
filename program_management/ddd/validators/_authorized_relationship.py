@@ -23,16 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain import node
-from program_management.ddd.domain.program_tree import ProgramTree
 from django.utils.translation import gettext as _
+
+from program_management.ddd.business_types import *
+from program_management.ddd.contrib.validation import BusinessValidator
 
 
 # Implemented from CheckAuthorizedRelationship (management.py)
 class AuthorizedRelationshipValidator(BusinessValidator):
 
-    def __init__(self, tree: ProgramTree, node_to_add: node.Node, position_to_add: node.Node):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', position_to_add: 'Node'):
         super(AuthorizedRelationshipValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add

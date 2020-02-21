@@ -26,11 +26,13 @@
 from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
-from program_management.ddd.domain import node
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
-
+from program_management.ddd.domain.node import Node
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 
 PATH_SEPARATOR = '|'
+Path = str  # Example : "root/node1/node2/child_leaf"
 
 
 class ProgramTree:
@@ -39,8 +41,8 @@ class ProgramTree:
     authorized_relationships = None
 
     # TODO :: load authorized_relationship into the __init__ ? (not use it as kwarg?)
-    def __init__(self, root_node: node.Node, authorized_relationships: AuthorizedRelationshipList = None):
-        if not isinstance(root_node, node.Node):
+    def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
+        if not isinstance(root_node, Node):
             raise Exception('root_group args must be an instance of Node')
         self.root_node = root_node
         self.authorized_relationships = authorized_relationships
@@ -52,7 +54,7 @@ class ProgramTree:
         return self.root_node.is_master_2m()
 
     # TODO :: unit test
-    def get_parents_as_reference_link(self, child_node: node.Node) -> List[node.Node]:
+    def get_parents_as_reference_link(self, child_node: 'Node') -> List['Node']:
         result = []
         for tree_node in self.get_all_nodes():
             for link in tree_node.children:
@@ -61,7 +63,7 @@ class ProgramTree:
         return result
 
     # TODO :: unit test + RecursionError
-    def get_parents(self, path: str) -> List[node.Node]:
+    def get_parents(self, path: Path) -> List['Node']:
         result = []
         str_nodes = path.split(PATH_SEPARATOR)
         if len(str_nodes) > 1:
@@ -71,8 +73,7 @@ class ProgramTree:
             result.append(self.get_node(str_nodes[0]))
         return result
 
-    # TODO :: typer "path" (pour plus de lisibilité dans le code)
-    def get_node(self, path: str) -> node.Node:
+    def get_node(self, path: Path) -> 'Node':
         """
         Return the corresponding node based on path of tree
         :param path: str
@@ -86,10 +87,8 @@ class ProgramTree:
         except KeyError:
             raise node.NodeNotFoundException
 
-    # def get_path(self, node: node.Node) -> str:
-
     # TODO :: unit test (set and not list)
-    def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set[node.Node]:
+    def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
         Return a flat list of all nodes which are in the tree
         :return: list of Node
@@ -104,7 +103,7 @@ class ProgramTree:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
-    def attach_node(self, node_to_attach: node.Node, path: str = None, **link_attributes):
+    def attach_node(self, node_to_attach: 'Node', path: Path = None, **link_attributes):
         """
         Add a node to the tree
         :param node_to_attach: Node to add on the tree
@@ -117,10 +116,8 @@ class ProgramTree:
             parent.add_child(node_to_attach, **link_attributes)
         return messages
 
-    def clean_attach_node(self, node, path):
-        # Avoid circular import
-        from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
-        validator = AttachNodeValidatorList(self, node, path)
+    def clean_attach_node(self, node_to_attach: 'Node', path: Path):
+        validator = AttachNodeValidatorList(self, node_to_attach, path)
         return validator.is_valid(), validator.messages
 
     def detach_node(self, path: str):
@@ -136,7 +133,7 @@ class ProgramTree:
         parent.detach_child(node_id)
 
 
-def _nodes_from_root(root: node.Node):  # TODO :: reuse Node.all_children_as_nodes
+def _nodes_from_root(root: 'Node'):  # TODO :: reuse Node.all_children_as_nodes
     nodes = [root]
     for link in root.children:
         nodes.extend(_nodes_from_root(link.child))

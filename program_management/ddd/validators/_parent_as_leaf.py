@@ -26,14 +26,13 @@
 from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain.node import Node, NodeLearningUnitYear
-from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.business_types import *
 
 
 # Implemented from AttachPermission._check_if_leaf
 class ParentIsNotLeafValidator(BusinessValidator):
 
-    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
         super(ParentIsNotLeafValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add

@@ -26,13 +26,12 @@
 from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain.node import Node
-from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.business_types import *
 
 
 # Implemented from DetachPermission._check_if_root
 class DetachRootForbiddenValidator(BusinessValidator):
-    def __init__(self, tree: ProgramTree, node_to_detach: Node):
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node'):
         super(DetachRootForbiddenValidator, self).__init__()
         self.tree = tree
         self.node_to_detach = node_to_detach

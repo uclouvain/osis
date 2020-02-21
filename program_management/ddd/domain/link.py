@@ -23,45 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
+from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 
 
 class Link:
 
-    # TODO :: Typing for Node (cyclic import)
-    # Solution 1 : if TYPE_CHECKING: from program_management.domain.node import Node + replace Node -> 'Node'
-    # Solution 2 : Node = TypeVar("Node", bound="program_management.domain.node.Node")
-    # Solution 3 : Node = TypeAlias('program_management.domain.node.Node')  # must be fully qualified name?
-    # Solution 4 : creates an interface used by Node and Link
-    parent = None
-    child = None
-    relative_credits = None
-    min_credits = None
-    max_credits = None
-    is_mandatory = None
-    block = None
-    access_condition = None  # TODO :: typing
-    comment = None
-    comment_english = None
-    own_comment = None
-    quadrimester_derogation = None  # TODO :: typing
-    link_type = None  # TODO :: Move Enum from model to business
-
-    def __init__(self, parent, child, **kwargs):
-        self.parent = parent
-        self.child = child
-        self.relative_credits = kwargs.get('relative_credits')
-        self.min_credits = kwargs.get('min_credits')
-        self.max_credits = kwargs.get('max_credits')
+    def __init__(self, parent: 'Node', child: 'Node', **kwargs):
+        self.parent: 'Node' = parent
+        self.child: 'Node' = child
+        self.relative_credits: int = kwargs.get('relative_credits')
+        self.min_credits: int = kwargs.get('min_credits')
+        self.max_credits: int = kwargs.get('max_credits')
         self.is_mandatory = kwargs.get('is_mandatory') or False
-        self.block = kwargs.get('block')
-        self.access_condition = kwargs.get('access_condition') or False
-        self.comment = kwargs.get('comment')
-        self.comment_english = kwargs.get('comment_english')
-        self.own_comment = kwargs.get('own_comment')
-        self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
-        self.link_type = kwargs.get('link_type')
+        self.block: str = kwargs.get('block')
+        self.access_condition: str = kwargs.get('access_condition') or False
+        self.comment: str = kwargs.get('comment')
+        self.comment_english: str = kwargs.get('comment_english')
+        self.own_comment: str = kwargs.get('own_comment')
+        self.quadrimester_derogation: DerogationQuadrimesterEnum = kwargs.get('quadrimester_derogation')
+        self.link_type: LinkTypes = kwargs.get('link_type')
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
@@ -81,7 +65,7 @@ class LinkWithChildBranch(Link):
 
 class LinkFactory:
 
-    def get_link(self, parent, child, **kwargs) -> Link:
+    def get_link(self, parent: 'Node', child: 'Node', **kwargs) -> Link:
         if parent and parent.node_type == NodeType.LEARNING_UNIT.name:
             return LinkWithChildLeaf(parent, child, **kwargs)
         else:

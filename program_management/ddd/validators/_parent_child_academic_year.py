@@ -25,15 +25,14 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain.node import Node
-from program_management.ddd.domain.program_tree import ProgramTree
 
 
 # Implemented from GroupElementYear._check_same_academic_year_parent_child_branch
 class ParentChildSameAcademicYearValidator(BusinessValidator):
 
-    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
         super(ParentChildSameAcademicYearValidator, self).__init__()
         self.tree = tree
         self.node_to_add = node_to_add

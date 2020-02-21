@@ -25,11 +25,9 @@
 ##############################################################################
 from typing import List
 
-from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessValidationMessage
-from program_management.ddd.domain.node import Node, NodeNotFoundException
-from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import fetch_tree, save_tree
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
@@ -37,9 +35,9 @@ from program_management.ddd.validators._authorized_relationship import AttachAut
 
 
 def attach_node(
-        tree: ProgramTree,
-        node: Node,
-        path: str = None,
+        tree: 'ProgramTree',
+        node: 'Node',
+        path: 'Path' = None,
         commit=True,
         **link_attributes
 ) -> List[BusinessValidationMessage]:
@@ -54,9 +52,9 @@ def attach_node(
 
 
 def __validate_trees_using_node_as_reference_link(
-        tree: ProgramTree,
-        node_to_attach: Node,
-        path: str
+        tree: 'ProgramTree',
+        node_to_attach: 'Node',
+        path: 'Path'
 ) -> List[BusinessValidationMessage]:
 
     error_messages = []
@@ -70,7 +68,7 @@ def __validate_trees_using_node_as_reference_link(
     return error_messages
 
 
-def _validate_end_date_and_option_finality(node_to_attach: Node) -> List[BusinessValidationMessage]:
+def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List[BusinessValidationMessage]:
     # TODO :: inclure le ftech dans le validateur? Et gérer cette boucle dans le validateur?
     error_messages = []
     tree_from_node_to_attach = fetch_tree.fetch(node_to_attach.node_id)

@@ -25,11 +25,9 @@
 ##############################################################################
 from django.utils.translation import gettext as _
 
+from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessListValidator
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, Node, \
-    NodeGroupYear
-from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators._attach_option import AttachOptionsValidator
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
 from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
@@ -47,7 +45,7 @@ class AttachNodeValidatorList(BusinessListValidator):
         _('Success message')
     ]
 
-    def __init__(self, tree: ProgramTree, node_to_add: Node, path: str):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
 
         # TODO :: instancier les validators directement, plutôt que d'avoir des classes (les paramètres changent)
         if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):

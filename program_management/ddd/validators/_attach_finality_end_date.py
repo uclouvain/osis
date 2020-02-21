@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import TrainingType
+from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessValidator
-from program_management.ddd.domain.program_tree import ProgramTree
 
 
 # Implemented from _check_end_year_constraints_on_2m
@@ -39,7 +38,7 @@ class AttachFinalityEndDateValidator(BusinessValidator):
     the end date of all 2M is greater or equals of all finalities.
     """
 
-    def __init__(self, tree_2m: ProgramTree, tree_from_node_to_add: ProgramTree, *args):
+    def __init__(self, tree_2m: 'ProgramTree', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachFinalityEndDateValidator, self).__init__()
         msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
         assert isinstance(tree_from_node_to_add, ProgramTree), msg

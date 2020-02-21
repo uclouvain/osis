@@ -27,15 +27,10 @@ from collections import Counter
 from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
-from program_management.ddd.domain.node import Node
+from program_management.ddd.business_types import *
 
 
 class AuthorizedRelationship:
-    parent_type = None  # TODO :: move EducationGroupTypesEnum from model to business
-    child_type = None
-    min_constraint = None
-    max_constraint = None
-
     def __init__(
             self,
             parent_type: EducationGroupTypesEnum,
@@ -51,7 +46,6 @@ class AuthorizedRelationship:
 
 #  TODO :: unit tests functions
 class AuthorizedRelationshipList:
-    authorized_relationships = None
 
     def __init__(self, authorized_relationships: List[AuthorizedRelationship]):
         assert authorized_relationships, "You must set at least 1 authorized relation (list can't be empty)"
@@ -59,7 +53,7 @@ class AuthorizedRelationshipList:
         assert isinstance(authorized_relationships[0], AuthorizedRelationship)
         self.authorized_relationships = authorized_relationships
 
-    def _get_authorized_relationship(self, parent_node: Node, child_node: Node) -> AuthorizedRelationship:
+    def _get_authorized_relationship(self, parent_node: 'Node', child_node: 'Node') -> AuthorizedRelationship:
         return next(
             (
                 auth_rel for auth_rel in self.authorized_relationships
@@ -69,23 +63,23 @@ class AuthorizedRelationshipList:
             None
         )
 
-    def is_authorized(self, parent_node: Node, child_node: Node) -> bool:
+    def is_authorized(self, parent_node: 'Node', child_node: 'Node') -> bool:
         return child_node.node_type in self.get_authorized_children_types(parent_node)
 
-    def get_authorized_children_types(self, parent_node: Node) -> Set[EducationGroupTypesEnum]:
+    def get_authorized_children_types(self, parent_node: 'Node') -> Set[EducationGroupTypesEnum]:
         return set(
             auth_rel.child_type for auth_rel in self.authorized_relationships
             if auth_rel.parent_type == parent_node.node_type
         )
 
-    def is_minimum_children_types_reached(self, parent_node: Node, child_node: Node):
+    def is_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         if not self.is_authorized(parent_node, child_node):
             return False
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
         return current_count == self._get_authorized_relationship(parent_node, child_node).min_constraint
 
-    def is_maximum_children_types_reached(self, parent_node: Node, child_node: Node):
+    def is_maximum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         if not self.is_authorized(parent_node, child_node):
             return False
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
