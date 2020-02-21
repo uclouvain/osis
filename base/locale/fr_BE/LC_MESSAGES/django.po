@@ -3686,9 +3686,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Do you want to get back to initial data?"
-#~ msgstr "Voulez-vous retourner à l'état initial?"
-
-#~ msgid "Get back to initial data"
-#~ msgstr "Retour à l'état initial"
