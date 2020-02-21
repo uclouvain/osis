@@ -211,6 +211,21 @@ class TestFetchTreesFromChildren(TestCase):
         for tree in expected_result:
             self.assertIn(tree, result)
 
+    def test_when_root_is_2_levels_up(self):
+        child = self.link_level_2.child_branch
+        lvl1 = GroupElementYearFactory(
+            parent__academic_year=child.academic_year,
+            child_branch=child
+        )
+        lvl2 = GroupElementYearFactory(
+            parent__academic_year=child.academic_year,
+            child_branch=lvl1.parent
+        )
+        result = fetch_tree.fetch_trees_from_children([child.id])
+        expected_parent = fetch_tree.fetch(lvl2.parent.id)
+        self.assertNotIn(fetch_tree.fetch(lvl1.parent.id), result)
+        self.assertIn(expected_parent, result)
+
     def test_when_link_type_is_reference(self):
         parent_node_type_reference = ElementEducationGroupYearFactory(
             education_group_year__academic_year=self.academic_year
