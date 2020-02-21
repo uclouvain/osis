@@ -27,8 +27,8 @@ from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import node
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
-from program_management.ddd.domain.node import Node
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 
 PATH_SEPARATOR = '|'
@@ -42,8 +42,6 @@ class ProgramTree:
 
     # TODO :: load authorized_relationship into the __init__ ? (not use it as kwarg?)
     def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
-        if not isinstance(root_node, Node):
-            raise Exception('root_group args must be an instance of Node')
         self.root_node = root_node
         self.authorized_relationships = authorized_relationships
 

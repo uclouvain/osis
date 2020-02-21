@@ -25,19 +25,26 @@
 ##############################################################################
 
 import copy
-from typing import List
+from typing import List, Dict, Any
 
 from django.db.models import Case, F, When, IntegerField
 
+from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
-
+from program_management.ddd.business_types import *
 from program_management.ddd.domain import node, link
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import fetch_node, fetch_prerequisite, \
     fetch_authorized_relationship
 
+# Typing
+GroupElementYearColumnName = str
+LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
+NodePk = int
+TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
-def fetch(tree_root_id) -> ProgramTree:
+
+def fetch(tree_root_id: int) -> 'ProgramTree':
     root_node = fetch_node.fetch_node_education_group_year(tree_root_id)
 
     structure = GroupElementYear.objects.get_adjacency_list([tree_root_id])
@@ -48,7 +55,11 @@ def fetch(tree_root_id) -> ProgramTree:
     return __build_tree(root_node, structure, nodes, links, prerequisites)
 
 
-def fetch_trees_from_children(child_branch_ids: list, child_leaf_ids: list = None, link_type=None) -> List[ProgramTree]:
+def fetch_trees_from_children(
+        child_branch_ids: list,
+        child_leaf_ids: list = None,
+        link_type: LinkTypes = None
+) -> List['ProgramTree']:
     # FIXME :: simplify the code (child_branch, chlid_leaf, if else)
     if not child_branch_ids and not child_leaf_ids:
         return []
@@ -75,13 +86,13 @@ def fetch_trees_from_children(child_branch_ids: list, child_leaf_ids: list = Non
     return [fetch(root_id) for root_id in root_ids]
 
 
-def __fetch_tree_nodes(tree_structure):
+def __fetch_tree_nodes(tree_structure: TreeStructure) -> Dict[NodePk, 'Node']:
     ids = [link['id'] for link in tree_structure]
     nodes_list = fetch_node.fetch_multiple(ids)
     return {n.pk: n for n in nodes_list}
 
 
-def __fetch_tree_links(tree_structure):
+def __fetch_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
     group_element_year_qs = GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
         child_id=Case(
@@ -124,13 +135,25 @@ def __fetch_tree_prerequisites(tree_root_id: int, nodes: dict):
     return {'has_prerequisite_dict': has_prerequisite_dict, 'is_prerequisite_dict': is_prerequisite_dict}
 
 
-def __build_tree(root_node, tree_structure, nodes, links, prerequisites):
+def __build_tree(
+        root_node: 'Node',
+        tree_structure: TreeStructure,
+        nodes: Dict[NodePk, 'Node'],
+        links: Dict[LinkKey, 'Link'],
+        prerequisites
+) -> 'ProgramTree':
     root_node.children = __build_children(str(root_node.pk), tree_structure, nodes, links, prerequisites)
     tree = ProgramTree(root_node, authorized_relationships=fetch_authorized_relationship.fetch())
     return tree
 
 
-def __build_children(root_path, tree_structure, nodes, links, prerequisites):
+def __build_children(
+        root_path: 'Path',
+        tree_structure: TreeStructure,
+        nodes: Dict[NodePk, 'Node'],
+        links: Dict[LinkKey, 'Link'],
+        prerequisites
+) -> List['Link']:
     children = []
 
     childs_structure = [

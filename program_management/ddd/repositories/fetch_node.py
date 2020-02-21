@@ -35,7 +35,7 @@ from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
 
 
-def fetch_by_type(type, element_id: int) -> node.Node:
+def fetch_by_type(type: NodeType, element_id: int) -> node.Node:
     if type == NodeType.EDUCATION_GROUP.name:
         return fetch_node_education_group_year(element_id)
     elif type == NodeType.LEARNING_UNIT.name:

@@ -34,18 +34,6 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
-class TestInitProgramTree(TestCase):
-    def test_init_with_incorrect_instance_root_group(self):
-        with self.assertRaises(Exception):
-            ProgramTree(object)
-
-    def test_init_set_correctly_instance_attribute(self):
-        node = Node(0)
-        tree = ProgramTree(node)
-
-        self.assertEquals(tree.root_node, node)
-
-
 class TestGetNodeProgramTree(TestCase):
     def setUp(self):
         self.subgroup_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)
