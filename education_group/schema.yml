@@ -734,6 +734,8 @@ components:
           $ref: '#/components/schemas/NodeLinkTypeEnum'
         link_type_text:
           type: string
+        with_prerequisite:
+          type: boolean
         children:
           type: array
           items:
@@ -744,7 +746,6 @@ components:
         - title
         - node_type
         - subtype
-        - credits
         - is_mandatory
         - block
         - access_condition
