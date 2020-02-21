@@ -42,47 +42,43 @@ from base.views.learning_units.search.common import SearchTypes
 
 
 @register.inclusion_tag('templatetags/navigation.html', takes_context=False)
-def navigation(query_parameters: QueryDict, current_element, url_name):
-    context = {"current_element": current_element}
+def navigation(get_parameters: QueryDict, element, url_name: str):
+    context = {"current_element": element}
+    if "search_query" not in get_parameters and "index" not in get_parameters:
+        return context
 
-    search_query_string = query_parameters.get("search_query")
-    index = query_parameters.get("index")
-    search_type = query_parameters.get("search_type")
-    if search_query_string and index is not None:
-        unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-        if isinstance(current_element, EducationGroupYear):
-            context.update(get_neighbor_elements(query_parameters, unquoted_search_query_string, int(index), url_name))
-        elif isinstance(current_element, LearningUnitYear):
-            context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name, search_type))
-    return context
+    search_query_string = get_parameters.get("search_query")
+    index = int(get_parameters.get("index"))
+    search_type = get_parameters.get("search_type")
 
+    unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
+    search_parameters = QueryDict(unquoted_search_query_string).dict()
 
-@register.inclusion_tag('templatetags/navigation.html', takes_context=False)
-def navigation_lu(query_parameters: QueryDict, current_element, url_name):
-    context = {"current_element": current_element}
+    if isinstance(element, EducationGroupYear):
+        filter_form_class = EducationGroupFilter
+        reverse_url_function = _reverse_education_group_year_url
+    else:
+        filter_form_class = _get_learning_unit_forms(search_type)
+        reverse_url_function = _reverse_learning_unit_year_url
 
-    search_query_string = query_parameters.get("search_query")
-    index = query_parameters.get("index")
-    search_type = query_parameters.get("search_type")
-    if search_query_string and index is not None:
-        unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-        context.update(get_neighbor_elements_lu(query_parameters, unquoted_search_query_string, int(index), url_name, search_type))
-
-    return context
-
-
-def get_neighbor_elements_lu(query_parameters, search_query_string, index, url_name, search_type):
-    search_parameters = QueryDict(search_query_string).dict()
-    filter_form_class = _get_learning_unit_forms(search_type)
     qs = filter_form_class(data=search_parameters).qs
     next_element = _get_next_element(qs, index)
+    next_element_get_parameters = get_parameters.copy()
+    next_element_get_parameters["index"] = index + 1
+
     previous_element = _get_previous_element(qs, index)
-    return {
+    previous_element_get_parameters = get_parameters.copy()
+    previous_element_get_parameters["index"] = index - 1
+
+    context.update({
         "next_element": next_element,
-        "next_url": _create_url_lu(next_element, query_parameters, index + 1, url_name) if next_element else None,
+        "next_url": reverse_url_function(next_element, url_name, next_element_get_parameters)
+        if next_element else None,
         "previous_element": previous_element,
-        "previous_url": _create_url_lu(previous_element, query_parameters, index - 1, url_name) if previous_element else None
-    }
+        "previous_url": reverse_url_function(previous_element, url_name, previous_element_get_parameters)
+        if previous_element else None
+    })
+    return context
 
 
 def _get_learning_unit_forms(search_type):
@@ -94,20 +90,7 @@ def _get_learning_unit_forms(search_type):
         SearchTypes.BORROWED_COURSE.value: BorrowedLearningUnitSearch,
         SearchTypes.EXTERNAL_SEARCH.value: ExternalLearningUnitFilter,
     }
-    return map_search_type_to_filter_form.get(int(search_type), LearningUnitFilter)
-
-
-def get_neighbor_elements(query_parameters, search_query_string, index, url_name):
-    search_parameters = QueryDict(search_query_string).dict()
-    qs = EducationGroupFilter(data=search_parameters).qs
-    next_element = _get_next_element(qs, index)
-    previous_element = _get_previous_element(qs, index)
-    return {
-        "next_element": next_element,
-        "next_url": _create_url(next_element, query_parameters, index + 1, url_name) if next_element else None,
-        "previous_element": previous_element,
-        "previous_url": _create_url(previous_element, query_parameters, index - 1, url_name) if previous_element else None
-    }
+    return map_search_type_to_filter_form.get(int(search_type) if search_type else None, LearningUnitFilter)
 
 
 def _get_next_element(qs, index):
@@ -124,21 +107,15 @@ def _get_previous_element(qs, index):
         return None
 
 
-def _create_url(education_group_year, query_parameters: QueryDict, index, url_name):
-    query_parameters_with_udpated_index = QueryDict(mutable=True)
-    query_parameters_with_udpated_index.update(query_parameters)
-    query_parameters_with_udpated_index["index"] = index
+def _reverse_education_group_year_url(education_group_year_obj, url_name, get_parameters):
     return "{}?{}".format(
-        reverse(url_name, args=[education_group_year.id, education_group_year.id]),
-        query_parameters_with_udpated_index.urlencode()
+        reverse(url_name, args=[education_group_year_obj.id, education_group_year_obj.id]),
+        get_parameters.urlencode()
     )
 
 
-def _create_url_lu(learning_unit_year, query_parameters: QueryDict, index, url_name):
-    query_parameters_with_udpated_index = QueryDict(mutable=True)
-    query_parameters_with_udpated_index.update(query_parameters)
-    query_parameters_with_udpated_index["index"] = index
+def _reverse_learning_unit_year_url(learning_unit_year_obj, url_name, get_parameters: QueryDict):
     return "{}?{}".format(
-        reverse(url_name, args=[learning_unit_year.id]),
-        query_parameters_with_udpated_index.urlencode()
+        reverse(url_name, args=[learning_unit_year_obj.id]),
+        get_parameters.urlencode()
     )
