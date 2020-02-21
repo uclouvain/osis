@@ -37,7 +37,6 @@ from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
 from base.models.education_group_year import EducationGroupYear
-from base.models.learning_unit_year import LearningUnitYear
 from base.views.learning_units.search.common import SearchTypes
 
 
@@ -62,11 +61,11 @@ def navigation(get_parameters: QueryDict, element, url_name: str):
         reverse_url_function = _reverse_learning_unit_year_url
 
     qs = filter_form_class(data=search_parameters).qs
-    next_element = _get_next_element(qs, index)
+    next_element = _get_element(qs, index + 1)
     next_element_get_parameters = get_parameters.copy()
     next_element_get_parameters["index"] = index + 1
 
-    previous_element = _get_previous_element(qs, index)
+    previous_element = _get_element(qs, index - 1)
     previous_element_get_parameters = get_parameters.copy()
     previous_element_get_parameters["index"] = index - 1
 
@@ -93,16 +92,9 @@ def _get_learning_unit_forms(search_type):
     return map_search_type_to_filter_form.get(int(search_type) if search_type else None, LearningUnitFilter)
 
 
-def _get_next_element(qs, index):
+def _get_element(qs, index):
     try:
-        return qs[index + 1] if index >= 0 else None
-    except IndexError:
-        return None
-
-
-def _get_previous_element(qs, index):
-    try:
-        return qs[index - 1] if index > 0 else None
+        return qs[index] if index >= 0 else None
     except IndexError:
         return None
 
