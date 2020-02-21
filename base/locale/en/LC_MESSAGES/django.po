@@ -2167,6 +2167,9 @@ msgstr ""
 msgid "Real/Planned classrooms"
 msgstr ""
 
+msgid "Reason for failure"
+msgstr ""
+
 msgid "Received on"
 msgstr ""
 
