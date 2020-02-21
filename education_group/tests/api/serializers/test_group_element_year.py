@@ -32,6 +32,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView
@@ -102,7 +103,6 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
-            'credits',
             'is_mandatory',
             'access_condition',
             'comment',
@@ -122,7 +122,6 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'subtype',
             'lecturing_volume',
             'practical_exercise_volume',
-            'credits',
             'is_mandatory',
             'access_condition',
             'comment',
@@ -130,6 +129,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'link_type_text',
             'block',
             'children',
+            'credits',
+            'with_prerequisite'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 
@@ -144,7 +145,37 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             self.learning_unit_year.learning_container_year.container_type
         )
 
-    def test_get_absolute_credit_if_no_relative_credits(self):
+    def test_get_with_prerequisites(self):
+        self.assertFalse(self.serializer.data['children'][0]['children'][0]['with_prerequisite'])
+
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__academic_year=self.academic_year
+        )
+        gey = GroupElementYearFactory(
+            parent__education_group_type__name=GroupType.COMMON_CORE.name,
+            child_branch=None,
+            child_leaf=luy,
+            relative_credits=None
+        )
+        PrerequisiteItemFactory(
+            prerequisite__learning_unit_year=luy,
+            prerequisite__education_group_year=gey.parent
+        )
+        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+            'partial_acronym': gey.parent.partial_acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupTreeSerializer(
+            EducationGroupHierarchy(gey.parent),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+        self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
+
+    def test_get_appropriate_credits(self):
         self.assertEqual(self.serializer.data['children'][0]['children'][0]['credits'], self.luy_gey.relative_credits)
 
         luy = LearningUnitYearFactory(
@@ -168,7 +199,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
-        self.assertEqual(serializer.data['children'][0]['credits'], luy.credits)
+        self.assertEqual(serializer.data['children'][0]['credits'], luy.credits,
+                         'should get absolute credits if no relative credits')
 
     def test_ensure_url_is_related_to_instance(self):
         expected_root_url = reverse('education_group_api_v1:' + TrainingDetail.name, kwargs={
@@ -258,7 +290,6 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
-            'credits',
             'is_mandatory',
             'access_condition',
             'comment',
@@ -337,7 +368,6 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'node_type',
             'subtype',
             'partial_title',
-            'credits',
             'is_mandatory',
             'access_condition',
             'comment',

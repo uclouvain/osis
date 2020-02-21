@@ -118,12 +118,12 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         data = super().to_representation(obj)
         node_type = self.get_node_type(obj)
         if node_type != NodeType.TRAINING.name \
-            or (node_type == NodeType.TRAINING.name
-                and obj.education_group_year.education_group_type.name
-                not in education_group_types.TrainingType.finality_types()):
+                or (node_type == NodeType.TRAINING.name
+                    and obj.education_group_year.education_group_type.name
+                    not in education_group_types.TrainingType.finality_types()):
             data.pop('partial_title')
 
-        if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
+        if node_type == NodeType.LEARNING_UNIT.name:
             for component in obj.learning_unit_year.learningcomponentyear_set.all():
                 data[
                     'lecturing_volume' if component.type == LECTURING
@@ -136,7 +136,6 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
 
 class NodeTreeSerializer(CommonNodeTreeSerializer):
-    credits = serializers.SerializerMethodField()
     is_mandatory = serializers.BooleanField(source='group_element_year.is_mandatory', read_only=True)
     access_condition = serializers.BooleanField(source='group_element_year.access_condition', read_only=True)
     comment = serializers.SerializerMethodField()
@@ -144,6 +143,8 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
     link_type_text = serializers.CharField(source='group_element_year.get_link_type_display', read_only=True)
     block = serializers.SerializerMethodField()
     children = RecursiveField(many=True)
+    credits = serializers.SerializerMethodField()
+    with_prerequisite = serializers.BooleanField(source='group_element_year.has_prerequisite', read_only=True)
 
     @staticmethod
     def get_block(obj):
@@ -158,6 +159,14 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
         learning_unit_year = obj.group_element_year.child_leaf
         absolute_credits = learning_unit_year and learning_unit_year.credits
         return obj.group_element_year.relative_credits or absolute_credits
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        node_type = self.get_node_type(obj)
+        if node_type != NodeType.LEARNING_UNIT.name:
+            for field in ['credits', 'with_prerequisite']:
+                data.pop(field)
+        return data
 
 
 class EducationGroupTreeSerializer(CommonNodeTreeSerializer):
