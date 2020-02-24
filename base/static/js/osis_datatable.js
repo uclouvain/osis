@@ -1,5 +1,4 @@
 function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
-    setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
     return domTable.DataTable(
     {

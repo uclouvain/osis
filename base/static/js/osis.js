@@ -143,30 +143,6 @@ var browser_supported_versions = {
     edge: 24
 };
 
-function setEventKeepIds(domTableId, localStorageKey) {
-    if (typeof localStorage != undefined) {
-        if (domTableId == undefined || localStorageKey == undefined) {
-            return;
-        }
-
-        var table = $('#' + domTableId)
-        if (table != undefined) {
-            table.on('init.dt order.dt', function () {
-                var orderList = [];
-                table.find('tr').each(function () {
-                    var id = $(this).attr('data-id');
-                    var value = $(this).attr('data-value');
-                    if (id != undefined) {
-                        orderList.push({'id': id, 'value': value});
-                    }
-                });
-                if (orderList.length > 0) {
-                    localStorage.setItem(localStorageKey, JSON.stringify(orderList));
-                }
-            });
-        }
-    }
-}
 
 function displayInfoMessage(jsonResponse, containerId) {
     let message_info_container = document.getElementById(containerId);
