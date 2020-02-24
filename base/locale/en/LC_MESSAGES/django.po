@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-18 15:43+0100\n"
+"POT-Creation-Date: 2020-02-19 14:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3435,6 +3435,12 @@ msgid "the"
 msgstr ""
 
 msgid "the program aims"
+msgstr ""
+
+#, python-format
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
 msgstr ""
 
 msgid "the sum of repartition volumes must be equal to the global volume"
