@@ -107,11 +107,7 @@
                     params.set("index", startingIndex + meta["row"]);
                     params.set("search_type", "{{ search_type.value }}");
 
-                    const url = `${row['osis_url']}?${params.toString()}`;
-                    const anchor = document.createElement("a");
-                    anchor.setAttribute("href", url);
-                    anchor.textContent = data;
-                    return anchor.outerHTML;
+                    return outputAnchorOuterHtml(row["url"], params, data);
                 }
             },
             {

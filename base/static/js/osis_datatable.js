@@ -45,3 +45,13 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
         }
     });
 }
+
+
+function outputAnchorOuterHtml(urlPath, urlSearchParams, textContent){
+    const fullUrl = `${urlPath}?${urlSearchParams.toString()}`;
+
+    const anchor = document.createElement("a");
+    anchor.setAttribute("href", fullUrl);
+    anchor.textContent = textContent;
+    return anchor.outerHTML;
+};

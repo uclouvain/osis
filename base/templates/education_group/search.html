@@ -182,6 +182,7 @@
             {% else %}
             const startingIndex = 0;
             {% endif %}
+
             let columnDefs = [
                 {"name": "academic_year", "targets": 0, "data": "academic_year"},
                 {
@@ -196,11 +197,7 @@
                         );
                         params.set("index", startingIndex + meta["row"]);
 
-                        const url = `${row['url']}?${params.toString()}`;
-                        const anchor = document.createElement("a");
-                        anchor.setAttribute("href", url);
-                        anchor.textContent = data;
-                        return anchor.outerHTML;
+                        return outputAnchorOuterHtml(row["url"], params, data);
                     }
                 },
                 {"name": "title", "targets": 2, "data": "title"},
