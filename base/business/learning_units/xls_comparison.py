@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
@@ -40,6 +41,7 @@ from base.business.xls import get_name_or_username
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
+from base.models.academic_year import find_academic_year_by_id
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
 from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
@@ -364,7 +366,8 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
 
     if proposal_comparison:
         academic_year = _format_academic_year(learning_unit_yr.academic_year.name,
-                                              lu_initial.get('end_year') or None)
+                                              find_academic_year_by_id(lu_initial.get('end_year'))
+                                              if lu_initial.get('end_year') else None)
     else:
         academic_year = learning_unit_yr.academic_year.name
 
@@ -378,7 +381,7 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         learning_unit_yr.get_subtype_display()
         if learning_unit_yr and learning_unit_yr.get_subtype_display() else BLANK_VALUE,
         get_translation(luy_initial.get('internship_subtype')),
-        volume_format(luy_initial['credits']) if luy_initial.get('credits') else BLANK_VALUE,
+        volume_format(Decimal(luy_initial['credits'])) if luy_initial.get('credits') else BLANK_VALUE,
         language.name if language else BLANK_VALUE,
         dict(PERIODICITY_TYPES)[luy_initial['periodicity']] if luy_initial.get('periodicity') else BLANK_VALUE,
         get_translation(luy_initial.get('quadrimester')),
