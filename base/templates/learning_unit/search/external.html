@@ -99,14 +99,11 @@
                 "targets": 1,
                 "data": "acronym",
                 "render": function ( data, type, row, meta ) {
-                    const params = new URLSearchParams();
-                    params.set(
-                        "search_query",
-                        encodeURIComponent((new URLSearchParams(meta.settings.oAjaxData)).toString())
+                    const params = constructLearningUnitSearchParameters(
+                        meta.settings.oAjaxData,
+                        startingIndex + meta["row"],
+                        "{{ search_type.value }}"
                     );
-                    params.set("index", startingIndex + meta["row"]);
-                    params.set("search_type", "{{ search_type.value }}");
-
                     return outputAnchorOuterHtml(row["url"], params, data);
                 }
             },

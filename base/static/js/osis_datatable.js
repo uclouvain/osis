@@ -54,4 +54,21 @@ function outputAnchorOuterHtml(urlPath, urlSearchParams, textContent){
     anchor.setAttribute("href", fullUrl);
     anchor.textContent = textContent;
     return anchor.outerHTML;
-};
+}
+
+
+function constructLearningUnitSearchParameters(getParametersDict, index, search_type){
+    const params = new URLSearchParams();
+    params.set("search_query", encodeURIComponent((new URLSearchParams(getParametersDict)).toString()));
+    params.set("index", index);
+    params.set("search_type", search_type);
+    return params
+}
+
+
+function constructEducationGroupSearchParameters(getParametersDict, index){
+    const params = new URLSearchParams();
+    params.set("search_query", encodeURIComponent((new URLSearchParams(getParametersDict)).toString()));
+    params.set("index", index);
+    return params
+}
