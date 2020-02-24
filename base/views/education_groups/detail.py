@@ -25,7 +25,6 @@
 ##############################################################################
 import itertools
 import json
-import urllib
 from collections import namedtuple, defaultdict
 
 from ckeditor.widgets import CKEditorWidget
@@ -33,10 +32,9 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Prefetch, QuerySet
-from django.http import HttpResponseRedirect, QueryDict
+from django.db.models import Prefetch
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.template import Context
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -51,7 +49,6 @@ from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
-from base.forms.education_groups import EducationGroupFilter
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine

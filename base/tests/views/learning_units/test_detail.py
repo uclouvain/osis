@@ -27,7 +27,7 @@ import datetime
 
 import reversion
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseForbidden, QueryDict
+from django.http import HttpResponseForbidden
 from django.test import TestCase, Client
 from django.urls import reverse
 

@@ -19,9 +19,8 @@
 
 {% block content %}
 
-    {% with disabled_nav=True %}
-        {% navigation  request.GET learning_unit_year request.resolver_match.url_name %}
-    {% endwith %}
+    {% navigation  request.GET learning_unit_year request.resolver_match.url_name %}
+
     <div class="page-header">
         <div class="row">
             <div class="col-md-offset-1 col-md-10">
