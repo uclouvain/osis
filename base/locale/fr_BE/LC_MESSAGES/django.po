@@ -117,7 +117,7 @@ msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
 msgstr ""
-"%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
+"%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
 
 msgid "1st quadri"
@@ -2256,6 +2256,9 @@ msgstr "Classes effectives"
 
 msgid "Real/Planned classrooms"
 msgstr "Classes effectives/prévues"
+
+msgid "Reason for failure"
+msgstr "Motif de l'échec"
 
 msgid "Received on"
 msgstr "Reçu le"
