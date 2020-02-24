@@ -23,21 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 import datetime
 from unittest import mock
 
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
+from base.business.learning_unit_proposal import copy_learning_unit_data
 from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _get_learning_unit_yrs_on_2_different_years, translate_status, create_xls_comparison, \
     XLS_FILENAME, XLS_DESCRIPTION, learning_unit_titles, WORKSHEET_TITLE, CELLS_MODIFIED_NO_BORDER, DATA, \
     _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
-    get_representing_string
+    get_representing_string, _get_data_from_initial_data
 from base.business.proposal_xls import components_titles, basic_titles, BLANK_VALUE
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_1
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -150,12 +152,18 @@ class TestPropositionComparisonXls(TestCase):
         cls.learning_unit_year_1 = generatorContainer.generated_container_years[0].learning_unit_year_full
         cls.entity_1 = generatorContainer.entities[0]
         cls.entity_version_1 = EntityVersionFactory(entity=cls.entity_1, acronym="AGRO")
-        cls.entity_2 = generatorContainer.entities[0]
+        cls.entity_2 = generatorContainer.entities[1]
         cls.entity_version_2 = EntityVersionFactory(entity=cls.entity_2, acronym="DRT")
 
         cls.learning_unit_year_1.entities = {REQUIREMENT_ENTITY: cls.entity_version_1,
                                              ALLOCATION_ENTITY: cls.entity_version_1,
                                              ADDITIONAL_REQUIREMENT_ENTITY_1: cls.entity_version_2}
+        cls.learning_unit_year_1.learning_container_year.requirement_entity = cls.entity_version_1.entity
+        cls.learning_unit_year_1.learning_container_year.allocation_entity = cls.entity_version_1.entity
+        cls.learning_unit_year_1.learning_container_year.additional_entity_1 = cls.entity_version_2.entity
+        cls.learning_unit_year_1.learning_container_year.additional_entity_2 = None
+
+        cls.original_learning_unit_year_1 = copy.deepcopy(cls.learning_unit_year_1)
 
         cls.academic_year = cls.learning_unit_year_1.academic_year
         cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_year_1,
@@ -239,6 +247,93 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(get_representing_string(None), BLANK_VALUE)
         self.assertEqual(get_representing_string(""), BLANK_VALUE)
         self.assertEqual(get_representing_string("test"), "test")
+
+    def test_get_data_from_initial_data(self):
+        practical_component = LearningComponentYear.objects.filter(
+            learning_unit_year=self.learning_unit_year_1,
+            type=PRACTICAL_EXERCISES
+        ).first()
+        lecturing_component = LearningComponentYear.objects.filter(
+            learning_unit_year=self.learning_unit_year_1,
+            type=LECTURING
+        ).first()
+
+        actual_data = copy_learning_unit_data(self.learning_unit_year_1)
+        self.learning_unit_year_1.proposallearningunit.initial_data = actual_data
+        self.learning_unit_year_1.proposallearningunit.save()
+
+        data = _get_data_from_initial_data(self.learning_unit_year_1.proposallearningunit.initial_data, True)
+
+        to_test = []
+        to_test.append((data[0], _('Initial data')))
+        to_test.append((data[1], self.original_learning_unit_year_1.acronym))
+        to_test.append((data[2], "{}   ({} {})".format(self.original_learning_unit_year_1.academic_year.name,
+                                                       _('End').lower(),
+                                                       self.original_learning_unit_year_1.learning_unit.end_year)))  # Attention, c'est l'id
+        to_test.append((data[3],
+                        self.original_learning_unit_year_1.learning_container_year.get_container_type_display()))
+        to_test.append((data[4], translate_status(self.original_learning_unit_year_1.status)))
+        to_test.append((data[5], self.original_learning_unit_year_1.get_subtype_display()))
+        to_test.append((data[6],
+                        str(_(self.original_learning_unit_year_1.get_internship_subtype_display()))
+                        if self.original_learning_unit_year_1.internship_subtype else '-'))
+        to_test.append((data[7], str(self.original_learning_unit_year_1.credits)))
+        to_test.append((data[8], self.original_learning_unit_year_1.language.name or BLANK_VALUE))
+        to_test.append((data[9], str(_(self.original_learning_unit_year_1.get_periodicity_display())) or BLANK_VALUE))
+        to_test.append((data[10], str(_(self.original_learning_unit_year_1.quadrimester)) or BLANK_VALUE))
+        to_test.append((data[11], str(_(self.original_learning_unit_year_1.session)) or BLANK_VALUE))
+        to_test.append((data[12],
+                        self.original_learning_unit_year_1.learning_container_year.common_title or BLANK_VALUE))
+        to_test.append((data[13], self.original_learning_unit_year_1.specific_title or BLANK_VALUE))
+        to_test.append((data[14], self.original_learning_unit_year_1.learning_container_year.common_title_english
+                        or BLANK_VALUE))
+        to_test.append((data[15], self.original_learning_unit_year_1.specific_title_english or BLANK_VALUE))
+
+        to_test.append((data[16],
+                        self.original_learning_unit_year_1.entities.get(REQUIREMENT_ENTITY).acronym or BLANK_VALUE))
+        to_test.append((data[17],
+                        self.original_learning_unit_year_1.entities.get(ALLOCATION_ENTITY).acronym or BLANK_VALUE))
+        to_test.append((data[18],
+                        self.original_learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_1).acronym
+                        if self.original_learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_1)
+                        else BLANK_VALUE))
+        to_test.append((data[19],
+                        self.original_learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_2).acronym
+                        if self.original_learning_unit_year_1.entities.get(ADDITIONAL_REQUIREMENT_ENTITY_2)
+                        else BLANK_VALUE))
+        to_test.append((data[20], _('Yes') if self.original_learning_unit_year_1.professional_integration else _('No')))
+        if self.learning_unit_year_1.campus:
+            to_test.append((data[21], self.original_learning_unit_year_1.campus.organization.name))
+            to_test.append((data[22], self.original_learning_unit_year_1.campus))
+        else:
+            to_test.append((data[21], BLANK_VALUE))
+            to_test.append((data[22], BLANK_VALUE))
+        to_test.append((data[23], self.original_learning_unit_year_1.learning_unit.faculty_remark or BLANK_VALUE))
+        to_test.append((data[24], self.original_learning_unit_year_1.learning_unit.other_remark or BLANK_VALUE))
+        to_test.append((data[25],
+                        _('Yes') if self.original_learning_unit_year_1.learning_container_year.team else _('No')))
+        to_test.append((data[26],
+                        _('Yes') if self.original_learning_unit_year_1.learning_container_year.is_vacant else _('No')))
+        to_test.append((data[27],
+                        self.original_learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display()
+                        or BLANK_VALUE))
+        to_test.append((data[28],
+                        self.original_learning_unit_year_1.get_attribution_procedure_display() or BLANK_VALUE))
+
+        to_test.append((data[29], lecturing_component.hourly_volume_total_annual or BLANK_VALUE))
+        to_test.append((data[30], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE))
+        to_test.append((data[31], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE))
+        to_test.append((data[32], lecturing_component.real_classes or BLANK_VALUE))
+        to_test.append((data[33], lecturing_component.planned_classes or BLANK_VALUE))
+        to_test.append((data[38], practical_component.hourly_volume_total_annual or BLANK_VALUE))
+        to_test.append((data[39], practical_component.hourly_volume_partial_q1 or BLANK_VALUE))
+        to_test.append((data[40], practical_component.hourly_volume_partial_q2 or BLANK_VALUE))
+        to_test.append((data[41], practical_component.real_classes or BLANK_VALUE))
+        to_test.append((data[42], practical_component.planned_classes or BLANK_VALUE))
+
+        for (i, (result, expected)) in enumerate(to_test):
+            with self.subTest(i):
+                self.assertEqual(expected, result)
 
 
 def _generate_xls_build_parameter(xls_data, user):
