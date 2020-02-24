@@ -318,14 +318,9 @@ class LearningUnitPedagogyEditTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         now = datetime.datetime.now()
-
         cls.academic_year = create_current_academic_year()
-        cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.previous_academic_year = GenerateAcademicYear(
-            cls.old_academic_year,
-            cls.old_academic_year
-        ).academic_years[0]
         AcademicCalendarFactory(
             academic_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
@@ -420,6 +415,41 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         expected_message = "{}. {}.".format(
             _("The learning unit has been updated"),
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_pedagogy_edit_post_with_proposal_previous_year(self):
+        previous_luy = LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=self.previous_academic_year,
+            learning_container_year__academic_year=self.previous_academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=self.requirement_entity_version.entity,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        ProposalLearningUnitFactory(learning_unit_year=previous_luy)
+        msg = self._post_learning_unit_pedagogy()
+        expected_message = "{}.".format(_("The learning unit has been updated"))
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_pedagogy_edit_post_with_proposal_next_year(self):
+        next_luy = LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=self.next_academic_year,
+            learning_container_year__academic_year=self.next_academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=self.requirement_entity_version.entity,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        proposal = ProposalLearningUnitFactory(learning_unit_year=next_luy)
+        msg = self._post_learning_unit_pedagogy()
+        expected_message = "{} ({}).".format(
+            _("The learning unit has been updated"),
+            _("the report has not been done from %(proposal_year)s because the LU is in proposal") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
         )

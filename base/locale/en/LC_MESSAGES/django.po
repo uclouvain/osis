@@ -2167,6 +2167,9 @@ msgstr ""
 msgid "Real/Planned classrooms"
 msgstr ""
 
+msgid "Reason for failure"
+msgstr ""
+
 msgid "Received on"
 msgstr ""
 
@@ -3435,6 +3438,12 @@ msgid "the"
 msgstr ""
 
 msgid "the program aims"
+msgstr ""
+
+#, python-format
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
 msgstr ""
 
 msgid "the sum of repartition volumes must be equal to the global volume"
