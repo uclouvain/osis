@@ -7,9 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-
-"POT-Creation-Date: 2020-02-04 11:14+0100\n"
-
+"POT-Creation-Date: 2020-02-19 14:23+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -96,8 +94,7 @@ msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
-msgstr ""
-"%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
 #, python-format
 msgid "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
@@ -1318,9 +1315,6 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
 
-msgid "It will be done at the consolidation"
-msgstr "Les modifications seront reportées lors de la consolidation"
-
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
@@ -1377,9 +1371,6 @@ msgid ""
 msgstr ""
 "Unité d'enseignement <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
 "a> créée avec succès."
-
-msgid "Learning achievement content has been successfully saved"
-msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
@@ -1873,9 +1864,6 @@ msgstr "Ouverture aux adultes"
 
 msgid "Operation"
 msgstr "Opération"
-
-msgid "Operation on learning achievement has been successfully completed"
-msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
 
 msgid "Option"
 msgstr "Option"
@@ -2514,7 +2502,8 @@ msgstr "Soumission des fiches descriptives"
 
 msgid "Summary course submission is not allowed for tutors during this period."
 msgstr ""
-"La modification des fiches descriptives n'est pas autorisée pour les enseignants durant cette période."
+"La modification des fiches descriptives n'est pas autorisée pour les "
+"enseignants durant cette période."
 
 msgid "Suppression"
 msgstr "Suppression"
@@ -2537,14 +2526,6 @@ msgstr "Stage d’enseignement"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
-#, python-format
-msgid ""
-"Teaching material has been saved and reported up to %(last_year_reported)s "
-"with success"
-msgstr ""
-"Le support de cours que vous avez modifié a été sauvegardé jusqu'en "
-"%(last_year_reported)s avec succès"
-
 msgid "Teaching profile"
 msgstr "Profil d'enseignement"
 
@@ -2562,10 +2543,6 @@ msgstr "Essai"
 
 msgid "The"
 msgstr "Le"
-
-#, python-format
-msgid "The '%(field)s' field content has been successfully saved"
-msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
@@ -2708,6 +2685,9 @@ msgstr ""
 "L'unité d'enseignement %(learning_unit)s a un partim %(partim)s avec une "
 "année de fin plus grande que %(year)s"
 
+msgid "The learning unit has been updated"
+msgstr "L'unité d'enseignement a été modifiée"
+
 #, python-format
 msgid ""
 "The learning unit has been updated (the report has not been done from "
@@ -2728,6 +2708,14 @@ msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
 
 msgid "The learning unit have partim"
 msgstr "L'unité d'enseignement dispose d'au moins un partim"
+
+#, python-format
+msgid ""
+"The learning unit is in proposal, the report from %(proposal_year)s will be "
+"done at consolidation"
+msgstr ""
+"L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
+"effectué lors de la consolidation"
 
 msgid "The learning unit's description fiche is not editable."
 msgstr ""
@@ -2791,17 +2779,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sections you modified have been saved and reported up to "
-"%(last_year_reported)s with success."
-msgstr ""
-"Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
-"jusqu'en %(last_year_reported)s avec succès"
-
-msgid "The sections you modified have been saved with success."
-msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
-
-#, python-format
-msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2816,20 +2793,6 @@ msgid ""
 msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
-
-#, python-format
-msgid ""
-"The teaching material has been deleted up to %(last_year_reported)s with "
-"success"
-msgstr ""
-"Le support de cours a été supprimé jusqu'en %(last_year_reported)s avec "
-"succès"
-
-msgid "The teaching material has been deleted with success"
-msgstr "Le support de cours a été supprimé avec succès"
-
-msgid "The teaching material has been saved with success"
-msgstr "Le support de cours a été modifié avec succès"
 
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
@@ -3399,7 +3362,7 @@ msgstr "numéro de l'attendu"
 
 #, python-format
 msgid "and postponed until %(year)s"
-msgstr "et reporté jusque %(year)s"
+msgstr "et reportée jusque %(year)s"
 
 msgid "at"
 msgstr "à"
@@ -3667,6 +3630,12 @@ msgstr "le"
 
 msgid "the program aims"
 msgstr "le programme vise"
+
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
+msgstr ""
+"le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE est en proposition"
 
 msgid "the sum of repartition volumes must be equal to the global volume"
 msgstr ""
