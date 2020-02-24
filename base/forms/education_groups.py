@@ -25,14 +25,17 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.db.models import Case, When, Value, CharField
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
+from base.forms.utils.filter_field import filter_field_by_regex
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 
 
@@ -70,21 +73,21 @@ class EducationGroupFilter(FilterSet):
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr='icontains',
+        method="filter_education_group_year_field",
         max_length=40,
         required=False,
         label=_('Acronym/Short title'),
     )
     title = filters.CharFilter(
         field_name="title",
-        lookup_expr='icontains',
+        method='filter_education_group_year_field',
         max_length=255,
         required=False,
         label=_('Title')
     )
     partial_acronym = filters.CharFilter(
         field_name="partial_acronym",
-        lookup_expr='icontains',
+        method='filter_education_group_year_field',
         max_length=15,
         required=False,
         label=_('Code'),
@@ -97,7 +100,7 @@ class EducationGroupFilter(FilterSet):
             ('partial_acronym', 'code'),
             ('academic_year__year', 'academic_year'),
             ('title', 'title'),
-            ('education_group_type__name', 'type'),
+            ('type_ordering', 'type'),
             ('management_entity__entityversion__acronym', 'management_entity')
         ),
         widget=forms.HiddenInput
@@ -116,6 +119,7 @@ class EducationGroupFilter(FilterSet):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.queryset = self.get_queryset()
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
         self.form.fields['academic_year'].initial = starting_academic_year()
         self.form.fields['category'].initial = education_group_categories.TRAINING
@@ -127,3 +131,19 @@ class EducationGroupFilter(FilterSet):
             entity_ids = get_entities_ids(value, with_subordinated)
             queryset = queryset.filter(management_entity__in=entity_ids)
         return queryset
+
+    @staticmethod
+    def filter_education_group_year_field(queryset, name, value):
+        return filter_field_by_regex(queryset, name, value)
+
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return EducationGroupYear.objects.none()
+        return EducationGroupYear.objects.all().annotate(
+            type_ordering=Case(
+                *[When(education_group_type__name=key, then=Value(str(_(val))))
+                  for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
+                default=Value(''),
+                output_field=CharField()
+            ))

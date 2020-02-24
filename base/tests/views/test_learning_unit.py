@@ -32,6 +32,7 @@ from unittest import mock
 
 import factory.fuzzy
 import reversion
+from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
@@ -79,7 +80,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -93,6 +93,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
+from base.tests.factories.utils.get_messages import get_messages_from_response
 from base.views.learning_unit import learning_unit_components, learning_unit_specifications, \
     learning_unit_comparison, \
     learning_unit_proposal_comparison, learning_unit_formations
@@ -106,6 +107,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
@@ -260,6 +262,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
         faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
         cls.user = faculty_manager.user
+        cls.access_denied = "access_denied.html"
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -273,7 +276,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         a_user_without_perms = UserFactory()
         self.client.force_login(a_user_without_perms)
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_create_partim_form_invalid_http_methods(self):
@@ -285,7 +288,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
                 side_effect=lambda *args: False)
     def test_create_partim_when_user_not_linked_to_entity_charge(self, mock_is_pers_linked_to_entity_charge):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
@@ -1100,9 +1103,35 @@ class LearningUnitViewTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_learning_unit_specifications_save_with_postponement(self):
+    def test_learning_unit_specifications_save_with_postponement_without_proposal(self):
         year_range = 5
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_years = self._generate_learning_unit_years(academic_years)
+        msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
+        expected_message = "{} {}.".format(
+            _("The learning unit has been updated"), _("and postponed until %(year)s") % {
+                'year': academic_years[-1]
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_specifications_save_with_postponement_and_proposal(self):
+        year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_years = self._generate_learning_unit_years(academic_years)
+        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[2])
+        msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
+        expected_message = "{}. {}.".format(
+            _("The learning unit has been updated"),
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def _generate_learning_unit_years(self, academic_years):
         learning_unit = LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
         learning_unit_years = [LearningUnitYearFactory(
             academic_year=ac,
@@ -1110,6 +1139,9 @@ class LearningUnitViewTestCase(TestCase):
             acronym=learning_unit.acronym,
             subtype=FULL,
         ) for ac in academic_years]
+        return learning_unit_years
+
+    def _test_learning_unit_specifications_save_with_postponement(self, learning_unit_years):
         # delete last learning unit year to ensure luy is not created
         learning_unit_years.pop().delete()
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
@@ -1127,7 +1159,6 @@ class LearningUnitViewTestCase(TestCase):
             language='en',
             text_label=label
         ) for luy in learning_unit_years]
-
         response = self.client.post(
             reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_years[0].id}),
             data={
@@ -1143,6 +1174,8 @@ class LearningUnitViewTestCase(TestCase):
             self.assertEqual(translated_text.text, 'textFR')
         for translated_text in TranslatedText.objects.filter(language='en'):
             self.assertEqual(translated_text.text, 'textEN')
+        msg = get_messages_from_response(response)
+        return msg
 
     def test_learning_unit(self):
         learning_unit_year = LearningUnitYearFactory()
