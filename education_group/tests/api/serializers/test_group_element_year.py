@@ -91,6 +91,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
+            'remark',
             'children',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
@@ -103,32 +104,36 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
+            'remark',
+            'children',
             'is_mandatory',
             'access_condition',
             'comment',
             'link_type',
             'link_type_text',
             'block',
-            'children',
+            'min_constraint',
+            'max_constraint',
+            'constraint_type'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0].keys()), expected_fields)
 
     def test_learning_unit_children_contains_expected_fields(self):
         expected_fields = [
             'url',
-            'acronym',
+            'code',
             'title',
             'node_type',
             'subtype',
-            'lecturing_volume',
-            'practical_exercise_volume',
+            'remark',
             'is_mandatory',
             'access_condition',
             'comment',
             'link_type',
             'link_type_text',
             'block',
-            'children',
+            'lecturing_volume',
+            'practical_exercise_volume',
             'credits',
             'with_prerequisite'
         ]
@@ -277,6 +282,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
+            'remark',
             'partial_title',
             'children',
         ]
@@ -290,13 +296,17 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
+            'remark',
+            'children',
             'is_mandatory',
             'access_condition',
             'comment',
             'link_type',
             'link_type_text',
             'block',
-            'children',
+            'min_constraint',
+            'max_constraint',
+            'constraint_type'
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data['children'][0].keys()))
 
@@ -355,6 +365,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
+            'remark',
             'children',
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data.keys()))
@@ -367,13 +378,17 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'title',
             'node_type',
             'subtype',
+            'remark',
             'partial_title',
+            'children',
             'is_mandatory',
             'access_condition',
             'comment',
             'link_type',
             'link_type_text',
             'block',
-            'children',
+            'min_constraint',
+            'max_constraint',
+            'constraint_type'
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data['children'][0]['children'][0].keys()))

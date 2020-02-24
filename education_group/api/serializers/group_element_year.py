@@ -39,7 +39,9 @@ from learning_unit.api.views.learning_unit import LearningUnitDetailed
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value):
-        serializer = self.parent.parent.__class__(value, context=self.context)
+        serializer_class = EducationGroupNodeTreeSerializer \
+            if value.education_group_year else LearningUnitNodeTreeSerializer
+        serializer = serializer_class(value, context=self.context)
         return serializer.data
 
 
@@ -71,11 +73,23 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
 
 class BaseCommonNodeTreeSerializer(serializers.Serializer):
     url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
-    acronym = serializers.SerializerMethodField()
-    code = serializers.CharField(source='education_group_year.partial_acronym', read_only=True)
+    acronym = serializers.CharField(source='education_group_year.acronym', read_only=True)
+    code = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
     node_type = serializers.SerializerMethodField()
     subtype = serializers.SerializerMethodField()
+    remark = serializers.SerializerMethodField()
+    partial_title = serializers.SerializerMethodField()
+    children = RecursiveField(many=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        node_type = self.get_node_type(self.instance)
+        if node_type != NodeType.TRAINING.name \
+                or (node_type == NodeType.TRAINING.name
+                    and self.instance.education_group_year.education_group_type.name
+                    not in education_group_types.TrainingType.finality_types()):
+            self.fields.pop('partial_title')
 
     @staticmethod
     def get_node_type(obj):
@@ -83,10 +97,19 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
             return NodeType.LEARNING_UNIT.name
         return obj.education_group_year.education_group_type.category
 
-    def get_acronym(self, obj):
+    def get_remark(self, obj):
+        language = self.context.get('language')
+        if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
+            return obj.learning_unit_year.learning_unit.other_remark
+        return getattr(
+            obj.education_group_year,
+            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+        )
+
+    def get_code(self, obj):
         if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
             return obj.learning_unit_year.acronym
-        return obj.education_group_year.acronym
+        return obj.education_group_year.partial_acronym
 
     def get_title(self, obj):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
@@ -99,52 +122,21 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
             return obj.learning_unit_year.learning_container_year.container_type
         return obj.education_group_year.education_group_type.name
 
-
-class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
-    partial_title = serializers.SerializerMethodField()
-    lecturing_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
-    practical_exercise_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
-
     def get_partial_title(self, obj):
         language = self.context.get('language')
-        if self.get_node_type(obj) == NodeType.TRAINING.name:
-            return getattr(
-                obj.education_group_year,
-                'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
-            )
-        return ""
-
-    def to_representation(self, obj):
-        data = super().to_representation(obj)
-        node_type = self.get_node_type(obj)
-        if node_type != NodeType.TRAINING.name \
-                or (node_type == NodeType.TRAINING.name
-                    and obj.education_group_year.education_group_type.name
-                    not in education_group_types.TrainingType.finality_types()):
-            data.pop('partial_title')
-
-        if node_type == NodeType.LEARNING_UNIT.name:
-            for component in obj.learning_unit_year.learningcomponentyear_set.all():
-                data[
-                    'lecturing_volume' if component.type == LECTURING
-                    else 'practical_exercise_volume'
-                ] = component.hourly_volume_total_annual
-        else:
-            for key in ['lecturing_volume', 'practical_exercise_volume']:
-                data.pop(key)
-        return data
+        return getattr(
+            obj.education_group_year,
+            'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+        )
 
 
-class NodeTreeSerializer(CommonNodeTreeSerializer):
+class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     is_mandatory = serializers.BooleanField(source='group_element_year.is_mandatory', read_only=True)
     access_condition = serializers.BooleanField(source='group_element_year.access_condition', read_only=True)
     comment = serializers.SerializerMethodField()
     link_type = serializers.CharField(source='group_element_year.link_type', read_only=True)
     link_type_text = serializers.CharField(source='group_element_year.get_link_type_display', read_only=True)
     block = serializers.SerializerMethodField()
-    children = RecursiveField(many=True)
-    credits = serializers.SerializerMethodField()
-    with_prerequisite = serializers.BooleanField(source='group_element_year.has_prerequisite', read_only=True)
 
     @staticmethod
     def get_block(obj):
@@ -154,6 +146,19 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
         return getattr(obj.group_element_year, 'comment' + field_suffix)
 
+
+class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer):
+    min_constraint = serializers.IntegerField(source='education_group_year.min_constraint', read_only=True)
+    max_constraint = serializers.IntegerField(source='education_group_year.max_constraint', read_only=True)
+    constraint_type = serializers.CharField(source='education_group_year.constraint_type', read_only=True)
+
+
+class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
+    lecturing_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
+    practical_exercise_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
+    credits = serializers.SerializerMethodField()
+    with_prerequisite = serializers.BooleanField(source='group_element_year.has_prerequisite', read_only=True)
+
     @staticmethod
     def get_credits(obj):
         learning_unit_year = obj.group_element_year.child_leaf
@@ -162,12 +167,14 @@ class NodeTreeSerializer(CommonNodeTreeSerializer):
 
     def to_representation(self, obj):
         data = super().to_representation(obj)
-        node_type = self.get_node_type(obj)
-        if node_type != NodeType.LEARNING_UNIT.name:
-            for field in ['credits', 'with_prerequisite']:
-                data.pop(field)
+        for component in obj.learning_unit_year.learningcomponentyear_set.all():
+            data[
+                'lecturing_volume' if component.type == LECTURING
+                else 'practical_exercise_volume'
+            ] = component.hourly_volume_total_annual
+        data.pop('children')
         return data
 
 
-class EducationGroupTreeSerializer(CommonNodeTreeSerializer):
-    children = NodeTreeSerializer(many=True)
+class EducationGroupTreeSerializer(BaseCommonNodeTreeSerializer):
+    children = RecursiveField(many=True)

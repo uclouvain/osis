@@ -730,19 +730,29 @@ components:
           type: boolean
         comment:
           type: string
+        remark:
+          type: string
         link_type:
           $ref: '#/components/schemas/NodeLinkTypeEnum'
         link_type_text:
           type: string
         with_prerequisite:
           type: boolean
+        min_constraint:
+          type: integer
+          minimum: 1
+        max_constraint:
+          type: integer
+          minimum: 1
+        contraint_type:
+          $ref: '#/components/schemas/ConstraintTypeEnum'
         children:
           type: array
           items:
             $ref: '#/components/schemas/Node'
       required:
         - url
-        - acronym
+        - code
         - title
         - node_type
         - subtype
@@ -750,6 +760,7 @@ components:
         - block
         - access_condition
         - comment
+        - remark
         - link_type
         - link_type_text
         - children
