@@ -331,10 +331,8 @@ class TestPropositionComparisonXls(TestCase):
         to_test.append((data[41], practical_component.real_classes or BLANK_VALUE))
         to_test.append((data[42], practical_component.planned_classes or BLANK_VALUE))
 
-        i = 0
-        for (result, expected) in to_test:
+        for (i, (result, expected)) in enumerate(to_test):
             with self.subTest(i):
-                i += 1
                 self.assertEqual(expected, result)
 
 
