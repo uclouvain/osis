@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from _pydecimal import Decimal
 
 from django.utils.translation import gettext_lazy as _
 from openpyxl.utils import get_column_letter
@@ -379,7 +378,7 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         learning_unit_yr.get_subtype_display()
         if learning_unit_yr and learning_unit_yr.get_subtype_display() else BLANK_VALUE,
         get_translation(luy_initial.get('internship_subtype')),
-        volume_format(Decimal(luy_initial['credits'])) if luy_initial.get('credits') else BLANK_VALUE,
+        volume_format(luy_initial['credits']) if luy_initial.get('credits') else BLANK_VALUE,
         language.name if language else BLANK_VALUE,
         dict(PERIODICITY_TYPES)[luy_initial['periodicity']] if luy_initial.get('periodicity') else BLANK_VALUE,
         get_translation(luy_initial.get('quadrimester')),
