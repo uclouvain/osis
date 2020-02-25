@@ -54,7 +54,7 @@ class SearchMixin:
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        if "search_query" in kwargs.get("data", {}):
+        if kwargs.get("data") and "search_query" in kwargs.get("data"):
             unquoted_search_query_string = urllib.parse.unquote_plus(kwargs["data"]["search_query"])
             kwargs["data"] = QueryDict(unquoted_search_query_string)
         return kwargs
