@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import JsonResponse
+import urllib
+
+from django.http import JsonResponse, QueryDict
 from django_filters.views import FilterView
 
 from base.templatetags import pagination
@@ -32,7 +34,7 @@ from base.templatetags import pagination
 class SearchMixin:
     """
         Search Mixin to return FilterView filter result as json when accept header is of type application/json.
-        Also implements method to return number of items per page.
+        Also implements method to return number of items per page and parse search query parameter for filter view.
 
         serializer_class: class used to serialize the resulting queryset
     """
@@ -49,6 +51,13 @@ class SearchMixin:
                 many=True)
             return JsonResponse({'object_list': serializer.data})
         return super().render_to_response(context, **response_kwargs)
+
+    def get_filterset_kwargs(self, filterset_class):
+        kwargs = super().get_filterset_kwargs(filterset_class)
+        if "search_query" in kwargs.get("data", {}):
+            unquoted_search_query_string = urllib.parse.unquote_plus(kwargs["data"]["search_query"])
+            kwargs["data"] = QueryDict(unquoted_search_query_string)
+        return kwargs
 
     def get_paginate_by(self, queryset):
         pagination.store_paginator_size(self.request)

@@ -24,11 +24,12 @@
 #
 ##############################################################################
 import json
+import urllib
 from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, QueryDict
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -391,6 +392,27 @@ class TestEducationGroupDataSearchFilter(TestCase):
                 "acronym": self.education_group_arke2a.acronym,
                 "management_entity": self.envi_entity_v.acronym,
                 "with_entity_subordinated": True
+            }
+        )
+
+        self.assertTemplateUsed(response, "education_group/search.html")
+
+        context = response.context
+        self.assertIsInstance(context["form"], self.form_class)
+        self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
+
+    def test_with_search_query_parameter(self):
+        data = {
+            "academic_year": self.current_academic_year.id,
+            "acronym": self.education_group_arke2a.acronym,
+            "management_entity": self.envi_entity_v.acronym,
+            "with_entity_subordinated": True
+        }
+        query_dict = QueryDict(mutable=True)
+        query_dict.update(data)
+        response = self.client.get(
+            self.url, data={
+                "search_query": urllib.parse.quote_plus(query_dict.urlencode())
             }
         )
 
