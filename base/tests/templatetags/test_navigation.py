@@ -55,6 +55,9 @@ class TestNavigationMixin:
     def _get_element_url(self, query_parameters: QueryDict, index):
         raise NotImplementedError()
 
+    def navigation_function(self, *args, **kwargs):
+        raise NotImplementedError
+
     @property
     def elements_sorted_by_acronym(self):
         return sorted(self.elements, key=lambda obj: obj.acronym)
@@ -68,7 +71,7 @@ class TestNavigationMixin:
         )
 
     def test_navigation_when_no_search_query(self):
-        context = navigation.navigation(
+        context = self.navigation_function(
             QueryDict(),
             self.elements_sorted_by_acronym[0],
             self.url_name
@@ -111,7 +114,7 @@ class TestNavigationMixin:
 
     def assertNavigationContextEquals(self, expected_context, index):
         self.query_parameters["index"] = index
-        context = navigation.navigation(
+        context = self.navigation_function(
             self.query_parameters,
             self.elements_sorted_by_acronym[index],
             self.url_name
@@ -132,6 +135,9 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
     def url_name(self):
         return 'learning_unit'
 
+    def navigation_function(self, *args, **kwargs):
+        return navigation.navigation_learning_unit(*args, **kwargs)
+
     def _get_element_url(self, query_parameters: QueryDict, index):
         query_parameters_with_updated_index = QueryDict(mutable=True)
         query_parameters_with_updated_index.update(query_parameters)
@@ -148,11 +154,11 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         self.query_parameters["search_type"] = SearchTypes.EXTERNAL_SEARCH.value
         self.query_parameters["index"] = 0
 
-        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_forms",
+        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_filter_class",
                                               return_value=LearningUnitFilter)
         self.mocked_filter_form = self.filter_form_patcher.start()
 
-        navigation.navigation(
+        self.navigation_function(
             self.query_parameters,
             self.elements_sorted_by_acronym[0],
             self.url_name
@@ -171,6 +177,9 @@ class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
     @property
     def url_name(self):
         return 'education_group_read'
+
+    def navigation_function(self, *args, **kwargs):
+        return navigation.navigation_education_group(*args, **kwargs)
 
     def _get_element_url(self, query_parameters: QueryDict, index):
         query_parameters_with_updated_index = QueryDict(mutable=True)

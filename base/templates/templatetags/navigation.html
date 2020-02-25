@@ -6,9 +6,9 @@
         <ul class="pager">
             {% if previous_element %}
                 <li class="previous">
-                    <a id="previousNavLink" href="{{ previous_url  }}" data-toggle="tooltip" data-placement="top" title="{{ previous_element.acronym }}">
-                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                    </a>
+                    {% block previous_element_anchor %}
+
+                    {% endblock previous_element_anchor %}
                 </li>
             {% else %}
             <li class="previous disabled">
@@ -20,16 +20,17 @@
         </ul>
     </div>
     <div class="col-md-10">
-        <h2>{{ current_element.acronym|default_if_none:'' }} &mdash; {{ current_element.academic_year }}</h2>
-        <h4 style="margin-top: 0;">{{ current_element.complete_title }}</h4>
+        {% block title %}
+
+        {% endblock title %}
     </div>
     <div class="col-md-1">
         <ul class="pager">
             {% if next_element %}
                 <li class="next">
-                    <a id="nextNavLink" href="{{ next_url  }}" data-toggle="tooltip" data-placement="top" title="{{ next_element.acronym }}">
-                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                    </a>
+                    {% block next_element_anchor %}
+
+                    {% endblock next_element_anchor %}
                 </li>
             {% else %}
                 <li class="next disabled">

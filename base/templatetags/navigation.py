@@ -36,12 +36,33 @@ from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
-from base.models.education_group_year import EducationGroupYear
 from base.views.learning_units.search.common import SearchTypes
 
 
-@register.inclusion_tag('templatetags/navigation.html', takes_context=False)
-def navigation(get_parameters: QueryDict, element, url_name: str):
+@register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
+def navigation_learning_unit(get_parameters: QueryDict, element, url_name: str):
+    return navigation_base(
+        _get_learning_unit_filter_class,
+        _reverse_learning_unit_year_url,
+        get_parameters,
+        element,
+        url_name
+    )
+
+
+@register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
+def navigation_education_group(get_parameters: QueryDict, element, url_name: str):
+    return navigation_base(
+        _get_education_group_filter_class,
+        _reverse_education_group_year_url,
+        get_parameters,
+        element,
+        url_name
+    )
+
+
+def navigation_base(filter_class_function, reverse_url_function,
+                    get_parameters: QueryDict, element, url_name: str):
     context = {"current_element": element}
     if "search_query" not in get_parameters and "index" not in get_parameters:
         return context
@@ -53,12 +74,7 @@ def navigation(get_parameters: QueryDict, element, url_name: str):
     unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
     search_parameters = QueryDict(unquoted_search_query_string).dict()
 
-    if isinstance(element, EducationGroupYear):
-        filter_form_class = EducationGroupFilter
-        reverse_url_function = _reverse_education_group_year_url
-    else:
-        filter_form_class = _get_learning_unit_forms(search_type)
-        reverse_url_function = _reverse_learning_unit_year_url
+    filter_form_class = filter_class_function(search_type)
 
     qs = filter_form_class(data=search_parameters).qs
     next_element = _get_element(qs, index + 1)
@@ -80,7 +96,11 @@ def navigation(get_parameters: QueryDict, element, url_name: str):
     return context
 
 
-def _get_learning_unit_forms(search_type):
+def _get_education_group_filter_class(search_type):
+    return EducationGroupFilter
+
+
+def _get_learning_unit_filter_class(search_type):
     map_search_type_to_filter_form = {
         SearchTypes.SIMPLE_SEARCH.value: LearningUnitFilter,
         SearchTypes.SERVICE_COURSES_SEARCH.value: ServiceCourseFilter,

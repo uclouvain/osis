@@ -35,7 +35,7 @@
 
 {% block content %}
 
-    {% navigation  request.GET learning_unit_year request.resolver_match.url_name %}
+    {% navigation_learning_unit  request.GET learning_unit_year request.resolver_match.url_name %}
     {% if messages_deletion %}
         {% include "learning_unit/deletion_msg.html" %}
     {% endif %}
