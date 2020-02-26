@@ -42,7 +42,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.person import Person
-from base.utils.cache import CacheFilterMixin
+from base.utils.cache import CacheFilterMixin, SearchParametersCache
 from base.utils.search import RenderToExcel, SearchMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
 
@@ -85,6 +85,8 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
     serializer_class = EducationGroupSerializer
 
     def get_context_data(self, **kwargs):
+        SearchParametersCache(self.request.user, EducationGroupYear.__name__).set_cached_data(self.request.GET)
+
         person = get_object_or_404(Person, user=self.request.user)
         context = super().get_context_data(**kwargs)
         starting_ac = starting_academic_year()

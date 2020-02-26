@@ -31,18 +31,24 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.forms.learning_unit.search.simple import LearningUnitFilter
+from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.templatetags import navigation
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.user import UserFactory
+from base.utils.cache import SearchParametersCache
 from base.views.learning_units.search.common import SearchTypes
 
 
 class TestNavigationMixin:
+    search_type = "DEFINE"
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.elements = cls.generate_elements()
+        cls.user = UserFactory()
 
     @classmethod
     def generate_elements(cls):
@@ -70,12 +76,25 @@ class TestNavigationMixin:
             )
         )
 
+        parameters = {
+            "academic_year": "self.academic_year.id",
+            "ordering": "acronym"
+        }
+        self.cache = SearchParametersCache(self.user, self.search_type)
+        self.cache.set_cached_data(parameters)
+
+    def tearDown(self):
+        self.cache.clear()
+
     def test_navigation_when_no_search_query(self):
+        self.cache.clear()
+
         context = self.navigation_function(
-            QueryDict(),
+            self.user,
             self.elements_sorted_by_acronym[0],
             self.url_name
         )
+
         expected_context = {"current_element": self.elements_sorted_by_acronym[0]}
         self.assertDictEqual(context, expected_context)
 
@@ -113,9 +132,8 @@ class TestNavigationMixin:
         self.assertNavigationContextEquals(expected_context, inner_element_index)
 
     def assertNavigationContextEquals(self, expected_context, index):
-        self.query_parameters["index"] = index
         context = self.navigation_function(
-            self.query_parameters,
+            self.user,
             self.elements_sorted_by_acronym[index],
             self.url_name
         )
@@ -127,6 +145,8 @@ class TestNavigationMixin:
 
 
 class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
+    search_type = LearningUnitYear.__name__
+
     @classmethod
     def generate_elements(cls):
         return LearningUnitYearFactory.create_batch(5, academic_year=cls.academic_year)
@@ -139,27 +159,24 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         return navigation.navigation_learning_unit(*args, **kwargs)
 
     def _get_element_url(self, query_parameters: QueryDict, index):
-        query_parameters_with_updated_index = QueryDict(mutable=True)
-        query_parameters_with_updated_index.update(query_parameters)
-        query_parameters_with_updated_index["index"] = index
-
         next_element = self.elements_sorted_by_acronym[index]
 
-        return "{}?{}".format(
-            reverse(self.url_name, args=[next_element.id]),
-            query_parameters_with_updated_index.urlencode()
-        )
+        return reverse(self.url_name, args=[next_element.id])
 
     def test_filter_called_depending_on_search_type(self):
-        self.query_parameters["search_type"] = SearchTypes.EXTERNAL_SEARCH.value
-        self.query_parameters["index"] = 0
+        parameters = {
+            "academic_year": "self.academic_year.id",
+            "ordering": "acronym",
+            "search_type": SearchTypes.EXTERNAL_SEARCH.value
+        }
+        self.cache.set_cached_data(parameters)
 
         self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_filter_class",
                                               return_value=LearningUnitFilter)
         self.mocked_filter_form = self.filter_form_patcher.start()
 
         self.navigation_function(
-            self.query_parameters,
+            self.user,
             self.elements_sorted_by_acronym[0],
             self.url_name
         )
@@ -170,9 +187,15 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
 
 
 class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
+    search_type = EducationGroupYear.__name__
+
     @classmethod
     def generate_elements(cls):
         return EducationGroupYearFactory.create_batch(5, academic_year=cls.academic_year)
+
+    def _get_element_url(self, query_parameters: QueryDict, index):
+        next_element = self.elements_sorted_by_acronym[index]
+        return reverse(self.url_name, args=[next_element.id, next_element.id])
 
     @property
     def url_name(self):
@@ -181,14 +204,3 @@ class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
     def navigation_function(self, *args, **kwargs):
         return navigation.navigation_education_group(*args, **kwargs)
 
-    def _get_element_url(self, query_parameters: QueryDict, index):
-        query_parameters_with_updated_index = QueryDict(mutable=True)
-        query_parameters_with_updated_index.update(query_parameters)
-        query_parameters_with_updated_index["index"] = index
-
-        next_element = self.elements_sorted_by_acronym[index]
-
-        return "{}?{}".format(
-            reverse(self.url_name, args=[next_element.id, next_element.id]),
-            query_parameters_with_updated_index.urlencode()
-        )

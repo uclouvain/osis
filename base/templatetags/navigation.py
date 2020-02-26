@@ -36,29 +36,70 @@ from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
+from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import SearchParametersCache
 from base.views.learning_units.search.common import SearchTypes
 
 
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
-def navigation_learning_unit(get_parameters: QueryDict, element, url_name: str):
-    return navigation_base(
-        _get_learning_unit_filter_class,
-        _reverse_learning_unit_year_url,
-        get_parameters,
-        element,
-        url_name
-    )
+def navigation_learning_unit(user, element, url_name: str):
+    filter_class_function = _get_learning_unit_filter_class
+    reverse_url_function = _reverse_learning_unit_year_url_bis
+
+    context = {"current_element": element}
+
+    search_parameters = SearchParametersCache(user, LearningUnitYear.__name__).cached_data
+    if not search_parameters:
+        return context
+
+    search_type = search_parameters.get("search_type")
+
+    filter_form_class = filter_class_function(search_type)
+
+    qs = filter_form_class(data=search_parameters).qs
+    next_element = _get_next_element_bis(qs, element)
+
+    previous_element = _get_previous_element_bis(qs, element)
+
+    context.update({
+        "next_element": next_element,
+        "next_url": reverse_url_function(next_element, url_name)
+        if next_element else None,
+        "previous_element": previous_element,
+        "previous_url": reverse_url_function(previous_element, url_name)
+        if previous_element else None
+    })
+    return context
 
 
 @register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
-def navigation_education_group(get_parameters: QueryDict, element, url_name: str):
-    return navigation_base(
-        _get_education_group_filter_class,
-        _reverse_education_group_year_url,
-        get_parameters,
-        element,
-        url_name
-    )
+def navigation_education_group(user, element, url_name: str):
+    filter_class_function = _get_education_group_filter_class
+    reverse_url_function = _reverse_education_group_year_url_bis
+    search_type = None
+    context = {"current_element": element}
+
+    search_parameters = SearchParametersCache(user, EducationGroupYear.__name__).cached_data
+    if not search_parameters:
+        return context
+
+    filter_form_class = filter_class_function(search_type)
+
+    qs = filter_form_class(data=search_parameters).qs
+    next_element = _get_next_element_bis(qs, element)
+
+    previous_element = _get_previous_element_bis(qs, element)
+
+    context.update({
+        "next_element": next_element,
+        "next_url": reverse_url_function(next_element, url_name)
+        if next_element else None,
+        "previous_element": previous_element,
+        "previous_url": reverse_url_function(previous_element, url_name)
+        if previous_element else None
+    })
+    return context
 
 
 def navigation_base(filter_class_function, reverse_url_function,
@@ -117,6 +158,32 @@ def _get_element(qs, index):
         return qs[index] if index >= 0 else None
     except IndexError:
         return None
+
+
+def _get_next_element_bis(qs, element):
+    previous = None
+    for current_element in qs:
+        if previous == element:
+            return current_element
+        previous = current_element
+    return None
+
+
+def _get_previous_element_bis(qs, element):
+    previous = None
+    for current_element in qs:
+        if current_element == element:
+            return previous
+        previous = current_element
+    return None
+
+
+def _reverse_education_group_year_url_bis(education_group_year_obj, url_name):
+    return reverse(url_name, args=[education_group_year_obj.id, education_group_year_obj.id])
+
+
+def _reverse_learning_unit_year_url_bis(learning_unit_year_obj, url_name):
+    return reverse(url_name, args=[learning_unit_year_obj.id])
 
 
 def _reverse_education_group_year_url(education_group_year_obj, url_name, get_parameters):
