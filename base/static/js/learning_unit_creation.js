@@ -123,8 +123,10 @@ function callbackAcronymValidation(data){
 
 function setErrorMessage(text, element){
     parent = $(element).closest(".acronym-group");
-    parent.addClass('has-error');
-    parent.append("<div class='help-block'>" + text + "</div>");
+    if (parent.find('.help-block').length === 0) {
+        parent.addClass('has-error');
+        parent.append("<div class='help-block'>" + text + "</div>");
+    }
 }
 
 function setWarningMessage(text, element){
