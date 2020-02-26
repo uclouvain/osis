@@ -215,21 +215,16 @@ function getDataAjaxTable(formId, domTable, d, pageNumber) {
     return queryString;
 }
 
-$(window).scroll(function() {
-    if (checkVisible($('.footer'))) {
-        $('.side-container').css("height", "calc(100% - 100px)");
-    } else {
-        $('.side-container').css("height", "calc(100% - 50px)");
-    }
-});
+let observer = new IntersectionObserver(function(entries) {
+    entries.forEach( entry => {
+        if (entry.isIntersecting) {
+            console.log('Element is fully visible in screen');
+            $('.side-container').css("height", "calc(100% - 100px)");
+        } else {
+            console.log('Element is NOT fully visible in screen');
+            $('.side-container').css("height", "calc(100% - 50px)");
+        }
+    });
+}, { threshold: [1] });
 
-function checkVisible( elm, eval ) {
-    eval = eval || "visible";
-    var vpH = $(window).height(), // Viewport Height
-        st = $(window).scrollTop(), // Scroll Top
-        y = $(elm).offset().top,
-        elementHeight = $(elm).height();
-
-    if (eval == "visible") return ((y < (vpH + st)) && (y > (st - elementHeight)));
-    if (eval == "above") return ((y < (vpH + st)));
-}
+observer.observe(document.querySelector(".footer"));
