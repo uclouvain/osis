@@ -110,7 +110,7 @@ class LearningComponentYear(SerializableModel):
     def real_classes(self) -> int:
         # FIXME :: Temporary solution - Waiting for real classes in OSIS
         real_classes = self.learningclassyear_set.count()
-        if self.planned_classes > 0 and real_classes == 0:
+        if self.planned_classes and self.planned_classes > 0 and real_classes == 0:
             return 1
         return real_classes
 
