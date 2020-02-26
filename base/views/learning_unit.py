@@ -504,3 +504,11 @@ def get_languages_settings():
         'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
         'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN
     }
+
+
+def proposal_is_on_future_year(proposal, base_luy):
+    return proposal.learning_unit_year.academic_year.year > base_luy.academic_year.year
+
+
+def proposal_is_on_same_year(proposal, base_luy):
+    return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year
