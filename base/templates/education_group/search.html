@@ -177,12 +177,6 @@
     <script src="{% static "js/osis_datatable.js" %}"></script>
     <script>
         $(document).ready(function () {
-            {% if page_obj.start_index %}
-            const startingIndex = {{ page_obj.start_index }} - 1;
-            {% else %}
-            const startingIndex = 0;
-            {% endif %}
-
             let columnDefs = [
                 {"name": "academic_year", "targets": 0, "data": "academic_year"},
                 {
@@ -190,11 +184,7 @@
                     "targets": 1,
                     "data": "acronym",
                     "render": function ( data, type, row, meta ) {
-                        const params = constructEducationGroupSearchParameters(
-                            meta.settings.oAjaxData,
-                            startingIndex + meta["row"]
-                        );
-                        return outputAnchorOuterHtml(row["url"], params, data);
+                        return outputAnchorOuterHtml(row["url"], data);
                     }
                 },
                 {"name": "title", "targets": 2, "data": "title"},

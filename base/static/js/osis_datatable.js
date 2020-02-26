@@ -47,28 +47,9 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
 }
 
 
-function outputAnchorOuterHtml(urlPath, urlSearchParams, textContent){
-    const fullUrl = `${urlPath}?${urlSearchParams.toString()}`;
-
+function outputAnchorOuterHtml(urlPath, textContent){
     const anchor = document.createElement("a");
-    anchor.setAttribute("href", fullUrl);
+    anchor.setAttribute("href", urlPath);
     anchor.textContent = textContent;
     return anchor.outerHTML;
-}
-
-
-function constructLearningUnitSearchParameters(getParametersDict, index, search_type){
-    const params = new URLSearchParams();
-    params.set("search_query", encodeURIComponent((new URLSearchParams(getParametersDict)).toString()));
-    params.set("index", index);
-    params.set("search_type", search_type);
-    return params
-}
-
-
-function constructEducationGroupSearchParameters(getParametersDict, index){
-    const params = new URLSearchParams();
-    params.set("search_query", encodeURIComponent((new URLSearchParams(getParametersDict)).toString()));
-    params.set("index", index);
-    return params
 }

@@ -78,11 +78,6 @@
 
     $(document).ready(function()
     {
-        {% if page_obj.start_index %}
-            const startingIndex = {{ page_obj.start_index }} - 1;
-        {% else %}
-            const startingIndex = 0;
-        {% endif %}
         columnDefs = [
             {
                 "name": "academic_year",
@@ -99,12 +94,7 @@
                 "targets": 1,
                 "data": "acronym",
                 "render": function ( data, type, row, meta ) {
-                    const params = constructLearningUnitSearchParameters(
-                        meta.settings.oAjaxData,
-                        startingIndex + meta["row"],
-                        "{{ search_type.value }}"
-                    );
-                    return outputAnchorOuterHtml(row["osis_url"], params, data);
+                    return outputAnchorOuterHtml(row["osis_url"], data);
                 }
             },
             {
