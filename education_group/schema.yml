@@ -579,6 +579,10 @@ components:
               type: number
             web_re_registration:
               type: boolean
+            domain_name:
+              type: string
+            domain_code:
+              type: string
     GroupDetailed:
       type: object
       properties:
