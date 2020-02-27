@@ -102,9 +102,9 @@ class TestNavigationMixin:
         first_element_index = 0
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[first_element_index],
-            "next_element": self.elements_sorted_by_acronym[first_element_index + 1],
+            "next_element_title": self.elements_sorted_by_acronym[first_element_index + 1].acronym,
             "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
-            "previous_element": None,
+            "previous_element_title": None,
             "previous_url": None,
         }
         self.assertNavigationContextEquals(expected_context, first_element_index)
@@ -113,9 +113,9 @@ class TestNavigationMixin:
         last_element_index = len(self.elements_sorted_by_acronym) - 1
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[last_element_index],
-            "next_element": None,
+            "next_element_title": None,
             "next_url": None,
-            "previous_element": self.elements_sorted_by_acronym[last_element_index - 1],
+            "previous_element_title": self.elements_sorted_by_acronym[last_element_index - 1].acronym,
             "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, last_element_index)
@@ -124,9 +124,9 @@ class TestNavigationMixin:
         inner_element_index = 2
         expected_context = {
             "current_element": self.elements_sorted_by_acronym[inner_element_index],
-            "next_element": self.elements_sorted_by_acronym[inner_element_index + 1],
+            "next_element_title": self.elements_sorted_by_acronym[inner_element_index + 1].acronym,
             "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
-            "previous_element": self.elements_sorted_by_acronym[inner_element_index - 1],
+            "previous_element_title": self.elements_sorted_by_acronym[inner_element_index - 1].acronym,
             "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
@@ -138,8 +138,8 @@ class TestNavigationMixin:
             self.url_name
         )
         self.assertEqual(context["current_element"], expected_context["current_element"])
-        self.assertEqual(context["next_element"], expected_context["next_element"])
-        self.assertEqual(context["previous_element"], expected_context["previous_element"])
+        self.assertEqual(context["next_element_title"], expected_context["next_element_title"])
+        self.assertEqual(context["previous_element_title"], expected_context["previous_element_title"])
         self.assertURLEqual(context["next_url"], expected_context["next_url"])
         self.assertURLEqual(context["previous_url"], expected_context["previous_url"])
 

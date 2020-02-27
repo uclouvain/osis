@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-import urllib
 
-from django.http import QueryDict
 from django.template.defaulttags import register
 from django.urls import reverse
 
@@ -43,96 +41,33 @@ from base.views.learning_units.search.common import SearchTypes
 
 
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
-def navigation_learning_unit(user, element, url_name: str):
-    filter_class_function = _get_learning_unit_filter_class
-    reverse_url_function = _reverse_learning_unit_year_url_bis
+def navigation_learning_unit(user, obj: LearningUnitYear, url_name: str):
+    return _navigation_base(_get_learning_unit_filter_class, _reverse_learning_unit_year_url, user, obj, url_name )
 
-    context = {"current_element": element}
 
-    search_parameters = SearchParametersCache(user, LearningUnitYear.__name__).cached_data
+@register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
+def navigation_education_group(user, obj: EducationGroupYear, url_name: str):
+    return _navigation_base(_get_education_group_filter_class, _reverse_education_group_year_url, user, obj, url_name)
+
+
+def _navigation_base(filter_class_function, reverse_url_function, user, obj, url_name):
+    context = {"current_element": obj}
+    search_parameters = SearchParametersCache(user, obj.__class__.__name__).cached_data
     if not search_parameters:
         return context
 
     search_type = search_parameters.get("search_type")
-
     filter_form_class = filter_class_function(search_type)
+    qs = filter_form_class(data=search_parameters).qs.values_list("id", "acronym", named=True)
 
-    qs = filter_form_class(data=search_parameters).qs
-    next_element = _get_next_element_bis(qs, element)
-
-    previous_element = _get_previous_element_bis(qs, element)
+    next_row = _get_next_row(qs, obj)
+    previous_row = _get_previous_row(qs, obj)
 
     context.update({
-        "next_element": next_element,
-        "next_url": reverse_url_function(next_element, url_name)
-        if next_element else None,
-        "previous_element": previous_element,
-        "previous_url": reverse_url_function(previous_element, url_name)
-        if previous_element else None
-    })
-    return context
-
-
-@register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
-def navigation_education_group(user, element, url_name: str):
-    filter_class_function = _get_education_group_filter_class
-    reverse_url_function = _reverse_education_group_year_url_bis
-    search_type = None
-    context = {"current_element": element}
-
-    search_parameters = SearchParametersCache(user, EducationGroupYear.__name__).cached_data
-    if not search_parameters:
-        return context
-
-    filter_form_class = filter_class_function(search_type)
-
-    qs = filter_form_class(data=search_parameters).qs
-    next_element = _get_next_element_bis(qs, element)
-
-    previous_element = _get_previous_element_bis(qs, element)
-
-    context.update({
-        "next_element": next_element,
-        "next_url": reverse_url_function(next_element, url_name)
-        if next_element else None,
-        "previous_element": previous_element,
-        "previous_url": reverse_url_function(previous_element, url_name)
-        if previous_element else None
-    })
-    return context
-
-
-def navigation_base(filter_class_function, reverse_url_function,
-                    get_parameters: QueryDict, element, url_name: str):
-    context = {"current_element": element}
-    if "search_query" not in get_parameters and "index" not in get_parameters:
-        return context
-
-    search_query_string = get_parameters.get("search_query")
-    index = int(get_parameters.get("index"))
-    search_type = get_parameters.get("search_type")
-
-    unquoted_search_query_string = urllib.parse.unquote_plus(search_query_string)
-    search_parameters = QueryDict(unquoted_search_query_string).dict()
-
-    filter_form_class = filter_class_function(search_type)
-
-    qs = filter_form_class(data=search_parameters).qs
-    next_element = _get_element(qs, index + 1)
-    next_element_get_parameters = get_parameters.copy()
-    next_element_get_parameters["index"] = index + 1
-
-    previous_element = _get_element(qs, index - 1)
-    previous_element_get_parameters = get_parameters.copy()
-    previous_element_get_parameters["index"] = index - 1
-
-    context.update({
-        "next_element": next_element,
-        "next_url": reverse_url_function(next_element, url_name, next_element_get_parameters)
-        if next_element else None,
-        "previous_element": previous_element,
-        "previous_url": reverse_url_function(previous_element, url_name, previous_element_get_parameters)
-        if previous_element else None
+        "next_element_title": next_row.acronym if next_row else None,
+        "next_url": reverse_url_function(next_row, url_name) if next_row else None,
+        "previous_element_title": previous_row.acronym if previous_row else None,
+        "previous_url": reverse_url_function(previous_row, url_name) if previous_row else None
     })
     return context
 
@@ -153,48 +88,27 @@ def _get_learning_unit_filter_class(search_type):
     return map_search_type_to_filter_form.get(int(search_type) if search_type else None, LearningUnitFilter)
 
 
-def _get_element(qs, index):
-    try:
-        return qs[index] if index >= 0 else None
-    except IndexError:
-        return None
-
-
-def _get_next_element_bis(qs, element):
-    previous = None
-    for current_element in qs:
-        if previous == element:
-            return current_element
-        previous = current_element
+def _get_next_row(qs, obj):
+    previous_row = None
+    for current_row in qs:
+        if previous_row and previous_row.id == obj.id:
+            return current_row
+        previous_row = current_row
     return None
 
 
-def _get_previous_element_bis(qs, element):
-    previous = None
-    for current_element in qs:
-        if current_element == element:
-            return previous
-        previous = current_element
+def _get_previous_row(qs, obj):
+    previous_row = None
+    for current_row in qs:
+        if current_row.id == obj.id:
+            return previous_row
+        previous_row = current_row
     return None
 
 
-def _reverse_education_group_year_url_bis(education_group_year_obj, url_name):
-    return reverse(url_name, args=[education_group_year_obj.id, education_group_year_obj.id])
+def _reverse_education_group_year_url(education_group_year_row, url_name):
+    return reverse(url_name, args=[education_group_year_row.id, education_group_year_row.id])
 
 
-def _reverse_learning_unit_year_url_bis(learning_unit_year_obj, url_name):
-    return reverse(url_name, args=[learning_unit_year_obj.id])
-
-
-def _reverse_education_group_year_url(education_group_year_obj, url_name, get_parameters):
-    return "{}?{}".format(
-        reverse(url_name, args=[education_group_year_obj.id, education_group_year_obj.id]),
-        get_parameters.urlencode()
-    )
-
-
-def _reverse_learning_unit_year_url(learning_unit_year_obj, url_name, get_parameters: QueryDict):
-    return "{}?{}".format(
-        reverse(url_name, args=[learning_unit_year_obj.id]),
-        get_parameters.urlencode()
-    )
+def _reverse_learning_unit_year_url(education_group_year_row, url_name):
+    return reverse(url_name, args=[education_group_year_row.id])

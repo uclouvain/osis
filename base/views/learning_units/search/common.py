@@ -69,7 +69,6 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self.request.GET)
         SearchParametersCache(self.request.user, LearningUnitYear.__name__).set_cached_data(self.request.GET)
         self._save_search_type_in_session()
 

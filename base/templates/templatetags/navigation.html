@@ -4,7 +4,7 @@
 <div class="row" style="margin:0 -15px 5px; padding:0;">
     <div class="col-md-1">
         <ul class="pager">
-            {% if previous_element %}
+            {% if previous_url %}
                 <li class="previous">
                     {% block previous_element_anchor %}
 
@@ -26,7 +26,7 @@
     </div>
     <div class="col-md-1">
         <ul class="pager">
-            {% if next_element %}
+            {% if next_url %}
                 <li class="next">
                     {% block next_element_anchor %}
 
