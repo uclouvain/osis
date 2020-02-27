@@ -42,7 +42,7 @@ from base.views.learning_units.search.common import SearchTypes
 
 @register.inclusion_tag('templatetags/navigation_learning_unit.html', takes_context=False)
 def navigation_learning_unit(user, obj: LearningUnitYear, url_name: str):
-    return _navigation_base(_get_learning_unit_filter_class, _reverse_learning_unit_year_url, user, obj, url_name )
+    return _navigation_base(_get_learning_unit_filter_class, _reverse_learning_unit_year_url, user, obj, url_name)
 
 
 @register.inclusion_tag('templatetags/navigation_education_group.html', takes_context=False)
