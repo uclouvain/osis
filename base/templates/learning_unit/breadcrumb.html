@@ -1,5 +1,4 @@
 {% load static i18n %}
-{% load url_utils %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -29,7 +28,7 @@
 <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
 <li><a href="{% url 'learning_units' %}{% if not search_url or not search_tab %}{% url_params %}{% endif %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
     {% if search_url and search_tab %}
-        <li><a href="{{ search_url }}{% url_params %}" id="lnk_learning_units">{{ search_tab }}</a></li>
+        <li><a href="{{ search_url }}" id="lnk_learning_units">{{ search_tab }}</a></li>
     {% endif %}
 <li class="active">{% if learning_unit_year.id %}{{ learning_unit_year.acronym }}{% else %}{% trans 'Learning unit' %}{% endif %}</li>
 {% endwith %}
