@@ -215,54 +215,21 @@ function getDataAjaxTable(formId, domTable, d, pageNumber) {
     return queryString;
 }
 
-// let observer = new IntersectionObserver(function(entries) {
-//     entries.forEach( entry => {
-//         if (entry.isIntersecting) {
-//             console.log('Element is fully visible in screen');
-//             $('.side-container').css("height", "calc(100% - 100px)");
-//         } else {
-//             console.log('Element is NOT fully visible in screen');
-//             $('.side-container').css("height", "calc(100% - 50px)");
-//         }
-//     });
-// }, {
-//     rootMargin: "0px 0px 0px 0px",
-//     threshold: [1]
-// });
-//
-// observer.observe(document.querySelector(".footer"));
-
-
-const observer = new IntersectionObserver((changes) => {
-    for (const change of changes) {
-        console.log("target: ", change.target);
-        console.log("rootBounds: ", change.rootBounds);         // Unclipped area of root
-        console.log("boundingClientRect: ", change.boundingClientRect); // target.boundingClientRect()
-        console.log("intersectionRect: ", change.intersectionRect);   // boundingClientRect, clipped by its containing block ancestors, and intersected with rootBounds
-        console.log("intersectionRatio: ", change.intersectionRatio);
-        // ⚠️ Feature detection
-        if (typeof change.isVisible === 'undefined') {
-            // The browser doesn't support Intersection Observer v2, falling back to v1 behavior.
-            change.isVisible = true;
-        }
-        if (change.isIntersecting && change.isVisible) {
-            let visibleSince = change.time;
-            console.log('Element is fully visible in screen', visibleSince);
-            $('.side-container').css("height", "calc(100% - 100px)");
-        } else {
-            let visibleSince = 0;
-            console.log('Element is NOT fully visible in screen', visibleSince);
-            $('.side-container').css("height", "calc(100% - 50px)");
-        }
+$(window).scroll(function() {
+    if (checkVisible($('.footer'))) {
+        $('.side-container').css("height", "calc(100% - 100px)");
+    } else {
+        $('.side-container').css("height", "calc(100% - 50px)");
     }
-}, {
-    threshold: [1.0],
-    // 🆕 Track the actual visibility of the element
-    trackVisibility: true,
-    // 🆕 Set a minimum delay between notifications
-    delay: 100
 });
 
-// Require that the entire iframe be visible.
-observer.observe(document.querySelector('.footer'));
+function checkVisible( elm, eval ) {
+    eval = eval || "visible";
+    var vpH = $(window).height(), // Viewport Height
+        st = $(window).scrollTop(), // Scroll Top
+        y = $(elm).offset().top,
+        elementHeight = $(elm).height();
 
+    if (eval == "visible") return ((y < (vpH + st)) && (y > (st - elementHeight)));
+    if (eval == "above") return ((y < (vpH + st)));
+}
