@@ -113,6 +113,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
     rate_code_text = serializers.CharField(source='get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='get_active_display', read_only=True)
     remark = serializers.SerializerMethodField(read_only=True)
+    domain_name = serializers.CharField(source='main_domain.parent.name', read_only=True)
+    domain_code = serializers.CharField(source='main_domain.code', read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
@@ -172,6 +174,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'active_text',
             'enrollment_campus',
             'main_teaching_campus',
+            'domain_code',
+            'domain_name'
         )
 
     def get_remark(self, training):
