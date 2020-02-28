@@ -1,6 +1,10 @@
 {% load bootstrap3 %}
+{% load i18n %}
 
+<h5><strong>{% trans "Title"%} (*)</strong></h5>
 {% bootstrap_field learning_container_year_form.common_title form_group_class="form-group required_field" %}
-{% bootstrap_field learning_unit_year_form.specific_title %}
-{% bootstrap_field learning_container_year_form.common_title_english  %}
-{% bootstrap_field learning_unit_year_form.specific_title_english %}
+{% bootstrap_field learning_unit_year_form.specific_title form_group_class="form-group" %}
+<br/>
+<h5><strong>{% trans "Title in English"%}</strong></h5>
+{% bootstrap_field learning_container_year_form.common_title_english form_group_class="form-group" %}
+{% bootstrap_field learning_unit_year_form.specific_title_english form_group_class="form-group" %}
