@@ -617,7 +617,7 @@ class TestGroupElementYearProperty(TestCase):
                                              credits=15)
         self.group_element_year = GroupElementYearFactory(
             parent__academic_year=self.academic_year,
-            parent__education_group_type__name=random.choices(group_types_not_finality_120_list_choice),
+            parent__education_group_type__name=random.choice(group_types_not_finality_120_list_choice),
             child_branch=self.egy,
             relative_credits=10
         )
