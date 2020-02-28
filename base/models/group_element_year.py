@@ -317,12 +317,15 @@ class GroupElementYear(OrderedModel):
         return self.child_branch or self.child_leaf
 
     def _verbose_credits(self):
+        title = self.child.partial_title if \
+            self.parent.education_group_type.name == GroupType.FINALITY_120_LIST_CHOICE.name and \
+            self.child.partial_title != "" else self.child.title
         if self.relative_credits or self.child_branch.credits:
             return "{} ({} {})".format(
-                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+                title, self.relative_credits or self.child_branch.credits or 0, _("credits")
             )
         else:
-            return "{}".format(self.child.title)
+            return "{}".format(title)
 
 
 def find_learning_unit_roots(
