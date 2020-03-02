@@ -220,7 +220,6 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(_get_gathering(self.education_group_yr_root.id, self.hierarchy), self.education_group_yr_root)
         self.assertEqual(_get_gathering(self.edy_node_1_training.id, self.hierarchy), self.edy_node_1_training)
         self.assertEqual(_get_gathering(self.edy_node_1_1_group.id, self.hierarchy), self.edy_node_1_training)
-        self.assertIsNone(_get_gathering(self.education_group_yr_root.id, []))
 
     def test_main_gathering_result_not_direct_parent(self):
         self.assertEqual(_get_gathering(self.edy_node_1_1_1_group_type.id, self.hierarchy), self.edy_node_1_training)
