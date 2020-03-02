@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-21 09:50+0100\n"
+"POT-Creation-Date: 2020-02-28 15:32+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -595,6 +595,9 @@ msgstr "Intitulé commun en anglais"
 
 msgid "Common core"
 msgstr "Partie de base (Tronc commun)"
+
+msgid "Common part"
+msgstr "Partie commune"
 
 msgid "Common title"
 msgstr "Intitulé commun"
@@ -2443,6 +2446,12 @@ msgstr "Conditions Particulières"
 msgid "Specific admission requirements"
 msgstr "Conditions spécifiques d'admission"
 
+msgid "Specific complement (Full)"
+msgstr "Complément spécifique à l'UE (complet)"
+
+msgid "Specific complement (Partim)"
+msgstr "Complément spécifique à l'UE (partim)"
+
 msgid "Specifications"
 msgstr "Cahier des charges"
 
@@ -3634,11 +3643,13 @@ msgstr "le"
 msgid "the program aims"
 msgstr "le programme vise"
 
+#, python-format
 msgid ""
 "the report has not been done from %(proposal_year)s because the LU is in "
 "proposal"
 msgstr ""
-"le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE est en proposition"
+"le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE "
+"est en proposition"
 
 msgid "the sum of repartition volumes must be equal to the global volume"
 msgstr ""
