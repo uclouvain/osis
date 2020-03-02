@@ -466,9 +466,8 @@ def _get_gathering(edg: int, hierarchy):
 
         if gey.parent:
             if gey.parent.education_group_type.category in [education_group_categories.TRAINING,
-                                                            education_group_categories.MINI_TRAINING]:
-                return gey.parent
-            elif gey.parent and gey.parent.education_group_type.name == GroupType.COMPLEMENTARY_MODULE.name:
+                                                            education_group_categories.MINI_TRAINING] or \
+                    gey.parent and gey.parent.education_group_type.name == GroupType.COMPLEMENTARY_MODULE.name:
                 return gey.parent
             else:
                 return _get_gathering(gey.parent.direct_parents_of_branch.first().id, hierarchy)
