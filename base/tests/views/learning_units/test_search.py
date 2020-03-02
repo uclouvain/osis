@@ -27,6 +27,7 @@ from django.contrib.auth.models import Permission
 from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -62,6 +63,9 @@ class TestSearchBorrowedLearningUnits(TestCase):
         context = response.context
         self.assertEqual(context["search_type"], SearchTypes.BORROWED_COURSE)
         self.assertTemplateUsed(response, "learning_unit/search/base.html")
+        self.assertEqual(len(context["object_list"]), 0)
+        messages = [str(m) for m in context["messages"]]
+        self.assertIn(_('No result!'), messages)
 
 
 class TestSearchExternalLearningUnits(TestCase):
@@ -88,3 +92,8 @@ class TestSearchExternalLearningUnits(TestCase):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, "learning_unit/search/external.html")
+        context = response.context
+        self.assertEqual(context["search_type"], SearchTypes.EXTERNAL_SEARCH)
+        self.assertEqual(len(context["object_list"]), 0)
+        messages = [str(m) for m in context["messages"]]
+        self.assertIn(_('No result!'), messages)
