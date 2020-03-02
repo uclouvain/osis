@@ -41,8 +41,6 @@ from base.business.learning_unit_xls import volume_information, annotate_qs, PRO
     prepare_proposal_legend_ws_data
 from base.business.learning_units.xls_generator import hyperlinks_to_string
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import GroupType
 from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_achievement import LearningAchievement
@@ -227,8 +225,7 @@ def _get_headers(custom_xls_form):
 def _fix_data(gey: GroupElementYear, luy: LearningUnitYear, hierarchy):
     data = []
 
-    edg = gey.parent.id
-    main_gathering = _get_gathering(edg, hierarchy)
+    main_gathering = hierarchy._get_main_parent(gey.parent.id)
 
     data_fix = FixLineUEContained(acronym=luy.acronym,
                                   year=luy.academic_year,
@@ -459,21 +456,6 @@ def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
 def _build_subquery_text_label(qs, cms_text_label, lang):
     return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
         'text')[:1]
-
-
-def _get_gathering(edg: int, hierarchy):
-    for gey in hierarchy.cache_hierarchy.get(edg) or []:
-
-        if gey.parent:
-            if gey.parent.education_group_type.category in [education_group_categories.TRAINING,
-                                                            education_group_categories.MINI_TRAINING] or \
-                    gey.parent and gey.parent.education_group_type.name == GroupType.COMPLEMENTARY_MODULE.name:
-                return gey.parent
-            else:
-                return _get_gathering(gey.parent.direct_parents_of_branch.first().id, hierarchy)
-        else:
-            continue
-    return None
 
 
 def _build_gathering_content(edg):

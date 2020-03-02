@@ -57,7 +57,7 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _get_gathering, _build_gathering_content
+    _build_validate_html_list_to_string, _build_gathering_content
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
@@ -214,15 +214,15 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         res = _fix_data(gey, luy, self.hierarchy)
         self.assertEqual(res, expected)
 
-    def test_main_gathering_result(self):
+    def test_main_parent_result(self):
         #  To find main gathering loop up throught the hierarchy till you find
         #  complementary module/formation/mini-formation
-        self.assertEqual(_get_gathering(self.education_group_yr_root.id, self.hierarchy), self.education_group_yr_root)
-        self.assertEqual(_get_gathering(self.edy_node_1_training.id, self.hierarchy), self.edy_node_1_training)
-        self.assertEqual(_get_gathering(self.edy_node_1_1_group.id, self.hierarchy), self.edy_node_1_training)
+        self.assertEqual(self.hierarchy._get_main_parent(self.education_group_yr_root.id), self.education_group_yr_root)
+        self.assertEqual(self.hierarchy._get_main_parent(self.edy_node_1_training.id), self.edy_node_1_training)
+        self.assertEqual(self.hierarchy._get_main_parent(self.edy_node_1_1_group.id), self.edy_node_1_training)
 
-    def test_main_gathering_result_not_direct_parent(self):
-        self.assertEqual(_get_gathering(self.edy_node_1_1_1_group_type.id, self.hierarchy), self.edy_node_1_training)
+    def test_main_parent_result_not_direct_parent(self):
+        self.assertEqual(self.hierarchy._get_main_parent(self.edy_node_1_1_1_group_type.id), self.edy_node_1_training)
 
     def test_legend_workbook_exists(self):
         wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], True, {})
