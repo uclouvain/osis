@@ -134,20 +134,28 @@
                         {% block titles %}
                             {% if learning_unit_year.subtype == "PARTIM" %}
                                 <h5><strong>{% trans "Title"%}</strong></h5>
+                                <div class="tab">
                                 {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype %}
                                 {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Specific complement (Partim)') title=_('Specific complement (Partim)') %}
+                                </div>
                                 <br/>
                                 <h5><strong>{% trans "Title in English"%}</strong></h5>
+                                <div class="tab">
                                 {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype %}
                                 {% dl_tooltip learning_unit_year 'specific_title_english' label_text=_('Specific complement (Partim)') title=_('Specific complement (Partim)') %}
+                                </div>
                             {% else %}
                                 <h5><strong>{% trans "Title"%}</strong></h5>
+                                <div class="tab">
                                 {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype %}
                                 {% dl_tooltip learning_unit_year 'specific_title' title=_('Specific complement (Full)') label_text=_('Specific complement (Full)') %}
+                                </div>
                                 <br/>
                                 <h5><strong>{% trans "Title in English"%}</strong></h5>
+                                <div class="tab">
                                 {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype %}
                                 {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Full)') label_text=_('Specific complement (Full)') %}
+                                </div>
                             {% endif %}
                         {% endblock titles %}
                     </div>
