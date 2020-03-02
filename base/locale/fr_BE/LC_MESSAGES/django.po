@@ -117,7 +117,7 @@ msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
 msgstr ""
-"%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
+"%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
 
 msgid "1st quadri"
@@ -502,6 +502,9 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annuler"
 
+msgid "Cancel proposal"
+msgstr "Annuler proposition"
+
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
@@ -809,6 +812,9 @@ msgstr "Remise du mémoire"
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
+msgid "Do you want to cancel proposal?"
+msgstr "Voulez-vous annuler ces propositions?"
+
 msgid "Do you want to change the status of this proposals?"
 msgstr "Voulez-vous changer le statut de ces propositions?"
 
@@ -820,9 +826,6 @@ msgstr "Voulez-vous continuer ?"
 
 msgid "Do you want to export the following informations"
 msgstr "Désirez-vous exporter les informations suivantes"
-
-msgid "Do you want to get back to initial data?"
-msgstr "Voulez-vous retourner à l'état initial?"
 
 msgid "Do you want to report the modifications done to the next years ?"
 msgstr ""
@@ -1152,9 +1155,6 @@ msgstr "Liste des UE qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
 msgstr "Liste des UE qui ont des prérequis"
-
-msgid "Get back to initial data"
-msgstr "Retour à l'état initial"
 
 msgid "Global ID"
 msgstr "Matricule FGS"
@@ -2256,6 +2256,9 @@ msgstr "Classes effectives"
 
 msgid "Real/Planned classrooms"
 msgstr "Classes effectives/prévues"
+
+msgid "Reason for failure"
+msgstr "Motif de l'échec"
 
 msgid "Received on"
 msgstr "Reçu le"
