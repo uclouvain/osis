@@ -338,7 +338,7 @@ paths:
               items:
                 type: string
           style: form
-          explode: false
+          explode: true
         - in: query
           name: ordering
           schema:
