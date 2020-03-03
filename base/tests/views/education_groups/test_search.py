@@ -401,27 +401,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertIsInstance(context["form"], self.form_class)
         self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
 
-    def test_with_search_query_parameter(self):
-        data = {
-            "academic_year": self.current_academic_year.id,
-            "acronym": self.education_group_arke2a.acronym,
-            "management_entity": self.envi_entity_v.acronym,
-            "with_entity_subordinated": True
-        }
-        query_dict = QueryDict(mutable=True)
-        query_dict.update(data)
-        response = self.client.get(
-            self.url, data={
-                "search_query": urllib.parse.quote_plus(query_dict.urlencode())
-            }
-        )
-
-        self.assertTemplateUsed(response, "education_group/search.html")
-
-        context = response.context
-        self.assertIsInstance(context["form"], self.form_class)
-        self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
-
 
 class TestEducationGroupTypeAutoComplete(TestCase):
     @classmethod
