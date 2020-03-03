@@ -118,15 +118,6 @@ def _get_current_row(qs, obj):
     return next((row for row in qs if row.id == obj.id), None)
 
 
-def _get_previous_row(qs, obj):
-    previous_row = None
-    for current_row in qs:
-        if current_row.id == obj.id:
-            return previous_row
-        previous_row = current_row
-    return None
-
-
 def _reverse_education_group_year_url(education_group_year_id, url_name):
     return reverse(url_name, args=[education_group_year_id, education_group_year_id])
 
