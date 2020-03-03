@@ -55,6 +55,7 @@ def before_all(context):
 
     screen_size = (settings.SELENIUM_SETTINGS['SCREEN_WIDTH'], settings.SELENIUM_SETTINGS['SCREEN_HIGH'])
     context.browser.set_window_size(*screen_size)
+    ScoreEncodingFactory()
     context.setup_data = LearningUnitBusinessFactory()
 
 
