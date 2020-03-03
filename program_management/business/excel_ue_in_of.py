@@ -233,7 +233,7 @@ def _fix_data(gey: GroupElementYear, luy: LearningUnitYear, hierarchy):
                                   type=luy.get_container_type_display(),
                                   subtype=luy.get_subtype_display(),
                                   gathering=_build_gathering_content(gey.parent),
-                                  main_gathering=_build_gathering_content(main_gathering),
+                                  main_gathering=_build_main_gathering_content(main_gathering),
                                   block=gey.block or '',
                                   mandatory=str.strip(yesno(gey.is_mandatory)))
     for name in data_fix._fields:
@@ -461,3 +461,6 @@ def _build_subquery_text_label(qs, cms_text_label, lang):
 def _build_gathering_content(edg):
     return "{} - {}".format(edg.partial_acronym, edg.title) if edg else ''
 
+
+def _build_main_gathering_content(edg):
+    return "{} - {}".format(edg.acronym, edg.title) if edg else ''
