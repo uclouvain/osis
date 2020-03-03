@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-
+from django.db.models import Window
+from django.db.models.functions import Lag, Lead
 from django.template.defaulttags import register
 from django.urls import reverse
 
@@ -58,16 +59,41 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
 
     search_type = search_parameters.get("search_type")
     filter_form_class = filter_class_function(search_type)
-    qs = filter_form_class(data=search_parameters).qs.values_list("id", "acronym", named=True)
+    order_by = filter_form_class(data=search_parameters).qs.query.order_by
+    qs = filter_form_class(data=search_parameters).qs.annotate(
+        previous_acronym=Window(
+            expression=Lag("acronym"),
+            order_by=order_by
+        ),
+        next_acronym=Window(
+            expression=Lead("acronym"),
+            order_by=order_by
+        ),
+        previous_id=Window(
+            expression=Lag("id"),
+            order_by=order_by
+        ),
+        next_id=Window(
+            expression=Lead("id"),
+            order_by=order_by
+        )
+    ).values_list(
+        "id",
+        "acronym",
+        "previous_acronym",
+        "previous_id",
+        "next_acronym",
+        "next_id",
+        named=True
+    )
 
-    next_row = _get_next_row(qs, obj)
-    previous_row = _get_previous_row(qs, obj)
+    current_row = _get_current_row(qs, obj)
 
     context.update({
-        "next_element_title": next_row.acronym if next_row else None,
-        "next_url": reverse_url_function(next_row, url_name) if next_row else None,
-        "previous_element_title": previous_row.acronym if previous_row else None,
-        "previous_url": reverse_url_function(previous_row, url_name) if previous_row else None
+        "next_element_title": current_row.next_acronym,
+        "next_url": reverse_url_function(current_row.next_id, url_name) if current_row.next_id else None,
+        "previous_element_title": current_row.previous_acronym,
+        "previous_url": reverse_url_function(current_row.previous_id, url_name) if current_row.previous_id else None
     })
     return context
 
@@ -88,13 +114,8 @@ def _get_learning_unit_filter_class(search_type):
     return map_search_type_to_filter_form.get(int(search_type) if search_type else None, LearningUnitFilter)
 
 
-def _get_next_row(qs, obj):
-    previous_row = None
-    for current_row in qs:
-        if previous_row and previous_row.id == obj.id:
-            return current_row
-        previous_row = current_row
-    return None
+def _get_current_row(qs, obj):
+    return next((row for row in qs if row.id == obj.id), None)
 
 
 def _get_previous_row(qs, obj):
@@ -106,9 +127,9 @@ def _get_previous_row(qs, obj):
     return None
 
 
-def _reverse_education_group_year_url(education_group_year_row, url_name):
-    return reverse(url_name, args=[education_group_year_row.id, education_group_year_row.id])
+def _reverse_education_group_year_url(education_group_year_id, url_name):
+    return reverse(url_name, args=[education_group_year_id, education_group_year_id])
 
 
-def _reverse_learning_unit_year_url(education_group_year_row, url_name):
-    return reverse(url_name, args=[education_group_year_row.id])
+def _reverse_learning_unit_year_url(learning_unit_year_id, url_name):
+    return reverse(url_name, args=[learning_unit_year_id])
