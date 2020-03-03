@@ -5,41 +5,41 @@ Feature: Score encoding
 
   Scenario: Encoding of scores
     When Go to score encoding home page
-    And Select user offer
-    And Click on encode
-    And Fill score for one student
-    Then Modification should be visible
-    When Click on encode bis
+    And Search learning units of the program manager offer
+    And Go encode scores for the first learning unit returned
+    And Submit score for one student
+    Then Scores should be updated
+    When Click on encode scores
     And Fill all scores
-    Then Modification should be visible
-    When Click on encode bis
+    Then Scores should be updated
+    When Click on encode scores
     And Clear all scores
-    Then Modification should be visible
+    Then Scores should be updated
 
   Scenario: Injection of excel file
     When Go to score encoding home page
-    And Select user offer
-    And Click on encode
+    And Search learning units of the program manager offer
+    And Go encode scores for the first learning unit returned
     And Clear all scores
     And Download excel
     Then Excel should be present
     When Fill excel file
     And Inject excel file
-    Then Modification should be visible
+    Then Scores should be updated
 
   Scenario: Double encoding of scores
     When Go to score encoding home page
-    And Select user offer
-    And Click on encode
+    And Search learning units of the program manager offer
+    And Go encode scores for the first learning unit returned
     And Fill all scores
     And Click on double encode
     And Fill all scores
     And Solve differences
-    Then Modification should be visible
+    Then Scores should be updated
 
   Scenario: Encode via pdf
     When Go to score encoding home page
-    And Select user offer
+    And Search learning units of the program manager offer
     And Select tab via paper
     And Download pdf
     Then Pdf should be present

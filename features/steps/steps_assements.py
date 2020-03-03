@@ -53,20 +53,21 @@ def step_impl(context: Context):
     pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding')).open()
 
 
-@when("Select user offer")
+@when("Search learning units of the program manager offer")
 def step_impl(context: Context):
     page = pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
     page.training_select = context.program_manager.offer_year.id
     page.submit()
 
 
-@when("Click on encode")
+@when("Go encode scores for the first learning unit returned")
 def step_impl(context: Context):
     page = pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
+
     page.results[0].encode()
 
 
-@when("Fill score for one student")
+@when("Submit score for one student")
 def step_impl(context: Context):
     page = pages.ScoreEncodingFormPage(driver=context.browser)
     page.results[0].score = str(12)
@@ -74,7 +75,7 @@ def step_impl(context: Context):
     context.scores = [str(12)]
 
 
-@then("Modification should be visible")
+@then("Scores should be updated")
 def step_impl(context: Context):
     page = pages.ScoreEncodingPage(driver=context.browser)
     for result, score in zip(page.results, context.scores):
@@ -93,7 +94,7 @@ def step_impl(context: Context):
             )
 
 
-@when("Click on encode bis")
+@when("Click on encode scores")
 def step_impl(context: Context):
     page = pages.ScoreEncodingPage(driver=context.browser)
     page.encode()
