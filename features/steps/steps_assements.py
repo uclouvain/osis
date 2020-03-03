@@ -30,7 +30,7 @@ from django.contrib.auth.models import Permission
 from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 
-from features.pages import pages_assesments
+from features.pages.assessments import pages
 from assessments.views import upload_xls_utils
 from base.models.enums import exam_enrollment_justification_type
 from base.models.program_manager import ProgramManager
@@ -50,25 +50,25 @@ def step_impl(context: Context):
 
 @when("Go to score encoding home page")
 def step_impl(context: Context):
-    pages_assesments.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding')).open()
+    pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding')).open()
 
 
 @when("Select user offer")
 def step_impl(context: Context):
-    page = pages_assesments.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
+    page = pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
     page.training_select = context.program_manager.offer_year.id
     page.submit()
 
 
 @when("Click on encode")
 def step_impl(context: Context):
-    page = pages_assesments.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
+    page = pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
     page.results[0].encode()
 
 
 @when("Fill score for one student")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingFormPage(driver=context.browser)
+    page = pages.ScoreEncodingFormPage(driver=context.browser)
     page.results[0].score = str(12)
     page.submit()
     context.scores = [str(12)]
@@ -76,7 +76,7 @@ def step_impl(context: Context):
 
 @then("Modification should be visible")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     for result, score in zip(page.results, context.scores):
         if score.isdecimal():
             context.test.assertEqual(result.score.text, score)
@@ -95,19 +95,19 @@ def step_impl(context: Context):
 
 @when("Click on encode bis")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     page.encode()
 
 
 @when("Click on double encode")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     page.double_encode()
 
 
 @when("Fill all scores")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingFormPage(driver=context.browser)
+    page = pages.ScoreEncodingFormPage(driver=context.browser)
     results = page.results
     context.scores = [str(random.randint(0, 20)) for i in range(20)]
     for result, score in zip(results, context.scores):
@@ -117,7 +117,7 @@ def step_impl(context: Context):
 
 @when("Clear all scores")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingFormPage(driver=context.browser)
+    page = pages.ScoreEncodingFormPage(driver=context.browser)
     results = page.results
     context.scores = ["" for i in range(20)]
     for result, score in zip(results, context.scores):
@@ -127,13 +127,13 @@ def step_impl(context: Context):
 
 @when("Download excel")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     page.download_excel()
 
 
 @then("Excel should be present")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     filename = page.get_excel_filename()
     full_path = os.path.join(context.download_directory, filename)
     context.test.assertTrue(os.path.exists(full_path), full_path)
@@ -141,7 +141,7 @@ def step_impl(context: Context):
 
 @when("Fill excel file")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     filename = page.get_excel_filename()
     full_path = os.path.join(context.download_directory, filename)
     context.scores = update_xlsx(full_path)
@@ -149,7 +149,7 @@ def step_impl(context: Context):
 
 @when("Inject excel file")
 def step_impl(context: Context):
-    page = pages_assesments.ScoreEncodingPage(driver=context.browser)
+    page = pages.ScoreEncodingPage(driver=context.browser)
     filename = page.get_excel_filename()
     full_path = os.path.join(context.download_directory, filename)
     page.inject_excel(full_path)
@@ -157,7 +157,7 @@ def step_impl(context: Context):
 
 @when("Solve differences")
 def step_impl(context: Context):
-    page = pages_assesments.DoubleScoreEncodingFormPage(driver=context.browser)
+    page = pages.DoubleScoreEncodingFormPage(driver=context.browser)
     validations = [random.randint(1, 2) for i in range(20)]
     for result, validation in zip(page.results, validations):
         if result.score_1.text != result.score_2.text:
@@ -168,13 +168,13 @@ def step_impl(context: Context):
 
 @when("Select tab via paper")
 def step_impl(context: Context):
-    page = pages_assesments.LearningUnitsPage(driver=context.browser)
+    page = pages.LearningUnitsPage(driver=context.browser)
     page.via_paper_link.click()
 
 
 @when("Download pdf")
 def step_impl(context: Context):
-    page = pages_assesments.LearningUnitsViaPaperTabPage(driver=context.browser)
+    page = pages.LearningUnitsViaPaperTabPage(driver=context.browser)
     page.results[0].download_pdf()
     context.filename = "session_%s_%s_%s.pdf" % (
         page.academic_year.text.split("-")[0],
