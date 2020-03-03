@@ -89,12 +89,13 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
 
     current_row = _get_current_row(qs, obj)
 
-    context.update({
-        "next_element_title": current_row.next_acronym,
-        "next_url": reverse_url_function(current_row.next_id, url_name) if current_row.next_id else None,
-        "previous_element_title": current_row.previous_acronym,
-        "previous_url": reverse_url_function(current_row.previous_id, url_name) if current_row.previous_id else None
-    })
+    if current_row:
+        context.update({
+            "next_element_title": current_row.next_acronym,
+            "next_url": reverse_url_function(current_row.next_id, url_name) if current_row.next_id else None,
+            "previous_element_title": current_row.previous_acronym,
+            "previous_url": reverse_url_function(current_row.previous_id, url_name) if current_row.previous_id else None
+        })
     return context
 
 
