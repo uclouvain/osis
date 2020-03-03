@@ -247,6 +247,34 @@ class TestUpdate(TestCase):
         self.assertEqual(self.education_group_year.partial_acronym, 'LDVLD101R')
         self.assertEqual(self.education_group_year.management_entity, new_entity_version.entity)
 
+    def test_post_with_group_not_content(self):
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        self.education_group_year.management_entity = new_entity_version.entity
+        self.education_group_year.save()
+
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.education_group_year.education_group_type.id,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.education_group_year.academic_year.pk,
+            "constraint_type": "",
+        }
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.education_group_year.refresh_from_db()
+        self.assertEqual(self.education_group_year.title, 'Cours au choix')
+        self.assertEqual(self.education_group_year.title_english, 'deaze')
+        self.assertEqual(self.education_group_year.credits, 42)
+        self.assertEqual(self.education_group_year.acronym, 'CRSCHOIXDVLD')
+        self.assertEqual(self.education_group_year.partial_acronym, 'LDVLD101R')
+        self.assertEqual(self.education_group_year.management_entity, new_entity_version.entity)
+
     def test_invalid_post_group(self):
         new_entity_version = MainEntityVersionFactory()
         PersonEntityFactory(person=self.person, entity=new_entity_version.entity)

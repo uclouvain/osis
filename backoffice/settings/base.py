@@ -329,6 +329,7 @@ if CDN_URL:
         CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
         CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
         CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
+        CKEDITOR_CONFIGS[config_name]['allowedContent'] = True
 
 LOGGING = {
     'version': 1,
@@ -474,3 +475,6 @@ YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
 LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
+
+# SITE_ID for Django "sites framework"
+SITE_ID = os.environ.get('SITE_ID', 1)

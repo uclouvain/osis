@@ -26,24 +26,27 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
-from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
-from base.models import academic_year
-from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
+from base.models.academic_year import AcademicYear
 
 
 # TODO Convert it in ModelForm
 class LearningUnitEndDateForm(forms.Form):
-    academic_year = forms.ModelChoiceField(required=True,
-                                           queryset=AcademicYear.objects.none(),
-                                           empty_label=BLANK_CHOICE_DISPLAY,
+    EMPTY_LABEL = BLANK_CHOICE_DISPLAY
+    REQUIRED = True
+    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(),
                                            label=_('Last year of organization')
                                            )
 
-    def __init__(self, data, learning_unit_year, *args, max_year=None, **kwargs):
+    def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
         self.learning_unit = learning_unit_year.learning_unit
         self.learning_unit_year = learning_unit_year
+        self.person = person
         super().__init__(data, *args, **kwargs)
+        self.fields['academic_year'].empty_label = self.EMPTY_LABEL
+        self.fields['academic_year'].required = self.REQUIRED
         end_year = self.learning_unit.end_year
 
         self._set_initial_value(end_year)
@@ -56,30 +59,50 @@ class LearningUnitEndDateForm(forms.Form):
         if max_year:
             self.fields['academic_year'].required = True
 
+    @classmethod
+    def get_event_perm_generator(cls):
+        raise NotImplementedError
+
     def _set_initial_value(self, end_year):
         self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
-        current_academic_year = academic_year.starting_academic_year()
-        min_year = current_academic_year.year
-
-        if not max_year:
-            max_year = compute_max_academic_year_adjournment()
-
-        if self.learning_unit.start_year.year > min_year:
-            min_year = self.learning_unit.start_year.year
-
         if self.learning_unit.is_past():
             raise ValueError(
-                'Learning_unit.end_year {} cannot be less than the current academic_year {}'.format(
-                    self.learning_unit.end_year, current_academic_year)
+                'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
+                    self.learning_unit.end_year)
             )
 
-        if min_year > max_year:
-            raise ValueError('Learning_unit {} cannot be modify'.format(self.learning_unit))
+        event_perm = self.get_event_perm_generator()(self.person)
+        self.luy_current_year = self.learning_unit_year.academic_year.year
+        academic_years = event_perm.get_academic_years(min_academic_y=self.luy_current_year, max_academic_y=max_year)
 
-        return AcademicYear.objects.min_max_years(min_year, max_year)
+        return academic_years
 
     def save(self, update_learning_unit_year=True):
         return edit_learning_unit_end_date(self.learning_unit, self.cleaned_data['academic_year'],
                                            update_learning_unit_year)
+
+
+class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
+    @classmethod
+    def get_event_perm_generator(cls):
+        return event_perms.generate_event_perm_creation_end_date_proposal
+
+    def _get_academic_years(self, max_year):
+        academic_years = super()._get_academic_years(max_year)
+
+        # Allow previous year as last organisation year for suppression proposal
+        previous_academic_year = AcademicYear.objects.filter(year=self.luy_current_year-1)
+        academic_years = previous_academic_year | academic_years
+
+        return academic_years
+
+
+class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
+    EMPTY_LABEL = NO_PLANNED_END_DISPLAY
+    REQUIRED = False
+
+    @classmethod
+    def get_event_perm_generator(cls):
+        return event_perms.generate_event_perm_learning_unit_edition

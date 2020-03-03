@@ -35,8 +35,7 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
 from base.models.academic_year import AcademicYear
-from base.models.enums import attribution_procedure, learning_unit_year_subtypes, \
-    vacant_declaration_type
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -343,40 +342,6 @@ class TestLearningUnitPostponementFormSave(LearningUnitPostponementFormContextMi
         learning_units = {learning_unit_year.learning_unit for learning_unit_year in form.save()}
         self.assertEqual(len(learning_units), 1)
 
-    def test_save_ensure_fields_to_not_postpone(self):
-        # Update fields to not postpone for next learning unit year
-        next_learning_unit_year = LearningUnitYear.objects.get(
-            learning_unit=self.learning_unit_year_full.learning_unit,
-            academic_year__year=self.learning_unit_year_full.academic_year.year + 1
-        )
-        next_learning_unit_year.attribution_procedure = attribution_procedure.EXTERNAL
-        next_learning_unit_year.save()
-        next_learning_unit_year.learning_container_year.is_vacant = False
-        next_learning_unit_year.learning_container_year.type_declaration_vacant = vacant_declaration_type.DO_NOT_ASSIGN
-        next_learning_unit_year.learning_container_year.save()
-
-        data = dict(self.instance_luy_base_form.data)
-        data['is_vacant'] = True
-        data['attribution_procedure'] = attribution_procedure.INTERNAL_TEAM
-        data['type_declaration_vacant'] = vacant_declaration_type.EXCEPTIONAL_PROCEDURE
-        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
-                                              learning_unit_instance=self.instance_luy_base_form.learning_unit_instance,
-                                              data=data)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-
-        # Ensure that modifications is done for first item
-        self.learning_unit_year_full.refresh_from_db()
-        self.assertEqual(data['is_vacant'], self.learning_unit_year_full.learning_container_year.is_vacant)
-        self.assertEqual(data['type_declaration_vacant'],
-                         self.learning_unit_year_full.learning_container_year.type_declaration_vacant)
-        self.assertEqual(data['attribution_procedure'], self.learning_unit_year_full.attribution_procedure)
-
-        self.assertFalse(next_learning_unit_year.learning_container_year.is_vacant)
-        self.assertEqual(next_learning_unit_year.learning_container_year.type_declaration_vacant,
-                         vacant_declaration_type.DO_NOT_ASSIGN)
-        self.assertEqual(next_learning_unit_year.attribution_procedure, attribution_procedure.EXTERNAL)
-
 
 class TestLearningUnitPostponementFormCheckConsistency(LearningUnitPostponementFormContextMixin):
     """Unit tests for LearningUnitPostponementForm._check_consistency()"""
@@ -597,28 +562,6 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         self.assertTrue(self.form.is_valid(), self.form.errors)
         result = self.form.consistency_errors
         self.assertDictEqual(result, expected_result)
-
-    def test_postponement_with_proposal(self):
-        next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 2)
-        luy = LearningUnitYear.objects.filter(
-            academic_year=next_academic_year, learning_unit=self.learning_unit_year_full.learning_unit
-        ).get()
-
-        ProposalLearningUnitFactory(learning_unit_year=luy)
-
-        msg_proposal = _("The learning unit %(luy)s is in proposal, can not save "
-                         "the change from the year %(academic_year)s") % {
-                           'luy': luy.acronym, 'academic_year': next_academic_year
-                       }
-
-        expected_result = OrderedDict({
-            next_academic_year: [msg_proposal],
-        })
-
-        self.assertTrue(self.form.is_valid(), self.form.errors)
-        result = self.form.consistency_errors
-        self.assertIsInstance(result, OrderedDict)  # Need to be ordered by academic_year
-        self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
 
     def test_when_differences_found_on_additional_requirement_entities(self):
         """
