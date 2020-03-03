@@ -210,12 +210,12 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_fix_data(self):
         gey = self.child_leaves[0]
         luy = self.luy_children_in_tree[0]
-        expected = get_expected_data(gey, luy)
+        expected = get_expected_data(gey, luy, self.education_group_yr_root)
         res = _fix_data(gey, luy, self.hierarchy)
         self.assertEqual(res, expected)
 
     def test_main_parent_result(self):
-        #  To find main gathering loop up throught the hierarchy till you find
+        #  To find main gathering loop up through the hierarchy till you find
         #  complementary module/formation/mini-formation
         self.assertEqual(self.hierarchy.get_main_parent(self.education_group_yr_root.id), self.education_group_yr_root)
         self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_training.id), self.edy_node_1_training)
@@ -317,7 +317,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         for gey in exl.learning_unit_years_parent:
             luy = gey.child_leaf
             if luy != self.child_leave_node_111.child_leaf and luy != self.child_leave_node_11.child_leaf:
-                expected = get_expected_data(gey, luy)
+                expected = get_expected_data(gey, luy, gey.parent)
             else:
                 # main_gathering different than direct parent
                 expected = get_expected_data(gey, luy, self.edy_node_1_training)
@@ -596,7 +596,7 @@ class TestExcludeUEFromdWorkbook(TestCase):
 def get_expected_data(gey, luy, main_gathering=None):
     gathering_str = "{} - {}".format(gey.parent.partial_acronym, gey.parent.title)
     if main_gathering:
-        main_gathering_str = "{} - {}".format(main_gathering.partial_acronym, main_gathering.title)
+        main_gathering_str = "{} - {}".format(main_gathering.acronym, main_gathering.title)
     else:
         main_gathering_str = gathering_str
     expected = [luy.acronym,
