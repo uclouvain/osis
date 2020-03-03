@@ -42,7 +42,7 @@ from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
 from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import CacheFilterMixin, SearchParametersCache
+from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.common import remove_from_session
 
@@ -70,7 +70,6 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        SearchParametersCache(self.request.user, LearningUnitYear.__name__).set_cached_data(self.request.GET)
         self._save_search_type_in_session()
 
         starting_ac = starting_academic_year()
