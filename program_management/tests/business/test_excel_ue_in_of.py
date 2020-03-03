@@ -217,12 +217,12 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_main_parent_result(self):
         #  To find main gathering loop up throught the hierarchy till you find
         #  complementary module/formation/mini-formation
-        self.assertEqual(self.hierarchy._get_main_parent(self.education_group_yr_root.id), self.education_group_yr_root)
-        self.assertEqual(self.hierarchy._get_main_parent(self.edy_node_1_training.id), self.edy_node_1_training)
-        self.assertEqual(self.hierarchy._get_main_parent(self.edy_node_1_1_group.id), self.edy_node_1_training)
+        self.assertEqual(self.hierarchy.get_main_parent(self.education_group_yr_root.id), self.education_group_yr_root)
+        self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_training.id), self.edy_node_1_training)
+        self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_1_group.id), self.edy_node_1_training)
 
     def test_main_parent_result_not_direct_parent(self):
-        self.assertEqual(self.hierarchy._get_main_parent(self.edy_node_1_1_1_group_type.id), self.edy_node_1_training)
+        self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_1_1_group_type.id), self.edy_node_1_training)
 
     def test_legend_workbook_exists(self):
         wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], True, {})

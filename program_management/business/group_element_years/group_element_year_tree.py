@@ -330,16 +330,15 @@ class EducationGroupHierarchy:
             if int(block) > self.max_block:
                 self.max_block = int(block)
 
-    def _get_main_parent(self, edg_id: int):
-        for gey in self.cache_hierarchy.get(edg_id, list()) or []:
-
+    def get_main_parent(self, edg_id: int):
+        for gey in self.cache_hierarchy.get(edg_id, list()):
             if gey.parent:
                 if gey.parent.education_group_type.category in [education_group_categories.TRAINING,
                                                                 education_group_categories.MINI_TRAINING] or \
                         gey.parent and gey.parent.education_group_type.name == GroupType.COMPLEMENTARY_MODULE.name:
                     return gey.parent
                 else:
-                    return self._get_main_parent(gey.parent.direct_parents_of_branch.first().id)
+                    return self.get_main_parent(gey.parent.direct_parents_of_branch.first().id)
             else:
                 continue
         return None

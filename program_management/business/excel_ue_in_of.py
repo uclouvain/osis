@@ -225,7 +225,7 @@ def _get_headers(custom_xls_form):
 def _fix_data(gey: GroupElementYear, luy: LearningUnitYear, hierarchy):
     data = []
 
-    main_gathering = hierarchy._get_main_parent(gey.parent.id)
+    main_gathering = hierarchy.get_main_parent(gey.parent.id)
 
     data_fix = FixLineUEContained(acronym=luy.acronym,
                                   year=luy.academic_year,
