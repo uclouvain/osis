@@ -42,7 +42,7 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=EducationGroupType.objects.filter(category=education_group_categories.TRAINING),
+        queryset=EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING),
     )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
 

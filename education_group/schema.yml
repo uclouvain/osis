@@ -829,7 +829,7 @@ components:
         max_constraint:
           type: integer
           minimum: 1
-        contraint_type:
+        constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         children:
           type: array
