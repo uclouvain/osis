@@ -338,7 +338,7 @@ paths:
               items:
                 type: string
           style: form
-          explode: false
+          explode: true
         - in: query
           name: ordering
           schema:
@@ -829,7 +829,7 @@ components:
         max_constraint:
           type: integer
           minimum: 1
-        contraint_type:
+        constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         children:
           type: array
