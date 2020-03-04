@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
 
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -55,10 +54,10 @@ class LearningAchievementList(generics.GenericAPIView):
         ).order_by('order').filter(
             language__code=language[:2].upper()
         ).values('code_name', 'text')
-        learning_achievements_grouped = OrderedDict()
+        learning_achievements_list = []
         for learning_achievement in qs:
-            code_name = learning_achievement['code_name']
-            learning_achievements_grouped.setdefault(code_name, {'achievement': '', 'code_name': code_name})
-            learning_achievements_grouped[code_name]['achievement'] = learning_achievement['text']
-        serializer = self.get_serializer(learning_achievements_grouped.values(), many=True)
+            learning_achievements_list.append(
+                {'achievement': learning_achievement['text'], 'code_name': learning_achievement['code_name']}
+            )
+        serializer = self.get_serializer(learning_achievements_list, many=True)
         return Response(serializer.data)
