@@ -33,6 +33,7 @@ from django.contrib.messages import get_messages
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
@@ -41,7 +42,8 @@ from base.models.enums import learning_unit_year_periodicity, learning_container
     learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
+    generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -49,8 +51,9 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
@@ -65,7 +68,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = PersonFactory(user=cls.user)
+        cls.person = CentralManagerFactory(user=cls.user)
         cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
         cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
@@ -84,6 +87,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
 
         cls.a_superuser = SuperUserFactory()
         cls.a_superperson = PersonFactory(user=cls.a_superuser)
+        generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -125,14 +129,8 @@ class TestEditLearningUnit(TestCase):
     @classmethod
     def setUpTestData(cls):
         today = datetime.date.today()
-        an_academic_year = create_current_academic_year()
-
-        AcademicCalendarFactory(
-            data_year=an_academic_year,
-            start_date=datetime.datetime(an_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        cls.an_academic_year = create_current_academic_year()
+        generate_learning_unit_edition_calendars([cls.an_academic_year])
 
         cls.requirement_entity = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
@@ -153,8 +151,8 @@ class TestEditLearningUnit(TestCase):
             entity__organization__type=organization_type.MAIN,
         )
 
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=an_academic_year,
+        cls.learning_container_year = LearningContainerYearFactory(
+            academic_year=cls.an_academic_year,
             container_type=learning_container_year_types.COURSE,
             type_declaration_vacant=vacant_declaration_type.DO_NOT_ASSIGN,
             requirement_entity=cls.requirement_entity.entity,
@@ -164,9 +162,9 @@ class TestEditLearningUnit(TestCase):
         )
 
         cls.learning_unit_year = LearningUnitYearFactory(
-            learning_container_year=learning_container_year,
+            learning_container_year=cls.learning_container_year,
             acronym="LOSIS4512",
-            academic_year=an_academic_year,
+            academic_year=cls.an_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
             attribution_procedure=attribution_procedure.INTERNAL_TEAM,
             credits=15,
@@ -175,16 +173,20 @@ class TestEditLearningUnit(TestCase):
         )
 
         cls.partim_learning_unit = LearningUnitYearFactory(
-            learning_container_year=learning_container_year,
+            learning_container_year=cls.learning_container_year,
             acronym="LOSIS4512A",
-            academic_year=an_academic_year,
+            academic_year=cls.an_academic_year,
             subtype=learning_unit_year_subtypes.PARTIM,
             credits=10,
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        cls.person = PersonEntityFactory(entity=cls.requirement_entity.entity).person
-        cls.user = cls.person.user
+        person = CentralManagerFactory()
+        PersonEntityFactory(
+            entity=cls.requirement_entity.entity,
+            person=person
+        )
+        cls.user = person.user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit"),
                                       Permission.objects.get(codename="can_access_learningunit"))
         cls.url = reverse(update_learning_unit, args=[cls.learning_unit_year.id])
@@ -312,6 +314,62 @@ class TestEditLearningUnit(TestCase):
 
         self.learning_unit_year.refresh_from_db()
         self.assertEqual(self.learning_unit_year.credits, credits)
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], _('The learning unit has been updated (without report).'))
+        self.assertIn(messages.SUCCESS, msg_level)
+
+    def test_valid_post_request_with_postponement(self):
+        credits = 17
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        form_data['postponement'] = 1  # This values triggers postponement switch in view
+        response = self.client.post(self.url, data=form_data)
+
+        expected_redirection = reverse("learning_unit", args=[self.learning_unit_year.id])
+        self.assertRedirects(response, expected_redirection)
+
+        self.learning_unit_year.refresh_from_db()
+        self.assertEqual(self.learning_unit_year.credits, credits)
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], _('The learning unit has been updated (with report).'))
+        self.assertIn(messages.SUCCESS, msg_level)
+
+    def test_valid_post_request_with_postponement_and_existing_proposal(self):
+        luy_next_year = LearningUnitYearFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            academic_year=AcademicYearFactory(year=self.an_academic_year.year + 1),
+            learning_container_year=self.learning_container_year,
+            acronym="LOSIS4512",
+            subtype=learning_unit_year_subtypes.FULL,
+            attribution_procedure=attribution_procedure.INTERNAL_TEAM,
+            credits=15,
+            campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN)),
+            internship_subtype=None,
+        )
+        ProposalLearningUnitFactory(
+            learning_unit_year=luy_next_year
+        )
+        credits = 17
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        form_data['postponement'] = 1  # This values triggers postponement switch in view
+        response = self.client.post(self.url, data=form_data)
+
+        expected_redirection = reverse("learning_unit", args=[self.learning_unit_year.id])
+        self.assertRedirects(response, expected_redirection)
+
+        self.learning_unit_year.refresh_from_db()
+        self.assertEqual(self.learning_unit_year.credits, credits)
+        msg = [m.message for m in get_messages(response.wsgi_request) if m.level == messages.SUCCESS]
+        self.assertEqual(
+            msg[0],
+            _('The learning unit has been updated (the report has not been done from %(year)s because the learning '
+              'unit is in proposal).') % {'year': luy_next_year.academic_year}
+        )
 
     def test_invalid_post_request(self):
         credits = ''
@@ -367,6 +425,8 @@ class TestLearningUnitVolumesManagement(TestCase):
         )
 
         cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        generate_learning_unit_edition_calendars(cls.academic_years)
+
         cls.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
         cls.generated_container_year = cls.generate_container.generated_container_years[0]
 
@@ -374,7 +434,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         cls.learning_unit_year = cls.generated_container_year.learning_unit_year_full
         cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
 
-        cls.person = PersonFactory()
+        cls.person = CentralManagerFactory()
 
         cls.url = reverse('learning_unit_volumes_management', kwargs={
             'learning_unit_year_id': cls.learning_unit_year.id,

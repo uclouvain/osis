@@ -145,12 +145,9 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         form = LearningUnitSpecificationsEditForm(request.POST)
         if form.is_valid():
             field_label, last_academic_year = form.save()
-            translated_field_label = _get_cms_label_translated(field_label, get_language())
             display_success_messages(
                 request,
-                _build_edit_specification_success_message(last_academic_year,
-                                                          translated_field_label,
-                                                          learning_unit_year_id)
+                build_success_message(last_academic_year, learning_unit_year_id, form.postponement)
             )
         return HttpResponse()
     else:
@@ -177,17 +174,42 @@ def _get_cms_label_translated(cms_label, user_language):
     ).first().label
 
 
-def _build_edit_specification_success_message(last_academic_year, translated_field_label, learning_unit_year_id):
-    default_msg = _("The '%(field)s' field content has been successfully saved")
-    msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+def build_success_message(last_academic_year=None, learning_unit_year_id=None, with_postponement=False):
+    default_msg = _("The learning unit has been updated")
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
-    if ProposalLearningUnit.objects. \
-            filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
-        msg = "{}. {}".format(msg, _("It will be done at the consolidation"))
-    return msg % {
-        'field': translated_field_label,
-        'year': last_academic_year
-    }
+    proposal = ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=luy.learning_unit
+    ).first()
+
+    if not proposal and last_academic_year:
+        msg = "{} {}.".format(
+            default_msg, _("and postponed until %(year)s") % {
+                'year': last_academic_year
+            }
+        )
+    elif proposal and proposal_is_on_same_year(proposal=proposal, base_luy=luy):
+        msg = "{}. {}.".format(
+            default_msg,
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+    elif proposal and proposal_is_on_future_year(proposal=proposal, base_luy=luy) and with_postponement:
+        msg = _("The learning unit has been updated (the report has not been done from %(year)s because the "
+                "learning unit is in proposal).") % {
+                  'year': proposal.learning_unit_year.academic_year
+              }
+
+    elif proposal and proposal_is_on_future_year(proposal=proposal, base_luy=luy) and not with_postponement:
+        msg = "{} ({}).".format(
+            default_msg,
+            _("without postponement")
+        )
+
+    else:
+        msg = "{}.".format(default_msg)
+
+    return msg
 
 
 @login_required
@@ -494,3 +516,11 @@ def get_languages_settings():
         'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
         'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN
     }
+
+
+def proposal_is_on_future_year(proposal, base_luy):
+    return proposal.learning_unit_year.academic_year.year > base_luy.academic_year.year
+
+
+def proposal_is_on_same_year(proposal, base_luy):
+    return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year

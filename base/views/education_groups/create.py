@@ -42,13 +42,14 @@ from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
-from base.models.utils.utils import get_object_or_none
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
+from osis_common.utils.models import get_object_or_none
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -122,6 +123,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         "parent": parent,
         'root_pk': root_id,
+        "is_finality_types": education_group_type.name in TrainingType.finality_types()
     }
 
     if category == education_group_categories.TRAINING:

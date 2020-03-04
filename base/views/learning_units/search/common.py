@@ -26,6 +26,7 @@
 import collections
 import itertools
 
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
@@ -60,7 +61,7 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
 
     filterset_class = None
     permission_required = 'base.can_access_learningunit'
-    cache_exclude_params = 'xls_status'
+    cache_exclude_params = ['xls_status']
 
     serializer_class = None
 
@@ -70,7 +71,8 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
         self._save_search_type_in_session()
 
         starting_ac = starting_academic_year()
-
+        if context["paginator"].count == 0:
+            messages.add_message(self.request, messages.WARNING, _('No result!'))
         context.update({
             'form': context["filter"].form,
             'learning_units_count': context["paginator"].count,

@@ -39,6 +39,7 @@ from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.views import learning_unit
 from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
@@ -98,18 +99,38 @@ def _post_learning_unit_pedagogy_form(request):
     form = LearningUnitPedagogyEditForm(request.POST)
     if form.is_valid():
         form.save()
-        last_academic_year_reported = form.luys[-1].academic_year if len(form.luys) >= 2 else None
-        if last_academic_year_reported and is_pedagogy_data_must_be_postponed(form.luys[0]):
-            display_success_messages(
-                request,
-                _("The sections you modified have been saved and "
-                  "reported up to %(last_year_reported)s with success.") % {
-                    "last_year_reported": str(last_academic_year_reported)
-                }
-            )
-        else:
-            msg = _("The sections you modified have been saved with success.")
-            if ProposalLearningUnit.objects.\
-                    filter(learning_unit_year__learning_unit=form.luys[0].learning_unit).exists():
-                msg = "{}. {}".format(msg, _('It will be done at the consolidation'))
-            display_success_messages(request, msg)
+        last_academic_year_reported = form.luys[-1] if len(form.luys) >= 2 else None
+        msg = build_success_message(last_academic_year_reported, form.luys[0])
+        display_success_messages(request, msg)
+
+
+def build_success_message(last_luy_reported, luy):
+    default_message = _("The learning unit has been updated")
+    proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=luy.learning_unit).first()
+
+    if last_luy_reported and is_pedagogy_data_must_be_postponed(luy):
+        msg = "{} {}.".format(
+            default_message,
+            _("and postponed until %(year)s") % {
+                "year": last_luy_reported.academic_year
+            }
+        )
+    elif proposal and learning_unit.proposal_is_on_same_year(proposal=proposal, base_luy=luy):
+        msg = "{}. {}.".format(
+            default_message,
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
+              "consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+    elif proposal and learning_unit.proposal_is_on_future_year(proposal=proposal, base_luy=luy):
+        msg = "{} ({}).".format(
+            default_message,
+            _("the report has not been done from %(proposal_year)s because the LU is in proposal") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+    else:
+        msg = "{}.".format(default_message)
+
+    return msg
