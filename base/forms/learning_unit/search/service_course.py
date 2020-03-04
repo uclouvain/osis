@@ -40,7 +40,7 @@ class ServiceCourseFilter(LearningUnitFilter):
         method=lambda request, *args, **kwargs: request,
         widget=forms.HiddenInput,
         required=False,
-        initial=SearchTypes.PROPOSAL_SEARCH.value
+        initial=SearchTypes.SERVICE_COURSES_SEARCH.value
     )
 
     def filter_queryset(self, queryset):
