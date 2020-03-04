@@ -39,6 +39,7 @@ from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.views import learning_unit
 from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
@@ -105,6 +106,8 @@ def _post_learning_unit_pedagogy_form(request):
 
 def build_success_message(last_luy_reported, luy):
     default_message = _("The learning unit has been updated")
+    proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=luy.learning_unit).first()
+
     if last_luy_reported and is_pedagogy_data_must_be_postponed(luy):
         msg = "{} {}.".format(
             default_message,
@@ -112,17 +115,22 @@ def build_success_message(last_luy_reported, luy):
                 "year": last_luy_reported.academic_year
             }
         )
+    elif proposal and learning_unit.proposal_is_on_same_year(proposal=proposal, base_luy=luy):
+        msg = "{}. {}.".format(
+            default_message,
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
+              "consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+    elif proposal and learning_unit.proposal_is_on_future_year(proposal=proposal, base_luy=luy):
+        msg = "{} ({}).".format(
+            default_message,
+            _("the report has not been done from %(proposal_year)s because the LU is in proposal") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
     else:
         msg = "{}.".format(default_message)
-        proposal = ProposalLearningUnit.objects.filter(
-            learning_unit_year__learning_unit=luy.learning_unit
-        ).first()
-        if proposal:
-            msg = "{} {}.".format(
-                msg,
-                _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
-                  "consolidation") % {
-                    'proposal_year': proposal.learning_unit_year.academic_year
-                }
-            )
+
     return msg

@@ -247,7 +247,7 @@ def build_proposal_report_attachment(manager, proposals_with_results, operation,
             {
                 xls_build.CONTENT_KEY: table_data,
                 xls_build.HEADER_TITLES_KEY: [_('Ac yr.'), _('Code'), _('Title'), _('Type'),
-                                              _("Proposal status"), _('Status'), _('Remarks')],
+                                              _("Proposal status"), _('Status'), _('Reason for failure')],
                 xls_build.WORKSHEET_TITLE_KEY: 'Report'
             }
         ],

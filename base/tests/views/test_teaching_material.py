@@ -54,6 +54,11 @@ class TeachingMaterialCreateTestCase(TestCase):
             LearningUnitYearFactory(subtype=FULL, academic_year=acy, learning_unit=learning_unit)
             for acy in ([cls.current_academic_year] + cls.future_academic_years)
         ]
+        cls.previous_luy = LearningUnitYearFactory(
+            subtype=FULL,
+            academic_year=AcademicYearFactory(year=cls.current_academic_year.year-1),
+            learning_unit=learning_unit
+        )
         cls.url = reverse('teaching_material_create', kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
         cls.person = _get_central_manager_person_with_permission()
 
@@ -103,13 +108,36 @@ class TeachingMaterialCreateTestCase(TestCase):
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
-    def test_create_teaching_material_successfull_post_with_proposal(self,  mock_is_linked_to_entity_charge):
+    def test_create_teaching_material_successfull_post_with_proposal_same_year(self,  mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
         proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year)
         msg = self._test_teaching_material_post()
         expected_message = "{}. {}.".format(
             _("The learning unit has been updated"),
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_create_teaching_material_successfull_post_with_proposal_prev_year(self,  mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        ProposalLearningUnitFactory(learning_unit_year=self.previous_luy)
+        msg = self._test_teaching_material_post()
+        expected_message = "{}.".format(_("The learning unit has been updated"))
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_create_teaching_material_successfull_post_with_proposal_next_year(self,  mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        proposal = ProposalLearningUnitFactory(learning_unit_year=self.future_learning_unit_years[0])
+        msg = self._test_teaching_material_post()
+        expected_message = "{} ({}).".format(
+            _("The learning unit has been updated"),
+            _("the report has not been done from %(proposal_year)s because the LU is in proposal") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
         )

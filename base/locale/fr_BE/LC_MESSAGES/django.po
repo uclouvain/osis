@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-18 15:43+0100\n"
+"POT-Creation-Date: 2020-02-28 11:58+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -117,7 +117,7 @@ msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
 msgstr ""
-"%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
+"%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
 
 msgid "1st quadri"
@@ -502,6 +502,9 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annuler"
 
+msgid "Cancel proposal"
+msgstr "Annuler proposition"
+
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
@@ -809,6 +812,9 @@ msgstr "Remise du mémoire"
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
+msgid "Do you want to cancel proposal?"
+msgstr "Voulez-vous annuler ces propositions?"
+
 msgid "Do you want to change the status of this proposals?"
 msgstr "Voulez-vous changer le statut de ces propositions?"
 
@@ -820,9 +826,6 @@ msgstr "Voulez-vous continuer ?"
 
 msgid "Do you want to export the following informations"
 msgstr "Désirez-vous exporter les informations suivantes"
-
-msgid "Do you want to get back to initial data?"
-msgstr "Voulez-vous retourner à l'état initial?"
 
 msgid "Do you want to report the modifications done to the next years ?"
 msgstr ""
@@ -1152,9 +1155,6 @@ msgstr "Liste des UE qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
 msgstr "Liste des UE qui ont des prérequis"
-
-msgid "Get back to initial data"
-msgstr "Retour à l'état initial"
 
 msgid "Global ID"
 msgstr "Matricule FGS"
@@ -2257,6 +2257,9 @@ msgstr "Classes effectives"
 msgid "Real/Planned classrooms"
 msgstr "Classes effectives/prévues"
 
+msgid "Reason for failure"
+msgstr "Motif de l'échec"
+
 msgid "Received on"
 msgstr "Reçu le"
 
@@ -2713,7 +2716,9 @@ msgstr "L'unité d'enseignement dispose d'au moins un partim"
 msgid ""
 "The learning unit is in proposal, the report from %(proposal_year)s will be "
 "done at consolidation"
-msgstr "L'UE étant en proposition, le report à partir de %(proposal_year)s sera effectué lors de la consolidation"
+msgstr ""
+"L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
+"effectué lors de la consolidation"
 
 msgid "The learning unit's description fiche is not editable."
 msgstr ""
@@ -3629,6 +3634,14 @@ msgstr "le"
 msgid "the program aims"
 msgstr "le programme vise"
 
+#, python-format
+msgid ""
+"the report has not been done from %(proposal_year)s because the LU is in "
+"proposal"
+msgstr ""
+"le report n'a pas été effectué à partir de %(proposal_year)s parce que l'UE "
+"est en proposition"
+
 msgid "the sum of repartition volumes must be equal to the global volume"
 msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
@@ -3678,6 +3691,9 @@ msgstr "vol. ent. charge"
 
 msgid "volume total requirement entities"
 msgstr "vol. tot. ent. charge"
+
+msgid "without postponement"
+msgstr "sans report"
 
 msgid "yes"
 msgstr "oui"
