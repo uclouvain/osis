@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import os
 import tempfile
 
 from django.conf import settings

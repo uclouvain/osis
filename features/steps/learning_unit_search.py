@@ -32,7 +32,7 @@ from base.models.entity_version import EntityVersion
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.tutor import Tutor
-from features.steps.utils.pages import SearchLearningUnitPage
+from features.pages.learning_unit.pages import SearchLearningUnitPage
 
 use_step_matcher("re")
 

@@ -40,7 +40,7 @@ from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES, FACULTY
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
-from features.steps.utils.pages import LearningUnitPage
+from features.pages.learning_unit.pages import LearningUnitPage
 
 use_step_matcher("parse")
 
