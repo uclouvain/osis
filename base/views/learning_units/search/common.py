@@ -73,7 +73,7 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
         self._save_search_type_in_session()
 
         starting_ac = starting_academic_year()
-        if context["paginator"].count == 0:
+        if context["paginator"].count == 0 and self.request.GET:
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         context.update({
             'form': context["filter"].form,
