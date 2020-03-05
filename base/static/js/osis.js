@@ -2,7 +2,6 @@ $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
     check_browser();
     collapseWarnings();
-
 });
 
 $.ajaxSetup({
