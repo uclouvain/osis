@@ -81,7 +81,8 @@ function cleanErrorMessage(){
     parent = $("#id_acronym_0").closest(".acronym-group");
     parent.removeClass('has-error');
     parent.removeClass('has-warning');
-    parent.children(".help-block").remove();
+    parent.find(".help-block").remove();
+    parent.find(".has-error").removeClass('has-error');
 }
 
 
