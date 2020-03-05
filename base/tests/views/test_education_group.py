@@ -675,8 +675,7 @@ class EducationGroupEditAdministrativeData(TestCase):
 class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        AcademicYearFactory(current=True)
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.education_group_parent = TrainingFactory(acronym="Parent", academic_year=cls.academic_year)
         cls.education_group_child = TrainingFactory(acronym="Child_1", academic_year=cls.academic_year)
 
@@ -753,7 +752,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
     def test_case_free_text_is_not_show_when_common(self):
         AcademicYearFactory(current=True)
-        common_bachelor = EducationGroupYearCommonBachelorFactory()
+        common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
         url_edit_common = reverse(
             "education_group_year_admission_condition_edit",
             args=[common_bachelor.pk, common_bachelor.pk]
