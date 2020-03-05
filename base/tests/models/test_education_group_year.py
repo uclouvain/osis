@@ -240,8 +240,10 @@ class EducationGroupYearTest(TestCase):
     @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
     def test_verbose_title_en(self):
         self.assertEqual(self.education_group_year_MD.verbose_title, self.education_group_year_MD.partial_title_english)
-        self.assertEqual(self.education_group_year_1.verbose_title,
-                         self.education_group_year_1.title_english or self.education_group_year_1.title)
+        self.assertEqual(
+            self.education_group_year_1.verbose_title,
+            self.education_group_year_1.partial_title_english or self.education_group_year_1.partial_title
+        )
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ], LANGUAGE_CODE='fr-be')
     def test_verbose_title_fr_partial_title_empty(self):
