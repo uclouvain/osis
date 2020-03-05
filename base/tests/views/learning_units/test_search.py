@@ -58,7 +58,7 @@ class TestSearchBorrowedLearningUnits(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_get_request(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, data={"acronym": "acronym"})
 
         context = response.context
         self.assertEqual(context["search_type"], SearchTypes.BORROWED_COURSE)
@@ -89,7 +89,7 @@ class TestSearchExternalLearningUnits(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_get_request(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, data={"acronym": "acronym"})
 
         self.assertTemplateUsed(response, "learning_unit/search/external.html")
         context = response.context
