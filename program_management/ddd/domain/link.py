@@ -33,19 +33,19 @@ from program_management.models.enums.node_type import NodeType
 class Link:
 
     def __init__(self, parent: 'Node', child: 'Node', **kwargs):
-        self.parent: 'Node' = parent
-        self.child: 'Node' = child
-        self.relative_credits: int = kwargs.get('relative_credits')
-        self.min_credits: int = kwargs.get('min_credits')
-        self.max_credits: int = kwargs.get('max_credits')
+        self.parent = parent
+        self.child = child
+        self.relative_credits = kwargs.get('relative_credits')
+        self.min_credits = kwargs.get('min_credits')
+        self.max_credits = kwargs.get('max_credits')
         self.is_mandatory = kwargs.get('is_mandatory') or False
-        self.block: str = kwargs.get('block')
-        self.access_condition: str = kwargs.get('access_condition') or False
-        self.comment: str = kwargs.get('comment')
-        self.comment_english: str = kwargs.get('comment_english')
-        self.own_comment: str = kwargs.get('own_comment')
-        self.quadrimester_derogation: DerogationQuadrimesterEnum = kwargs.get('quadrimester_derogation')
-        self.link_type: LinkTypes = kwargs.get('link_type')
+        self.block = kwargs.get('block')
+        self.access_condition = kwargs.get('access_condition') or False
+        self.comment = kwargs.get('comment')
+        self.comment_english = kwargs.get('comment_english')
+        self.own_comment = kwargs.get('own_comment')
+        self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
+        self.link_type = kwargs.get('link_type')
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}

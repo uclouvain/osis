@@ -159,7 +159,7 @@ class NodeEducationGroupYear(Node):
 
 
 class NodeGroupYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, children: List['Link'] = None, **kwargs):
+    def __init__(self, node_id: int, acronym: str, title, year, children: List['Link'] = None, **kwargs):
         super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
         self.acronym = acronym
         self.title = title
@@ -167,11 +167,11 @@ class NodeGroupYear(Node):
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, node_id: int, acronym, title, year, proposal_type=None, **kwargs):
+    def __init__(self, node_id: int, acronym: str, title, year, proposal_type=None, **kwargs):
         super().__init__(node_id, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
-        self.acronym: str = acronym
-        self.title: str = title
-        self.year: str = year
+        self.acronym = acronym
+        self.title = title
+        self.year = year
         self.proposal_type: ProposalType = proposal_type
         self.prerequisite: PrerequisiteExpression = None  # FIXME : Should be of type Prerequisite?
         self.is_prerequisite_of: List['NodeLearningUnitYear'] = []
