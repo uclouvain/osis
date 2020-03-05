@@ -49,7 +49,8 @@ class AuthorizedRelationshipValidator(BusinessValidator):
             )
 
 
-# TODO :: ne pas hériter de la classe? Et lister AttachAuthorizedRelationshipValidator + AuthorizedRelationshipValidator dans le BusinessListVaidator?
+# TODO :: ne pas hériter de la classe?
+#       Et lister AttachAuthorizedRelationshipValidator + AuthorizedRelationshipValidator dans le BusinessListVaidator?
 class AttachAuthorizedRelationshipValidator(AuthorizedRelationshipValidator):
     def validate(self):
         super(AttachAuthorizedRelationshipValidator, self).validate()

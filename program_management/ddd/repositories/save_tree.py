@@ -30,8 +30,10 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
 
 
-# TODO :: gérer automatiquement les erreurs liées au modèle pour les remonter vers la couche business (contraintes d'unicité, valeur des champs, etc)
+# TODO :: OSIS-3951 Gérer automatiquement les erreurs liées au modèle pour les remonter vers la couche business
+#         (contraintes d'unicité, valeur des champs, etc)
 # TODO :: @Transaction.atomic
+# TODO :: rename save() -> persist()
 def save(tree: program_tree.ProgramTree) -> None:
     __update_or_create_links(tree.root_node)
     __delete_links(tree.root_node)

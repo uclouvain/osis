@@ -106,20 +106,20 @@ class GroupElementYearManager(models.Manager):
             return []
 
         adjacency_query = """
-            WITH RECURSIVE 
+            WITH RECURSIVE
                 adjacency_query AS (
-                    SELECT 
-                        parent_id as starting_node_id, 
-                        id, 
-                        child_branch_id, 
-                        child_leaf_id, 
-                        parent_id, 
-                        "order", 
+                    SELECT
+                        parent_id as starting_node_id,
+                        id,
+                        child_branch_id,
+                        child_leaf_id,
+                        parent_id,
+                        "order",
                         0 AS level,
-                        CAST(parent_id || '|' || 
-                            ( 
-                                CASE 
-                                WHEN child_branch_id is not null 
+                        CAST(parent_id || '|' ||
+                            (
+                                CASE
+                                WHEN child_branch_id is not null
                                     THEN child_branch_id
                                     ELSE child_leaf_id
                                 END
@@ -127,9 +127,9 @@ class GroupElementYearManager(models.Manager):
                         ) As path
                     FROM base_groupelementyear
                     WHERE parent_id IN (%s)
-                    
+
                     UNION ALL
-                    
+
                     SELECT parent.starting_node_id,
                            child.id,
                            child.child_branch_id,
@@ -138,8 +138,8 @@ class GroupElementYearManager(models.Manager):
                            child.order,
                            parent.level + 1,
                            CAST(
-                                parent.path || '|' || 
-                                    ( 
+                                parent.path || '|' ||
+                                    (
                                         CASE 
                                         WHEN child.child_branch_id is not null 
                                             THEN child.child_branch_id
@@ -149,9 +149,9 @@ class GroupElementYearManager(models.Manager):
                                ) as path
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
-                )            
+                )
             SELECT * FROM adjacency_query 
-            ORDER BY starting_node_id, level, "order";        
+            ORDER BY starting_node_id, level, "order";
         """ % ','.join(["%s"] * len(root_elements_ids))
 
         with connection.cursor() as cursor:
@@ -211,27 +211,27 @@ class GroupElementYearManager(models.Manager):
         # filters_statement = ' AND ' + ' AND '.join(['%s = %s' {}])
 
         reverse_adjacency_query = """
-            WITH RECURSIVE 
+            WITH RECURSIVE
                 reverse_adjacency_query AS (
-                    SELECT 
+                    SELECT
                         CASE 
                             WHEN gey.child_leaf_id is not null then gey.child_leaf_id
                             ELSE gey.child_branch_id
                         END as starting_node_id,
-                           gey.id, 
+                           gey.id,
                            gey.child_branch_id, 
-                           gey.child_leaf_id, 
+                           gey.child_leaf_id,
                            gey.parent_id,
                            gey.order,
                            edyc.academic_year_id,
                            0 AS level
                     FROM base_groupelementyear gey
                     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE %(where_statement)s 
+                    WHERE %(where_statement)s
                     AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
-                
+
                     UNION ALL
-                
+
                     SELECT 	child.starting_node_id,
                             parent.id,
                             parent.child_branch_id,
