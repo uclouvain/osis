@@ -388,8 +388,16 @@ class TestManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.learning_unit_year_1 = LearningUnitYearFactory()
-        cls.learning_unit_year_without_container = LearningUnitYearFactory(learning_container_year=None)
-        cls.group_element_year_1 = GroupElementYearFactory(child_branch=None, child_leaf=cls.learning_unit_year_1)
+
+        cls.learning_unit_year_without_container = LearningUnitYearFactory(
+            learning_container_year=None
+        )
+
+        cls.group_element_year_1 = GroupElementYearFactory(
+            child_branch=None,
+            child_leaf=cls.learning_unit_year_1
+        )
+
         cls.group_element_year_without_container = GroupElementYearFactory(
             child_branch=None,
             child_leaf=cls.learning_unit_year_without_container
@@ -601,12 +609,24 @@ class TestGroupElementYearProperty(TestCase):
         cls.academic_year = AcademicYearFactory()
 
     def setUp(self):
+
+        group_types_not_finality_120_list_choice = education_group_types.GroupType.get_names()
+        group_types_not_finality_120_list_choice.remove(education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name)
         self.egy = EducationGroupYearFactory(academic_year=self.academic_year,
                                              title="Title FR",
                                              credits=15)
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
-                                                          child_branch=self.egy,
-                                                          relative_credits=10)
+        self.group_element_year = GroupElementYearFactory(
+            parent__academic_year=self.academic_year,
+            parent__education_group_type__name=random.choice(group_types_not_finality_120_list_choice),
+            child_branch=self.egy,
+            relative_credits=10
+        )
+        self.gey_finality_120_list_choice = GroupElementYearFactory(
+            parent__academic_year=self.academic_year,
+            parent__education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
+            child_branch=self.egy,
+            relative_credits=10
+        )
 
     def test_verbose_credit(self):
         self.assertEqual(self.group_element_year.verbose, "{} ({} {})".format(
@@ -623,6 +643,36 @@ class TestGroupElementYearProperty(TestCase):
 
         self.assertEqual(self.group_element_year.verbose, "{}".format(
             self.group_element_year.child.title))
+
+    def test_verbose_credit_finality_120_list_choice_no_partial_title(self):
+        self.egy.partial_title = ""
+        self.egy.save()
+
+        self.assertEqual(self.group_element_year.verbose, "{} ({} {})".format(
+            self.gey_finality_120_list_choice.child.title,
+            self.gey_finality_120_list_choice.relative_credits,
+            _("credits")))
+
+    def test_verbose_credit_finality_120_list_choice_partial_title_with_credits(self):
+        self.egy.partial_title = "partial_title"
+        self.egy.save()
+
+        self.assertEqual(self.gey_finality_120_list_choice.verbose, "{} ({} {})".format(
+            self.gey_finality_120_list_choice.child.partial_title,
+            self.gey_finality_120_list_choice.relative_credits,
+            _("credits")))
+
+    def test_verbose_credit_finality_120_list_choice_partial_title_without_credits(self):
+        self.egy.partial_title = "partial_title"
+        self.egy.save()
+
+        self.egy.credits = None
+        self.egy.save()
+        self.gey_finality_120_list_choice.relative_credits = None
+        self.gey_finality_120_list_choice.save()
+
+        self.assertEqual(self.gey_finality_120_list_choice.verbose, "{}".format(
+            self.gey_finality_120_list_choice.child.partial_title))
 
 
 class TestManagerGetAdjacencyList(TestCase):
