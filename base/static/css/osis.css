@@ -537,7 +537,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .tab {
-    width: 90%;
+    width: 95%;
     display: block;
     margin-left: auto;
     margin-right: auto;
