@@ -2,6 +2,7 @@ $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
     check_browser();
     collapseWarnings();
+
 });
 
 $.ajaxSetup({
@@ -214,14 +215,6 @@ function getDataAjaxTable(formId, domTable, d, pageNumber) {
     queryString['page'] = pageNumber;
     return queryString;
 }
-
-$(window).scroll(function() {
-    if (checkVisible($('.footer'))) {
-        $('.side-container').css("height", "calc(100% - 100px)");
-    } else {
-        $('.side-container').css("height", "calc(100% - 50px)");
-    }
-});
 
 function checkVisible( elm, eval ) {
     eval = eval || "visible";
