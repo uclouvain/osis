@@ -140,8 +140,8 @@ class GroupElementYearManager(models.Manager):
                            CAST(
                                 parent.path || '|' ||
                                     (
-                                        CASE 
-                                        WHEN child.child_branch_id is not null 
+                                        CASE
+                                        WHEN child.child_branch_id is not null
                                             THEN child.child_branch_id
                                             ELSE child.child_leaf_id
                                         END
@@ -150,7 +150,7 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )
-            SELECT * FROM adjacency_query 
+            SELECT * FROM adjacency_query
             ORDER BY starting_node_id, level, "order";
         """ % ','.join(["%s"] * len(root_elements_ids))
 
@@ -214,12 +214,12 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 reverse_adjacency_query AS (
                     SELECT
-                        CASE 
+                        CASE
                             WHEN gey.child_leaf_id is not null then gey.child_leaf_id
                             ELSE gey.child_branch_id
                         END as starting_node_id,
                            gey.id,
-                           gey.child_branch_id, 
+                           gey.child_branch_id,
                            gey.child_leaf_id,
                            gey.parent_id,
                            gey.order,
@@ -244,7 +244,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN reverse_adjacency_query AS child on parent.child_branch_id = child.parent_id
                     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
                 )
-                            
+
             SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
