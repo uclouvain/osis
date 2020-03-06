@@ -123,6 +123,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
         cls.workbook_contains = \
             EducationGroupYearLearningUnitsContainedToExcel(cls.education_group_yr_root,
+                                                            cls.education_group_yr_root,
                                                             CustomXlsForm({}))._to_workbook()
         cls.sheet_contains = cls.workbook_contains.worksheets[0]
 
@@ -305,7 +306,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_data(self):
         custom_form = CustomXlsForm({})
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root, custom_form)
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              custom_form)
         data = _build_excel_lines_ues(custom_form, exl.learning_unit_years_parent, self.hierarchy)
         content = data.get('content')
         self._assert_content_equals(content, exl)
@@ -406,7 +409,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         optional_data['has_description_fiche'] = True
 
         custom_form = CustomXlsForm({'description_fiche': 'on'})
-        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root, custom_form)
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                        self.education_group_yr_root,
+                                                        custom_form)
         self.assertTrue(mock.called)
 
     @mock.patch("program_management.business.excel_ue_in_of._annotate_with_description_fiche_specifications")
@@ -415,7 +420,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         optional_data['has_specifications'] = True
 
         custom_form = CustomXlsForm({'specifications': 'on'})
-        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root, custom_form)
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                        self.education_group_yr_root,
+                                                        custom_form)
         self.assertTrue(mock.called)
 
     def test_build_description_fiche_cols(self):
@@ -490,13 +497,17 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_row_height_not_populated(self):
         custom_form = CustomXlsForm({})
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root, custom_form)
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              custom_form)
         data = _build_excel_lines_ues(custom_form, exl.qs, self.hierarchy)
         self.assertDictEqual(data.get('row_height'), {})
 
     def test_row_height_populated(self):
         custom_form = CustomXlsForm({'description_fiche': 'on'})
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root, custom_form)
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              custom_form)
         data = _build_excel_lines_ues(custom_form, exl.qs, self.hierarchy)
         self.assertDictEqual(data.get('row_height'), {
             'height': 30,
@@ -523,7 +534,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(res, "Introduire aux méthodes d'analyse")
 
     def test_keep_UES_tree_order_in_qs(self):
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root, CustomXlsForm({}))
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              CustomXlsForm({}))
         expected_ids_following_tree_order = [lu.id for lu in exl.learning_unit_years_parent]
         ids_ordered_for_xls = [lu.id for lu in list(exl.qs)]
         self.assertCountEqual(expected_ids_following_tree_order, ids_ordered_for_xls)
@@ -588,7 +601,7 @@ class TestExcludeUEFromdWorkbook(TestCase):
                                                [self.luy_in_common_core.id, self.luy_in_finality_options.id])
 
     def _assert_correct_ue_present_in_xls(self, edy, expected_ue_ids_in_xls):
-        exl = EducationGroupYearLearningUnitsContainedToExcel(edy, CustomXlsForm({}))
+        exl = EducationGroupYearLearningUnitsContainedToExcel(edy, edy, CustomXlsForm({}))
         ue_ids_in_xls = [lu.child_leaf.id for lu in list(exl.qs)]
         self.assertCountEqual(expected_ue_ids_in_xls, ue_ids_in_xls)
 

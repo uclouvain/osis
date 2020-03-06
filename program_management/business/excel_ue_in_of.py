@@ -126,15 +126,15 @@ LEGEND_WB_CONTENT = 'content'
 
 class EducationGroupYearLearningUnitsContainedToExcel:
 
-    def __init__(self, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
+    def __init__(self, root: EducationGroupYear, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
         self.egy = egy
 
         exclude_options = True if self.egy.is_master120 or self.egy.is_master180 else False
-
-        self.hierarchy = EducationGroupHierarchy(root=self.egy, exclude_options=exclude_options)
+        self.root_hierarchy = EducationGroupHierarchy(root=root, exclude_options=exclude_options)
+        hierarchy = EducationGroupHierarchy(root=self.egy, exclude_options=exclude_options)
         self.learning_unit_years_parent = []
 
-        for grp in self.hierarchy.included_group_element_years:
+        for grp in hierarchy.included_group_element_years:
             if not grp.child_leaf:
                 continue
             self.learning_unit_years_parent.append(grp)
@@ -158,7 +158,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         self.qs = GroupElementYear.objects.filter(id__in=ids).order_by(preserved)
 
     def _to_workbook(self):
-        return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs, self.hierarchy)
+        return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs, self.root_hierarchy)
 
     def to_excel(self, ):
         return save_virtual_workbook(self._to_workbook())
