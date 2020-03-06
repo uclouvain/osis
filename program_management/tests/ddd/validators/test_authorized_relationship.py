@@ -25,34 +25,32 @@
 ##############################################################################
 import copy
 
-from django.test import TestCase
+from django.test import SimpleTestCase
+from django.utils.translation import gettext as _
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
-from program_management.ddd.validators._authorized_relationship import AuthorizedRelationshipValidator, \
-    AttachAuthorizedRelationshipValidator, DetachAuthorizedRelationshipValidator
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator, \
+    DetachAuthorizedRelationshipValidator
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
-from django.utils.translation import gettext as _
 
+class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
 
-class TestAttachAuthorizedRelationshipValidator(TestCase):
+    def setUp(self):
+        self.academic_year = AcademicYearFactory.build(current=True)
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
-
-        cls.root_node = NodeEducationGroupYearFactory(
-            year=cls.academic_year.year,
+        self.root_node = NodeEducationGroupYearFactory(
+            year=self.academic_year.year,
         )
-        cls.common_core_node = NodeEducationGroupYearFactory(
-            year=cls.academic_year.year,
+        self.common_core_node = NodeEducationGroupYearFactory(
+            year=self.academic_year.year,
         )
-        cls.authorized_relationships = AuthorizedRelationshipList([
+        self.authorized_relationships = AuthorizedRelationshipList([
             AuthorizedRelationship(
-                parent_type=cls.root_node.node_type,
-                child_type=cls.common_core_node.node_type,
+                parent_type=self.root_node.node_type,
+                child_type=self.common_core_node.node_type,
                 min_constraint=1,
                 max_constraint=1,
             )
@@ -93,22 +91,21 @@ class TestAttachAuthorizedRelationshipValidator(TestCase):
         self.assertIn(error_msg, validator.error_messages)
 
 
-class TestDetachAuthorizedRelationshipValidator(TestCase):
+class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
+    def setUp(self):
+        self.academic_year = AcademicYearFactory.build(current=True)
 
-        cls.root_node = NodeEducationGroupYearFactory(
-            year=cls.academic_year.year,
+        self.root_node = NodeEducationGroupYearFactory(
+            year=self.academic_year.year,
         )
-        cls.common_core_node = NodeEducationGroupYearFactory(
-            year=cls.academic_year.year,
+        self.common_core_node = NodeEducationGroupYearFactory(
+            year=self.academic_year.year,
         )
-        cls.authorized_relationships = AuthorizedRelationshipList([
+        self.authorized_relationships = AuthorizedRelationshipList([
             AuthorizedRelationship(
-                parent_type=cls.root_node.node_type,
-                child_type=cls.common_core_node.node_type,
+                parent_type=self.root_node.node_type,
+                child_type=self.common_core_node.node_type,
                 min_constraint=1,
                 max_constraint=1,
             )

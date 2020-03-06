@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
@@ -34,7 +34,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestAttachOptionsValidator(TestCase):
+class TestAttachOptionsValidator(SimpleTestCase):
 
     def setUp(self):
         self.option = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)

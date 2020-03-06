@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.translation import ngettext
 
 from base.models.enums.education_group_types import TrainingType
@@ -33,18 +33,18 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestAttachFinalityEndDateValidator(TestCase):
+class TestAttachFinalityEndDateValidator(SimpleTestCase):
 
     @classmethod
-    def setUpTestData(cls):
-        cls.tree_2m = ProgramTreeFactory(
+    def setUp(self):
+        self.tree_2m = ProgramTreeFactory(
             root_node__node_type=TrainingType.PGRM_MASTER_120,
             root_node__end_date=2099
         )
 
-        cls.finality_node_greater_end_date = NodeGroupYearFactory(
+        self.finality_node_greater_end_date = NodeGroupYearFactory(
             node_type=TrainingType.MASTER_MA_120,
-            end_date=cls.tree_2m.root_node.end_date + 1
+            end_date=self.tree_2m.root_node.end_date + 1
         )
 
     def test_init_when_tree_is_not_2m_and_node_to_attach_has_no_finality(self):

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.translation import gettext as _
 
@@ -33,7 +33,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestMinimumEditableYearValidator(TestCase):
+class TestMinimumEditableYearValidator(SimpleTestCase):
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_when_root_year_is_lower_than_settings(self):

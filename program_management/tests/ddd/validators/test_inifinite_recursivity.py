@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -34,19 +34,19 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestInfiniteRecursivityValidator(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
+class TestInfiniteRecursivityValidator(SimpleTestCase):
 
-        cls.node_to_attach = NodeGroupYearFactory(
-            year=cls.academic_year.year,
+    def setUp(self):
+        self.academic_year = AcademicYearFactory.build(current=True)
+
+        self.node_to_attach = NodeGroupYearFactory(
+            year=self.academic_year.year,
         )
 
-        cls.tree = ProgramTreeFactory(root_node=cls.node_to_attach)
+        self.tree = ProgramTreeFactory(root_node=self.node_to_attach)
 
-        cls.common_core_node = NodeGroupYearFactory(
-            year=cls.academic_year.year,
+        self.common_core_node = NodeGroupYearFactory(
+            year=self.academic_year.year,
         )
 
     def test_when_no_recursivity_found(self):

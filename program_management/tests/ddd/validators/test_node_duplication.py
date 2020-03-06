@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
 from program_management.ddd.domain.program_tree import build_path
@@ -34,7 +34,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestNodeDuplicationValidator(TestCase):
+class TestNodeDuplicationValidator(SimpleTestCase):
 
     def setUp(self):
         link = LinkFactory()
