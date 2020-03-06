@@ -47,4 +47,3 @@ def get_score_justification_disabled_status(context):
                 return DISABLED
 
     return ENABLED
-
