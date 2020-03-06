@@ -34,7 +34,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 class TestInit(TestCase):
     def test_normal_usage(self):
-        auth_relations = AuthorizedRelationshipListFactory()
+        auth_relations = [AuthorizedRelationshipFactory()]
         result = AuthorizedRelationshipList(auth_relations)
         self.assertEqual(auth_relations, result.authorized_relationships)
 
