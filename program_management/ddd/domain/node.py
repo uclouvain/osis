@@ -62,7 +62,8 @@ class Node:
             children: List['Link'] = None,
             acronym: str = None,
             title: str = None,
-            year: int = None
+            year: int = None,
+            proposal_type: ProposalType = None
     ):
         self.node_id = node_id
         if children is None:
@@ -73,6 +74,7 @@ class Node:
         self.acronym = acronym
         self.title = title
         self.year = year
+        self.proposal_type = proposal_type
 
     def __eq__(self, other):
         return self.node_id == other.node_id
@@ -167,9 +169,8 @@ class NodeGroupYear(Node):
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, proposal_type: ProposalType = None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.proposal_type = proposal_type
         self.prerequisite = None  # FIXME : Should be of type Prerequisite?
         self.is_prerequisite_of = []
 

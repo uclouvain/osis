@@ -26,7 +26,7 @@
 from typing import List
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Value, Case, When, IntegerField, CharField
+from django.db.models import F, Value, Case, When, IntegerField, CharField, QuerySet
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
@@ -37,16 +37,16 @@ from program_management.models.enums.node_type import NodeType
 
 # TODO :: rename fetch() -> load()
 def fetch_by_type(type: NodeType, element_id: int) -> node.Node:
-    if type == NodeType.EDUCATION_GROUP.name:
+    if type == NodeType.EDUCATION_GROUP:
         return fetch_node_education_group_year(element_id)
-    elif type == NodeType.LEARNING_UNIT.name:
+    elif type == NodeType.LEARNING_UNIT:
         return fetch_node_learning_unit_year(element_id)
 
 
 def fetch_node_education_group_year(node_id: int) -> node.Node:
     try:
         node_data = __fetch_multiple_node_education_group_year([node_id])[0]
-        return node.factory.get_node(**node_data)
+        return node.factory.get_node(**__convert_string_to_enum(node_data))
     except IndexError:
         raise node.NodeNotFoundException
 
@@ -54,7 +54,7 @@ def fetch_node_education_group_year(node_id: int) -> node.Node:
 def fetch_node_learning_unit_year(node_id: int) -> node.Node:
     try:
         node_data = __fetch_multiple_node_learning_unit_year([node_id])[0]
-        return node.factory.get_node(**node_data)
+        return node.factory.get_node(**__convert_string_to_enum(node_data))
     except IndexError:
         raise node.NodeNotFoundException
 
@@ -82,17 +82,24 @@ def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
             NodeType.EDUCATION_GROUP.name: __fetch_multiple_node_education_group_year,
             NodeType.LEARNING_UNIT.name: __fetch_multiple_node_learning_unit_year,
         }[result_aggregate['node_type']]
-        qs = qs_function(result_aggregate['node_ids']) \
-            .values('node_id', 'type', 'acronym', 'title', 'year', 'proposal_type')
+        qs = qs_function(result_aggregate['node_ids'])
 
         union_qs = qs if union_qs is None else union_qs.union(qs)
 
     if union_qs is not None:
-        return [node.factory.get_node(**node_data) for node_data in union_qs]
-    return[]
+        return [
+            node.factory.get_node(**__convert_string_to_enum(node_data)) for node_data in union_qs
+        ]
+    return []
 
 
-def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]):
+def __convert_string_to_enum(node_data: dict) -> dict:
+#     TODO Enum.choices should return tuple((enum, enum.value) for enum in cls) ?
+    node_data['type'] = NodeType[node_data['type']]
+    return node_data
+
+
+def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         node_id=F('pk'),
         type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
@@ -101,7 +108,8 @@ def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]):
         year=F('academic_year__year'),
         proposal_type=Value(None, output_field=CharField())
     ).values('node_id', 'type', 'year', 'proposal_type', 'node_acronym', 'node_title')\
-     .annotate(title=F('node_title'), acronym=F('node_acronym'))
+     .annotate(title=F('node_title'), acronym=F('node_acronym'))\
+     .values('node_id', 'type', 'year', 'proposal_type', 'acronym', 'title')
 
 
 def __fetch_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
@@ -113,4 +121,5 @@ def __fetch_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[i
         year=F('academic_year__year'),
         proposal_type=F('proposallearningunit__type')
     ).values('node_id', 'type', 'year', 'proposal_type', 'node_acronym', 'node_title')\
-     .annotate(title=F('node_title'), acronym=F('node_acronym'))
+     .annotate(title=F('node_title'), acronym=F('node_acronym'))\
+     .values('node_id', 'type', 'year', 'proposal_type', 'acronym', 'title')
