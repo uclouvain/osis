@@ -35,6 +35,7 @@ from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
 
 
+# TODO :: rename fetch() -> load()
 def fetch_by_type(type: NodeType, element_id: int) -> node.Node:
     if type == NodeType.EDUCATION_GROUP.name:
         return fetch_node_education_group_year(element_id)

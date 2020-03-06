@@ -27,6 +27,7 @@ from program_management.ddd.domain.authorized_relationship import AuthorizedRela
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship
 
 
+# TODO :: rename fetch() -> load()
 def fetch() -> AuthorizedRelationshipList:
     authorized_relationships = []
     qs = ModelRelationship.objects.all().values(

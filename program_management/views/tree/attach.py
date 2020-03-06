@@ -23,49 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import SuspiciousOperation
+from typing import List
+
 from django.forms import formset_factory
-from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_success_messages
+from base.views.common import display_warning_messages, display_success_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
-from program_management.ddd.domain import node
-from program_management.ddd.repositories import fetch_tree
+from program_management.ddd.contrib.validation import BusinessValidationMessage
+from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet
 from program_management.models.enums.node_type import NodeType
 
 
-class AttachNodeView(AjaxTemplateMixin, TemplateView):
+class AttachMultipleNodesView(AjaxTemplateMixin, TemplateView):
     template_name = "tree/attach_inner.html"
 
     @cached_property
-    def tree(self):
-        root_id, *_ = self.request.GET['to_path'].split('|', 1)
-        return fetch_tree.fetch(root_id)
+    def root_id(self):
+        _root_id, *_ = self.request.GET['to_path'].split('|', 1)
+        return _root_id
 
     @cached_property
     def elements_to_attach(self):
         return management.fetch_elements_selected(self.request.GET, self.request.user)
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if 'to_path' not in request.GET:
-            raise SuspiciousOperation('Missing to_path parameter')
-        try:
-            self.tree.get_node(request.GET['to_path'])
-        except node.NodeNotFoundException:
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     def get_formset_class(self):
         return formset_factory(
@@ -81,7 +69,6 @@ class AttachNodeView(AjaxTemplateMixin, TemplateView):
                 'node_id': element.pk,
                 'node_type': NodeType.EDUCATION_GROUP.name if isinstance(element, EducationGroupYear) else
                 NodeType.LEARNING_UNIT.name,
-                'tree': self.tree,
                 'to_path': self.request.GET['to_path']
             })
         return formset_kwargs
@@ -104,16 +91,23 @@ class AttachNodeView(AjaxTemplateMixin, TemplateView):
             return self.form_invalid(formset)
 
     def form_valid(self, formset):
-        formset.save()
-        ElementCache(self.request.user).clear()
-        display_success_messages(
-            self.request,
-            _("The content of %(acronym)s has been updated.") % {
-                "acronym": self.tree.get_node(self.request.GET['to_path']).acronym
-            }
-        )
+        messages = []
+        # FIXME :: transaction.Atomic?
+        for form in formset:
+            messages += attach_node_service.attach_node(
+                self.root_id,
+                form.node_id,
+                form.node_type,
+                form.to_path,
+                **form.cleaned_data
+            )
+        if not BusinessValidationMessage.contains_errors(messages):
+            ElementCache(self.request.user).clear()
+        # TODO :: create function to display List[BusinessValidationMessage]
+        display_success_messages(self.request, (m for m in messages if m.is_success()))
+        display_error_messages(self.request, (m for m in messages if m.is_error()))
         return redirect(
-            reverse('education_group_read', args=[self.tree.root_node.node_id, self.tree.root_node.node_id])
+            reverse('education_group_read', args=[self.root_id, self.root_id])
         )
 
     def form_invalid(self, formset):

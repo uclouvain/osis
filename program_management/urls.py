@@ -92,7 +92,7 @@ urlpatterns = [
     url(r'^(?P<root_id>[0-9]+)/', include([
         url(u'^create', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         url(u'^update', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        url(u'^attach', tree.attach.AttachNodeView.as_view(), name='tree_attach_node'),
+        url(u'^attach', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
         url(u'^detach', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
         url(u'^move', tree.move.MoveNodeView.as_view(), name='tree_move_node'),
     ])),

@@ -29,6 +29,16 @@ class BusinessValidationMessage:
     def __str__(self):
         return "%(level)s %(msg)s" % {'level': self.level, 'msg': self.message}
 
+    def is_error(self):
+        return self.level == MessageLevel.ERROR
+
+    def is_success(self):
+        return self.level == MessageLevel.SUCCESS
+
+    @staticmethod
+    def contains_errors(messages: List['BusinessValidationMessage']) -> bool:
+        return any(msg.is_error() for msg in messages)
+
 
 class BusinessValidator(ABC):
 

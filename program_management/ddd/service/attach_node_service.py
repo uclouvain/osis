@@ -28,6 +28,7 @@ from typing import List
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.contrib.validation import BusinessValidationMessage
+from program_management.ddd.domain.node import factory
 from program_management.ddd.repositories import fetch_tree, save_tree
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
@@ -35,17 +36,20 @@ from program_management.ddd.validators._authorized_relationship import AttachAut
 
 
 def attach_node(
-        tree: 'ProgramTree',
-        node: 'Node',
+        root_id: int,
+        node_id_to_attach: int,
+        type_node_to_attach,
         path: 'Path' = None,
         commit=True,
         **link_attributes
 ) -> List[BusinessValidationMessage]:
-    error_messages = __validate_trees_using_node_as_reference_link(tree, node, path)
-    error_messages += _validate_end_date_and_option_finality(node)
+    tree = fetch_tree.fetch(root_id)
+    node_to_attach = factory.get_node(type_node_to_attach, node_id=node_id_to_attach)
+    error_messages = __validate_trees_using_node_as_reference_link(tree, node_to_attach, path)
+    error_messages += _validate_end_date_and_option_finality(node_to_attach)
     if error_messages:
         return error_messages
-    success_messages = tree.attach_node(node, path, **link_attributes)
+    success_messages = tree.attach_node(node_to_attach, path, **link_attributes)
     if commit:
         save_tree.save(tree)
     return success_messages
@@ -69,7 +73,6 @@ def __validate_trees_using_node_as_reference_link(
 
 
 def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List[BusinessValidationMessage]:
-    # TODO :: inclure le ftech dans le validateur? Et gérer cette boucle dans le validateur?
     error_messages = []
     tree_from_node_to_attach = fetch_tree.fetch(node_to_attach.node_id)
     finality_ids = [n.node_id for n in tree_from_node_to_attach.get_all_finalities()]

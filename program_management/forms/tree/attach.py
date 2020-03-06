@@ -33,11 +33,6 @@ from program_management.ddd.repositories import fetch_node
 
 
 class AttachNodeFormSet(BaseFormSet):
-    def save(self):
-        instances = []
-        for f in self:
-            instances.append(f.save())
-        return instances
 
     def get_form_kwargs(self, index):
         if self.form_kwargs:
@@ -53,16 +48,8 @@ class AttachNodeForm(forms.Form):
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
 
-    def __init__(self, tree: program_tree.ProgramTree, to_path: str, node_id: int, node_type: str, **kwargs):
-        self.tree = tree
+    def __init__(self, to_path: str, node_id: int, node_type: str, **kwargs):
         self.to_path = to_path
-        self.node = fetch_node.fetch_by_type(node_type, node_id)
+        self.node_id = node_id
+        self.node_type = node_type
         super().__init__(**kwargs)
-
-    def save(self):
-        attach_node_service.attach_node(
-            self.tree,
-            self.node,
-            self.to_path,
-            **self.cleaned_data
-        )

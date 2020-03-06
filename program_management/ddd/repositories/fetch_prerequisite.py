@@ -35,6 +35,7 @@ from base.models.prerequisite_item import PrerequisiteItem
 from program_management.ddd.domain import prerequisite
 
 
+# TODO :: rename fetch() -> load()
 def fetch_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
     """
     This function return a dict of prerequisite grouped by node_id

@@ -44,6 +44,7 @@ NodePk = int
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
+# TODO :: rename fetch() -> load()
 def fetch(tree_root_id: int) -> 'ProgramTree':
     root_node = fetch_node.fetch_node_education_group_year(tree_root_id)
 
