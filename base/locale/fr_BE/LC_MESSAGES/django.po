@@ -3701,6 +3701,9 @@ msgstr "vol. ent. charge"
 msgid "volume total requirement entities"
 msgstr "vol. tot. ent. charge"
 
+msgid "without postponement"
+msgstr "sans report"
+
 msgid "yes"
 msgstr "oui"
 
