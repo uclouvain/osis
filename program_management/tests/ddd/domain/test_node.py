@@ -26,15 +26,19 @@
 from django.test import SimpleTestCase
 
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
 class TestAddChildNode(SimpleTestCase):
     def test_add_child_to_node(self):
-        group_year_node = NodeGroupYear(0, "LDROI200G", "Tronc commun", 2018)
-        learning_unit_year_node = NodeLearningUnitYear(2, "LDROI100", "Introduction", 2018)
+        group_year_node = NodeGroupYearFactory(node_id=0, acronym="LDROI200G", title="Tronc commun", year=2018)
+        learning_unit_year_node = NodeLearningUnitYearFactory(
+            node_id=2,
+            acronym="LDROI100",
+            title="Introduction",
+            year=2018
+        )
 
         group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
         self.assertEquals(len(group_year_node.children), 1)
@@ -45,9 +49,9 @@ class TestAddChildNode(SimpleTestCase):
 
 class TestDescendentsPropertyNode(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYear(0, "LDROI200T", "Tronc commun", 2018)
-        self.subgroup_node = NodeGroupYear(1, "LDROI200G", "Sub group", 2018)
-        self.leaf = NodeLearningUnitYear(2, "LDROI100", "Introduction", 2018)
+        self.root_node = NodeGroupYearFactory(node_id=0, acronym="LDROI200T", title="Tronc commun", year=2018)
+        self.subgroup_node = NodeGroupYearFactory(node_id=1, acronym="LDROI200G", title="Sub group", year=2018)
+        self.leaf = NodeLearningUnitYearFactory(node_id=2, acronym="LDROI100", title="Introduction", year=2018)
 
     def test_case_no_descendents(self):
         self.assertIsInstance(self.root_node.descendents, dict)

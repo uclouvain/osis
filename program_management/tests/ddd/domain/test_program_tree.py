@@ -36,7 +36,7 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 class TestGetNodeProgramTree(SimpleTestCase):
     def setUp(self):
-        self.subgroup_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)
+        self.subgroup_node = NodeGroupYearFactory(node_id=1, acronym="LTRONC100T", title="Tronc commun", year=2018)
         self.root_node = Node(0)
         self.root_node.add_child(self.subgroup_node)
 
@@ -103,9 +103,9 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
 
 class TestDetachNodeProgramTree(SimpleTestCase):
     def setUp(self):
-        self.leaf = NodeGroupYear(2, "LBRAF200G", "Sous groupe", 2018)
-        self.common_core_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)
-        self.root_node = NodeGroupYear(1, "LBIR1000A", "Bachelier en Bio", 2018)
+        self.leaf = NodeGroupYearFactory(node_id=2, acronym="LBRAF200G", title="Sous groupe", year=2018)
+        self.common_core_node = NodeGroupYearFactory(node_id=1, acronym="LTRONC100T", title="Tronc commun", year=2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR1000A", title="Bachelier en Bio", year=2018)
 
         self.common_core_node.add_child(self.leaf)
         self.root_node.add_child(self.common_core_node)

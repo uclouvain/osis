@@ -25,7 +25,7 @@
 ##############################################################################
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType
@@ -35,26 +35,27 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
-class TestAttachNode(TestCase, ValidatorPatcherMixin):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.root_node = NodeEducationGroupYearFactory()
-        cls.tree = ProgramTreeFactory(root_node=cls.root_node)
-        cls.root_path = str(cls.root_node.node_id)
-        cls.node_to_attach = NodeEducationGroupYearFactory()
+class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
 
     def setUp(self):
+        self.root_node = NodeEducationGroupYearFactory()
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+        self.root_path = str(self.root_node.node_id)
+        self.node_to_attach = NodeEducationGroupYearFactory()
+        self.node_to_attach_type = NodeType.EDUCATION_GROUP
+
         self._patch_save_tree()
         self._patch_fetch_tree()
+        self._patch_fetch_trees_from_children()
 
     def _patch_save_tree(self):
         patcher_save = patch("program_management.ddd.repositories.save_tree.save")
@@ -65,12 +66,23 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         patcher_fetch = patch("program_management.ddd.repositories.fetch_tree.fetch")
         self.addCleanup(patcher_fetch.stop)
         self.mock_fetch = patcher_fetch.start()
+        self.mock_fetch.return_value = self.tree
+
+    def _patch_fetch_trees_from_children(self):
+        patcher_fetch = patch("program_management.ddd.repositories.fetch_tree.fetch_trees_from_children")
+        self.addCleanup(patcher_fetch.stop)
+        self.mock_fetch_tress_from_children = patcher_fetch.start()
 
     @patch.object(program_tree.ProgramTree, 'attach_node')
     def test_when_attach_node_action_is_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
         mock_attach_node.return_value = [validator_message]
-        result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        result = attach_node_service.attach_node(
+            self.tree.root_node.node_id,
+            self.node_to_attach.node_id,
+            self.node_to_attach_type,
+            self.root_path
+        )
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
@@ -78,7 +90,12 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
     def test_when_attach_node_action_is_not_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
         mock_attach_node.return_value = [validator_message]
-        result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        result = attach_node_service.attach_node(
+            self.tree.root_node.node_id,
+            self.node_to_attach.node_id,
+            self.node_to_attach_type,
+            self.root_path
+        )
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
@@ -94,7 +111,12 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, [])
         self.mock_validator(AttachAuthorizedRelationshipValidator, ['error link reference'])
 
-        result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        result = attach_node_service.attach_node(
+            self.tree.root_node,
+            self.node_to_attach.node_id,
+            self.node_to_attach_type,
+            self.root_path
+        )
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].message, 'error link reference')
         self.assertEqual(result[0].level, MessageLevel.ERROR)
@@ -111,34 +133,48 @@ class TestAttachNode(TestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         self.mock_validator(AttachAuthorizedRelationshipValidator, [])
 
-        result = attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path)
+        result = attach_node_service.attach_node(
+            self.tree.root_node,
+            self.node_to_attach.node_id,
+            self.node_to_attach_type,
+            self.root_path
+        )
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].message, _('Success message'))
         self.assertEqual(result[0].level, MessageLevel.SUCCESS)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_commit_is_true(self, mock_fetch):
+    def test_when_commit_is_true(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path, commit=True)
-        self.assertTrue(mock_fetch.called)
+        attach_node_service.attach_node(
+            self.tree.root_node,
+            self.node_to_attach.node_id,
+            self.node_to_attach_type,
+            self.root_path,
+            commit=True
+        )
+        self.assertTrue(self.mock_fetch_tress_from_children.called)
         self.assertTrue(self.mock_save.called)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_commit_is_false(self, mock_fetch):
+    def test_when_commit_is_false(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_node_service.attach_node(self.tree, self.node_to_attach, self.root_path, commit=False)
+        attach_node_service.attach_node(
+            self.tree.root_node,
+            self.node_to_attach.node_id,
+            self.node_to_attach_type,
+            self.root_path,
+            commit=False
+        )
         self.assertFalse(self.mock_save.called)
 
 
-class TestValidateEndDateAndOptionFinality(TestCase, ValidatorPatcherMixin):
-    @classmethod
-    def setUpTestData(cls):
-        cls.root_node = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
-        cls.tree_2m = ProgramTreeFactory(root_node=cls.root_node)
-        cls.root_path = str(cls.root_node.node_id)
-        cls.node_to_attach_not_finality = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin):
 
     def setUp(self):
+        self.root_node = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
+        self.tree_2m = ProgramTreeFactory(root_node=self.root_node)
+        self.root_path = str(self.root_node.node_id)
+        self.node_to_attach_not_finality = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+
         self._patch_fetch_tree()
 
     def _patch_fetch_tree(self):

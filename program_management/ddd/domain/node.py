@@ -35,15 +35,15 @@ from program_management.models.enums.node_type import NodeType
 
 
 class NodeFactory:
-    def get_node(self, type, **kwargs):
+    def get_node(self, type: NodeType, **node_attrs):
         node_cls = {
-            NodeType.EDUCATION_GROUP.name: NodeEducationGroupYear,   # TODO: Remove when migration is done
+            NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
-            NodeType.GROUP.name: NodeGroupYear,
-            NodeType.LEARNING_UNIT.name: NodeLearningUnitYear,
-            NodeType.LEARNING_CLASS.name: NodeLearningClassYear
+            NodeType.GROUP: NodeGroupYear,
+            NodeType.LEARNING_UNIT: NodeLearningUnitYear,
+            NodeType.LEARNING_CLASS: NodeLearningClassYear
         }[type]
-        return node_cls(**kwargs)
+        return node_cls(**node_attrs)
 
 
 factory = NodeFactory()
@@ -56,10 +56,13 @@ class Node:
 
     def __init__(
             self,
-            node_id: int,
+            node_id: int = None,
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
-            children: List['Link'] = None
+            children: List['Link'] = None,
+            acronym: str = None,
+            title: str = None,
+            year: int = None
     ):
         self.node_id = node_id
         if children is None:
@@ -67,6 +70,9 @@ class Node:
         self.children = children
         self.node_type = node_type
         self.end_date = end_date
+        self.acronym = acronym
+        self.title = title
+        self.year = year
 
     def __eq__(self, other):
         return self.node_id == other.node_id
@@ -151,27 +157,18 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
 
 
 class NodeEducationGroupYear(Node):
-    def __init__(self, node_id: int, acronym: str, title, year, children: List['Link'] = None, **kwargs):
-        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
-        self.acronym = acronym
-        self.title = title
-        self.year = year
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class NodeGroupYear(Node):
-    def __init__(self, node_id: int, acronym: str, title, year, children: List['Link'] = None, **kwargs):
-        super().__init__(node_id, children=children, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
-        self.acronym = acronym
-        self.title = title
-        self.year = year
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, node_id: int, acronym: str, title, year, proposal_type: ProposalType = None, **kwargs):
-        super().__init__(node_id, node_type=kwargs.get('node_type'), end_date=kwargs.get('end_date'))
-        self.acronym = acronym
-        self.title = title
-        self.year = year
+    def __init__(self, proposal_type: ProposalType = None, **kwargs):
+        super().__init__(**kwargs)
         self.proposal_type = proposal_type
         self.prerequisite = None  # FIXME : Should be of type Prerequisite?
         self.is_prerequisite_of = []
