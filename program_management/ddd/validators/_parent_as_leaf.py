@@ -27,6 +27,7 @@ from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.contrib.validation import BusinessValidator
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import node
 
 
 # Implemented from AttachPermission._check_if_leaf
@@ -39,7 +40,7 @@ class ParentIsNotLeafValidator(BusinessValidator):
         self.path = path
 
     def validate(self):
-        if isinstance(self.tree.get_node(self.path), NodeLearningUnitYear):
+        if isinstance(self.tree.get_node(self.path), node.NodeLearningUnitYear):
             self.add_error_message(
                 _("Cannot add any element to learning unit")
             )

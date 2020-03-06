@@ -82,6 +82,7 @@ class ProgramTree:
                 **self.root_node.descendents
             }[path]
         except KeyError:
+            from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
     # TODO :: unit test (set and not list)

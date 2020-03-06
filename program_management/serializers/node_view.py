@@ -34,6 +34,7 @@ from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.domain import link, node
 from program_management.models.enums import node_type
+from program_management.models.enums.node_type import NodeType
 
 
 class ChildrenField(serializers.Serializer):
@@ -68,11 +69,11 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         child_node = obj.child
 
         if isinstance(child_node, node.NodeEducationGroupYear):
-            return node_type.EDUCATION_GROUP
+            return NodeType.EDUCATION_GROUP
         elif isinstance(child_node, node.NodeGroupYear):
-            return node_type.GROUP
+            return NodeType.GROUP
         elif isinstance(child_node, node.NodeLearningClassYear):
-            return node_type.LEARNING_CLASS
+            return NodeType.LEARNING_CLASS
 
     def get_root(self, obj: link.Link):
         return self.context['root'].pk
@@ -115,7 +116,7 @@ class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
         return reverse('learning_unit_utilization', args=[self.get_root(obj), obj.child.pk])
 
     def get_element_type(self, obj):
-        return node_type.LEARNING_UNIT
+        return NodeType.LEARNING_UNIT
 
     def get_title(self, obj: link.Link):
         title = obj.child.title

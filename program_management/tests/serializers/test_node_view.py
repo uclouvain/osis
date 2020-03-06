@@ -35,6 +35,7 @@ from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
 from program_management.models.enums import node_type
+from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import NodeViewAttributeSerializer, LeafViewAttributeSerializer, \
     NodeViewSerializer, LeafViewSerializer
 
@@ -128,10 +129,10 @@ class TestLeafViewSerializer(TestCase):
 
         self.assertEquals(self.serializer.data['text'], expected_text)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
     def test_serializer_leaf_ensure_get_icon_with_prerequisites_and_is_prerequisite(
@@ -142,10 +143,10 @@ class TestLeafViewSerializer(TestCase):
         expected_icon = "fa fa-exchange-alt"
         self.assertEquals(self.serializer.data['icon'], expected_icon)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
     def test_serializer_leaf_ensure_get_icon_no_prerequisite_but_is_prerequisite(
@@ -156,10 +157,10 @@ class TestLeafViewSerializer(TestCase):
         expected_icon = "fa fa-arrow-right"
         self.assertEquals(self.serializer.data['icon'], expected_icon)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
     def test_serializer_leaf_ensure_get_icon_with_prerequisites_but_is_not_prerequisite(
@@ -170,10 +171,10 @@ class TestLeafViewSerializer(TestCase):
         expected_icon = "fa fa-arrow-left"
         self.assertEquals(self.serializer.data['icon'], expected_icon)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
     def test_serializer_leaf_ensure_get_icon_no_prerequisites_and_is_not_prerequisite(
@@ -203,12 +204,12 @@ class TestLeafViewAttributeSerializer(TestCase):
         self.assertEquals(self.serializer.data['href'], expected_url)
 
     def test_serializer_node_attr_ensure_get_element_type(self):
-        self.assertEquals(self.serializer.data['element_type'], node_type.LEARNING_UNIT)
+        self.assertEquals(self.serializer.data['element_type'], NodeType.LEARNING_UNIT)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
     def test_serializer_node_attr_ensure_get_title_with_prerequisites_and_is_prerequisite(
@@ -220,10 +221,10 @@ class TestLeafViewAttributeSerializer(TestCase):
                                      _("The learning unit has prerequisites and is a prerequisite"))
         self.assertEquals(self.serializer.data['title'], expected_title)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
     def test_serializer_node_attr_ensure_get_title_no_prerequisite_but_is_prerequisite(
@@ -234,10 +235,10 @@ class TestLeafViewAttributeSerializer(TestCase):
         expected_title = "%s\n%s" % (self.link.child.title, _("The learning unit is a prerequisite"))
         self.assertEquals(self.serializer.data['title'], expected_title)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=True)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
     def test_serializer_node_attr_ensure_get_title_with_prerequisites_but_is_not_prerequisite(
@@ -248,10 +249,10 @@ class TestLeafViewAttributeSerializer(TestCase):
         expected_title = "%s\n%s" % (self.link.child.title, _("The learning unit has prerequisites"))
         self.assertEquals(self.serializer.data['title'], expected_title)
 
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.has_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
-    @mock.patch('program_management.domain.node.NodeLearningUnitYear.is_prerequisite',
+    @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.is_prerequisite',
                 new_callable=mock.PropertyMock,
                 return_value=False)
     def test_serializer_node_attr_ensure_get_title_no_prerequisites_and_is_not_prerequisite(

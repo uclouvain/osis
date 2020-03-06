@@ -150,11 +150,11 @@ class TestGetChildrenTypes(TestCase):
         self.assertNotIn(link0.child.node_type, result, error_msg)
 
 
-class TestAllChildrenAsNode(TestCase):
+class TestGetAllChildrenAsNode(TestCase):
 
     def test_when_no_child(self):
         node = NodeGroupYearFactory()
-        self.assertEqual(set(), node.all_children_as_nodes)
+        self.assertEqual(set(), node.get_all_children_as_nodes())
 
     def test_when_2_children_level(self):
         link1 = LinkFactory()
