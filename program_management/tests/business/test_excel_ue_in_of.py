@@ -62,8 +62,6 @@ from program_management.business.group_element_years.group_element_year_tree imp
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
 from reference.tests.factories.language import LanguageFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.models.enums import education_group_categories
 
 PARTIAL_ACRONYM = 'Partial'
 
