@@ -89,10 +89,6 @@ class TestAttachNodeView(TestCase):
         response = self.client.get(self.url)
         self.assertEquals(response.status_code, HttpResponseBadRequest.status_code)
 
-    def test_get_method_when_path_destination_is_invalid(self):
-        response = self.client.get(self.url + "?to_path=555")
-        self.assertEquals(response.status_code, HttpResponseNotFound.status_code)
-
     def test_get_method_when_no_data_selected_on_cache(self):
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url + "?to_path=" + to_path)
