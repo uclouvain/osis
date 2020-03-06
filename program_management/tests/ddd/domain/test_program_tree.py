@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from program_management.ddd.contrib.validation import MessageLevel
 from program_management.ddd.domain import node
@@ -34,7 +34,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
-class TestGetNodeProgramTree(TestCase):
+class TestGetNodeProgramTree(SimpleTestCase):
     def setUp(self):
         self.subgroup_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)
         self.root_node = Node(0)
@@ -60,7 +60,7 @@ class TestGetNodeProgramTree(TestCase):
         )
 
 
-class TestAttachNodeProgramTree(TestCase, ValidatorPatcherMixin):
+class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTree(root_node)
@@ -101,7 +101,7 @@ class TestAttachNodeProgramTree(TestCase, ValidatorPatcherMixin):
         self.assertNotIn(child_to_attach, self.tree.root_node.children_as_nodes)
 
 
-class TestDetachNodeProgramTree(TestCase):
+class TestDetachNodeProgramTree(SimpleTestCase):
     def setUp(self):
         self.leaf = NodeGroupYear(2, "LBRAF200G", "Sous groupe", 2018)
         self.common_core_node = NodeGroupYear(1, "LTRONC100T", "Tronc commun", 2018)

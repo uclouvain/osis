@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain import prerequisite
 
 
-class TestPrerequisiteItem(TestCase):
+class TestPrerequisiteItem(SimpleTestCase):
     def test_case_assert_str_method(self):
         p_item = prerequisite.PrerequisiteItem(acronym='LDROI1200', year=2018)
         expected_str = p_item.acronym
@@ -37,7 +37,7 @@ class TestPrerequisiteItem(TestCase):
         self.assertEquals(str(p_item), expected_str)
 
 
-class TestPrerequisiteGroupItem(TestCase):
+class TestPrerequisiteGroupItem(SimpleTestCase):
     def test_case_assert_invalid_operator_raise_exception(self):
         with self.assertRaises(AssertionError):
             prerequisite.PrerequisiteItemGroup(operator="XOR")
@@ -62,7 +62,7 @@ class TestPrerequisiteGroupItem(TestCase):
         self.assertEquals(str(p_group), expected_str)
 
 
-class TestPrerequisite(TestCase):
+class TestPrerequisite(SimpleTestCase):
     def setUp(self):
         self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
         self.p_group.add_prerequisite_item('LDROI1300', 2018)

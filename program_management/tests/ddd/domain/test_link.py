@@ -23,14 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from base.models.enums.link_type import LinkTypes
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-class TestIsReference(TestCase):
+class TestIsReference(SimpleTestCase):
     def test_when_link_type_is_reference(self):
         link = LinkFactory(link_type=LinkTypes.REFERENCE)
         self.assertTrue(link.is_reference())
@@ -40,7 +40,7 @@ class TestIsReference(TestCase):
         self.assertFalse(link.is_reference())
 
 
-class TestStr(TestCase):
+class TestStr(SimpleTestCase):
     def test_str(self):
         link = LinkFactory(
             parent=NodeGroupYearFactory(acronym='parent', year=2019),

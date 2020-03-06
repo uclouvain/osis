@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
@@ -31,7 +31,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-class TestAddChildNode(TestCase):
+class TestAddChildNode(SimpleTestCase):
     def test_add_child_to_node(self):
         group_year_node = NodeGroupYear(0, "LDROI200G", "Tronc commun", 2018)
         learning_unit_year_node = NodeLearningUnitYear(2, "LDROI100", "Introduction", 2018)
@@ -43,7 +43,7 @@ class TestAddChildNode(TestCase):
         self.assertEquals(group_year_node.children[0].comment, 'Dummy comment')
 
 
-class TestDescendentsPropertyNode(TestCase):
+class TestDescendentsPropertyNode(SimpleTestCase):
     def setUp(self):
         self.root_node = NodeGroupYear(0, "LDROI200T", "Tronc commun", 2018)
         self.subgroup_node = NodeGroupYear(1, "LDROI200G", "Sub group", 2018)
@@ -65,11 +65,11 @@ class TestDescendentsPropertyNode(TestCase):
         self.assertTrue(all(k in expected_keys for k in self.root_node.descendents.keys()))
 
 
-class TestEq(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.node_id = 1
-        cls.node = NodeGroupYearFactory(node_id=1)
+class TestEq(SimpleTestCase):
+
+    def setUp(self):
+        self.node_id = 1
+        self.node = NodeGroupYearFactory(node_id=1)
 
     def test_when_nodes_group_year_are_equal(self):
         node_with_same_id = NodeGroupYearFactory(node_id=self.node_id)
@@ -88,13 +88,13 @@ class TestEq(TestCase):
         self.assertFalse(self.node == node_with_different_id)
 
 
-class TestStr(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+class TestStr(SimpleTestCase):
+
+    def setUp(self):
         acronym = 'Acronym'
         year = 2019
-        cls.node_group_year = NodeGroupYearFactory(acronym=acronym, year=year)
-        cls.node_learning_unit = NodeLearningUnitYearFactory(acronym=acronym, year=year)
+        self.node_group_year = NodeGroupYearFactory(acronym=acronym, year=year)
+        self.node_learning_unit = NodeLearningUnitYearFactory(acronym=acronym, year=year)
 
     def test_node_group_year_str(self):
         self.assertEqual(str(self.node_group_year), 'Acronym (2019)')
@@ -103,7 +103,7 @@ class TestStr(TestCase):
         self.assertEqual(str(self.node_learning_unit), 'Acronym (2019)')
 
 
-class TestGetChildrenTypes(TestCase):
+class TestGetChildrenTypes(SimpleTestCase):
 
     def test_when_no_children(self):
         node = NodeGroupYearFactory()
@@ -150,7 +150,7 @@ class TestGetChildrenTypes(TestCase):
         self.assertNotIn(link0.child.node_type, result, error_msg)
 
 
-class TestGetAllChildrenAsNode(TestCase):
+class TestGetAllChildrenAsNode(SimpleTestCase):
 
     def test_when_no_child(self):
         node = NodeGroupYearFactory()

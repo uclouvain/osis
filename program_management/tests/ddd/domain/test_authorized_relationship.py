@@ -23,16 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.test import SimpleTestCase
 
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
-    AuthorizedRelationshipFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
-class TestInit(TestCase):
+class TestInit(SimpleTestCase):
     def test_normal_usage(self):
         auth_relations = [AuthorizedRelationshipFactory()]
         result = AuthorizedRelationshipList(auth_relations)
@@ -56,15 +55,15 @@ class TestInit(TestCase):
             AuthorizedRelationshipList([wrong_instance])
 
 
-class TestGetAuthorizedRelationship(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.auth_relation = AuthorizedRelationshipFactory(
+class TestGetAuthorizedRelationship(SimpleTestCase):
+
+    def setUp(self):
+        self.auth_relation = AuthorizedRelationshipFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.COMMON_CORE
         )
-        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
-        cls.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-        cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+        self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
+        self.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        self.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
 
     def test_when_child_type_matches_but_not_parent_type(self):
         unauthorized_child = NodeGroupYearFactory(node_type=TrainingType.ACCESS_CONTEST)
@@ -83,13 +82,13 @@ class TestGetAuthorizedRelationship(TestCase):
         self.assertEqual(self.auth_relation, result)
 
 
-class TestIsAuthorized(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.auth_relation = AuthorizedRelationshipFactory(
+class TestIsAuthorized(SimpleTestCase):
+
+    def setUp(self):
+        self.auth_relation = AuthorizedRelationshipFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.COMMON_CORE
         )
-        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
+        self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
 
     def test_when_is_authorized(self):
         parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
@@ -104,15 +103,15 @@ class TestIsAuthorized(TestCase):
         self.assertFalse(result)
 
 
-class TestGetAuthorizedChildrenTypes(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.auth_relation = AuthorizedRelationshipFactory(
+class TestGetAuthorizedChildrenTypes(SimpleTestCase):
+
+    def setUp(self):
+        self.auth_relation = AuthorizedRelationshipFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.COMMON_CORE
         )
-        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
-        cls.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-        cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+        self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
+        self.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        self.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
 
     def test_result_is_a_set_instance(self):
         error_msg = """Using a set() for performance"""
@@ -145,17 +144,17 @@ class TestGetAuthorizedChildrenTypes(TestCase):
         self.assertSetEqual(expected_result, result)
 
 
-class TestIsMinimumChildrenTypesReached(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.auth_relation = AuthorizedRelationshipFactory(
+class TestIsMinimumChildrenTypesReached(SimpleTestCase):
+
+    def setUp(self):
+        self.auth_relation = AuthorizedRelationshipFactory(
             parent_type=TrainingType.BACHELOR,
             child_type=GroupType.COMMON_CORE,
             min_constraint=1
         )
-        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
-        cls.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-        cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+        self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
+        self.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        self.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
 
     def test_when_relation_is_not_authorized(self):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
@@ -181,17 +180,17 @@ class TestIsMinimumChildrenTypesReached(TestCase):
         self.assertTrue(result)
 
 
-class TestIsMaximumChildrenTypesReached(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.auth_relation = AuthorizedRelationshipFactory(
+class TestIsMaximumChildrenTypesReached(SimpleTestCase):
+
+    def setUp(self):
+        self.auth_relation = AuthorizedRelationshipFactory(
             parent_type=TrainingType.BACHELOR,
             child_type=GroupType.COMMON_CORE,
             max_constraint=1
         )
-        cls.auth_relations = AuthorizedRelationshipList([cls.auth_relation])
-        cls.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
-        cls.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
+        self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
+        self.authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
+        self.authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
 
     def test_when_relation_is_not_authorized(self):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
