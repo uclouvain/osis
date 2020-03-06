@@ -19,8 +19,6 @@
 
 {% block content %}
 
-    {% navigation_learning_unit  request.user learning_unit_year request.resolver_match.url_name %}
-
     <div class="page-header">
         <div class="row">
             <div class="col-md-offset-1 col-md-10">
@@ -32,6 +30,7 @@
             </div>
         </div>
     </div>
+
     <div class="panel panel-default">
         <div class="panel-heading">
             {% block submit_up %}

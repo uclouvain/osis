@@ -88,7 +88,7 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
         person = get_object_or_404(Person, user=self.request.user)
         context = super().get_context_data(**kwargs)
         starting_ac = starting_academic_year()
-        if context["paginator"].count == 0:
+        if context["paginator"].count == 0 and self.request.GET:
             messages.add_message(self.request, messages.WARNING, _('No result!'))
         context.update({
             'person': person,
