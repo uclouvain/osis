@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -43,7 +44,7 @@ from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormS
 from program_management.models.enums.node_type import NodeType
 
 
-class AttachMultipleNodesView(AjaxTemplateMixin, TemplateView):
+class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):
     template_name = "tree/attach_inner.html"
 
     @cached_property

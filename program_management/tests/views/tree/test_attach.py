@@ -158,7 +158,6 @@ class TestAttachNodeView(TestCase):
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
 
     @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid', return_value=True)
-    @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.save', return_value=None)
     @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
     def test_post_method_case_formset_valid(self, mock_cache_elems, *mocks_args):
         subgroup_to_attach = GroupFactory(

@@ -29,6 +29,7 @@ from django.test import SimpleTestCase
 
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeForm
+from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
@@ -44,10 +45,9 @@ class TestAttachNodeForm(SimpleTestCase):
         node_to_attach = NodeGroupYearFactory()
 
         return AttachNodeForm(
-            self.tree,
             to_path,
             node_to_attach.node_id,
-            node_to_attach.node_type,
+            NodeType.GROUP.name,
             data=link_attributes
         )
 
