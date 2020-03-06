@@ -38,6 +38,7 @@ from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilte
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import SearchParametersCache
+from base.utils.db import convert_order_by_strings_to_expressions
 from base.views.learning_units.search.common import SearchTypes
 
 
@@ -60,22 +61,23 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
     search_type = search_parameters.get("search_type")
     filter_form_class = filter_class_function(search_type)
     order_by = filter_form_class(data=search_parameters).qs.query.order_by
+    order_by_expressions = convert_order_by_strings_to_expressions(order_by)
     qs = filter_form_class(data=search_parameters).qs.annotate(
         previous_acronym=Window(
             expression=Lag("acronym"),
-            order_by=order_by
+            order_by=order_by_expressions,
         ),
         next_acronym=Window(
             expression=Lead("acronym"),
-            order_by=order_by
+            order_by=order_by_expressions,
         ),
         previous_id=Window(
             expression=Lag("id"),
-            order_by=order_by
+            order_by=order_by_expressions,
         ),
         next_id=Window(
             expression=Lead("id"),
-            order_by=order_by
+            order_by=order_by_expressions,
         )
     ).values_list(
         "id",
@@ -85,7 +87,7 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
         "next_acronym",
         "next_id",
         named=True
-    )
+    ).order_by(*order_by)
 
     current_row = _get_current_row(qs, obj)
 
@@ -125,3 +127,5 @@ def _reverse_education_group_year_url(education_group_year_id, url_name):
 
 def _reverse_learning_unit_year_url(learning_unit_year_id, url_name):
     return reverse(url_name, args=[learning_unit_year_id])
+
+

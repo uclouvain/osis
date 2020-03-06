@@ -204,3 +204,4 @@ class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
     def navigation_function(self, *args, **kwargs):
         return navigation.navigation_education_group(*args, **kwargs)
 
+
