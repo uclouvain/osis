@@ -84,10 +84,6 @@ class Generate11BAFrom1BATest(TestCase):
             "First year of Bachelor in Law"
         )
         self.assertEqual(
-            first_created_education_group_year.external_id,
-            ""
-        )
-        self.assertEqual(
             first_created_education_group_year.acronym,
             new_acronym
         )
@@ -100,6 +96,7 @@ class Generate11BAFrom1BATest(TestCase):
             ''
         )
 
+        self.assertIsNone(first_created_education_group_year.external_id)
         self.assertIsNone(first_created_education_group_year.partial_acronym)
         self.assertIsNone(first_created_education_group_year.credits)
         self.assertIsNone(first_created_education_group_year.internship)

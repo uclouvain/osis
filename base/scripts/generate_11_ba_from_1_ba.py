@@ -85,7 +85,7 @@ def generate_11_ba_from_1_ba(existing_acronym):
     new_eg = deepcopy(source_eg)
     new_eg.pk = None
     new_eg.uuid = uuid.uuid4()
-    new_eg.external_id = ''
+    new_eg.external_id = None
     new_eg.save()
     logger.info("Education group {} created from {}\n".format(new_eg, source_eg))
 
@@ -100,7 +100,7 @@ def generate_11_ba_from_1_ba(existing_acronym):
         new_egy = deepcopy(egy)
         new_egy.pk = None
         new_egy.uuid = uuid.uuid4()
-        new_egy.external_id = ''
+        new_egy.external_id = None
 
         new_egy.education_group = new_eg
         new_egy.acronym = new_acronym
