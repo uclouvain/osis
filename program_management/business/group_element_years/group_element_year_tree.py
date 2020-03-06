@@ -338,10 +338,18 @@ class EducationGroupHierarchy:
                         gey.parent and gey.parent.education_group_type.name == GroupType.COMPLEMENTARY_MODULE.name:
                     return gey.parent
                 else:
-                    return self.get_main_parent(gey.parent.direct_parents_of_branch.first().id)
+                    return self.get_main_parent(self._get_parent_in_hierarchy(gey))
             else:
                 continue
         return None
+
+    def _get_parent_in_hierarchy(self, gey):
+        parent_in_tree = None
+        for parent in gey.parent.direct_parents_of_branch:
+            if self.cache_hierarchy.get(parent.id):
+                parent_in_tree = parent.id
+                break
+        return parent_in_tree
 
 
 class NodeLeafJsTree(EducationGroupHierarchy):
