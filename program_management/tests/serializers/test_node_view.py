@@ -26,25 +26,24 @@
 from urllib.parse import urlencode
 
 import mock
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.domain.link import Link
-from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
-from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import NodeViewAttributeSerializer, LeafViewAttributeSerializer, \
     NodeViewSerializer, LeafViewSerializer
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-class TestNodeViewSerializer(TestCase):
+class TestNodeViewSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYear(1, "LBIR100A", "BIR1BA", 2018)
-        node_parent = NodeGroupYear(2, "LTROC250T", "Tronc commun 2", 2018)
-        node_child = NodeGroupYear(6, "LSUBGR150G", "Sous-groupe 2", 2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
+        node_child = NodeGroupYearFactory(node_id=6, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
         self.link = Link(parent=node_parent, child=node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
@@ -65,11 +64,11 @@ class TestNodeViewSerializer(TestCase):
         self.assertIn(expected_icon_path, self.serializer.data['icon'])
 
 
-class TestNodeViewAttributeSerializer(TestCase):
+class TestNodeViewAttributeSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYear(1, "LBIR100A", "BIR1BA", 2018)
-        node_parent = NodeGroupYear(2, "LTROC250T", "Tronc commun 2", 2018)
-        node_child = NodeGroupYear(6, "LSUBGR150G", "Sous-groupe 2", 2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
+        node_child = NodeGroupYearFactory(node_id=6, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
         self.link = Link(parent=node_parent, child=node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
@@ -109,11 +108,11 @@ class TestNodeViewAttributeSerializer(TestCase):
         self.assertEquals(self.serializer.data['element_id'], self.link.child.pk)
 
 
-class TestLeafViewSerializer(TestCase):
+class TestLeafViewSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYear(1, "LBIR100A", "BIR1BA", 2018)
-        node_parent = NodeGroupYear(2, "LTROC250T", "Tronc commun 2", 2018)
-        leaf_child = NodeLearningUnitYear(9, "LSUBGR150G", "Sous-groupe 2", 2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
+        leaf_child = NodeLearningUnitYearFactory(node_id=9, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
         self.link = Link(parent=node_parent, child=leaf_child)
 
         self.context = {'path': '1|2|9', 'root': self.root_node}
@@ -186,11 +185,11 @@ class TestLeafViewSerializer(TestCase):
         self.assertEquals(self.serializer.data['icon'], expected_icon)
 
 
-class TestLeafViewAttributeSerializer(TestCase):
+class TestLeafViewAttributeSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYear(1, "LBIR100A", "BIR1BA", 2018)
-        node_parent = NodeGroupYear(2, "LTROC250T", "Tronc commun 2", 2018)
-        leaf_child = NodeLearningUnitYear(9, "LSUBGR150G", "Sous-groupe 2", 2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
+        leaf_child = NodeLearningUnitYearFactory(node_id=9, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
         self.link = Link(parent=node_parent, child=leaf_child)
 
         self.context = {'path': '1|2|9', 'root': self.root_node}

@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 
 from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.serializers.program_tree_view import ProgramTreeViewSerializer
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-class TestProgramTreeViewSerializer(TestCase):
+class TestProgramTreeViewSerializer(SimpleTestCase):
     def setUp(self):
         """
         root_node
@@ -42,12 +43,12 @@ class TestProgramTreeViewSerializer(TestCase):
                   |---- LDROI100A (UE)
         :return:
         """
-        self.root_node = NodeGroupYear(1, "LBIR100B", "Bachelier en droit", 2018)
-        self.common_core = NodeGroupYear(2, "LGROUP100A", "Tronc commun", 2018)
-        self.ldroi100a = NodeLearningUnitYear(3, "LDROI100A", "Introduction", 2018)
-        self.ldroi120b = NodeLearningUnitYear(4, "LDROI120B", "Séminaire", 2018)
-        self.subgroup1 = NodeGroupYear(5, "LSUBGR100G", "Sous-groupe 1", 2018)
-        self.subgroup2 = NodeGroupYear(6, "LSUBGR150G", "Sous-groupe 2", 2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100B", title="Bachelier en droit", year=2018)
+        self.common_core = NodeGroupYearFactory(node_id=2, acronym="LGROUP100A", title="Tronc commun", year=2018)
+        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3, acronym="LDROI100A", title="Introduction", year=2018)
+        self.ldroi120b = NodeLearningUnitYearFactory(node_id=4, acronym="LDROI120B", title="Séminaire", year=2018)
+        self.subgroup1 = NodeGroupYearFactory(node_id=5, acronym="LSUBGR100G", title="Sous-groupe 1", year=2018)
+        self.subgroup2 = NodeGroupYearFactory(node_id=6, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
 
         self.root_node.add_child(self.common_core)
         self.common_core.add_child(self.ldroi100a)
