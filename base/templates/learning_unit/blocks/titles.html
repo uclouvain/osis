@@ -2,16 +2,16 @@
 {% load i18n %}
 
 <div class="panel panel-default">
-    <div class="panel-heading"><h5><strong>{% trans "Title"%} (*)</strong></h5></div>
     <div class="panel-body">
+        <h5><strong><em>{% trans "Title"%} (*)</em></strong></h5>
         {% bootstrap_field learning_container_year_form.common_title form_group_class="form-group" %}
         {% bootstrap_field learning_unit_year_form.specific_title form_group_class="form-group" %}
     </div>
 </div>
 <br/>
 <div class="panel panel-default">
-<div class="panel-heading"><h5><strong>{% trans "Title in English"%}</strong></h5></div>
     <div class="panel-body">
+        <h5><strong><em>{% trans "Title in English"%}</em></strong></h5>
         {% bootstrap_field learning_container_year_form.common_title_english form_group_class="form-group" %}
         {% bootstrap_field learning_unit_year_form.specific_title_english form_group_class="form-group" %}
     </div>
