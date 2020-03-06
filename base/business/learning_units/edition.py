@@ -277,10 +277,10 @@ def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
 
 
 def _get_actual_end_year(learning_unit_to_edit):
-    p = ProposalLearningUnit.objects.filter(
+    proposal = ProposalLearningUnit.objects.filter(
         learning_unit_year__learning_unit=learning_unit_to_edit
-    )
-    end_year_lu = p.get().initial_data.get('learning_unit').get('end_year') if p.exists() \
+    ).first()
+    end_year_lu = proposal.initial_data.get('learning_unit').get('end_year') if proposal \
         else learning_unit_to_edit.end_year
     return end_year_lu or academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
