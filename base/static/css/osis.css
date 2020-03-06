@@ -535,10 +535,3 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     vertical-align: middle;
     margin-left: 5px;
 }
-
-.tab {
-    width: 95%;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
