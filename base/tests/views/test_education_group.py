@@ -751,7 +751,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
     def test_case_free_text_is_not_show_when_common(self):
-        AcademicYearFactory(current=True)
         common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
         url_edit_common = reverse(
             "education_group_year_admission_condition_edit",
