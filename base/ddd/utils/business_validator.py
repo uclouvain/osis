@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from abc import ABC
-from typing import List
+from typing import List, Tuple
 
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
 
@@ -32,6 +32,8 @@ from base.ddd.utils.validation_message import BusinessValidationMessage, Message
 class BusinessValidator(ABC):
 
     _messages = None
+
+    _validation_done = False
 
     success_messages = None
 
@@ -51,7 +53,10 @@ class BusinessValidator(ABC):
         return [msg for msg in self.messages if msg.level == MessageLevel.WARNING]
 
     def is_valid(self) -> bool:
-        self.validate()  # TODO :: utiliser _validation_done attr?
+        if self._validation_done:
+            self._reset_messages()
+        self.validate()
+        self._validation_done = True
         return not self.error_messages
 
     def add_message(self, msg: BusinessValidationMessage):
@@ -68,6 +73,9 @@ class BusinessValidator(ABC):
     def validate(self, *args, **kwargs):
         """Method used to add messages during validation"""
         raise NotImplementedError()
+
+    def _reset_messages(self):
+        self._messages = []
 
 
 class BusinessListValidator(BusinessValidator):

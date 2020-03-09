@@ -33,8 +33,6 @@ class MessageLevel(Enum):
     INFO = "info"
     SUCCESS = "succes"
 
-    # Se baser sur le Message level de python
-
 
 class BusinessValidationMessage:
     message = None
