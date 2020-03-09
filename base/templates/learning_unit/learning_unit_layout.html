@@ -19,9 +19,6 @@
 
 {% block content %}
 
-    {% with disabled_nav=True %}
-        {% include "learning_unit/blocks/header.html" %}
-    {% endwith %}
     <div class="page-header">
         <div class="row">
             <div class="col-md-offset-1 col-md-10">
@@ -33,6 +30,7 @@
             </div>
         </div>
     </div>
+
     <div class="panel panel-default">
         <div class="panel-heading">
             {% block submit_up %}

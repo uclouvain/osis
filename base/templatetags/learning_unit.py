@@ -136,7 +136,7 @@ def dl_tooltip(context, instance, key, **kwargs):
         'difference': difference,
         'id': key.lower(),
         'label_text': label_text,
-        'value': value or ''
+        'value': value or '-'
     }
 
 
