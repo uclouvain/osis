@@ -25,6 +25,7 @@
 ##############################################################################
 from django.test import SimpleTestCase
 
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -166,3 +167,18 @@ class TestGetAllChildrenAsNode(SimpleTestCase):
         result = link1.parent.get_all_children_as_nodes()
         expected_result = {link2.parent, link2.child}
         self.assertEqual(expected_result, result)
+
+    def test_when_ignore_children_from(self):
+        link1 = LinkFactory(parent__node_type=TrainingType.BACHELOR, child__node_type=GroupType.MINOR_LIST_CHOICE)
+        link1_1 = LinkFactory(parent=link1.parent, child__node_type=GroupType.COMMON_CORE)
+        link1_2_1 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.ACCESS_MINOR)
+        result = link1.parent.get_all_children_as_nodes(
+            ignore_children_from={GroupType.MINOR_LIST_CHOICE}
+        )
+        self.assertNotIn(link1.child, result)
+        self.assertNotIn(link1_2_1.child, result)
+
+        expected_result = {
+            link1_1.child,
+        }
+        self.assertSetEqual(result, expected_result)

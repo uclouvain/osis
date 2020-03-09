@@ -92,16 +92,16 @@ class Node:
     def pk(self):
         return self.node_id
 
-    def is_finality(self) -> bool:  # TODO :: unit test
+    def is_finality(self) -> bool:
         return self.node_type in set(TrainingType.finality_types_enum())
 
-    def is_master_2m(self) -> bool:  # TODO :: unit test
+    def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
     def get_all_children_as_nodes(
             self,
             filter_types: Set[EducationGroupTypesEnum] = None,
-            ignore_children_from: Set[EducationGroupTypesEnum] = None  # TODO :: unit tests
+            ignore_children_from: Set[EducationGroupTypesEnum] = None
     ) -> Set['Node']:
         result = set()
         for link in self.children:
