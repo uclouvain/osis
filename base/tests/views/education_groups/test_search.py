@@ -24,11 +24,12 @@
 #
 ##############################################################################
 import json
+import urllib
 from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, QueryDict
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
