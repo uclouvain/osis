@@ -139,7 +139,7 @@ class TrainingDetailSerializerTestCase(TestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization__type=organization_type.MAIN
         )
-        cls.training = TrainingFactory(
+        cls.training = EducationGroupYearBachelorFactory(
             acronym='BIR1BA',
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
