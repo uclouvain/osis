@@ -30,7 +30,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
-from program_management.ddd.repositories import save_tree
+from program_management.ddd.repositories import persist_tree
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -60,35 +60,35 @@ class TestSaveTree(TestCase):
             year=learning_unit_year.academic_year.year
         )
 
-    def test_case_tree_save_from_scratch(self):
+    def test_case_tree_persist_from_scratch(self):
         self.common_core_node.add_child(self.learning_unit_year_node)
         self.root_node.add_child(self.common_core_node)
         tree = ProgramTreeFactory(root_node=self.root_node)
 
-        save_tree.save(tree)
+        persist_tree.persist(tree)
 
         self.assertEquals(GroupElementYear.objects.all().count(), 2)
 
-    def test_case_tree_save_with_some_existing_part(self):
+    def test_case_tree_persist_with_some_existing_part(self):
         self.root_node.add_child(self.common_core_node)
         tree = ProgramTreeFactory(root_node=self.root_node)
 
-        save_tree.save(tree)
+        persist_tree.persist(tree)
         self.assertEquals(GroupElementYear.objects.all().count(), 1)
 
         # Append UE to common core
         self.common_core_node.add_child(self.learning_unit_year_node)
-        save_tree.save(tree)
+        persist_tree.persist(tree)
         self.assertEquals(GroupElementYear.objects.all().count(), 2)
 
-    def test_case_tree_save_after_detach_element(self):
+    def test_case_tree_persist_after_detach_element(self):
         self.root_node.add_child(self.common_core_node)
         tree = ProgramTreeFactory(root_node=self.root_node)
 
-        save_tree.save(tree)
+        persist_tree.persist(tree)
         self.assertEquals(GroupElementYear.objects.all().count(), 1)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(self.common_core_node.pk)])
         tree.detach_node(path_to_detach)
-        save_tree.save(tree)
+        persist_tree.persist(tree)
         self.assertEquals(GroupElementYear.objects.all().count(), 0)

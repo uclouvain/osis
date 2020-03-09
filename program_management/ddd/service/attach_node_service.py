@@ -29,7 +29,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd.domain.node import factory
-from program_management.ddd.repositories import load_tree, save_tree
+from program_management.ddd.repositories import load_tree, persist_tree
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
@@ -51,7 +51,7 @@ def attach_node(
         return error_messages
     success_messages = tree.attach_node(node_to_attach, path, **link_attributes)
     if commit:
-        save_tree.save(tree)
+        persist_tree.persist(tree)
     return success_messages
 
 
