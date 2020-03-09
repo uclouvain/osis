@@ -26,13 +26,13 @@
 import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType
-from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
+from base.models.authorized_relationship import AuthorizedRelationshipObject, AuthorizedRelationshipList
 
 
 class AuthorizedRelationshipFactory(factory.Factory):
 
     class Meta:
-        model = AuthorizedRelationship
+        model = AuthorizedRelationshipObject
         abstract = False
 
     parent_type = factory.fuzzy.FuzzyChoice(TrainingType)

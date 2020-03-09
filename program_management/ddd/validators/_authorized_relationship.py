@@ -62,7 +62,7 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
         relation = self.auth_relations.get_authorized_relationship(parent_node.node_type, child_node.node_type)
-        return current_count == relation.max_constraint
+        return current_count == relation.max_count_authorized
 
 
 # Implemented from CheckAuthorizedRelationship (management.py)
@@ -90,7 +90,7 @@ class DetachAuthorizedRelationshipValidator(BusinessValidator):
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
         relation = self.auth_relations.get_authorized_relationship(parent_node.node_type, child_node.node_type)
-        return current_count == relation.min_constraint
+        return current_count == relation.min_count_authorized
 
 
 class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):

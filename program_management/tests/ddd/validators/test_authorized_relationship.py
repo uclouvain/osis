@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
-from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory

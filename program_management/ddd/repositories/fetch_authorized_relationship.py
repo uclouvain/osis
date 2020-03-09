@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.domain.authorized_relationship import AuthorizedRelationshipList, AuthorizedRelationship
-from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship
+from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship, \
+    AuthorizedRelationshipObject, AuthorizedRelationshipList
 
 
 # TODO :: rename fetch() -> load()
@@ -38,7 +38,7 @@ def fetch() -> AuthorizedRelationshipList:
     )
     for obj in qs:
         authorized_relationships.append(
-            AuthorizedRelationship(
+            AuthorizedRelationshipObject(
                 obj['parent_type__name'],
                 obj['child_type__name'],
                 obj['min_count_authorized'],
