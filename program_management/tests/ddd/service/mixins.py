@@ -35,7 +35,7 @@ class ValidatorPatcherMixin:
         """
         Mixin used to mock the "messages" attribute of the validator passed in parameter.
         It aims to avoid too many decorators "@patch" above the tests methods.
-        :param validator_to_patch: BusinessValidator
+        :param validator_to_patch: a BusinessValidator class
         :param messages: Messages returned by the validator (mock the 'messages' attribute of the validator)
         :param level: The severity level of the messages
         :return: -
