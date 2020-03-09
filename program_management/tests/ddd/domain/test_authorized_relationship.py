@@ -67,18 +67,24 @@ class TestGetAuthorizedRelationship(SimpleTestCase):
 
     def test_when_child_type_matches_but_not_parent_type(self):
         unauthorized_child = NodeGroupYearFactory(node_type=TrainingType.ACCESS_CONTEST)
-        result = self.auth_relations._get_authorized_relationship(self.authorized_parent, unauthorized_child)
+        result = self.auth_relations.get_authorized_relationship(
+            self.authorized_parent.node_type,
+            unauthorized_child.node_type
+        )
         self.assertIsNone(result)
 
     def test_when_parent_type_matches_but_not_parent_type(self):
         unauthorized_parent = NodeGroupYearFactory(node_type=TrainingType.INTERNSHIP)
-        result = self.auth_relations._get_authorized_relationship(unauthorized_parent, self.authorized_child)
+        result = self.auth_relations.get_authorized_relationship(
+            unauthorized_parent.node_type,
+            self.authorized_child.node_type
+        )
         self.assertIsNone(result)
 
     def test_when_parent_type_and_child_type_matches(self):
         parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
         child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
-        result = self.auth_relations._get_authorized_relationship(parent, child)
+        result = self.auth_relations.get_authorized_relationship(parent.node_type, child.node_type)
         self.assertEqual(self.auth_relation, result)
 
 
@@ -93,13 +99,13 @@ class TestIsAuthorized(SimpleTestCase):
     def test_when_is_authorized(self):
         parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
         child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
-        result = self.auth_relations._get_authorized_relationship(parent, child)
+        result = self.auth_relations.get_authorized_relationship(parent.node_type, child.node_type)
         self.assertTrue(result)
 
     def test_when_is_not_authorized(self):
         parent = NodeGroupYearFactory(node_type=TrainingType.INTERNSHIP)
         child = NodeGroupYearFactory(node_type=GroupType.FINALITY_120_LIST_CHOICE)
-        result = self.auth_relations._get_authorized_relationship(parent, child)
+        result = self.auth_relations.get_authorized_relationship(parent.node_type, child.node_type)
         self.assertFalse(result)
 
 
@@ -115,16 +121,16 @@ class TestGetAuthorizedChildrenTypes(SimpleTestCase):
 
     def test_result_is_a_set_instance(self):
         error_msg = """Using a set() for performance"""
-        result = self.auth_relations.get_authorized_children_types(self.authorized_parent)
+        result = self.auth_relations.get_authorized_children_types(self.authorized_parent.node_type)
         self.assertIsInstance(result, set, error_msg)
 
     def test_when_child_type_unauthorized(self):
         parent_without_authorized_children = NodeGroupYearFactory(node_type=TrainingType.ACCESS_CONTEST)
-        result = self.auth_relations.get_authorized_children_types(parent_without_authorized_children)
+        result = self.auth_relations.get_authorized_children_types(parent_without_authorized_children.node_type)
         self.assertEqual(set(), result)
 
     def test_when_child_type_authorized(self):
-        result = self.auth_relations.get_authorized_children_types(self.authorized_parent)
+        result = self.auth_relations.get_authorized_children_types(self.authorized_parent.node_type)
         expected_result = {
             self.authorized_child.node_type
         }
@@ -136,7 +142,7 @@ class TestGetAuthorizedChildrenTypes(SimpleTestCase):
         )
         authorized_relations = AuthorizedRelationshipList([self.auth_relation, another_authorized_relation])
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
-        result = authorized_relations.get_authorized_children_types(self.authorized_parent)
+        result = authorized_relations.get_authorized_children_types(self.authorized_parent.node_type)
         expected_result = {
             self.authorized_child.node_type,
             another_authorized_child.node_type

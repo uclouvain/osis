@@ -41,7 +41,7 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
         self.auth_relations = tree.authorized_relationships
 
     def validate(self):
-        if not self.tree.authorized_relationships.is_authorized(self.parent, self.node_to_add):
+        if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_add.node_type):
             self.add_error_message(
                 _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                     'child_types': self.node_to_add.node_type.value,
@@ -52,16 +52,17 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
         if self.is_maximum_children_types_reached(self.parent, self.node_to_add):
             self.add_error_message(
                 _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-                    "types": str(self.tree.authorized_relationships.get_authorized_children_types(self.parent))
+                    "types": str(self.auth_relations.get_authorized_children_types(self.parent.node_type))
                 }
             )
 
     def is_maximum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
-        if not self.auth_relations.is_authorized(parent_node, child_node):
+        if not self.auth_relations.is_authorized(parent_node.node_type, child_node.node_type):
             return False
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
-        return current_count == self.auth_relations._get_authorized_relationship(parent_node, child_node).max_constraint
+        relation = self.auth_relations.get_authorized_relationship(parent_node.node_type, child_node.node_type)
+        return current_count == relation.max_constraint
 
 
 # Implemented from CheckAuthorizedRelationship (management.py)
@@ -84,11 +85,12 @@ class DetachAuthorizedRelationshipValidator(BusinessValidator):
             )
 
     def is_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
-        if not self.auth_relations.is_authorized(parent_node, child_node):
+        if not self.auth_relations.is_authorized(parent_node.node_type, child_node.node_type):
             return False
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
         current_count = counter[child_node.node_type]
-        return current_count == self.auth_relations._get_authorized_relationship(parent_node, child_node).min_constraint
+        relation = self.auth_relations.get_authorized_relationship(parent_node.node_type, child_node.node_type)
+        return current_count == relation.min_constraint
 
 
 class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):

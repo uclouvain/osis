@@ -108,7 +108,7 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
         self.assertFalse(validator.is_valid())
 
         max_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-            "types": str(self.tree.authorized_relationships.get_authorized_children_types(self.authorized_parent))
+            "types": str(self.tree.authorized_relationships.get_authorized_children_types(self.authorized_parent.node_type))
         }
         self.assertIn(max_error_msg, validator.error_messages)
         self.assertEqual(len(validator.error_messages), 1)

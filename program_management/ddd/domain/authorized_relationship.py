@@ -53,21 +53,25 @@ class AuthorizedRelationshipList:
         assert isinstance(authorized_relationships[0], AuthorizedRelationship)
         self.authorized_relationships = authorized_relationships
 
-    def _get_authorized_relationship(self, parent_node: 'Node', child_node: 'Node') -> AuthorizedRelationship:
+    def get_authorized_relationship(
+            self,
+            parent_type: EducationGroupTypesEnum,
+            child_type: EducationGroupTypesEnum
+    ) -> AuthorizedRelationship:
         return next(
             (
                 auth_rel for auth_rel in self.authorized_relationships
-                if auth_rel.child_type == child_node.node_type
-                and auth_rel.parent_type == parent_node.node_type
+                if auth_rel.child_type == child_type
+                and auth_rel.parent_type == parent_type
             ),
             None
         )
 
-    def is_authorized(self, parent_node: 'Node', child_node: 'Node') -> bool:
-        return child_node.node_type in self.get_authorized_children_types(parent_node)
+    def is_authorized(self, parent_type: EducationGroupTypesEnum, child_type: EducationGroupTypesEnum) -> bool:
+        return parent_type in self.get_authorized_children_types(child_type)
 
-    def get_authorized_children_types(self, parent_node: 'Node') -> Set[EducationGroupTypesEnum]:
+    def get_authorized_children_types(self, parent_type: EducationGroupTypesEnum) -> Set[EducationGroupTypesEnum]:
         return set(
             auth_rel.child_type for auth_rel in self.authorized_relationships
-            if auth_rel.parent_type == parent_node.node_type
+            if auth_rel.parent_type == parent_type
         )
