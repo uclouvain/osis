@@ -29,7 +29,7 @@ from django.utils.translation import ngettext
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree
-from program_management.ddd.contrib.validation import BusinessValidator
+from base.ddd.utils.business_validator import BusinessValidator
 
 
 # TODO :: get a common mixin (merge with AttachFinalityEndDateValidator ?)

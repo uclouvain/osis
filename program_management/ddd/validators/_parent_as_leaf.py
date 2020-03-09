@@ -25,7 +25,7 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.contrib.validation import BusinessValidator
+from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 

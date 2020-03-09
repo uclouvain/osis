@@ -33,7 +33,7 @@ from django.utils.translation import gettext_lazy as _
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
-from program_management.ddd.contrib.validation import BusinessValidationMessage, MessageLevel
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory

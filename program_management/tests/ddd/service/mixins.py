@@ -26,7 +26,7 @@
 from typing import List
 from unittest.mock import PropertyMock, patch
 
-from program_management.ddd.contrib.validation import MessageLevel, BusinessValidationMessage
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 
 
 class ValidatorPatcherMixin:

@@ -6,4 +6,4 @@ if TYPE_CHECKING:
     from program_management.ddd.domain.program_tree import ProgramTree
     from program_management.ddd.domain.program_tree import Path
     from program_management.ddd.domain.link import Link
-    from program_management.ddd.contrib.validation import BusinessValidationMessage
+    from base.ddd.utils.validation_message import BusinessValidationMessage

@@ -26,7 +26,7 @@
 from django.utils.translation import gettext as _
 
 from program_management.ddd.business_types import *
-from program_management.ddd.contrib.validation import BusinessListValidator
+from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator

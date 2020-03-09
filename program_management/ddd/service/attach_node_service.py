@@ -27,7 +27,7 @@ from typing import List
 
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
-from program_management.ddd.contrib.validation import BusinessValidationMessage
+from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd.domain.node import factory
 from program_management.ddd.repositories import fetch_tree, save_tree
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
