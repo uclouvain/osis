@@ -127,7 +127,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_with_education_group_year_of_type_group(self):
-        group_education_group_year = EducationGroupYearFactory(
+        group_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year
         )
         group_education_group_year.education_group_type.category = education_group_categories.GROUP
