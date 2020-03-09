@@ -54,10 +54,10 @@ class AttachOptionsValidator(BusinessValidator):
     def get_options_from_finalities(self):
         options_from_finalities = set()
         for finality in self.tree_from_node_to_add.get_all_finalities():
-            options_from_finalities |= finality.get_all_children_as_nodes(filter_types={MiniTrainingType.OPTION})
+            options_from_finalities |= finality.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
         if self.node_to_add.is_finality():
             options_from_finalities |= self.node_to_add.get_all_children_as_nodes(
-                filter_types={MiniTrainingType.OPTION}
+                take_only={MiniTrainingType.OPTION}
             )
         return options_from_finalities
 
@@ -65,7 +65,7 @@ class AttachOptionsValidator(BusinessValidator):
         options_from_finalities = self.get_options_from_finalities()
         if options_from_finalities:
             options_from_2m = self.tree_2m.root_node.get_all_children_as_nodes(
-                filter_types={MiniTrainingType.OPTION},
+                take_only={MiniTrainingType.OPTION},
                 ignore_children_from=set(TrainingType.finality_types_enum())
             )
             missing_options = options_from_finalities - options_from_2m

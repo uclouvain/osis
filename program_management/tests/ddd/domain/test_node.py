@@ -168,17 +168,35 @@ class TestGetAllChildrenAsNode(SimpleTestCase):
         expected_result = {link2.parent, link2.child}
         self.assertEqual(expected_result, result)
 
-    def test_when_ignore_children_from(self):
+    def test_when_kwarg_ignore_children_from_is_set(self):
         link1 = LinkFactory(parent__node_type=TrainingType.BACHELOR, child__node_type=GroupType.MINOR_LIST_CHOICE)
         link1_1 = LinkFactory(parent=link1.parent, child__node_type=GroupType.COMMON_CORE)
         link1_2_1 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.ACCESS_MINOR)
         result = link1.parent.get_all_children_as_nodes(
             ignore_children_from={GroupType.MINOR_LIST_CHOICE}
         )
-        self.assertNotIn(link1.child, result)
         self.assertNotIn(link1_2_1.child, result)
 
         expected_result = {
+            link1.child,
             link1_1.child,
+        }
+        self.assertSetEqual(result, expected_result)
+
+    def test_when_kwarg_take_only_is_set(self):
+        link1 = LinkFactory(
+            parent__node_type=TrainingType.PGRM_MASTER_120,
+            child__node_type=GroupType.OPTION_LIST_CHOICE
+        )
+        link1_1 = LinkFactory(parent=link1.parent, child__node_type=TrainingType.MASTER_MA_120)
+        link1_1_1 = LinkFactory(parent=link1_1.child, child__node_type=MiniTrainingType.OPTION)
+        link1_2_1 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
+        result = link1.parent.get_all_children_as_nodes(
+            take_only={MiniTrainingType.OPTION}
+        )
+
+        expected_result = {
+            link1_1_1.child,
+            link1_2_1.child,
         }
         self.assertSetEqual(result, expected_result)

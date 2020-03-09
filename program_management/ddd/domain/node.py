@@ -100,18 +100,25 @@ class Node:
 
     def get_all_children_as_nodes(
             self,
-            filter_types: Set[EducationGroupTypesEnum] = None,
+            take_only: Set[EducationGroupTypesEnum] = None,
             ignore_children_from: Set[EducationGroupTypesEnum] = None
     ) -> Set['Node']:
+        """
+
+        :param take_only: Result will only contain all children nodes if their type matches with this param
+        :param ignore_children_from: Result will not contain all nodes and their children
+        if their type matches with this param
+        :return: A flat set of all children nodes
+        """
         result = set()
         for link in self.children:
             child = link.child
+            result.add(link.child)
             if ignore_children_from and child.node_type in ignore_children_from:
                 continue
             result |= child.get_all_children_as_nodes()
-            result.add(link.child)
-        if filter_types:
-            return set(n for n in result if n.node_type in filter_types)
+        if take_only:
+            return set(n for n in result if n.node_type in take_only)
         return result
 
     @property
