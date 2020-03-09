@@ -68,7 +68,7 @@ class AuthorizedRelationshipList:
         )
 
     def is_authorized(self, parent_type: EducationGroupTypesEnum, child_type: EducationGroupTypesEnum) -> bool:
-        return parent_type in self.get_authorized_children_types(child_type)
+        return child_type in self.get_authorized_children_types(parent_type)
 
     def get_authorized_children_types(self, parent_type: EducationGroupTypesEnum) -> Set[EducationGroupTypesEnum]:
         return set(

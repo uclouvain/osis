@@ -63,9 +63,13 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
         )
 
     def test_success(self):
-        tree = ProgramTreeFactory(root_node=self.authorized_parent, authorized_relationships=self.authorized_relationships)
-        validator = AttachAuthorizedRelationshipValidator(tree, self.authorized_child, self.authorized_parent)
-        self.assertTrue(validator.is_valid())
+        tree = ProgramTreeFactory(
+            root_node=NodeGroupYearFactory(node_type=TrainingType.BACHELOR),
+            authorized_relationships=self.authorized_relationships
+        )
+        validator = AttachAuthorizedRelationshipValidator(tree, self.authorized_child, tree.root_node)
+        result = validator.is_valid()
+        self.assertTrue(result)
 
     def test_when_relation_is_not_authorized(self):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
