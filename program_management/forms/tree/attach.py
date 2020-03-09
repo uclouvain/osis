@@ -49,6 +49,8 @@ class AttachNodeForm(forms.Form):
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
 
     def __init__(self, to_path: str, node_id: int, node_type: str, **kwargs):
+        # TODO :: validation on to_path (should be required=True)
+        # TODO :: transform 'to_path', 'node_id' and 'node_type' to forms.InputHidden ??
         self.to_path = to_path
         self.node_id = node_id
         self.node_type = node_type
