@@ -1,5 +1,4 @@
 function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs, extra){
-    setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
     let options = {
         'createdRow': function (row, data, dataIndex) {
@@ -45,4 +44,12 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
         }
     };
     return domTable.DataTable($.extend(true, {}, options, extra));
+}
+
+
+function outputAnchorOuterHtml(urlPath, textContent){
+    const anchor = document.createElement("a");
+    anchor.setAttribute("href", urlPath);
+    anchor.textContent = textContent;
+    return anchor.outerHTML;
 }
