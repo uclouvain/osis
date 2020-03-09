@@ -538,6 +538,3 @@ class ModificationPermission(LinkActionPermission):
             self.errors.append(
                 str(_("Cannot perform modification action on root."))
             )
-
-
-
