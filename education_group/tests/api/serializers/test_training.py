@@ -29,7 +29,7 @@ from django.urls import reverse
 
 from base.models.enums import organization_type, education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from reference.tests.factories.domain import DomainFactory
@@ -42,7 +42,7 @@ class TrainingListSerializerTestCase(TestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization__type=organization_type.MAIN
         )
-        cls.training = TrainingFactory(
+        cls.training = EducationGroupYearBachelorFactory(
             acronym='BIR1BA',
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
