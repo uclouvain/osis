@@ -71,17 +71,3 @@ class AuthorizedRelationshipList:
             auth_rel.child_type for auth_rel in self.authorized_relationships
             if auth_rel.parent_type == parent_node.node_type
         )
-
-    def is_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
-        if not self.is_authorized(parent_node, child_node):
-            return False
-        counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
-        current_count = counter[child_node.node_type]
-        return current_count == self._get_authorized_relationship(parent_node, child_node).min_constraint
-
-    def is_maximum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
-        if not self.is_authorized(parent_node, child_node):
-            return False
-        counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
-        current_count = counter[child_node.node_type]
-        return current_count == self._get_authorized_relationship(parent_node, child_node).max_constraint
