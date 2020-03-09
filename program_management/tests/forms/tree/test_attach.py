@@ -60,26 +60,3 @@ class TestAttachNodeForm(SimpleTestCase):
         form_instance = self._get_attach_node_form_instance({'link_type': 'invalid_link_type'})
         self.assertFalse(form_instance.is_valid())
         self.assertTrue(form_instance.errors['link_type'])
-
-    @mock.patch('program_management.ddd.service.attach_node_service.attach_node', return_value=True)
-    def test_ensure_form_save_method_call_attach_node_service(self, mock_attach_node_service):
-        form_instance = self._get_attach_node_form_instance({'is_mandatory': True, 'comment': 'Commentaire'})
-        self.assertTrue(form_instance.is_valid())
-        form_instance.save()
-
-        self.assertTrue(
-            mock_attach_node_service.called,
-            msg="Form must call attach node service because there are validation between two business objects"
-        )
-        mock_attach_node_service.assert_called_with(
-            form_instance.tree,
-            form_instance.node,
-            form_instance.to_path,
-
-            access_condition=False,
-            block='',
-            is_mandatory=True,
-            comment='Commentaire',
-            comment_english='',
-            link_type='',
-        )

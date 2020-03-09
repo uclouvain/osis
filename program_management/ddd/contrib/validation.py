@@ -35,6 +35,9 @@ class BusinessValidationMessage:
     def is_success(self):
         return self.level == MessageLevel.SUCCESS
 
+    def is_warning(self):
+        return self.level == MessageLevel.WARNING
+
     @staticmethod
     def contains_errors(messages: List['BusinessValidationMessage']) -> bool:
         return any(msg.is_error() for msg in messages)

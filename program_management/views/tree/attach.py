@@ -26,6 +26,7 @@
 from typing import List
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -35,7 +36,8 @@ from django.views.generic.base import TemplateView
 
 from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_success_messages, display_error_messages
+from base.views.common import display_warning_messages, display_success_messages, display_error_messages, \
+    display_business_messages
 from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
 from program_management.ddd.contrib.validation import BusinessValidationMessage
@@ -92,8 +94,16 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
             return self.form_invalid(formset)
 
     def form_valid(self, formset):
+        messages = self.__execute_attach_node(formset)
+        self.__clear_cache(messages)
+        display_business_messages(self.request, messages)
+        return redirect(
+            reverse('education_group_read', args=[self.root_id, self.root_id])
+        )
+
+    @transaction.atomic
+    def __execute_attach_node(self, formset) -> List['BusinessValidationMessage']:
         messages = []
-        # FIXME :: transaction.Atomic?
         for form in formset:
             messages += attach_node_service.attach_node(
                 self.root_id,
@@ -102,14 +112,11 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
                 form.to_path,
                 **form.cleaned_data
             )
+        return messages
+
+    def __clear_cache(self, messages):
         if not BusinessValidationMessage.contains_errors(messages):
             ElementCache(self.request.user).clear()
-        # TODO :: create function to display List[BusinessValidationMessage]
-        display_success_messages(self.request, (m for m in messages if m.is_success()))
-        display_error_messages(self.request, (m for m in messages if m.is_error()))
-        return redirect(
-            reverse('education_group_read', args=[self.root_id, self.root_id])
-        )
 
     def form_invalid(self, formset):
         return self.render_to_response(self.get_context_data(formset=formset))

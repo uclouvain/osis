@@ -33,9 +33,16 @@ from django.utils.translation import gettext_lazy as _
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
+from program_management.ddd.contrib.validation import BusinessValidationMessage, MessageLevel
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
+
+
+def form_valid_effect(formset: AttachNodeFormSet):
+    for form in formset:
+        form.cleaned_data = {}
+    return True
 
 
 class TestAttachNodeView(TestCase):
@@ -84,10 +91,6 @@ class TestAttachNodeView(TestCase):
         for method in allowed_method:
             response = getattr(self.client, method)(self.url)
             self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
-    def test_get_method_when_path_parameter_is_not_set(self):
-        response = self.client.get(self.url)
-        self.assertEquals(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_get_method_when_no_data_selected_on_cache(self):
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
@@ -157,9 +160,11 @@ class TestAttachNodeView(TestCase):
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
 
-    @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid', return_value=True)
+    @mock.patch('program_management.ddd.service.attach_node_service.attach_node')
+    @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
     @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
-    def test_post_method_case_formset_valid(self, mock_cache_elems, *mocks_args):
+    def test_post_method_case_formset_valid(self, mock_cache_elems, mock_service):
+        mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
         subgroup_to_attach = GroupFactory(
             academic_year__year=self.tree.root_node.year,
             education_group_type__name=GroupType.SUB_GROUP.name,
@@ -171,6 +176,10 @@ class TestAttachNodeView(TestCase):
         response = self.client.post(self.url + "?to_path=" + to_path)
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
-        self.assertEqual(msgs, [_("The content of %(acronym)s has been updated.") % {
-                "acronym": self.tree.root_node.children[1].child.acronym
-            }])
+        self.assertEqual(msgs, ['Success'])
+
+        self.assertTrue(
+            mock_service.called,
+            msg="View must call attach node service (and not another layer) "
+                "because the 'attach node' action uses multiple domain objects"
+        )
