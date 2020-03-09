@@ -53,14 +53,14 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.node_to_attach = NodeEducationGroupYearFactory()
         self.node_to_attach_type = NodeType.EDUCATION_GROUP
 
-        self._patch_save_tree()
+        self._patch_persist_tree()
         self._patch_load_tree()
         self._patch_load_trees_from_children()
 
-    def _patch_save_tree(self):
-        patcher_save = patch("program_management.ddd.repositories.save_tree.save")
-        self.addCleanup(patcher_save.stop)
-        self.mock_save = patcher_save.start()
+    def _patch_persist_tree(self):
+        patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
+        self.addCleanup(patcher_persist.stop)
+        self.mock_persist = patcher_persist.start()
 
     def _patch_load_tree(self):
         patcher_load = patch("program_management.ddd.repositories.load_tree.load")
@@ -153,7 +153,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             commit=True
         )
         self.assertTrue(self.mock_load_tress_from_children.called)
-        self.assertTrue(self.mock_save.called)
+        self.assertTrue(self.mock_persist.called)
 
     def test_when_commit_is_false(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
@@ -164,7 +164,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.root_path,
             commit=False
         )
-        self.assertFalse(self.mock_save.called)
+        self.assertFalse(self.mock_persist.called)
 
 
 class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin):
