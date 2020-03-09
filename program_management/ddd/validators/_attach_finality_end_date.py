@@ -65,13 +65,6 @@ class AttachFinalityEndDateValidator(BusinessValidator):
                     }
                 )
 
-    def _get_all_finality_nodes(self):  # TODO :: déplacer dans ProgramTree en tant qu'attr ?
-        all_finalities = set()
-        finality_types = set(TrainingType.finality_types_enum())
-        if self.node_to_add.node_type in finality_types:
-            all_finalities.add(self.node_to_add)
-        return all_finalities | self.node_to_add.get_all_children_as_nodes(take_only=finality_types)
-
     def _get_acronyms_where_end_date_gte_root_end_date(self):
         return [
             finality.acronym for finality in self.tree_from_node_to_add.get_all_finalities()
