@@ -29,7 +29,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd.domain.node import factory
-from program_management.ddd.repositories import fetch_tree, save_tree
+from program_management.ddd.repositories import load_tree, save_tree
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
@@ -43,7 +43,7 @@ def attach_node(
         commit=True,
         **link_attributes
 ) -> List[BusinessValidationMessage]:
-    tree = fetch_tree.fetch(root_id)
+    tree = load_tree.load(root_id)
     node_to_attach = factory.get_node(type_node_to_attach, node_id=node_id_to_attach)
     error_messages = __validate_trees_using_node_as_reference_link(tree, node_to_attach, path)
     error_messages += _validate_end_date_and_option_finality(node_to_attach)
@@ -63,7 +63,7 @@ def __validate_trees_using_node_as_reference_link(
 
     error_messages = []
     child_node = tree.get_node(path)
-    trees = fetch_tree.fetch_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
+    trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
     for tree in trees:
         for parent_from_reference_link in tree.get_parents_as_reference_link(child_node):
             validator = AttachAuthorizedRelationshipValidator(tree, node_to_attach, parent_from_reference_link)
@@ -74,11 +74,11 @@ def __validate_trees_using_node_as_reference_link(
 
 def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List[BusinessValidationMessage]:
     error_messages = []
-    tree_from_node_to_attach = fetch_tree.fetch(node_to_attach.node_id)
+    tree_from_node_to_attach = load_tree.load(node_to_attach.node_id)
     finality_ids = [n.node_id for n in tree_from_node_to_attach.get_all_finalities()]
     if node_to_attach.is_finality() or finality_ids:
         trees_2m = [
-            tree for tree in fetch_tree.fetch_trees_from_children(child_branch_ids=finality_ids)
+            tree for tree in load_tree.load_trees_from_children(child_branch_ids=finality_ids)
             if tree.is_master_2m()
         ]
         for tree_2m in trees_2m:

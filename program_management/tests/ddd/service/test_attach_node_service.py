@@ -54,24 +54,24 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.node_to_attach_type = NodeType.EDUCATION_GROUP
 
         self._patch_save_tree()
-        self._patch_fetch_tree()
-        self._patch_fetch_trees_from_children()
+        self._patch_load_tree()
+        self._patch_load_trees_from_children()
 
     def _patch_save_tree(self):
         patcher_save = patch("program_management.ddd.repositories.save_tree.save")
         self.addCleanup(patcher_save.stop)
         self.mock_save = patcher_save.start()
 
-    def _patch_fetch_tree(self):
-        patcher_fetch = patch("program_management.ddd.repositories.fetch_tree.fetch")
-        self.addCleanup(patcher_fetch.stop)
-        self.mock_fetch = patcher_fetch.start()
-        self.mock_fetch.return_value = self.tree
+    def _patch_load_tree(self):
+        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
+        self.addCleanup(patcher_load.stop)
+        self.mock_load = patcher_load.start()
+        self.mock_load.return_value = self.tree
 
-    def _patch_fetch_trees_from_children(self):
-        patcher_fetch = patch("program_management.ddd.repositories.fetch_tree.fetch_trees_from_children")
-        self.addCleanup(patcher_fetch.stop)
-        self.mock_fetch_tress_from_children = patcher_fetch.start()
+    def _patch_load_trees_from_children(self):
+        patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")
+        self.addCleanup(patcher_load.stop)
+        self.mock_load_tress_from_children = patcher_load.start()
 
     @patch.object(program_tree.ProgramTree, 'attach_node')
     def test_when_attach_node_action_is_valid(self, mock_attach_node):
@@ -99,12 +99,12 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_node_used_as_reference_is_not_valid(self, mock_fetch):
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_node_used_as_reference_is_not_valid(self, mock_load):
         link1 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
         link2 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
 
-        mock_fetch.return_value = [
+        mock_load.return_value = [
             ProgramTreeFactory(root_node=link1.parent),
             ProgramTreeFactory(root_node=link2.parent)
         ]
@@ -121,12 +121,12 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertEqual(result[0].message, 'error link reference')
         self.assertEqual(result[0].level, MessageLevel.ERROR)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_node_used_as_reference_is_valid(self, mock_fetch):
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_node_used_as_reference_is_valid(self, mock_load):
         link1 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
         link2 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
 
-        mock_fetch.return_value = [
+        mock_load.return_value = [
             ProgramTreeFactory(root_node=link1.parent),
             ProgramTreeFactory(root_node=link2.parent)
         ]
@@ -152,7 +152,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.root_path,
             commit=True
         )
-        self.assertTrue(self.mock_fetch_tress_from_children.called)
+        self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_save.called)
 
     def test_when_commit_is_false(self):
@@ -175,61 +175,61 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.root_path = str(self.root_node.node_id)
         self.node_to_attach_not_finality = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
 
-        self._patch_fetch_tree()
+        self._patch_load_tree()
 
-    def _patch_fetch_tree(self):
-        patcher_fetch = patch("program_management.ddd.repositories.fetch_tree.fetch")
-        self.addCleanup(patcher_fetch.stop)
-        self.mock_fetch_tree_to_attach = patcher_fetch.start()
-        self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
+    def _patch_load_tree(self):
+        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
+        self.addCleanup(patcher_load.stop)
+        self.mock_load_tree_to_attach = patcher_load.start()
+        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_node_to_attach_is_not_finality(self, mock_fetch_2m_trees):
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
         """Unit test only for performance"""
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
 
         attach_node_service._validate_end_date_and_option_finality(self.node_to_attach_not_finality)
-        self.assertFalse(mock_fetch_2m_trees.called)
+        self.assertFalse(mock_load_2m_trees.called)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_fetch_2m_trees):
-        mock_fetch_2m_trees.return_value = [self.tree_2m]
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
+        mock_load_2m_trees.return_value = [self.tree_2m]
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
+        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
         result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_fetch_2m_trees):
-        mock_fetch_2m_trees.return_value = [self.tree_2m]
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_load_2m_trees):
+        mock_load_2m_trees.return_value = [self.tree_2m]
         not_finality = NodeGroupYearFactory(node_type=TrainingType.AGGREGATION)
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         not_finality.add_child(finality)
-        self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
+        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
         result = attach_node_service._validate_end_date_and_option_finality(not_finality)
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_valid(self, mock_fetch_2m_trees):
-        mock_fetch_2m_trees.return_value = [self.tree_2m]
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees):
+        mock_load_2m_trees.return_value = [self.tree_2m]
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
+        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
 
         result = attach_node_service._validate_end_date_and_option_finality(finality)
         self.assertEqual([], result)
 
-    @patch('program_management.ddd.repositories.fetch_tree.fetch_trees_from_children')
-    def test_when_option_validator_not_valid(self, mock_fetch_2m_trees):
-        mock_fetch_2m_trees.return_value = [self.tree_2m]
+    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
+    def test_when_option_validator_not_valid(self, mock_load_2m_trees):
+        mock_load_2m_trees.return_value = [self.tree_2m]
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_fetch_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
+        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
 
         result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)

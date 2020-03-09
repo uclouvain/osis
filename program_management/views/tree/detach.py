@@ -27,7 +27,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView
 
 from base.views.mixins import AjaxTemplateMixin
-from program_management.ddd.repositories import fetch_tree
+from program_management.ddd.repositories import load_tree
 from program_management.forms.tree.detach import DetachNodeForm
 
 
@@ -38,7 +38,7 @@ class DetachNodeView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
     def get_form_kwargs(self):
         return {
             **super().get_form_kwargs(),
-            'tree': fetch_tree.fetch(self.kwargs['root_id']),
+            'tree': load_tree.load(self.kwargs['root_id']),
         }
 
     def get_initial(self):

@@ -27,8 +27,7 @@ from base.models.authorized_relationship import AuthorizedRelationship as ModelR
     AuthorizedRelationshipObject, AuthorizedRelationshipList
 
 
-# TODO :: rename fetch() -> load()
-def fetch() -> AuthorizedRelationshipList:
+def load() -> AuthorizedRelationshipList:
     authorized_relationships = []
     qs = ModelRelationship.objects.all().values(
         'parent_type__name',

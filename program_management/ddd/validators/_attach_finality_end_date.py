@@ -41,7 +41,7 @@ class AttachFinalityEndDateValidator(BusinessValidator):
 
     def __init__(self, tree_2m: 'ProgramTree', tree_from_node_to_add: 'ProgramTree', *args):
         super(AttachFinalityEndDateValidator, self).__init__()
-        msg = "This validator need the children of the node to add. Please fetch the complete Tree from the Node to Add"
+        msg = "This validator need the children of the node to add. Please load the complete Tree from the Node to Add"
         assert isinstance(tree_from_node_to_add, program_tree.ProgramTree), msg
         if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
             assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"

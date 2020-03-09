@@ -35,31 +35,30 @@ from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
 
 
-# TODO :: rename fetch() -> load()
-def fetch_by_type(type: NodeType, element_id: int) -> node.Node:
+def load_by_type(type: NodeType, element_id: int) -> node.Node:
     if type == NodeType.EDUCATION_GROUP:
-        return fetch_node_education_group_year(element_id)
+        return load_node_education_group_year(element_id)
     elif type == NodeType.LEARNING_UNIT:
-        return fetch_node_learning_unit_year(element_id)
+        return load_node_learning_unit_year(element_id)
 
 
-def fetch_node_education_group_year(node_id: int) -> node.Node:
+def load_node_education_group_year(node_id: int) -> node.Node:
     try:
-        node_data = __fetch_multiple_node_education_group_year([node_id])[0]
+        node_data = __load_multiple_node_education_group_year([node_id])[0]
         return node.factory.get_node(**__convert_string_to_enum(node_data))
     except IndexError:
         raise node.NodeNotFoundException
 
 
-def fetch_node_learning_unit_year(node_id: int) -> node.Node:
+def load_node_learning_unit_year(node_id: int) -> node.Node:
     try:
-        node_data = __fetch_multiple_node_learning_unit_year([node_id])[0]
+        node_data = __load_multiple_node_learning_unit_year([node_id])[0]
         return node.factory.get_node(**__convert_string_to_enum(node_data))
     except IndexError:
         raise node.NodeNotFoundException
 
 
-def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
+def load_multiple(element_ids: List[int]) -> List[node.Node]:
     aggregate_qs = GroupElementYear.objects.filter(pk__in=element_ids)\
         .annotate(
             node_type=Case(
@@ -79,8 +78,8 @@ def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
     union_qs = None
     for result_aggregate in aggregate_qs:
         qs_function = {
-            NodeType.EDUCATION_GROUP.name: __fetch_multiple_node_education_group_year,
-            NodeType.LEARNING_UNIT.name: __fetch_multiple_node_learning_unit_year,
+            NodeType.EDUCATION_GROUP.name: __load_multiple_node_education_group_year,
+            NodeType.LEARNING_UNIT.name: __load_multiple_node_learning_unit_year,
         }[result_aggregate['node_type']]
         qs = qs_function(result_aggregate['node_ids'])
 
@@ -94,12 +93,12 @@ def fetch_multiple(element_ids: List[int]) -> List[node.Node]:
 
 
 def __convert_string_to_enum(node_data: dict) -> dict:
-#     TODO Enum.choices should return tuple((enum, enum.value) for enum in cls) ?
+    # TODO Enum.choices should return tuple((enum, enum.value) for enum in cls) ?
     node_data['type'] = NodeType[node_data['type']]
     return node_data
 
 
-def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
+def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         node_id=F('pk'),
         type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
@@ -112,7 +111,7 @@ def __fetch_multiple_node_education_group_year(node_group_year_ids: List[int]) -
      .values('node_id', 'type', 'year', 'proposal_type', 'acronym', 'title')
 
 
-def __fetch_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
+def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
     return LearningUnitYear.objects.filter(pk__in=node_learning_unit_year_ids).annotate_full_title().annotate(
         node_id=F('pk'),
         type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
