@@ -32,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.views.learning_units.search.common import BORROWED_COURSE, EXTERNAL_SEARCH
+from base.views.learning_units.search.common import SearchTypes
 
 
 class TestSearchBorrowedLearningUnits(TestCase):
@@ -58,10 +58,10 @@ class TestSearchBorrowedLearningUnits(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_get_request(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, data={"acronym": "acronym"})
 
         context = response.context
-        self.assertEqual(context["search_type"], BORROWED_COURSE)
+        self.assertEqual(context["search_type"], SearchTypes.BORROWED_COURSE)
         self.assertTemplateUsed(response, "learning_unit/search/base.html")
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
@@ -89,11 +89,11 @@ class TestSearchExternalLearningUnits(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_get_request(self):
-        response = self.client.get(self.url)
+        response = self.client.get(self.url, data={"acronym": "acronym"})
 
         self.assertTemplateUsed(response, "learning_unit/search/external.html")
         context = response.context
-        self.assertEqual(context["search_type"], EXTERNAL_SEARCH)
+        self.assertEqual(context["search_type"], SearchTypes.EXTERNAL_SEARCH)
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
         self.assertIn(_('No result!'), messages)
