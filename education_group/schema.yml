@@ -728,7 +728,7 @@ components:
             type: integer
         lecturing_volume:
           type: number
-        pratical_exercise_volume:
+        practical_exercise_volume:
           type: number
         access_condition:
           type: boolean
