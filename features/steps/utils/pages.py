@@ -184,6 +184,7 @@ class NewTrainingPage(pypom.Page):
     sigleintitule_abrege = InputField(By.ID, 'id_acronym')
     code = InputField(By.ID, 'id_partial_acronym')
     intitule_en_francais = InputField(By.ID, 'id_title')
+    intitule_en_anglais = InputField(By.ID, 'id_title_english')
     entite_de_gestion = SelectEntityVersionField(By.ID, 'id_management_entity')
     entite_dadministration = SelectEntityVersionField(By.ID, 'id_administration_entity')
     intitule_du_diplome = InputField(By.ID, 'id_diploma_printing_title')

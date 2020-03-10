@@ -34,7 +34,7 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.functionals.factories import LearningUnitBusinessFactory
+from base.tests.functionals.business_lu_factories import LearningUnitBusinessFactory
 
 
 class TestAcademicCalendarForm(TestCase):

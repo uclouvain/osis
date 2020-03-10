@@ -28,10 +28,13 @@ from behave import *
 from behave.runner import Context
 from django.utils.translation import gettext_lazy as _
 
+from base.models.education_group_type import EducationGroupType
 from base.models.entity_version import EntityVersion
+from base.models.enums import education_group_categories
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.tutor import Tutor
+from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from features.pages.learning_unit.pages import SearchLearningUnitPage
 
 use_step_matcher("re")

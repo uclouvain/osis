@@ -53,6 +53,10 @@ class EducationGroupTypeFactory(DjangoModelFactory):
         )
 
 
+class TrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
+    pass
+
+
 class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
     minitraining = True
 

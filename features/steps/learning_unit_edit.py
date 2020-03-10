@@ -143,7 +143,6 @@ def step_impl(context: Context, value: str, field: str):
         raise AttributeError(context.current_page.__class__.__name__ + " has no " + slug_field)
 
 
-
 @step("Encoder année suivante")
 def step_impl(context: Context):
     year = current_academic_year().year + 1

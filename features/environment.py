@@ -29,7 +29,8 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
 from assessments.tests.functionals.factories import ScoreEncodingFactory
-from base.tests.functionals.factories import LearningUnitBusinessFactory
+from base.tests.functionals.business_lu_factories import LearningUnitBusinessFactory
+from base.tests.functionals.business_offer_factories import OfferBusinessFactory
 
 
 def before_all(context):
@@ -56,6 +57,7 @@ def before_all(context):
     context.browser.set_window_size(*screen_size)
     ScoreEncodingFactory()
     context.setup_data = LearningUnitBusinessFactory()
+    OfferBusinessFactory()
 
 
 def before_scenario(context, scenario):

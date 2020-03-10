@@ -77,7 +77,9 @@ class BusinessFacultyManagerFactory(FacultyManagerFactory):
             'can_create_learningunit',
             'can_edit_learning_unit_proposal',
             'can_propose_learningunit',
-            'can_consolidate_learningunit_proposal'
+            'can_consolidate_learningunit_proposal',
+            'can_access_education_group',
+            'add_educationgroup',
         )
         factory_parameters = {
             "user__username": "faculty_manager",
@@ -105,7 +107,9 @@ class BusinessCentralManagerFactory(CentralManagerFactory):
             'can_create_learningunit',
             'can_edit_learning_unit_proposal',
             'can_propose_learningunit',
-            'can_consolidate_learningunit_proposal'
+            'can_consolidate_learningunit_proposal',
+            'can_access_education_group',
+            'add_educationgroup'
         )
         factory_parameters = {
             "user__username": "central_manager",
@@ -180,13 +184,13 @@ class BusinessLearningFactory:
         self.learning_units += BusinessLearningUnitFactory.create_batch(
             len(faculties),
             start_year__year=2015,
-            create_learning_unit_years__learning_container_year__requirement_entity=factory.Iterator(faculties, getter=lambda ev: ev.entity)
+            learningunityears__learning_container_year__requirement_entity=factory.Iterator(faculties, getter=lambda ev: ev.entity)
         )
 
 
 class BusinessLearningUnitFactory(LearningUnitFactory):
     @factory.post_generation
-    def create_learning_unit_years(obj, create, extracted, **kwargs):
+    def learningunityears(obj, create, extracted, **kwargs):
         starting_learning_unit_year = BusinessLearningUnitYearFactory(
             academic_year=obj.start_year,
             **kwargs

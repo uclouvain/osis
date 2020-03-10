@@ -21,13 +21,24 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
 from behave import *
+from behave.runner import Context
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from waffle.models import Flag
 
+from base.models.entity_version import EntityVersion
+from base.models.enums.entity_type import FACULTY
+from base.tests.factories.education_group_year import string_generator
 from features.steps.utils.pages import SearchEducationGroupPage
 
 use_step_matcher("parse")
+
+
+@step("les flags d'éditions des offres sont désactivés.")
+def step_impl(context: Context):
+    Flag.objects.update_or_create(name='education_group_create', defaults={"authenticated": True})
 
 
 @given("Aller sur la page Catalogue de formations / Formation")
@@ -84,6 +95,12 @@ def step_impl(context, acronym, start_year, end_year):
         context.test.assertIn(string_to_check, context.current_page.success_messages.text)
 
 
+@then("Vérifier que la formation {acronym} à bien été créée")
+def step_impl(context, acronym):
+    string_to_check = "créée avec succès"
+    context.test.assertIn(string_to_check, context.current_page.success_messages.text)
+
+
 @step("Cliquer sur « Nouvelle Mini-Formation »")
 def step_impl(context):
     """
@@ -113,3 +130,32 @@ def step_impl(context, code, children):
     children_in_tree = context.current_page.get_name_first_children()
     for i, child in enumerate(expected_children):
         context.test.assertIn(child, children_in_tree[i])
+
+
+@step("Encoder Entité de gestion")
+def step_impl(context: Context):
+    ev = EntityVersion.objects.get(entity__personentity__person=context.user.person)
+    entities_version = [ev] + list(ev.descendants)
+    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
+    random_entity_version = random.choice(faculties)
+    context.current_page.entite_de_gestion = random_entity_version.acronym
+
+
+@step("Encoder Entité d’administration")
+def step_impl(context: Context):
+    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
+    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
+    random_entity_version = random.choice(faculties)
+    context.current_page.entite_dadministration = random_entity_version.acronym
+
+
+@step("Encoder intitulé français")
+def step_impl(context: Context):
+    title = string_generator()
+    context.current_page.intitule_en_francais = title
+
+
+@step("Encoder intitulé anglais")
+def step_impl(context: Context):
+    title = string_generator()
+    context.current_page.intitule_en_anglais = title
