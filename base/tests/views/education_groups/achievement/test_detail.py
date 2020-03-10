@@ -32,7 +32,7 @@ from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from base.views.education_groups.detail import EducationGroupGenericDetailView
@@ -48,7 +48,7 @@ class TestEducationGroupSkillsAchievements(TestCase):
             return_value=True
         )
 
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.education_group_year = EducationGroupYearBachelorFactory(
             academic_year=AcademicYearFactory(current=True)
         )
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
