@@ -290,6 +290,78 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - groups
+  /mini_trainings/:
+    get:
+      description: Return a list of all the mini_trainings with optional filtering.
+      operationId: minitrainings_list
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: acronym
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: code
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: title
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: from_year
+          schema:
+            description: From which mini-training year we want to display
+            type: integer
+        - in: query
+          name: to_year
+          schema:
+            description: To which mini-training year we want to display
+            type: integer
+        - in: query
+          name: education_group_type
+          schema:
+              description: Filter result by specified mini-training types
+              type: array
+              items:
+                type: string
+          style: form
+          explode: true
+        - in: query
+          name: ordering
+          schema:
+            description: Which field to use when ordering the results.
+            type: string
+        - in: query
+          name: search
+          schema:
+            description: A search term.
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfMiniTraining'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - mini_trainings
   /mini_trainings/{year}/{partial_acronym}:
     get:
       description: Return the detail of the mini-training
@@ -620,7 +692,11 @@ components:
           type: string
         campus:
           $ref: '#/components/schemas/Campus'
-    MiniTrainingDetailed:
+    ArrayOfMiniTraining:
+      type: array
+      items:
+        $ref: '#/components/schemas/MiniTraining'
+    MiniTraining:
       type: object
       properties:
         url:
@@ -640,33 +716,38 @@ components:
           type: string
         title:
           type: string
-        credits:
-          type: integer
-          minimum: 1
-        min_constraint:
-          type: integer
-          minimum: 1
-        max_constraint:
-          type: integer
-          minimum: 1
-        constraint_type:
-          $ref: '#/components/schemas/ConstraintTypeEnum'
-        constraint_type_text:
-          type: string
-        remark:
-          type: string
-        campus:
-          $ref: '#/components/schemas/Campus'
-        keywords:
-          type: string
-        active:
-          $ref: '#/components/schemas/ActiveEnum'
-        active_text:
-          type: string
-        schedule_type:
-          $ref: '#/components/schemas/ScheduleTypeEnum'
-        schedule_type_text:
-          type: string
+    MiniTrainingDetailed:
+      allOf:
+        - $ref: '#/components/schemas/MiniTraining'
+        - type: object
+          properties:
+            credits:
+              type: integer
+              minimum: 1
+            min_constraint:
+              type: integer
+              minimum: 1
+            max_constraint:
+              type: integer
+              minimum: 1
+            constraint_type:
+              $ref: '#/components/schemas/ConstraintTypeEnum'
+            constraint_type_text:
+              type: string
+            remark:
+              type: string
+            campus:
+              $ref: '#/components/schemas/Campus'
+            keywords:
+              type: string
+            active:
+              $ref: '#/components/schemas/ActiveEnum'
+            active_text:
+              type: string
+            schedule_type:
+              $ref: '#/components/schemas/ScheduleTypeEnum'
+            schedule_type_text:
+              type: string
     Tree:
       type: object
       properties:
@@ -748,7 +829,7 @@ components:
         max_constraint:
           type: integer
           minimum: 1
-        contraint_type:
+        constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         children:
           type: array
