@@ -67,7 +67,7 @@ class TrainingListSerializerTestCase(TestCase):
             'administration_entity',
             'management_entity',
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertListEqual(list(self.serializer.data), expected_fields)
 
     def test_ensure_academic_year_field_is_slugified(self):
         self.assertEqual(
