@@ -33,6 +33,7 @@ from base.business.education_groups import perms as education_group_perms
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion, \
     get_entity_version_parent_or_itself_from_type, get_structure_of_entity_version
+from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
 from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION
 from base.models.enums.link_type import LinkTypes
@@ -328,6 +329,27 @@ class EducationGroupHierarchy:
             block = str(group_element_year_block)[-1:]
             if int(block) > self.max_block:
                 self.max_block = int(block)
+
+    def get_main_parent(self, edg_id: int):
+        for gey in self.cache_hierarchy.get(edg_id, list()):
+            if gey.parent:
+                if gey.parent.education_group_type.category in [education_group_categories.TRAINING,
+                                                                education_group_categories.MINI_TRAINING] or \
+                        gey.parent and gey.parent.education_group_type.name == GroupType.COMPLEMENTARY_MODULE.name:
+                    return gey.parent
+                else:
+                    return self.get_main_parent(self._get_parent_in_hierarchy(gey))
+            else:
+                continue
+        return None
+
+    def _get_parent_in_hierarchy(self, gey):
+        parent_in_tree = None
+        for parent in gey.parent.direct_parents_of_branch:
+            if self.cache_hierarchy.get(parent.id):
+                parent_in_tree = parent.id
+                break
+        return parent_in_tree
 
 
 class NodeLeafJsTree(EducationGroupHierarchy):
