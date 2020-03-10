@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,34 +22,16 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from enum import Enum
+############################################################################
+from django.db.models import F
 
 
-class ChoiceEnum(Enum):
-    @classmethod
-    def choices(cls):
-        return tuple((x.name, x.value) for x in cls)
+def convert_order_by_strings_to_expressions(order_by):
+    def _convert_field_to_expression(field):
+        reverse_order_character = "-"
+        expression = F(field.strip(reverse_order_character))
+        if field.startswith("-"):
+            expression = expression.desc()
+        return expression
 
-    @classmethod
-    def get_value(cls, key):
-        return getattr(cls, key, key).value if hasattr(cls, key) else key
-
-    @classmethod
-    def get_names(cls):
-        return [x.name for x in cls]
-
-
-def get_verbose_field_value(instance, key):
-    if hasattr(instance, "get_" + key + "_display"):
-        value = getattr(instance, "get_" + key + "_display")()
-    else:
-        value = getattr(instance, key, "")
-    return value
-
-
-def filter_with_list_or_object(fk_name, model, **kwargs):
-    return model.objects.all().filter(**{
-        fk_name + ('__in' if isinstance(kwargs[fk_name], list) else ''):
-            kwargs[fk_name]
-    })
+    return tuple(_convert_field_to_expression(field) for field in order_by)
