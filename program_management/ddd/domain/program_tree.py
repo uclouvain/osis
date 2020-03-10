@@ -39,7 +39,6 @@ class ProgramTree:
     root_node = None
     authorized_relationships = None
 
-    # TODO :: load authorized_relationship into the __init__ ? (not use it as kwarg?)
     def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
         self.root_node = root_node
         self.authorized_relationships = authorized_relationships

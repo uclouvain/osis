@@ -45,7 +45,7 @@ class TestDetachNodeView(TestCase):
         self.url = reverse("tree_detach_node", kwargs={'root_id': self.tree.root_node.pk})
         self.client.force_login(self.person.user)
 
-        fetch_tree_patcher = mock.patch('program_management.ddd.repositories.fetch_tree.fetch', return_value=self.tree)
+        fetch_tree_patcher = mock.patch('program_management.ddd.repositories.load_tree.load', return_value=self.tree)
         fetch_tree_patcher.start()
         self.addCleanup(fetch_tree_patcher.stop)
 

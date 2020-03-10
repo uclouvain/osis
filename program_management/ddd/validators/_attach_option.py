@@ -32,7 +32,6 @@ from program_management.ddd.domain import program_tree
 from base.ddd.utils.business_validator import BusinessValidator
 
 
-# TODO :: get a common mixin (merge with AttachFinalityEndDateValidator ?)
 # Implmented from _check_attach_options_rules
 class AttachOptionsValidator(BusinessValidator):
     """
