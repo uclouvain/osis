@@ -599,193 +599,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
-    def test_learning_unit_read(self):
-        learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=learning_container_year,
-                                                     subtype=learning_unit_year_subtypes.FULL)
-
-        header = {'HTTP_REFERER': SEARCH_URL_PART}
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]), **header)
-
-        self.assertTemplateUsed(response, 'learning_unit/identification.html')
-        self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
-        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
-
-    def test_learning_unit_read_versions(self):
-        learning_unit_year = LearningUnitYearFullFactory(
-            academic_year=self.current_academic_year,
-        )
-        LearningComponentYearFactory(learning_unit_year=learning_unit_year)
-
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
-        self.assertEqual(len(response.context['versions']), 0)
-
-        with reversion.create_revision():
-            learning_unit_year.learning_container_year.save()
-
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
-        self.assertEqual(len(response.context['versions']), 1)
-
-        with reversion.create_revision():
-            learning_unit_year.learningcomponentyear_set.first().save()
-
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
-        self.assertEqual(len(response.context['versions']), 2)
-
-    def test_external_learning_unit_read(self):
-        external_learning_unit_year = ExternalLearningUnitYearFactory(
-            learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
-        )
-        learning_unit_year = external_learning_unit_year.learning_unit_year
-
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
-
-        self.assertTemplateUsed(response, 'learning_unit/identification.html')
-        self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
-
-    def test_external_learning_unit_read_permission_denied(self):
-        learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=learning_container_year,
-                                                     subtype=learning_unit_year_subtypes.FULL)
-        external_learning_unit_year = ExternalLearningUnitYearFactory(learning_unit_year=learning_unit_year)
-        learning_unit_year = external_learning_unit_year.learning_unit_year
-
-        a_user_without_perms = PersonFactory().user
-        client = Client()
-        client.force_login(a_user_without_perms)
-
-        response = client.get(reverse("learning_unit", args=[learning_unit_year.id]))
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
-
-        a_user_without_perms.user_permissions.add(
-            Permission.objects.get(codename='can_access_externallearningunityear'))
-
-        response = client.get(reverse("learning_unit", args=[learning_unit_year.id]))
-        self.assertEqual(response.status_code, 200)
-
-    def test_warnings_learning_unit_read(self):
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
-            container_type=learning_container_year_types.INTERNSHIP,
-            requirement_entity=EntityVersionFactory().entity,
-            allocation_entity=EntityVersionFactory().entity,
-            additional_entity_1=EntityVersionFactory().entity,
-            additional_entity_2=EntityVersionFactory().entity,
-        )
-        LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                learning_container_year=learning_container_year,
-                                internship_subtype=internship_subtypes.TEACHING_INTERNSHIP,
-                                subtype=learning_unit_year_subtypes.FULL,
-                                periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
-                                status=False)
-        partim_without_internship = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                            learning_container_year=learning_container_year,
-                                                            internship_subtype=None,
-                                                            subtype=learning_unit_year_subtypes.PARTIM,
-                                                            periodicity=learning_unit_year_periodicity.ANNUAL,
-                                                            status=True)
-
-        response = self.client.get(reverse('learning_unit', args=[partim_without_internship.pk]))
-
-        self.assertTemplateUsed(response, 'learning_unit/identification.html')
-        self.assertEqual(len(response.context['warnings']), 3)
-
-    def test_learning_unit_with_faculty_manager_when_can_edit_end_date(self):
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
-            container_type=learning_container_year_types.OTHER_COLLECTIVE,
-            requirement_entity=EntityFactory(),
-        )
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=learning_container_year,
-                                                     subtype=learning_unit_year_subtypes.FULL)
-        EntityVersionFactory(entity=learning_container_year.requirement_entity)
-
-        learning_unit_year.learning_unit.end_year = None
-        learning_unit_year.learning_unit.save()
-        ue_manager = UEFacultyManagerFactory(
-            'can_edit_learningunit',
-            'can_access_learningunit',
-            'can_edit_learningunit_date'
-        )
-        managers = [
-            FacultyManagerFactory('can_edit_learningunit', 'can_access_learningunit', 'can_edit_learningunit_date'),
-            ue_manager
-        ]
-
-        for manager in managers:
-            PersonEntityFactory(
-                entity=learning_container_year.requirement_entity,
-                person=manager
-            )
-            url = reverse("learning_unit", args=[learning_unit_year.id])
-            self.client.force_login(manager.user)
-
-            response = self.client.get(url)
-            self.assertEqual(response.context["can_edit_date"], True)
-
-    def test_learning_unit_of_type_partim_with_faculty_manager(self):
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
-            container_type=learning_container_year_types.COURSE,
-            requirement_entity=EntityFactory(),
-        )
-        LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                learning_container_year=learning_container_year,
-                                subtype=learning_unit_year_subtypes.FULL)
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=learning_container_year,
-                                                     subtype=learning_unit_year_subtypes.PARTIM)
-        EntityVersionFactory(entity=learning_container_year.requirement_entity)
-        learning_unit_year.learning_unit.end_year = None
-        learning_unit_year.learning_unit.save()
-        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
-        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
-        managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
-            ue_manager
-        ]
-        for manager in managers:
-            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
-            manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
-            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
-            url = reverse("learning_unit", args=[learning_unit_year.id])
-            self.client.force_login(manager.user)
-
-            response = self.client.get(url)
-            self.assertEqual(response.context["can_edit_date"], True)
-
-    def test_learning_unit_with_faculty_manager_when_cannot_edit_end_date(self):
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
-            container_type=learning_container_year_types.COURSE,
-            requirement_entity=EntityFactory(),
-        )
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=learning_container_year,
-                                                     subtype=learning_unit_year_subtypes.FULL)
-        EntityVersionFactory(entity=learning_container_year.requirement_entity)
-        learning_unit_year.learning_unit.end_year = None
-        learning_unit_year.learning_unit.save()
-        managers = [
-            FacultyManagerFactory('can_access_learningunit'),
-        ]
-        for manager in managers:
-            PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
-            url = reverse("learning_unit", args=[learning_unit_year.id])
-            self.client.force_login(manager.user)
-
-            response = self.client.get(url)
-            self.assertEqual(response.context["can_edit_date"], False)
-
-    def test_get_components_no_learning_container_yr(self):
-        luy_without_components = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        components_dict = learning_unit_business.get_same_container_year_components(luy_without_components)
-        self.assertEqual(len(components_dict.get('components')), 0)
-
     def test_get_components_with_classes(self):
         l_container = LearningContainerFactory()
         l_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year,
@@ -799,40 +612,6 @@ class LearningUnitViewTestCase(TestCase):
         components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
         self.assertEqual(len(components_dict.get('components')), 1)
         self.assertEqual(len(components_dict.get('components')[0]['learning_component_year'].classes), 2)
-
-    def test_get_partims_identification_tabs(self):
-        learning_unit_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year
-        )
-        learning_unit_year = LearningUnitYearFactory(
-            acronym="LCHIM1210",
-            learning_container_year=learning_unit_container_year,
-            subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.current_academic_year
-        )
-        LearningUnitYearFactory(
-            acronym="LCHIM1210A",
-            learning_container_year=learning_unit_container_year,
-            subtype=learning_unit_year_subtypes.PARTIM,
-            academic_year=self.current_academic_year
-        )
-        LearningUnitYearFactory(
-            acronym="LCHIM1210B",
-            learning_container_year=learning_unit_container_year,
-            subtype=learning_unit_year_subtypes.PARTIM,
-            academic_year=self.current_academic_year
-        )
-        LearningUnitYearFactory(
-            acronym="LCHIM1210F",
-            learning_container_year=learning_unit_container_year,
-            subtype=learning_unit_year_subtypes.PARTIM,
-            academic_year=self.current_academic_year
-        )
-
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
-
-        self.assertTemplateUsed(response, 'learning_unit/identification.html')
-        self.assertEqual(len(response.context['learning_container_year_partims']), 3)
 
     def test_learning_unit_formation(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -1116,17 +895,43 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
-    def test_learning_unit_specifications_save_with_postponement_and_proposal(self):
+    def test_learning_unit_specifications_save_with_postponement_and_proposal_on_same_year(self):
         year_range = 5
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
         learning_unit_years = self._generate_learning_unit_years(academic_years)
-        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[2])
+        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[0])
         msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
         expected_message = "{}. {}.".format(
             _("The learning unit has been updated"),
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_specifications_save_with_postponement_and_proposal_on_future_year(self):
+        year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_years = self._generate_learning_unit_years(academic_years)
+        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[1])
+        msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
+        expected_message = _("The learning unit has been updated (the report has not been done from %(year)s because "
+                             "the learning unit is in proposal).") % {
+            'year': proposal.learning_unit_year.academic_year
+        }
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_specifications_save_without_postponement_and_proposal_on_future_year(self):
+        year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_years = self._generate_learning_unit_years(academic_years)
+        ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[1])
+        msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years, postpone=False)
+        expected_message = "{} ({}).".format(
+            _("The learning unit has been updated"),
+            _("without postponement")
         )
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
@@ -1141,7 +946,7 @@ class LearningUnitViewTestCase(TestCase):
         ) for ac in academic_years]
         return learning_unit_years
 
-    def _test_learning_unit_specifications_save_with_postponement(self, learning_unit_years):
+    def _test_learning_unit_specifications_save_with_postponement(self, learning_unit_years, postpone=True):
         # delete last learning unit year to ensure luy is not created
         learning_unit_years.pop().delete()
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
@@ -1164,16 +969,17 @@ class LearningUnitViewTestCase(TestCase):
             data={
                 'trans_text_fr': 'textFR',
                 'trans_text_en': 'textEN',
-                'postpone': 1,
+                'postpone': 1 if postpone else 0,
                 'cms_fr_id': trans_fr_be[0].id,
                 'cms_en_id': trans_en[0].id,
             }
         )
         self.assertEqual(response.status_code, 200)
-        for translated_text in TranslatedText.objects.filter(language='fr-be'):
-            self.assertEqual(translated_text.text, 'textFR')
-        for translated_text in TranslatedText.objects.filter(language='en'):
-            self.assertEqual(translated_text.text, 'textEN')
+        if postpone:
+            for translated_text in TranslatedText.objects.filter(language='fr-be'):
+                self.assertEqual(translated_text.text, 'textFR')
+            for translated_text in TranslatedText.objects.filter(language='en'):
+                self.assertEqual(translated_text.text, 'textEN')
         msg = get_messages_from_response(response)
         return msg
 

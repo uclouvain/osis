@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -135,6 +136,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context["versions"] = self.get_versions()
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
         context["tab_active"] = "learning_unit"  # Corresponds to url_name
+
         return context
 
     def get_context_permission(self, proposal):
