@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from behave import *
+from behave.runner import Context
 from selenium.webdriver.common.by import By
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
@@ -65,12 +66,23 @@ def step_impl(context, acronym):
     context.current_page = context.current_page.first_row.click()
 
 
+@step("Cliquer sur le premier sigle dans la liste de résultats")
+def step_impl(context: Context):
+    context.offer_to_delete = context.current_page.first_row.text
+    context.current_page = context.current_page.first_row.click()
+
+
 @step("Cliquer sur « Supprimer »")
 def step_impl(context):
     """
     :type context: behave.runner.Context
     """
     context.current_page.delete.click()
+
+
+@then("Vérifier que l'offre n'apparaît plus dans la liste")
+def step_impl(context: Context):
+    context.test.assertNotEqual(context.current_page.first_row.text, context.offer_to_delete)
 
 
 @then("Vérifier que la liste est vide.")

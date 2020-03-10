@@ -80,6 +80,7 @@ class BusinessFacultyManagerFactory(FacultyManagerFactory):
             'can_consolidate_learningunit_proposal',
             'can_access_education_group',
             'add_educationgroup',
+            'delete_educationgroup',
         )
         factory_parameters = {
             "user__username": "faculty_manager",
@@ -109,7 +110,8 @@ class BusinessCentralManagerFactory(CentralManagerFactory):
             'can_propose_learningunit',
             'can_consolidate_learningunit_proposal',
             'can_access_education_group',
-            'add_educationgroup'
+            'add_educationgroup',
+            'delete_educationgroup',
         )
         factory_parameters = {
             "user__username": "central_manager",

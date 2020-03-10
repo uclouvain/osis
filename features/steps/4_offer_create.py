@@ -39,6 +39,7 @@ use_step_matcher("parse")
 @step("les flags d'éditions des offres sont désactivés.")
 def step_impl(context: Context):
     Flag.objects.update_or_create(name='education_group_create', defaults={"authenticated": True})
+    Flag.objects.update_or_create(name='education_group_delete', defaults={"authenticated": True})
 
 
 @given("Aller sur la page Catalogue de formations / Formation")
