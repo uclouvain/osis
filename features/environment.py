@@ -23,14 +23,14 @@
 # ############################################################################
 import tempfile
 
+from behave.runner import Context
 from django.conf import settings
 from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
-from features.factories.score_encoding import ScoreEncodingFactory
-from features.factories.learning_unit import LearningUnitBusinessFactory
-from features.factories.education_group import OfferBusinessFactory
+from features import factories as functional_factories
+from features.factories import users, score_encoding, learning_unit, education_group, organization, academic_year, reference
 
 
 def before_all(context):
@@ -55,9 +55,20 @@ def before_all(context):
 
     screen_size = (settings.SELENIUM_SETTINGS['SCREEN_WIDTH'], settings.SELENIUM_SETTINGS['SCREEN_HIGH'])
     context.browser.set_window_size(*screen_size)
-    ScoreEncodingFactory()
-    context.setup_data = LearningUnitBusinessFactory()
-    OfferBusinessFactory()
+    setup_data(context)
+
+
+def setup_data(context: Context):
+    context.current_academic_year = functional_factories.academic_year.BusinessAcademicYearFactory().current_academic_year
+    functional_factories.reference.BusinessLanguageFactory()
+    functional_factories.organization.BusinessEntityVersionTreeFactory()
+    functional_factories.organization.BusinessCampusFactory()
+    functional_factories.users.BusinessUsersFactory()
+    functional_factories.score_encoding.ScoreEncodingFactory()
+    context.setup_data = functional_factories.learning_unit.LearningUnitBusinessFactory()
+    functional_factories.education_group.OfferBusinessFactory()
+
+    return context
 
 
 def before_scenario(context, scenario):

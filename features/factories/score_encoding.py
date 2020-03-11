@@ -14,14 +14,10 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.student import StudentFactory
-from base.tests.factories.user import SuperUserFactory
 
 
 class ScoreEncodingFactory:
     def __init__(self):
-        self.superuser = SuperUserFactory()
-        self.academic_years = AcademicYearFactory.produce(number_past=6, number_future=6)
-
         self.students = StudentFactory.create_batch(100)
 
         self.offers = OfferYearFactory.create_batch(5, academic_year__current=True)

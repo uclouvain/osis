@@ -67,7 +67,7 @@ def step_impl(context: Context):
 @step("Encoder année de fin")
 def step_impl(context: Context):
     end_year_chosen = AcademicYear.objects.filter(
-        year__gt=context.setup_data.current_academic_year.year
+        year__gt=context.current_academic_year.year
     ).order_by('?').first()
     context.current_page.fin = str(end_year_chosen)
     context.end_year_chosen = str(end_year_chosen)
