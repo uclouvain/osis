@@ -211,3 +211,23 @@ class TestGetParents(SimpleTestCase):
         LinkFactory(parent=self.link_with_child.child, child=self.link_with_root.parent)
         with self.assertRaises(RecursionError):
             self.tree.get_parents(self.path)
+
+
+class TestGetAllNodes(SimpleTestCase):
+
+    def test_when_tree_has_not_children(self):
+        tree = ProgramTreeFactory()
+        self.assertSetEqual(tree.get_all_nodes(), {tree.root_node}, 'All nodes must include the root node')
+
+    def test_when_tree_has_nodes_in_multiple_levels(self):
+        link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
+        link_with_child = LinkFactory(
+            parent=link_with_root.child,
+            child__title='child__child__ROOT',
+        )
+        tree = ProgramTreeFactory(root_node=link_with_root.parent)
+        result = tree.get_all_nodes()
+        self.assertSetEqual(
+            result,
+            {link_with_root.parent, link_with_root.child, link_with_child.child}
+        )

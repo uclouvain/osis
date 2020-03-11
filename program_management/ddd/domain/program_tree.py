@@ -82,10 +82,9 @@ class ProgramTree:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
-    # TODO :: unit test (set and not list)
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
-        Return a flat list of all nodes which are in the tree
+        Return a flat set of all nodes present in the tree
         :return: list of Node
         """
         all_nodes = set([self.root_node] + _nodes_from_root(self.root_node))
