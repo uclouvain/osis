@@ -127,12 +127,19 @@ class CkeditorField(Field):
 
 
 class SelectField(Field):
+    def __get__(self, instance, owner):
+        obj = super().__get__(instance, owner)
+        return Select(self.element)
+
     def __set__(self, obj, value):
         element = Select(obj.find_element(*self.locator))
         try:
             element.select_by_value(str(value))
         except NoSuchElementException:
             element.select_by_visible_text(value)
+
+    def options(self):
+        return Select(self.element).options()
 
     @property
     def text(self):

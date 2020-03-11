@@ -117,7 +117,7 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
         '#identification > div > div > div.row > div.col-md-5 > div:nth-child(1) > div > dl:nth-child(2) > dd'
     )
     actions = ButtonField(By.ID, 'dLabel')
-
+    end_year = Field(By.ID, "end_year")
     modify = Link('UpdateTrainingPage', By.CSS_SELECTOR, '#link_update > a', 1)
     delete = ButtonField(By.CSS_SELECTOR, '#link_delete > a', 1)
     select_first = ButtonField(By.CSS_SELECTOR, "#select_li > a", 1)
@@ -194,7 +194,7 @@ class NewTrainingPage(pypom.Page):
 
 
 class UpdateTrainingPage(NewTrainingPage):
-    fin = InputField(By.ID, 'id_end_year')
+    fin = SelectField(By.ID, 'id_end_year')
 
 
 class SearchEducationGroupPage(CommonPageMixin, pypom.Page):

@@ -57,7 +57,7 @@ from testing.providers import LANGUAGES
 class LearningUnitBusinessFactory:
     def __init__(self):
         SuperUserFactory()
-        BusinessAcademicYearFactory()
+        self.current_academic_year = BusinessAcademicYearFactory().current_academic_year
         BusinessLanguageFactory()
         BusinessEntityVersionTreeFactory()
         BusinessCampusFactory()
@@ -81,6 +81,7 @@ class BusinessFacultyManagerFactory(FacultyManagerFactory):
             'can_access_education_group',
             'add_educationgroup',
             'delete_educationgroup',
+            'change_educationgroup',
         )
         factory_parameters = {
             "user__username": "faculty_manager",
@@ -112,6 +113,7 @@ class BusinessCentralManagerFactory(CentralManagerFactory):
             'can_access_education_group',
             'add_educationgroup',
             'delete_educationgroup',
+            'change_educationgroup',
         )
         factory_parameters = {
             "user__username": "central_manager",
@@ -133,6 +135,7 @@ class BusinessCentralManagerFactory(CentralManagerFactory):
 class BusinessAcademicYearFactory:
     def __init__(self):
         self.academic_years = AcademicYearFactory.produce(number_past=10, number_future=10)
+        self.current_academic_year = self.academic_years[10]
 
 
 class BusinessLanguageFactory:

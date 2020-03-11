@@ -6,7 +6,7 @@ Feature: Création d'offre
     And L'utilisateur est loggé en tant que gestionnaire central
 
     # TODO vérification au niveau de l'arbre. Ajout de authorized relationship
-  Scenario Outline: 29 : En tant que gestionnaire central, je dois pouvoir créer une offre de type « formation ».
+  Scenario Outline: En tant que gestionnaire central, je dois pouvoir créer une offre de type « formation ».
   Description :
   « Master 120 à finalité spécialisée »
   DROI2MS/TT LDROI200S DRT DRT
@@ -38,7 +38,7 @@ Feature: Création d'offre
       | DROI2MS/TT | LDROI200S | Master en 120 crédits à finalité spécialisée | Diplome en droit    |
       | CUIS2FC    | LCUIS100Q | Certificat d’université 2ème cycle           | Diplome en cuisine  |
 
-  Scenario: 30 : En tant que gestionnaire central, je dois pouvoir créer une offre de type « mini- formation ».
+  Scenario: En tant que gestionnaire central, je dois pouvoir créer une offre de type « mini- formation ».
   OPTIONENTF LSIPS100O CAMG CAMG
     Given Aller sur la page Catalogue de formations / Formation
     When Cliquer sur le menu « Actions »

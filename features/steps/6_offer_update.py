@@ -21,11 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
+
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
 
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from features.steps.utils.pages import EducationGroupPage
 
 use_step_matcher("parse")
@@ -38,6 +42,35 @@ def step_impl(context: Context, acronym: str, year: str):
 
     context.current_page = EducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
     context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@given("Aller sur la page de detail d'une formation en année académique courante")
+def step_impl(context: Context):
+    egy = EducationGroupYear.objects.filter(
+        academic_year=context.setup_data.current_academic_year,
+        education_group_type__category=education_group_categories.TRAINING
+    ).order_by('?').first()
+    url = reverse('education_group_read', args=[egy.pk, egy.pk])
+
+    context.egy_modified = egy
+
+    context.current_page = EducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
+    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@then("Vérifier que la dernière année d'organisation de la formation a été mis à jour")
+def step_impl(context: Context):
+    end_year_displayed = context.current_page.end_year.text
+    context.test.assertEqual(context.end_year_chosen, end_year_displayed)
+
+
+@step("Encoder année de fin")
+def step_impl(context: Context):
+    end_year_chosen = AcademicYear.objects.filter(
+        year__gt=context.setup_data.current_academic_year.year
+    ).order_by('?').first()
+    context.current_page.fin = str(end_year_chosen)
+    context.end_year_chosen = str(end_year_chosen)
 
 
 @when("Cliquer sur « Modifier »")

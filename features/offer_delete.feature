@@ -5,7 +5,7 @@ Feature: Suppression d'offre.
     And les flags d'éditions des offres sont désactivés.
     And L'utilisateur est loggé en tant que gestionnaire central
 
-  Scenario: 31 : En tant que gestionnaire central, je dois pouvoir supprimer une offre.
+  Scenario: En tant que gestionnaire central, je dois pouvoir supprimer une offre.
     Given Aller sur la page Catalogue de formations / Formation
     And Réinitialiser les critères de recherche
     And Cliquer sur le bouton Rechercher (Loupe)
