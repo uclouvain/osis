@@ -128,8 +128,16 @@ class TestGetChildrenTypes(SimpleTestCase):
             A 'REFERENCE' link means that we should ignore the child node, 
             and consider the children of the child as there were direct children
         """
-        link0 = LinkFactory(link_type=LinkTypes.REFERENCE)
-        link1 = LinkFactory(parent=link0.child, link_type=None)
+        link0 = LinkFactory(
+            parent__node_type=TrainingType.BACHELOR,
+            child__node_type=GroupType.SUB_GROUP,
+            link_type=LinkTypes.REFERENCE
+        )
+        link1 = LinkFactory(
+            parent=link0.child,
+            child__node_type=GroupType.COMMON_CORE,
+            link_type=None
+        )
         result = link0.parent.get_children_types(include_nodes_used_as_reference=True)
         self.assertListEqual(
             [link1.child.node_type],
