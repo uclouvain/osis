@@ -127,12 +127,12 @@ class ProgramTree:
         parent.detach_child(node_id)
 
 
-def _nodes_from_root(root: 'Node'):  # TODO :: reuse Node.all_children_as_nodes
+def _nodes_from_root(root: 'Node'):
     nodes = [root]
     for link in root.children:
         nodes.extend(_nodes_from_root(link.child))
     return nodes
 
 
-def build_path(*nodes):  # TODO : unit test
+def build_path(*nodes):
     return '{}'.format(PATH_SEPARATOR).join((str(n.node_id) for n in nodes))

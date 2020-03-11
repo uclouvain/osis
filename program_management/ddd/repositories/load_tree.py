@@ -60,7 +60,6 @@ def load_trees_from_children(
         child_leaf_ids: list = None,
         link_type: LinkTypes = None
 ) -> List['ProgramTree']:
-    # FIXME :: simplify the code (child_branch, chlid_leaf, if else)
     if not child_branch_ids and not child_leaf_ids:
         return []
     if child_branch_ids:
