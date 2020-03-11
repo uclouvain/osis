@@ -208,8 +208,6 @@ class GroupElementYearManager(models.Manager):
         else:
             where_statement = where_statement_branch
 
-        # filters_statement = ' AND ' + ' AND '.join(['%s = %s' {}])
-
         reverse_adjacency_query = """
             WITH RECURSIVE
                 reverse_adjacency_query AS (

@@ -65,7 +65,7 @@ def __validate_trees_using_node_as_reference_link(
     child_node = tree.get_node(path)
     trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
     for tree in trees:
-        for parent_from_reference_link in tree.get_parents_as_reference_link(child_node):
+        for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
             validator = AttachAuthorizedRelationshipValidator(tree, node_to_attach, parent_from_reference_link)
             if not validator.is_valid():
                 error_messages += validator.error_messages

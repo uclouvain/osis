@@ -29,12 +29,6 @@ from program_management.ddd.domain.link import Link
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
-# def __generate_authorized_relation(link):
-#     if link.authorized_relation is not None:
-#         return link.authorized_relation
-#     return AuthorizedRelationship()
-
-
 class LinkFactory(factory.Factory):
     class Meta:
         model = Link
@@ -52,5 +46,3 @@ class LinkFactory(factory.Factory):
             self.parent.children = [self]
         else:
             self.parent.children.append(self)
-
-    # authorized_relation = True
