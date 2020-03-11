@@ -30,7 +30,7 @@ from django.urls import reverse
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from features.steps.utils.pages import EducationGroupPage
+from features.pages.education_group.pages import EducationGroupPage
 
 use_step_matcher("parse")
 

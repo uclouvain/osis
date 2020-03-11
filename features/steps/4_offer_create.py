@@ -31,7 +31,7 @@ from waffle.models import Flag
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.tests.factories.education_group_year import string_generator
-from features.steps.utils.pages import SearchEducationGroupPage
+from features.pages.education_group.pages import SearchEducationGroupPage
 
 use_step_matcher("parse")
 

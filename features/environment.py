@@ -28,9 +28,9 @@ from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
-from assessments.tests.functionals.factories import ScoreEncodingFactory
-from base.tests.functionals.business_lu_factories import LearningUnitBusinessFactory
-from base.tests.functionals.business_offer_factories import OfferBusinessFactory
+from features.factories.score_encoding import ScoreEncodingFactory
+from features.factories.learning_unit import LearningUnitBusinessFactory
+from features.factories.education_group import OfferBusinessFactory
 
 
 def before_all(context):

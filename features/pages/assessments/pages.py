@@ -26,7 +26,7 @@
 import pypom
 from selenium.webdriver.common.by import By
 
-from features.steps.utils import fields
+from features.fields import fields
 
 
 class LearningUnitsPage(pypom.Page):

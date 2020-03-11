@@ -27,9 +27,9 @@ import pypom
 from selenium.webdriver.common.by import By
 
 from base.models.entity_version import EntityVersion
-from features.steps.utils.fields import InputField, Link, SelectField, Select2Field, ButtonField, CkeditorField, \
+from features.fields.fields import InputField, Link, SelectField, Select2Field, ButtonField, CkeditorField, \
     RadioField, Field, Checkbox, CharField
-from features.steps.utils.pages import CommonPageMixin
+from features.pages.common import CommonPageMixin
 
 
 class RepartitionPage(pypom.Page):

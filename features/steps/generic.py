@@ -48,7 +48,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory, Lea
 from base.tests.factories.person import FacultyManagerFactory, PersonFactory, CentralManagerFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.functionals.test_education_group import LoginPage
+from features.pages.common import LoginPage
 
 use_step_matcher("parse")
 

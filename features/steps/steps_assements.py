@@ -34,7 +34,7 @@ from features.pages.assessments import pages
 from assessments.views import upload_xls_utils
 from base.models.enums import exam_enrollment_justification_type
 from base.models.program_manager import ProgramManager
-from features.steps.utils.pages import LoginPage
+from features.pages.common import LoginPage
 
 use_step_matcher("parse")
 
