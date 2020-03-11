@@ -57,15 +57,14 @@ class ProgramTree:
                     result.append(link.parent)
         return result
 
-    # TODO :: unit test + RecursionError
     def get_parents(self, path: Path) -> List['Node']:
         result = []
         str_nodes = path.split(PATH_SEPARATOR)
         if len(str_nodes) > 1:
+            str_nodes = str_nodes[:-1]
+            path = '{}'.format(PATH_SEPARATOR).join(str_nodes)
             result.append(self.get_node(path))
-            result += self.get_parents(PATH_SEPARATOR.join(str_nodes[:-1]))
-        else:
-            result.append(self.get_node(str_nodes[0]))
+            result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
     def get_node(self, path: Path) -> 'Node':

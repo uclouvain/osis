@@ -170,3 +170,44 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
             result,
             [self.link_with_ref.parent, another_link_with_ref.parent]
         )
+
+
+class TestGetParents(SimpleTestCase):
+    def setUp(self):
+        self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
+        self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
+
+        self.link_with_child = LinkFactory(
+            parent=self.link_with_root.child,
+            child__title='child__child__ROOT',
+        )
+
+        self.path = '{level1}|{level2}|{level3}'.format(
+            level1=self.link_with_root.parent.node_id,
+            level2=self.link_with_root.child.node_id,
+            level3=self.link_with_child.child.node_id
+        )
+
+    def test_when_child_has_parents_on_2_levels(self):
+        result = self.tree.get_parents(self.path)
+        self.assertListEqual(
+            result,
+            [self.link_with_root.child, self.link_with_root.parent]
+        )
+
+    def test_when_child_has_multiple_parents(self):
+        another_link_with_root = LinkFactory(parent=self.link_with_root.parent)
+        another_link_with_child = LinkFactory(parent=another_link_with_root.child, child=self.link_with_child.child)
+        result = self.tree.get_parents(self.path)
+
+        self.assertNotIn(another_link_with_root.child, result)
+
+        self.assertListEqual(
+            result,
+            [self.link_with_root.child, self.link_with_root.parent]
+        )
+
+    def test_when_infinite_loop(self):
+        LinkFactory(parent=self.link_with_child.child, child=self.link_with_root.parent)
+        with self.assertRaises(RecursionError):
+            self.tree.get_parents(self.path)
