@@ -31,7 +31,7 @@ from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 
 PATH_SEPARATOR = '|'
-Path = str  # Example : "root/node1/node2/child_leaf"
+Path = str  # Example : "root|node1|node2|child_leaf"
 
 
 class ProgramTree:
@@ -49,12 +49,11 @@ class ProgramTree:
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 
-    # TODO :: unit test
-    def get_parents_as_reference_link(self, child_node: 'Node') -> List['Node']:
+    def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
         result = []
         for tree_node in self.get_all_nodes():
             for link in tree_node.children:
-                if link.child == child_node and link.is_reference:
+                if link.child == child_node and link.is_reference():
                     result.append(link.parent)
         return result
 

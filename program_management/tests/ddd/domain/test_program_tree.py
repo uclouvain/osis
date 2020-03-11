@@ -26,21 +26,23 @@
 from django.test import SimpleTestCase
 
 from base.ddd.utils.validation_message import MessageLevel
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
 from program_management.ddd.domain.node import Node, NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
     def setUp(self):
-        self.subgroup_node = NodeGroupYearFactory(node_id=1, acronym="LTRONC100T", title="Tronc commun", year=2018)
-        self.root_node = Node(0)
-        self.root_node.add_child(self.subgroup_node)
-
-        self.tree = ProgramTree(self.root_node)
+        link = LinkFactory()
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_get_node_case_invalid_path(self):
         with self.assertRaises(node.NodeNotFoundException):
@@ -63,7 +65,7 @@ class TestGetNodeProgramTree(SimpleTestCase):
 class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
-        self.tree = ProgramTree(root_node)
+        self.tree = ProgramTreeFactory(root_node=root_node)
 
     def test_attach_node_case_no_path_specified(self):
         self.mock_validator(AttachNodeValidatorList, ['Success msg'], level=MessageLevel.SUCCESS)
@@ -103,13 +105,9 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
 
 class TestDetachNodeProgramTree(SimpleTestCase):
     def setUp(self):
-        self.leaf = NodeGroupYearFactory(node_id=2, acronym="LBRAF200G", title="Sous groupe", year=2018)
-        self.common_core_node = NodeGroupYearFactory(node_id=1, acronym="LTRONC100T", title="Tronc commun", year=2018)
-        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR1000A", title="Bachelier en Bio", year=2018)
-
-        self.common_core_node.add_child(self.leaf)
-        self.root_node.add_child(self.common_core_node)
-        self.tree = ProgramTree(self.root_node)
+        self.link1 = LinkFactory()
+        self.link2 = LinkFactory(parent=self.link1.child)
+        self.tree = ProgramTreeFactory(root_node=self.link1.parent)
 
     def test_detach_node_case_invalid_path(self):
         with self.assertRaises(node.NodeNotFoundException):
@@ -117,9 +115,9 @@ class TestDetachNodeProgramTree(SimpleTestCase):
 
     def test_detach_node_case_valid_path(self):
         path_to_detach = "|".join([
-            str(self.root_node.pk),
-            str(self.common_core_node.pk),
-            str(self.leaf.pk),
+            str(self.link1.parent.pk),
+            str(self.link1.child.pk),
+            str(self.link2.child.pk),
         ])
 
         self.tree.detach_node(path_to_detach)
@@ -130,4 +128,45 @@ class TestDetachNodeProgramTree(SimpleTestCase):
 
     def test_detach_node_case_try_to_detach_root_node(self):
         with self.assertRaises(Exception):
-            self.tree.detach_node(str(self.root_node.pk))
+            self.tree.detach_node(str(self.link1.parent.pk))
+
+
+class TestGetParentsUsingNodeAsReference(SimpleTestCase):
+    def setUp(self):
+        self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
+        self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
+
+        self.link_with_ref = LinkFactory(
+            parent=self.link_with_root.child,
+            child__title='child__child__ROOT',
+            link_type=LinkTypes.REFERENCE,
+        )
+
+    def test_when_node_is_not_used_as_reference(self):
+        link_without_ref = LinkFactory(parent=self.link_with_root.child, link_type=None)
+        result = self.tree.get_parents_using_node_as_reference(link_without_ref.child)
+        self.assertListEqual(result, [])
+
+    def test_when_node_is_used_as_reference(self):
+        result = self.tree.get_parents_using_node_as_reference(self.link_with_ref.child)
+        self.assertListEqual(
+            result,
+            [self.link_with_ref.parent]
+        )
+
+    def test_when_node_is_used_as_reference_twice(self):
+        child_used_twice = self.link_with_ref.child
+
+        another_link = LinkFactory(parent=self.link_with_root.parent)
+        another_link_with_ref = LinkFactory(
+            parent=another_link.child,
+            child=child_used_twice,
+            link_type=LinkTypes.REFERENCE
+        )
+
+        result = self.tree.get_parents_using_node_as_reference(child_used_twice)
+
+        self.assertListEqual(
+            result,
+            [self.link_with_ref.parent, another_link_with_ref.parent]
+        )
