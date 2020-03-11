@@ -102,6 +102,16 @@ class TestBusinessValidator(SimpleTestCase):
         ]
         self.assertEqual(validator.messages, expected_result, "Assert the validator doesn't add messages twice")
 
+    def test_reset_messages_does_not_reset_success_message(self):
+        validator = ValidatorTest()
+        initial_success_message = validator.success_messages[0]
+        validator._reset_messages()
+        self.assertListEqual(
+            validator.success_messages,
+            [initial_success_message],
+            "Success message is an attribute of the class ; it is a static value, it can't be removed."
+        )
+
     def test_add_message_when_arg_is_success_message(self):
         validator = ValidatorTest()
         with self.assertRaises(AssertionError):
