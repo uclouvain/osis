@@ -45,3 +45,5 @@ django-cors-headers==3.2.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
+-r ./osis_role/requirements.txt
+
