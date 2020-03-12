@@ -32,8 +32,6 @@ from dateutil.relativedelta import relativedelta
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 
-EMPTY_STRING = ''
-
 
 class EducationGroupVersionFactory(factory.DjangoModelFactory):
     class Meta:
@@ -51,5 +49,5 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
 
 
 class StandardEducationGroupVersionFactory(EducationGroupVersionFactory):
-    version_name = EMPTY_STRING
+    version_name = ''
 

@@ -30,8 +30,6 @@ from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
-EMPTY_STRING = ''
-
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'is_transition')
@@ -42,7 +40,7 @@ class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
 
 class StandardEducationGroupVersionManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(version_name=EMPTY_STRING)
+        return super().get_queryset().filter(version_name='')
 
 
 class EducationGroupVersion(models.Model):
