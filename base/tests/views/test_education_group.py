@@ -52,7 +52,8 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
-    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory, \
+    EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
@@ -446,27 +447,24 @@ class EducationGroupViewTestCase(TestCase):
 
 
 class EducationGroupAdministrativedata(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.person = PersonWithPermissionsFactory(
+    def setUp(self):
+        self.person = PersonWithPermissionsFactory(
             'can_access_education_group', 'can_edit_education_group_administrative_data'
         )
 
-        cls.permission_access = Permission.objects.get(codename='can_access_education_group')
-        cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
+        self.permission_access = Permission.objects.get(codename='can_access_education_group')
+        self.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
-        cls.education_group_year = EducationGroupYearFactory()
-        cls.program_manager = ProgramManagerFactory(
-            person=cls.person,
-            education_group=cls.education_group_year.education_group,
+        self.education_group_year = EducationGroupYearFactory()
+        self.program_manager = ProgramManagerFactory(
+            person=self.person,
+            education_group=self.education_group_year.education_group,
         )
 
-        cls.url = reverse('education_group_administrative', args=[
-            cls.education_group_year.id, cls.education_group_year.id
+        self.url = reverse('education_group_administrative', args=[
+            self.education_group_year.id, self.education_group_year.id
         ])
         create_current_academic_year()
-
-    def setUp(self):
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -547,7 +545,7 @@ class EducationGroupAdministrativedata(TestCase):
     def test_get_good_mandataries(self):
         ed = EducationGroupFactory()
         ac = AcademicYearFactory(current=True)
-        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
+        edy = EducationGroupYearBachelorFactory(education_group=ed, academic_year=ac)
 
         url = reverse('education_group_administrative', args=[
             edy.id, edy.id
