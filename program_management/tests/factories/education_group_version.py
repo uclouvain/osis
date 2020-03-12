@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 import string
+from datetime import datetime
 
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
@@ -38,12 +38,12 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
         model = 'program_management.EducationGroupVersion'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.date.today() - relativedelta(years=1), datetime.date.today())
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.today() - relativedelta(years=1), datetime.today())
 
     is_transition = False
     version_name = factory.fuzzy.FuzzyText(length=10)
-    root_group = GroupYearFactory()
-    offer = EducationGroupYearFactory()
+    root_group = factory.SubFactory(GroupYearFactory)
+    offer = factory.SubFactory(EducationGroupYearFactory)
     title_fr = factory.fuzzy.FuzzyText(length=15)
     title_en = factory.fuzzy.FuzzyText(length=15)
 
