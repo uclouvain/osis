@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-11 11:00+0100\n"
+"POT-Creation-Date: 2020-03-12 11:28+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -290,6 +290,9 @@ msgstr "Aucun résultat!"
 msgid "Non-mandatory"
 msgstr "Facultatif"
 
+msgid "Offer"
+msgstr "Offre"
+
 msgid "Official"
 msgstr "Officiel"
 
@@ -370,6 +373,15 @@ msgstr "Formulaire d'inscription au contenu de"
 
 msgid "Relative credits"
 msgstr "Crédits relatifs"
+
+msgid "Req. Entity"
+msgstr ""
+
+msgid "Requirement entity"
+msgstr ""
+
+msgid "Root group"
+msgstr "Groupe racine"
 
 msgid "Save"
 msgstr "Enregistrer"
@@ -480,11 +492,23 @@ msgstr "La formation n'a pas de contenu à reporter."
 msgid "Title"
 msgstr "Intitulé"
 
+msgid "Title in English"
+msgstr "Titre en anglais"
+
+msgid "Title in French"
+msgstr "Titre en français"
+
 msgid "Trainings"
 msgstr "Formations"
 
 msgid "Utilizations"
 msgstr "Utilisations"
+
+msgid "Version name"
+msgstr "Nom de version"
+
+msgid "Volume"
+msgstr ""
 
 msgid "Yes"
 msgstr "Oui"
