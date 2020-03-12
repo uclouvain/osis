@@ -50,7 +50,7 @@ class EducationGroupVersion(models.Model):
     is_transition = models.BooleanField(verbose_name=_('Transition'))
     version_name = models.CharField(
         blank=True,
-        max_length=100,
+        max_length=15,
         verbose_name=_('Version name')
     )
     root_group = models.OneToOneField(
@@ -67,12 +67,12 @@ class EducationGroupVersion(models.Model):
     )
     title_fr = models.CharField(
         blank=True, null=True,
-        max_length=255,
+        max_length=100,
         verbose_name=_("Title in French")
     )
     title_en = models.CharField(
         blank=True, null=True,
-        max_length=255,
+        max_length=100,
         verbose_name=_("Title in English")
     )
 

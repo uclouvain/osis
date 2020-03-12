@@ -375,10 +375,10 @@ msgid "Relative credits"
 msgstr "Crédits relatifs"
 
 msgid "Req. Entity"
-msgstr ""
+msgstr "Entité Resp."
 
 msgid "Requirement entity"
-msgstr ""
+msgstr "Entité resp. cahier des charges"
 
 msgid "Root group"
 msgstr "Groupe racine"
@@ -508,7 +508,7 @@ msgid "Version name"
 msgstr "Nom de version"
 
 msgid "Volume"
-msgstr ""
+msgstr "Volume"
 
 msgid "Yes"
 msgstr "Oui"
