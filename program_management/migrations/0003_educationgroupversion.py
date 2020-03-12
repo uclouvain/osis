@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('education_group', '0005_auto_20200128_1246'),
-        ('base', '0507_auto_20200303_1341'),
+        ('base', '0506_remove_prerequisites_whithout_item'),
         ('program_management', '0002_auto_20200124_2055'),
     ]
 
