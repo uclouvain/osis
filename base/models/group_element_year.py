@@ -445,7 +445,7 @@ def _build_child_key(child_branch=None, child_leaf=None):
 
 
 def _is_root_group_element_year(group_element_year, recursive_conditions=None):
-    recursive_conditions = {'stop': DEFAULT_ROOT_TYPES, 'continue': []} if recursive_conditions is None \
+    recursive_conditions = {'stop': [], 'continue': []} if recursive_conditions is None \
         else recursive_conditions
     filter_types = COMMON_FILTER_TYPES + recursive_conditions['continue']
     return group_element_year["parent__education_group_type__name"] not in filter_types and \
