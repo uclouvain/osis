@@ -49,13 +49,12 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
     @classmethod
     def setUpTestData(cls):
         current_academic_year = create_current_academic_year()
-        root_group_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
-        cls.root = EducationGroupYearFactory(academic_year=current_academic_year,
-                                             education_group_type=root_group_type)
+        cls.root = TrainingFactory(
+            academic_year=current_academic_year,
+            education_group_type__name=TrainingType.BACHELOR.name
+        )
 
-        group_type = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        cls.child_branch = EducationGroupYearFactory(academic_year=current_academic_year,
-                                                     education_group_type=group_type)
+        cls.child_branch = GroupFactory(academic_year=current_academic_year)
         GroupElementYearFactory(parent=cls.root, child_branch=cls.child_branch)
 
         cls.child_leaf = LearningUnitYearFactory(academic_year=current_academic_year)
@@ -92,8 +91,10 @@ class TestFindRelatedRootEducationGroups(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.child_leaf = LearningUnitYearFactory(academic_year=cls.current_academic_year)
 
-        cls.root = TrainingFactory(academic_year=cls.current_academic_year,
-                                             education_group_type__name=TrainingType.BACHELOR.name)
+        cls.root = TrainingFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type__name=TrainingType.BACHELOR.name
+        )
 
     @mock.patch('base.models.group_element_year._raise_if_incorrect_instance')
     def test_objects_instances_check_is_called(self, mock_check_instance):
@@ -124,10 +125,9 @@ class TestFindRelatedRootEducationGroups(TestCase):
             group_element_year.find_learning_unit_roots([self.child_leaf, child_leaf_other_ac_year])
 
     def test_with_filters_case_direct_parent_is_root_and_not_matches_filter(self):
-        root = EducationGroupYearFactory(
+        root = GroupFactory(
             academic_year=self.current_academic_year,
-            education_group_type=EducationGroupTypeFactory(name='Options choices',
-                                                           category=education_group_categories.GROUP)
+            education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
         )
         GroupElementYearFactory(parent=root, child_branch=None, child_leaf=self.child_leaf)
         expected_result = {
@@ -164,12 +164,8 @@ class TestFindRelatedRootEducationGroups(TestCase):
         self.assertIn(root_2.id, result[self.child_leaf.id])
 
     def test_with_filters_case_objects_are_education_group_instance(self):
-        root = EducationGroupYearFactory(
-            academic_year=self.current_academic_year,
-        )
-        child_branch = EducationGroupYearFactory(
-            academic_year=self.current_academic_year,
-        )
+        root = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        child_branch = EducationGroupYearFactory(academic_year=self.current_academic_year)
         GroupElementYearFactory(parent=root, child_branch=child_branch)
         result = group_element_year.find_learning_unit_roots([child_branch])
         expected_result = {
@@ -468,15 +464,14 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        cls.root = TrainingFactory(
+        cls.root = EducationGroupYearMasterFactory(
             acronym='DROI2M',
-            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120,
             academic_year=cls.academic_year
         )
 
         finality_list = GroupFactory(
             acronym='LIST FINALITIES',
-            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
             academic_year=cls.academic_year
         )
 
