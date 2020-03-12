@@ -66,7 +66,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         education_group_root_ids = group_element_year.find_learning_unit_roots(
             [learning_unit_year],
             luy=learning_unit_year,
-            recursive_params={
+            recursive_conditions={
                 'stop': [GroupType.COMPLEMENTARY_MODULE.name],
                 'continue': TrainingType.finality_types()
             }

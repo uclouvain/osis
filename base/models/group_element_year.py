@@ -328,7 +328,7 @@ class GroupElementYear(OrderedModel):
             return "{}".format(self.child.title)
 
 
-def find_learning_unit_roots(objects, return_result_params=None, luy=None, recursive_params=None):
+def find_learning_unit_roots(objects, return_result_params=None, luy=None, recursive_conditions=None):
     if return_result_params is None:
         return_result_params = {}
     parents_as_instances = return_result_params.get('parents_as_instances', False)
@@ -348,13 +348,13 @@ def find_learning_unit_roots(objects, return_result_params=None, luy=None, recur
 
         parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
-        roots_by_object_id = _find_related_formations(objects, parents_by_id, recursive_params)
+        roots_by_object_id = _find_related_formations(objects, parents_by_id, recursive_conditions)
 
         if parents_as_instances:
             roots_by_object_id = _convert_parent_ids_to_instances(roots_by_object_id)
             if with_parents_of_parents:
                 flat_list_of_parents = _flatten_list_of_lists(roots_by_object_id.values())
-                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id, recursive_params)
+                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id, recursive_conditions)
                 roots_by_parent_id = _convert_parent_ids_to_instances(roots_by_parent_id)
                 roots_by_object_id = {**roots_by_object_id, **roots_by_parent_id}
 
@@ -365,13 +365,13 @@ def _flatten_list_of_lists(list_of_lists):
     return list(set(itertools.chain.from_iterable(list_of_lists)))
 
 
-def _find_related_formations(objects, parents_by_id, recursive_params=None):
+def _find_related_formations(objects, parents_by_id, recursive_conditions=None):
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
-        return {obj.id: _find_elements(parents_by_id, recursive_params, child_leaf_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, recursive_conditions, child_leaf_id=obj.id) for obj in objects}
     else:
-        return {obj.id: _find_elements(parents_by_id, recursive_params, child_branch_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, recursive_conditions, child_branch_id=obj.id) for obj in objects}
 
 
 def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = None, learning_unit_year=None):
@@ -444,27 +444,28 @@ def _build_child_key(child_branch=None, child_leaf=None):
     return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
 
 
-def _is_root_group_element_year(group_element_year, recursive_params=None):
-    recursive_params = {'stop': DEFAULT_ROOT_TYPES, 'continue': []} if recursive_params is None else recursive_params
-    filter_types = COMMON_FILTER_TYPES + recursive_params['continue']
+def _is_root_group_element_year(group_element_year, recursive_conditions=None):
+    recursive_conditions = {'stop': DEFAULT_ROOT_TYPES, 'continue': []} if recursive_conditions is None \
+        else recursive_conditions
+    filter_types = COMMON_FILTER_TYPES + recursive_conditions['continue']
     return group_element_year["parent__education_group_type__name"] not in filter_types and \
-        group_element_year["parent__education_group_type__name"] in recursive_params['stop'] + DEFAULT_ROOT_TYPES
+        group_element_year["parent__education_group_type__name"] in recursive_conditions['stop'] + DEFAULT_ROOT_TYPES
 
 
-def _find_elements(group_elements_by_child_id, recursive_params=None, child_leaf_id=None, child_branch_id=None):
+def _find_elements(group_elements_by_child_id, recursive_conditions=None, child_leaf_id=None, child_branch_id=None):
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
 
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
-        if _is_root_group_element_year(group_elem_year, recursive_params):
+        if _is_root_group_element_year(group_elem_year, recursive_conditions):
             # If record matches any filter, we must stop mounting across the hierarchy.
             roots.append(parent_id)
         else:
             # Recursive call ; the parent_id becomes the child_branch.
             roots.extend(
-                _find_elements(group_elements_by_child_id, recursive_params, child_branch_id=parent_id)
+                _find_elements(group_elements_by_child_id, recursive_conditions, child_branch_id=parent_id)
             )
 
     return list(set(roots))
