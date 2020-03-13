@@ -77,11 +77,11 @@ class Generate11BAFrom1BATest(TestCase):
         )
         self.assertEqual(
             first_created_education_group_year.title,
-            "Première année du bachelier en Droit"
+            "Première année de bachelier en Droit"
         )
         self.assertEqual(
             first_created_education_group_year.title_english,
-            "First year of Bachelor in Law"
+            "First year of the Bachelor in Law"
         )
         self.assertEqual(
             first_created_education_group_year.acronym,

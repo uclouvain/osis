@@ -113,8 +113,8 @@ def generate_11_ba_from_1_ba(existing_acronym):
         new_egy.diploma_printing_title = ''
 
         #  Lowercase first letter of title ONLY in french (english title keeps the first letter uppercase)
-        new_egy.title = "{} {}".format("Première année du", _lower_case_first_letter(egy.title))
-        new_egy.title_english = "{} {}".format("First year of", egy.title_english)
+        new_egy.title = "{} {}".format("Première année de", _lower_case_first_letter(egy.title))
+        new_egy.title_english = "{} {}".format("First year of the", egy.title_english)
 
         new_egy.save()
         logger.info(
