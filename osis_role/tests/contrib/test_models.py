@@ -31,7 +31,6 @@ from django.test import TestCase
 
 from base.tests.factories.person import PersonFactory
 from osis_role.contrib import models
-from osis_role.tests.utils import ConcreteRoleModel
 
 
 class TestRoleModel(TestCase):
@@ -52,7 +51,7 @@ class TestRoleModel(TestCase):
     @mock.patch('django.db.models.Model.save', return_value=None)
     @mock.patch('osis_role.contrib.models.RoleModel._add_user_to_group', return_value=None)
     def test_ensure_save_will_call_add_user_to_group_method(self, mock_model_save, mock_add_user_to_group):
-        instance = ConcreteRoleModel(person=self.person)
+        instance = models.RoleModel(person=self.person)
         instance.save()
 
         self.assertTrue(mock_model_save.called)
@@ -61,41 +60,39 @@ class TestRoleModel(TestCase):
     @mock.patch('django.db.models.Model.delete', return_value=None)
     @mock.patch('osis_role.contrib.models.RoleModel._remove_user_from_group', return_value=None)
     def test_ensure_delete_will_call_remove_user_from_group_method(self, mock_model_delete, mock_remove_user_from_group):
-        instance = ConcreteRoleModel(person=self.person)
+        instance = models.RoleModel(person=self.person)
         instance.delete()
 
         self.assertTrue(mock_model_delete.called)
         self.assertTrue(mock_remove_user_from_group.called)
 
-    def test_ensure_add_user_to_group_will_create_group_if_not_exist_and_attach_user(self):
-        instance = ConcreteRoleModel(person=self.person)
+    @mock.patch('osis_role.contrib.models.RoleModel.group_name', new_callable=mock.PropertyMock,
+                return_value="concrete_role")
+    def test_ensure_add_user_to_group_will_create_group_if_not_exist_and_attach_user(self, mock_group_name):
+        instance = models.RoleModel(person=self.person)
         instance._add_user_to_group()
 
-        self.assertTrue(Group.objects.filter(name=ConcreteRoleModel.group_name).exists())
-        self.assertIn(ConcreteRoleModel.group_name, self.person.user.groups.all().values_list('name', flat=True))
+        self.assertTrue(Group.objects.filter(name="concrete_role").exists())
+        self.assertIn("concrete_role", self.person.user.groups.all().values_list('name', flat=True))
 
-    @mock.patch('django.db.models.QuerySet.exists', return_value=False)
-    def test_remove_user_to_group_case_not_more_record_in_table(self, mock_queryset_exists):
-        group = Group.objects.create(name=ConcreteRoleModel.group_name)
+    @mock.patch('osis_role.contrib.models.RoleModel.group_name', new_callable=mock.PropertyMock,
+                return_value="concrete_role")
+    @mock.patch('osis_role.contrib.models.RoleModel.belong_to', return_value=False)
+    def test_remove_user_to_group_case_not_more_record_in_table(self, mock_queryset_exists, mock_group_name):
+        group = Group.objects.create(name="concrete_role")
         self.person.user.groups.add(group)
 
-        instance = ConcreteRoleModel(person=self.person)
+        instance = models.RoleModel(person=self.person)
         instance._remove_user_from_group(self.person)
-        self.assertNotIn(ConcreteRoleModel.group_name, self.person.user.groups.all().values_list('name', flat=True))
+        self.assertNotIn("concrete_role", self.person.user.groups.all().values_list('name', flat=True))
 
-    @mock.patch('django.db.models.QuerySet.exists', return_value=True)
-    def test_remove_user_to_group_case_have_still_one_record_in_table(self, mock_queryset_exists):
-        group = Group.objects.create(name=ConcreteRoleModel.group_name)
+    @mock.patch('osis_role.contrib.models.RoleModel.group_name', new_callable=mock.PropertyMock,
+                return_value="concrete_role")
+    @mock.patch('osis_role.contrib.models.RoleModel.belong_to', return_value=True)
+    def test_remove_user_to_group_case_have_still_one_record_in_table(self, mock_queryset_exists, mock_group_name):
+        group = Group.objects.create(name="concrete_role")
         self.person.user.groups.add(group)
 
-        instance = ConcreteRoleModel(person=self.person)
+        instance = models.RoleModel(person=self.person)
         instance._remove_user_from_group(self.person)
-        self.assertIn(ConcreteRoleModel.group_name, self.person.user.groups.all().values_list('name', flat=True))
-
-    @mock.patch('django.db.models.QuerySet.exists', return_value=True)
-    def test_belong_to_case_person_belong_to_model(self, mock_queryset_exists):
-        self.assertTrue(ConcreteRoleModel().belong_to(self.person))
-
-    @mock.patch('django.db.models.QuerySet.exists', return_value=False)
-    def test_belong_to_case_person_not_belong_to_model(self, mock_queryset_exists):
-        self.assertFalse(ConcreteRoleModel().belong_to(self.person))
+        self.assertIn("concrete_role", self.person.user.groups.all().values_list('name', flat=True))
