@@ -23,16 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-import operator
 import random
 
 import factory.fuzzy
 
-from base.models.enums.education_group_types import TrainingType
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
 
 
@@ -70,6 +65,14 @@ class NodeGroupYearFactory(NodeFactory):
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
     children = None
+
+    class Params:
+        minitraining = factory.Trait(
+            node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType)
+        )
+        group = factory.Trait(
+            node_type=factory.fuzzy.FuzzyChoice(GroupType)
+        )
 
 
 class NodeLearningUnitYearFactory(NodeFactory):
