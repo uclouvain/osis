@@ -31,7 +31,7 @@ STANDARD = ""
 
 class ProgramTreeVersionBuilder:
 
-    _tree_version: 'ProgramTreeVersion' = None
+    _tree_version = None
 
     def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
         assert isinstance(from_tree, ProgramTreeVersion)
