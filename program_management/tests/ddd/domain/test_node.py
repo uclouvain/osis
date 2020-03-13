@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory.fuzzy
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
@@ -153,7 +154,7 @@ class TestGetChildrenTypes(SimpleTestCase):
         """
         link0 = LinkFactory(link_type=LinkTypes.REFERENCE)
         link1 = LinkFactory(parent=link0.child, link_type=LinkTypes.REFERENCE)
-        link2 = LinkFactory(parent=link1.child, link_type=None)
+        link2 = LinkFactory(parent=link1.child, child__minitraining=True, link_type=None)
         result = link0.parent.get_children_types(include_nodes_used_as_reference=True)
         self.assertListEqual(
             [link2.child.node_type],
