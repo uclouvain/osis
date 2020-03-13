@@ -50,8 +50,7 @@
         {% bootstrap_field form.tutor show_label=False %}
         </div>
         {% bootstrap_field form.requirement_entity form_group_class="col-md-2" %}
-
-        {% if search_type == service_search_type or search_type == activity_search_type or search_type == borrowed_search_type%}
+        {% if search_type.value == service_search_type or search_type.value == activity_search_type or search_type.value == borrowed_search_type%}
             {% bootstrap_field form.allocation_entity form_group_class="col-md-2" %}
             {% bootstrap_field form.with_entity_subordinated form_group_class="col-md-2" %}
         {% endif %}
