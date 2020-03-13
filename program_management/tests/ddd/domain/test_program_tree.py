@@ -28,8 +28,6 @@ from django.test import SimpleTestCase
 from base.ddd.utils.validation_message import MessageLevel
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
-from program_management.ddd.domain.node import Node, NodeGroupYear
-from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
