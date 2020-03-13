@@ -25,6 +25,7 @@
 ##############################################################################
 import random
 
+from django.conf import settings
 from django.db.models import F, When, Case
 from django.http import HttpResponse
 from django.test import TestCase
@@ -50,7 +51,7 @@ class TestRead(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        cls.person = PersonFactory()
+        cls.person = PersonFactory(language=settings.LANGUAGE_CODE_FR)
         cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year,
