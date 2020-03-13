@@ -24,51 +24,44 @@
 #
 ##############################################################################
 
-from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree import ProgramTree
 
 STANDARD = ""
 
 
-class ProgramTreeVersionFactory:
+class ProgramTreeVersionBuilder:
 
-    def copy_from(
-            self,
-            from_tree: 'ProgramTreeVersion',
-            **tree_version_attrs
-    ):
-        assert isinstance(from_tree, ProgramTree)
+    _tree_version: 'ProgramTreeVersion' = None
+
+    def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+        assert isinstance(from_tree, ProgramTreeVersion)
         assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
         if from_tree.is_transition:
-            tree = self._copy_from_transition(from_tree, **tree_version_attrs)
+            self._tree_version = self._build_from_transition(from_tree.tree, **tree_version_attrs)
         else:
-            tree = self._copy_from_standard(from_tree, **tree_version_attrs)
-        return tree
+            self._tree_version = self._build_from_standard(from_tree.tree, **tree_version_attrs)
+        return self.program_tree_version
 
-    def get_tree(self, **tree_attrs):
-        return ProgramTreeVersion(**tree_attrs)
+    @property
+    def program_tree_version(self):
+        return self._tree_version
 
-    def _copy_from_transition(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+    def _build_from_transition(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
         raise NotImplementedError()
 
-    def _copy_from_standard(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+    def _build_from_standard(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
         raise NotImplementedError()
 
 
-factory = ProgramTreeVersionFactory()
-
-
-class ProgramTreeVersion(ProgramTree):
+class ProgramTreeVersion:
 
     def __init__(
             self,
-            root_node: 'Node',
+            tree: 'ProgramTree',
             version_name: str = STANDARD,
             is_transition: bool = False,
-            authorized_relationships: AuthorizedRelationshipList = None
     ):
-        super(ProgramTreeVersion, self).__init__(root_node, authorized_relationships=authorized_relationships)
+        self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
 
