@@ -26,8 +26,37 @@
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree import ProgramTree
 
 STANDARD = ""
+
+
+class ProgramTreeVersionFactory:
+
+    def copy_from(
+            self,
+            from_tree: 'ProgramTreeVersion',
+            **tree_version_attrs
+    ):
+        assert isinstance(from_tree, ProgramTree)
+        assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
+        if from_tree.is_transition:
+            tree = self._copy_from_transition(from_tree, **tree_version_attrs)
+        else:
+            tree = self._copy_from_standard(from_tree, **tree_version_attrs)
+        return tree
+
+    def get_tree(self, **tree_attrs):
+        return ProgramTreeVersion(**tree_attrs)
+
+    def _copy_from_transition(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+        raise NotImplementedError()
+
+    def _copy_from_standard(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+        raise NotImplementedError()
+
+
+factory = ProgramTreeVersionFactory()
 
 
 class ProgramTreeVersion(ProgramTree):
@@ -37,12 +66,12 @@ class ProgramTreeVersion(ProgramTree):
             root_node: 'Node',
             version_name: str = STANDARD,
             is_transition: bool = False,
-            title_fr: str = None,
-            title_en: str = None,
             authorized_relationships: AuthorizedRelationshipList = None
     ):
         super(ProgramTreeVersion, self).__init__(root_node, authorized_relationships=authorized_relationships)
         self.is_transition = is_transition
         self.version_name = version_name
-        self.title_fr = title_fr
-        self.title_en = title_en
+
+    @property
+    def is_standard(self):
+        return self.version_name == STANDARD
