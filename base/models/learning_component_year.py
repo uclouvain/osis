@@ -108,7 +108,11 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def real_classes(self) -> int:
-        return self.learningclassyear_set.count()
+        # FIXME :: Temporary solution - Waiting for real classes in OSIS
+        real_classes = self.learningclassyear_set.count()
+        if self.planned_classes and self.planned_classes > 0 and real_classes == 0:
+            return 1
+        return real_classes
 
     @property
     def warnings(self):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-21 09:50+0100\n"
+"POT-Creation-Date: 2020-02-28 15:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -565,6 +565,9 @@ msgid "Common English title"
 msgstr ""
 
 msgid "Common core"
+msgstr ""
+
+msgid "Common part"
 msgstr ""
 
 msgid "Common title"
@@ -2353,6 +2356,12 @@ msgstr ""
 msgid "Specific admission requirements"
 msgstr ""
 
+msgid "Specific complement (Full)"
+msgstr ""
+
+msgid "Specific complement (Partim)"
+msgstr ""
+
 msgid "Specifications"
 msgstr ""
 
@@ -3492,6 +3501,9 @@ msgid "volume requirement entity"
 msgstr ""
 
 msgid "volume total requirement entities"
+msgstr ""
+
+msgid "without postponement"
 msgstr ""
 
 msgid "yes"
