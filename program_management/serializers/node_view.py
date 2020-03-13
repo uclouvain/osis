@@ -69,11 +69,11 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         child_node = obj.child
 
         if isinstance(child_node, node.NodeEducationGroupYear):
-            return NodeType.EDUCATION_GROUP
+            return NodeType.EDUCATION_GROUP.name
         elif isinstance(child_node, node.NodeGroupYear):
-            return NodeType.GROUP
+            return NodeType.GROUP.name
         elif isinstance(child_node, node.NodeLearningClassYear):
-            return NodeType.LEARNING_CLASS
+            return NodeType.LEARNING_CLASS.name
 
     def get_root(self, obj: link.Link):
         return self.context['root'].pk
@@ -116,7 +116,7 @@ class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
         return reverse('learning_unit_utilization', args=[self.get_root(obj), obj.child.pk])
 
     def get_element_type(self, obj):
-        return NodeType.LEARNING_UNIT
+        return NodeType.LEARNING_UNIT.name
 
     def get_title(self, obj: link.Link):
         title = obj.child.title

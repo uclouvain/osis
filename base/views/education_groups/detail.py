@@ -73,7 +73,9 @@ from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
+from program_management.serializers import program_tree_view
 from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
@@ -168,10 +170,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
             # FIXME: resolve dependency in other way
-            from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
-            education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
-                                                                     tab_to_show=self.request.GET.get('tab_to_show'))
-            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
+            # TODO replace by 3*d call
+            program_tree = load_tree.load(self.root.id)
+            serialized_data = program_tree_view.ProgramTreeViewSerializer(program_tree).data
+            context['tree'] = json.dumps(serialized_data)
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,
