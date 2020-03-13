@@ -193,6 +193,9 @@ msgstr "Activité non dispensée en"
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
 
+msgid "Direct gathering"
+msgstr "Regroupement direct"
+
 #, python-format
 msgid "Element selected %(element)s"
 msgstr "Elément sélectionné %(element)s"
@@ -226,9 +229,6 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
-msgid "Gathering"
-msgstr "Regroupement"
-
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -256,6 +256,9 @@ msgstr "Type de lien"
 
 msgid "Made in"
 msgstr "Fait à"
+
+msgid "Main gathering"
+msgstr "Regroupement principal"
 
 msgid "Mandatory"
 msgstr "Obligatoire"

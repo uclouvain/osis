@@ -3616,6 +3616,11 @@
                     "can_edit_received_file_field",
                     "continuing_education",
                     "admission"
+                ],
+                [
+                    "can_validate_registration",
+                    "continuing_education",
+                    "admission"
                 ]
             ]
         }

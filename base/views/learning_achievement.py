@@ -34,10 +34,10 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications, build_success_message
 from base.views.learning_units import perms
+from osis_common.utils.models import get_object_or_none
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
