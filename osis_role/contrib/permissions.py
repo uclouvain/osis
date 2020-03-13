@@ -37,7 +37,7 @@ class ObjectPermissionBackend(ModelBackend):
             return False
 
         results = set()
-        for role_mdl in _get_roles_assigned(user_obj):
+        for role_mdl in _get_relevant_roles(user_obj, perm):
             qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))
             if qs.exists():
                 rule_set = role_mdl.rule_set()
@@ -46,6 +46,9 @@ class ObjectPermissionBackend(ModelBackend):
         return any(results) or super().has_perm(user_obj, perm, obj=kwargs.get('obj'))
 
     def _get_group_permissions(self, user_obj, obj=None):
+        """
+        Override method in order to fallback to default RBAC Django when role is not registered
+        """
         user_groups_field = get_user_model()._meta.get_field('groups')
         user_groups_query = 'group__%s' % user_groups_field.related_query_name()
         return Permission.objects.filter(**{user_groups_query: user_obj}).exclude(
@@ -53,7 +56,12 @@ class ObjectPermissionBackend(ModelBackend):
         )
 
 
-def _get_roles_assigned(user_obj):
+def _get_relevant_roles(user_obj, perm):
+    roles_assigned = _get_roles_assigned_to_user(user_obj)
+    return {r for r in roles_assigned if r.rule_exists(perm)}
+
+
+def _get_roles_assigned_to_user(user_obj):
     groups_assigned = user_obj.groups.values_list('name', flat=True)
     return {r for r in role.role_manager.roles if r.group_name in groups_assigned}
 

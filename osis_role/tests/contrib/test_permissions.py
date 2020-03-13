@@ -34,7 +34,6 @@ from rules import RuleSet
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from osis_role.contrib.permissions import ObjectPermissionBackend, _add_role_queryset_to_perms_context
-from osis_role.tests.utils import ConcreteRoleModel
 
 
 class TestObjectPermissionBackend(TestCase):
@@ -42,11 +41,18 @@ class TestObjectPermissionBackend(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.auth_class = ObjectPermissionBackend()
+        cls.group, _ = Group.objects.get_or_create(name="concrete_role")
 
     def setUp(self):
         self.person = PersonFactory()
+        self.mock_role_model = mock.MagicMock()
+        self.mock_role_model.group_name = mock.PropertyMock(return_value=self.group.name)
+        self.mock_role_model.rule_set = mock.Mock(return_value=rules.RuleSet({
+            'perm_allowed': rules.always_allow,
+            'perm_denied': rules.always_deny
+        }))
 
-        mock_config = {'roles': {ConcreteRoleModel}}
+        mock_config = {'roles': {self.mock_role_model}}
         patcher_role_manager = mock.patch("osis_role.role.role_manager", **mock_config)
         patcher_role_manager.start()
         self.addCleanup(patcher_role_manager.stop)
@@ -65,15 +71,13 @@ class TestObjectPermissionBackend(TestCase):
 
     @mock.patch('django.db.models.QuerySet.exists', return_value=True)
     def test_user_have_perms_case_is_assign_to_at_least_one_role(self, mock_queryset_exists):
-        role_mdl = ConcreteRoleModel(person=self.person)
-        role_mdl._add_user_to_group()
+        self.person.user.groups.add(self.group)
 
         self.assertTrue(self.auth_class.has_perm(self.person.user, 'perm_allowed'))
 
     @mock.patch('django.db.models.QuerySet.exists', return_value=True)
     def test_user_have_no_perms_case_is_assign_to_at_least_one_role(self, mock_queryset_exists):
-        role_mdl = ConcreteRoleModel(person=self.person)
-        role_mdl._add_user_to_group()
+        self.person.user.groups.add(self.group)
 
         self.assertFalse(self.auth_class.has_perm(self.person.user, 'perm_denied'))
 
@@ -102,4 +106,3 @@ class TestAddRoleQuerysetToRuleSet(TestCase):
 
         _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', qs)
         self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
-
