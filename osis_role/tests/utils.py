@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+
 import rules
 
 from osis_role.contrib import models
 
 
+@mock.patch('django.db.models.Model.delete', return_value=None)
+@mock.patch('django.db.models.Model.save', return_value=None)
 class ConcreteRoleModel(models.RoleModel):
     class Meta:
         group_name = "concrete_role"
