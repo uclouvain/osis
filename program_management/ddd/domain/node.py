@@ -52,7 +52,7 @@ factory = NodeFactory()
 
 class Node:
 
-    acronym = None
+    code = None
     year = None
 
     def __init__(

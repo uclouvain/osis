@@ -43,12 +43,12 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
                   |---- LDROI100A (UE)
         :return:
         """
-        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100B", title="Bachelier en droit", year=2018)
-        self.common_core = NodeGroupYearFactory(node_id=2, acronym="LGROUP100A", title="Tronc commun", year=2018)
-        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3, acronym="LDROI100A", title="Introduction", year=2018)
-        self.ldroi120b = NodeLearningUnitYearFactory(node_id=4, acronym="LDROI120B", title="Séminaire", year=2018)
-        self.subgroup1 = NodeGroupYearFactory(node_id=5, acronym="LSUBGR100G", title="Sous-groupe 1", year=2018)
-        self.subgroup2 = NodeGroupYearFactory(node_id=6, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
+        self.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
+        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
+        self.ldroi120b = NodeLearningUnitYearFactory(node_id=4, code="LDROI120B", title="Séminaire", year=2018)
+        self.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
+        self.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
 
         self.root_node.add_child(self.common_core)
         self.common_core.add_child(self.ldroi100a)
@@ -76,7 +76,8 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
             serializer.data['children'][0]['path'],
             "|".join([str(self.root_node.pk), str(self.common_core.pk)]),
         )
-        self.assertEquals(serializer.data['children'][0]['text'], self.common_core.acronym)
+        expected_text = self.common_core.code + " - " + self.common_core.title
+        self.assertEquals(serializer.data['children'][0]['text'], expected_text)
         self.assertEquals(serializer.data['children'][0]['icon'], None)
         self.assertIsInstance(serializer.data['children'][0]['children'], list)
 

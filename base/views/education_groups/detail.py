@@ -169,8 +169,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            # FIXME: resolve dependency in other way
-            # TODO replace by 3*d call
             program_tree = load_tree.load(self.root.id)
             serialized_data = program_tree_view.ProgramTreeViewSerializer(program_tree).data
             context['tree'] = json.dumps(serialized_data)

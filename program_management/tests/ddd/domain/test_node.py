@@ -35,10 +35,10 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory, No
 
 class TestAddChildNode(SimpleTestCase):
     def test_add_child_to_node(self):
-        group_year_node = NodeGroupYearFactory(node_id=0, acronym="LDROI200G", title="Tronc commun", year=2018)
+        group_year_node = NodeGroupYearFactory(node_id=0, code="LDROI200G", title="Tronc commun", year=2018)
         learning_unit_year_node = NodeLearningUnitYearFactory(
             node_id=2,
-            acronym="LDROI100",
+            code="LDROI100",
             title="Introduction",
             year=2018
         )
@@ -52,9 +52,9 @@ class TestAddChildNode(SimpleTestCase):
 
 class TestDescendentsPropertyNode(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=0, acronym="LDROI200T", title="Tronc commun", year=2018)
-        self.subgroup_node = NodeGroupYearFactory(node_id=1, acronym="LDROI200G", title="Sub group", year=2018)
-        self.leaf = NodeLearningUnitYearFactory(node_id=2, acronym="LDROI100", title="Introduction", year=2018)
+        self.root_node = NodeGroupYearFactory(node_id=0, code="LDROI200T", title="Tronc commun", year=2018)
+        self.subgroup_node = NodeGroupYearFactory(node_id=1, code="LDROI200G", title="Sub group", year=2018)
+        self.leaf = NodeLearningUnitYearFactory(node_id=2, code="LDROI100", title="Introduction", year=2018)
 
     def test_case_no_descendents(self):
         self.assertIsInstance(self.root_node.descendents, dict)
@@ -98,16 +98,16 @@ class TestEq(SimpleTestCase):
 class TestStr(SimpleTestCase):
 
     def setUp(self):
-        acronym = 'Acronym'
+        code = 'Code'
         year = 2019
-        self.node_group_year = NodeGroupYearFactory(acronym=acronym, year=year)
-        self.node_learning_unit = NodeLearningUnitYearFactory(acronym=acronym, year=year)
+        self.node_group_year = NodeGroupYearFactory(code=code, year=year)
+        self.node_learning_unit = NodeLearningUnitYearFactory(code=code, year=year)
 
     def test_node_group_year_str(self):
-        self.assertEqual(str(self.node_group_year), 'Acronym (2019)')
+        self.assertEqual(str(self.node_group_year), 'Code (2019)')
 
     def test_node_learning_unit_str(self):
-        self.assertEqual(str(self.node_learning_unit), 'Acronym (2019)')
+        self.assertEqual(str(self.node_learning_unit), 'Code (2019)')
 
 
 class TestGetChildrenTypes(SimpleTestCase):

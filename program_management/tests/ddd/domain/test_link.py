@@ -43,8 +43,8 @@ class TestIsReference(SimpleTestCase):
 class TestStr(SimpleTestCase):
     def test_str(self):
         link = LinkFactory(
-            parent=NodeGroupYearFactory(acronym='parent', year=2019),
-            child=NodeLearningUnitYearFactory(acronym='child', year=2018)
+            parent=NodeGroupYearFactory(code='parent', year=2019),
+            child=NodeLearningUnitYearFactory(code='child', year=2018)
         )
         expected_result = 'parent (2019) - child (2018)'
         self.assertEqual(expected_result, str(link))
