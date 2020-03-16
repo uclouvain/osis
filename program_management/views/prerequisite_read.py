@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 
@@ -33,6 +35,7 @@ from base.models.enums.education_group_categories import Categories
 from base.models.prerequisite import Prerequisite
 from base.views.common import display_warning_messages
 from osis_common.utils.models import get_object_or_none
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.learning_units.prerequisite import \
     get_prerequisite_acronyms_which_are_outside_of_education_group
 from program_management.views.generic import LearningUnitGenericDetailView
@@ -64,7 +67,10 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             context["root"]
         )
 
+        context["prerequisite_links"] = self.program_tree.get_links()
         context["learning_unit_years_parent"] = {}
+        self.hierarchy = EducationGroupHierarchy(root, tab_to_show=self.request.GET.get("tab_to_show"))
+
         for grp in self.hierarchy.included_group_element_years:
             if not grp.child_leaf:
                 continue

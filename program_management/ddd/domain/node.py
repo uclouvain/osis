@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from _decimal import Decimal
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
@@ -30,7 +31,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite, PrerequisiteExpression
+from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
 from program_management.models.enums.node_type import NodeType
 
 
@@ -63,7 +64,8 @@ class Node:
             code: str = None,
             title: str = None,
             year: int = None,
-            proposal_type: ProposalType = None
+            proposal_type: ProposalType = None,
+            credits: Decimal = None
     ):
         self.node_id = node_id
         if children is None:
@@ -75,6 +77,7 @@ class Node:
         self.title = title
         self.year = year
         self.proposal_type = proposal_type
+        self.credits = credits
 
     def __eq__(self, other):
         return self.node_id == other.node_id
@@ -98,6 +101,18 @@ class Node:
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
+    def get_all_children(
+            self,
+            ignore_children_from: Set[EducationGroupTypesEnum] = None,
+    ) -> Set['Link']:
+        children = set()
+        for link in self.children:
+            children.add(link)
+            if ignore_children_from and link.child.node_type in ignore_children_from:
+                continue
+            children |= link.child.get_all_children(ignore_children_from=ignore_children_from)
+        return children
+
     def get_all_children_as_nodes(
             self,
             take_only: Set[EducationGroupTypesEnum] = None,
@@ -110,16 +125,17 @@ class Node:
         if their type matches with this param
         :return: A flat set of all children nodes
         """
-        result = set()
-        for link in self.children:
-            child = link.child
-            result.add(link.child)
-            if ignore_children_from and child.node_type in ignore_children_from:
-                continue
-            result |= child.get_all_children_as_nodes()
+        children_links = self.get_all_children(ignore_children_from=ignore_children_from)
         if take_only:
-            return set(n for n in result if n.node_type in take_only)
-        return result
+            return set(link.child for link in children_links if link.child.node_type in take_only)
+        return set(link.child for link in children_links)
+
+    def get_all_children_as_learning_unit_nodes(self) -> List['NodeLearningUnitYear']:
+        sorted_links = sorted(
+            [link for link in self.get_all_children() if isinstance(link.child, NodeLearningUnitYear)],
+            key=lambda link: (link.order, link.parent.code)
+        )
+        return [link.child for link in sorted_links]
 
     @property
     def children_as_nodes(self) -> List['Node']:
@@ -177,9 +193,9 @@ class NodeGroupYear(Node):
 
 class NodeLearningUnitYear(Node):
     def __init__(self, **kwargs):
+        self.is_prerequisite_of = kwargs.pop('is_prerequisite_of', []) or []
         super().__init__(**kwargs)
-        self.prerequisite = None  # FIXME : Should be of type Prerequisite?
-        self.is_prerequisite_of = []
+        self.prerequisite = NullPrerequisite()
 
     @property
     def has_prerequisite(self) -> bool:
@@ -192,6 +208,9 @@ class NodeLearningUnitYear(Node):
     @property
     def has_proposal(self) -> bool:
         return bool(self.proposal_type)
+
+    def get_is_prerequisite_of(self) -> List['NodeLearningUnitYear']:
+        return sorted(self.is_prerequisite_of, key=lambda node: node.code)
 
     def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite

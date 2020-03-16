@@ -105,10 +105,10 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
         node_code=F('partial_acronym'),
         node_title=F('acronym'),
         year=F('academic_year__year'),
-        proposal_type=Value(None, output_field=CharField())
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title')\
+        proposal_type=Value(None, output_field=CharField()),
+    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
      .annotate(title=F('node_title'), code=F('node_code'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title')
+     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')
 
 
 def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
@@ -118,7 +118,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         node_code=F('acronym'),
         node_title=F('full_title'),
         year=F('academic_year__year'),
-        proposal_type=F('proposallearningunit__type')
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title')\
+        proposal_type=F('proposallearningunit__type'),
+    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
      .annotate(title=F('node_title'), code=F('node_code'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title')
+     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')

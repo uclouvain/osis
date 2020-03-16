@@ -64,7 +64,16 @@ class Prerequisite:
         self.prerequisite_item_groups.append(group)
 
     def __str__(self) -> PrerequisiteExpression:
-        str_format = "({})" if len(self.prerequisite_item_groups) > 1 else "{}"
+        def _format_group(group: PrerequisiteItemGroup):
+            return "({})" if len(group.prerequisite_items) > 1 and len(self.prerequisite_item_groups) > 1 else "{}"
         return str(" " + self.main_operator + " ").join(
-            str_format.format(group) for group in self.prerequisite_item_groups
+            _format_group(group).format(group) for group in self.prerequisite_item_groups
         )
+
+
+class NullPrerequisite(Prerequisite):
+    def __init__(self):
+        super().__init__(prerequisite_operator.AND, None)
+
+    def __bool__(self):
+        return False

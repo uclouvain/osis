@@ -76,9 +76,10 @@ class NodeGroupYearFactory(NodeFactory):
 
 
 class NodeLearningUnitYearFactory(NodeFactory):
-
     class Meta:
         model = NodeLearningUnitYear
         abstract = False
 
     node_type = None
+    is_prerequisite_of = []
+    credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

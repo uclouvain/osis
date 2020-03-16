@@ -48,7 +48,6 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
-from program_management.business.excel import _get_blocks_prerequisite_of
 from program_management.business.excel_ue_in_of import EducationGroupYearLearningUnitsContainedToExcel, FIX_TITLES, \
     _get_headers, optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, \
     _get_attribution_line, optional_header_for_required_entity, optional_header_for_active, \
@@ -493,7 +492,6 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_build_validate_html_list_to_string_wrong_method(self):
         self.assertEqual(_build_validate_html_list_to_string('Test', None), 'Test')
-        self.assertEqual(_build_validate_html_list_to_string('Test', _get_blocks_prerequisite_of), 'Test')
 
     def test_row_height_not_populated(self):
         custom_form = CustomXlsForm({})
