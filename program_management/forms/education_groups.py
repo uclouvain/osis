@@ -26,6 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
+from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
@@ -189,21 +190,17 @@ class GroupFilter(FilterSet):
             )
         ).annotate(
             entity_management_version=Subquery(management_entity)
-        ).annotate(standard_version=Case(
-            When(educationgroupversion__version_name='',
-                 then='educationgroupversion__version_name'),
-            default=None,
-            output_field=CharField())
-        ).annotate(non_standard_version=Case(
-            When(~Q(educationgroupversion__version_name=''),
-                 then='educationgroupversion__version_name'),
-            default=None,
-            output_field=CharField())
         ).annotate(
             version=Case(
                 When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
                      then=Value(PARTICULAR)),
                 default=Value(STANDARD),
+                output_field=CharField(),)
+        ).annotate(
+            complete_title_fr=Case(
+                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
+                     then=Concat('acronym', Value(' ['), 'educationgroupversion__version_name', Value(']'))),
+                default=Value('acronym'),
                 output_field=CharField(),)
         )
 
