@@ -367,8 +367,7 @@ def _build_excel_lines_prerequisited(root: EducationGroupYear):
 
 def _build_is_prerequisite_for_line(prerequisite_node: 'NodeLearningUnitYear', first, tree: 'ProgramTree'):
     text = (_("is a prerequisite of") + " :") if first else None
-    links = tree.get_links_using_node(prerequisite_node)
-    first_link = links[0]  # FIXME :: how to deal with multiple usage of the same learning unit ?
+    first_link = tree.get_first_link_occurence_using_node(prerequisite_node)
     return PrerequisiteOfItemLine(
         text=text,
         luy_acronym=prerequisite_node.code,

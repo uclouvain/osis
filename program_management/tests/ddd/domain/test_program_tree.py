@@ -229,3 +229,35 @@ class TestGetAllNodes(SimpleTestCase):
             result,
             {link_with_root.parent, link_with_root.child, link_with_child.child}
         )
+
+
+class TestGetFirstLinkOccurenceUsingNode(SimpleTestCase):
+
+    def setUp(self):
+        self.tree = ProgramTreeFactory()
+        self.child_reused = NodeGroupYearFactory()
+
+    def test_when_child_not_used(self):
+        LinkFactory(parent=self.tree.root_node)
+        result = self.tree.get_first_link_occurence_using_node(self.child_reused)
+        self.assertEqual(result, None)
+
+    def test_when_child_used_only_one_time_in_tree(self):
+        link1 = LinkFactory(parent=self.tree.root_node)
+        link1_1 = LinkFactory(parent=link1.child, child=self.child_reused)
+        result = self.tree.get_first_link_occurence_using_node(self.child_reused)
+        self.assertEqual(result, link1_1)
+
+    def test_with_child_reused_in_tree(self):
+        link1 = LinkFactory(parent=self.tree.root_node)
+        link1_1 = LinkFactory(parent=link1.child, child=self.child_reused)
+        link2 = LinkFactory(parent=self.tree.root_node)
+        link2_1 = LinkFactory(parent=link2.child, child=self.child_reused)
+        link3 = LinkFactory(parent=self.tree.root_node)
+        link3_1 = LinkFactory(parent=link3.child, child=self.child_reused)
+
+        result = self.tree.get_first_link_occurence_using_node(self.child_reused)
+        error_msg = "Must take the first occurence from the order displayed in the tree"
+        self.assertEqual(result, link1_1, error_msg)
+        self.assertNotEqual(result, link2_1, error_msg)
+        self.assertNotEqual(result, link3_1, error_msg)

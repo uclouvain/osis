@@ -68,11 +68,12 @@ class ProgramTree:
         return result
 
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
-        maps = {}
-        for l in self.root_node.get_all_children():
-            if l.child == child_node:
-                maps.setdefault(child_node, []).append(l)
-        return maps[child_node]
+        return [l for l in _links_from_root(self.root_node) if l.child == child_node]
+
+    def get_first_link_occurence_using_node(self, child_node: 'Node') -> 'Link':
+        links = self.get_links_using_node(child_node)
+        if links:
+            return links[0]
 
     def get_node(self, path: Path) -> 'Node':
         """
@@ -134,11 +135,19 @@ class ProgramTree:
         parent.detach_child(node_id)
 
 
-def _nodes_from_root(root: 'Node'):
+def _nodes_from_root(root: 'Node') -> List['Node']:
     nodes = [root]
     for link in root.children:
         nodes.extend(_nodes_from_root(link.child))
     return nodes
+
+
+def _links_from_root(root: 'Node') -> List['Link']:
+    links = []
+    for link in root.children:
+        links.append(link)
+        links.extend(_links_from_root(link.child))
+    return links
 
 
 def build_path(*nodes):
