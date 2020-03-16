@@ -110,7 +110,6 @@ class GroupFilter(FilterSet):
         label=_('Version'),
         field_name='version',
         empty_label=pgettext_lazy("plural", "All"),
-        method='filter_by_version'
     )
 
     with_entity_transition = filters.BooleanFilter(
@@ -170,13 +169,6 @@ class GroupFilter(FilterSet):
             return queryset.exclude(educationgroupversion__is_transition=True)
         return queryset
 
-    def filter_by_version(self, queryset, name, value):
-        if value == STANDARD:
-            return queryset.filter(standard_version='')
-        if value == PARTICULAR:
-            return queryset.filter(~Q(non_standard_version=''))
-        return queryset
-
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
@@ -201,13 +193,18 @@ class GroupFilter(FilterSet):
             When(educationgroupversion__version_name='',
                  then='educationgroupversion__version_name'),
             default=None,
-            output_field=CharField(),
-        )).annotate(non_standard_version=Case(
+            output_field=CharField())
+        ).annotate(non_standard_version=Case(
             When(~Q(educationgroupversion__version_name=''),
                  then='educationgroupversion__version_name'),
             default=None,
-            output_field=CharField(),
-        ))
+            output_field=CharField())
+        ).annotate(
+            version=Case(
+                When(~Q( Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True ) ) , then= Value(PARTICULAR)),  
+                default=Value(STANDARD),
+                output_field=CharField(),)
+        )
 
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)
