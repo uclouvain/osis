@@ -84,7 +84,7 @@ To declare a role within a Django application:
             @classmethod
             def rule_set(cls):
                 return rules.RuleSet({
-                    'view_examscore': examscore_period_is_openned & student_is_registered_to_exam,
+                    'view_examscore': examscore_period_is_open & student_is_registered_to_exam,
                     ...            
                 })
                            
@@ -170,6 +170,6 @@ TODO
 
 FAQ
 ===
-- ##### Can I use a Django Group without register a corresponding role ? 
+- ##### Can I use a Django Group without registering a corresponding role ? 
    Yes, `osis_role` fallback to standard behaviour when no corresponding roles found on RoleManager
    
