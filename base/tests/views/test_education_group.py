@@ -49,7 +49,6 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
@@ -373,17 +372,16 @@ class EducationGroupViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
 
-        cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.type_minitraining = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
-        cls.type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+    def setUp(self):
+        self.client.force_login(self.person.user)
 
     def test_education_administrative_data(self):
         an_education_group_year = TrainingFactory(
             education_group_type__name=TrainingType.BACHELOR.name,
             academic_year=self.academic_year
         )
-        self.initialize_session()
         url = reverse("education_group_administrative", args=[an_education_group_year.id, an_education_group_year.id])
         response = self.client.get(url)
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
@@ -394,7 +392,6 @@ class EducationGroupViewTestCase(TestCase):
         edy = TrainingFactory(academic_year=self.academic_year)
         a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
                                                        child_branch=edy)
-        self.initialize_session()
         url = reverse("education_group_administrative",
                       args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])
         response = self.client.get(url)
@@ -438,15 +435,10 @@ class EducationGroupViewTestCase(TestCase):
 
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()
-        self.initialize_session()
         url = reverse("education_group_diplomas", args=[an_education_group.id, an_education_group.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/tab_diplomas.html")
-
-    def initialize_session(self):
-        person = PersonWithPermissionsFactory("can_access_education_group")
-        self.client.force_login(person.user)
 
 
 class EducationGroupAdministrativedata(TestCase):
