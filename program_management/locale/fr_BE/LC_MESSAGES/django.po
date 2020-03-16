@@ -387,7 +387,7 @@ msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
 msgid "Root group"
-msgstr "Groupe racine"
+msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
@@ -499,10 +499,10 @@ msgid "Title"
 msgstr "Intitulé"
 
 msgid "Title in English"
-msgstr "Titre en anglais"
+msgstr "Intitulé en anglais"
 
 msgid "Title in French"
-msgstr "Titre en français"
+msgstr "Intitulé en français"
 
 msgid "Trainings"
 msgstr "Formations"
@@ -511,7 +511,7 @@ msgid "Utilizations"
 msgstr "Utilisations"
 
 msgid "Version name"
-msgstr "Nom de version"
+msgstr "Sigle de la version"
 
 msgid "Volume"
 msgstr "Volume"
