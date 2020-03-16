@@ -155,6 +155,8 @@ class TestLearningUnitModificationProposal(TestCase):
             'component-1-hourly_volume_partial_q2': 10,
             'component-1-planned_classes': 1,
         }
+        cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
+            year=cls.learning_unit_year.academic_year.year - 1)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -305,6 +307,8 @@ class TestLearningUnitSuppressionProposal(TestCase):
             "folder_id": "1",
             "state": ProposalState.FACULTY.name
         }
+        cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
+            year=cls.learning_unit_year.academic_year.year - 1)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -321,16 +325,14 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertIsInstance(response.context['form_end_date'], LearningUnitProposalEndDateForm)
         self.assertCountEqual(
             list(response.context['form_end_date'].fields['academic_year'].queryset),
-            list(AcademicYear.objects.filter(
-                year__range=(self.current_academic_year.year - 1, self.current_academic_year.year + 6)
-            ))
+            list(self.academic_year_for_suppression_proposal)
         )
 
         form_proposal = response.context['form_proposal']
         form_end_date = response.context['form_end_date']
 
         self.assertEqual(form_end_date.fields['academic_year'].initial, None)
-        self.assertTrue(form_end_date.fields['academic_year'].required)
+        self.assertFalse(form_end_date.fields['academic_year'].required)
         self.assertEqual(form_proposal.fields['folder_id'].initial, None)
         self.assertEqual(form_proposal.fields['entity'].initial, None)
 
@@ -339,9 +341,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         response = self.client.get(self.url)
         self.assertCountEqual(
             list(response.context['form_end_date'].fields['academic_year'].queryset),
-            list(AcademicYear.objects.filter(
-                year__range=(self.current_academic_year.year - 1, self.current_academic_year.year + 6)
-            ))
+            list(self.academic_year_for_suppression_proposal)
         )
 
     def test_post_request(self):
@@ -364,7 +364,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         )
 
         self.learning_unit.refresh_from_db()
-        self.assertEqual(self.learning_unit.end_year, self.next_academic_year)
+        self.assertEqual(self.learning_unit.end_year, self.academic_year_for_suppression_proposal.first())
 
 
 class TestLearningUnitProposalSearch(TestCase):
@@ -717,6 +717,8 @@ class TestEditProposal(TestCase):
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.entity)
 
         cls.url = reverse(update_learning_unit_proposal, args=[cls.learning_unit_year.id])
+        cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
+            year=cls.learning_unit_year.academic_year.year - 1)
 
     def setUp(self):
         self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
@@ -846,9 +848,7 @@ class TestEditProposal(TestCase):
         self.assertIsInstance(response.context['form_end_date'], LearningUnitProposalEndDateForm)
         self.assertCountEqual(
             list(response.context['form_end_date'].fields['academic_year'].queryset),
-            list(AcademicYear.objects.filter(
-                year=self.learning_unit_year.academic_year.year - 1
-            ))
+            list(self.academic_year_for_suppression_proposal)
         )
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
@@ -857,8 +857,8 @@ class TestEditProposal(TestCase):
         self.proposal.save()
 
         request_factory = RequestFactory()
-        request = request_factory.post(self.url, data={"academic_year": AcademicYear.objects.get(
-            year=self.learning_unit_year.academic_year.year - 1).id,
+        request = request_factory.post(self.url, data={"academic_year":
+                                                           self.academic_year_for_suppression_proposal.first().id,
                                                        "entity": self.entity_version.id,
                                                        "folder_id": 12})
 
