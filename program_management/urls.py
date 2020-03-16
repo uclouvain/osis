@@ -28,7 +28,7 @@ from django.urls import include
 
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
-    groupelementyear_management, excel
+    groupelementyear_management, excel, search
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
@@ -86,5 +86,6 @@ urlpatterns = [
         r'reporting/(?P<root_id>[0-9]+)/(?P<education_group_year_pk>[0-9]+)/contains/$',
         excel.get_learning_units_of_training_for_excel,
         name="education_group_learning_units_contains"
-    )
+    ),
+    url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
 ]
