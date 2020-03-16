@@ -80,7 +80,7 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         return self.context['root'].pk
 
     def get_title(self, obj: 'Link'):
-        return obj.child.acronym
+        return obj.child.code
 
     def get_href(self, obj: 'Link'):
         # TODO: add table_to_show....
@@ -161,7 +161,7 @@ class NodeViewSerializer(CommonNodeViewSerializer):
         return None
 
     def get_text(self, obj: 'Link'):
-        return '%(acronym)s - %(title)s' % {'acronym': obj.child.acronym, 'title': obj.child.title}
+        return '%(code)s - %(title)s' % {'code': obj.child.code, 'title': obj.child.title}
 
 
 class LeafViewSerializer(CommonNodeViewSerializer):
@@ -169,7 +169,7 @@ class LeafViewSerializer(CommonNodeViewSerializer):
     a_attr = LeafViewAttributeSerializer(source='*')
 
     def get_text(self, obj: 'Link'):
-        text = obj.child.acronym
+        text = obj.child.code
         if self.context['root'].year != obj.child.year:
             text += '|{}'.format(obj.child.year)
         return text

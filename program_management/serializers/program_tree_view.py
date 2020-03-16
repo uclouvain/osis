@@ -46,4 +46,4 @@ class ProgramTreeViewSerializer(serializers.Serializer):
         return None
 
     def get_text(self, obj: 'ProgramTree'):
-        return '%(acronym)s - %(title)s' % {'acronym': obj.root_node.acronym, 'title': obj.root_node.title}
+        return '%(code)s - %(title)s' % {'code': obj.root_node.code, 'title': obj.root_node.title}

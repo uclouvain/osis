@@ -32,12 +32,12 @@ PrerequisiteExpression = str  # Example : "(Prerequisite1 OR Prerequisite2) AND 
 
 
 class PrerequisiteItem:
-    def __init__(self, acronym: str, year: int):
-        self.acronym = acronym
+    def __init__(self, code: str, year: int):
+        self.code = code
         self.year = year
 
     def __str__(self):
-        return self.acronym
+        return self.code
 
 
 class PrerequisiteItemGroup:
@@ -46,8 +46,8 @@ class PrerequisiteItemGroup:
         self.operator = operator
         self.prerequisite_items = prerequisite_items or []
 
-    def add_prerequisite_item(self, acronym: str, year: int):
-        self.prerequisite_items.append(PrerequisiteItem(acronym, year))
+    def add_prerequisite_item(self, code: str, year: int):
+        self.prerequisite_items.append(PrerequisiteItem(code, year))
 
     def __str__(self):
         return str(" " + self.operator + " ").join(str(p_item) for p_item in self.prerequisite_items)

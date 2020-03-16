@@ -51,7 +51,7 @@ factory = NodeFactory()
 
 class Node:
 
-    acronym = None
+    code = None
     year = None
 
     def __init__(
@@ -60,7 +60,7 @@ class Node:
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
             children: List['Link'] = None,
-            acronym: str = None,
+            code: str = None,
             title: str = None,
             year: int = None,
             proposal_type: ProposalType = None
@@ -71,7 +71,7 @@ class Node:
         self.children = children
         self.node_type = node_type
         self.end_date = end_date
-        self.acronym = acronym
+        self.code = code
         self.title = title
         self.year = year
         self.proposal_type = proposal_type
@@ -83,7 +83,7 @@ class Node:
         return hash(self.node_id)
 
     def __str__(self):
-        return '%(acronym)s (%(year)s)' % {'acronym': self.acronym, 'year': self.year}
+        return '%(code)s (%(year)s)' % {'code': self.code, 'year': self.year}
 
     def __repr__(self):
         return str(self)
