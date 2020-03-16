@@ -55,13 +55,15 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.views.education_groups.detail import get_appropriate_common_admission_condition
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+
+ACCESS_DENIED = "access_denied.html"
 
 
 class EducationGroupGeneralInformations(TestCase):
@@ -115,7 +117,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.client.force_login(an_other_user)
 
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_with_non_existent_education_group_year(self):
@@ -440,8 +442,7 @@ class EducationGroupViewTestCase(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_diplomas.html")
 
     def initialize_session(self):
-        person = PersonFactory()
-        person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        person = PersonWithPermissionsFactory("can_access_education_group")
         self.client.force_login(person.user)
 
 
@@ -481,7 +482,7 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
 
     def test_user_is_not_program_manager_of_education_group(self):
         self.program_manager.delete()
@@ -616,14 +617,14 @@ class EducationGroupEditAdministrativeData(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
 
     def test_user_is_not_program_manager_of_education_group(self):
         self.program_manager.delete()
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
 
     def test_education_group_non_existent(self):
         self.education_group_year.delete()
@@ -641,7 +642,7 @@ class EducationGroupEditAdministrativeData(TestCase):
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_with_education_group_year_of_type_group(self):
@@ -653,7 +654,7 @@ class EducationGroupEditAdministrativeData(TestCase):
                       args=[group_education_group_year.id, group_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     @mock.patch('base.business.education_group.can_user_edit_administrative_data')
@@ -733,7 +734,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_user_has_link_to_edit_conditions(self):

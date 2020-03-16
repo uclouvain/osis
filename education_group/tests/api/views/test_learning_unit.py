@@ -35,13 +35,14 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
+
+LEARNING_UNIT_API_HEAD = 'learning_unit_api_v1:'
 
 
 class FilterEducationGroupRootsTestCase(APITestCase):
@@ -74,12 +75,11 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         GroupElementYearFactory(parent=cls.complementary_module, child_branch=None, child_leaf=cls.learning_unit_year)
 
-        cls.person = PersonFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
         }
-        cls.url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs=url_kwargs)
+        cls.url = reverse(LEARNING_UNIT_API_HEAD + EducationGroupRootsList.name, kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -151,15 +151,15 @@ class EducationGroupRootsListTestCase(APITestCase):
             learning_container_year__academic_year=cls.academic_year
         )
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
-        cls.person = PersonFactory()
+        cls.user = UserFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
         }
-        cls.url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs=url_kwargs)
+        cls.url = reverse(LEARNING_UNIT_API_HEAD + EducationGroupRootsList.name, kwargs=url_kwargs)
 
     def setUp(self):
-        self.client.force_authenticate(user=self.person.user)
+        self.client.force_authenticate(user=self.user)
 
     def test_get_not_authorized(self):
         self.client.force_authenticate(user=None)
@@ -176,7 +176,7 @@ class EducationGroupRootsListTestCase(APITestCase):
 
     def test_get_results_case_learning_unit_year_not_found(self):
         invalid_url = reverse(
-            'learning_unit_api_v1:' + EducationGroupRootsList.name,
+            LEARNING_UNIT_API_HEAD + EducationGroupRootsList.name,
             kwargs={'acronym': 'ACRO', 'year': 2019}
         )
         response = self.client.get(invalid_url)
@@ -216,15 +216,15 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             education_group_year=cls.education_group_year
         )
         PrerequisiteItemFactory(prerequisite=cls.prerequisite)
-        cls.person = PersonFactory()
+        cls.user = UserFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
         }
-        cls.url = reverse('learning_unit_api_v1:' + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
+        cls.url = reverse(LEARNING_UNIT_API_HEAD + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
 
     def setUp(self):
-        self.client.force_authenticate(user=self.person.user)
+        self.client.force_authenticate(user=self.user)
 
     def test_get_not_authorized(self):
         self.client.force_authenticate(user=None)
@@ -241,7 +241,7 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
 
     def test_get_results_case_learning_unit_year_not_found(self):
         invalid_url = reverse(
-            'learning_unit_api_v1:' + LearningUnitPrerequisitesList.name,
+            LEARNING_UNIT_API_HEAD + LearningUnitPrerequisitesList.name,
             kwargs={'acronym': 'ACRO', 'year': 2019}
         )
         response = self.client.get(invalid_url)
