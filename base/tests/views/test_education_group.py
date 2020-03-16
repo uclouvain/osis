@@ -379,13 +379,16 @@ class EducationGroupViewTestCase(TestCase):
         cls.type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
 
     def test_education_administrative_data(self):
-        an_education_group = EducationGroupYearFactory(academic_year=self.academic_year)
+        an_education_group_year = TrainingFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
         self.initialize_session()
-        url = reverse("education_group_administrative", args=[an_education_group.id, an_education_group.id])
+        url = reverse("education_group_administrative", args=[an_education_group_year.id, an_education_group_year.id])
         response = self.client.get(url)
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
-        self.assertEqual(response.context['education_group_year'], an_education_group)
-        self.assertEqual(response.context['parent'], an_education_group)
+        self.assertEqual(response.context['education_group_year'], an_education_group_year)
+        self.assertEqual(response.context['parent'], an_education_group_year)
 
     def test_education_administrative_data_with_root_set(self):
         edy = TrainingFactory(academic_year=self.academic_year)
