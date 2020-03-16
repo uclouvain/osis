@@ -162,6 +162,9 @@ msgstr ""
 msgid "Cred. rel./abs."
 msgstr ""
 
+msgid "Direct gathering"
+msgstr ""
+
 #, python-format
 msgid "Element selected %(element)s"
 msgstr ""
@@ -191,9 +194,6 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
-msgid "Gathering"
-msgstr ""
-
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -218,6 +218,9 @@ msgid "Link type"
 msgstr ""
 
 msgid "Made in"
+msgstr ""
+
+msgid "Main gathering"
 msgstr ""
 
 msgid "Mandatory"
