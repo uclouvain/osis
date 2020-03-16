@@ -3567,11 +3567,6 @@
                     "admission"
                 ],
                 [
-                    "view_admission",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
                     "change_admission",
                     "continuing_education",
                     "admission"
