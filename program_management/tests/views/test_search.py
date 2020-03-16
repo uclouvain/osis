@@ -524,13 +524,13 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
                                                             is_transition=False)
 
         # Transition of particular
-        # group_transition_particular_group_yr_2 = EducationGroupGroupFactory(start_year=cls.current_academic_year)
-        # cls.transition_group_yr_2_transition = GroupYearFactory(group=group_transition_particular_group_yr_2,
-        #                                                         academic_year=cls.current_academic_year)
-        # cls.transition_egv = EducationGroupVersionFactory(root_group=cls.transition_group_yr_2_transition,
-        #                                                   offer=cls.egy,
-        #                                                   version_name='Transition',
-        #                                                   is_transition=True)
+        group_transition_particular_group_yr_2 = EducationGroupGroupFactory(start_year=cls.current_academic_year)
+        cls.transition_group_yr_2_transition = GroupYearFactory(group=group_transition_particular_group_yr_2,
+                                                                academic_year=cls.current_academic_year)
+        cls.transition_egv = EducationGroupVersionFactory(root_group=cls.transition_group_yr_2_transition,
+                                                          offer=cls.egy,
+                                                          version_name='CMES-2[Transition]',
+                                                          is_transition=True)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
@@ -558,6 +558,7 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
                 self.transition_group_yr,
                 self.particular_group_yr_1,
                 self.particular_group_yr_2,
+                self.transition_group_yr_2_transition
             ]
         )
 
@@ -613,7 +614,8 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
             [
                 self.transition_group_yr,
                 self.particular_group_yr_1,
-                self.particular_group_yr_2
+                self.particular_group_yr_2,
+                self.transition_group_yr_2_transition
             ]
         )
 
