@@ -201,7 +201,8 @@ class GroupFilter(FilterSet):
             output_field=CharField())
         ).annotate(
             version=Case(
-                When(~Q( Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True ) ) , then= Value(PARTICULAR)),  
+                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
+                     then=Value(PARTICULAR)),
                 default=Value(STANDARD),
                 output_field=CharField(),)
         )
