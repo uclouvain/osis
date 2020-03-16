@@ -63,6 +63,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 
 ACCESS_DENIED = "access_denied.html"
+LOGIN_NEXT = '/login/?next={}'
 
 
 class EducationGroupGeneralInformations(TestCase):
@@ -95,6 +96,7 @@ class EducationGroupGeneralInformations(TestCase):
             "education_group_general_informations",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
         )
+        cls.template_path = "education_group/tab_general_informations.html"
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -109,7 +111,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_without_permission(self):
         an_other_user = UserFactory()
@@ -143,7 +145,7 @@ class EducationGroupGeneralInformations(TestCase):
         )
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_case_didactic_offer_ensure_show_finalite_common(self):
@@ -155,7 +157,7 @@ class EducationGroupGeneralInformations(TestCase):
                       args=[education_group_year.pk, education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         context = response.context
         self.assertEqual(context["parent"], education_group_year)
@@ -174,7 +176,7 @@ class EducationGroupGeneralInformations(TestCase):
                       args=[education_group_year.pk, education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         context = response.context
         self.assertEqual(context["parent"], education_group_year)
@@ -195,7 +197,7 @@ class EducationGroupGeneralInformations(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('a.pedagogy-edit-btn')), 0)
@@ -205,7 +207,7 @@ class EducationGroupGeneralInformations(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(len(soup.select('a.pedagogy-edit-btn')), 0)
@@ -249,7 +251,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     def test_when_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
@@ -335,7 +337,7 @@ class EducationGroupPublishViewTestCase(TestCase):
     def test_publish_case_user_not_logged(self):
         self.client.logout()
         response = self.client.post(self.url)
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_public_case_methods_not_allowed(self):
         methods_not_allowed = ['get', 'delete', 'put']
@@ -373,6 +375,7 @@ class EducationGroupViewTestCase(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.template_name = "education_group/tab_administrative_data.html"
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -384,18 +387,21 @@ class EducationGroupViewTestCase(TestCase):
         )
         url = reverse("education_group_administrative", args=[an_education_group_year.id, an_education_group_year.id])
         response = self.client.get(url)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
         self.assertEqual(response.context['education_group_year'], an_education_group_year)
         self.assertEqual(response.context['parent'], an_education_group_year)
 
     def test_education_administrative_data_with_root_set(self):
-        edy = TrainingFactory(academic_year=self.academic_year)
+        edy = TrainingFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
         a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
                                                        child_branch=edy)
         url = reverse("education_group_administrative",
                       args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])
         response = self.client.get(url)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
         self.assertEqual(response.context['education_group_year'], a_group_element_year.child_branch)
         self.assertEqual(response.context['parent'], a_group_element_year.parent)
 
@@ -461,6 +467,7 @@ class EducationGroupAdministrativedata(TestCase):
             cls.education_group_year.id, cls.education_group_year.id
         ])
         create_current_academic_year()
+        cls.template_name = "education_group/tab_administrative_data.html"
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -469,7 +476,7 @@ class EducationGroupAdministrativedata(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_has_not_permission(self):
         Group.objects.get(name="program_managers").permissions.remove(self.permission_access)
@@ -484,7 +491,7 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertFalse(response.context["can_edit_administrative_data"])
 
@@ -493,7 +500,7 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertFalse(response.context["can_edit_administrative_data"])
 
@@ -536,7 +543,7 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertTrue(response.context["can_edit_administrative_data"])
 
@@ -605,7 +612,7 @@ class EducationGroupEditAdministrativeData(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_has_not_permission(self):
         self.person.user.user_permissions.remove(self.permission)
@@ -707,6 +714,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             "education_group_year_admission_condition_edit",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
         )
+        cls.template_name = "education_group/tab_admission_conditions.html"
 
     def setUp(self):
         self.perm_patcher = mock.patch(
@@ -721,7 +729,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_without_permission(self):
         an_other_user = UserFactory()
@@ -736,7 +744,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('button.btn-publish')), 0)
@@ -745,7 +753,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_user_has_not_link_to_edit_conditions(self, mock_perms):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
@@ -759,7 +767,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         response = self.client.get(url_edit_common)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertFalse(response.context['info']['show_free_text'])
 
