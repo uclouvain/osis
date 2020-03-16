@@ -118,7 +118,7 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/search/description_fiche.html')
         self.assertTrue(response.context['is_faculty_manager'])
-        self.assertEqual(response.context['search_type'], SearchTypes.SUMMARY_LIST)
+        self.assertEqual(response.context['search_type'], SearchTypes.SUMMARY_LIST.value)
         self.assertEqual(response.context['learning_units_count'], 1)
 
         self.assertEqual(response.context['object_list'].first(), self.learning_unit_year)
