@@ -50,7 +50,7 @@ class EducationGroupVersion(models.Model):
     is_transition = models.BooleanField(verbose_name=_('Transition'))
     version_name = models.CharField(
         blank=True,
-        max_length=15,
+        max_length=25,
         verbose_name=_('Version name')
     )
     root_group = models.OneToOneField(
@@ -76,6 +76,7 @@ class EducationGroupVersion(models.Model):
         verbose_name=_("Title in English")
     )
 
+    default_manager = models.Manager()
     standard = StandardEducationGroupVersionManager()
 
     def __str__(self):
