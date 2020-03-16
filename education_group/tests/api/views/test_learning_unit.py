@@ -127,7 +127,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             }
         )
 
-        self.assertListEqual(response.data, serializer.data)
+        self.assertCountEqual(response.data, serializer.data)
 
 
 class EducationGroupRootsListTestCase(APITestCase):
