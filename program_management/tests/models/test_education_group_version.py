@@ -51,14 +51,16 @@ class TestEducationGroupVersion(SimpleTestCase):
 
     def test_str_standard_education_group_version(self):
         version = EducationGroupVersion(offer=self.offer, root_group=self.root_group)
-        self.assertEqual(str(version), '{} ({})'.format(version.offer, STANDARD))
+        self.assertEqual(str(version), str(version.offer))
 
 
 class TestStandardEducationGroupManager(TestCase):
 
     def setUp(self):
-        EducationGroupVersionFactory()
+        self.not_standard_version = EducationGroupVersionFactory()
         self.standard_version = StandardEducationGroupVersionFactory()
 
     def test_standard_education_group_version_manager(self):
-        self.assertEqual(list(EducationGroupVersion.standard.all()), [self.standard_version])
+        result = EducationGroupVersion.standard.all()
+        self.assertIn(self.standard_version, result)
+        self.assertNotIn(self.not_standard_version, result)

@@ -35,7 +35,6 @@ class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'is_transition')
     list_filter = ('version_name', 'is_transition')
     search_fields = ('offer__acronym', 'root_group__acronym')
-    raw_id_fields = ('offer', 'root_group')
 
 
 class StandardEducationGroupVersionManager(models.Manager):
@@ -76,14 +75,12 @@ class EducationGroupVersion(models.Model):
         verbose_name=_("Title in English")
     )
 
-    default_manager = models.Manager()
+    objects = models.Manager()
     standard = StandardEducationGroupVersionManager()
 
     def __str__(self):
-        return "{} ({})".format(
-            self.offer,
-            self.version_name or 'standard',
-        )
+        return "{} ({})".format(self.offer, self.version_name) if self.version_name else str(self.offer)
 
     class Meta:
         unique_together = ('version_name', 'offer')
+        default_manager_name = 'objects'
