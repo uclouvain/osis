@@ -33,8 +33,6 @@ from program_management.models.education_group_version import EducationGroupVers
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory
 
-STANDARD = 'standard'
-
 
 class TestEducationGroupVersion(SimpleTestCase):
 
