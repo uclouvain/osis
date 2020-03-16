@@ -26,7 +26,6 @@
 from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
-from base.models.education_group_year import EducationGroupYear
 
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -63,13 +62,12 @@ class EducationGroupSerializer(serializers.Serializer):
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
             'academic_year',
             'management_entity'
         )
 
     def get_complete_title_fr(self, obj):
-        return "{}{}".format(obj.acronym, " [{}]".format(obj.version_name) if obj.version_name else '')
+        return "{}{}".format(obj.acronym, " [{}]".format(obj.non_standard_version) if obj.non_standard_version else '')
 
     def get_title_fr(self, obj):
         return "{}".format(obj.title_fr)

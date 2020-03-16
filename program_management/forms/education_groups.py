@@ -38,7 +38,6 @@ from education_group.models.group_year import GroupYear
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
-from program_management.models import education_group_version
 from django.db.models import Q
 
 
@@ -173,9 +172,9 @@ class GroupFilter(FilterSet):
 
     def filter_by_version(self, queryset, name, value):
         if value == STANDARD:
-            return queryset.filter(Q(version_name='') | Q(version_name__isnull=True))
+            return queryset.filter(standard_version='')
         if value == PARTICULAR:
-            return queryset.exclude(version_name='')
+            return queryset.filter(~Q(non_standard_version=''))
         return queryset
 
     def get_queryset(self):
@@ -189,8 +188,6 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        eg_version = education_group_version.EducationGroupVersion.objects.filter(root_group=OuterRef('pk')).values(
-            'version_name')[:1]
         return GroupYear.objects.all().annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
@@ -200,9 +197,17 @@ class GroupFilter(FilterSet):
             )
         ).annotate(
             entity_management_version=Subquery(management_entity)
-        ).annotate(
-            version_name=Subquery(eg_version)
-        )
+        ).annotate(standard_version=Case(
+            When(educationgroupversion__version_name='',
+                 then='educationgroupversion__version_name'),
+            default=None,
+            output_field=CharField(),
+        )).annotate(non_standard_version=Case(
+            When(~Q(educationgroupversion__version_name=''),
+                 then='educationgroupversion__version_name'),
+            default=None,
+            output_field=CharField(),
+        ))
 
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)

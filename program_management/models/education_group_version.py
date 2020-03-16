@@ -43,11 +43,6 @@ class StandardEducationGroupVersionManager(models.Manager):
         return super().get_queryset().filter(version_name='')
 
 
-class VersionManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset()
-
-
 class EducationGroupVersion(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -81,8 +76,8 @@ class EducationGroupVersion(models.Model):
         verbose_name=_("Title in English")
     )
 
+    default_manager = models.Manager()
     standard = StandardEducationGroupVersionManager()
-    objects = VersionManager()
 
     def __str__(self):
         return "{} ({})".format(
