@@ -102,23 +102,23 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         node_id=F('pk'),
         type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
-        node_acronym=F('acronym'),
-        node_title=F('title'),
+        node_code=F('partial_acronym'),
+        node_title=F('acronym'),
         year=F('academic_year__year'),
-        proposal_type=Value(None, output_field=CharField())
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_acronym', 'node_title')\
-     .annotate(title=F('node_title'), acronym=F('node_acronym'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'acronym', 'title')
+        proposal_type=Value(None, output_field=CharField()),
+    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
+     .annotate(title=F('node_title'), code=F('node_code'))\
+     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')
 
 
 def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
     return LearningUnitYear.objects.filter(pk__in=node_learning_unit_year_ids).annotate_full_title().annotate(
         node_id=F('pk'),
         type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
-        node_acronym=F('acronym'),
+        node_code=F('acronym'),
         node_title=F('full_title'),
         year=F('academic_year__year'),
-        proposal_type=F('proposallearningunit__type')
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_acronym', 'node_title')\
-     .annotate(title=F('node_title'), acronym=F('node_acronym'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'acronym', 'title')
+        proposal_type=F('proposallearningunit__type'),
+    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
+     .annotate(title=F('node_title'), code=F('node_code'))\
+     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')

@@ -24,6 +24,8 @@
 #
 ##############################################################################
 import factory.fuzzy
+
+from base.tests.factories.group_element_year import _generate_block_value
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
 from program_management.ddd.domain.link import Link
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
@@ -38,6 +40,8 @@ class LinkFactory(factory.Factory):
     child = factory.SubFactory(NodeGroupYearFactory)
     relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
     is_mandatory = FuzzyBoolean()
+    order = None
+    block = factory.LazyFunction(_generate_block_value)
     link_type = None
 
     @factory.post_generation

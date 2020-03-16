@@ -82,3 +82,4 @@ class NodeLearningUnitYearFactory(NodeFactory):
         abstract = False
 
     node_type = None
+    is_prerequisite_of = []

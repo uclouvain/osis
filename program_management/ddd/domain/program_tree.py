@@ -67,6 +67,13 @@ class ProgramTree:
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
+    def get_links_using_node(self, child_node: 'Node') -> List['Link']:
+        maps = {}
+        for l in self.root_node.get_all_children():
+            if l.child == child_node:
+                maps.setdefault(child_node, []).append(l)
+        return maps[child_node]
+
     def get_node(self, path: Path) -> 'Node':
         """
         Return the corresponding node based on path of tree
