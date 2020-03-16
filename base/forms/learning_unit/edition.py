@@ -67,25 +67,11 @@ class LearningUnitEndDateForm(forms.Form):
         self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
-        if self.learning_unit.is_past():
-            raise ValueError(
-                'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
-                    self.learning_unit.end_year)
-            )
-
         event_perm = self.get_event_perm_generator()(self.person)
         self.luy_current_year = self.learning_unit_year.academic_year.year
         academic_years = event_perm.get_academic_years(min_academic_y=self.luy_current_year, max_academic_y=max_year)
 
         return academic_years
-
-    def disable_field(self, field):
-        self.fields[field].disabled = True
-        self.fields[field].required = False
-
-    def enable_field(self, field):
-        self.fields[field].disabled = False
-        self.fields[field].required = True
 
     def save(self, update_learning_unit_year=True):
         return edit_learning_unit_end_date(self.learning_unit, self.cleaned_data['academic_year'],
@@ -94,10 +80,11 @@ class LearningUnitEndDateForm(forms.Form):
 
 class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
     EMPTY_LABEL = None
+    REQUIRED = False
 
     def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
         super().__init__(data, learning_unit_year, *args, max_year=max_year, person=person, **kwargs)
-        self.disable_field('academic_year')
+        self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
 
     @classmethod
     def get_event_perm_generator(cls):

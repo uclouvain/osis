@@ -857,10 +857,10 @@ class TestEditProposal(TestCase):
         self.proposal.save()
 
         request_factory = RequestFactory()
-        request = request_factory.post(self.url, data={"academic_year":
-                                                           self.academic_year_for_suppression_proposal.first().id,
-                                                       "entity": self.entity_version.id,
-                                                       "folder_id": 12})
+        request = request_factory.post(self.url,
+                                       data={"academic_year": self.academic_year_for_suppression_proposal.first().id,
+                                             "entity": self.entity_version.id,
+                                             "folder_id": 12})
 
         request.user = self.person.user
         request.session = 'session'
