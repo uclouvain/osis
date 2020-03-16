@@ -847,7 +847,7 @@ class TestEditProposal(TestCase):
         self.assertCountEqual(
             list(response.context['form_end_date'].fields['academic_year'].queryset),
             list(AcademicYear.objects.filter(
-                year__range=(self.current_academic_year.year, self.current_academic_year.year + 4)
+                year=self.learning_unit_year.academic_year.year - 1
             ))
         )
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
@@ -857,7 +857,8 @@ class TestEditProposal(TestCase):
         self.proposal.save()
 
         request_factory = RequestFactory()
-        request = request_factory.post(self.url, data={"academic_year": self.academic_years[3].id,
+        request = request_factory.post(self.url, data={"academic_year": AcademicYear.objects.get(
+            year=self.learning_unit_year.academic_year.year - 1).id,
                                                        "entity": self.entity_version.id,
                                                        "folder_id": 12})
 
