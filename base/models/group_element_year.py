@@ -151,6 +151,8 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )
             SELECT * FROM adjacency_query
+            LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
+            WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null 
             ORDER BY starting_node_id, level, "order";
         """ % ','.join(["%s"] * len(root_elements_ids))
 
