@@ -35,7 +35,6 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 
 class TestAttachFinalityEndDateValidator(SimpleTestCase):
 
-    @classmethod
     def setUp(self):
         self.tree_2m = ProgramTreeFactory(
             root_node__node_type=TrainingType.PGRM_MASTER_120,

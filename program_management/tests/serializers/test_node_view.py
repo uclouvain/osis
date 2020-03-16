@@ -50,7 +50,7 @@ class TestNodeViewSerializer(SimpleTestCase):
         self.serializer = NodeViewSerializer(self.link, context=self.context)
 
     def test_serialize_node_ensure_text(self):
-        expected_text = self.link.child.acronym
+        expected_text = self.link.child.acronym + " - " + self.link.child.title
         self.assertEquals(self.serializer.data['text'], expected_text)
 
     def test_serialize_node_ensure_icon_case_concrete_link(self):
@@ -119,12 +119,12 @@ class TestLeafViewSerializer(SimpleTestCase):
         self.serializer = LeafViewSerializer(self.link, context=self.context)
 
     def test_serializer_leaf_ensure_text_case_leaf_have_same_year_of_root(self):
-        expected_text = self.link.child.title
+        expected_text = self.link.child.acronym
         self.assertEquals(self.serializer.data['text'], expected_text)
 
     def test_serializer_leaf_ensure_text_case_leaf_doesnt_have_same_year_of_root(self):
         self.link.child.year = self.root_node.year - 1
-        expected_text = self.link.child.title + "|" + str(self.link.child.year)
+        expected_text = self.link.child.acronym + "|" + str(self.link.child.year)
 
         self.assertEquals(self.serializer.data['text'], expected_text)
 

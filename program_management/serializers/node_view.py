@@ -32,13 +32,14 @@ from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.domain import link, node
-from program_management.models.enums import node_type
+from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
+
+from program_management.ddd.business_types import *
 
 
 class ChildrenField(serializers.Serializer):
-    def to_representation(self, value: link.Link):
+    def to_representation(self, value: 'Link'):
         context = {
             **self.context,
             'path': "|".join([self.context['path'], str(value.child.pk)])
@@ -65,7 +66,7 @@ class NodeViewAttributeSerializer(serializers.Serializer):
     modification_msg = serializers.CharField(default=None)
     search_url = serializers.SerializerMethodField()
 
-    def get_element_type(self, obj):
+    def get_element_type(self, obj: 'Link'):
         child_node = obj.child
 
         if isinstance(child_node, node.NodeEducationGroupYear):
@@ -75,32 +76,32 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         elif isinstance(child_node, node.NodeLearningClassYear):
             return NodeType.LEARNING_CLASS.name
 
-    def get_root(self, obj: link.Link):
+    def get_root(self, obj: 'Link'):
         return self.context['root'].pk
 
-    def get_title(self, obj: link.Link):
+    def get_title(self, obj: 'Link'):
         return obj.child.acronym
 
-    def get_href(self, obj: link.Link):
+    def get_href(self, obj: 'Link'):
         # TODO: add table_to_show....
         return reverse('education_group_read', args=[self.get_root(obj), obj.child.pk])
 
-    def get_attach_url(self, obj: link.Link):
+    def get_attach_url(self, obj: 'Link'):
         return reverse('tree_attach_node', args=[self.get_root(obj)]) + "?" + urlencode({
             'to_path': self.context['path']
         })
 
-    def get_detach_url(self, obj: link.Link):
+    def get_detach_url(self, obj: 'Link'):
         return reverse('tree_detach_node', args=[self.get_root(obj)]) + "?" + urlencode({
             'path': self.context['path']
         })
 
-    def get_modify_url(self, obj: link.Link):
+    def get_modify_url(self, obj: 'Link'):
         return reverse('tree_update_link', args=[self.get_root(obj)]) + "?" + urlencode({
             'path': self.context['path']
         })
 
-    def get_search_url(self, obj: link.Link):
+    def get_search_url(self, obj: 'Link'):
         # if attach.can_attach_learning_units(self.education_group_year):
         #     return reverse('quick_search_learning_unit', args=[self.root.pk, self.education_group_year.pk])
         return reverse('quick_search_education_group', args=[self.get_root(obj), obj.child.pk])
@@ -111,14 +112,14 @@ class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
     is_prerequisite = serializers.BooleanField(source='child.is_prerequisite')
     css_class = serializers.SerializerMethodField()
 
-    def get_href(self, obj: link.Link):
+    def get_href(self, obj: 'Link'):
         # TODO: add table_to_show....
         return reverse('learning_unit_utilization', args=[self.get_root(obj), obj.child.pk])
 
     def get_element_type(self, obj):
         return NodeType.LEARNING_UNIT.name
 
-    def get_title(self, obj: link.Link):
+    def get_title(self, obj: 'Link'):
         title = obj.child.title
         if obj.child.has_prerequisite and obj.child.is_prerequisite:
             title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
@@ -128,7 +129,7 @@ class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
             title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
         return title
 
-    def get_css_class(self, obj: link.Link):
+    def get_css_class(self, obj: 'Link'):
         return {
             ProposalType.CREATION.name: "proposal proposal_creation",
             ProposalType.MODIFICATION.name: "proposal proposal_modification",
@@ -142,35 +143,38 @@ class CommonNodeViewSerializer(serializers.Serializer):
     path = serializers.SerializerMethodField()
     icon = serializers.SerializerMethodField()
 
-    def get_path(self, obj: link.Link):
+    def get_path(self, obj: 'Link'):
         return self.context['path']
 
-    def get_icon(self, obj: link.Link):
+    def get_icon(self, obj: 'Link'):
         return None
 
 
 class NodeViewSerializer(CommonNodeViewSerializer):
-    text = serializers.CharField(source='child.acronym')
+    text = serializers.SerializerMethodField()
     children = ChildrenField(source='child.children', many=True)
     a_attr = NodeViewAttributeSerializer(source='*')
 
-    def get_icon(self, obj: link.Link):
+    def get_icon(self, obj: 'Link'):
         if obj.link_type == link_type.LinkTypes.REFERENCE.name:
             return static('img/reference.jpg')
         return None
+
+    def get_text(self, obj: 'Link'):
+        return '%(acronym)s - %(title)s' % {'acronym': obj.child.acronym, 'title': obj.child.title}
 
 
 class LeafViewSerializer(CommonNodeViewSerializer):
     text = serializers.SerializerMethodField()
     a_attr = LeafViewAttributeSerializer(source='*')
 
-    def get_text(self, obj: link.Link):
-        text = obj.child.title
+    def get_text(self, obj: 'Link'):
+        text = obj.child.acronym
         if self.context['root'].year != obj.child.year:
             text += '|{}'.format(obj.child.year)
         return text
 
-    def get_icon(self, obj: link.Link):
+    def get_icon(self, obj: 'Link'):
         if obj.child.has_prerequisite and obj.child.is_prerequisite:
             return "fa fa-exchange-alt"
         elif obj.child.has_prerequisite:

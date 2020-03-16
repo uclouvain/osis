@@ -102,8 +102,8 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         node_id=F('pk'),
         type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
-        node_acronym=F('acronym'),
-        node_title=F('title'),
+        node_acronym=F('partial_acronym'),
+        node_title=F('acronym'),
         year=F('academic_year__year'),
         proposal_type=Value(None, output_field=CharField())
     ).values('node_id', 'type', 'year', 'proposal_type', 'node_acronym', 'node_title')\
