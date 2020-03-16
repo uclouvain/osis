@@ -50,7 +50,7 @@ class EducationGroupSerializer(serializers.Serializer):
     )
     management_entity = serializers.StringRelatedField()
     complete_title_fr = serializers.SerializerMethodField()
-    title_fr = serializers.SerializerMethodField()
+    title_fr = serializers.CharField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -68,6 +68,3 @@ class EducationGroupSerializer(serializers.Serializer):
 
     def get_complete_title_fr(self, obj):
         return "{}{}".format(obj.acronym, " [{}]".format(obj.non_standard_version) if obj.non_standard_version else '')
-
-    def get_title_fr(self, obj):
-        return "{}".format(obj.title_fr)
