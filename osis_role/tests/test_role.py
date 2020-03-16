@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from types import SimpleNamespace
+
 import mock
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
@@ -36,27 +38,22 @@ class TestOsisRoleManager(SimpleTestCase):
         self.manager = OsisRoleManager()
 
     def test_register_case_not_subclass_of_role_model(self):
-        class DummyObj(object):
-            pass
-
         with self.assertRaises(ImproperlyConfigured):
-            self.manager.register(DummyObj)
+            self.manager.register(SimpleNamespace)
 
     def test_register_case_subclass_of_role_model(self):
-        class RoleModelSubclass(models.RoleModel):
-            class Meta:
-                group_name = 'role_model_subclass'
+        subclass = mock.Mock(spec=models.RoleModel)
+        type(subclass.__class__).group_name = mock.PropertyMock(return_value='role_model_subclass')
 
-        self.manager.register(RoleModelSubclass)
+        self.manager.register(subclass.__class__)
         self.assertIsInstance(self.manager.roles, set)
         self.assertEquals(len(self.manager.roles), 1)
 
     @mock.patch('osis_role.role.OsisRoleManager.roles', new_callable=mock.PropertyMock)
     def test_get_group_names_managed(self, mock_roles_set):
-        class RoleModelSubclass(models.RoleModel):
-            class Meta:
-                group_name = 'role_model_subclass'
-        mock_roles_set.return_value = {RoleModelSubclass}
+        subclass = mock.Mock(spec=models.RoleModel)
+        type(subclass.__class__).group_name = mock.PropertyMock(return_value='role_model_subclass')
+        mock_roles_set.return_value = {subclass.__class__}
 
         self.assertEquals(
             self.manager.group_names_managed(),
