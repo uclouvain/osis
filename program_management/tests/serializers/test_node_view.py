@@ -203,7 +203,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         self.assertEquals(self.serializer.data['href'], expected_url)
 
     def test_serializer_node_attr_ensure_get_element_type(self):
-        self.assertEquals(self.serializer.data['element_type'], NodeType.LEARNING_UNIT)
+        self.assertEquals(self.serializer.data['element_type'], NodeType.LEARNING_UNIT.name)
 
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,
