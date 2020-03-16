@@ -194,6 +194,9 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
+msgid "Include transition"
+msgstr ""
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -289,6 +292,9 @@ msgid "Optional"
 msgstr ""
 
 msgid "Other informations"
+msgstr ""
+
+msgid "Particular"
 msgstr ""
 
 msgid "Paste"
