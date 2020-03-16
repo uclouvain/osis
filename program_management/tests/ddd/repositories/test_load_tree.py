@@ -67,7 +67,7 @@ class TestLoadTree(TestCase):
         self.assertIsInstance(education_group_program_tree.root_node, node.NodeEducationGroupYear)
         self.assertEqual(len(education_group_program_tree.root_node.children), 1)
         self.assertEqual(
-            education_group_program_tree.root_node.children[0].child.acronym,
+            education_group_program_tree.root_node.children[0].child.title,
             self.link_level_1.child_branch.acronym
         )
 
