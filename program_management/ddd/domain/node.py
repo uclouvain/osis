@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from _decimal import Decimal
-from copy import copy
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
@@ -51,69 +50,7 @@ class NodeFactory:
 factory = NodeFactory()
 
 
-def post_init(init_function):
-    def f_post_init(self, *args, **kwargs):
-        result = init_function(self, *args, **kwargs)
-        print('coucou')
-        self._initial_hash = hash(frozenset(vars(self).items()))
-        print('OK : {}'.format(self._initial_hash))
-        return result
-    return f_post_init
-
-
-class TriggerChangedMixin:  # TODO :: unit tests
-    # _changed = False
-    _initials: dict = None
-
-    def __setattr__(self, key, value):
-        if key not in ('_changed', '_initials'):
-            if not hasattr(self, key) or key not in (self._initials or {}):
-                if self._initials is None:
-                    self._initials = {}
-                # if isinstance(value, dict) or isinstance(value, list):
-                self._initials[key] = copy(value)
-            # else:
-            #     self._changed = True
-        super(TriggerChangedMixin, self).__setattr__(key, value)
-
-    @staticmethod
-    def _is_mutable_object(obj):
-        return isinstance(obj, dict) or isinstance(obj, list)
-
-    # def has_changed(self):
-    #     return hash(frozenset(vars(self).items())) != self._initial_hash
-
-    def check_diff_with_initials(self):
-        diffs = {}
-        for key, initial_value in self._initials.items():
-            current_value = getattr(self, key)
-            if self._mutable_object_has_changed() or initial_value != current_value:
-                diffs[key] = {'old': initial_value, 'new': current_value}
-        return diffs
-
-    def get_new_objects(self, attr_name: str) -> set:
-        assert attr_name in self._initials
-        diffs = self.check_diff_with_initials()[attr_name]
-        return set(diffs.get('new', [])) - set(diffs.get('old', []))
-
-    def has_changed(self):
-        return bool(self.check_diff_with_initials())
-
-    def _mutable_object_has_changed(self):
-        return any(
-            self._is_mutable_object(value) and value != getattr(self, key)
-            for key, value in self._initials.items()
-        )
-        # for key, value in self._initials:
-        #     if self._is_mutable_object(value) and value != getattr(self, key):
-        #         return True
-        # return False
-
-    def __init__(self, *args, **kwargs):
-        super(TriggerChangedMixin, self).__init__(*args, **kwargs)
-
-
-class Node(TriggerChangedMixin):
+class Node:
 
     acronym = None
     year = None
