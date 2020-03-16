@@ -427,7 +427,7 @@ msgstr ""
 "n'ont pas encore été soumises (état 'brouillon')"
 
 msgid "Req. Entity"
-msgstr "Entité"
+msgstr "Ent. charge"
 
 msgid ""
 "Reuse the address of an entity linked to the program or inform the posting "
@@ -596,7 +596,7 @@ msgid "Type"
 msgstr "Type"
 
 msgid "Type of training"
-msgstr "Formation"
+msgstr "Type de formation"
 
 msgid "UE title"
 msgstr "Intitulé de l'UE"
