@@ -426,8 +426,6 @@ msgstr ""
 "entouré de parenthèses est le nombre de notes encodées par le tuteur qui "
 "n'ont pas encore été soumises (état 'brouillon')"
 
-#, fuzzy
-#| msgid "Entity"
 msgid "Req. Entity"
 msgstr "Entité"
 
@@ -597,8 +595,6 @@ msgstr "Tuteurs du cours"
 msgid "Type"
 msgstr "Type"
 
-#, fuzzy
-#| msgid "Training"
 msgid "Type of training"
 msgstr "Formation"
 
