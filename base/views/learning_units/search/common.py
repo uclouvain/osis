@@ -80,7 +80,7 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
             'learning_units_count': context["paginator"].count,
             'current_academic_year': starting_ac,
             'proposal_academic_year': starting_ac.next(),
-            'search_type': self.search_type,
+            'search_type': self.search_type.value,
             'items_per_page': context["paginator"].per_page,
         })
         return context
