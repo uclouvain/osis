@@ -61,7 +61,7 @@ class TestSearchBorrowedLearningUnits(TestCase):
         response = self.client.get(self.url, data={"acronym": "acronym"})
 
         context = response.context
-        self.assertEqual(context["search_type"], SearchTypes.BORROWED_COURSE)
+        self.assertEqual(context["search_type"], SearchTypes.BORROWED_COURSE.value)
         self.assertTemplateUsed(response, "learning_unit/search/base.html")
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
@@ -93,7 +93,7 @@ class TestSearchExternalLearningUnits(TestCase):
 
         self.assertTemplateUsed(response, "learning_unit/search/external.html")
         context = response.context
-        self.assertEqual(context["search_type"], SearchTypes.EXTERNAL_SEARCH)
+        self.assertEqual(context["search_type"], SearchTypes.EXTERNAL_SEARCH.value)
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
         self.assertIn(_('No result!'), messages)

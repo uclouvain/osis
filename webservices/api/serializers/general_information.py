@@ -125,6 +125,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             ),
             translated_label=Value(translated_text_label.label, output_field=CharField())
         )
+
         try:
             return translated_text.values('label', 'translated_label', 'text').get()
         except ObjectDoesNotExist:

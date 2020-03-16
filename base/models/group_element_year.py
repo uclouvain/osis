@@ -322,10 +322,10 @@ class GroupElementYear(OrderedModel):
     def _verbose_credits(self):
         if self.relative_credits or self.child_branch.credits:
             return "{} ({} {})".format(
-                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+                self.child.verbose_title, self.relative_credits or self.child_branch.credits or 0, _("credits")
             )
         else:
-            return "{}".format(self.child.title)
+            return "{}".format(self.child.verbose_title)
 
 
 def find_learning_unit_roots(objects, return_result_params=None, luy=None, recursive_conditions=None):
@@ -471,7 +471,7 @@ def _find_elements(group_elements_by_child_id, recursive_conditions=None, child_
     return list(set(roots))
 
 
-def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 
@@ -482,6 +482,11 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
 
     group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
     for group_elem_year in queryset:
+        if exclude_options and group_elem_year.child_branch and \
+                group_elem_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
+            if EducationGroupYear.hierarchy.filter(pk=group_elem_year.child_branch.pk).get_parents(). \
+                        filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                continue
         parent_id = group_elem_year.parent_id
         group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
     return group_elems_by_parent_id
