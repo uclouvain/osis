@@ -108,6 +108,7 @@ To declare a role within a Django application:
 Manage permissions within role
 -------------------------------
 All permissions for a specific role are contained in class method `rule_set(cls)`
+These permissions are specified as predicates.
 This method must return an RuleSet object provided by `rules` library.
 
 Documentation: [How to write predicate ?](https://github.com/dfunckt/django-rules/blob/master/README.rst#setting-up-rules)
