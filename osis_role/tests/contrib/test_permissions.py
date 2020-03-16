@@ -45,8 +45,8 @@ class TestObjectPermissionBackend(TestCase):
 
     def setUp(self):
         self.person = PersonFactory()
-        self.mock_role_model = mock.MagicMock()
-        self.mock_role_model.group_name = mock.PropertyMock(return_value=self.group.name)
+        self.mock_role_model = mock.Mock()
+        type(self.mock_role_model).group_name = mock.PropertyMock(return_value=self.group.name)
         self.mock_role_model.rule_set = mock.Mock(return_value=rules.RuleSet({
             'perm_allowed': rules.always_allow,
             'perm_denied': rules.always_deny
