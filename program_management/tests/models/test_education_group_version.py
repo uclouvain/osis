@@ -23,20 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.datetime_safe import datetime
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 
 STANDARD = 'standard'
 
 
 class TestEducationGroupVersion(SimpleTestCase):
 
-    def setUp(cls):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
         cls.academic_year = AcademicYear(year=datetime.today().year)
         cls.offer = EducationGroupYear(academic_year=cls.academic_year, partial_acronym='PA', acronym='ACRO')
         cls.root_group = GroupYear()
@@ -48,3 +52,13 @@ class TestEducationGroupVersion(SimpleTestCase):
     def test_str_standard_education_group_version(self):
         version = EducationGroupVersion(offer=self.offer, root_group=self.root_group)
         self.assertEqual(str(version), '{} ({})'.format(version.offer, STANDARD))
+
+
+class TestStandardEducationGroupManager(TestCase):
+
+    def setUp(self):
+        EducationGroupVersionFactory()
+        self.standard_version = StandardEducationGroupVersionFactory()
+
+    def test_standard_education_group_version_manager(self):
+        self.assertEqual(list(EducationGroupVersion.standard.all()), [self.standard_version])
