@@ -61,7 +61,7 @@ def _navigation_base(filter_class_function, reverse_url_function, user, obj, url
     search_type = search_parameters.get("search_type")
     filter_form_class = filter_class_function(search_type)
     order_by = filter_form_class(data=search_parameters).qs.query.order_by
-    order_by_expressions = convert_order_by_strings_to_expressions(order_by)
+    order_by_expressions = convert_order_by_strings_to_expressions(order_by) or None
     qs = filter_form_class(data=search_parameters).qs.annotate(
         previous_acronym=Window(
             expression=Lag("acronym"),
