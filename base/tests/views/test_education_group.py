@@ -52,7 +52,8 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
-    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory, \
+    EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
@@ -128,8 +129,11 @@ class EducationGroupGeneralInformations(TestCase):
 
     def test_with_education_group_year_of_type_group(self):
         group_education_group_year = EducationGroupYearFactory(
-            academic_year=self.current_academic_year
+            academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.BACHELOR.name,
+            education_group_type__category=education_group_categories.TRAINING
         )
+
         group_education_group_year.education_group_type.category = education_group_categories.GROUP
         group_education_group_year.education_group_type.save()
 
@@ -383,8 +387,9 @@ class EducationGroupViewTestCase(TestCase):
         self.assertEqual(response.context['parent'], an_education_group)
 
     def test_education_administrative_data_with_root_set(self):
+        edy = TrainingFactory(academic_year=self.academic_year)
         a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
-                                                       child_branch__academic_year=self.academic_year)
+                                                       child_branch=edy)
         self.initialize_session()
         url = reverse("education_group_administrative",
                       args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])
@@ -442,27 +447,24 @@ class EducationGroupViewTestCase(TestCase):
 
 
 class EducationGroupAdministrativedata(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.person = PersonWithPermissionsFactory(
+    def setUp(self):
+        self.person = PersonWithPermissionsFactory(
             'can_access_education_group', 'can_edit_education_group_administrative_data'
         )
 
-        cls.permission_access = Permission.objects.get(codename='can_access_education_group')
-        cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
+        self.permission_access = Permission.objects.get(codename='can_access_education_group')
+        self.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
-        cls.education_group_year = EducationGroupYearFactory()
-        cls.program_manager = ProgramManagerFactory(
-            person=cls.person,
-            education_group=cls.education_group_year.education_group,
+        self.education_group_year = EducationGroupYearFactory()
+        self.program_manager = ProgramManagerFactory(
+            person=self.person,
+            education_group=self.education_group_year.education_group,
         )
 
-        cls.url = reverse('education_group_administrative', args=[
-            cls.education_group_year.id, cls.education_group_year.id
+        self.url = reverse('education_group_administrative', args=[
+            self.education_group_year.id, self.education_group_year.id
         ])
         create_current_academic_year()
-
-    def setUp(self):
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -543,7 +545,7 @@ class EducationGroupAdministrativedata(TestCase):
     def test_get_good_mandataries(self):
         ed = EducationGroupFactory()
         ac = AcademicYearFactory(current=True)
-        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
+        edy = EducationGroupYearBachelorFactory(education_group=ed, academic_year=ac)
 
         url = reverse('education_group_administrative', args=[
             edy.id, edy.id
@@ -675,10 +677,17 @@ class EducationGroupEditAdministrativeData(TestCase):
 class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        AcademicYearFactory(current=True)
-        cls.education_group_parent = TrainingFactory(acronym="Parent", academic_year=cls.academic_year)
-        cls.education_group_child = TrainingFactory(acronym="Child_1", academic_year=cls.academic_year)
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_parent = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,  # Type to match 'show_admission_conditions'
+            acronym="Parent",
+            academic_year=cls.academic_year
+        )
+        cls.education_group_child = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MC.name,  # Type to match 'show_admission_conditions'
+            acronym="Child_1",
+            academic_year=cls.academic_year
+        )
 
         cls.agregation_adm_cond = AdmissionConditionFactory(
             education_group_year=EducationGroupYearCommonAgregationFactory(academic_year=cls.academic_year)
@@ -752,8 +761,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
     def test_case_free_text_is_not_show_when_common(self):
-        AcademicYearFactory(current=True)
-        common_bachelor = EducationGroupYearCommonBachelorFactory()
+        common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
         url_edit_common = reverse(
             "education_group_year_admission_condition_edit",
             args=[common_bachelor.pk, common_bachelor.pk]

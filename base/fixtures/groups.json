@@ -3562,7 +3562,7 @@
             "name": "continuing_education_managers",
             "permissions": [
                 [
-                    "can_access_admission",
+                    "view_admission",
                     "continuing_education",
                     "admission"
                 ],
@@ -3572,12 +3572,7 @@
                     "admission"
                 ],
                 [
-                    "can_validate_registration",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "can_create_json",
+                    "validate_registration",
                     "continuing_education",
                     "admission"
                 ]
@@ -3590,7 +3585,7 @@
             "name": "continuing_education_training_managers",
             "permissions": [
                 [
-                    "can_access_admission",
+                    "view_admission",
                     "continuing_education",
                     "admission"
                 ],
@@ -3608,12 +3603,17 @@
             "name": "continuing_education_student_workers",
             "permissions": [
                 [
-                    "can_access_admission",
+                    "view_admission",
                     "continuing_education",
                     "admission"
                 ],
                 [
-                    "can_edit_received_file_field",
+                    "change_received_file_state",
+                    "continuing_education",
+                    "admission"
+                ],
+                [
+                    "validate_registration",
                     "continuing_education",
                     "admission"
                 ]
