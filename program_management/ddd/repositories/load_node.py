@@ -26,13 +26,15 @@
 from typing import List
 
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Value, Case, When, IntegerField, CharField, QuerySet
+from django.db.models import F, Value, Case, When, IntegerField, CharField, QuerySet, Q
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
-from base.models.learning_unit_year import LearningUnitYear
+from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
+
+from learning_unit.ddd.business_types import *
 
 
 def load_by_type(type: NodeType, element_id: int) -> node.Node:
@@ -59,37 +61,50 @@ def load_node_learning_unit_year(node_id: int) -> node.Node:
 
 
 def load_multiple(element_ids: List[int]) -> List[node.Node]:
-    aggregate_qs = GroupElementYear.objects.filter(pk__in=element_ids)\
-        .annotate(
-            node_type=Case(
-                When(child_branch_id__isnull=False, then=Value(NodeType.EDUCATION_GROUP.name)),
-                When(child_leaf_id__isnull=False, then=Value(NodeType.LEARNING_UNIT.name)),
-                default=Value('Unknown'),
-                output_field=CharField()
-            ),
-            node_id=Case(
-                When(child_branch_id__isnull=False, then=F('child_branch_id')),
-                When(child_leaf_id__isnull=False, then=F('child_leaf_id')),
-                default=Value(-1),
-                output_field=IntegerField()
-            ),
-        ).values('node_type').annotate(node_ids=ArrayAgg('node_id')).exclude(node_type='Unknown')
+    qs = GroupElementYear.objects.filter(
+        pk__in=element_ids
+    ).filter(
+        Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
+    ).annotate(
+        node_id=F('child_branch__pk'),
+        type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
+        code=F('child_branch__partial_acronym'),
+        title=F('child_branch__acronym'),
+        year=F('child_branch__academic_year__year'),
+        learning_unit_year_id=F('child_leaf__pk'),
+    ).values(
+        'node_id', 'type', 'code', 'title', 'year', 'learning_unit_year_id',
+    )
 
-    union_qs = None
-    for result_aggregate in aggregate_qs:
-        qs_function = {
-            NodeType.EDUCATION_GROUP.name: __load_multiple_node_education_group_year,
-            NodeType.LEARNING_UNIT.name: __load_multiple_node_learning_unit_year,
-        }[result_aggregate['node_type']]
-        qs = qs_function(result_aggregate['node_ids'])
+    nodes_data = list(qs)
 
-        union_qs = qs if union_qs is None else union_qs.union(qs)
+    learning_unit_pks = list(node_data.pop('learning_unit_year_id') for node_data in nodes_data)
 
-    if union_qs is not None:
-        return [
-            node.factory.get_node(**__convert_string_to_enum(node_data)) for node_data in union_qs
-        ]
-    return []
+    nodes_objects = [node.factory.get_node(**__convert_string_to_enum(node_data)) for node_data in nodes_data]
+
+    learn_units = load_learning_unit_year.load_multiple(learning_unit_pks)
+
+    nodes_objects += __convert_to_node(learn_units)
+
+    return nodes_objects
+
+
+def __convert_to_node(learning_units: List['LearningUnitYear']) -> List[node.Node]:
+    nodes = []
+    for lu in learning_units:
+        node_data = {
+            'node_id': lu.id,
+            'type': NodeType.LEARNING_UNIT.name,
+            'year': lu.year,
+            'proposal_type': lu.proposal_type,
+            'code': lu.acronym,
+            'title': lu.full_title_fr,
+            'credits': lu.credits,
+            'status': lu.credits,
+            'periodicity': lu.credits,
+        }
+        nodes.append(node.factory.get_node(**__convert_string_to_enum(node_data)))
+    return nodes
 
 
 def __convert_string_to_enum(node_data: dict) -> dict:

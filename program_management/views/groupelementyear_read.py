@@ -35,6 +35,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.repositories import load_tree
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
 MAIN_PART_INIT_SIZE = 650
@@ -47,9 +48,10 @@ USUAL_NUMBER_OF_BLOCKS = 3
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)
+    tree = load_tree.load(education_group_year.id)
     context = {
         'root': education_group_year,
-        'tree': tree_object.to_list(),
+        'tree': tree_object.to_list(),  # rename to-list -> to_ordered_flat_list
         'language': language,
         'created': datetime.datetime.now(),
         'max_block': tree_object.max_block,

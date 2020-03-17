@@ -27,6 +27,7 @@ from _decimal import Decimal
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.business_types import *
@@ -192,8 +193,10 @@ class NodeGroupYear(Node):
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, **kwargs):
+    def __init__(self, status: bool = None, periodicity: PeriodicityEnum = None, **kwargs):
         self.is_prerequisite_of = kwargs.pop('is_prerequisite_of', []) or []
+        self.status = status
+        self.periodicity = periodicity
         super().__init__(**kwargs)
         self.prerequisite = None  # FIXME : Should be of type Prerequisite?
 
