@@ -31,7 +31,8 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite
+from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+
 from program_management.models.enums.node_type import NodeType
 
 
@@ -80,7 +81,7 @@ class Node:
         self.credits = credits
 
     def __eq__(self, other):
-        return self.node_id == other.node_id
+        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
 
     def __hash__(self):
         return hash(self.node_id)
@@ -195,7 +196,7 @@ class NodeLearningUnitYear(Node):
     def __init__(self, **kwargs):
         self.is_prerequisite_of = kwargs.pop('is_prerequisite_of', []) or []
         super().__init__(**kwargs)
-        self.prerequisite = None  # FIXME : Should be of type Prerequisite?
+        self.prerequisite = NullPrerequisite()
 
     @property
     def has_prerequisite(self) -> bool:

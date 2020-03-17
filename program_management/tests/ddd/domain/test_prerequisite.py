@@ -91,5 +91,5 @@ class TestPrerequisite(SimpleTestCase):
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group_2)
 
-        expected_str = '(LDROI1300 OR LAGRO2400) AND (LDROI1400)'
+        expected_str = '(LDROI1300 OR LAGRO2400) AND LDROI1400'
         self.assertEquals(str(p_req), expected_str)

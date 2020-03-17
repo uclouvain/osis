@@ -67,8 +67,11 @@ class ProgramTree:
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
+    def get_links(self):
+        return _links_from_root(self.root_node)
+
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
-        return [l for l in _links_from_root(self.root_node) if l.child == child_node]
+        return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
 
     def get_first_link_occurence_using_node(self, child_node: 'Node') -> 'Link':
         links = self.get_links_using_node(child_node)
@@ -89,6 +92,21 @@ class ProgramTree:
         except KeyError:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
+
+    def get_node_by_id_and_class(self, node_id: int, node_class: 'Node') -> 'Node':
+        """
+        Return the corresponding node based on the node_id value with respect to the class.
+        :param node_id: int
+        :param node_class: a Node subclass
+        :return: Node
+        """
+        return next(
+            (
+                node for node in self.get_all_nodes()
+                if node.node_id == node_id and isinstance(node, node_class)
+            ),
+            None
+        )
 
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """

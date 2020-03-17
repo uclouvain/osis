@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 
@@ -54,26 +55,17 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        luy = self.object
-        root = context["root"]
-        context["prerequisite"] = get_object_or_none(Prerequisite,
-                                                     learning_unit_year=luy,
-                                                     education_group_year=root)
+        context["prerequisite"] = get_object_or_none(
+            Prerequisite,
+            learning_unit_year=self.object,
+            education_group_year=context["root"]
+        )
         context["can_modify_prerequisite"] = perms.is_eligible_to_change_education_group(
             context['person'],
             context["root"]
         )
-
-        context["learning_unit_years_parent"] = {}
-        for grp in self.hierarchy.included_group_element_years:
-            if not grp.child_leaf:
-                continue
-            context["learning_unit_years_parent"].setdefault(grp.child_leaf.id, grp)
-
-        context['is_prerequisites_list'] = Prerequisite.objects.filter(
-            prerequisiteitem__learning_unit=luy.learning_unit,
-            education_group_year=root
-        ).select_related('learning_unit_year')
+        context["program_links"] = self.program_tree.get_links()
+        context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
         return context
 
     def render_to_response(self, context, **response_kwargs):
