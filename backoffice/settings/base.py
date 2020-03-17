@@ -183,6 +183,8 @@ DATABASES = {
     },
 }
 
+AUTHENTICATION_BACKENDS = os.environ.get('AUTHENTICATION_BACKENDS', 'django.contrib.auth.backends.ModelBackend').split()
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 # If you want to change the default settings,
