@@ -93,6 +93,21 @@ class ProgramTree:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
+    def get_node_by_id_and_class(self, node_id: int, node_class: 'Node') -> 'Node':
+        """
+        Return the corresponding node based on the node_id value with respect to the class.
+        :param node_id: int
+        :param node_class: a Node subclass
+        :return: Node
+        """
+        return next(
+            (
+                node for node in self.get_all_nodes()
+                if node.node_id == node_id and isinstance(node, node_class)
+            ),
+            None
+        )
+
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
         Return a flat set of all nodes present in the tree

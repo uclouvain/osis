@@ -88,7 +88,7 @@ class TestEq(SimpleTestCase):
 
     def test_when_nodes_learning_unit_are_equal(self):
         node_with_same_id = NodeLearningUnitYearFactory(node_id=self.node_id)
-        self.assertTrue(self.node == node_with_same_id)
+        self.assertFalse(self.node == node_with_same_id)
 
     def test_when_nodes_learning_unit_are_not_equal(self):
         node_with_different_id = NodeLearningUnitYearFactory(node_id=self.node_id + 1)

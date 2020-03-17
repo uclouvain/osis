@@ -81,7 +81,7 @@ class Node:
         self.credits = credits
 
     def __eq__(self, other):
-        return self.node_id == other.node_id
+        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
 
     def __hash__(self):
         return hash(self.node_id)

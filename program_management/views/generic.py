@@ -141,13 +141,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, Catalog
         self.program_tree = load_tree.load(root.id)
         serialized_data = program_tree_view.ProgramTreeViewSerializer(self.program_tree).data
 
-        node = next(
-            (
-                node for node in self.program_tree.get_all_nodes()
-                if node.node_id == self.object.id and isinstance(node, NodeLearningUnitYear)
-            ),
-            None
-        )
+        node = self.program_tree.get_node_by_id_and_class(self.object.id, NodeLearningUnitYear)
 
         context['person'] = self.get_person()
         context['root'] = root
