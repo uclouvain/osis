@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import rules
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
+from base.models.entity import Entity
 from base.models.person import Person
 
 
@@ -91,3 +93,16 @@ class RoleModel(models.Model, metaclass=RoleModelMeta):
         if not self.belong_to(person):
             group, _ = Group.objects.get_or_create(name=self.group_name)
             person.user.groups.remove(group)
+
+
+class EntityRoleModel(RoleModel):
+
+    entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+        unique_together = ('person', 'entity',)
+
+    @classmethod
+    def get_person_related_entities(cls, person):
+        return cls.objects.filter(person=person).values_list('entity_id', flat=True)
