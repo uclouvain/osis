@@ -53,9 +53,14 @@ Add ``osis_role`` to ``INSTALLED_APPS``:
 Add the authentication backend:
 
     AUTHENTICATION_BACKENDS = (
-        'osis_role.contrib.permissions.ObjectPermissionBackend',
-        'django.contrib.auth.backends.ModelBackend',
+        'osis_role.contrib.permissions.ObjectPermissionBackend'
     )
+    
+  *OR*
+  
+  Add line in .env:
+        
+    AUTHENTICATION_BACKENDS = 'osis_role.contrib.permissions.ObjectPermissionBackend'
 
 Using OSIS-Role
 ===============
