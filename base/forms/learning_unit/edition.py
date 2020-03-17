@@ -80,7 +80,6 @@ class LearningUnitEndDateForm(forms.Form):
 
 class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
     EMPTY_LABEL = None
-    REQUIRED = False
 
     def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
         super().__init__(data, learning_unit_year, *args, max_year=max_year, person=person, **kwargs)
@@ -94,9 +93,6 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
         super()._get_academic_years(max_year)
         # Allow previous year as last organisation year for suppression proposal
         return AcademicYear.objects.filter(year=self.luy_current_year-1)
-
-    def clean_academic_year(self):
-        return self._get_academic_years(max_year=None).first()
 
 
 class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
