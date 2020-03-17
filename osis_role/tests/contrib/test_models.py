@@ -96,3 +96,13 @@ class TestRoleModel(TestCase):
         instance = models.RoleModel(person=self.person)
         instance._remove_user_from_group(self.person)
         self.assertIn("concrete_role", self.person.user.groups.all().values_list('name', flat=True))
+
+
+class TestEntityRoleModel(TestCase):
+    def test_ensure_class_is_abstract(self):
+        instance = models.EntityRoleModel()
+        self.assertTrue(instance._meta.abstract)
+
+    def test_unique_together_person_entity(self):
+        instance = models.EntityRoleModel()
+        self.assertEqual(instance._meta.unique_together, (('person', 'entity'),))
