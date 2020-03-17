@@ -166,7 +166,7 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
 
         self.assertIn(self.link_with_ref.parent, result)
         self.assertIn(another_link_with_ref.parent, result)
-        self.assertEqual(len(result), 2)
+        self.assertCountEqual(result, [self.link_with_ref.parent, another_link_with_ref.parent])
 
 
 class TestGetParents(SimpleTestCase):
