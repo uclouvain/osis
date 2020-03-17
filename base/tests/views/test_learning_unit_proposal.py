@@ -301,14 +301,15 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
         cls.url = reverse(learning_unit_suppression_proposal, args=[cls.learning_unit_year.id])
 
+        cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
+            year=cls.learning_unit_year.academic_year.year - 1)
+
         cls.form_data = {
-            "academic_year": cls.next_academic_year.id,
+            "academic_year": cls.academic_year_for_suppression_proposal.first().id,
             "entity": cls.entity_version.id,
             "folder_id": "1",
             "state": ProposalState.FACULTY.name
         }
-        cls.academic_year_for_suppression_proposal = AcademicYear.objects.filter(
-            year=cls.learning_unit_year.academic_year.year - 1)
 
     def setUp(self):
         self.client.force_login(self.person.user)
