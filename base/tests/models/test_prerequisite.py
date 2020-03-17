@@ -25,14 +25,8 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils.translation import gettext_lazy as _
 
-import program_management.templatetags.prerequisite
 from base.models import prerequisite
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
-from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class TestPrerequisiteSyntaxValidator(TestCase):
