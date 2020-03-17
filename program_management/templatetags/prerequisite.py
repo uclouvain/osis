@@ -94,4 +94,4 @@ def is_prerequisite_as_html(is_prerequisite_list: List[node.NodeLearningUnitYear
             node_obj.code, str(node_obj.year), node_obj.title, str(relative_credits), str(node_obj.credits.normalize())
         )
         rows.append(row)
-    return {"rows": rows}
+    return {"is_prerequisite_rows": rows}

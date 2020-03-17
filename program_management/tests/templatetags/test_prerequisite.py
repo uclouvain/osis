@@ -136,7 +136,7 @@ class TestIsPrerequisiteAsHtml(SimpleTestCase):
         result = prerequisite_tags.is_prerequisite_as_html([], [])
         self.assertEqual(
             result,
-            {"rows": []}
+            {"is_prerequisite_rows": []}
         )
 
     def test_when_is_prerequisite_of_one_luy_should_return_a_table_row(self):
@@ -149,7 +149,7 @@ class TestIsPrerequisiteAsHtml(SimpleTestCase):
         ]
         self.assertEqual(
             result,
-            {"rows": rows}
+            {"is_prerequisite_rows": rows}
         )
 
     def test_should_return_as_many_rows_as_there_is_element_in_is_prerequisite_list_sorted_by_code(self):
@@ -167,5 +167,5 @@ class TestIsPrerequisiteAsHtml(SimpleTestCase):
         ]
         self.assertEqual(
             result,
-            {"rows": rows}
+            {"is_prerequisite_rows": rows}
         )
