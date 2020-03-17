@@ -164,8 +164,6 @@ class TestGetParentsUsingNodeAsReference(SimpleTestCase):
 
         result = self.tree.get_parents_using_node_as_reference(child_used_twice)
 
-        self.assertIn(self.link_with_ref.parent, result)
-        self.assertIn(another_link_with_ref.parent, result)
         self.assertCountEqual(result, [self.link_with_ref.parent, another_link_with_ref.parent])
 
 
