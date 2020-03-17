@@ -71,7 +71,7 @@ class ProgramTree:
         return _links_from_root(self.root_node)
 
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
-        return [l for l in _links_from_root(self.root_node) if l.child == child_node]
+        return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
 
     def get_first_link_occurence_using_node(self, child_node: 'Node') -> 'Link':
         links = self.get_links_using_node(child_node)
