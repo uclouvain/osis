@@ -71,9 +71,24 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
         code=F('child_branch__partial_acronym'),
         title=F('child_branch__acronym'),
         year=F('child_branch__academic_year__year'),
+        constraint_type=F('child_branch__constraint_type'),
+        min_constraint=F('child_branch__min_constraint'),
+        max_constraint=F('child_branch__max_constraint'),
+        remark_fr=F('child_branch__remark'),
+        remark_en=F('child_branch__remark_english'),
         learning_unit_year_id=F('child_leaf__pk'),
     ).values(
-        'node_id', 'type', 'code', 'title', 'year', 'learning_unit_year_id',
+        'node_id',
+        'type',
+        'code',
+        'title',
+        'year',
+        'constraint_type',
+        'min_constraint',
+        'max_constraint',
+        'remark_fr',
+        'remark_en',
+        'learning_unit_year_id',
     )
 
     nodes_data = list(qs)

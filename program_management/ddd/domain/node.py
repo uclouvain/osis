@@ -30,6 +30,7 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
+from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite
@@ -183,13 +184,39 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
 
 
 class NodeEducationGroupYear(Node):
-    def __init__(self, **kwargs):
+    def __init__(
+            self,
+            constraint_type: ConstraintTypes = None,
+            min_constraint: int = None,
+            max_constraint: int = None,
+            remark_fr: str = None,
+            remark_en: str = None,
+            **kwargs
+    ):
         super().__init__(**kwargs)
+        self.constraint_type = constraint_type
+        self.min_constraint = min_constraint
+        self.max_constraint = max_constraint
+        self.remark_fr = remark_fr
+        self.remark_en = remark_en
 
 
 class NodeGroupYear(Node):
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        constraint_type: ConstraintTypes = None,
+        min_constraint: int = None,
+        max_constraint: int = None,
+        remark_fr: str = None,
+        remark_en: str = None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
+        self.constraint_type = constraint_type
+        self.min_constraint = min_constraint
+        self.max_constraint = max_constraint
+        self.remark_fr = remark_fr
+        self.remark_en = remark_en
 
 
 class NodeLearningUnitYear(Node):
