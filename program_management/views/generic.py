@@ -141,12 +141,20 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, Catalog
         self.program_tree = load_tree.load(root.id)
         serialized_data = program_tree_view.ProgramTreeViewSerializer(self.program_tree).data
 
+        node = next(
+            (
+                node for node in self.program_tree.get_all_nodes()
+                if node.node_id == self.object.id and isinstance(node, NodeLearningUnitYear)
+            ),
+            None
+        )
+
         context['person'] = self.get_person()
         context['root'] = root
         context['root_id'] = root.pk
         context['parent'] = root
         context['tree'] = json.dumps(serialized_data)
-        context['node'] = node = next((node for node in self.program_tree.get_all_nodes() if node.node_id == self.object.id and isinstance(node, NodeLearningUnitYear)), None)
+        context['node'] = node
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(root)
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
