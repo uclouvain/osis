@@ -48,7 +48,8 @@ class TestLoadTree(TestCase):
                 |-- leaf
         """
         cls.root_node = ElementEducationGroupYearFactory()
-        cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)  # TODO: Change to root_node when migration of group_element_year is done
+        #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
+        cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)
         cls.link_level_2 = GroupElementYearFactory(
             parent=cls.link_level_1.child_branch,
             child_branch=None,
@@ -60,8 +61,15 @@ class TestLoadTree(TestCase):
         with self.assertRaises(node.NodeNotFoundException):
             load_tree.load(unknown_tree_root_id)
 
+    def test_fields_to_load(self):
+        #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
+        educ_group = self.root_node.education_group_year
+        tree = load_tree.load(educ_group.pk)
+        self.assertEqual(tree.root_node.credits, educ_group.credits, "Field used to load prerequisites excel")
+
     def test_case_tree_root_with_multiple_level(self):
-        education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)  #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
+        #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
+        education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
         self.assertIsInstance(education_group_program_tree, program_tree.ProgramTree)
 
         self.assertIsInstance(education_group_program_tree.root_node, node.NodeEducationGroupYear)

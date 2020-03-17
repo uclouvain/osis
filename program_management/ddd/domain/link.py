@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
@@ -46,12 +47,26 @@ class Link:
         self.own_comment = kwargs.get('own_comment')
         self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
         self.link_type = kwargs.get('link_type')
+        self.order = kwargs.get('order')
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
 
     def is_reference(self):
         return self.link_type == LinkTypes.REFERENCE
+
+    @property
+    def block_repr(self) -> str:
+        if self.block:
+            block_in_array = [i for i in str(self.block)]
+            return " ; ".join(
+                block_in_array
+            )
+        return ''
+
+    @property
+    def relative_credits_repr(self) -> str:
+        return "{} / {:f}".format(self.relative_credits, self.child.credits.to_integral_value())
 
 
 class LinkWithChildLeaf(Link):

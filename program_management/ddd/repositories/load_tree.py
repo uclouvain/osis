@@ -111,7 +111,8 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         'quadrimester_derogation',
         'link_type',
         'parent_id',
-        'child_id'
+        'child_id',
+        'order'
     )
 
     tree_links = {}
