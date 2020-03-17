@@ -56,10 +56,10 @@ class LearningUnitYear:
         self.id = id
         self.year = year
         self.acronym = acronym
-        self.common_title_fr = common_title_fr
-        self.specific_title_fr = specific_title_fr
-        self.common_title_en = common_title_en
-        self.specific_title_en = specific_title_en
+        self.common_title_fr = common_title_fr or ''
+        self.specific_title_fr = specific_title_fr or ''
+        self.common_title_en = common_title_en or ''
+        self.specific_title_en = specific_title_en or ''
         self.start_date = start_year
         self.end_date = end_year
         self.proposal_type = proposal_type
