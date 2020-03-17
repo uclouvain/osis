@@ -72,6 +72,7 @@ class LearningUnitEndDateForm(forms.Form):
                 'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
                     self.learning_unit.end_year)
             )
+
         event_perm = self.get_event_perm_generator()(self.person)
         self.luy_current_year = self.learning_unit_year.academic_year.year
         academic_years = event_perm.get_academic_years(min_academic_y=self.luy_current_year, max_academic_y=max_year)
