@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-28 15:32+0100\n"
+"POT-Creation-Date: 2020-03-16 13:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -897,9 +897,6 @@ msgstr ""
 msgid "English title proper"
 msgstr ""
 
-msgid "English title proper to the partim"
-msgstr ""
-
 msgid "Enrolled"
 msgstr ""
 
@@ -997,7 +994,7 @@ msgstr ""
 msgid "Faculty borrowing"
 msgstr ""
 
-msgid "Faculty remark"
+msgid "Faculty remark (unpublished)"
 msgstr ""
 
 msgid "Failure"
@@ -1832,7 +1829,7 @@ msgstr ""
 msgid "Other languages activities"
 msgstr ""
 
-msgid "Other remark"
+msgid "Other remark (intended for publication)"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
@@ -2818,9 +2815,6 @@ msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
-msgstr ""
-
-msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
