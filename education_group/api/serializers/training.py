@@ -32,6 +32,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, education_group_types
+from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
@@ -45,8 +46,8 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.TRAINING),
     )
-    administration_entity = serializers.CharField(source='administration_entity_version.acronym', read_only=True)
-    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    administration_entity = serializers.SerializerMethodField()
+    management_entity = serializers.SerializerMethodField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -64,9 +65,17 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
             'management_entity',
         )
 
+    @staticmethod
+    def get_administration_entity(obj):
+        return utils.get_entity(obj, 'administration')
+
+    @staticmethod
+    def get_management_entity(obj):
+        return utils.get_entity(obj, 'management')
+
 
 class TrainingListSerializer(TrainingBaseListSerializer):
-    partial_title = serializers.SerializerMethodField(read_only=True)
+    partial_title = serializers.SerializerMethodField()
 
     class Meta(TrainingBaseListSerializer.Meta):
         fields = TrainingBaseListSerializer.Meta.fields + (
@@ -112,7 +121,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
     rate_code_text = serializers.CharField(source='get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='get_active_display', read_only=True)
-    remark = serializers.SerializerMethodField(read_only=True)
+    remark = serializers.SerializerMethodField()
     domain_name = serializers.CharField(source='main_domain.parent.name', read_only=True)
     domain_code = serializers.CharField(source='main_domain.code', read_only=True)
 

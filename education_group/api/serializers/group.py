@@ -32,6 +32,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import GroupHyperlinkedIdentityField
 
@@ -44,7 +45,7 @@ class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSeri
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.GROUP),
     )
-    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_entity = serializers.SerializerMethodField()
     remark = serializers.SerializerMethodField()
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
@@ -77,3 +78,7 @@ class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSeri
             education_group_year,
             'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
+
+    @staticmethod
+    def get_management_entity(obj):
+        return utils.get_entity(obj, 'management')

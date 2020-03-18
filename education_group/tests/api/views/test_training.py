@@ -35,6 +35,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
@@ -45,9 +47,10 @@ class TrainingTitleTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         anac = AcademicYearFactory()
-
+        entity = EntityFactory()
+        EntityVersionFactory(entity=entity)
         cls.egy = TrainingFactory(
-            academic_year=anac,
+            academic_year=anac, administration_entity=entity, management_entity=entity
         )
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:trainingstitle_read', kwargs={
@@ -94,9 +97,20 @@ class GetAllTrainingTestCase(APITestCase):
         cls.url = reverse('education_group_api_v1:training-list')
 
         cls.academic_year = AcademicYearFactory(year=2018)
-        TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
-        TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=cls.academic_year)
-        TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year)
+        cls.entity = EntityFactory()
+        EntityVersionFactory(entity=cls.entity)
+        TrainingFactory(
+            acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year,
+            management_entity=cls.entity, administration_entity=cls.entity
+        )
+        TrainingFactory(
+            acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=cls.academic_year,
+            management_entity=cls.entity, administration_entity=cls.entity
+        )
+        TrainingFactory(
+            acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year,
+            management_entity=cls.entity, administration_entity=cls.entity
+        )
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -130,7 +144,10 @@ class GetAllTrainingTestCase(APITestCase):
 
     def test_get_all_training_ensure_default_order(self):
         """ This test ensure that default order is academic_year [DESC Order] + acronym [ASC Order]"""
-        TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year__year=2017)
+        TrainingFactory(
+            acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year__year=2017,
+            management_entity=self.entity, administration_entity=self.entity
+        )
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -172,12 +189,22 @@ class FilterTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
-
+        entity = EntityFactory()
+        EntityVersionFactory(entity=entity)
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
-            TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
-            TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
-            TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            TrainingFactory(
+                acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year,
+                management_entity=entity, administration_entity=entity
+            )
+            TrainingFactory(
+                acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year,
+                management_entity=entity, administration_entity=entity
+            )
+            TrainingFactory(
+                acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year,
+                management_entity=entity, administration_entity=entity
+            )
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -247,7 +274,12 @@ class GetTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        entity = EntityFactory()
+        EntityVersionFactory(entity=entity)
+        cls.training = TrainingFactory(
+            acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year,
+            management_entity=entity, administration_entity=entity
+        )
 
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={
