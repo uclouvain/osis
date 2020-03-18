@@ -26,11 +26,11 @@
 from django.db import models
 
 from base.models.education_group import EducationGroup
+from base.models.education_group_year import EducationGroupYear
 from osis_role.contrib.models import RoleModel
 
 
 class EducationGroupRoleModel(RoleModel):
-
     education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
 
     class Meta:
@@ -40,3 +40,15 @@ class EducationGroupRoleModel(RoleModel):
     @classmethod
     def get_person_related_education_groups(cls, person):
         return cls.objects.filter(person=person).values_list('education_group_id', flat=True)
+
+
+class EducationGroupYearRoleModel(RoleModel):
+    education_group_year = models.ForeignKey(EducationGroupYear, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+        unique_together = ('person', 'education_group_year',)
+
+    @classmethod
+    def get_person_related_education_group_years(cls, person):
+        return cls.objects.filter(person=person).values_list('education_group_year_id', flat=True)
