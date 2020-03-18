@@ -56,7 +56,7 @@ class Link:
         return self.link_type == LinkTypes.REFERENCE
 
     @property
-    def block_repr(self) -> str:
+    def block_repr(self) -> FieldValueRepresentation:
         if self.block:
             block_in_array = [i for i in str(self.block)]
             return " ; ".join(
@@ -65,8 +65,18 @@ class Link:
         return ''
 
     @property
-    def relative_credits_repr(self) -> str:
+    def block_max_value(self):
+        return str(self.block)[-1] if self.block else 0
+
+    @property
+    def relative_credits_repr(self) -> FieldValueRepresentation:
         return "{} / {:f}".format(self.relative_credits, self.child.credits.to_integral_value())
+
+    def is_link_with_learning_unit(self):
+        return self.child.is_learning_unit()
+
+    def is_link_with_group(self):
+        return self.child.is_group()
 
 
 class LinkWithChildLeaf(Link):

@@ -32,6 +32,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite
 from program_management.models.enums.node_type import NodeType
@@ -53,6 +54,8 @@ factory = NodeFactory()
 
 
 class Node:
+
+    _academic_year = None
 
     code = None
     year = None
@@ -96,6 +99,18 @@ class Node:
     @property
     def pk(self):
         return self.node_id
+
+    @property
+    def academic_year(self):
+        if self._academic_year is None:
+            self._academic_year = AcademicYear(self.year)
+        return self._academic_year
+
+    def is_learning_unit(self):
+        return self.node_type == NodeType.LEARNING_UNIT
+
+    def is_group(self):
+        return self.node_type == NodeType.GROUP or self.node_type == NodeType.EDUCATION_GROUP
 
     def is_finality(self) -> bool:
         return self.node_type in set(TrainingType.finality_types_enum())
