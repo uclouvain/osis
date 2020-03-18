@@ -61,6 +61,9 @@ def consolidate_proposal(request, learning_unit_year_id):
         return redirect('learning_units')
 
     if proposal.type == proposal_type.ProposalType.SUPPRESSION.name and not messages_by_level.get(ERROR, []):
-        return redirect('learning_unit',
-                        learning_unit_year_id=proposal.learning_unit_year.get_learning_unit_previous_year().id)
+        to_redirect_luy = proposal.learning_unit_year.get_learning_unit_previous_year()
+        if to_redirect_luy:
+            return redirect('learning_unit', learning_unit_year_id=to_redirect_luy.id)
+        else:
+            return redirect('learning_units')
     return redirect('learning_unit', learning_unit_year_id=proposal.learning_unit_year.id)
