@@ -83,6 +83,13 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     link_type = serializers.CharField(source='group_element_year.link_type', read_only=True)
     link_type_text = serializers.CharField(source='group_element_year.get_link_type_display', read_only=True)
     block = serializers.SerializerMethodField()
+    credits = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_credits(obj):
+        learning_unit_year = obj.group_element_year.child_leaf
+        absolute_credits = learning_unit_year and learning_unit_year.credits
+        return obj.group_element_year.relative_credits or absolute_credits
 
     @staticmethod
     def get_block(obj):
@@ -135,14 +142,17 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     remark = serializers.CharField(source='learning_unit_year.learning_unit.other_remark', read_only=True)
     lecturing_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
     practical_exercise_volume = serializers.DecimalField(max_digits=6, decimal_places=2, default=None)
-    credits = serializers.SerializerMethodField()
     with_prerequisite = serializers.BooleanField(source='group_element_year.has_prerequisite', read_only=True)
+    periodicity = serializers.CharField(source='learning_unit_year.periodicity', read_only=True)
+    quadrimester = serializers.CharField(source='learning_unit_year.quadrimester', read_only=True)
+    status = serializers.CharField(source='learning_unit_year.status', read_only=True)
+    proposal_type = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_credits(obj):
-        learning_unit_year = obj.group_element_year.child_leaf
-        absolute_credits = learning_unit_year and learning_unit_year.credits
-        return obj.group_element_year.relative_credits or absolute_credits
+    def get_proposal_type(obj):
+        if hasattr(obj.learning_unit_year, "proposallearningunit"):
+            return obj.learning_unit_year.proposallearningunit.type
+        return None
 
     def get_title(self, obj):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''

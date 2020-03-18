@@ -111,6 +111,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'acronym',
@@ -132,14 +133,18 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'code',
             'remark',
             'lecturing_volume',
             'practical_exercise_volume',
-            'credits',
-            'with_prerequisite'
+            'with_prerequisite',
+            'periodicity',
+            'quadrimester',
+            'status',
+            'proposal_type'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 
@@ -343,6 +348,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'acronym',
@@ -428,6 +434,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'acronym',
