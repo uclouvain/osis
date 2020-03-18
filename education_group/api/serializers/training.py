@@ -46,8 +46,10 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.TRAINING),
     )
-    administration_entity = serializers.SerializerMethodField()
-    management_entity = serializers.SerializerMethodField()
+    administration_entity = serializers.CharField(source='administration_entity_version.acronym', read_only=True)
+    administration_faculty = serializers.SerializerMethodField()
+    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -62,15 +64,17 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
             'education_group_type_text',
             'academic_year',
             'administration_entity',
+            'administration_faculty',
             'management_entity',
+            'management_faculty',
         )
 
     @staticmethod
-    def get_administration_entity(obj):
+    def get_administration_faculty(obj):
         return utils.get_entity(obj, 'administration')
 
     @staticmethod
-    def get_management_entity(obj):
+    def get_management_faculty(obj):
         return utils.get_entity(obj, 'management')
 
 

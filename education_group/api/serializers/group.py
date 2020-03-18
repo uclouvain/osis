@@ -45,7 +45,8 @@ class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSeri
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.GROUP),
     )
-    management_entity = serializers.SerializerMethodField()
+    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
     remark = serializers.SerializerMethodField()
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
@@ -60,6 +61,7 @@ class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSeri
             'acronym',
             'code',
             'management_entity',
+            'management_faculty',
             'academic_year',
             'education_group_type',
             'education_group_type_text',
@@ -80,5 +82,5 @@ class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSeri
         )
 
     @staticmethod
-    def get_management_entity(obj):
+    def get_management_faculty(obj):
         return utils.get_entity(obj, 'management')

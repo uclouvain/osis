@@ -516,8 +516,12 @@ components:
           type: number
         administration_entity:
           type: string
+        administration_faculty:
+          type:string
         management_entity:
           type: string
+        management_faculty:
+          type:string
         partial_title:
           type: string
       required:
@@ -667,6 +671,8 @@ components:
           type: string
         management_entity:
           type: string
+        management_faculty:
+          type:string
         academic_year:
           type: number
         education_group_type:
@@ -708,6 +714,8 @@ components:
           type: string
         management_entity:
           type: string
+        management_faculty:
+          type:string
         academic_year:
           type: number
         education_group_type:

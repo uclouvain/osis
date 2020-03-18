@@ -26,8 +26,6 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from base.models.enums.entity_type import FACULTY
-
 
 class TrainingGetUrlMixin:
     def __init__(self, **kwargs):
@@ -82,10 +80,6 @@ class GroupHyperlinkedIdentityField(GroupGetUrlMixin, serializers.HyperlinkedIde
 
 
 def get_entity(obj, entity_field):
-    print(obj)
     entity_version = getattr(obj, entity_field + '_entity_version')
-    faculty_entity = entity_version.find_faculty_version(obj.academic_year)
-    return {
-        'ENTITY': entity_version.acronym,
-        FACULTY: faculty_entity.acronym if faculty_entity else None
-    }
+    faculty_entity = entity_version and entity_version.find_faculty_version(obj.academic_year)
+    return faculty_entity.acronym if faculty_entity else None

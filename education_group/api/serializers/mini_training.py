@@ -45,7 +45,8 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING),
     )
-    management_entity = serializers.SerializerMethodField()
+    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -60,10 +61,11 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
             'education_group_type_text',
             'academic_year',
             'management_entity',
+            'management_faculty',
         )
 
     @staticmethod
-    def get_management_entity(obj):
+    def get_management_faculty(obj):
         return utils.get_entity(obj, 'management')
 
 
