@@ -58,7 +58,7 @@ class ObjectPermissionBackend(ModelBackend):
 
 def _get_relevant_roles(user_obj, perm):
     roles_assigned = _get_roles_assigned_to_user(user_obj)
-    return {r for r in roles_assigned if r.rule_exists(perm)}
+    return {r for r in roles_assigned if r.rule_set().rule_exists(perm)}
 
 
 def _get_roles_assigned_to_user(user_obj):

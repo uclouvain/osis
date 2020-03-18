@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
-from education_group.contrib.models.education_group_role import EducationGroupRoleModel
+from education_group.contrib.models import EducationGroupRoleModel
 
 
 class TestEducationGroupRoleModel(TestCase):
