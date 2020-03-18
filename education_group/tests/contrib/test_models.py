@@ -25,7 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
-from education_group.contrib.models import EducationGroupRoleModel
+from education_group.contrib.models import EducationGroupRoleModel, EducationGroupYearRoleModel
 
 
 class TestEducationGroupRoleModel(TestCase):
@@ -36,3 +36,13 @@ class TestEducationGroupRoleModel(TestCase):
     def test_unique_together_person_entity(self):
         instance = EducationGroupRoleModel()
         self.assertEqual(instance._meta.unique_together, (('person', 'education_group'),))
+
+
+class TestEducationGroupYearRoleModel(TestCase):
+    def test_ensure_class_is_abstract(self):
+        instance = EducationGroupYearRoleModel()
+        self.assertTrue(instance._meta.abstract)
+
+    def test_unique_together_person_entity(self):
+        instance = EducationGroupYearRoleModel()
+        self.assertEqual(instance._meta.unique_together, (('person', 'education_group_year'),))
