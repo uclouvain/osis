@@ -89,6 +89,41 @@ class TestGetNodeByIdAndClassProgramTree(SimpleTestCase):
         )
 
 
+class TestGetAllNodesByClass(SimpleTestCase):
+    def setUp(self):
+        link = LinkFactory(child=NodeGroupYearFactory())
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory())
+        self.learning_unit_node = link_with_learning_unit.child
+
+        other_link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory())
+        self.other_learning_unit_node = other_link_with_learning_unit.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_empty_list_when_no_matching_node_class(self):
+        result = self.tree.get_all_nodes_by_class(node.NodeLearningClassYear)
+        self.assertCountEqual(
+            result,
+            []
+        )
+
+    def test_should_return_all_nodes_matching_node_class(self):
+        result = self.tree.get_all_nodes_by_class(node.NodeLearningUnitYear)
+        self.assertCountEqual(
+            result,
+            [self.learning_unit_node, self.other_learning_unit_node]
+        )
+
+        result = self.tree.get_all_nodes_by_class(node.NodeGroupYear)
+        self.assertCountEqual(
+            result,
+            [self.subgroup_node, self.root_node]
+        )
+
+
 class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)

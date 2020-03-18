@@ -118,6 +118,9 @@ class ProgramTree:
             return set(n for n in all_nodes if n.node_type in types)
         return all_nodes
 
+    def get_all_nodes_by_class(self, node_class: 'Node') -> List['Node']:
+        return [node for node in self.get_all_nodes() if isinstance(node, node_class)]
+
     # TODO :: unit test
     def get_all_finalities(self):
         finality_types = set(TrainingType.finality_types_enum())
