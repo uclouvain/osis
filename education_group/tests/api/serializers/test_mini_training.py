@@ -65,6 +65,7 @@ class MiniTrainingListSerializerTestCase(TestCase):
             'education_group_type_text',
             'academic_year',
             'management_entity',
+            'management_faculty',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -118,6 +119,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             'education_group_type_text',
             'academic_year',
             'management_entity',
+            'management_faculty',
             'active',
             'active_text',
             'schedule_type',
