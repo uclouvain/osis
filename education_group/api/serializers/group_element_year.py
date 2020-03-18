@@ -87,8 +87,11 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
     @staticmethod
     def get_credits(obj):
+        education_group_year = obj.education_group_year
         learning_unit_year = obj.group_element_year.child_leaf
-        absolute_credits = learning_unit_year and learning_unit_year.credits
+        absolute_credits = (education_group_year and education_group_year.credits) or (
+                learning_unit_year and learning_unit_year.credits
+        )
         return obj.group_element_year.relative_credits or absolute_credits
 
     @staticmethod
