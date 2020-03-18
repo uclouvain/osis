@@ -32,8 +32,6 @@ from rest_framework.test import APITestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import GroupFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
@@ -45,9 +43,7 @@ class GroupTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
 
-        cls.egy = GroupFactory(
-            academic_year=anac,
-        )
+        cls.egy = GroupFactory(academic_year=anac)
 
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:groupstitle_read', kwargs={
@@ -91,12 +87,7 @@ class GetGroupTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        management_entity = EntityFactory()
-        EntityVersionFactory(entity=management_entity)
-        cls.group = GroupFactory(
-            academic_year=cls.academic_year,
-            management_entity=management_entity
-        )
+        cls.group = GroupFactory(academic_year=cls.academic_year)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:group_read', kwargs={
             'partial_acronym': cls.group.partial_acronym,

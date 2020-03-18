@@ -34,7 +34,6 @@ from rest_framework.test import APITestCase
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -181,13 +180,7 @@ class GetMiniTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        management_entity = EntityFactory()
-        EntityVersionFactory(entity=management_entity)
-        cls.mini_training = MiniTrainingFactory(
-            partial_acronym='LGENR100I',
-            academic_year=cls.academic_year,
-            management_entity=management_entity
-        )
+        cls.mini_training = MiniTrainingFactory(partial_acronym='LGENR100I', academic_year=cls.academic_year)
 
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
