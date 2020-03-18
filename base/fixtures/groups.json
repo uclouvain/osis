@@ -3575,6 +3575,21 @@
                     "validate_registration",
                     "continuing_education",
                     "admission"
+                ],
+                [
+                    "view_persontraining",
+                    "continuing_education",
+                    "persontraining"
+                ],
+                [
+                    "add_persontraining",
+                    "continuing_education",
+                    "persontraining"
+                ],
+                [
+                    "delete_persontraining",
+                    "continuing_education",
+                    "persontraining"
                 ]
             ]
         }
