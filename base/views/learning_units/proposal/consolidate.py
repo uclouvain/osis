@@ -59,4 +59,8 @@ def consolidate_proposal(request, learning_unit_year_id):
     if proposal.type == proposal_type.ProposalType.CREATION.name and \
             proposal.state == proposal_state.ProposalState.REFUSED.name and not messages_by_level.get(ERROR, []):
         return redirect('learning_units')
+
+    if proposal.type == proposal_type.ProposalType.SUPPRESSION.name and not messages_by_level.get(ERROR, []):
+        return redirect('learning_unit',
+                        learning_unit_year_id=proposal.learning_unit_year.get_learning_unit_previous_year().id)
     return redirect('learning_unit', learning_unit_year_id=proposal.learning_unit_year.id)
