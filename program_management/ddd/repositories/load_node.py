@@ -60,6 +60,7 @@ def load_node_learning_unit_year(node_id: int) -> node.Node:
         raise node.NodeNotFoundException
 
 
+# TODO :: create a new app group/ddd and move the fetch of Group, GroupYear into this new app? (like learning_unit?)
 def load_multiple(element_ids: List[int]) -> List[node.Node]:
     qs = GroupElementYear.objects.filter(
         pk__in=element_ids
