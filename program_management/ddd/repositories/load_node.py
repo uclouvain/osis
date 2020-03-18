@@ -94,31 +94,39 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 
 def __convert_string_to_enum(node_data: dict) -> dict:
     # TODO Enum.choices should return tuple((enum, enum.value) for enum in cls) ?
-    node_data['type'] = NodeType[node_data['type']]
+    node_data['node_type'] = NodeType[node_data['node_type']]
     return node_data
 
 
 def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         node_id=F('pk'),
-        type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
+        node_type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
         node_code=F('partial_acronym'),
         node_title=F('acronym'),
         year=F('academic_year__year'),
         proposal_type=Value(None, output_field=CharField()),
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
-     .annotate(title=F('node_title'), code=F('node_code'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')
+    ).values(
+        'node_id', 'node_type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits'
+    ).annotate(
+        title=F('node_title'), code=F('node_code')
+    ).values(
+        'node_id', 'node_type', 'year', 'proposal_type', 'code', 'title', 'credits'
+    )
 
 
 def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
     return LearningUnitYear.objects.filter(pk__in=node_learning_unit_year_ids).annotate_full_title().annotate(
         node_id=F('pk'),
-        type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
+        node_type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
         node_code=F('acronym'),
         node_title=F('full_title'),
         year=F('academic_year__year'),
         proposal_type=F('proposallearningunit__type'),
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
-     .annotate(title=F('node_title'), code=F('node_code'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')
+    ).values(
+        'node_id', 'node_type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits'
+    ).annotate(
+        title=F('node_title'), code=F('node_code')
+    ).values(
+        'node_id', 'node_type', 'year', 'proposal_type', 'code', 'title', 'credits'
+    )

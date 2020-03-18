@@ -29,6 +29,7 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from program_management.ddd.business_types import *
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.models.enums import node_type
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -118,8 +119,12 @@ class ProgramTree:
             return set(n for n in all_nodes if n.node_type in types)
         return all_nodes
 
-    def get_all_nodes_by_class(self, node_class: 'Node') -> List['Node']:
-        return [node for node in self.get_all_nodes() if isinstance(node, node_class)]
+    def get_nodes_by_type(self, node_type_value) -> List['Node']:
+        return [node for node in self.get_all_nodes() if node.node_type == node_type_value]
+
+    def get_codes_permitted_as_prerequisite(self):
+        learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+        return [node_obj.code for node_obj in learning_unit_nodes_contained_in_program]
 
     # TODO :: unit test
     def get_all_finalities(self):

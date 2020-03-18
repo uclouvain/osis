@@ -51,11 +51,8 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
                 education_group_year=self.get_root(),
                 learning_unit_year=self.object
             )
-
-        learning_unit_nodes_contained_in_program = self.program_tree.get_all_nodes_by_class(node.NodeLearningUnitYear)
-        codes_permitted_as_prerequisite = [node_obj.code for node_obj in learning_unit_nodes_contained_in_program]
         form_kwargs["instance"] = instance
-        form_kwargs["codes_permitted"] = codes_permitted_as_prerequisite
+        form_kwargs["codes_permitted"] = self.program_tree.get_codes_permitted_as_prerequisite()
         return form_kwargs
 
     def get_context_data(self, **kwargs):
