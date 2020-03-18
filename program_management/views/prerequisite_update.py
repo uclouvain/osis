@@ -29,10 +29,11 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.prerequisite import LearningUnitPrerequisiteForm
+from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
+from program_management.ddd.domain import node
 from program_management.views.generic import LearningUnitGenericUpdateView
 
 
@@ -50,10 +51,8 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
                 education_group_year=self.get_root(),
                 learning_unit_year=self.object
             )
-        leaf_children = self.education_group_year_hierarchy.to_list(flat=True)
-        luys_contained_in_formation = set(grp.child_leaf for grp in leaf_children if grp.child_leaf)
         form_kwargs["instance"] = instance
-        form_kwargs["luys_that_can_be_prerequisite"] = luys_contained_in_formation
+        form_kwargs["codes_permitted"] = self.program_tree.get_codes_permitted_as_prerequisite()
         return form_kwargs
 
     def get_context_data(self, **kwargs):
