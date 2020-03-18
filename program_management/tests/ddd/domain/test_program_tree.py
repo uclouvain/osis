@@ -119,15 +119,12 @@ class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
         self.root_node = link.parent
         self.subgroup_node = link.child
 
-        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code='LOSIS452'))
-        self.learning_unit_node = link_with_learning_unit.child
-
-        other_link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code="LT"))
-        self.other_learning_unit_node = other_link_with_learning_unit.child
-
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
-    def test_should_code_of_all_learning_unit_nodes(self):
+    def test_should_return_codes_of_all_learning_unit_nodes(self):
+        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code='LOSIS452'))
+        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code="LT"))
+
         result = self.tree.get_codes_permitted_as_prerequisite()
         self.assertCountEqual(
             result,
