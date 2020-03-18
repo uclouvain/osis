@@ -367,7 +367,7 @@ class GroupElementYear(OrderedModel):
     def __str__(self):
         return "{} - {}".format(self.parent, self.child)
 
-    @property
+    @property  # TODO :: remove this and move unit test into test templates tags (only used for PDF)
     def verbose(self):
         if self.child_branch:
             return self._verbose_credits()
@@ -438,6 +438,7 @@ class GroupElementYear(OrderedModel):
     def child(self):
         return self.child_branch or self.child_leaf
 
+    # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def _verbose_credits(self):
         if self.relative_credits or self.child_branch.credits:
             return "{} ({} {})".format(

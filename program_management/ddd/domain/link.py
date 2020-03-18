@@ -33,7 +33,7 @@ from program_management.models.enums.node_type import NodeType
 
 class Link:
 
-    def __init__(self, parent: 'Node', child: 'Node', **kwargs):
+    def __init__(self, parent: 'Node', child: 'Node', **kwargs):  # TODO :: use typed kwargs
         self.parent = parent
         self.child = child
         self.relative_credits = kwargs.get('relative_credits')
@@ -65,8 +65,8 @@ class Link:
         return ''
 
     @property
-    def block_max_value(self):
-        return str(self.block)[-1] if self.block else 0
+    def block_max_value(self) -> int:
+        return int(str(self.block)[-1]) if self.block else 0
 
     @property
     def relative_credits_repr(self) -> FieldValueRepresentation:

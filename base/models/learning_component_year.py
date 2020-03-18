@@ -190,6 +190,7 @@ class LearningComponentYear(SerializableModel):
             setattr(self, attr, repartition_volumes[entity_container_type])
 
 
+# TODO :: remove this and move unit test into test templates tags (only used for PDF)
 def volume_total_verbose(learning_component_years):
     q1 = next((component['total'] for component in learning_component_years
                if component['type'] == LECTURING), 0)

@@ -28,7 +28,9 @@ from typing import List
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import F, Value, Case, When, IntegerField, CharField, QuerySet, Q
 
+from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import AllTypes, EducationGroupTypesEnum
 from base.models.group_element_year import GroupElementYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
@@ -67,28 +69,10 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
     ).filter(
         Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
     ).annotate(
-        node_id=F('child_branch__pk'),
-        type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
-        code=F('child_branch__partial_acronym'),
-        title=F('child_branch__acronym'),
-        year=F('child_branch__academic_year__year'),
-        constraint_type=F('child_branch__constraint_type'),
-        min_constraint=F('child_branch__min_constraint'),
-        max_constraint=F('child_branch__max_constraint'),
-        remark_fr=F('child_branch__remark'),
-        remark_en=F('child_branch__remark_english'),
+        group_year_id=F('child_branch__pk'),
         learning_unit_year_id=F('child_leaf__pk'),
     ).values(
-        'node_id',
-        'type',
-        'code',
-        'title',
-        'year',
-        'constraint_type',
-        'min_constraint',
-        'max_constraint',
-        'remark_fr',
-        'remark_en',
+        'child_branch__pk',
         'learning_unit_year_id',
     )
 
@@ -96,18 +80,90 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 
     learning_unit_pks = list(node_data.pop('learning_unit_year_id') for node_data in nodes_data)
 
-    nodes_objects = [node.factory.get_node(**__convert_string_to_enum(node_data)) for node_data in nodes_data]
+    group_pks = list(node_data.pop('child_branch__pk') for node_data in nodes_data)
 
-    learn_units = load_learning_unit_year.load_multiple(learning_unit_pks)
+    nodes_objects = [node.factory.get_node(**__convert_string_to_enum(node_data))
+                     for node_data in __load_multiple_node_education_group_year(group_pks)]
 
-    nodes_objects += __convert_to_node(learn_units)
-
-    return nodes_objects
+    return nodes_objects + __load_multiple_node_learning_unit_year(learning_unit_pks)
 
 
-def __convert_to_node(learning_units: List['LearningUnitYear']) -> List[node.Node]:
+def __convert_string_to_enum(node_data: dict) -> dict:
+    if node_data.get('node_type'):
+        node_data['node_type'] = __convert_node_type_enum(node_data['node_type'])
+    node_data['type'] = NodeType[node_data['type']]
+    return node_data
+
+
+def __convert_node_type_enum(str_node_type: str) -> EducationGroupTypesEnum:
+    enum_node_type = None
+    for sub_enum in EducationGroupTypesEnum.__subclasses__():
+        try:
+            enum_node_type = sub_enum[str_node_type]
+        except KeyError:
+            pass
+    if not enum_node_type:
+        raise KeyError("Cannot convert '{}' str type to '{}' type".format(str_node_type, EducationGroupTypesEnum))
+    return enum_node_type
+
+
+def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
+    return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
+        node_id=F('pk'),
+        type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
+        node_type=F('education_group_type__name'),
+        code=F('partial_acronym'),
+        title_t=F('acronym'),
+        year=F('academic_year__year'),
+        remark_fr=F('remark'),
+        remark_en=F('remark_english'),
+
+        # TODO :: Warning Should load this into education_group/ddd/repository (when model refactor to GroupYear)
+        offer_partial_title_fr=F('partial_title'),
+        offer_partial_title_en=F('partial_title_english'),
+        offer_title_fr=F('title'),
+        offer_title_en=F('title_english'),
+
+    ).values(
+        'node_id',
+        'type',
+        'node_type',
+        'code',
+        'title_t',
+        'offer_title_fr',
+        'offer_title_en',
+        'year',
+        'constraint_type',
+        'min_constraint',
+        'max_constraint',
+        'remark_fr',
+        'remark_en',
+        'offer_partial_title_fr',
+        'offer_partial_title_en',
+        'credits',
+    ).annotate(title=F('title_t')).values(
+        'node_id',
+        'type',
+        'node_type',
+        'code',
+        'title',
+        'offer_title_fr',
+        'offer_title_en',
+        'year',
+        'constraint_type',
+        'min_constraint',
+        'max_constraint',
+        'remark_fr',
+        'remark_en',
+        'offer_partial_title_fr',
+        'offer_partial_title_en',
+        'credits',
+    )
+
+
+def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
     nodes = []
-    for lu in learning_units:
+    for lu in load_learning_unit_year.load_multiple(node_learning_unit_year_ids):
         node_data = {
             'node_id': lu.id,
             'type': NodeType.LEARNING_UNIT.name,
@@ -118,38 +174,10 @@ def __convert_to_node(learning_units: List['LearningUnitYear']) -> List[node.Nod
             'credits': lu.credits,
             'status': lu.credits,
             'periodicity': lu.credits,
+            'common_title_fr': lu.common_title_fr,
+            'specific_title_fr': lu.specific_title_fr,
+            'common_title_en': lu.common_title_en,
+            'specific_title_en': lu.specific_title_en,
         }
         nodes.append(node.factory.get_node(**__convert_string_to_enum(node_data)))
     return nodes
-
-
-def __convert_string_to_enum(node_data: dict) -> dict:
-    # TODO Enum.choices should return tuple((enum, enum.value) for enum in cls) ?
-    node_data['type'] = NodeType[node_data['type']]
-    return node_data
-
-
-def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
-    return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
-        node_id=F('pk'),
-        type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
-        node_code=F('partial_acronym'),
-        node_title=F('acronym'),
-        year=F('academic_year__year'),
-        proposal_type=Value(None, output_field=CharField()),
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
-     .annotate(title=F('node_title'), code=F('node_code'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')
-
-
-def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[int]):
-    return LearningUnitYear.objects.filter(pk__in=node_learning_unit_year_ids).annotate_full_title().annotate(
-        node_id=F('pk'),
-        type=Value(NodeType.LEARNING_UNIT.name, output_field=CharField()),
-        node_code=F('acronym'),
-        node_title=F('full_title'),
-        year=F('academic_year__year'),
-        proposal_type=F('proposallearningunit__type'),
-    ).values('node_id', 'type', 'year', 'proposal_type', 'node_code', 'node_title', 'credits')\
-     .annotate(title=F('node_title'), code=F('node_code'))\
-     .values('node_id', 'type', 'year', 'proposal_type', 'code', 'title', 'credits')

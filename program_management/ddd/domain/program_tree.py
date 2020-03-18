@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
@@ -105,6 +106,37 @@ class ProgramTree:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
+    def get_greater_block_value(self):  # TODO :: unit test
+        return max(l.block_max_value for l in self.get_all_links())
+
+    def get_all_links(self) -> List['Link']:
+        return _links_from_root(self.root_node)
+        # if with_reference_effect:
+        #     result = []
+        #     for link in links:
+        #         if link.is_reference():
+        #             pass
+        #         else:
+        #             result.append(link)
+        # return result
+
+    # def copy_and_prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
+    #     pass
+    #
+    # @staticmethod
+    # def test(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
+    #     new_node = copy.deepcopy(root)
+    #     children_after_pruning = []
+    #     for link in root.children:
+    #         if ignore_children_from and link.parent.node_type in ignore_children_from:
+    #             continue
+    #         new_link = copy.deepcopy(link)
+    #         children_after_pruning.append(new_link)
+    #         test(new_link)
+    #
+    #     return children
+
+
     def attach_node(self, node_to_attach: 'Node', path: Path = None, **link_attributes):
         """
         Add a node to the tree
@@ -142,11 +174,12 @@ def _nodes_from_root(root: 'Node') -> List['Node']:
     return nodes
 
 
-def _links_from_root(root: 'Node') -> List['Link']:
+def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) -> List['Link']:
     links = []
     for link in root.children:
-        links.append(link)
-        links.extend(_links_from_root(link.child))
+        if not ignore or link.parent.node_type not in ignore:
+            links.append(link)
+            links.extend(_links_from_root(link.child, ignore=ignore))
     return links
 
 

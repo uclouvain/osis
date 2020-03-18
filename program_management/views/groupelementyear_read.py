@@ -32,6 +32,7 @@ from waffle.decorators import waffle_switch
 
 from base.forms.education_group.common import SelectLanguage
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType, AllTypes
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
@@ -47,15 +48,15 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)
+    # tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)
     tree = load_tree.load(education_group_year.id)
     context = {
         'root': education_group_year,
-        'tree': tree_object.to_list(),  # rename to-list -> to_ordered_flat_list
+        'tree': tree.root_node.children,  # TODO :: rename to-list -> to_ordered_flat_list + manage AllTypes VS EducationGroupType ?
         'language': language,
         'created': datetime.datetime.now(),
-        'max_block': tree_object.max_block,
-        'main_part_col_length': get_main_part_col_length(tree_object.max_block),
+        'max_block': tree.get_greater_block_value(),
+        'main_part_col_length': get_main_part_col_length(tree.get_greater_block_value()),
     }
     with translation.override(language):
         return render_pdf(
