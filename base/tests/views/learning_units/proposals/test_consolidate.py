@@ -40,7 +40,7 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_
 from base.business.learning_units.edition import _descriptive_fiche_and_achievements_update
 from base.models.enums import proposal_state, learning_unit_year_subtypes, \
     proposal_type
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
+from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -62,7 +62,8 @@ FR_CODE_LANGUAGE = 'FR'
 class TestConsolidate(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
+        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
+        cls.current_academic_year = cls.academic_years[0]
 
         cls.proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
