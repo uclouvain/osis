@@ -35,13 +35,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for role_mdl in role.role_manager.roles:
-            self._add_all_perms_to_role(role_mdl)
-            self._remove_unused_perms_in_group(role_mdl)
+            group, _ = Group.objects.get_or_create(name=role_mdl.group_name)
+
+            self._add_all_perms_to_role(role_mdl, group)
+            self._remove_unused_perms_in_group(role_mdl, group)
             self.stdout.write(self.style.SUCCESS('Perms-Role {} successfully synchronized'.format(role_mdl.group_name)))
 
-    def _add_all_perms_to_role(self, role):
-        group, _ = Group.objects.get_or_create(name=role.group_name)
-
+    def _add_all_perms_to_role(self, role, group):
         for perm_codename in role.rule_set().keys():
             try:
                 perm = Permission.objects.get(codename=perm_codename)
@@ -50,8 +50,6 @@ class Command(BaseCommand):
                 warning_msg = 'Permission {} does not exist - defined in {}'.format(perm_codename, role.group_name)
                 self.stdout.write(self.style.WARNING(warning_msg))
 
-    def _remove_unused_perms_in_group(self, role):
-        group, _ = Group.objects.get_or_create(name=role.group_name)
-
+    def _remove_unused_perms_in_group(self, role, group):
         permissions_to_remove = group.permissions.exclude(codename__in=role.rule_set().keys())
         group.permissions.remove(*permissions_to_remove)
