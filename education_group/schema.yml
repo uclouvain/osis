@@ -816,6 +816,14 @@ components:
           type: number
         practical_exercise_volume:
           type: number
+        proposal_type:
+          $ref: '#/components/schemas/ProposalTypeEnum'
+        status:
+          type: boolean
+        quadrimester:
+          $ref: '#/components/schemas/QuadrimesterEnum'
+        periodicity:
+          $ref: '#/components/schemas/PeriodicityEnum'
         access_condition:
           type: boolean
         comment:
@@ -1026,6 +1034,28 @@ components:
         - NON_ACADEMIC
         - NON_ACADEMIC_CREF
         - ACADEMIC
+    QuadrimesterEnum:
+      type: string
+      enum:
+        - Q1
+        - Q2
+        - Q3
+        - Q1and2
+        - Q1or2
+    PeriodicityEnum:
+      type: string
+      enum:
+        - ANNUAL
+        - BIENNIAL_EVEN
+        - BIENNIAL_ODD
+    ProposalTypeEnum:
+      type: string
+      enum:
+        - CREATION
+        - MODIFICATION
+        - TRANSFORMATION
+        - SUPPRESSION
+        - TRANSFORMATION_AND_MODIFICATION
     Error:
       type: object
       properties:
