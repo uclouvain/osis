@@ -41,7 +41,6 @@ from base.models.person import Person
 from base.views.education_groups import perms
 from base.views.education_groups.detail import CatalogGenericDetailView
 from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.repositories import load_tree
 from program_management.serializers import program_tree_view
@@ -101,18 +100,20 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     @cached_property
-    def education_group_year_hierarchy(self):
-        return EducationGroupHierarchy(self.get_root())
+    def program_tree(self):
+        return load_tree.load(self.get_root().id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         root = self.get_root()
+        serialized_data = program_tree_view.ProgramTreeViewSerializer(self.program_tree).data
+
         context['person'] = self.get_person()
         context['root'] = root
         context['root_id'] = self.kwargs.get("root_id")
         context['parent'] = root
-        context['tree'] = json.dumps(self.education_group_year_hierarchy.to_json())
+        context['tree'] = json.dumps(serialized_data)
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         return context

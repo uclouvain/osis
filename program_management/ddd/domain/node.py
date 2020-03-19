@@ -37,15 +37,15 @@ from program_management.models.enums.node_type import NodeType
 
 
 class NodeFactory:
-    def get_node(self, type: NodeType, **node_attrs):
+    def get_node(self, node_type: NodeType, **node_attrs):
         node_cls = {
             NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
             NodeType.GROUP: NodeGroupYear,
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
             NodeType.LEARNING_CLASS: NodeLearningClassYear
-        }[type]
-        return node_cls(**node_attrs)
+        }[node_type]
+        return node_cls(node_type=node_type, **node_attrs)
 
 
 factory = NodeFactory()

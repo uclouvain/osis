@@ -29,6 +29,7 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
+from program_management.models.enums.node_type import NodeType
 
 
 def generate_year(node):
@@ -53,7 +54,7 @@ class NodeEducationGroupYearFactory(NodeFactory):
         model = NodeEducationGroupYear
         abstract = False
 
-    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    node_type = NodeType.EDUCATION_GROUP
     children = None
 
 
@@ -63,7 +64,7 @@ class NodeGroupYearFactory(NodeFactory):
         model = NodeGroupYear
         abstract = False
 
-    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    node_type = NodeType.GROUP
     children = None
 
     class Params:
@@ -80,6 +81,6 @@ class NodeLearningUnitYearFactory(NodeFactory):
         model = NodeLearningUnitYear
         abstract = False
 
-    node_type = None
+    node_type = NodeType.LEARNING_UNIT
     is_prerequisite_of = []
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

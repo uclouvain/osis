@@ -29,6 +29,7 @@ from base.ddd.utils.validation_message import MessageLevel
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -86,6 +87,48 @@ class TestGetNodeByIdAndClassProgramTree(SimpleTestCase):
         self.assertEqual(
             result,
             self.subgroup_node
+        )
+
+
+class TestGetCNodesByType(SimpleTestCase):
+    def setUp(self):
+        link = LinkFactory(child=NodeGroupYearFactory())
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_empty_list_if_no_matching_type(self):
+        result = self.tree.get_nodes_by_type(node_type.NodeType.EDUCATION_GROUP)
+        self.assertCountEqual(
+            result,
+            []
+        )
+
+    def test_should_return_all_nodes_with_specific_node_type(self):
+        result = self.tree.get_nodes_by_type(node_type.NodeType.GROUP)
+        self.assertCountEqual(
+            result,
+            [self.subgroup_node, self.root_node]
+        )
+
+
+class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
+    def setUp(self):
+        link = LinkFactory(child=NodeGroupYearFactory())
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_codes_of_all_learning_unit_nodes(self):
+        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code='LOSIS452'))
+        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code="LT"))
+
+        result = self.tree.get_codes_permitted_as_prerequisite()
+        self.assertCountEqual(
+            result,
+            ["LOSIS452", "LT"]
         )
 
 
