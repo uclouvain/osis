@@ -134,18 +134,9 @@ def dl_tooltip(context, instance, key, **kwargs):
             value if value else default_if_none
         )
 
-    if common_title:
-        label_style = "font-style:italic;color:grey;" if inherited == PARTIM else "font-style:italic;"
-        label_tooltip = _("Part of the title which is common to the complete EU, to its partims and to its classes")
-        label_text = get_style_of_label_text(label_text, label_style, label_tooltip)
-        value_style = "color:grey;" if inherited == PARTIM else ""
-        value = get_style_of_value(value_style, '', value if value else default_if_none)
-
-    if specific_title:
-        label_style = "font-style:italic;"
-        label_text = get_style_of_label_text(label_text, label_style, '')
-        value_style = "color:grey;" if inherited == PARTIM else ''
-        value = get_style_of_value(value_style, '', value if value else default_if_none)
+    if common_title or specific_title:
+        is_common = common_title is False
+        label_text, value = _get_title_tooltip(is_common, default_if_none, inherited, label_text, value)
 
     return {
         'difference': difference,
@@ -153,6 +144,21 @@ def dl_tooltip(context, instance, key, **kwargs):
         'label_text': label_text,
         'value': value or '-'
     }
+
+
+def _get_title_tooltip(is_common, default_if_none, inherited, label_text, value):
+    value_style = "color:grey;" if inherited == PARTIM else ''
+
+    if is_common:
+        label_style = "font-style:italic;color:grey;" if inherited == PARTIM else "font-style:italic;"
+        label_tooltip = _("Part of the title which is common to the complete EU, to its partims and to its classes")
+        label_text = get_style_of_label_text(label_text, label_style, label_tooltip)
+    else:
+        label_style = "font-style:italic;"
+        label_text = get_style_of_label_text(label_text, label_style, '')
+
+    value = get_style_of_value(value_style, '', value if value else default_if_none)
+    return label_text, value
 
 
 def get_style_of_value(style, title, value):

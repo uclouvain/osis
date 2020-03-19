@@ -151,7 +151,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
 
     def test_learning_unit_children_status_field_is_false_boolean(self):
         luy = self.serializer.data['children'][0]['children'][0]
-        self.assertFalse(luy.status)
+        self.assertFalse(luy['status'])
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
