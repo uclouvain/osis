@@ -52,7 +52,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 CreateLinkValidatorList(tree.get_node(path), node_to_add),
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_add, tree.get_node(path)),
+                InfiniteRecursivityTreeValidator(tree, node_to_add, path),
             ]
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
@@ -61,7 +61,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
-                InfiniteRecursivityTreeValidator(tree, node_to_add, tree.get_node(path)),
+                InfiniteRecursivityTreeValidator(tree, node_to_add, path),
                 DetachRootForbiddenValidator(tree, node_to_add, tree.get_node(path)),
             ]
 
