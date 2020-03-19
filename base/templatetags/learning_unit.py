@@ -135,7 +135,7 @@ def dl_tooltip(context, instance, key, **kwargs):
         )
 
     if common_title or specific_title:
-        is_common = common_title is False
+        is_common = common_title is True
         label_text, value_style = _get_title_tooltip(is_common, inherited, label_text)
         value = get_style_of_value(value_style, '', value if value else default_if_none)
 
