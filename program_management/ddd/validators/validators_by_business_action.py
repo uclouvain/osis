@@ -46,11 +46,9 @@ class AttachNodeValidatorList(BusinessListValidator):
     ]
 
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
-
-        # TODO :: instancier les validators directement, plutôt que d'avoir des classes (les paramètres changent)
         if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):
 
-            self.validators = [
+            self.validators_cls = [
                 ParentIsNotLeafValidator,
                 AttachAuthorizedRelationshipValidator,
                 NodeDuplicationValidator,
@@ -61,7 +59,7 @@ class AttachNodeValidatorList(BusinessListValidator):
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
 
-            self.validators = [
+            self.validators_cls = [
                 ParentIsNotLeafValidator,
                 AuthorizedRelationshipLearningUnitValidator,
                 NodeDuplicationValidator,
@@ -74,4 +72,7 @@ class AttachNodeValidatorList(BusinessListValidator):
         else:
             raise AttributeError("Unknown instance of node")
 
-        super(AttachNodeValidatorList, self).__init__(validator_args=[tree, node_to_add, tree.get_node(path)])
+        self.validators = [
+            validator(tree, node_to_add, tree.get_node(path)) for validator in self.validators_cls
+        ]
+        super().__init__()
