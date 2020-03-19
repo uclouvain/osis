@@ -41,8 +41,12 @@ register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
 CSS_PROPOSAL_VALUE = "proposal_value"
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
-EXTERNAL_CREDIT_TOOLTIP = _('If the partner university does not use ECTS credit units, '
-                            'enter below the number of credit units according to the local system.')
+EXTERNAL_CREDIT_TOOLTIP = _(
+    'If the partner university does not use ECTS credit units, '
+    'enter below the number of credit units according to the local system.'
+)
+GREY_COLOR = "color:grey"
+ITALIC_FONT = "font-style:italic"
 
 
 @register.filter
@@ -121,17 +125,17 @@ def dl_tooltip(context, instance, key, **kwargs):
         value = "<a href='{url}'>{value}</a>".format(value=value or '', url=url)
 
     if inherited == PARTIM and not common_title:
-        label_text = get_style_of_label_text(label_text, "color:grey",
-                                             "The value of this attribute is inherited from the parent UE")
-        value = get_style_of_value("color:grey", "The value of this attribute is inherited from the parent UE", value)
+        label_text = get_style_of_label_text(
+            label_text, GREY_COLOR, "The value of this attribute is inherited from the parent UE"
+        )
+        value = get_style_of_value(GREY_COLOR, "The value of this attribute is inherited from the parent UE", value)
 
     if not_annualized:
-        label_text = get_style_of_label_text(label_text, "font-style:italic",
-                                             "The value of this attribute is not annualized")
+        label_text = get_style_of_label_text(
+            label_text, ITALIC_FONT, "The value of this attribute is not annualized"
+        )
         value = get_style_of_value(
-            "font-style:italic",
-            "The value of this attribute is not annualized",
-            value if value else default_if_none
+            ITALIC_FONT,  "The value of this attribute is not annualized", value if value else default_if_none
         )
 
     if common_title or specific_title:
@@ -148,17 +152,15 @@ def dl_tooltip(context, instance, key, **kwargs):
 
 
 def _get_title_tooltip(is_common, inherited, label_text):
-    value_style = "color:grey;" if inherited == PARTIM else ''
-
     if is_common:
-        label_style = "font-style:italic;color:grey;" if inherited == PARTIM else "font-style:italic;"
+        label_style = "font-style:italic;color:grey;" if inherited == PARTIM else ITALIC_FONT
         label_tooltip = _("Part of the title which is common to the complete EU, to its partims and to its classes")
         label_text = get_style_of_label_text(label_text, label_style, label_tooltip)
     else:
-        label_style = "font-style:italic;"
+        label_style = ITALIC_FONT
         label_text = get_style_of_label_text(label_text, label_style, '')
 
-    return label_text, value_style
+    return label_text, GREY_COLOR if inherited == PARTIM else ''
 
 
 def get_style_of_value(style, title, value):
