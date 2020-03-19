@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf import settings
 from django.test import TestCase, RequestFactory
+from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_types import TrainingType, GroupType
@@ -147,6 +148,9 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'proposal_type'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
+
+    def test_learning_unit_children_status_field_is_boolean(self):
+        self.assertEqual(type(self.serializer.get_fields()['status']), serializers.BooleanField)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
