@@ -48,25 +48,29 @@ class AttachNodeValidatorList(BusinessListValidator):
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
         if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):
 
-            self.validators_cls = [
+            self.link_validators_cls = [
                 ParentIsNotLeafValidator,
                 AttachAuthorizedRelationshipValidator,
                 NodeDuplicationValidator,
+                ParentChildSameAcademicYearValidator,
+            ]
+            self.validators_cls = [
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
-                ParentChildSameAcademicYearValidator,
             ]
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
-
-            self.validators_cls = [
+            self.link_validators_cls = [
                 ParentIsNotLeafValidator,
-                AuthorizedRelationshipLearningUnitValidator,
+                AttachAuthorizedRelationshipValidator,
                 NodeDuplicationValidator,
+                ParentChildSameAcademicYearValidator,
+            ]
+            self.validators_cls = [
+                AuthorizedRelationshipLearningUnitValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
                 DetachRootForbiddenValidator,
-                ParentChildSameAcademicYearValidator,
             ]
 
         else:
@@ -74,5 +78,8 @@ class AttachNodeValidatorList(BusinessListValidator):
 
         self.validators = [
             validator(tree, node_to_add, tree.get_node(path)) for validator in self.validators_cls
+        ]
+        self.validators += [
+            validator(tree, node_to_add, tree.get_node(path)) for validator in self.link_validators_cls
         ]
         super().__init__()
