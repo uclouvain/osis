@@ -2774,7 +2774,7 @@ msgstr ""
 msgid "This label %s does not exist"
 msgstr ""
 
-msgid "This learning unit has attribution."
+msgid "This learning unit has application."
 msgstr ""
 
 msgid ""

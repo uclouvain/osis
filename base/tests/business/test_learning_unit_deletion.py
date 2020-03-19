@@ -415,7 +415,7 @@ class LearningUnitYearDeletion(TestCase):
         self.luy1.subtype = learning_unit_year_subtypes.FULL
         self.luy1.save()
 
-    def test_cannot_delete_if_has_attribution(self):
+    def test_cannot_delete_if_has_application(self):
         luy = LearningUnitYearFactory()
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
         self.assertFalse(
