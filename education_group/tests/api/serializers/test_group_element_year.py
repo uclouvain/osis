@@ -25,7 +25,6 @@
 ##############################################################################
 from django.conf import settings
 from django.test import TestCase, RequestFactory
-from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_types import TrainingType, GroupType
@@ -67,7 +66,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
-            credits=10
+            credits=10,
+            status=False
         )
         cls.luy_gey = GroupElementYearFactory(
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15
@@ -149,8 +149,9 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 
-    def test_learning_unit_children_status_field_is_boolean(self):
-        self.assertEqual(type(self.serializer.get_fields()['status']), serializers.BooleanField)
+    def test_learning_unit_children_status_field_is_false_boolean(self):
+        luy = self.serializer.data['children'][0]['children'][0]
+        self.assertFalse(luy.status)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
