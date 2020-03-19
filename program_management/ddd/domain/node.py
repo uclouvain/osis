@@ -64,13 +64,12 @@ class Node:
     def __init__(
             self,
             node_id: int = None,
-            node_type: EducationGroupTypesEnum = None,  # TODO :: move this into NodeEducatioNgroupYear
+            node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
             children: List['Link'] = None,
             code: str = None,
             title: str = None,
             year: int = None,
-            proposal_type: ProposalType = None,  # TODO :: move this into NodeLearningUnitYear
             credits: Decimal = None
     ):
         self.node_id = node_id
@@ -82,7 +81,6 @@ class Node:
         self.code = code
         self.title = title
         self.year = year
-        self.proposal_type = proposal_type
         self.credits = credits
 
     def __eq__(self, other):
@@ -269,6 +267,7 @@ class NodeLearningUnitYear(Node):
             specific_title_fr: str = None,
             common_title_en: str = None,
             specific_title_en: str = None,
+            proposal_type: ProposalType = None,
             **kwargs
     ):
         self.is_prerequisite_of = kwargs.pop('is_prerequisite_of', []) or []
@@ -280,6 +279,7 @@ class NodeLearningUnitYear(Node):
         self.specific_title_fr = specific_title_fr
         self.common_title_en = common_title_en
         self.specific_title_en = specific_title_en
+        self.proposal_type = proposal_type
 
     @property
     def has_prerequisite(self) -> bool:
