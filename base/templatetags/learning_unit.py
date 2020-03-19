@@ -181,13 +181,13 @@ def get_previous_acronym(luy):
         return _get_acronym_from_proposal(luy)
     else:
         previous_luy = find_lt_learning_unit_year_with_different_acronym(luy)
-        return previous_luy.acronym if previous_luy else None
+        return previous_luy and previous_luy.acronym
 
 
 @register.filter
 def get_next_acronym(luy):
     next_luy = find_gt_learning_unit_year_with_different_acronym(luy)
-    return next_luy.acronym if next_luy else None
+    return next_luy and next_luy.acronym
 
 
 def _get_acronym_from_proposal(luy):

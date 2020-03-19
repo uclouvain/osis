@@ -35,6 +35,8 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 
+EDUCATION_GROUP_API_PREFIX = 'education_group_api_v1:'
+
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value):
@@ -53,15 +55,15 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
                 'year': obj.learning_unit_year.academic_year.year,
             }
         elif obj.education_group_year.education_group_type.category == Categories.TRAINING.name:
-            view_name = 'education_group_api_v1:' + TrainingDetail.name
+            view_name = EDUCATION_GROUP_API_PREFIX + TrainingDetail.name
             url_kwargs = {
                 'acronym': obj.education_group_year.acronym,
                 'year': obj.education_group_year.academic_year.year,
             }
         else:
             view_name = {
-                Categories.GROUP.name: 'education_group_api_v1:' + GroupDetail.name,
-                Categories.MINI_TRAINING.name: 'education_group_api_v1:' + MiniTrainingDetail.name
+                Categories.GROUP.name: EDUCATION_GROUP_API_PREFIX + GroupDetail.name,
+                Categories.MINI_TRAINING.name: EDUCATION_GROUP_API_PREFIX + MiniTrainingDetail.name
             }.get(obj.education_group_year.education_group_type.category)
             url_kwargs = {
                 'partial_acronym': obj.education_group_year.partial_acronym,
@@ -71,7 +73,7 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
 
 
 class BaseCommonNodeTreeSerializer(serializers.Serializer):
-    url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
+    url = CommonNodeHyperlinkedRelatedField(view_name=EDUCATION_GROUP_API_PREFIX + TrainingDetail.name)
     title = serializers.SerializerMethodField()
     children = RecursiveField(many=True)
 
