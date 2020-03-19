@@ -758,8 +758,13 @@ components:
           type: string
         title:
           type: string
-        type:
+        node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
+        subtype:
+          allOf:
+            - $ref: '#/components/schemas/MiniTrainingTypeEnum'
+            - $ref: '#/components/schemas/TrainingTypeEnum'
+            - $ref: '#/components/schemas/GroupTypeEnum'
         partial_title:
           type: string
         children:
@@ -795,7 +800,7 @@ components:
           type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
-        sub_type:
+        subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
           type: string
