@@ -31,7 +31,8 @@ from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroup
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
 from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
-from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityValidator
+from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
+    InfiniteRecursivityLinkValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
@@ -52,11 +53,12 @@ class AttachNodeValidatorList(BusinessListValidator):
                 ParentIsNotLeafValidator,
                 NodeDuplicationValidator,
                 ParentChildSameAcademicYearValidator,
+                InfiniteRecursivityLinkValidator
             ]
             self.validators_cls = [
                 AttachAuthorizedRelationshipValidator,
                 MinimumEditableYearValidator,
-                InfiniteRecursivityValidator,
+                InfiniteRecursivityTreeValidator,
             ]
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
@@ -64,12 +66,13 @@ class AttachNodeValidatorList(BusinessListValidator):
                 ParentIsNotLeafValidator,
                 NodeDuplicationValidator,
                 ParentChildSameAcademicYearValidator,
+                InfiniteRecursivityLinkValidator
             ]
             self.validators_cls = [
                 AttachAuthorizedRelationshipValidator,
                 AuthorizedRelationshipLearningUnitValidator,
                 MinimumEditableYearValidator,
-                InfiniteRecursivityValidator,
+                InfiniteRecursivityTreeValidator,
                 DetachRootForbiddenValidator,
             ]
 
