@@ -62,7 +62,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
-                DetachRootForbiddenValidator(tree, node_to_add, tree.get_node(path)),
+                DetachRootForbiddenValidator(tree, node_to_add),
             ]
 
         else:
