@@ -119,8 +119,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     value = normalize_fraction(value) if isinstance(value, Decimal) else value
 
     difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(
-        EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits'
-        else _(title)
+        EXTERNAL_CREDIT_TOOLTIP if key == 'external_credits' else _(title)
     )
 
     if url:
@@ -137,14 +136,14 @@ def dl_tooltip(context, instance, key, **kwargs):
             label_text, ITALIC_FONT, "The value of this attribute is not annualized"
         )
         value = get_style_of_value(
-            ITALIC_FONT,  "The value of this attribute is not annualized", value if value else default_if_none
+            ITALIC_FONT,  "The value of this attribute is not annualized", value or default_if_none
         )
 
     if common_title or specific_title:
         is_common = common_title is True
         style, tooltip = _get_title_tooltip(is_common, inherited)
         label_text = get_style_of_label_text(label_text, style, tooltip)
-        value = get_style_of_value(value_style, '', value if value else default_if_none)
+        value = get_style_of_value(value_style, '', value or default_if_none)
 
     return {
         'difference': difference,
@@ -163,14 +162,16 @@ def _get_title_tooltip(is_common, inherited):
 
 
 def get_style_of_value(style, title, value):
-    value = "<p style='{style}' title='{title}'>{value}</p>".format(style=style, title=_(title),
-                                                                    value=value or DEFAULT_VALUE_FOR_NONE)
+    value = "<p style='{style}' title='{title}'>{value}</p>".format(
+        style=style, title=_(title), value=value or DEFAULT_VALUE_FOR_NONE
+    )
     return value
 
 
 def get_style_of_label_text(label_text, style, title):
-    label_text = '<label style="{style}" title="{inherited_title}">{label_text}</label>' \
-        .format(style=style, inherited_title=_(title), label_text=label_text)
+    label_text = '<label style="{style}" title="{inherited_title}">{label_text}</label>'.format(
+        style=style, inherited_title=_(title), label_text=label_text
+    )
     return label_text
 
 
@@ -190,9 +191,9 @@ def get_next_acronym(luy):
 
 
 def _get_acronym_from_proposal(luy):
-    proposal = ProposalLearningUnit.objects \
-        .filter(learning_unit_year=luy) \
-        .order_by('-learning_unit_year__academic_year__year').first()
+    proposal = ProposalLearningUnit.objects.filter(
+        learning_unit_year=luy
+    ).order_by('-learning_unit_year__academic_year__year').first()
     if proposal and proposal.initial_data and proposal.initial_data.get('learning_unit_year'):
         return proposal.initial_data['learning_unit_year']['acronym']
     return None
@@ -209,8 +210,9 @@ def value_label(values_dict, key, sub_key, key_comp):
 
 def _get_label(data, key_comp, val):
     if val != data.get(key_comp):
-        return mark_safe("<label {}>{}</label>"
-                         .format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if val is None else val))
+        return mark_safe("<label {}>{}</label>".format(
+            DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if val is None else val
+        ))
     else:
         return mark_safe("{}".format(DEFAULT_VALUE_FOR_NONE if val is None else val))
 
@@ -218,8 +220,9 @@ def _get_label(data, key_comp, val):
 @register.simple_tag
 def changed_label(value, other=None):
     if str(value) != str(other) and other:
-        return mark_safe(
-            "<td><label {}>{}</label></td>".format(DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value))
+        return mark_safe("<td><label {}>{}</label></td>".format(
+            DIFFERENCE_CSS, DEFAULT_VALUE_FOR_NONE if value is None else value
+        ))
     else:
         return mark_safe("<td><label>{}</label></td>".format(DEFAULT_VALUE_FOR_NONE if value is None else value))
 
@@ -244,20 +247,19 @@ def dl_component_tooltip(context, key, **kwargs):
         html_id = "id='id_{}'".format(key.lower())
 
         return mark_safe("<dl><dd {difference} {id}>{value}</dd></dl>".format(
-            difference=difference, id=html_id, value=str(value)))
+            difference=difference, id=html_id, value=str(value)
+        ))
     return normalize_fraction(value) if value else default_if_none
 
 
 @register.filter
 def get_component_volume_css(values, parameter, default_if_none="", value=None):
     if parameter in values and values[parameter] != value:
-        return mark_safe(
-            " data-toggle=tooltip title='{} : {}' class='{}' ".format(
+        return mark_safe(" data-toggle=tooltip title='{} : {}' class='{}' ".format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
                 normalize_fraction(values[parameter]) or default_if_none,
                 CSS_PROPOSAL_VALUE
-            )
-        )
+        ))
     return default_if_none
 
 
@@ -273,4 +275,5 @@ def th_tooltip(context, key, **kwargs):
         difference = ''
 
     return mark_safe("<span {difference}>{value}</span>".format(
-        difference=difference, value=_(str(value))))
+        difference=difference, value=_(str(value))
+    ))
