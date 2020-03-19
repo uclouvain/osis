@@ -134,7 +134,7 @@
                         {% block titles %}
                             <div class="panel panel-default">
                                 <div class="panel-body">
-                                    <label title="{% trans "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"%}">{% trans "Title"%}</label>
+                                    <label title="{% trans "The title is made up of the common part and / or any supplement"%}">{% trans "Title"%}</label>
                                     {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True %}
                                     {% if learning_unit_year.subtype == "PARTIM" %}
                                         {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Specific complement (Partim)') title=_('Specific complement (Partim)') specific_title=True %}
@@ -146,7 +146,7 @@
                             <br/>
                             <div class="panel panel-default">
                                 <div class="panel-body">
-                                    <label title="{% trans "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"%}">{% trans "Title in English"%}</label>
+                                    <label title="{% trans "The title is made up of the common part and / or any supplement"%}">{% trans "Title in English"%}</label>
                                     {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True %}
                                     {% if learning_unit_year.subtype == "PARTIM" %}
                                         {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Partim)') label_text=_('Specific complement (Partim)') specific_title=True %}
