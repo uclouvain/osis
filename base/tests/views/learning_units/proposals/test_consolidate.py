@@ -66,6 +66,7 @@ class TestConsolidate(TestCase):
         cls.current_academic_year = cls.academic_years[0]
 
         cls.proposal = ProposalLearningUnitFactory(
+            type=proposal_type.ProposalType.MODIFICATION.name,
             state=proposal_state.ProposalState.ACCEPTED.name,
             learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
             learning_unit_year__academic_year=cls.current_academic_year,
