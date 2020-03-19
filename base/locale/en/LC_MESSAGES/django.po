@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-28 15:32+0100\n"
+"POT-Creation-Date: 2020-03-19 07:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -895,9 +895,6 @@ msgid "English comment"
 msgstr ""
 
 msgid "English title proper"
-msgstr ""
-
-msgid "English title proper to the partim"
 msgstr ""
 
 msgid "Enrolled"
@@ -1850,6 +1847,11 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
+msgid ""
+"Part of the title which is common to the complete EU, to its partims and to "
+"its classes"
+msgstr ""
+
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
@@ -2680,6 +2682,9 @@ msgid ""
 "The sum of the volumes of the entities must be equal to the global volume"
 msgstr ""
 
+msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
@@ -2818,9 +2823,6 @@ msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
-msgstr ""
-
-msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
