@@ -34,7 +34,8 @@ from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite
+from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
+
 from program_management.models.enums.node_type import NodeType
 
 
@@ -84,7 +85,7 @@ class Node:
         self.credits = credits
 
     def __eq__(self, other):
-        return self.node_id == other.node_id
+        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
 
     def __hash__(self):
         return hash(self.node_id)
@@ -274,6 +275,7 @@ class NodeLearningUnitYear(Node):
         self.status = status
         self.periodicity = periodicity
         super().__init__(**kwargs)
+        self.prerequisite = NullPrerequisite()
         self.prerequisite = None  # FIXME : Should be of type Prerequisite?
         self.common_title_fr = common_title_fr
         self.specific_title_fr = specific_title_fr

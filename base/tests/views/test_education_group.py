@@ -387,7 +387,7 @@ class EducationGroupViewTestCase(TestCase):
         self.assertEqual(response.context['parent'], an_education_group)
 
     def test_education_administrative_data_with_root_set(self):
-        edy = TrainingFactory(academic_year=self.academic_year)
+        edy = EducationGroupYearBachelorFactory(academic_year=self.academic_year)
         a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
                                                        child_branch=edy)
         self.initialize_session()

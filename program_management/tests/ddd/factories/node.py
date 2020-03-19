@@ -91,3 +91,4 @@ class NodeLearningUnitYearFactory(NodeFactory):
 
     node_type = None
     is_prerequisite_of = []
+    credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

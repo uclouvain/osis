@@ -106,7 +106,7 @@ class TestLoadTree(TestCase):
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
         self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
-        expected_str = '(LDROI1200) AND (LAGRO1600 OR LBIR2300)'
+        expected_str = 'LDROI1200 AND (LAGRO1600 OR LBIR2300)'
         self.assertEquals(str(leaf.prerequisite), expected_str)
         self.assertTrue(leaf.has_prerequisite)
 

@@ -35,8 +35,10 @@ from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
+from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeEducationGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -63,6 +65,77 @@ class TestGetNodeProgramTree(SimpleTestCase):
         self.assertEquals(
             result_node.pk,
             self.root_node.pk
+        )
+
+
+class TestGetNodeByIdAndClassProgramTree(SimpleTestCase):
+    def setUp(self):
+        link = LinkFactory(child=NodeGroupYearFactory(node_id=1))
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=1))
+        self.learning_unit_node = link_with_learning_unit.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_None_when_no_node_present_with_corresponding_node_id(self):
+        result = self.tree.get_node_by_id_and_class(2, node.NodeLearningUnitYear)
+        self.assertIsNone(result)
+
+    def test_should_return_node_matching_specific_node_id_with_respect_to_class(self):
+        result = self.tree.get_node_by_id_and_class(1, node.NodeLearningUnitYear)
+        self.assertEqual(
+            result,
+            self.learning_unit_node
+        )
+
+        result = self.tree.get_node_by_id_and_class(1, node.NodeGroupYear)
+        self.assertEqual(
+            result,
+            self.subgroup_node
+        )
+
+
+class TestGetCNodesByType(SimpleTestCase):
+    def setUp(self):
+        link = LinkFactory(child=NodeGroupYearFactory())
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_empty_list_if_no_matching_type(self):
+        result = self.tree.get_nodes_by_type(node_type.NodeType.EDUCATION_GROUP)
+        self.assertCountEqual(
+            result,
+            []
+        )
+
+    def test_should_return_all_nodes_with_specific_node_type(self):
+        result = self.tree.get_nodes_by_type(node_type.NodeType.GROUP)
+        self.assertCountEqual(
+            result,
+            [self.subgroup_node, self.root_node]
+        )
+
+
+class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
+    def setUp(self):
+        link = LinkFactory(child=NodeGroupYearFactory())
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_codes_of_all_learning_unit_nodes(self):
+        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code='LOSIS452'))
+        LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(code="LT"))
+
+        result = self.tree.get_codes_permitted_as_prerequisite()
+        self.assertCountEqual(
+            result,
+            ["LOSIS452", "LT"]
         )
 
 
