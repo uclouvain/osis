@@ -32,6 +32,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
 from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory

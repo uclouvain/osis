@@ -121,7 +121,7 @@ class ProgramTree:
         return all_nodes
 
     def get_nodes_by_type(self, node_type_value) -> List['Node']:
-        return [node for node in self.get_all_nodes() if node.node_type == node_type_value]
+        return [node for node in self.get_all_nodes() if node.type == node_type_value]
 
     def get_codes_permitted_as_prerequisite(self):
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)

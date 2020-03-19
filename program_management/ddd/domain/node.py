@@ -229,7 +229,7 @@ class NodeEducationGroupYear(Node):
 
 class NodeGroupYear(Node):
 
-    type = NodeType.EDUCATION_GROUP
+    type = NodeType.GROUP
 
     def __init__(
         self,
