@@ -23,21 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from typing import List, Tuple
+from typing import List
 
 from django.templatetags.static import static
-from django.utils import six, translation
+from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import AllTypes, GroupType
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 from base.templatetags.education_group import register
 from program_management.ddd.business_types import *
-
-from django.utils.translation import gettext_lazy as _
 
 # TODO :: Remove this file and move the code into a Serializer
 
@@ -112,34 +110,6 @@ BRANCH_CONSTRAINT = """\
 @register.filter  # TODO :: Remove this tag and move the code into a Serializer
 def pdf_tree_list(value: List['Link']):
     return mark_safe(list_formatter(value))
-
-
-def walk_items(item_list: List['Link']):
-    if item_list:
-        item_iterator = iter(item_list)
-        try:
-            item = next(item_iterator)
-            while True:
-                try:
-                    next_item = next(item_iterator)
-                except StopIteration:
-                    yield item, None
-                    break
-                if not isinstance(next_item, six.string_types):
-                    try:
-                        iter(next_item)
-                    except TypeError:
-                        pass
-                    else:
-                        yield item, next_item
-                        item = next(item_iterator)
-                        continue
-                yield item, None
-                item = next_item
-        except StopIteration:
-            pass
-    else:
-        return ""
 
 
 def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
@@ -267,29 +237,17 @@ def get_verbose_link(link: 'Link'):
     if link.is_link_with_group():
         return get_verbose_credits(link)
     elif link.is_link_with_learning_unit():
-        # components = LearningComponentYear.objects.filter(
-        #     learning_unit_year=self.child_leaf).annotate(
-        #     total=Case(When(hourly_volume_total_annual=None, then=0),
-        #                default=F('hourly_volume_total_annual'))).values('type', 'total')
-
         return "{} {} [{}] ({} {})".format(
             link.child.code,
             get_verbose_title_ue(link.child),
             get_volume_total_verbose(link.child),
             link.relative_credits or link.child.credits or 0, _("credits")  # FIXME :: Duplicated line
         )
-    else:
-        raise Exception()
 
 
 def get_volume_total_verbose(node: 'NodeLearningUnitYear'):
-    return "%(q1)gh + %(q2)gh" % {"q1": 10, "q2": 10}
-    # return "%(q1)gh + %(q2)gh" % {"q1": node.volume_total_lecturing, "q2": node.volume_total_practical}
-    # q1 = next((component['total'] for component in learning_component_years
-    #            if component['type'] == LECTURING), 0)
-    # q2 = next((component['total'] for component in learning_component_years
-    #            if component['type'] == PRACTICAL_EXERCISES), 0)
-    # return "%(q1)gh + %(q2)gh" % {"q1": q1, "q2": q2}
+    # TODO :: add volumes into the NodeLearningUnitYear object (via program_tree.load())
+    return "%(total_lecturing)gh + %(total_practical)gh" % {"total_lecturing": 10, "total_practical": 10}
 
 
 def get_status_picture(node: 'NodeLearningUnitYear'):
