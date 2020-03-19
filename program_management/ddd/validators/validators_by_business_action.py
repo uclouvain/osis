@@ -31,13 +31,10 @@ from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroup
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
 from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
-from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
-    InfiniteRecursivityLinkValidator
+from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
-from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
-from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
-from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
+from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
 class AttachNodeValidatorList(BusinessListValidator):
@@ -67,19 +64,4 @@ class AttachNodeValidatorList(BusinessListValidator):
 
         else:
             raise AttributeError("Unknown instance of node")
-        super().__init__()
-
-
-class CreateLinkValidatorList(BusinessListValidator):
-    success_messages = [
-        _('Success message')
-    ]
-
-    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
-        self.validators = [
-            ParentIsNotLeafValidator(parent_node, node_to_add),
-            NodeDuplicationValidator(parent_node, node_to_add),
-            ParentChildSameAcademicYearValidator(parent_node, node_to_add),
-            InfiniteRecursivityLinkValidator(parent_node, node_to_add)
-        ]
         super().__init__()
