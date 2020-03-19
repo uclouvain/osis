@@ -146,9 +146,6 @@ def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
     output = []
     depth = depth if depth else 1
     for link in links_under_root:
-        if link.parent.node_type == GroupType.MINOR_LIST_CHOICE:
-            # Into the PDF, we must ignore children from MINOR_LIST_CHOICE
-            continue
         sublist = ''
         padding = 2 * depth
         if link.child.children:

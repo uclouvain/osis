@@ -709,15 +709,6 @@ class EducationGroupYear(SerializableModel):
             return self.remark_english
         return self.remark
 
-    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
-    def verbose_constraint(self):
-        msg = "from %(min)s to %(max)s credits among" \
-            if self.constraint_type == CREDITS else "from %(min)s to %(max)s among"
-        return _(msg) % {
-            "min": self.min_constraint if self.min_constraint else "",
-            "max": self.max_constraint if self.max_constraint else ""
-        }
-
     @property
     def verbose_duration(self):
         if self.duration and self.duration_unit:

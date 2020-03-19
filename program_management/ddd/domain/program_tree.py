@@ -107,35 +107,17 @@ class ProgramTree:
         return self.get_all_nodes(types=finality_types)
 
     def get_greater_block_value(self):  # TODO :: unit test
-        return max(l.block_max_value for l in self.get_all_links())
+        all_links = self.get_all_links()
+        if not all_links:
+            return 0
+        return max(l.block_max_value for l in all_links)
 
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
-        # if with_reference_effect:
-        #     result = []
-        #     for link in links:
-        #         if link.is_reference():
-        #             pass
-        #         else:
-        #             result.append(link)
-        # return result
 
-    # def copy_and_prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
-    #     pass
-    #
-    # @staticmethod
-    # def test(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    #     new_node = copy.deepcopy(root)
-    #     children_after_pruning = []
-    #     for link in root.children:
-    #         if ignore_children_from and link.parent.node_type in ignore_children_from:
-    #             continue
-    #         new_link = copy.deepcopy(link)
-    #         children_after_pruning.append(new_link)
-    #         test(new_link)
-    #
-    #     return children
-
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
+        copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
+        return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
     def attach_node(self, node_to_attach: 'Node', path: Path = None, **link_attributes):
         """
@@ -185,3 +167,17 @@ def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) 
 
 def build_path(*nodes):
     return '{}'.format(PATH_SEPARATOR).join((str(n.node_id) for n in nodes))
+
+
+def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
+    new_node = copy.deepcopy(root)
+    new_children = []
+    for link in root.children:
+        if ignore_children_from and link.parent.node_type in ignore_children_from:
+            continue
+        new_child = _copy(link.child, ignore_children_from=ignore_children_from)
+        new_link = copy.deepcopy(link)
+        new_link.child = new_child
+        new_children.append(new_link)
+    new_node.children = new_children
+    return new_node

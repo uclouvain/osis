@@ -23,14 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import inspect
+
 from django.test import SimpleTestCase
 
 from base.ddd.utils.validation_message import MessageLevel
+from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
+from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -258,3 +264,96 @@ class TestGetFirstLinkOccurenceUsingNode(SimpleTestCase):
         self.assertEqual(result, link1_1, error_msg)
         self.assertNotEqual(result, link2_1, error_msg)
         self.assertNotEqual(result, link3_1, error_msg)
+
+
+class TestGetGreaterBlockValue(SimpleTestCase):
+    def test_when_tree_is_empty(self):
+        tree = ProgramTreeFactory()
+        self.assertEqual(0, tree.get_greater_block_value())
+
+    def test_when_1_link_without_block_value(self):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node, block=None)
+        self.assertEqual(0, tree.get_greater_block_value())
+
+    def test_when_multiple_links_with_multiple_values(self):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node, block=13)
+        LinkFactory(parent=tree.root_node, block=None)
+        LinkFactory(parent=tree.root_node, block=1)
+        LinkFactory(parent=tree.root_node, block=456)
+        LinkFactory(parent=tree.root_node, block=123)
+        self.assertEqual(6, tree.get_greater_block_value())
+
+
+class TestCopyAndPrune(SimpleTestCase):
+
+    def setUp(self):
+        self.auth_relations = [AuthorizedRelationshipFactory()]
+
+        self.original_root = NodeEducationGroupYearFactory()
+
+        self.original_link = LinkFactory(parent=self.original_root, block=0)
+
+        self.original_tree = ProgramTreeFactory(
+            root_node=self.original_root,
+            authorized_relationships=self.auth_relations
+        )
+
+    def test_should_copy_nodes(self):
+        copied_tree = self.original_tree.prune()
+        copied_root = copied_tree.root_node
+        self.assertEqual(copied_root.node_id, self.original_root.node_id)
+        self.assertEqual(copied_root.title, self.original_root.title)
+        original_title = self.original_root.title
+        copied_root.title = "Another value"
+        self.assertEqual(copied_root.title, "Another value")
+        self.assertEqual(self.original_root.title, original_title)
+
+    def test_should_copy_tree(self):
+        copied_tree = self.original_tree.prune()
+        self.assertEqual(copied_tree.root_node, self.original_tree.root_node)
+        self.assertEqual(copied_tree.authorized_relationships, self.original_tree.authorized_relationships)
+        self.assertNotEqual(id(self.original_tree), id(copied_tree))
+
+    def test_should_copy_links(self):
+        original_link = self.original_tree.root_node.children[0]
+        copied_tree = self.original_tree.prune()
+        copied_link = copied_tree.root_node.children[0]
+        self.assertEqual(copied_link.child, original_link.child)
+        self.assertEqual(copied_link.parent, original_link.parent)
+        self.assertEqual(copied_link.block, original_link.block)
+
+        self.assertNotEqual(id(original_link), id(copied_link))
+        self.assertNotEqual(id(original_link.child), id(copied_link.child))
+
+        copied_link.block = 123456
+        self.assertEqual(copied_link.block, 123456)
+        self.assertNotEqual(original_link, 123456)
+
+    def test_when_change_tree_signature(self):
+        original_signature = ['self', 'root_node', 'authorized_relationships']
+        current_signature = list(inspect.signature(ProgramTree.__init__).parameters.keys())
+        error_msg = "Please update the {} function to fit with new object signature.".format(ProgramTree.prune)
+        self.assertEqual(original_signature, current_signature, error_msg)
+
+    def test_pruning_with_param_ignore_children_from(self):
+        link = LinkFactory(parent=self.original_root)
+        copied_tree = self.original_tree.prune(ignore_children_from={link.parent.node_type})
+        self.assertListEqual([], copied_tree.root_node.children)
+
+    def test_pruning_multiple_levels_with_param_ignore_children_from(self):
+        link_1 = LinkFactory(
+            parent__node_type=TrainingType.BACHELOR,
+            child__node_type=GroupType.MINOR_LIST_CHOICE
+        )
+        link1_1 = LinkFactory(parent=link_1.child, child__node_type=GroupType.SUB_GROUP)
+        link1_1_1 = LinkFactory(parent=link1_1.child)
+        link1_1_1_1 = LinkFactory(parent=link1_1_1.child)
+        original_tree = ProgramTreeFactory(root_node=link_1.parent)
+        copied_tree = original_tree.prune(ignore_children_from={GroupType.SUB_GROUP})
+        result = copied_tree.get_all_links()
+        copied_link_1_1_1 = copied_tree.root_node.children[0].child.children[0].child
+        self.assertListEqual([], copied_link_1_1_1.children)
+        self.assertNotIn(link1_1_1, result)
+        self.assertNotIn(link1_1_1_1, result)

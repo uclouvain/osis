@@ -54,6 +54,10 @@ class NodeEducationGroupYearFactory(NodeFactory):
         abstract = False
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_title_en = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     children = None
 
 
@@ -64,6 +68,10 @@ class NodeGroupYearFactory(NodeFactory):
         abstract = False
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_title_en = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     children = None
 
     class Params:

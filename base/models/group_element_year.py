@@ -45,7 +45,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType, EducationGroupTypesEnum, TrainingType
 from base.models.enums.link_type import LinkTypes
-from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -367,26 +366,6 @@ class GroupElementYear(OrderedModel):
     def __str__(self):
         return "{} - {}".format(self.parent, self.child)
 
-    @property  # TODO :: remove this and move unit test into test templates tags (only used for PDF)
-    def verbose(self):
-        if self.child_branch:
-            return self._verbose_credits()
-        else:
-            components = LearningComponentYear.objects.filter(
-                learning_unit_year=self.child_leaf).annotate(
-                total=Case(When(hourly_volume_total_annual=None, then=0),
-                           default=F('hourly_volume_total_annual'))).values('type', 'total')
-
-            return "{} {} [{}] ({} {})".format(
-                self.child_leaf.acronym,
-                self.child.complete_title_english
-                if self.child.complete_title_english and translation.get_language() == 'en'
-                else self.child.complete_title,
-                volume_total_verbose(components),
-                self.relative_credits or self.child_leaf.credits or 0,
-                _("credits"),
-            )
-
     @property
     def verbose_comment(self):
         if self.comment_english and translation.get_language() == LANGUAGE_CODE_EN:
@@ -437,15 +416,6 @@ class GroupElementYear(OrderedModel):
     @cached_property
     def child(self):
         return self.child_branch or self.child_leaf
-
-    # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
-    def _verbose_credits(self):
-        if self.relative_credits or self.child_branch.credits:
-            return "{} ({} {})".format(
-                self.child.verbose_title, self.relative_credits or self.child_branch.credits or 0, _("credits")
-            )
-        else:
-            return "{}".format(self.child.verbose_title)
 
 
 def find_learning_unit_roots(

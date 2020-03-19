@@ -48,11 +48,11 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    # tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)
     tree = load_tree.load(education_group_year.id)
+    tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
     context = {
         'root': education_group_year,
-        'tree': tree.root_node.children,  # TODO :: rename to-list -> to_ordered_flat_list + manage AllTypes VS EducationGroupType ?
+        'tree': tree.root_node.children,
         'language': language,
         'created': datetime.datetime.now(),
         'max_block': tree.get_greater_block_value(),
