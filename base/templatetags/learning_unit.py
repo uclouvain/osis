@@ -136,14 +136,14 @@ def dl_tooltip(context, instance, key, **kwargs):
             label_text, ITALIC_FONT, "The value of this attribute is not annualized"
         )
         value = get_style_of_value(
-            ITALIC_FONT,  "The value of this attribute is not annualized", value or default_if_none
+            ITALIC_FONT,  "The value of this attribute is not annualized", value, default_if_none
         )
 
     if common_title or specific_title:
         is_common = common_title is True
         style, tooltip = _get_title_tooltip(is_common, inherited)
         label_text = get_style_of_label_text(label_text, style, tooltip)
-        value = get_style_of_value(value_style, '', value or default_if_none)
+        value = get_style_of_value(value_style, '', value, default_if_none)
 
     return {
         'difference': difference,
@@ -161,9 +161,9 @@ def _get_title_tooltip(is_common, inherited):
     return ITALIC_FONT, ''
 
 
-def get_style_of_value(style, title, value):
+def get_style_of_value(style, title, value, default_if_none=DEFAULT_VALUE_FOR_NONE):
     value = "<p style='{style}' title='{title}'>{value}</p>".format(
-        style=style, title=_(title), value=value or DEFAULT_VALUE_FOR_NONE
+        style=style, title=_(title), value=value or default_if_none
     )
     return value
 
