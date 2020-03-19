@@ -136,7 +136,8 @@ def dl_tooltip(context, instance, key, **kwargs):
 
     if common_title or specific_title:
         is_common = common_title is False
-        label_text, value = _get_title_tooltip(is_common, default_if_none, inherited, label_text, value)
+        label_text, value_style = _get_title_tooltip(is_common, inherited, label_text)
+        value = get_style_of_value(value_style, '', value if value else default_if_none)
 
     return {
         'difference': difference,
@@ -146,7 +147,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     }
 
 
-def _get_title_tooltip(is_common, default_if_none, inherited, label_text, value):
+def _get_title_tooltip(is_common, inherited, label_text):
     value_style = "color:grey;" if inherited == PARTIM else ''
 
     if is_common:
@@ -157,8 +158,7 @@ def _get_title_tooltip(is_common, default_if_none, inherited, label_text, value)
         label_style = "font-style:italic;"
         label_text = get_style_of_label_text(label_text, label_style, '')
 
-    value = get_style_of_value(value_style, '', value if value else default_if_none)
-    return label_text, value
+    return label_text, value_style
 
 
 def get_style_of_value(style, title, value):
