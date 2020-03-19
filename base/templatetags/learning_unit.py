@@ -108,6 +108,8 @@ def dl_tooltip(context, instance, key, **kwargs):
     common_title = kwargs.get('common_title')
     specific_title = kwargs.get('specific_title')
 
+    value_style = GREY_COLOR if inherited == PARTIM else ''
+
     if not label_text:
         label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
@@ -140,7 +142,7 @@ def dl_tooltip(context, instance, key, **kwargs):
 
     if common_title or specific_title:
         is_common = common_title is True
-        label_text, value_style = _get_title_tooltip(is_common, inherited, label_text)
+        label_text = _get_title_tooltip(is_common, inherited, label_text)
         value = get_style_of_value(value_style, '', value if value else default_if_none)
 
     return {
@@ -155,12 +157,8 @@ def _get_title_tooltip(is_common, inherited, label_text):
     if is_common:
         label_style = ";".join([ITALIC_FONT, GREY_COLOR]) if inherited == PARTIM else ITALIC_FONT
         label_tooltip = _("Part of the title which is common to the complete EU, to its partims and to its classes")
-        label_text = get_style_of_label_text(label_text, label_style, label_tooltip)
-    else:
-        label_style = ITALIC_FONT
-        label_text = get_style_of_label_text(label_text, label_style, '')
-
-    return label_text, GREY_COLOR if inherited == PARTIM else ''
+        return get_style_of_label_text(label_text, label_style, label_tooltip)
+    return get_style_of_label_text(label_text, ITALIC_FONT, '')
 
 
 def get_style_of_value(style, title, value):
