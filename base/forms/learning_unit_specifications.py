@@ -102,6 +102,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             self.last_postponed_academic_year = None
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
+                print(ac_year_postponement_range)
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
                 cms = {"language": self.trans_text.language,
                        "text_label": self.text_label,

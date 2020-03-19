@@ -106,7 +106,7 @@ class PermsTestCase(TestCase):
 
             self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
-    def test_not_eligible_if_has_attribution(self):
+    def test_not_eligible_if_has_application(self):
         luy = LearningUnitYearFactory(academic_year__year=2020)
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
         self.assertFalse(
@@ -416,7 +416,7 @@ class PermsTestCase(TestCase):
             with self.subTest(luy=luy):
                 self.assertFalse(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
-    def test_is_not_eligible_if_creation_proposal_has_attribution(self):
+    def test_is_not_eligible_if_creation_proposal_has_application(self):
         luy = LearningUnitYearFactory()
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=luy,
@@ -577,7 +577,7 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
 
                 self.assertTrue(is_eligible_to_consolidate_proposal(proposal, self.person_with_right_to_consolidate))
 
-    def test_is_not_eligible_consolidate_delete_proposal_if_has_attribution(self):
+    def test_is_not_eligible_consolidate_delete_proposal_if_has_applications(self):
         requirement_entity = EntityFactory()
         luy = LearningUnitYearFactory(learning_container_year__requirement_entity=requirement_entity)
         proposal = ProposalLearningUnitFactory(

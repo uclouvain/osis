@@ -2916,7 +2916,7 @@ msgstr "Ce champ est obligatoire."
 msgid "This label %s does not exist"
 msgstr "Ce label %s n’existe pas"
 
-msgid "This learning unit has attribution."
+msgid "This learning unit has application."
 msgstr "L'unité d'enseignement dispose d'au moins une candidature"
 
 msgid ""
