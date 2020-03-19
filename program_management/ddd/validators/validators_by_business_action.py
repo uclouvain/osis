@@ -51,10 +51,10 @@ class AttachNodeValidatorList(BusinessListValidator):
             self.link_validators_cls = [
                 ParentIsNotLeafValidator,
                 NodeDuplicationValidator,
+                ParentChildSameAcademicYearValidator,
             ]
             self.validators_cls = [
                 AttachAuthorizedRelationshipValidator,
-                ParentChildSameAcademicYearValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
             ]
@@ -63,10 +63,10 @@ class AttachNodeValidatorList(BusinessListValidator):
             self.link_validators_cls = [
                 ParentIsNotLeafValidator,
                 NodeDuplicationValidator,
+                ParentChildSameAcademicYearValidator,
             ]
             self.validators_cls = [
                 AttachAuthorizedRelationshipValidator,
-                ParentChildSameAcademicYearValidator,
                 AuthorizedRelationshipLearningUnitValidator,
                 MinimumEditableYearValidator,
                 InfiniteRecursivityValidator,
