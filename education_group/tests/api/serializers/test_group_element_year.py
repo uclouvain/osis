@@ -41,6 +41,8 @@ from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
+EDUCATION_GROUP_API_PREFIX = 'education_group_api_v1:'
+
 
 class EducationGroupTreeSerializerTestCase(TestCase):
     @classmethod
@@ -61,7 +63,9 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        cls.gey_no_child_leaf = GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
+        cls.gey_no_child_leaf = GroupElementYearFactory(
+            parent=cls.training, child_branch=cls.common_core, child_leaf=None
+        )
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
@@ -73,7 +77,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15
         )
 
-        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + TrainingTreeView.name, kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
@@ -181,7 +185,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             prerequisite__learning_unit_year=luy,
             prerequisite__education_group_year=gey.parent
         )
-        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + GroupTreeView.name, kwargs={
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
@@ -208,7 +212,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             child_leaf=luy,
             relative_credits=None
         )
-        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + GroupTreeView.name, kwargs={
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
@@ -234,7 +238,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             child_leaf=None,
             relative_credits=None
         )
-        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + GroupTreeView.name, kwargs={
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
@@ -259,13 +263,13 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         self.assertEqual(serializer.data['children'][0]['credits'], expected_credits)
 
     def test_ensure_url_is_related_to_instance(self):
-        expected_root_url = reverse('education_group_api_v1:' + TrainingDetail.name, kwargs={
+        expected_root_url = reverse(EDUCATION_GROUP_API_PREFIX + TrainingDetail.name, kwargs={
             'acronym': self.training.acronym,
             'year': self.training.academic_year.year,
         })
         self.assertIn(expected_root_url, self.serializer.data['url'])
 
-        expected_group_url = reverse('education_group_api_v1:' + GroupDetail.name, kwargs={
+        expected_group_url = reverse(EDUCATION_GROUP_API_PREFIX + GroupDetail.name, kwargs={
             'partial_acronym': self.common_core.partial_acronym,
             'year': self.common_core.academic_year.year,
         })
@@ -286,7 +290,6 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         )
 
     def expected_credits(self, absolute_credits, relative_credits):
-
         luy = LearningUnitYearFactory(
             academic_year=self.academic_year,
             learning_container_year__academic_year=self.academic_year,
@@ -298,7 +301,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             child_leaf=luy,
             relative_credits=relative_credits
         )
-        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + GroupTreeView.name, kwargs={
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
@@ -339,7 +342,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
         )
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
 
-        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + TrainingTreeView.name, kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
@@ -426,7 +429,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
         )
         GroupElementYearFactory(parent=cls.training_2, child_branch=None, child_leaf=cls.learning_unit_year)
 
-        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+        url = reverse(EDUCATION_GROUP_API_PREFIX + TrainingTreeView.name, kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
