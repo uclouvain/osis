@@ -200,7 +200,7 @@ class GroupFilter(FilterSet):
             complete_title_fr=Case(
                 When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
                      then=Concat('acronym', Value(' ['), 'educationgroupversion__version_name', Value(']'))),
-                default=Value('acronym'),
+                default='acronym',
                 output_field=CharField(),)
         )
 
