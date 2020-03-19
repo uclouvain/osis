@@ -69,6 +69,7 @@ class TestConsolidate(TestCase):
             state=proposal_state.ProposalState.ACCEPTED.name,
             learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
             learning_unit_year__academic_year=cls.current_academic_year,
+            learning_unit_year__learning_unit__start_year=cls.current_academic_year,
             learning_unit_year__learning_container_year__academic_year=cls.current_academic_year,
             learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
         )
