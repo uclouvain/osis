@@ -122,7 +122,7 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
 
 
 def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs):
-    formations = group_element_year.find_learning_unit_roots(
+    formations = group_element_year.find_learning_unit_roots_bis(
         learning_unit_year_qs,
         return_result_params={
             'parents_as_instances': False

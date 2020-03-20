@@ -91,7 +91,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
     @cached_property
     def _parents(self):
-        return group_element_year.find_learning_unit_roots(
+        return group_element_year.find_learning_unit_roots_bis(
             [self.parent],
             return_result_params={
                 'parents_as_instances': True

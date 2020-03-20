@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.group_element_year import find_learning_unit_roots
+from base.models.group_element_year import find_learning_unit_roots_bis
 from program_management.views.generic import LearningUnitGenericDetailView
 
 
@@ -33,7 +33,7 @@ class LearningUnitUtilization(LearningUnitGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_leaf.select_related("parent")
-        context["formations"] = find_learning_unit_roots(
+        context["formations"] = find_learning_unit_roots_bis(
             list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
             return_result_params={
                 'parents_as_instances': True

@@ -433,6 +433,9 @@ def find_learning_unit_roots_bis(
     if return_result_params is None:
         return_result_params = {}
     parents_as_instances = return_result_params.get('parents_as_instances', False)
+    with_parents_of_parents = return_result_params.get('with_parents_of_parents', False)
+    if with_parents_of_parents and not parents_as_instances:
+        raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
 
     if not objects:
         return parents

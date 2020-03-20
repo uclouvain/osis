@@ -330,7 +330,7 @@ class TestConvertParentIdsToInstances(TestCase):
             child_branch=None,
             child_leaf=LearningUnitYearFactory()
         )
-        root_ids_by_object_id = group_element_year.find_learning_unit_roots([group_element.child_leaf])
+        root_ids_by_object_id = group_element_year.find_learning_unit_roots_bis([group_element.child_leaf])
         result = group_element_year._convert_parent_ids_to_instances(root_ids_by_object_id)
         expected_result = {
             group_element.child_leaf.id: [group_element.parent]
@@ -356,7 +356,7 @@ class TestConvertParentIdsToInstances(TestCase):
             child_branch=None,
             child_leaf=learn_unit_year
         )
-        root_ids_by_object_id = group_element_year.find_learning_unit_roots([learn_unit_year])
+        root_ids_by_object_id = group_element_year.find_learning_unit_roots_bis([learn_unit_year])
         result = group_element_year._convert_parent_ids_to_instances(root_ids_by_object_id)
         expected_order = [group_element2.parent, group_element1.parent, group_element3.parent]
         self.assertListEqual(result[learn_unit_year.id], expected_order)
@@ -365,7 +365,7 @@ class TestConvertParentIdsToInstances(TestCase):
         with self.assertRaisesMessage(
                 ValueError,
                 "If parameter with_parents_of_parents is True, parameter parents_as_instances must be True"):
-            group_element_year.find_learning_unit_roots(
+            group_element_year.find_learning_unit_roots_bis(
                 [],
                 return_result_params={
                     'parents_as_instances': False,
