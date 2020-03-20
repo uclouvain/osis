@@ -228,49 +228,58 @@ class TestFindLearningUnitFormationRoots(TestCase):
             category=education_group_categories.MINI_TRAINING
         )
         hierarchy = self._build_hierarchy(self.current_academic_year, type_option, self.child_leaf)
-        result = group_element_year.find_learning_unit_roots([self.child_leaf])
+        result = group_element_year.find_learning_unit_roots_bis([self.child_leaf])
         self.assertNotIn(hierarchy['group_element_child'].parent.id, result[self.child_leaf.id])
         self.assertIn(hierarchy['group_element_root'].parent.id, result[self.child_leaf.id])
 
     def test_all_group_types_of_category_mini_training_stops_recursivity(self):
         group_type = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
         hierarchy = self._build_hierarchy(self.current_academic_year, group_type, self.child_leaf)
-        result = group_element_year.find_learning_unit_roots([self.child_leaf])
+        result = group_element_year.find_learning_unit_roots_bis([self.child_leaf])
         self.assertNotIn(hierarchy['group_element_root'].parent.id, result[self.child_leaf.id])
         self.assertIn(hierarchy['group_element_child'].parent.id, result[self.child_leaf.id])
 
     def test_all_group_types_of_category_training_stops_recursivity(self):
-        type_bachelor = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
+        type_bachelor = EducationGroupTypeFactory(
+            name=education_group_types.TrainingType.BACHELOR.name,
+            category=education_group_categories.TRAINING
+        )
         hierarchy = self._build_hierarchy(self.current_academic_year, type_bachelor, self.child_leaf)
-        result = group_element_year.find_learning_unit_roots([self.child_leaf])
+        result = group_element_year.find_learning_unit_roots_bis([self.child_leaf])
         self.assertNotIn(hierarchy['group_element_root'].parent.id, result[self.child_leaf.id])
         self.assertIn(hierarchy['group_element_child'].parent.id, result[self.child_leaf.id])
 
     def test_case_group_category_is_not_root(self):
-        a_group_type = EducationGroupTypeFactory(name='Subgroup', category=education_group_categories.GROUP)
+        a_group_type = EducationGroupTypeFactory(
+            name=education_group_types.MiniTrainingType.OPTION.name,
+            category=education_group_categories.GROUP)
+
         hierarchy = self._build_hierarchy(self.current_academic_year, a_group_type, self.child_leaf)
-        result = group_element_year.find_learning_unit_roots([self.child_leaf])
+        result = group_element_year.find_learning_unit_roots_bis([self.child_leaf])
         self.assertNotIn(hierarchy['group_element_child'].parent.id, result[self.child_leaf.id])
         self.assertIn(hierarchy['group_element_root'].parent.id, result[self.child_leaf.id])
 
     def test_case_group_category_is_root(self):
-        a_group_type = EducationGroupTypeFactory(name='Subgroup', category=education_group_categories.GROUP)
+        a_group_type = EducationGroupTypeFactory(
+            name=education_group_types.GroupType.SUB_GROUP.name,
+            category=education_group_categories.GROUP
+        )
         group_element = GroupElementYearFactory(
             parent=EducationGroupYearFactory(academic_year=self.current_academic_year,
                                              education_group_type=a_group_type),
             child_branch=None,
             child_leaf=self.child_leaf
         )
-        result = group_element_year.find_learning_unit_roots([self.child_leaf])
+        result = group_element_year.find_learning_unit_roots_bis([self.child_leaf])
         self.assertEqual(result[self.child_leaf.id], [])
         self.assertNotIn(group_element.parent.id, result[self.child_leaf.id])
 
     def test_case_arg_is_empty(self):
-        result = group_element_year.find_learning_unit_roots([])
+        result = group_element_year.find_learning_unit_roots_bis([])
         self.assertEqual(result, {})
 
     def test_case_arg_is_none(self):
-        result = group_element_year.find_learning_unit_roots(None)
+        result = group_element_year.find_learning_unit_roots_bis(None)
         self.assertEqual(result, {})
 
     def test_with_kwarg_parents_as_instances_is_true(self):
@@ -278,7 +287,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
             child_branch=None,
             child_leaf=self.child_leaf
         )
-        result = group_element_year.find_learning_unit_roots(
+        result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
             return_result_params={
                 'parents_as_instances': True
@@ -291,7 +300,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
             child_branch=None,
             child_leaf=self.child_leaf
         )
-        result = group_element_year.find_learning_unit_roots(
+        result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
             luy=self.child_leaf,
             is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
@@ -304,7 +313,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
             category=education_group_categories.GROUP
         )
         hierarchy = self._build_hierarchy(self.current_academic_year, group_type, self.child_leaf)
-        result = group_element_year.find_learning_unit_roots(
+        result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
             luy=self.child_leaf,
             is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]

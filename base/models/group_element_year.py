@@ -430,6 +430,10 @@ def find_learning_unit_roots_bis(
     default_is_root_when_matches = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
     is_root_when_matches = default_is_root_when_matches | set(is_root_when_matches or [])
 
+    if return_result_params is None:
+        return_result_params = {}
+    parents_as_instances = return_result_params.get('parents_as_instances', False)
+
     if not objects:
         return parents
 
@@ -451,6 +455,8 @@ def find_learning_unit_roots_bis(
         )
         parents[node.node_id] = [node_parent.node_id for node_parent in node_parents]
 
+    if parents_as_instances:
+        parents = _convert_parent_ids_to_instances(parents)
     return parents
 
 
