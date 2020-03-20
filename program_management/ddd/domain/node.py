@@ -27,9 +27,12 @@ from _decimal import Decimal
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
+from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
 
@@ -37,15 +40,15 @@ from program_management.models.enums.node_type import NodeType
 
 
 class NodeFactory:
-    def get_node(self, node_type: NodeType, **node_attrs):
+    def get_node(self, type: NodeType, **node_attrs):
         node_cls = {
             NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
 
             NodeType.GROUP: NodeGroupYear,
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
             NodeType.LEARNING_CLASS: NodeLearningClassYear
-        }[node_type]
-        return node_cls(node_type=node_type, **node_attrs)
+        }[type]
+        return node_cls(**node_attrs)
 
 
 factory = NodeFactory()
@@ -53,8 +56,11 @@ factory = NodeFactory()
 
 class Node:
 
+    _academic_year = None
+
     code = None
     year = None
+    type = None
 
     def __init__(
             self,
@@ -65,7 +71,6 @@ class Node:
             code: str = None,
             title: str = None,
             year: int = None,
-            proposal_type: ProposalType = None,
             credits: Decimal = None
     ):
         self.node_id = node_id
@@ -77,7 +82,6 @@ class Node:
         self.code = code
         self.title = title
         self.year = year
-        self.proposal_type = proposal_type
         self.credits = credits
 
     def __eq__(self, other):
@@ -95,6 +99,18 @@ class Node:
     @property
     def pk(self):
         return self.node_id
+
+    @property
+    def academic_year(self):
+        if self._academic_year is None:
+            self._academic_year = AcademicYear(self.year)
+        return self._academic_year
+
+    def is_learning_unit(self):
+        return self.type == NodeType.LEARNING_UNIT
+
+    def is_group(self):
+        return self.type == NodeType.GROUP or self.type == NodeType.EDUCATION_GROUP
 
     def is_finality(self) -> bool:
         return self.node_type in set(TrainingType.finality_types_enum())
@@ -183,20 +199,88 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
 
 
 class NodeEducationGroupYear(Node):
-    def __init__(self, **kwargs):
+
+    type = NodeType.EDUCATION_GROUP
+
+    def __init__(
+            self,
+            constraint_type: ConstraintTypes = None,
+            min_constraint: int = None,
+            max_constraint: int = None,
+            remark_fr: str = None,
+            remark_en: str = None,
+            offer_title_fr: str = None,
+            offer_title_en: str = None,
+            offer_partial_title_fr: str = None,
+            offer_partial_title_en: str = None,
+            **kwargs
+    ):
         super().__init__(**kwargs)
+        self.constraint_type = constraint_type
+        self.min_constraint = min_constraint
+        self.max_constraint = max_constraint
+        self.remark_fr = remark_fr
+        self.remark_en = remark_en
+        self.offer_title_fr = offer_title_fr
+        self.offer_title_en = offer_title_en
+        self.offer_partial_title_fr = offer_partial_title_fr
+        self.offer_partial_title_en = offer_partial_title_en
 
 
 class NodeGroupYear(Node):
-    def __init__(self, **kwargs):
+
+    type = NodeType.GROUP
+
+    def __init__(
+        self,
+        constraint_type: ConstraintTypes = None,
+        min_constraint: int = None,
+        max_constraint: int = None,
+        remark_fr: str = None,
+        remark_en: str = None,
+        offer_title_fr: str = None,
+        offer_title_en: str = None,
+        offer_partial_title_fr: str = None,
+        offer_partial_title_en: str = None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
+        self.constraint_type = constraint_type
+        self.min_constraint = min_constraint
+        self.max_constraint = max_constraint
+        self.remark_fr = remark_fr
+        self.remark_en = remark_en
+        self.offer_title_fr = offer_title_fr
+        self.offer_title_en = offer_title_en
+        self.offer_partial_title_fr = offer_partial_title_fr
+        self.offer_partial_title_en = offer_partial_title_en
 
 
 class NodeLearningUnitYear(Node):
-    def __init__(self, **kwargs):
+
+    type = NodeType.LEARNING_UNIT
+
+    def __init__(
+            self,
+            status: bool = None,
+            periodicity: PeriodicityEnum = None,
+            common_title_fr: str = None,
+            specific_title_fr: str = None,
+            common_title_en: str = None,
+            specific_title_en: str = None,
+            proposal_type: ProposalType = None,
+            **kwargs
+    ):
         self.is_prerequisite_of = kwargs.pop('is_prerequisite_of', []) or []
+        self.status = status
+        self.periodicity = periodicity
         super().__init__(**kwargs)
         self.prerequisite = NullPrerequisite()
+        self.common_title_fr = common_title_fr
+        self.specific_title_fr = specific_title_fr
+        self.common_title_en = common_title_en
+        self.specific_title_en = specific_title_en
+        self.proposal_type = proposal_type
 
     @property
     def has_prerequisite(self) -> bool:
@@ -218,6 +302,9 @@ class NodeLearningUnitYear(Node):
 
 
 class NodeLearningClassYear(Node):
+
+    type = NodeType.LEARNING_CLASS
+
     def __init__(self, node_id: int, year: int, children: List['Link'] = None):
         super().__init__(node_id, children)
         self.year = year

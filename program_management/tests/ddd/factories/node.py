@@ -29,11 +29,6 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
-from program_management.models.enums.node_type import NodeType
-
-
-def generate_year(node):
-    return random.randint(1999, 2099)
 
 
 def generate_end_date(node):
@@ -45,7 +40,7 @@ class NodeFactory(factory.Factory):
     node_id = factory.Sequence(lambda n: n+1)
     code = factory.Sequence(lambda n: 'Code-%02d' % n)
     title = factory.fuzzy.FuzzyText(length=240)
-    year = factory.LazyAttribute(generate_year)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_date = factory.LazyAttribute(generate_end_date)
 
 
@@ -54,7 +49,11 @@ class NodeEducationGroupYearFactory(NodeFactory):
         model = NodeEducationGroupYear
         abstract = False
 
-    node_type = NodeType.EDUCATION_GROUP
+    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_title_en = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     children = None
 
 
@@ -64,7 +63,11 @@ class NodeGroupYearFactory(NodeFactory):
         model = NodeGroupYear
         abstract = False
 
-    node_type = NodeType.GROUP
+    node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_title_en = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
+    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     children = None
 
     class Params:
@@ -77,10 +80,11 @@ class NodeGroupYearFactory(NodeFactory):
 
 
 class NodeLearningUnitYearFactory(NodeFactory):
+
     class Meta:
         model = NodeLearningUnitYear
         abstract = False
 
-    node_type = NodeType.LEARNING_UNIT
+    node_type = None
     is_prerequisite_of = []
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

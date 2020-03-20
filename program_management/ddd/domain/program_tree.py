@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import copy
 from typing import List, Set
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
@@ -120,7 +121,7 @@ class ProgramTree:
         return all_nodes
 
     def get_nodes_by_type(self, node_type_value) -> List['Node']:
-        return [node for node in self.get_all_nodes() if node.node_type == node_type_value]
+        return [node for node in self.get_all_nodes() if node.type == node_type_value]
 
     def get_codes_permitted_as_prerequisite(self):
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
@@ -130,6 +131,19 @@ class ProgramTree:
     def get_all_finalities(self):
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
+
+    def get_greater_block_value(self):
+        all_links = self.get_all_links()
+        if not all_links:
+            return 0
+        return max(l.block_max_value for l in all_links)
+
+    def get_all_links(self) -> List['Link']:
+        return _links_from_root(self.root_node)
+
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
+        copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
+        return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
     def attach_node(self, node_to_attach: 'Node', path: Path = None, **link_attributes):
         """
@@ -168,13 +182,44 @@ def _nodes_from_root(root: 'Node') -> List['Node']:
     return nodes
 
 
-def _links_from_root(root: 'Node') -> List['Link']:
+def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) -> List['Link']:
     links = []
     for link in root.children:
-        links.append(link)
-        links.extend(_links_from_root(link.child))
+        if not ignore or link.parent.node_type not in ignore:
+            links.append(link)
+            links.extend(_links_from_root(link.child, ignore=ignore))
     return links
 
 
 def build_path(*nodes):
     return '{}'.format(PATH_SEPARATOR).join((str(n.node_id) for n in nodes))
+
+
+def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
+    new_node = _deepcopy_node_without_copy_children_recursively(root)
+    new_children = []
+    for link in root.children:
+        if ignore_children_from and link.parent.node_type in ignore_children_from:
+            continue
+        new_child = _copy(link.child, ignore_children_from=ignore_children_from)
+        new_link = _deepcopy_link_without_copy_children_recursively(link)
+        new_link.child = new_child
+        new_children.append(new_link)
+    new_node.children = new_children
+    return new_node
+
+
+def _deepcopy_node_without_copy_children_recursively(original_node: 'Node'):
+    original_children = original_node.children
+    original_node.children = []  # To avoid recursive deep copy of all children behind
+    copied_node = copy.deepcopy(original_node)
+    original_node.children = original_children
+    return copied_node
+
+
+def _deepcopy_link_without_copy_children_recursively(original_link: 'Link'):
+    original_child = original_link.child
+    original_link.child = None  # To avoid recursive deep copy of all children behind
+    new_link = copy.deepcopy(original_link)
+    original_link.child = original_child
+    return new_link

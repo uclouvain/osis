@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
@@ -33,21 +32,37 @@ from program_management.models.enums.node_type import NodeType
 
 class Link:
 
-    def __init__(self, parent: 'Node', child: 'Node', **kwargs):
+    def __init__(
+        self,
+        parent: 'Node',
+        child: 'Node',
+        relative_credits: int = None,
+        min_credits: int = None,
+        max_credits: int = None,
+        is_mandatory: bool = False,
+        block: str = None,
+        access_condition: bool = False,
+        comment: str = None,
+        comment_english: str = None,
+        own_comment: str = None,
+        quadrimester_derogation: DerogationQuadrimesterEnum = None,
+        link_type: LinkTypes = None,
+        order: int = None
+    ):
         self.parent = parent
         self.child = child
-        self.relative_credits = kwargs.get('relative_credits')
-        self.min_credits = kwargs.get('min_credits')
-        self.max_credits = kwargs.get('max_credits')
-        self.is_mandatory = kwargs.get('is_mandatory') or False
-        self.block = kwargs.get('block')
-        self.access_condition = kwargs.get('access_condition') or False
-        self.comment = kwargs.get('comment')
-        self.comment_english = kwargs.get('comment_english')
-        self.own_comment = kwargs.get('own_comment')
-        self.quadrimester_derogation = kwargs.get('quadrimester_derogation')
-        self.link_type = kwargs.get('link_type')
-        self.order = kwargs.get('order')
+        self.relative_credits = relative_credits
+        self.min_credits = min_credits
+        self.max_credits = max_credits
+        self.is_mandatory = is_mandatory
+        self.block = block
+        self.access_condition = access_condition
+        self.comment = comment
+        self.comment_english = comment_english
+        self.own_comment = own_comment
+        self.quadrimester_derogation = quadrimester_derogation
+        self.link_type = link_type
+        self.order = order
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
@@ -56,7 +71,7 @@ class Link:
         return self.link_type == LinkTypes.REFERENCE
 
     @property
-    def block_repr(self) -> str:
+    def block_repr(self) -> FieldValueRepresentation:
         if self.block:
             block_in_array = [i for i in str(self.block)]
             return " ; ".join(
@@ -65,8 +80,18 @@ class Link:
         return ''
 
     @property
-    def relative_credits_repr(self) -> str:
+    def block_max_value(self) -> int:
+        return int(str(self.block)[-1]) if self.block else 0
+
+    @property
+    def relative_credits_repr(self) -> FieldValueRepresentation:
         return "{} / {:f}".format(self.relative_credits, self.child.credits.to_integral_value())
+
+    def is_link_with_learning_unit(self):
+        return self.child.is_learning_unit()
+
+    def is_link_with_group(self):
+        return self.child.is_group()
 
 
 class LinkWithChildLeaf(Link):

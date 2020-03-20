@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,20 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from django.test import SimpleTestCase
 
-from base.models.utils.utils import ChoiceEnum
-
-CREDITS = "CREDITS"
-NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
-
-# FIXME :: DEPRECATED - use ConstraintTypeEnum instead
-CONSTRAINT_TYPE = (
-    (CREDITS, _("credits")),
-    (NUMBER_OF_ELEMENTS, _("Number of elements")),
-)
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 
 
-class ConstraintTypeEnum(ChoiceEnum):
-    CREDITS = _("credits")
-    NUMBER_OF_ELEMENTS = _("Number of elements")
+class TestInit(SimpleTestCase):
+
+    def test_when_titles_are_none(self):
+        obj = LearningUnitYear(
+            common_title_fr=None,
+            common_title_en=None,
+            specific_title_fr=None,
+            specific_title_en=None,
+        )
+        self.assertEqual(obj.common_title_fr, '')
+        self.assertEqual(obj.common_title_en, '')
+        self.assertEqual(obj.specific_title_fr, '')
+        self.assertEqual(obj.specific_title_en, '')
