@@ -59,7 +59,7 @@ class TestFindRelatedRootEducationGroups(TestCase):
         cls.root = EducationGroupYearFactory(academic_year=cls.current_academic_year,
                                              education_group_type=root_group_type)
 
-    @mock.patch('base.models.group_element_year._raise_if_incorrect_instance')
+    @mock.patch('base.models.group_element_year._assert_same_academic_year')
     def test_objects_instances_check_is_called(self, mock_check_instance):
         group_element_year.find_learning_unit_roots_bis([self.child_leaf])
         self.assertTrue(mock_check_instance.called)
@@ -292,7 +292,6 @@ class TestFindLearningUnitFormationRoots(TestCase):
         )
         result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
-            luy=self.child_leaf,
             is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent.id])
@@ -305,7 +304,6 @@ class TestFindLearningUnitFormationRoots(TestCase):
         hierarchy = self._build_hierarchy(self.current_academic_year, group_type, self.child_leaf)
         result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
-            luy=self.child_leaf,
             is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
         )
 
@@ -364,14 +362,14 @@ class TestConvertParentIdsToInstances(TestCase):
             )
 
 
-class TestRaiseIfIncorrectInstance(TestCase):
+class TestAssertSameObjectsClass(TestCase):
     def test_case_unothorized_instance(self):
         with self.assertRaises(AttributeError):
-            group_element_year._raise_if_incorrect_instance([AcademicYearFactory()])
+            group_element_year._assert_same_objects_class([AcademicYearFactory()])
 
     def test_case_different_objects_instances(self):
         with self.assertRaises(AttributeError):
-            group_element_year._raise_if_incorrect_instance(
+            group_element_year._assert_same_objects_class(
                 [EducationGroupYearFactory(), LearningUnitYearFactory()])
 
 

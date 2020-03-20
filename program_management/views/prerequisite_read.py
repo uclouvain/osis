@@ -97,8 +97,10 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_roots_bis([learning_unit_year]). \
-            get(learning_unit_year.id, [])
+        formations_id = group_element_year.find_learning_unit_roots_bis([learning_unit_year]).get(
+            learning_unit_year.id,
+            []
+        )
         qs = EducationGroupYear.objects.filter(id__in=formations_id)
         prefetch_prerequisites = Prefetch("prerequisite_set",
                                           Prerequisite.objects.filter(learning_unit_year=learning_unit_year),

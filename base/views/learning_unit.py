@@ -84,8 +84,7 @@ def learning_unit_formations(request, learning_unit_year_id):
         return_result_params={
             'parents_as_instances': True,
             'with_parents_of_parents': True
-        },
-        luy=learn_unit_year
+        }
     )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
     context['group_elements_years'] = group_elements_years

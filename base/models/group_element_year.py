@@ -423,7 +423,6 @@ class GroupElementYear(OrderedModel):
 def find_learning_unit_roots_bis(
         objects,
         return_result_params=None,
-        luy=None,
         is_root_when_matches: List[EducationGroupTypesEnum] = None
 ):
     parents = {}
@@ -440,11 +439,9 @@ def find_learning_unit_roots_bis(
     if not objects:
         return parents
 
-    academic_year = None
-    if not luy:
-        academic_year = _extract_common_academic_year(objects)
+    _assert_same_academic_year(objects)
+    _assert_same_objects_class(objects)
 
-    _raise_if_incorrect_instance(objects)
     child_branch_ids = [obj.id for obj in objects if isinstance(obj, EducationGroupYear)]
     child_leaf_ids = [obj.id for obj in objects if isinstance(obj, LearningUnitYear)]
     trees = load_tree.load_trees_from_children(child_branch_ids=child_branch_ids, child_leaf_ids=child_leaf_ids)
@@ -488,7 +485,7 @@ def _convert_parent_ids_to_instances(root_ids_by_object_id):
     }
 
 
-def _raise_if_incorrect_instance(objects):
+def _assert_same_objects_class(objects):
     first_obj = objects[0]
     obj_class = first_obj.__class__
     if obj_class not in (LearningUnitYear, EducationGroupYear):
@@ -497,11 +494,12 @@ def _raise_if_incorrect_instance(objects):
         raise AttributeError("All objects must be the same class instance ({})".format(obj_class))
 
 
-def _extract_common_academic_year(objects):
+def _assert_same_academic_year(objects):
     if len(set(getattr(obj, 'academic_year_id') for obj in objects)) > 1:
-        raise AttributeError("The algorithm should load only graph/structure for 1 academic_year "
-                             "to avoid too large 'in-memory' data and performance issues.")
-    return objects[0].academic_year
+        raise AttributeError(
+            "The algorithm should load only graph/structure for 1 academic_year "
+            "to avoid too large 'in-memory' data and performance issues."
+        )
 
 
 def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
