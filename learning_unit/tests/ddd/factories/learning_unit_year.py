@@ -34,10 +34,6 @@ from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 
 
-def generate_year(node):
-    return random.randint(1999, 2099)
-
-
 def generate_end_year(node):
     return node.year + 10
 
@@ -58,7 +54,7 @@ class LearningUnitYearFactory(factory.Factory):
     specific_title_fr = factory.fuzzy.FuzzyText(length=240)
     common_title_en = factory.fuzzy.FuzzyText(length=240)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
-    year = factory.LazyAttribute(generate_year)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     start_year = factory.LazyAttribute(generate_start_year)
     end_year = factory.LazyAttribute(generate_end_year)
     proposal_type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
