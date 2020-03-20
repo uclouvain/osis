@@ -422,19 +422,13 @@ class GroupElementYear(OrderedModel):
 # TODO move to service
 def find_learning_unit_roots_bis(
         objects,
-        return_result_params=None,
+        parents_as_instances=False,
+        with_parents_of_parents=False,
         is_root_when_matches: List[EducationGroupTypesEnum] = None
 ):
     parents = {}
     default_is_root_when_matches = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
     is_root_when_matches = default_is_root_when_matches | set(is_root_when_matches or [])
-
-    if return_result_params is None:
-        return_result_params = {}
-    parents_as_instances = return_result_params.get('parents_as_instances', False)
-    with_parents_of_parents = return_result_params.get('with_parents_of_parents', False)
-    if with_parents_of_parents and not parents_as_instances:
-        raise ValueError("If parameter with_parents_of_parents is True, parameter parents_as_instances must be True")
 
     if not objects:
         return parents

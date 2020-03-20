@@ -162,10 +162,8 @@ class TestFindRelatedRootEducationGroups(TestCase):
         GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
         result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
-            return_result_params={
-                'parents_as_instances': True,
-                'with_parents_of_parents': True
-            }
+            parents_as_instances=True,
+            with_parents_of_parents=True,
         )
         self.assertCountEqual(
             result[self.child_leaf.id],
@@ -279,9 +277,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         )
         result = group_element_year.find_learning_unit_roots_bis(
             [self.child_leaf],
-            return_result_params={
-                'parents_as_instances': True
-            }
+            parents_as_instances=True,
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent])
 
@@ -348,18 +344,6 @@ class TestConvertParentIdsToInstances(TestCase):
         result = group_element_year._convert_parent_ids_to_instances(root_ids_by_object_id)
         expected_order = [group_element2.parent, group_element1.parent, group_element3.parent]
         self.assertListEqual(result[learn_unit_year.id], expected_order)
-
-    def test_find_learning_unit_roots_improper_parameters(self):
-        with self.assertRaisesMessage(
-                ValueError,
-                "If parameter with_parents_of_parents is True, parameter parents_as_instances must be True"):
-            group_element_year.find_learning_unit_roots_bis(
-                [],
-                return_result_params={
-                    'parents_as_instances': False,
-                    'with_parents_of_parents': True
-                }
-            )
 
 
 class TestAssertSameObjectsClass(TestCase):
