@@ -117,6 +117,7 @@ class GroupFilter(FilterSet):
         method="filter_by_transition",
         label=_('Include transition'),
         widget=forms.CheckboxInput,
+        initial='True'
     )
 
     order_by_field = 'ordering'
@@ -199,8 +200,14 @@ class GroupFilter(FilterSet):
         ).annotate(
             complete_title_fr=Case(
                 When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
-                     then=Concat('acronym', Value(' ['), 'educationgroupversion__version_name', Value(']'))),
+                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
                 default='acronym',
+                output_field=CharField(),)
+        ).annotate(
+            title=Case(
+                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
+                     then=Concat('title_fr', Value('['), 'educationgroupversion__title_fr', Value(']'))),
+                default='title_fr',
                 output_field=CharField(),)
         )
 
