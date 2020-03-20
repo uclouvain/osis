@@ -424,17 +424,13 @@ def find_learning_unit_roots_bis(
         objects,
         parents_as_instances=False,
         with_parents_of_parents=False,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None
+        root_types: List[EducationGroupTypesEnum] = None
 ):
-    parents = {}
-    default_is_root_when_matches = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
-    is_root_when_matches = default_is_root_when_matches | set(is_root_when_matches or [])
-
-    if not objects:
-        return parents
-
     _assert_same_academic_year(objects)
     _assert_same_objects_class(objects)
+
+    default_root_types = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
+    root_types = default_root_types | set(root_types or [])
 
     child_branch_ids = [obj.id for obj in objects if isinstance(obj, EducationGroupYear)]
     child_leaf_ids = [obj.id for obj in objects if isinstance(obj, LearningUnitYear)]
@@ -443,27 +439,30 @@ def find_learning_unit_roots_bis(
     nodes = [load_node.load_node_learning_unit_year(obj_id) for obj_id in child_leaf_ids]
     nodes += [load_node.load_node_education_group_year(obj_id) for obj_id in child_branch_ids]
 
+    parents_by_children_id = _get_parents_for_nodes(nodes, trees, root_types)
+
+    if with_parents_of_parents:
+        flat_list_of_parents = _flatten_list_of_lists(parents_by_children_id.values())
+        parents_of_parents = _get_parents_for_nodes(flat_list_of_parents, trees, root_types)
+        parents_by_children_id.update(parents_of_parents)
+
+    result = {}
+    for key, value in parents_by_children_id.items():
+        result[key] = [node.node_id for node in value]
+
+    if parents_as_instances:
+        result = _convert_parent_ids_to_instances(result)
+    return result
+
+
+def _get_parents_for_nodes(nodes, trees, is_root_when_matches):
+    parents = {}
     for node in nodes:
         node_parents = itertools.chain.from_iterable(
             [tree.get_first_ancestors_matching_type(node, is_root_when_matches) for tree in trees]
         )
         parents[node.node_id] = set(node_parents)
-
-    if with_parents_of_parents:
-        flat_list_of_parents = _flatten_list_of_lists(parents.values())
-        for node in flat_list_of_parents:
-            node_parents = itertools.chain.from_iterable(
-                [tree.get_first_ancestors_matching_type(node, is_root_when_matches) for tree in trees]
-            )
-            parents[node.node_id] = set(node_parents)
-
-    new_parents = {}
-    for key, value in parents.items():
-        new_parents[key] = [node.node_id for node in value]
-
-    if parents_as_instances:
-        new_parents = _convert_parent_ids_to_instances(new_parents)
-    return new_parents
+    return parents
 
 
 def _flatten_list_of_lists(list_of_lists):
@@ -480,6 +479,8 @@ def _convert_parent_ids_to_instances(root_ids_by_object_id):
 
 
 def _assert_same_objects_class(objects):
+    if not objects:
+        return
     first_obj = objects[0]
     obj_class = first_obj.__class__
     if obj_class not in (LearningUnitYear, EducationGroupYear):
