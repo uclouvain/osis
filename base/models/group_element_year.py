@@ -47,6 +47,7 @@ from base.models.enums.education_group_types import GroupType, MiniTrainingType,
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from program_management.ddd.repositories import load_tree, load_node
 
 
 class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
@@ -416,6 +417,41 @@ class GroupElementYear(OrderedModel):
     @cached_property
     def child(self):
         return self.child_branch or self.child_leaf
+
+
+# TODO move to service
+def find_learning_unit_roots_bis(
+        objects,
+        return_result_params=None,
+        luy=None,
+        is_root_when_matches: List[EducationGroupTypesEnum] = None
+):
+    parents = {}
+    default_is_root_when_matches = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
+    is_root_when_matches = default_is_root_when_matches | set(is_root_when_matches or [])
+
+    if not objects:
+        return parents
+
+    academic_year = None
+    if not luy:
+        academic_year = _extract_common_academic_year(objects)
+
+    _raise_if_incorrect_instance(objects)
+    child_branch_ids = [obj.id for obj in objects if isinstance(obj, EducationGroupYear)]
+    child_leaf_ids = [obj.id for obj in objects if isinstance(obj, LearningUnitYear)]
+    trees = load_tree.load_trees_from_children(child_branch_ids=child_branch_ids, child_leaf_ids=child_leaf_ids)
+
+    nodes = [load_node.load_node_learning_unit_year(obj_id) for obj_id in child_leaf_ids]
+    nodes += [load_node.load_node_education_group_year(obj_id) for obj_id in child_branch_ids]
+
+    for node in nodes:
+        node_parents = itertools.chain.from_iterable(
+            [tree.get_first_ancestors_matching_type(node, is_root_when_matches) for tree in trees]
+        )
+        parents[node.node_id] = [node_parent.node_id for node_parent in node_parents]
+
+    return parents
 
 
 def find_learning_unit_roots(

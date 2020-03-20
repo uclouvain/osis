@@ -30,7 +30,7 @@ from typing import List, Dict, Any
 from django.db.models import Case, F, When, IntegerField
 
 from base.models.enums.link_type import LinkTypes
-from base.models.group_element_year import GroupElementYear
+from base.models import group_element_year
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node, link
 from program_management.ddd.domain.program_tree import ProgramTree
@@ -47,7 +47,7 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 def load(tree_root_id: int) -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
 
-    structure = GroupElementYear.objects.get_adjacency_list([tree_root_id])
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
     nodes = __load_tree_nodes(structure)
     nodes.update({root_node.pk: root_node})
     links = __load_tree_links(structure)
@@ -66,7 +66,7 @@ def load_trees_from_children(
         assert isinstance(child_branch_ids, list)
     if child_leaf_ids:
         assert isinstance(child_leaf_ids, list)
-    qs = GroupElementYear.objects.get_reverse_adjacency_list(
+    qs = group_element_year.GroupElementYear.objects.get_reverse_adjacency_list(
         child_branch_ids=child_branch_ids,
         child_leaf_ids=child_leaf_ids,
         link_type=link_type,
@@ -93,7 +93,7 @@ def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodePk, 'Node']:
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
-    group_element_year_qs = GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
+    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
         child_id=Case(
             When(child_branch_id__isnull=True, then=F('child_leaf_id')),
             default=F('child_branch_id'),

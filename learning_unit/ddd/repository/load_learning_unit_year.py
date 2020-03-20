@@ -24,13 +24,10 @@
 #
 ##############################################################################
 
-import copy
-from typing import List, Dict, Any
+from typing import List
 
-from django.db.models import Case, F, When, IntegerField
+from django.db.models import F
 
-from base.models.enums.link_type import LinkTypes
-from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 
