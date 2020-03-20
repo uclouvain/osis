@@ -276,7 +276,6 @@ class NodeLearningUnitYear(Node):
         self.periodicity = periodicity
         super().__init__(**kwargs)
         self.prerequisite = NullPrerequisite()
-        self.prerequisite = None  # FIXME : Should be of type Prerequisite?
         self.common_title_fr = common_title_fr
         self.specific_title_fr = specific_title_fr
         self.common_title_en = common_title_en
