@@ -132,7 +132,7 @@ class ProgramTree:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
-    def get_greater_block_value(self):  # TODO :: unit test
+    def get_greater_block_value(self):
         all_links = self.get_all_links()
         if not all_links:
             return 0
