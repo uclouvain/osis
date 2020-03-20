@@ -33,6 +33,7 @@ from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDA
 from base.models import learning_unit_enrollment, learning_unit_year as learn_unit_year_model, \
     academic_year
 from base.models import proposal_learning_unit
+from base.models.enums import proposal_type, proposal_state
 from cms.enums import entity_name
 from cms.models import translated_text
 from learning_unit.models.learning_class_year import LearningClassYear
@@ -49,6 +50,9 @@ def check_learning_unit_deletion(learning_unit, check_proposal=True):
 
 def check_learning_unit_year_deletion(learning_unit_year, check_proposal=True):
     msg = {}
+
+    if check_proposal:
+        msg.update(_check_learning_unit_proposal(learning_unit_year))
     msg.update(check_can_delete_ignoring_proposal_validation(learning_unit_year))
     return msg
 
@@ -124,7 +128,8 @@ def _check_learning_unit_proposal(learning_unit_year):
     msg = {}
 
     proposal = proposal_learning_unit.find_by_learning_unit_year(learning_unit_year)
-    if proposal:
+    if proposal and not (proposal.type == proposal_type.ProposalType.SUPPRESSION.name
+                         and proposal.state == proposal_state.ProposalState.ACCEPTED.name):
         error_proposal = "%(subtype)s %(acronym)s is in proposal for the year %(year)s"
         msg[proposal] = _(error_proposal) % {'subtype': _str_partim_or_full(proposal.learning_unit_year),
                                              'acronym': proposal.learning_unit_year.acronym,
