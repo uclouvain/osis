@@ -420,7 +420,7 @@ class GroupElementYear(OrderedModel):
 
 
 # TODO move to service
-def find_learning_unit_roots_bis(
+def find_roots(
         objects,
         parents_as_instances=False,
         with_parents_of_parents=False,

@@ -512,7 +512,7 @@ class LearningUnitYear(SerializableModel):
         ).exists()
 
     def has_or_is_prerequisite(self, education_group_year):
-        formations = group_element_year.find_learning_unit_roots_bis([education_group_year])[education_group_year.id]
+        formations = group_element_year.find_roots([education_group_year])[education_group_year.id]
         return PrerequisiteItem.objects.filter(
             Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)

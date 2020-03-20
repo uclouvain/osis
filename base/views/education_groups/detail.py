@@ -61,7 +61,7 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.group_element_year import GroupElementYear, find_learning_unit_roots_bis
+from base.models.group_element_year import GroupElementYear, find_roots
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -543,7 +543,7 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_branch.select_related("parent")
-        context["formations"] = find_learning_unit_roots_bis(
+        context["formations"] = find_roots(
             list(grp.parent for grp in self.object.child_branch.select_related("parent")),
             parents_as_instances=True
         )

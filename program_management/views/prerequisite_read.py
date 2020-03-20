@@ -97,7 +97,7 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_roots_bis([learning_unit_year]).get(
+        formations_id = group_element_year.find_roots([learning_unit_year]).get(
             learning_unit_year.id,
             []
         )
