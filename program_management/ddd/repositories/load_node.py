@@ -78,9 +78,15 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 
     nodes_data = list(qs)
 
-    learning_unit_pks = list(node_data.pop('learning_unit_year_id') for node_data in nodes_data)
+    learning_unit_pks = list(
+        node_data['learning_unit_year_id'] for node_data in nodes_data
+        if node_data['learning_unit_year_id']
+    )
 
-    group_pks = list(node_data.pop('child_branch__pk') for node_data in nodes_data)
+    group_pks = list(
+        node_data['child_branch__pk'] for node_data in nodes_data
+        if node_data['child_branch__pk']
+    )
 
     nodes_objects = [node.factory.get_node(**__convert_string_to_enum(node_data))
                      for node_data in __load_multiple_node_education_group_year(group_pks)]
