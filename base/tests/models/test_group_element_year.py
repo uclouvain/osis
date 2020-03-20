@@ -44,46 +44,6 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
-class TestFindBuildParentListByEducationGroupYearId(TestCase):
-    """Unit tests for _build_parent_list_by_education_group_year_id() function"""
-    @classmethod
-    def setUpTestData(cls):
-        current_academic_year = create_current_academic_year()
-        root_group_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
-        cls.root = EducationGroupYearFactory(academic_year=current_academic_year,
-                                             education_group_type=root_group_type)
-
-        group_type = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        cls.child_branch = EducationGroupYearFactory(academic_year=current_academic_year,
-                                                     education_group_type=group_type)
-        GroupElementYearFactory(parent=cls.root, child_branch=cls.child_branch)
-
-        cls.child_leaf = LearningUnitYearFactory(academic_year=current_academic_year)
-        GroupElementYearFactory(parent=cls.child_branch, child_branch=None, child_leaf=cls.child_leaf)
-
-    def test_with_filters(self):
-        result = group_element_year._build_parent_list_by_education_group_year_id(self.child_leaf.academic_year)
-
-        expected_result = {
-            'base_educationgroupyear_{}'.format(self.child_branch.id): [{
-                'parent': self.root.id,
-                'child_branch': self.child_branch.id,
-                'child_leaf': None,
-                'parent__education_group_type__category': self.root.education_group_type.category,
-                'parent__education_group_type__name': self.root.education_group_type.name,
-            }, ],
-            'base_learningunityear_{}'.format(self.child_leaf.id): [{
-                'parent': self.child_branch.id,
-                'child_branch': None,
-                'child_leaf': self.child_leaf.id,
-                'parent__education_group_type__category': self.child_branch.education_group_type.category,
-                'parent__education_group_type__name': self.child_branch.education_group_type.name,
-            }, ]
-        }
-        self.assertEqual(len(result), len(expected_result))
-        self.assertDictEqual(result, expected_result)
-
-
 class TestFindRelatedRootEducationGroups(TestCase):
     """Unit tests for find_learning_unit_roots() function"""
 
@@ -402,26 +362,6 @@ class TestConvertParentIdsToInstances(TestCase):
                     'with_parents_of_parents': True
                 }
             )
-
-
-class TestBuildChildKey(TestCase):
-    """Unit tests on _build_child_key() """
-
-    def test_case_params_are_none(self):
-        with self.assertRaises(AttributeError):
-            group_element_year._build_child_key()
-
-    def test_case_two_params_are_set(self):
-        with self.assertRaises(AttributeError):
-            group_element_year._build_child_key(child_branch=1234, child_leaf=5678)
-
-    def test_case_child_branch_is_set(self):
-        result = group_element_year._build_child_key(child_branch=5678)
-        self.assertEqual(result, 'base_educationgroupyear_5678')
-
-    def test_case_child_leaf_is_set(self):
-        result = group_element_year._build_child_key(child_leaf=5678)
-        self.assertEqual(result, 'base_learningunityear_5678')
 
 
 class TestRaiseIfIncorrectInstance(TestCase):
