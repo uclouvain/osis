@@ -31,14 +31,12 @@ from base.ddd.utils.validation_message import MessageLevel
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
-from program_management.ddd.domain.link import Link
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.models.enums import node_type
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeEducationGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin

@@ -196,14 +196,30 @@ def build_path(*nodes):
 
 
 def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    new_node = copy.deepcopy(root)
+    new_node = _deepcopy_node_without_copy_children_recursively(root)
     new_children = []
     for link in root.children:
         if ignore_children_from and link.parent.node_type in ignore_children_from:
             continue
         new_child = _copy(link.child, ignore_children_from=ignore_children_from)
-        new_link = copy.deepcopy(link)
+        new_link = _deepcopy_link_without_copy_children_recursively(link)
         new_link.child = new_child
         new_children.append(new_link)
     new_node.children = new_children
     return new_node
+
+
+def _deepcopy_node_without_copy_children_recursively(original_node: 'Node'):
+    original_children = original_node.children
+    original_node.children = []  # To avoid recursive deep copy of all children behind
+    copied_node = copy.deepcopy(original_node)
+    original_node.children = original_children
+    return copied_node
+
+
+def _deepcopy_link_without_copy_children_recursively(original_link: 'Link'):
+    original_child = original_link.child
+    original_link.child = None  # To avoid recursive deep copy of all children behind
+    new_link = copy.deepcopy(original_link)
+    original_link.child = original_child
+    return new_link
