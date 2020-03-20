@@ -45,8 +45,8 @@ EXTERNAL_CREDIT_TOOLTIP = _(
     'If the partner university does not use ECTS credit units, '
     'enter below the number of credit units according to the local system.'
 )
-GREY_COLOR = "color:grey"
-ITALIC_FONT = "font-style:italic"
+GREY_COLOR = "color-grey"
+ITALIC_FONT = "font-italic"
 
 
 @register.filter
@@ -108,7 +108,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     common_title = kwargs.get('common_title')
     specific_title = kwargs.get('specific_title')
 
-    value_style = GREY_COLOR if inherited == PARTIM else ''
+    value_style_class = GREY_COLOR if inherited == PARTIM else ''
 
     if not label_text:
         label_text = instance._meta.get_field(key).verbose_name.capitalize()
@@ -132,18 +132,16 @@ def dl_tooltip(context, instance, key, **kwargs):
         value = get_style_of_value(GREY_COLOR, "The value of this attribute is inherited from the parent UE", value)
 
     if not_annualized:
-        label_text = get_style_of_label_text(
-            label_text, ITALIC_FONT, "The value of this attribute is not annualized"
-        )
+        label_text = get_style_of_label_text(label_text, ITALIC_FONT, "The value of this attribute is not annualized")
         value = get_style_of_value(
             ITALIC_FONT,  "The value of this attribute is not annualized", value, default_if_none
         )
 
     if common_title or specific_title:
         is_common = common_title is True
-        style, tooltip = _get_title_tooltip(is_common, inherited)
-        label_text = get_style_of_label_text(label_text, style, tooltip)
-        value = get_style_of_value(value_style, '', value, default_if_none)
+        style_class, tooltip = _get_title_tooltip(is_common, inherited)
+        label_text = get_style_of_label_text(label_text, style_class, tooltip)
+        value = get_style_of_value(value_style_class, '', value, default_if_none)
 
     return {
         'difference': difference,
@@ -155,22 +153,22 @@ def dl_tooltip(context, instance, key, **kwargs):
 
 def _get_title_tooltip(is_common, inherited):
     if is_common:
-        label_style = ";".join([ITALIC_FONT, GREY_COLOR]) if inherited == PARTIM else ITALIC_FONT
+        label_style_class = " ".join([ITALIC_FONT, GREY_COLOR]) if inherited == PARTIM else ITALIC_FONT
         label_tooltip = _("Part of the title which is common to the complete EU, to its partims and to its classes")
-        return label_style, label_tooltip
+        return label_style_class, label_tooltip
     return ITALIC_FONT, ''
 
 
-def get_style_of_value(style, title, value, default_if_none=DEFAULT_VALUE_FOR_NONE):
-    value = "<p style='{style}' title='{title}'>{value}</p>".format(
-        style=style, title=_(title), value=value or default_if_none
+def get_style_of_value(style_class, title, value, default_if_none=DEFAULT_VALUE_FOR_NONE):
+    value = "<p class='{style_class}' title='{title}'>{value}</p>".format(
+        style_class=style_class, title=_(title), value=value or default_if_none
     )
     return value
 
 
-def get_style_of_label_text(label_text, style, title):
-    label_text = '<label style="{style}" title="{inherited_title}">{label_text}</label>'.format(
-        style=style, inherited_title=_(title), label_text=label_text
+def get_style_of_label_text(label_text, style_class, title):
+    label_text = '<label class="{style_class}" title="{inherited_title}">{label_text}</label>'.format(
+        style_class=style_class, inherited_title=_(title), label_text=label_text
     )
     return label_text
 
