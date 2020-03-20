@@ -186,6 +186,36 @@ class TestFindRelatedRootEducationGroups(TestCase):
             [self.root.id, root_2.id]
         )
 
+    def test_when_parent_of_parents_is_set(self):
+        root_2 = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=EducationGroupTypeFactory(
+                name=education_group_types.TrainingType.MASTER_MA_120.name,
+                category=education_group_categories.TRAINING
+            )
+        )
+        child_branch = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+        )
+        GroupElementYearFactory(parent=self.root, child_branch=child_branch)
+        GroupElementYearFactory(parent=root_2, child_branch=child_branch)
+        GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
+        result = group_element_year.find_learning_unit_roots_bis(
+            [self.child_leaf],
+            return_result_params={
+                'parents_as_instances': True,
+                'with_parents_of_parents': True
+            }
+        )
+        self.assertCountEqual(
+            result[self.child_leaf.id],
+            [child_branch]
+        )
+        self.assertCountEqual(
+            result[child_branch.id],
+            [root_2, self.root]
+        )
+
     def test_with_filters_case_objects_are_education_group_instance(self):
         root = EducationGroupYearFactory(
             academic_year=self.current_academic_year,

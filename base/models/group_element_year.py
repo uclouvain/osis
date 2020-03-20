@@ -456,11 +456,23 @@ def find_learning_unit_roots_bis(
         node_parents = itertools.chain.from_iterable(
             [tree.get_first_ancestors_matching_type(node, is_root_when_matches) for tree in trees]
         )
-        parents[node.node_id] = [node_parent.node_id for node_parent in node_parents]
+        parents[node.node_id] = set(node_parents)
+
+    if with_parents_of_parents:
+        flat_list_of_parents = _flatten_list_of_lists(parents.values())
+        for node in flat_list_of_parents:
+            node_parents = itertools.chain.from_iterable(
+                [tree.get_first_ancestors_matching_type(node, is_root_when_matches) for tree in trees]
+            )
+            parents[node.node_id] = set(node_parents)
+
+    new_parents = {}
+    for key, value in parents.items():
+        new_parents[key] = [node.node_id for node in value]
 
     if parents_as_instances:
-        parents = _convert_parent_ids_to_instances(parents)
-    return parents
+        new_parents = _convert_parent_ids_to_instances(new_parents)
+    return new_parents
 
 
 def find_learning_unit_roots(

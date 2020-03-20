@@ -79,7 +79,7 @@ def learning_unit_formations(request, learning_unit_year_id):
         "parent", "child_leaf", "parent__education_group_type"
     ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_roots(
+    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_roots_bis(
         education_groups_years,
         return_result_params={
             'parents_as_instances': True,
