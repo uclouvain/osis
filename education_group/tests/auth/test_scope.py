@@ -5,7 +5,7 @@ from education_group.auth.scope import Scope
 
 
 class TestScope(SimpleTestCase):
-    def test_get_eduction_group_type_for_all_scope(self):
+    def test_get_education_group_type_for_all_scope(self):
         expected_education_group_types = TrainingType.choices() + MiniTrainingType.choices() + GroupType.choices()
         self.assertTupleEqual(
             Scope.get_education_group_types(Scope.ALL.name),

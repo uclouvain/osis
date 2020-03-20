@@ -9,7 +9,7 @@ from osis_role.contrib import admin as osis_role_admin
 
 
 class FacultyManagerAdmin(osis_role_admin.EntityRoleModelAdmin):
-    pass
+    list_display = osis_role_admin.EntityRoleModelAdmin.list_display + ('scopes', )
 
 
 class FacultyManager(osis_role_models.EntityRoleModel):
