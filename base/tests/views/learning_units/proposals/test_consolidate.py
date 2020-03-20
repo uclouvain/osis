@@ -44,7 +44,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, get_current_
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -147,6 +147,61 @@ class TestConsolidate(TestCase):
         self.client.post("learning_unit_consolidate_proposal",
                          data={"learning_unit_year_id": creation_proposal.learning_unit_year.id}, follow=False)
         self.assertTrue(mdl_base.learning_unit.LearningUnit.objects.filter(pk=lu_id).exists())
+
+
+@override_flag('learning_unit_proposal_delete', active=True)
+class TestConsolidateDelete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
+        cls.current_academic_year = cls.academic_years[1]
+
+        cls.proposal = ProposalLearningUnitFactory(
+            type=proposal_type.ProposalType.SUPPRESSION.name,
+            state=proposal_state.ProposalState.ACCEPTED.name,
+            learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
+            learning_unit_year__academic_year=cls.current_academic_year,
+            learning_unit_year__learning_unit__start_year=cls.current_academic_year,
+            learning_unit_year__learning_container_year__academic_year=cls.current_academic_year,
+            learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
+        )
+        cls.learning_unit_year = cls.proposal.learning_unit_year
+
+        cls.person = PersonFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
+
+        person_entity = PersonEntityFactory(person=cls.person,
+                                            entity=cls.learning_unit_year.learning_container_year.requirement_entity)
+        EntityVersionFactory(entity=person_entity.entity)
+        cls.url = reverse("learning_unit_consolidate_proposal",
+                          kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
+        cls.post_data = {"learning_unit_year_id": cls.learning_unit_year.id}
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    @mock.patch("base.business.learning_unit_proposal.consolidate_proposals_and_send_report",
+                side_effect=lambda prop, author, send_mail: {})
+    def test_when_proposal_and_can_consolidate_proposal_suppression_with_previous_year(self, mock_consolidate):
+        create_learning_units_year(self.academic_years[0].year,
+                                   self.academic_years[0].year,
+                                   self.learning_unit_year.learning_unit)
+        response = self.client.post(self.url, data=self.post_data, follow=False)
+
+        expected_redirect_url = reverse('learning_unit',
+                                        args=[self.learning_unit_year.get_learning_unit_previous_year().id])
+        self.assertRedirects(response, expected_redirect_url)
+        mock_consolidate.assert_called_once_with([self.proposal], self.person, {})
+
+    @mock.patch("base.business.learning_unit_proposal.consolidate_proposals_and_send_report",
+                side_effect=lambda prop, author, send_mail: {})
+    def test_when_proposal_and_can_consolidate_proposal_suppression_without_previous_year(self, mock_consolidate):
+        response = self.client.post(self.url, data=self.post_data, follow=False)
+
+        expected_redirect_url = reverse('learning_units')
+        self.assertRedirects(response, expected_redirect_url)
+        mock_consolidate.assert_called_once_with([self.proposal], self.person, {})
 
 
 class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
