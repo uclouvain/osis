@@ -463,4 +463,4 @@ def _build_gathering_content(edg):
 
 
 def _build_main_gathering_content(edg):
-    return "{} - {}".format(edg.acronym, edg.title) if edg else ''
+    return "{} - {}".format(edg.acronym, edg.partial_title if edg.is_finality else edg.title) if edg else ''
