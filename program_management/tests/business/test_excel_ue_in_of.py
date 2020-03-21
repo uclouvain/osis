@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import html
+import random
 from unittest import mock
 
 from django.test import TestCase
@@ -35,6 +36,7 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.education_group_categories import Categories
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
@@ -57,7 +59,7 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string, _build_gathering_content
+    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
@@ -546,6 +548,18 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(_build_gathering_content(self.education_group_yr_root),
                          "{} - {}".format(self.education_group_yr_root.partial_acronym,
                                           self.education_group_yr_root.title))
+
+    def test_build_main_gathering_content_finality_master(self):
+        edg_finality = EducationGroupYearFactory(
+            education_group_type__name=random.choice(TrainingType.finality_types()),
+            partial_title='partial_title')
+        self.assertEqual(_build_main_gathering_content(edg_finality),
+                         "{} - {}".format(edg_finality.acronym, edg_finality.partial_title))
+
+    def test_build_main_gathering_content_not_master(self):
+        edg_not_a_finality = EducationGroupYearFactory(education_group_type__name=GroupType.COMMON_CORE.name)
+        self.assertEqual(_build_main_gathering_content(edg_not_a_finality),
+                         "{} - {}".format(edg_not_a_finality.acronym, edg_not_a_finality.title))
 
 
 class TestExcludeUEFromdWorkbook(TestCase):
