@@ -8,51 +8,51 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
 
 
+DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
+
+
 def find_roots(
         objects,
         parents_as_instances=False,
         with_parents_of_parents=False,
-        root_types: List[EducationGroupTypesEnum] = None
+        additional_root_categories: List[EducationGroupTypesEnum] = None
 ):
     _assert_same_academic_year(objects)
     _assert_same_objects_class(objects)
 
-    default_root_types = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
-    root_types = default_root_types | set(root_types or [])
-    root_types = [root_type.name for root_type in root_types]
+    root_categories = DEFAULT_ROOT_CATEGORIES | set(additional_root_categories or [])
+    root_categories_names = [root_type.name for root_type in root_categories]
 
     child_branch_ids = [obj.id for obj in objects if isinstance(obj, EducationGroupYear)]
     child_leaf_ids = [obj.id for obj in objects if isinstance(obj, learning_unit_year.LearningUnitYear)]
 
-    structure = group_element_year.GroupElementYear.objects.get_root_list(
+    child_root_list = group_element_year.GroupElementYear.objects.get_root_list(
         child_branch_ids=child_branch_ids,
         child_leaf_ids=child_leaf_ids,
-        root_category_name=root_types
+        root_category_name=root_categories_names
     )
 
-    parents_by_children_id = _get_parents_for_nodes(structure)
+    roots_by_children_id = _aggregate_child_root_list_into_roots_by_children_id(child_root_list)
 
     if with_parents_of_parents:
-        flat_list_of_parents = _flatten_list_of_lists(parents_by_children_id.values())
-        structure = group_element_year.GroupElementYear.objects.get_root_list(
+        flat_list_of_parents = _flatten_list_of_lists(roots_by_children_id.values())
+        child_root_list = group_element_year.GroupElementYear.objects.get_root_list(
             child_branch_ids=flat_list_of_parents,
-            root_category_name=root_types
+            root_category_name=root_categories_names
         )
-        parents_of_parents = _get_parents_for_nodes(structure)
-        parents_by_children_id.update(parents_of_parents)
-
-    result = parents_by_children_id
+        roots_by_children_id.update(_aggregate_child_root_list_into_roots_by_children_id(child_root_list))
 
     if parents_as_instances:
-        result = _convert_parent_ids_to_instances(result)
-    return result
+        return _convert_parent_ids_to_instances(roots_by_children_id)
+
+    return roots_by_children_id
 
 
-def _get_parents_for_nodes(structure):
-    parents = collections.defaultdict(list)
-    for link in structure:
-        parents[link["starting_node_id"]].append(link["root_id"])
-    return parents
+def _aggregate_child_root_list_into_roots_by_children_id(child_root_list):
+    roots_by_children_id = collections.defaultdict(list)
+    for child_root in child_root_list:
+        roots_by_children_id[child_root["starting_node_id"]].append(child_root["root_id"])
+    return roots_by_children_id
 
 
 def _flatten_list_of_lists(list_of_lists):

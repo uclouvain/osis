@@ -478,6 +478,7 @@ class GroupElementYear(OrderedModel):
         return super().save(force_insert, force_update, using, update_fields)
 
     # FIXME :: DEPRECATED ??? Move this to validators? (is a model validation - not a business validation?)
+    # FIXME :: Should be moved to form validation via validators of the ddd module
     def clean(self):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))

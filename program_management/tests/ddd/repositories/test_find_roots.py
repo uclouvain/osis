@@ -253,7 +253,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         )
         result = program_management.ddd.repositories.find_roots.find_roots(
             [self.child_leaf],
-            root_types=[GroupType.COMPLEMENTARY_MODULE]
+            additional_root_categories=[GroupType.COMPLEMENTARY_MODULE]
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent.id])
 
@@ -265,7 +265,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         hierarchy = self._build_hierarchy(self.current_academic_year, group_type, self.child_leaf)
         result = program_management.ddd.repositories.find_roots.find_roots(
             [self.child_leaf],
-            root_types=[GroupType.COMPLEMENTARY_MODULE]
+            additional_root_categories=[GroupType.COMPLEMENTARY_MODULE]
         )
 
         self.assertEqual(result[self.child_leaf.id], [hierarchy['group_element_child'].parent.id])
