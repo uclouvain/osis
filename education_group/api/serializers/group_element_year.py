@@ -89,6 +89,16 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     link_type = serializers.CharField(source='link_type.name', read_only=True)
     link_type_text = _('Link type')
     block = serializers.SerializerMethodField()
+    credits = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_credits(obj):
+        education_group_year = obj.education_group_year
+        learning_unit_year = obj.group_element_year.child_leaf
+        absolute_credits = (education_group_year and education_group_year.credits) or (
+                learning_unit_year and learning_unit_year.credits
+        )
+        return obj.group_element_year.relative_credits or absolute_credits
 
     # @staticmethod
     # def get_link_type_text(obj):
@@ -155,14 +165,17 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         decimal_places=2,
         default=None
     )
-    credits = serializers.SerializerMethodField()
     with_prerequisite = serializers.BooleanField(source='child.has_prerequisite', read_only=True)
+    periodicity = serializers.CharField(source='learning_unit_year.periodicity', read_only=True)
+    quadrimester = serializers.CharField(source='learning_unit_year.quadrimester', read_only=True)
+    status = serializers.BooleanField(source='learning_unit_year.status', read_only=True)
+    proposal_type = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_credits(obj: 'Link'):
-        learning_unit_year = obj.child
-        absolute_credits = learning_unit_year and learning_unit_year.credits
-        return obj.relative_credits or absolute_credits
+    def get_proposal_type(obj):
+        if hasattr(obj.learning_unit_year, "proposallearningunit"):
+            return obj.learning_unit_year.proposallearningunit.type
+        return None
 
     def get_title(self, obj: 'Link'):
         if self.context.get('language') == settings.LANGUAGE_CODE_EN:
