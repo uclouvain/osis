@@ -35,10 +35,10 @@ class TestFindRelatedRootEducationGroups(TestCase):
 
     def test_case_filters_arg_is_none(self):
         result = program_management.ddd.repositories.find_roots.find_roots([self.child_leaf])
-        expected_result = {
-            self.child_leaf.id: []
-        }
-        self.assertDictEqual(result, expected_result)
+        self.assertEqual(
+            result[self.child_leaf.id],
+            []
+        )
 
     def test_with_filters_case_direct_parent_id_root_and_matches_filters(self):
         element_year = GroupElementYearFactory(parent=self.root, child_branch=None, child_leaf=self.child_leaf)
@@ -64,11 +64,11 @@ class TestFindRelatedRootEducationGroups(TestCase):
             )
         )
         GroupElementYearFactory(parent=root, child_branch=None, child_leaf=self.child_leaf)
-        expected_result = {
-            self.child_leaf.id: []
-        }
         result = program_management.ddd.repositories.find_roots.find_roots([self.child_leaf])
-        self.assertDictEqual(result, expected_result)
+        self.assertEqual(
+            result[self.child_leaf.id],
+            []
+        )
 
     def test_with_filters_case_root_in_2nd_level_and_direct_parent_matches_filter(self):
         root = EducationGroupYearFactory(

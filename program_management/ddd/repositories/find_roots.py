@@ -1,11 +1,11 @@
+import collections
 import itertools
 from typing import List
 
-from base.models import education_group_year
+from base.models import education_group_year, group_element_year
+from base.models import learning_unit_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
-from base.models import learning_unit_year
-from program_management.ddd.repositories import load_tree, load_node
 
 
 def find_roots(
@@ -19,37 +19,39 @@ def find_roots(
 
     default_root_types = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
     root_types = default_root_types | set(root_types or [])
+    root_types = [root_type.name for root_type in root_types]
 
     child_branch_ids = [obj.id for obj in objects if isinstance(obj, EducationGroupYear)]
     child_leaf_ids = [obj.id for obj in objects if isinstance(obj, learning_unit_year.LearningUnitYear)]
-    trees = load_tree.load_trees_from_children(child_branch_ids=child_branch_ids, child_leaf_ids=child_leaf_ids)
 
-    nodes = [load_node.load_node_learning_unit_year(obj_id) for obj_id in child_leaf_ids]
-    nodes += [load_node.load_node_education_group_year(obj_id) for obj_id in child_branch_ids]
+    structure = group_element_year.GroupElementYear.objects.get_root_list(
+        child_branch_ids=child_branch_ids,
+        child_leaf_ids=child_leaf_ids,
+        root_category_name=root_types
+    )
 
-    parents_by_children_id = _get_parents_for_nodes(nodes, trees, root_types)
+    parents_by_children_id = _get_parents_for_nodes(structure)
 
     if with_parents_of_parents:
         flat_list_of_parents = _flatten_list_of_lists(parents_by_children_id.values())
-        parents_of_parents = _get_parents_for_nodes(flat_list_of_parents, trees, root_types)
+        structure = group_element_year.GroupElementYear.objects.get_root_list(
+            child_branch_ids=flat_list_of_parents,
+            root_category_name=root_types
+        )
+        parents_of_parents = _get_parents_for_nodes(structure)
         parents_by_children_id.update(parents_of_parents)
 
-    result = {}
-    for key, value in parents_by_children_id.items():
-        result[key] = [node.node_id for node in value]
+    result = parents_by_children_id
 
     if parents_as_instances:
         result = _convert_parent_ids_to_instances(result)
     return result
 
 
-def _get_parents_for_nodes(nodes, trees, is_root_when_matches):
-    parents = {}
-    for node in nodes:
-        node_parents = itertools.chain.from_iterable(
-            [tree.get_first_ancestors_matching_type(node, is_root_when_matches) for tree in trees]
-        )
-        parents[node.node_id] = set(node_parents)
+def _get_parents_for_nodes(structure):
+    parents = collections.defaultdict(list)
+    for link in structure:
+        parents[link["starting_node_id"]].append(link["root_id"])
     return parents
 
 

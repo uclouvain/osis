@@ -66,6 +66,7 @@ def load_trees_from_children(
         assert isinstance(child_branch_ids, list)
     if child_leaf_ids:
         assert isinstance(child_leaf_ids, list)
+
     qs = group_element_year.GroupElementYear.objects.get_reverse_adjacency_list(
         child_branch_ids=child_branch_ids,
         child_leaf_ids=child_leaf_ids,

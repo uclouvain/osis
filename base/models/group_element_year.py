@@ -165,17 +165,120 @@ class GroupElementYearManager(models.Manager):
                 } for row in cursor.fetchall()
             ]
 
-    def get_reverse_adjacency_list(
+    def get_root_list(
+            self,
+            child_leaf_ids=None,
+            child_branch_ids=None,
+            academic_year_id=None,
+            link_type: LinkTypes = None,
+            root_category_name=None
+    ):
+        root_category_name = root_category_name or []
+        if child_leaf_ids is None:
+            child_leaf_ids = []
+        if child_branch_ids is None:
+            child_branch_ids = []
+        if child_leaf_ids and not isinstance(child_leaf_ids, list):
+            raise Exception('child_leaf_ids must be an instance of list')
+        if child_branch_ids and not isinstance(child_branch_ids, list):
+            raise Exception('child_branch_ids must be an instance of list')
+        if not child_leaf_ids and not child_branch_ids:
+            return []
+
+        # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
+        where_statement_leaf = ""
+        if child_leaf_ids:
+            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
+            }
+
+        where_statement_branch = ""
+        if child_branch_ids:
+            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_branch_ids))
+            }
+
+        if child_leaf_ids and child_branch_ids:
+            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
+        elif child_leaf_ids and not child_branch_ids:
+            where_statement = where_statement_leaf
+        else:
+            where_statement = where_statement_branch
+        reverse_adjacency_query = """
+            WITH RECURSIVE
+                root_query AS (
+                    SELECT
+                        CASE
+                            WHEN gey.child_leaf_id is not null then gey.child_leaf_id
+                            ELSE gey.child_branch_id
+                            END as starting_node_id,
+                        gey.id,
+                        gey.child_branch_id,
+                        gey.child_leaf_id,
+                        gey.parent_id,
+                        edyc.academic_year_id,
+                        CASE
+                            WHEN egt.name in (%(root_category_name)s) THEN true
+                            ELSE false
+                          END as is_root_row
+                    FROM base_groupelementyear gey
+                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+                    INNER JOIN base_educationgrouptype AS egt on edyc.education_group_type_id = egt.id
+                    WHERE %(where_statement)s
+                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
+
+                    UNION ALL
+
+                    SELECT 	child.starting_node_id,
+                      parent.id,
+                      parent.child_branch_id,
+                      parent.child_leaf_id,
+                      parent.parent_id,
+                      edyp.academic_year_id,
+                      CASE
+                        WHEN egt.name in (%(root_category_name)s) THEN true
+                        ELSE false
+                      END as is_root_row
+                    FROM base_groupelementyear AS parent
+                    INNER JOIN root_query AS child on parent.child_branch_id = child.parent_id and child.is_root_row = false
+                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+                    INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
+                )
+
+            SELECT distinct starting_node_id, parent_id
+            FROM root_query
+            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) and (is_root_row is not Null and is_root_row = true)
+            ORDER BY starting_node_id;
+        """ % {
+            'where_statement': where_statement,
+            'academic_year_id': "%s",
+            'link_type': '%s',
+            'root_category_name': ', '.join(["'{}'".format(name) for name in root_category_name])
+        }
+        with connection.cursor() as cursor:
+            parameters = child_leaf_ids + child_branch_ids + [
+                link_type.name if link_type else None,
+                link_type.name if link_type else None,
+                academic_year_id,
+                academic_year_id
+            ]
+            cursor.execute(reverse_adjacency_query, parameters)
+            return [
+                {
+                    'starting_node_id': row[0],
+                    'root_id': row[1],
+                } for row in cursor.fetchall()
+            ]
+
+    def get_reverse_adjency_list(
             self,
             child_leaf_ids=None,
             child_branch_ids=None,
             academic_year_id=None,
             link_type: LinkTypes = None
     ):
-        if child_leaf_ids is None:
-            child_leaf_ids = []
-        if child_branch_ids is None:
-            child_branch_ids = []
+        child_leaf_ids = child_leaf_ids or []
+        child_branch_ids = child_branch_ids or []
         if child_leaf_ids and not isinstance(child_leaf_ids, list):
             raise Exception('child_leaf_ids must be an instance of list')
         if child_branch_ids and not isinstance(child_branch_ids, list):
