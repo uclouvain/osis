@@ -82,10 +82,10 @@
                     <div class="col-md-1">
                         {% bootstrap_field form.version %}
                     </div>
-                    <div class="col-md-1" style="margin-top: 28px;">
+                    <div class="col-md-2" style="margin-top: 28px;">
                          {% bootstrap_field form.with_entity_transition %}
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <br>
                         <div class="btn-toolbar pull-right">
                             <button type="submit" id="bt_submit_education_groups_search"
@@ -148,7 +148,7 @@
                         return outputAnchorOuterHtml(row["url"], data);
                     }
                 },
-                {"name": "title_fr", "targets": 2, "data": "title_fr"},
+                {"name": "title", "targets": 2, "data": "title"},
                 {"name": "type", "targets": 3,  "data": "education_group_type_text"},
                 {"name": "management_entity", "targets": 4, "data": "management_entity"},
                 {"name": "code", "targets": 5, "data": "code"}
