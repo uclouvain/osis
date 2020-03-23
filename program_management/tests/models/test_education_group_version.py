@@ -34,7 +34,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory
+    StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
 
 
 class TestEducationGroupVersion(SimpleTestCase):
@@ -73,6 +73,7 @@ class TestEducationGroupVersionModel(TestCase):
         self.offer_1 = EducationGroupYearFactory(academic_year=self.academic_year)
 
     def test_unique(self):
-        EducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1, is_transition=True)
+        particular_version = ParticularTransitionEducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1)
         with self.assertRaises(IntegrityError):
-            EducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1, is_transition=True)
+            ParticularTransitionEducationGroupVersionFactory(version_name=particular_version.version_name,
+                                                             offer=self.offer_1)

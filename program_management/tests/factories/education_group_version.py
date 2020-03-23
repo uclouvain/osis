@@ -55,3 +55,8 @@ class StandardEducationGroupVersionFactory(EducationGroupVersionFactory):
 class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = ''
     is_transition = True
+
+
+class ParticularTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
+    version_name = 'CEMS'
+    is_transition = True
