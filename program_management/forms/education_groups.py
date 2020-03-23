@@ -211,6 +211,8 @@ class GroupFilter(FilterSet):
                         When(~Q(educationgroupversion__version_name='') &
                              Q(educationgroupversion__is_transition=False),
                              then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
+                        default='acronym',
+                        output_field=CharField()
                     )
                 ),
                 default='acronym',
