@@ -26,7 +26,6 @@
 from unittest.mock import patch
 
 from django.test import TestCase
-from django.test.utils import override_settings
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -160,7 +159,6 @@ class TestSendMessage(TestCase):
 
     @patch("osis_common.messaging.send_message.send_messages")
     @patch("osis_common.messaging.message_config.create_table")
-    @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
     def test_with_one_enrollment(self, mock_create_table, mock_send_messages):
         send_mail.send_message_after_all_encoded_by_manager(
             self.persons,
@@ -180,7 +178,6 @@ class TestSendMessage(TestCase):
                               self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
                               self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
                               ])
-        print(args)
 
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
