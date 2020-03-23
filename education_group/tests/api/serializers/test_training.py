@@ -29,9 +29,10 @@ from django.urls import reverse
 
 from base.models.enums import organization_type, education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from reference.tests.factories.domain import DomainFactory
 
 
 class TrainingListSerializerTestCase(TestCase):
@@ -41,7 +42,7 @@ class TrainingListSerializerTestCase(TestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization__type=organization_type.MAIN
         )
-        cls.training = TrainingFactory(
+        cls.training = EducationGroupYearBachelorFactory(
             acronym='BIR1BA',
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
@@ -66,7 +67,7 @@ class TrainingListSerializerTestCase(TestCase):
             'administration_entity',
             'management_entity',
         ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+        self.assertListEqual(list(self.serializer.data), expected_fields)
 
     def test_ensure_academic_year_field_is_slugified(self):
         self.assertEqual(
@@ -94,8 +95,9 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             academic_year=cls.academic_year,
             education_group_type__name=education_group_types.TrainingType.MASTER_MA_120.name,
             management_entity=cls.entity_version.entity,
-            administration_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity
         )
+
         url = reverse('education_group_api_v1:training-list')
         cls.serializer = TrainingListSerializer(cls.training, context={
             'request': RequestFactory().get(url),
@@ -137,12 +139,13 @@ class TrainingDetailSerializerTestCase(TestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization__type=organization_type.MAIN
         )
-        cls.training = TrainingFactory(
+        cls.training = EducationGroupYearBachelorFactory(
             acronym='BIR1BA',
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
+            main_domain=DomainFactory(parent=DomainFactory())
         )
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
@@ -220,6 +223,8 @@ class TrainingDetailSerializerTestCase(TestCase):
             'active_text',
             'enrollment_campus',
             'main_teaching_campus',
+            'domain_code',
+            'domain_name'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -250,6 +255,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             education_group_type__name=education_group_types.TrainingType.MASTER_MA_120.name,
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
+            main_domain=DomainFactory(parent=DomainFactory())
         )
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
@@ -328,6 +334,8 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'active_text',
             'enrollment_campus',
             'main_teaching_campus',
+            'domain_code',
+            'domain_name'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
