@@ -37,7 +37,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR, AND
-from base.models.group_element_year import fetch_row_sql, GroupElementYear
+from base.models.group_element_year import GroupElementYear, fetch_row_sql
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem

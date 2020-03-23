@@ -38,7 +38,7 @@ from reversion.admin import VersionAdmin
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -515,33 +515,5 @@ class GroupElementYear(OrderedModel):
         return self.child_branch or self.child_leaf
 
 
-def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
-    if queryset.model != GroupElementYear:
-        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
-
-    elements = fetch_row_sql([root.id])
-
-    distinct_group_elem_ids = {elem['id'] for elem in elements}
-    queryset = queryset.filter(pk__in=distinct_group_elem_ids)
-
-    group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
-    for group_elem_year in queryset:
-        if exclude_options and group_elem_year.child_branch and \
-                group_elem_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
-            if EducationGroupYear.hierarchy.filter(pk=group_elem_year.child_branch.pk).get_parents(). \
-                        filter(education_group_type__name__in=TrainingType.finality_types()).exists():
-                continue
-        parent_id = group_elem_year.parent_id
-        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
-    return group_elems_by_parent_id
-
-
 def fetch_row_sql(root_ids):
     return GroupElementYear.objects.get_adjacency_list(root_ids)
-
-
-def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> list:
-    return GroupElementYear.objects.get_reverse_adjacency_list(
-        child_leaf_ids=[child_leaf_id],
-        academic_year_id=academic_year_id
-    )
