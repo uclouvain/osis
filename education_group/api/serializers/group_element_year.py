@@ -92,17 +92,9 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     credits = serializers.SerializerMethodField()
 
     @staticmethod
-    def get_credits(obj):
-        education_group_year = obj.education_group_year
-        learning_unit_year = obj.group_element_year.child_leaf
-        absolute_credits = (education_group_year and education_group_year.credits) or (
-                learning_unit_year and learning_unit_year.credits
-        )
-        return obj.group_element_year.relative_credits or absolute_credits
-
-    # @staticmethod
-    # def get_link_type_text(obj):
-    #     return _('Link type')
+    def get_credits(obj: 'Link'):
+        absolute_credits = obj.child.credits
+        return obj.relative_credits or absolute_credits
 
     @staticmethod
     def get_block(obj: 'Link'):
@@ -166,16 +158,10 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         default=None
     )
     with_prerequisite = serializers.BooleanField(source='child.has_prerequisite', read_only=True)
-    periodicity = serializers.CharField(source='learning_unit_year.periodicity', read_only=True)
-    quadrimester = serializers.CharField(source='learning_unit_year.quadrimester', read_only=True)
-    status = serializers.BooleanField(source='learning_unit_year.status', read_only=True)
-    proposal_type = serializers.SerializerMethodField()
-
-    @staticmethod
-    def get_proposal_type(obj):
-        if hasattr(obj.learning_unit_year, "proposallearningunit"):
-            return obj.learning_unit_year.proposallearningunit.type
-        return None
+    periodicity = serializers.CharField(source='child.periodicity.name', read_only=True)
+    quadrimester = serializers.CharField(source='child.quadrimester', read_only=True)
+    status = serializers.BooleanField(source='child.status', read_only=True)
+    proposal_type = serializers.CharField(source='proposal_type.name', read_only=True)
 
     def get_title(self, obj: 'Link'):
         if self.context.get('language') == settings.LANGUAGE_CODE_EN:

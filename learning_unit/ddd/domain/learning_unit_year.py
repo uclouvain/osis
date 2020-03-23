@@ -30,6 +30,9 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_type import ProposalType
 
 
+StrDerogationQuadrimesterEnum = str  # based on DerogationQuadrimesterEnum FIXME :: cf DerogationQuadrimesterEnum
+
+
 class LecturingVolume:
     def __init__(
         self,
@@ -64,6 +67,7 @@ class LearningUnitYear:
             status: bool = None,
             periodicity: PeriodicityEnum = None,
             other_remark: str = None,
+            quadrimester: StrDerogationQuadrimesterEnum = None,
 
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
@@ -83,6 +87,7 @@ class LearningUnitYear:
         self.status = status
         self.periodicity = periodicity
         self.other_remark = other_remark
+        self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
 

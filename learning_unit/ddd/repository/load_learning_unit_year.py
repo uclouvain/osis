@@ -32,6 +32,7 @@ from django.db.models import Case, F, When, IntegerField, Subquery, OuterRef
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
@@ -87,6 +88,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'status',
         'periodicity',
         'other_remark',
+        'quadrimester',
 
         'pm_vol_tot',
         'pp_vol_tot',
