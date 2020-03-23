@@ -246,8 +246,10 @@ def get_verbose_link(link: 'Link'):
 
 
 def get_volume_total_verbose(node: 'NodeLearningUnitYear'):
-    # TODO :: add volumes into the NodeLearningUnitYear object (via program_tree.load())
-    return "%(total_lecturing)gh + %(total_practical)gh" % {"total_lecturing": 10, "total_practical": 10}
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": node.volume_total_lecturing,
+        "total_practical": node.volume_total_practical
+    }
 
 
 def get_status_picture(node: 'NodeLearningUnitYear'):

@@ -293,8 +293,8 @@ class NodeLearningUnitYear(Node):
         self.proposal_type = proposal_type
         self.learning_unit_type = learning_unit_type
         self.other_remark = other_remark
-        self.volume_total_lecturing = volume_total_lecturing
-        self.volume_total_practical = volume_total_practical
+        self.volume_total_lecturing = volume_total_lecturing or Decimal(0.0)
+        self.volume_total_practical = volume_total_practical or Decimal(0.0)
 
     @property
     def has_prerequisite(self) -> bool:
