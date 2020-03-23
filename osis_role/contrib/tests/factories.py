@@ -23,20 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
+import factory
+from django.contrib.auth.models import Permission
 
-from base.models.education_group import EducationGroup
-from osis_role.contrib.models import RoleModel
+from base.tests.factories.person import PersonFactory
 
 
-class EducationGroupRoleModel(RoleModel):
-
-    education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
-
+class RoleModelFactory(factory.DjangoModelFactory):
     class Meta:
         abstract = True
-        unique_together = ('person', 'education_group',)
 
-    @classmethod
-    def get_person_related_education_groups(cls, person):
-        return cls.objects.filter(person=person).values_list('education_group_id', flat=True)
+    person = factory.SubFactory(PersonFactory)
+
+    @factory.post_generation
+    def add_relevant_permissions_to_user_group(self, create, extracted, **kwargs):
+        permissions = [
+            Permission.objects.get_or_create(
+                defaults={"name": p.split('.')[1]}, codename=p.split('.')[1]
+            )[0] for p in self.rule_set().keys()
+        ]
+        self.person.user.groups.get(name=self.group_name).permissions.set(permissions)
