@@ -61,7 +61,8 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.group_element_year import GroupElementYear, find_roots
+from base.models.group_element_year import GroupElementYear
+from program_management.ddd.repositories.find_roots import find_roots
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar

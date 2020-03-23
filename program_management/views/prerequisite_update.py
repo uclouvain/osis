@@ -29,6 +29,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+import program_management.ddd.repositories.find_roots
 from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -61,7 +62,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         learning_unit_year = context["learning_unit_year"]
         education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
 
-        formations = group_element_year.find_roots(
+        formations = program_management.ddd.repositories.find_roots.find_roots(
             [learning_unit_year],
             parents_as_instances=True,
             with_parents_of_parents=True,

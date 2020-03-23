@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.group_element_year import find_roots
+from program_management.ddd.repositories.find_roots import find_roots
 from program_management.views.generic import LearningUnitGenericDetailView
 
 

@@ -28,6 +28,7 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -63,7 +64,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        education_group_root_ids = group_element_year.find_roots(
+        education_group_root_ids = program_management.ddd.repositories.find_roots.find_roots(
             [learning_unit_year],
             root_types=[GroupType.COMPLEMENTARY_MODULE]
         ).get(learning_unit_year.id, [])

@@ -29,6 +29,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django_filters import filters
 
+import program_management.ddd.repositories.find_roots
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import group_element_year, entity_version
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
@@ -122,7 +123,7 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
 
 
 def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs):
-    formations = group_element_year.find_roots(learning_unit_year_qs)
+    formations = program_management.ddd.repositories.find_roots.find_roots(learning_unit_year_qs)
     education_group_ids = list(itertools.chain.from_iterable(formations.values()))
     offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids). \
         values_list("education_group_year", "entity")

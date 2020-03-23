@@ -33,7 +33,7 @@ from django.http import HttpResponse
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, GroupType
-from base.models.group_element_year import find_roots
+from program_management.ddd.repositories.find_roots import find_roots
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
