@@ -96,8 +96,8 @@ class RoleModel(models.Model, metaclass=RoleModelMeta):
 
 
 class EntityRoleModel(RoleModel):
-
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
+    with_child = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

@@ -516,8 +516,12 @@ components:
           type: number
         administration_entity:
           type: string
+        administration_faculty:
+          type:string
         management_entity:
           type: string
+        management_faculty:
+          type:string
         partial_title:
           type: string
       required:
@@ -667,6 +671,8 @@ components:
           type: string
         management_entity:
           type: string
+        management_faculty:
+          type:string
         academic_year:
           type: number
         education_group_type:
@@ -708,6 +714,8 @@ components:
           type: string
         management_entity:
           type: string
+        management_faculty:
+          type:string
         academic_year:
           type: number
         education_group_type:
@@ -758,8 +766,13 @@ components:
           type: string
         title:
           type: string
-        type:
+        node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
+        subtype:
+          allOf:
+            - $ref: '#/components/schemas/MiniTrainingTypeEnum'
+            - $ref: '#/components/schemas/TrainingTypeEnum'
+            - $ref: '#/components/schemas/GroupTypeEnum'
         partial_title:
           type: string
         children:
@@ -795,7 +808,7 @@ components:
           type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
-        sub_type:
+        subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
           type: string
@@ -811,6 +824,14 @@ components:
           type: number
         practical_exercise_volume:
           type: number
+        proposal_type:
+          $ref: '#/components/schemas/ProposalTypeEnum'
+        status:
+          type: boolean
+        quadrimester:
+          $ref: '#/components/schemas/QuadrimesterEnum'
+        periodicity:
+          $ref: '#/components/schemas/PeriodicityEnum'
         access_condition:
           type: boolean
         comment:
@@ -1021,6 +1042,28 @@ components:
         - NON_ACADEMIC
         - NON_ACADEMIC_CREF
         - ACADEMIC
+    QuadrimesterEnum:
+      type: string
+      enum:
+        - Q1
+        - Q2
+        - Q3
+        - Q1and2
+        - Q1or2
+    PeriodicityEnum:
+      type: string
+      enum:
+        - ANNUAL
+        - BIENNIAL_EVEN
+        - BIENNIAL_ODD
+    ProposalTypeEnum:
+      type: string
+      enum:
+        - CREATION
+        - MODIFICATION
+        - TRANSFORMATION
+        - SUPPRESSION
+        - TRANSFORMATION_AND_MODIFICATION
     Error:
       type: object
       properties:
