@@ -86,8 +86,8 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     is_mandatory = serializers.BooleanField(read_only=True)
     access_condition = serializers.BooleanField(read_only=True)
     comment = serializers.SerializerMethodField()
-    link_type = serializers.CharField(source='link_type.name', read_only=True)
-    link_type_text = _('Link type')
+    link_type = serializers.CharField(source='link_type.name', allow_null=True, read_only=True)
+    link_type_text = serializers.CharField(source='link_type.value', allow_null=True, read_only=True)
     block = serializers.SerializerMethodField()
     credits = serializers.SerializerMethodField()
 
@@ -158,10 +158,10 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         default=None
     )
     with_prerequisite = serializers.BooleanField(source='child.has_prerequisite', read_only=True)
-    periodicity = serializers.CharField(source='child.periodicity.name', read_only=True)
+    periodicity = serializers.CharField(source='child.periodicity.name', allow_null=True, read_only=True)
     quadrimester = serializers.CharField(source='child.quadrimester', read_only=True)
     status = serializers.BooleanField(source='child.status', read_only=True)
-    proposal_type = serializers.CharField(source='proposal_type.name', read_only=True)
+    proposal_type = serializers.CharField(source='child.proposal_type.name', allow_null=True, read_only=True)
 
     def get_title(self, obj: 'Link'):
         if self.context.get('language') == settings.LANGUAGE_CODE_EN:

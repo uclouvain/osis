@@ -32,6 +32,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import AllTypes, EducationGroupTypesEnum
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.group_element_year import GroupElementYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
@@ -100,6 +101,8 @@ def __convert_string_to_enum(node_data: dict) -> dict:
         node_data['node_type'] = __convert_node_type_enum(node_data['node_type'])
     if node_data.get('category'):
         node_data['category'] = __convert_category_enum(node_data['category'])
+    if node_data.get('periodicity'):
+        node_data['periodicity'] = PeriodicityEnum[node_data['periodicity']]
     node_data['type'] = NodeType[node_data['type']]
     return node_data
 
@@ -195,7 +198,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
             'title': lu.full_title_fr,
             'credits': lu.credits,
             'status': lu.credits,
-            'periodicity': lu.credits,
+            'periodicity': lu.periodicity,
             'common_title_fr': lu.common_title_fr,
             'specific_title_fr': lu.specific_title_fr,
             'common_title_en': lu.common_title_en,

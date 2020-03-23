@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from decimal import Decimal
 from typing import List
 
 from django.templatetags.static import static
@@ -250,8 +251,8 @@ def get_verbose_link(link: 'Link'):
 
 def get_volume_total_verbose(node: 'NodeLearningUnitYear'):
     return "%(total_lecturing)gh + %(total_practical)gh" % {
-        "total_lecturing": node.volume_total_lecturing,
-        "total_practical": node.volume_total_practical
+        "total_lecturing": node.volume_total_lecturing or Decimal(0.0),
+        "total_practical": node.volume_total_practical or Decimal(0.0)
     }
 
 
