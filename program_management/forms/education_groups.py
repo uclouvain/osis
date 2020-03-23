@@ -202,16 +202,13 @@ class GroupFilter(FilterSet):
                 When(
                     Q(educationgroupversion__isnull=False),
                     then=Case(
-                        When(Q(educationgroupversion__isnull=False) &
-                             Q(educationgroupversion__is_transition=True) &
+                        When(Q(educationgroupversion__is_transition=True) &
                              Q(educationgroupversion__version_name=''),
                              then=Concat('acronym', Value('[Transition]'))),
                         When(~Q(educationgroupversion__version_name='') &
-                             Q(educationgroupversion__isnull=False) &
                              Q(educationgroupversion__is_transition=True),
                              then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
                         When(~Q(educationgroupversion__version_name='') &
-                             Q(educationgroupversion__isnull=False) &
                              Q(educationgroupversion__is_transition=False),
                              then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
                     )
