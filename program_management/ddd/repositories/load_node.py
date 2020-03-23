@@ -30,6 +30,7 @@ from django.db.models import F, Value, Case, When, IntegerField, CharField, Quer
 
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import AllTypes, EducationGroupTypesEnum
 from base.models.group_element_year import GroupElementYear
 from learning_unit.ddd.repository import load_learning_unit_year
@@ -97,6 +98,8 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 def __convert_string_to_enum(node_data: dict) -> dict:
     if node_data.get('node_type'):
         node_data['node_type'] = __convert_node_type_enum(node_data['node_type'])
+    if node_data.get('category'):
+        node_data['category'] = __convert_category_enum(node_data['category'])
     node_data['type'] = NodeType[node_data['type']]
     return node_data
 
@@ -113,8 +116,13 @@ def __convert_node_type_enum(str_node_type: str) -> EducationGroupTypesEnum:
     return enum_node_type
 
 
+def __convert_category_enum(category: str):
+    return Categories[category]
+
+
 def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return EducationGroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
+        # Fields from "Group"
         node_id=F('pk'),
         type=Value(NodeType.EDUCATION_GROUP.name, output_field=CharField()),
         node_type=F('education_group_type__name'),
@@ -125,10 +133,12 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
         remark_en=F('remark_english'),
 
         # TODO :: Warning Should load this into education_group/ddd/repository (when model refactor to GroupYear)
+        # Fields from "Offer"
         offer_partial_title_fr=F('partial_title'),
         offer_partial_title_en=F('partial_title_english'),
         offer_title_fr=F('title'),
         offer_title_en=F('title_english'),
+        category=F('education_group_type__category'),
 
     ).values(
         'node_id',
@@ -136,34 +146,39 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
         'node_type',
         'code',
         'title_t',
-        'offer_title_fr',
-        'offer_title_en',
         'year',
         'constraint_type',
         'min_constraint',
         'max_constraint',
         'remark_fr',
         'remark_en',
+        'credits',
+
         'offer_partial_title_fr',
         'offer_partial_title_en',
-        'credits',
+        'offer_title_fr',
+        'offer_title_en',
+        'category',
+
     ).annotate(title=F('title_t')).values(
         'node_id',
         'type',
         'node_type',
         'code',
         'title',
-        'offer_title_fr',
-        'offer_title_en',
         'year',
         'constraint_type',
         'min_constraint',
         'max_constraint',
         'remark_fr',
         'remark_en',
+        'credits',
+
         'offer_partial_title_fr',
         'offer_partial_title_en',
-        'credits',
+        'offer_title_fr',
+        'offer_title_en',
+        'category',
     )
 
 
@@ -173,6 +188,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
         node_data = {
             'node_id': lu.id,
             'type': NodeType.LEARNING_UNIT.name,
+            'learning_unit_type': lu.type,
             'year': lu.year,
             'proposal_type': lu.proposal_type,
             'code': lu.acronym,
@@ -184,6 +200,9 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
             'specific_title_fr': lu.specific_title_fr,
             'common_title_en': lu.common_title_en,
             'specific_title_en': lu.specific_title_en,
+            'other_remark': lu.other_remark,
+            'volume_total_lecturing': lu.lecturing_volume.total_annual,
+            'volume_total_practical': lu.practical_volume.total_annual,
         }
         nodes.append(node.factory.get_node(**__convert_string_to_enum(node_data)))
     return nodes

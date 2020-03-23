@@ -25,8 +25,25 @@
 ##############################################################################
 from _decimal import Decimal
 
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_type import ProposalType
+
+
+class LecturingVolume:
+    def __init__(
+        self,
+        total_annual: int = None,
+    ):
+        self.total_annual = total_annual
+
+
+class PracticalVolume:
+    def __init__(
+            self,
+            total_annual: int = None,
+    ):
+        self.total_annual = total_annual
 
 
 class LearningUnitYear:
@@ -35,6 +52,7 @@ class LearningUnitYear:
             id: int = None,
             year: int = None,
             acronym: str = None,
+            type: LearningContainerYearType = None,
             common_title_fr: str = '',
             specific_title_fr: str = '',
             common_title_en: str = '',
@@ -44,11 +62,16 @@ class LearningUnitYear:
             proposal_type: ProposalType = None,
             credits: Decimal = None,
             status: bool = None,
-            periodicity: PeriodicityEnum = None
+            periodicity: PeriodicityEnum = None,
+            other_remark: str = None,
+
+            lecturing_volume: LecturingVolume = None,
+            practical_volume: PracticalVolume = None,
     ):
         self.id = id
         self.year = year
         self.acronym = acronym
+        self.type = type
         self.common_title_fr = common_title_fr or ''
         self.specific_title_fr = specific_title_fr or ''
         self.common_title_en = common_title_en or ''
@@ -59,6 +82,9 @@ class LearningUnitYear:
         self.credits = credits
         self.status = status
         self.periodicity = periodicity
+        self.other_remark = other_remark
+        self.lecturing_volume = lecturing_volume
+        self.practical_volume = practical_volume
 
     @property
     def full_title_fr(self):

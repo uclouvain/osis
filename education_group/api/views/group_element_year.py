@@ -31,6 +31,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.repositories import load_tree
 
 
 class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -51,7 +52,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
         self.check_object_permissions(self.request, education_group_year)
 
-        return EducationGroupHierarchy(education_group_year)
+        return load_tree.load(education_group_year.id)
 
 
 class TrainingTreeView(EducationGroupTreeView):

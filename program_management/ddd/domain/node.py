@@ -26,7 +26,9 @@
 from _decimal import Decimal
 from typing import List, Set, Dict
 
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
@@ -213,6 +215,7 @@ class NodeEducationGroupYear(Node):
             offer_title_en: str = None,
             offer_partial_title_fr: str = None,
             offer_partial_title_en: str = None,
+            category: Categories = None,
             **kwargs
     ):
         super().__init__(**kwargs)
@@ -225,6 +228,7 @@ class NodeEducationGroupYear(Node):
         self.offer_title_en = offer_title_en
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
+        self.category = category
 
 
 class NodeGroupYear(Node):
@@ -242,6 +246,7 @@ class NodeGroupYear(Node):
         offer_title_en: str = None,
         offer_partial_title_fr: str = None,
         offer_partial_title_en: str = None,
+        category: Categories = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -254,6 +259,7 @@ class NodeGroupYear(Node):
         self.offer_title_en = offer_title_en
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
+        self.category = category
 
 
 class NodeLearningUnitYear(Node):
@@ -269,18 +275,26 @@ class NodeLearningUnitYear(Node):
             common_title_en: str = None,
             specific_title_en: str = None,
             proposal_type: ProposalType = None,
-            **kwargs
+            learning_unit_type: LearningContainerYearType = None,
+            other_remark: str = None,
+            volume_total_lecturing: Decimal = None,
+            volume_total_practical: Decimal = None,
+            **common_node_kwargs
     ):
-        self.is_prerequisite_of = kwargs.pop('is_prerequisite_of', []) or []
+        self.is_prerequisite_of = common_node_kwargs.pop('is_prerequisite_of', []) or []
+        super().__init__(**common_node_kwargs)
         self.status = status
         self.periodicity = periodicity
-        super().__init__(**kwargs)
         self.prerequisite = NullPrerequisite()
         self.common_title_fr = common_title_fr
         self.specific_title_fr = specific_title_fr
         self.common_title_en = common_title_en
         self.specific_title_en = specific_title_en
         self.proposal_type = proposal_type
+        self.learning_unit_type = learning_unit_type
+        self.other_remark = other_remark
+        self.volume_total_lecturing = volume_total_lecturing
+        self.volume_total_practical = volume_total_practical
 
     @property
     def has_prerequisite(self) -> bool:

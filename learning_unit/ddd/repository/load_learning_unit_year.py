@@ -27,15 +27,34 @@
 import copy
 from typing import List, Dict, Any
 
-from django.db.models import Case, F, When, IntegerField
+from django.db.models import Case, F, When, IntegerField, Subquery, OuterRef
 
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+
+
+def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
+    learn_unit_data['lecturing_volume'] = LecturingVolume(total_annual=learn_unit_data.pop('pm_vol_tot'))
+    learn_unit_data['practical_volume'] = PracticalVolume(total_annual=learn_unit_data.pop('pp_vol_tot'))
+    return learn_unit_data
 
 
 def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']:
+    subquery_component = LearningComponentYear.objects.filter(
+        learning_unit_year_id=OuterRef('pk')
+    )
+    subquery_component_pm = subquery_component.filter(
+        type=LECTURING
+    )
+    subquery_component_pp = subquery_component.filter(
+        type=PRACTICAL_EXERCISES
+    )
+
     qs = LearningUnitYearModel.objects.filter(pk__in=learning_unit_year_ids).annotate(
         specific_title_en=F('specific_title_english'),
         specific_title_fr=F('specific_title'),
@@ -45,10 +64,18 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         proposal_type=F('proposallearningunit__type'),
         start_year=F('learning_unit__start_year'),
         end_year=F('learning_unit__end_year'),
+        type=F('learning_container_year__container_type'),
+        other_remark=F('learning_unit__other_remark'),
+
+        # components (volumes) data
+        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
+        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+
     ).values(
         'id',
         'year',
         'acronym',
+        'type',
         'specific_title_fr',
         'specific_title_en',
         'common_title_fr',
@@ -58,6 +85,24 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'proposal_type',
         'credits',
         'status',
-        'periodicity'
+        'periodicity',
+        'other_remark',
+
+        'pm_vol_tot',
+        'pp_vol_tot',
     )
-    return [LearningUnitYear(**learnin_unit_data) for learnin_unit_data in qs]
+
+    return [
+        LearningUnitYear(
+            **__instanciate_volume_domain_object(
+                __convert_string_to_enum(learnin_unit_data)
+            )
+        )
+        for learnin_unit_data in qs
+    ]
+
+
+def __convert_string_to_enum(learn_unit_data: dict) -> dict:
+    subtype_str = learn_unit_data['type']
+    learn_unit_data['type'] = LearningContainerYearType[subtype_str]
+    return learn_unit_data
