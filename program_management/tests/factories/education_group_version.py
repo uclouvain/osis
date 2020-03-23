@@ -51,3 +51,7 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
 class StandardEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = ''
 
+
+class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
+    version_name = ''
+    is_transition = True

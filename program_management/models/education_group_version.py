@@ -82,5 +82,5 @@ class EducationGroupVersion(models.Model):
         return "{} ({})".format(self.offer, self.version_name) if self.version_name else str(self.offer)
 
     class Meta:
-        unique_together = ('version_name', 'offer')
+        unique_together = ('version_name', 'offer', 'is_transition')
         default_manager_name = 'objects'

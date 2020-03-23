@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import IntegrityError
 from django.test import SimpleTestCase, TestCase
 from django.utils.datetime_safe import datetime
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
@@ -62,3 +65,14 @@ class TestStandardEducationGroupManager(TestCase):
         result = EducationGroupVersion.standard.all()
         self.assertIn(self.standard_version, result)
         self.assertNotIn(self.not_standard_version, result)
+
+
+class TestEducationGroupVersionModel(TestCase):
+    def setUp(self):
+        self.academic_year = create_current_academic_year()
+        self.offer_1 = EducationGroupYearFactory(academic_year=self.academic_year)
+
+    def test_unique(self):
+        EducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1, is_transition=True)
+        with self.assertRaises(IntegrityError):
+            EducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1, is_transition=True)
