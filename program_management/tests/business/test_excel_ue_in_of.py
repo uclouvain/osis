@@ -320,11 +320,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         idx = 1
         for gey in exl.learning_unit_years_parent:
             luy = gey.child_leaf
-            if luy != self.child_leave_node_111.child_leaf and luy != self.child_leave_node_11.child_leaf:
-                expected = get_expected_data(gey, luy, gey.parent)
-            else:
-                # main_gathering different than direct parent
-                expected = get_expected_data(gey, luy, self.edy_node_1_training)
+            expected = get_expected_data(gey, luy, gey.parent)
             self.assertListEqual(content[idx], expected)
             idx += 1
 
