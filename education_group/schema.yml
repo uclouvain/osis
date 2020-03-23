@@ -672,7 +672,7 @@ components:
         management_entity:
           type: string
         management_faculty:
-          type:string
+          type: string
         academic_year:
           type: number
         education_group_type:
@@ -715,7 +715,7 @@ components:
         management_entity:
           type: string
         management_faculty:
-          type:string
+          type: string
         academic_year:
           type: number
         education_group_type:
