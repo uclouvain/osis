@@ -347,7 +347,6 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
                                                             [table], receivers, template_base_data, subject_data,
                                                             attachment)
-    print(message_content)
     return message_service.send_messages(message_content)
 
 
@@ -372,7 +371,7 @@ def send_mail_for_educational_information_update(teachers, learning_units_years)
 
 def get_enrollment_headers():
     return [
-        str(_('Acronym enrollment header')),
+        _('Acronym enrollment header'),
         _('Session enrollment header'),
         _('Registration number header'),
         _('Lastname'),
