@@ -39,7 +39,7 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_
     CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SUMMARY
 from base.business.learning_units.edition import _descriptive_fiche_and_achievements_update
 from base.models.enums import proposal_state, learning_unit_year_subtypes, \
-    proposal_type
+    proposal_type, learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -168,6 +168,7 @@ class TestConsolidateDelete(TestCase):
             learning_unit_year__academic_year=self.current_academic_year,
             learning_unit_year__learning_unit__start_year=self.current_academic_year,
             learning_unit_year__learning_container_year__academic_year=self.current_academic_year,
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.COURSE,
             learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
         )
         self.learning_unit_year = self.proposal.learning_unit_year
