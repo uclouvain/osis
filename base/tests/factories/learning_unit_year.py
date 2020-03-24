@@ -73,7 +73,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
-    quadrimester = factory.Iterator(quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+    quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
                                     getter=operator.itemgetter(0))
     language = factory.SubFactory(LanguageFactory)
     attribution_procedure = None
@@ -100,7 +100,7 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
-    quadrimester = factory.Iterator(quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+    quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
                                     getter=operator.itemgetter(0))
     language = factory.SubFactory(LanguageFactory)
     attribution_procedure = None
