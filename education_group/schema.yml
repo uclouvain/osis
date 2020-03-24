@@ -1045,8 +1045,8 @@ components:
         - Q1
         - Q2
         - Q3
-        - "Q1 and Q2"
-        - "Q1 or Q2"
+        - Q1and2
+        - Q1or2
     PeriodicityEnum:
       type: string
       enum:
