@@ -199,14 +199,29 @@ class GroupFilter(FilterSet):
                 output_field=CharField(),)
         ).annotate(
             complete_title_fr=Case(
-                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
-                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
+                When(
+                    Q(educationgroupversion__isnull=False),
+                    then=Case(
+                        When(Q(educationgroupversion__is_transition=True) &
+                             Q(educationgroupversion__version_name=''),
+                             then=Concat('acronym', Value('[Transition]'))),
+                        When(~Q(educationgroupversion__version_name='') &
+                             Q(educationgroupversion__is_transition=True),
+                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
+                        When(~Q(educationgroupversion__version_name='') &
+                             Q(educationgroupversion__is_transition=False),
+                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
+                        default='acronym',
+                        output_field=CharField()
+                    )
+                ),
                 default='acronym',
-                output_field=CharField(),)
+                output_field=CharField()
+            )
         ).annotate(
             title=Case(
-                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
-                     then=Concat('title_fr', Value('['), 'educationgroupversion__title_fr', Value(']'))),
+                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__title_fr=''),
+                     then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
                 default='title_fr',
                 output_field=CharField(),)
         )

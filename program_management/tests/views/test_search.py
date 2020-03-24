@@ -38,7 +38,6 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory, \
     MiniTrainingEducationGroupTypeFactory, \
     GroupEducationGroupTypeFactory
@@ -51,7 +50,8 @@ from base.utils.cache import RequestCache
 from education_group.tests.factories.group import GroupFactory as EducationGroupGroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.forms.education_groups import GroupFilter, STANDARD, PARTICULAR
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
 
 URL_EDUCATION_GROUPS = "version_program"
 SEARCH_TEMPLATE = "search.html"
@@ -504,11 +504,9 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
 
         group_transition = EducationGroupGroupFactory(start_year=cls.current_academic_year)
         cls.transition_group_yr = GroupYearFactory(group=group_transition, academic_year=cls.current_academic_year)
-        cls.transition_egv = EducationGroupVersionFactory(root_group=cls.transition_group_yr, offer=cls.egy,
-                                                          version_name='Transition',
-                                                          is_transition=True)
+        cls.transition_egv = StandardTransitionEducationGroupVersionFactory(
+            root_group=cls.transition_group_yr, offer=cls.egy)
 
-        group_particular_1 = EducationGroupGroupFactory()
         cls.particular_group_yr_1 = GroupYearFactory(group=group_transition,
                                                      academic_year=cls.current_academic_year)
         cls.particular_egv_1 = EducationGroupVersionFactory(root_group=cls.particular_group_yr_1,
@@ -516,7 +514,6 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
                                                             version_name='CMES-1',
                                                             is_transition=False)
 
-        group_particular_2 = EducationGroupGroupFactory()
         cls.particular_group_yr_2 = GroupYearFactory(group=group_transition,
                                                      academic_year=cls.current_academic_year)
         cls.particular_egv_2 = EducationGroupVersionFactory(root_group=cls.particular_group_yr_2,
@@ -527,10 +524,9 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
         group_transition_particular_group_yr_2 = EducationGroupGroupFactory(start_year=cls.current_academic_year)
         cls.transition_group_yr_2_transition = GroupYearFactory(group=group_transition_particular_group_yr_2,
                                                                 academic_year=cls.current_academic_year)
-        cls.transition_egv = EducationGroupVersionFactory(root_group=cls.transition_group_yr_2_transition,
-                                                          offer=cls.egy,
-                                                          version_name='CMES-2[Transition]',
-                                                          is_transition=True)
+        cls.transition_egv = ParticularTransitionEducationGroupVersionFactory(
+            root_group=cls.transition_group_yr_2_transition,
+            offer=cls.egy)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
@@ -577,7 +573,8 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
         self.assertCountEqual(
             context["object_list"],
             [
-                self.standard_group_yr
+                self.standard_group_yr,
+                self.transition_group_yr
             ]
         )
 
@@ -612,7 +609,6 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
         self.assertCountEqual(
             context["object_list"],
             [
-                self.transition_group_yr,
                 self.particular_group_yr_1,
                 self.particular_group_yr_2,
                 self.transition_group_yr_2_transition
