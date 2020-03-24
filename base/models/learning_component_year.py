@@ -147,7 +147,7 @@ class LearningComponentYear(SerializableModel):
 
         strategies = {
             None: LearningComponentYearQuadriNoStrategy,
-            quadrimesters.LearningUnitYearQuadrimester.Q1: LearningComponentYearQ1Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1.value: LearningComponentYearQ1Strategy,
             quadrimesters.LearningUnitYearQuadrimester.Q2.value: LearningComponentYearQ2Strategy,
             quadrimesters.LearningUnitYearQuadrimester.Q1and2.value: LearningComponentYearQ1and2Strategy,
             quadrimesters.LearningUnitYearQuadrimester.Q1or2.value: LearningComponentYearQ1or2Strategy,
