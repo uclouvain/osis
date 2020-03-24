@@ -197,7 +197,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
             'code': lu.acronym,
             'title': lu.full_title_fr,
             'credits': lu.credits,
-            'status': lu.credits,
+            'status': lu.status,
             'periodicity': lu.periodicity,
             'common_title_fr': lu.common_title_fr,
             'specific_title_fr': lu.specific_title_fr,

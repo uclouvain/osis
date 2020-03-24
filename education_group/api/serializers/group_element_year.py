@@ -28,16 +28,13 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.learning_component_year_type import LECTURING
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
-from django.utils.translation import gettext_lazy as _
-
-
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import link
 
 
 class RecursiveField(serializers.Serializer):
@@ -47,7 +44,7 @@ class RecursiveField(serializers.Serializer):
         }
         if value.is_link_with_learning_unit():
             return LearningUnitNodeTreeSerializer(value, context=context).data
-        return EducationGroupNodeTreeSerializer(value,context=context).data
+        return EducationGroupNodeTreeSerializer(value, context=context).data
 
 
 class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
@@ -61,7 +58,7 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
         elif obj.is_link_with_group() and obj.child.category == Categories.TRAINING:
             view_name = 'education_group_api_v1:' + TrainingDetail.name
             url_kwargs = {
-                'acronym': obj.child.code,
+                'acronym': obj.child.title,
                 'year': obj.child.year,
             }
         else:
@@ -143,7 +140,7 @@ class EducationGroupNodeTreeSerializer(CommonNodeTreeSerializer, EducationGroupR
 class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     node_type = serializers.ReadOnlyField(default=NodeType.LEARNING_UNIT.name)
     subtype = serializers.CharField(source='child.learning_unit_type.name', read_only=True)
-    code = serializers.CharField(source='child.acronym', read_only=True)
+    code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.CharField(source='child.other_remark', read_only=True)
     lecturing_volume = serializers.DecimalField(
         source='child.volume_total_lecturing',
@@ -182,5 +179,9 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         return data
 
 
-class EducationGroupTreeSerializer(serializers.Serializer):
-    children = RecursiveField(source='root_node.children', many=True)
+class EducationGroupTreeSerializer(EducationGroupRootNodeTreeSerializer):
+    children = RecursiveField(source='child.children', many=True)
+
+    def __init__(self, instance: 'ProgramTree', **kwargs):
+        instance = link.Link(parent=None, child=instance.root_node)
+        super().__init__(instance, **kwargs)
