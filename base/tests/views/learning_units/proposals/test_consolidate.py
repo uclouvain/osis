@@ -156,29 +156,30 @@ class TestConsolidateDelete(TestCase):
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.current_academic_year = cls.academic_years[1]
 
-        cls.proposal = ProposalLearningUnitFactory(
-            type=proposal_type.ProposalType.SUPPRESSION.name,
-            state=proposal_state.ProposalState.ACCEPTED.name,
-            learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
-            learning_unit_year__academic_year=cls.current_academic_year,
-            learning_unit_year__learning_unit__start_year=cls.current_academic_year,
-            learning_unit_year__learning_container_year__academic_year=cls.current_academic_year,
-            learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
-        )
-        cls.learning_unit_year = cls.proposal.learning_unit_year
-
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
 
-        person_entity = PersonEntityFactory(person=cls.person,
-                                            entity=cls.learning_unit_year.learning_container_year.requirement_entity)
-        EntityVersionFactory(entity=person_entity.entity)
-        cls.url = reverse("learning_unit_consolidate_proposal",
-                          kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
-        cls.post_data = {"learning_unit_year_id": cls.learning_unit_year.id}
-
     def setUp(self):
+        self.proposal = ProposalLearningUnitFactory(
+            type=proposal_type.ProposalType.SUPPRESSION.name,
+            state=proposal_state.ProposalState.ACCEPTED.name,
+            learning_unit_year__subtype=learning_unit_year_subtypes.FULL,
+            learning_unit_year__academic_year=self.current_academic_year,
+            learning_unit_year__learning_unit__start_year=self.current_academic_year,
+            learning_unit_year__learning_container_year__academic_year=self.current_academic_year,
+            learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
+        )
+        self.learning_unit_year = self.proposal.learning_unit_year
+
+        person_entity = PersonEntityFactory(person=self.person,
+                                            entity=self.learning_unit_year.learning_container_year.requirement_entity)
+        EntityVersionFactory(entity=person_entity.entity)
+
+        self.url = reverse("learning_unit_consolidate_proposal",
+                           kwargs={'learning_unit_year_id': self.learning_unit_year.id})
+        self.post_data = {"learning_unit_year_id": self.learning_unit_year.id}
+
         self.client.force_login(self.person.user)
 
     @mock.patch("base.business.learning_unit_proposal.consolidate_proposals_and_send_report",
