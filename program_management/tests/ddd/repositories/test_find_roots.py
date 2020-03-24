@@ -19,14 +19,14 @@ class TestFindAllRoots(TestCase):
         cls.academic_year = AcademicYearFactory()
 
     def test_when_no_link_for_academic_year(self):
-        result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
+        result = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(self.academic_year.id)
         self.assertDictEqual(result, {})
 
     def test_when_one_link_for_academic_year_should_but_do_not_match_criteria(self):
         GroupElementYearFactory(
             parent__education_group_type__group=True
         )
-        result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
+        result = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(self.academic_year.id)
         self.assertDictEqual(result, {})
 
     def test_should_return_all_children_root_for_academic_year(self):
@@ -42,7 +42,7 @@ class TestFindAllRoots(TestCase):
             parent__academic_year=self.academic_year,
             child_leaf__academic_year=self.academic_year
         )
-        result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
+        result = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(self.academic_year.id)
         self.assertEqual(
             len(result),
             3

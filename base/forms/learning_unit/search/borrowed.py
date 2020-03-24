@@ -129,7 +129,7 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
 
 
 def map_learning_unit_year_with_entities_of_education_groups(academic_year):
-    formations = program_management.ddd.repositories.find_roots.find_all_roots(academic_year.id)
+    formations = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(academic_year.id)
     education_group_ids = list(itertools.chain.from_iterable(formations.values()))
     offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids). \
         values_list("education_group_year", "entity")

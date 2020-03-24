@@ -420,8 +420,8 @@ class GroupElementYear(OrderedModel):
         self.clean()
         return super().save(force_insert, force_update, using, update_fields)
 
-    # FIXME :: DEPRECATED ??? Move this to validators? (is a model validation - not a business validation?)
-    # FIXME :: Should be moved to form validation via validators of the ddd module
+    # FIXME Move all those validations into link and program tree validation when attaching and detaching via
+    #       business validators (OSIS-3954)
     def clean(self):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
@@ -438,7 +438,6 @@ class GroupElementYear(OrderedModel):
             )
         self._check_same_academic_year_parent_child_branch()
 
-    # FIXME :: DEPRECATED -  Use AttachOptionsValidator
     def _check_same_academic_year_parent_child_branch(self):
         if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):

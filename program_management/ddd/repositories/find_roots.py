@@ -11,7 +11,8 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
 
 
-def find_all_roots(academic_year_id):
+# FIXME Suppress this method when borrowed course filter is refactored OSIS-3376
+def find_all_roots_for_academic_year(academic_year_id):
     root_categories = DEFAULT_ROOT_CATEGORIES
     root_categories_names = [root_type.name for root_type in root_categories]
 
@@ -20,7 +21,7 @@ def find_all_roots(academic_year_id):
         root_category_name=root_categories_names
     )
 
-    roots_by_children_id = _aggregate_child_root_list_into_roots_by_children_id(child_root_list)
+    roots_by_children_id = _group_roots_id_by_children_id(child_root_list)
 
     return roots_by_children_id
 
@@ -46,7 +47,7 @@ def find_roots(
         root_category_name=root_categories_names
     )
 
-    roots_by_children_id = _aggregate_child_root_list_into_roots_by_children_id(child_root_list)
+    roots_by_children_id = _group_roots_id_by_children_id(child_root_list)
 
     if with_parents_of_parents:
         flat_list_of_parents = _flatten_list_of_lists(roots_by_children_id.values())
@@ -54,7 +55,7 @@ def find_roots(
             child_branch_ids=flat_list_of_parents,
             root_category_name=root_categories_names
         )
-        roots_by_children_id.update(_aggregate_child_root_list_into_roots_by_children_id(child_root_list))
+        roots_by_children_id.update(_group_roots_id_by_children_id(child_root_list))
 
     if parents_as_instances:
         return _convert_parent_ids_to_instances(roots_by_children_id)
@@ -62,7 +63,7 @@ def find_roots(
     return roots_by_children_id
 
 
-def _aggregate_child_root_list_into_roots_by_children_id(child_root_list):
+def _group_roots_id_by_children_id(child_root_list):
     roots_by_children_id = collections.defaultdict(list)
     for child_root in child_root_list:
         roots_by_children_id[child_root["child_id"]].append(child_root["root_id"])

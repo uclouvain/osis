@@ -59,27 +59,6 @@ class ProgramTree:
                     result.append(link.parent)
         return result
 
-    def get_parents_using_node(self, child_node: 'Node') -> List['Node']:
-        result = []
-        for tree_node in self.get_all_nodes():
-            for link in tree_node.children:
-                if link.child == child_node:
-                    result.append(link.parent)
-        return result
-
-    def get_first_ancestors_matching_type(
-            self,
-            child_node: 'Node',
-            node_types: Set[EducationGroupTypesEnum]
-    ) -> List['Node']:
-        result = []
-        for parent in self.get_parents_using_node(child_node):
-            if parent.node_type in node_types:
-                result.append(parent)
-            else:
-                result.extend(self.get_first_ancestors_matching_type(parent, node_types))
-        return result
-
     def get_parents(self, path: Path) -> List['Node']:
         result = []
         str_nodes = path.split(PATH_SEPARATOR)
