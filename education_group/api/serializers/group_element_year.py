@@ -39,12 +39,9 @@ from program_management.ddd.domain import link
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value: 'Link'):
-        context = {
-            **self.context,
-        }
         if value.is_link_with_learning_unit():
-            return LearningUnitNodeTreeSerializer(value, context=context).data
-        return EducationGroupNodeTreeSerializer(value, context=context).data
+            return LearningUnitNodeTreeSerializer(value, context=self.context).data
+        return EducationGroupNodeTreeSerializer(value, context=self.context).data
 
 
 class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
