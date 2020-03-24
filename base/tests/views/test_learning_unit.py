@@ -580,11 +580,11 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_quadrimester(self):
         self._prepare_context_learning_units_search()
-        self.luy_LBIR1100C.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.value
+        self.luy_LBIR1100C.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.name
         self.luy_LBIR1100C.save()
         filter_data = {
             'academic_year': self.current_academic_year.id,
-            'quadrimester': quadrimesters.LearningUnitYearQuadrimester.Q1and2.value,
+            'quadrimester': quadrimesters.LearningUnitYearQuadrimester.Q1and2.name,
             'acronym': 'LBIR1100C',
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
