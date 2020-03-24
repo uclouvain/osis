@@ -147,11 +147,11 @@ class LearningComponentYear(SerializableModel):
 
         strategies = {
             None: LearningComponentYearQuadriNoStrategy,
-            quadrimesters.LearningUnitYearQuadrimester.Q1.value: LearningComponentYearQ1Strategy,
-            quadrimesters.LearningUnitYearQuadrimester.Q2.value: LearningComponentYearQ2Strategy,
-            quadrimesters.LearningUnitYearQuadrimester.Q1and2.value: LearningComponentYearQ1and2Strategy,
-            quadrimesters.LearningUnitYearQuadrimester.Q1or2.value: LearningComponentYearQ1or2Strategy,
-            quadrimesters.LearningUnitYearQuadrimester.Q3.value: LearningComponentYearQuadriNoStrategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1.name: LearningComponentYearQ1Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q2.name: LearningComponentYearQ2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1and2.name: LearningComponentYearQ1and2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1or2.name: LearningComponentYearQ1or2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q3.name: LearningComponentYearQuadriNoStrategy,
         }
 
         try:
