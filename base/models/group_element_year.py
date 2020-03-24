@@ -174,10 +174,8 @@ class GroupElementYearManager(models.Manager):
             root_category_name=None
     ):
         root_category_name = root_category_name or []
-        if child_leaf_ids is None:
-            child_leaf_ids = []
-        if child_branch_ids is None:
-            child_branch_ids = []
+        child_leaf_ids = child_leaf_ids or []
+        child_branch_ids = child_branch_ids or []
         if child_leaf_ids and not isinstance(child_leaf_ids, list):
             raise Exception('child_leaf_ids must be an instance of list')
         if child_branch_ids and not isinstance(child_branch_ids, list):
@@ -186,31 +184,7 @@ class GroupElementYearManager(models.Manager):
             return []
 
         # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
-        where_statement_leaf = ""
-        if child_leaf_ids:
-            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
-                'child_ids': ', '.join(["{}".format(str(name)) for name in child_leaf_ids])
-            }
-
-        where_statement_branch = ""
-        if child_branch_ids:
-            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
-                'child_ids': ','.join(["%s"] * len(child_branch_ids))
-            }
-
-        where_statement_academic_year = "(edyc.academic_year_id = {academic_year_id} " \
-                                        "OR bl.academic_year_id = {academic_year_id})".format(
-            academic_year_id=academic_year_id
-        )
-
-        if child_leaf_ids and child_branch_ids:
-            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
-        elif child_leaf_ids and not child_branch_ids:
-            where_statement = where_statement_leaf
-        elif academic_year_id:
-            where_statement = where_statement_academic_year
-        else:
-            where_statement = where_statement_branch
+        where_statement = self._build_where_statement(academic_year_id, child_branch_ids, child_leaf_ids)
         reverse_adjacency_query = """
             WITH RECURSIVE
                 root_query AS (
@@ -265,7 +239,7 @@ class GroupElementYearManager(models.Manager):
             'root_category_name': ', '.join(["'{}'".format(name) for name in root_category_name])
         }
         with connection.cursor() as cursor:
-            parameters = child_branch_ids + [
+            parameters =  child_leaf_ids + child_branch_ids + [
                 link_type.name if link_type else None,
                 link_type.name if link_type else None,
                 academic_year_id,
@@ -279,7 +253,32 @@ class GroupElementYearManager(models.Manager):
                 } for row in cursor.fetchall()
             ]
 
-    def get_reverse_adjency_list(
+    def _build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
+        where_statement_leaf = ""
+        if child_leaf_ids:
+            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
+            }
+        where_statement_branch = ""
+        if child_branch_ids:
+            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_branch_ids))
+            }
+        where_statement_academic_year = "(edyc.academic_year_id = {academic_year_id} " \
+                                        "OR bl.academic_year_id = {academic_year_id})".format(
+                                            academic_year_id=academic_year_id
+                                        )
+        if child_leaf_ids and child_branch_ids:
+            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
+        elif child_leaf_ids and not child_branch_ids:
+            where_statement = where_statement_leaf
+        elif academic_year_id:
+            where_statement = where_statement_academic_year
+        else:
+            where_statement = where_statement_branch
+        return where_statement
+
+    def get_reverse_adjacency_list(
             self,
             child_leaf_ids=None,
             child_branch_ids=None,
@@ -295,25 +294,7 @@ class GroupElementYearManager(models.Manager):
         if not child_leaf_ids and not child_branch_ids:
             return []
 
-        # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
-        where_statement_leaf = ""
-        if child_leaf_ids:
-            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
-                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
-            }
-
-        where_statement_branch = ""
-        if child_branch_ids:
-            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
-                'child_ids': ','.join(["%s"] * len(child_branch_ids))
-            }
-
-        if child_leaf_ids and child_branch_ids:
-            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
-        elif child_leaf_ids and not child_branch_ids:
-            where_statement = where_statement_leaf
-        else:
-            where_statement = where_statement_branch
+        where_statement = self._build_where_statement(None, child_branch_ids, child_leaf_ids)
 
         reverse_adjacency_query = """
             WITH RECURSIVE

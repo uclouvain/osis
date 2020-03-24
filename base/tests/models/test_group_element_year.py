@@ -367,12 +367,12 @@ class TestManagerGetRoots(TestCase):
         self.assertEqual(len(child_root_list), 0)
 
     def test_when_child_leaf_given_then_return_all_their_root(self):
-        child_leaf_ids = [self.level_2.child_leaf.id]
+        child_leaf_ids = [self.level_21.child_leaf.id]
         child_root_list = GroupElementYear.objects.get_root_list(child_leaf_ids=child_leaf_ids,
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [{"starting_node_id": self.level_2.child_leaf.id, "root_id": self.level_2.parent.id}]
+            [{"starting_node_id": self.level_21.child_leaf.id, "root_id": self.level_2.parent.id}]
         )
 
     def test_when_child_branch_given_then_return_all_their_root(self):
