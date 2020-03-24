@@ -91,7 +91,7 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     @staticmethod
     def get_credits(obj: 'Link'):
         absolute_credits = obj.child.credits
-        return obj.relative_credits or absolute_credits
+        return obj.relative_credits or absolute_credits or None
 
     @staticmethod
     def get_block(obj: 'Link'):

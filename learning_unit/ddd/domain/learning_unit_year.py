@@ -36,7 +36,7 @@ StrDerogationQuadrimesterEnum = str  # based on DerogationQuadrimesterEnum FIXME
 class LecturingVolume:
     def __init__(
         self,
-        total_annual: int = None,
+        total_annual: Decimal = None,
     ):
         self.total_annual = total_annual
 
@@ -44,7 +44,7 @@ class LecturingVolume:
 class PracticalVolume:
     def __init__(
             self,
-            total_annual: int = None,
+            total_annual: Decimal = None,
     ):
         self.total_annual = total_annual
 
