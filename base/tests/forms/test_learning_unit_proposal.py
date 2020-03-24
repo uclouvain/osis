@@ -112,7 +112,7 @@ class TestSave(TestCase):
             "periodicity": learning_unit_year_periodicity.BIENNIAL_ODD,
             "status": False,
             "language": cls.language.pk,
-            "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q1,
+            "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q1.value,
             "campus": cls.campus.id,
             "entity": cls.entity_version.id,
             "folder_id": "1",
