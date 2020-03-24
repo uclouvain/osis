@@ -820,7 +820,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
             "internship_subtype": internship_subtypes.PROFESSIONAL_INTERNSHIP,
             "status": False,
             "session": learning_unit_year_session.SESSION_123,
-            "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q2.value,
+            "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q2.name,
             "attribution_procedure": attribution_procedure.EXTERNAL,
             "language": self.other_language
         }
