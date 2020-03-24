@@ -80,3 +80,14 @@ def _add_role_queryset_to_perms_context(rule_set, perm, qs):
             return True
         rule_set[perm] = cache_role_qs_fn & rule_set[perm]
     return rule_set
+
+
+# TODO: move this logic into OsisRoleBackend
+def has_module_perms(user_obj, app_label):
+    if not user_obj.is_active or user_obj.is_anonymous:
+        return False
+    roles_assigned = _get_roles_assigned_to_user(user_obj)
+    all_perms = []
+    for r in roles_assigned:
+        all_perms += [key for key in r.rule_set().keys() if app_label in key]
+    return any(app_label in perm for perm in all_perms)

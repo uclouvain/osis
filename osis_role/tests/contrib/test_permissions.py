@@ -31,9 +31,9 @@ from django.db.models import QuerySet
 from django.test import TestCase
 from rules import RuleSet
 
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from osis_role.contrib.permissions import ObjectPermissionBackend, _add_role_queryset_to_perms_context
+from osis_role.contrib.permissions import ObjectPermissionBackend, _add_role_queryset_to_perms_context, has_module_perms
 
 
 class TestObjectPermissionBackend(TestCase):
@@ -106,3 +106,26 @@ class TestAddRoleQuerysetToRuleSet(TestCase):
 
         _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', qs)
         self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
+
+
+class TestHasModulePerms(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.group, _ = Group.objects.get_or_create(name="concrete_role")
+        cls.person = PersonWithPermissionsFactory(groups=[cls.group])
+        cls.mock_role_model = mock.Mock()
+        type(cls.mock_role_model).group_name = mock.PropertyMock(return_value=cls.group.name)
+        cls.module = 'module'
+        cls.mock_role_model.rule_set = mock.Mock(return_value=rules.RuleSet({cls.module+'.perm': rules.always_allow}))
+
+    def setUp(self):
+        patcher_role_manager = mock.patch("osis_role.role.role_manager", **{'roles': {self.mock_role_model}})
+        patcher_role_manager.start()
+        self.addCleanup(patcher_role_manager.stop)
+
+    def test_user_has_module_perms(self):
+        self.assertTrue(has_module_perms(self.person.user, self.module))
+
+    def test_user_has_not_module_perms(self):
+        self.assertFalse(has_module_perms(self.person.user, 'nonexisting_module'))
