@@ -33,7 +33,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from waffle.decorators import waffle_flag
+from rules.contrib.views import permission_required
 
 from base import models as mdl_base
 from base.business.education_group import has_coorganization
@@ -47,17 +47,14 @@ from base.models import program_manager
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_types import TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_change_education_group
 from program_management.forms.group_element_year import GroupElementYearFormset
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_education_group(request, root_id, education_group_year_id):
-    education_group_year = get_object_or_404(
+def get_education_group_year_by_pk(request, root_id, education_group_year_id):
+    return get_object_or_404(
         EducationGroupYear.objects.select_related('education_group_type').prefetch_related(
             Prefetch(
                 'groupelementyear_set',
@@ -70,6 +67,12 @@ def update_education_group(request, root_id, education_group_year_id):
         ),
         pk=education_group_year_id
     )
+
+
+@login_required
+@permission_required('change_educationgroup', fn=get_education_group_year_by_pk)
+def update_education_group(request, root_id, education_group_year_id):
+    education_group_year = get_education_group_year_by_pk(request, root_id, education_group_year_id)
     person = request.user.person
 
     # Store root in the instance to avoid to pass the root in methods

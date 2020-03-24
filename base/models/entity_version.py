@@ -137,6 +137,9 @@ class EntityVersionQuerySet(models.QuerySet):
 
             list_entities_id.append(str(entity))
 
+        if not list_entities_id:
+            return []
+
         with connection.cursor() as cursor:
             cursor.execute(SQL_RECURSIVE_QUERY.format(list_entities=','.join(list_entities_id), date=date))
 

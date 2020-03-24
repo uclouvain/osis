@@ -26,6 +26,7 @@
 import factory
 from django.contrib.auth.models import Permission
 
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -35,11 +36,20 @@ class RoleModelFactory(factory.DjangoModelFactory):
 
     person = factory.SubFactory(PersonFactory)
 
-    @factory.post_generation
-    def add_relevant_permissions_to_user_group(self, create, extracted, **kwargs):
-        permissions = [
-            Permission.objects.get_or_create(
-                defaults={"name": p.split('.')[1]}, codename=p.split('.')[1]
-            )[0] for p in self.rule_set().keys()
-        ]
-        self.person.user.groups.get(name=self.group_name).permissions.set(permissions)
+    # @factory.post_generation
+    # def add_relevant_permissions_to_user_group(self, create, extracted, **kwargs):
+    #     permissions = [
+    #         Permission.objects.get_or_create(
+    #             defaults={"name": p.split('.')[1]}, codename=p.split('.')[1]
+    #         )[0] for p in self.rule_set().keys()
+    #     ]
+    #     self.person.user.groups.get(name=self.group_name).permissions.set(permissions)
+
+
+class EntityModelFactory(RoleModelFactory):
+    class Meta:
+        abstract = True
+        django_get_or_create = ('person', 'entity',)
+
+    entity = factory.SubFactory(EntityFactory)
+    with_child = False

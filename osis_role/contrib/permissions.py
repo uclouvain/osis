@@ -28,7 +28,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import Permission
 
-from osis_role import role
+from osis_role import role, errors
 
 
 class ObjectPermissionBackend(ModelBackend):
@@ -36,6 +36,7 @@ class ObjectPermissionBackend(ModelBackend):
         if not user_obj.is_active or user_obj.is_anonymous:
             return False
 
+        errors.clear_cached_error_perms(user_obj, perm)
         results = set()
         for role_mdl in _get_relevant_roles(user_obj, perm):
             qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))
@@ -76,6 +77,7 @@ def _add_role_queryset_to_perms_context(rule_set, perm, qs):
     if perm in rule_set:
         @rules.predicate(name='cache_role_qs')
         def cache_role_qs_fn(*args, **kwargs):
+            cache_role_qs_fn.context['perm_name'] = perm
             cache_role_qs_fn.context['role_qs'] = qs
             return True
         rule_set[perm] = cache_role_qs_fn & rule_set[perm]
