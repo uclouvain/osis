@@ -223,15 +223,16 @@ class GroupElementYearManager(models.Manager):
                         gey.child_branch_id,
                         gey.child_leaf_id,
                         gey.parent_id,
-                        edyc.academic_year_id,
+                        edyp.academic_year_id,
                         CASE
                             WHEN egt.name in (%(root_category_name)s) THEN true
                             ELSE false
                           END as is_root_row
                     FROM base_groupelementyear gey
-                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    INNER JOIN base_educationgrouptype AS egt on edyc.education_group_type_id = egt.id
-                    INNER JOIN base_learningunityear bl on gey.child_leaf_id = bl.id
+                    INNER JOIN base_educationgroupyear AS edyp on gey.parent_id = edyp.id
+                    INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
+                    LEFT JOIN base_learningunityear bl on gey.child_leaf_id = bl.id
+                    LEFT JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
                     WHERE %(where_statement)s
                     AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
 

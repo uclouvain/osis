@@ -30,6 +30,10 @@ class TestFindAllRoots(TestCase):
         self.assertDictEqual(result, {})
 
     def test_should_return_all_children_root_for_academic_year(self):
+        GroupElementYearFactory(
+            parent__academic_year=self.academic_year,
+            child_branch__academic_year=self.academic_year
+        )
         GroupElementYearChildLeafFactory(
             parent__academic_year=self.academic_year,
             child_leaf__academic_year=self.academic_year
@@ -41,7 +45,7 @@ class TestFindAllRoots(TestCase):
         result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
         self.assertEqual(
             len(result),
-            2
+            3
         )
 
 

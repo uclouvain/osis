@@ -33,8 +33,9 @@ from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from program_management.ddd.repositories import find_roots
 
 
 class TestManager(TestCase):
@@ -335,3 +336,62 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         result_parent_ids = [rec['parent_id'] for rec in reverse_adjacency_list]
         self.assertIn(link_reference.parent.id, result_parent_ids)
         self.assertNotIn(link_not_reference.parent.id, result_parent_ids)
+
+
+class TestManagerGetRoots(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root_element_a = EducationGroupYearFactory()
+        cls.level_1 = GroupElementYearFactory(parent=cls.root_element_a)
+        cls.level_11 = GroupElementYearFactory(parent=cls.level_1.child_branch)
+        cls.level_111 = GroupElementYearChildLeafFactory(
+            parent=cls.level_11.child_branch,
+        )
+        cls.level_2 = GroupElementYearFactory(
+            parent=cls.root_element_a,
+            child_branch__education_group_type__group=True,
+            order=5
+        )
+        cls.level_21 = GroupElementYearChildLeafFactory(
+            parent=cls.level_2.child_branch
+        )
+        cls.root_categories_name = [category.name for category in find_roots.DEFAULT_ROOT_CATEGORIES]
+
+    def test_when_no_parameters_set_then_return_empty_list(self):
+        child_root_list = GroupElementYear.objects.get_root_list(root_category_name=self.root_categories_name)
+        self.assertEqual(len(child_root_list), 0)
+
+    def test_when_empty_children_list_given_then_return_empty_list(self):
+        child_root_list = GroupElementYear.objects.get_root_list(child_leaf_ids=[], child_branch_ids=[],
+                                                                 root_category_name=self.root_categories_name)
+        self.assertEqual(len(child_root_list), 0)
+
+    def test_when_child_leaf_given_then_return_all_their_root(self):
+        child_leaf_ids = [self.level_2.child_leaf.id]
+        child_root_list = GroupElementYear.objects.get_root_list(child_leaf_ids=child_leaf_ids,
+                                                                 root_category_name=self.root_categories_name)
+        self.assertCountEqual(
+            child_root_list,
+            [{"starting_node_id": self.level_2.child_leaf.id, "root_id": self.level_2.parent.id}]
+        )
+
+    def test_when_child_branch_given_then_return_all_their_root(self):
+        child_branch_ids = [self.level_11.child_branch.id]
+        child_root_list = GroupElementYear.objects.get_root_list(child_branch_ids=child_branch_ids,
+                                                                 root_category_name=self.root_categories_name)
+        self.assertCountEqual(
+            child_root_list,
+            [{"starting_node_id": self.level_11.child_branch.id, "root_id": self.level_11.parent.id}]
+        )
+
+    def test_when_academic_year_given_then_return_all_children_root_for_given_year(self):
+        child_root_list = GroupElementYear.objects.get_root_list(academic_year_id=self.root_element_a.academic_year.id,
+                                                                 root_category_name=self.root_categories_name)
+        self.assertCountEqual(
+            child_root_list,
+            [{"starting_node_id": self.level_1.child_branch.id, "root_id": self.level_1.parent.id},
+             {"starting_node_id": self.level_11.child_branch.id, "root_id": self.level_11.parent.id},
+             {"starting_node_id": self.level_111.child_leaf.id, "root_id": self.level_111.parent.id},
+             {"starting_node_id": self.level_2.child_branch.id, "root_id": self.level_2.parent.id},
+             {"starting_node_id": self.level_21.child_leaf.id, "root_id": self.level_2.parent.id}]
+        )
