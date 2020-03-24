@@ -52,7 +52,7 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory, \
-    EducationGroupYearBachelorFactory
+    EducationGroupYearBachelorFactory, MiniTrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
@@ -458,7 +458,7 @@ class EducationGroupAdministrativedata(TestCase):
         cls.permission_access = Permission.objects.get(codename='can_access_education_group')
         cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.education_group_year = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
         cls.program_manager = ProgramManagerFactory(
             person=cls.person,
             education_group=cls.education_group_year.education_group,
@@ -513,9 +513,7 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "page_not_found.html")
 
     def test_with_education_group_year_of_type_mini_training(self):
-        mini_training_education_group_year = EducationGroupYearFactory()
-        mini_training_education_group_year.education_group_type.category = education_group_categories.MINI_TRAINING
-        mini_training_education_group_year.education_group_type.save()
+        mini_training_education_group_year = MiniTrainingFactory()
 
         url = reverse("education_group_administrative",
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
@@ -527,9 +525,7 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_with_education_group_year_of_type_group(self):
-        group_education_group_year = EducationGroupYearFactory()
-        group_education_group_year.education_group_type.category = education_group_categories.GROUP
-        group_education_group_year.education_group_type.save()
+        group_education_group_year = GroupFactory()
 
         url = reverse("education_group_administrative",
                       args=[group_education_group_year.id, group_education_group_year.id])
