@@ -31,7 +31,7 @@ UNIQUE = "UNIQUE"
 SEPARATE = "SEPARATE"
 NOT_CONCERNED = "NOT_CONCERNED"
 
-# Pas l'impression que ce soit utilisé ??
+# TODO: Is it used ?
 COORGANIZATION_DIPLOMA_TYPE = (
     (UNIQUE, _("Unique")),
     (SEPARATE, _("Separate")),
