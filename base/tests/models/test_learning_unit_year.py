@@ -662,7 +662,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_ok_volumes_for_Q1(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1.value
         self.luy_full.save()
 
         test_cases = [
@@ -675,7 +675,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_warning_volumes_for_Q1(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1.value
         self.luy_full.save()
 
         test_cases = [
@@ -704,7 +704,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_ok_volumes_for_Q2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q2
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q2.value
         self.luy_full.save()
 
         test_cases = [
@@ -717,7 +717,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_warning_volumes_for_Q2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q2
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q2.value
         self.luy_full.save()
 
         test_cases = [
@@ -736,7 +736,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_ok_volumes_for_Q1and2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.value
         self.luy_full.save()
 
         test_cases = [
@@ -749,7 +749,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_warning_volumes_for_Q1and2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.value
         self.luy_full.save()
 
         test_cases = [
@@ -770,7 +770,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_ok_volumes_for_Q1or2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1or2
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1or2.value
         self.luy_full.save()
 
         test_cases = [
@@ -785,7 +785,7 @@ class TestQuadriConsistency(TestCase):
 
     def test_warning_volumes_for_Q1or2(self):
         self.luy_full.credits = self.luy_full.credits + 1
-        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1or2
+        self.luy_full.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1or2.value
         self.luy_full.save()
 
         test_cases = [
