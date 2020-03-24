@@ -177,11 +177,3 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
         data = super().to_representation(obj)
         data.pop('children')
         return data
-
-
-class EducationGroupTreeSerializer(EducationGroupRootNodeTreeSerializer):
-    children = RecursiveField(source='child.children', many=True)
-
-    def __init__(self, instance: 'ProgramTree', **kwargs):
-        instance = link.Link(parent=None, child=instance.root_node)
-        super().__init__(instance, **kwargs)
