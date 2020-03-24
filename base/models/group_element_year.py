@@ -182,14 +182,14 @@ class GroupElementYearManager(models.Manager):
             raise Exception('child_leaf_ids must be an instance of list')
         if child_branch_ids and not isinstance(child_branch_ids, list):
             raise Exception('child_branch_ids must be an instance of list')
-        if not child_leaf_ids and not child_branch_ids:
+        if not child_leaf_ids and not child_branch_ids and not academic_year_id:
             return []
 
         # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
         where_statement_leaf = ""
         if child_leaf_ids:
             where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
-                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
+                'child_ids': ', '.join(["{}".format(str(name)) for name in child_leaf_ids])
             }
 
         where_statement_branch = ""
@@ -198,10 +198,17 @@ class GroupElementYearManager(models.Manager):
                 'child_ids': ','.join(["%s"] * len(child_branch_ids))
             }
 
+        where_statement_academic_year = "(edyc.academic_year_id = {academic_year_id} " \
+                                        "OR bl.academic_year_id = {academic_year_id})".format(
+            academic_year_id=academic_year_id
+        )
+
         if child_leaf_ids and child_branch_ids:
             where_statement = where_statement_leaf + ' OR ' + where_statement_branch
         elif child_leaf_ids and not child_branch_ids:
             where_statement = where_statement_leaf
+        elif academic_year_id:
+            where_statement = where_statement_academic_year
         else:
             where_statement = where_statement_branch
         reverse_adjacency_query = """
@@ -224,6 +231,7 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear gey
                     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
                     INNER JOIN base_educationgrouptype AS egt on edyc.education_group_type_id = egt.id
+                    INNER JOIN base_learningunityear bl on gey.child_leaf_id = bl.id
                     WHERE %(where_statement)s
                     AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
 
@@ -256,7 +264,7 @@ class GroupElementYearManager(models.Manager):
             'root_category_name': ', '.join(["'{}'".format(name) for name in root_category_name])
         }
         with connection.cursor() as cursor:
-            parameters = child_leaf_ids + child_branch_ids + [
+            parameters = child_branch_ids + [
                 link_type.name if link_type else None,
                 link_type.name if link_type else None,
                 academic_year_id,

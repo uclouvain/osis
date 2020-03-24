@@ -11,6 +11,20 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
 
 
+def find_all_roots(academic_year_id):
+    root_categories = DEFAULT_ROOT_CATEGORIES
+    root_categories_names = [root_type.name for root_type in root_categories]
+
+    child_root_list = group_element_year.GroupElementYear.objects.get_root_list(
+        academic_year_id=academic_year_id,
+        root_category_name=root_categories_names
+    )
+
+    roots_by_children_id = _aggregate_child_root_list_into_roots_by_children_id(child_root_list)
+
+    return roots_by_children_id
+
+
 def find_roots(
         objects,
         parents_as_instances=False,

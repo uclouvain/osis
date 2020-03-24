@@ -9,8 +9,40 @@ from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory, GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+
+
+class TestFindAllRoots(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
+    def test_when_no_link_for_academic_year(self):
+        result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
+        self.assertDictEqual(result, {})
+
+    def test_when_one_link_for_academic_year_should_but_do_not_match_criteria(self):
+        GroupElementYearFactory(
+            parent__education_group_type__group=True
+        )
+        result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
+        self.assertDictEqual(result, {})
+
+    def test_should_return_all_children_root_for_academic_year(self):
+        GroupElementYearChildLeafFactory(
+            parent__academic_year=self.academic_year,
+            child_leaf__academic_year=self.academic_year
+        )
+        GroupElementYearChildLeafFactory(
+            parent__academic_year=self.academic_year,
+            child_leaf__academic_year=self.academic_year
+        )
+        result = program_management.ddd.repositories.find_roots.find_all_roots(self.academic_year.id)
+        self.assertEqual(
+            len(result),
+            2
+        )
 
 
 class TestFindRelatedRootEducationGroups(TestCase):
