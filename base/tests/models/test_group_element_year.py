@@ -372,7 +372,7 @@ class TestManagerGetRoots(TestCase):
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [{"starting_node_id": self.level_21.child_leaf.id, "root_id": self.level_2.parent.id}]
+            [(self.level_21.child_leaf.id, self.level_2.parent.id)]
         )
 
     def test_when_child_branch_given_then_return_all_their_root(self):
@@ -381,7 +381,7 @@ class TestManagerGetRoots(TestCase):
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [{"starting_node_id": self.level_11.child_branch.id, "root_id": self.level_11.parent.id}]
+            [(self.level_11.child_branch.id, self.level_11.parent.id)]
         )
 
     def test_when_academic_year_given_then_return_all_children_root_for_given_year(self):
@@ -389,9 +389,9 @@ class TestManagerGetRoots(TestCase):
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [{"starting_node_id": self.level_1.child_branch.id, "root_id": self.level_1.parent.id},
-             {"starting_node_id": self.level_11.child_branch.id, "root_id": self.level_11.parent.id},
-             {"starting_node_id": self.level_111.child_leaf.id, "root_id": self.level_111.parent.id},
-             {"starting_node_id": self.level_2.child_branch.id, "root_id": self.level_2.parent.id},
-             {"starting_node_id": self.level_21.child_leaf.id, "root_id": self.level_2.parent.id}]
+            [(self.level_1.child_branch.id, self.level_1.parent.id),
+             (self.level_11.child_branch.id, self.level_11.parent.id),
+             (self.level_111.child_leaf.id, self.level_111.parent.id),
+             (self.level_2.child_branch.id, self.level_2.parent.id),
+             (self.level_21.child_leaf.id, self.level_2.parent.id)]
         )

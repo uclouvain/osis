@@ -40,6 +40,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from base.utils.db import namedtuple_fetchall
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -185,7 +186,7 @@ class GroupElementYearManager(models.Manager):
 
         # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
         where_statement = self._build_where_statement(academic_year_id, child_branch_ids, child_leaf_ids)
-        reverse_adjacency_query = """
+        root_query_template = """
             WITH RECURSIVE
                 root_query AS (
                     SELECT
@@ -228,7 +229,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
                 )
 
-            SELECT distinct starting_node_id, parent_id
+            SELECT distinct starting_node_id AS child_id, parent_id AS root_id
             FROM root_query
             WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) and (is_root_row is not Null and is_root_row = true)
             ORDER BY starting_node_id;
@@ -239,19 +240,14 @@ class GroupElementYearManager(models.Manager):
             'root_category_name': ', '.join(["'{}'".format(name) for name in root_category_name])
         }
         with connection.cursor() as cursor:
-            parameters =  child_leaf_ids + child_branch_ids + [
+            parameters = child_leaf_ids + child_branch_ids + [
                 link_type.name if link_type else None,
                 link_type.name if link_type else None,
                 academic_year_id,
                 academic_year_id
             ]
-            cursor.execute(reverse_adjacency_query, parameters)
-            return [
-                {
-                    'starting_node_id': row[0],
-                    'root_id': row[1],
-                } for row in cursor.fetchall()
-            ]
+            cursor.execute(root_query_template, parameters)
+            return namedtuple_fetchall(cursor)
 
     def _build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
         where_statement_leaf = ""
