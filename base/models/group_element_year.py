@@ -120,7 +120,7 @@ class GroupElementYearManager(models.Manager):
                             ) as varchar(1000)
                         ) As path
                     FROM base_groupelementyear
-                    WHERE parent_id IN (%s)
+                    WHERE parent_id IN %(root_element_ids)s
 
                     UNION ALL
 
@@ -148,10 +148,13 @@ class GroupElementYearManager(models.Manager):
             LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
             WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null 
             ORDER BY starting_node_id, level, "order";
-        """ % ','.join(["%s"] * len(root_elements_ids))
+        """
 
         with connection.cursor() as cursor:
-            cursor.execute(adjacency_query, root_elements_ids)
+            parameters = {
+                "root_element_ids": tuple(root_elements_ids)
+            }
+            cursor.execute(adjacency_query, parameters)
             return [
                 {
                     'starting_node_id': row[0],
@@ -200,7 +203,7 @@ class GroupElementYearManager(models.Manager):
                         gey.parent_id,
                         edyp.academic_year_id,
                         CASE
-                            WHEN egt.name in (%(root_category_name)s) THEN true
+                            WHEN egt.name in %(root_categories_names)s THEN true
                             ELSE false
                           END as is_root_row
                     FROM base_groupelementyear gey
@@ -208,7 +211,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
                     LEFT JOIN base_learningunityear bl on gey.child_leaf_id = bl.id
                     LEFT JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE %(where_statement)s
+                    WHERE {where_statement}
                     AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
 
                     UNION ALL
@@ -220,7 +223,7 @@ class GroupElementYearManager(models.Manager):
                       parent.parent_id,
                       edyp.academic_year_id,
                       CASE
-                        WHEN egt.name in (%(root_category_name)s) THEN true
+                        WHEN egt.name in %(root_categories_names)s THEN true
                         ELSE false
                       END as is_root_row
                     FROM base_groupelementyear AS parent
@@ -233,43 +236,32 @@ class GroupElementYearManager(models.Manager):
             FROM root_query
             WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) and (is_root_row is not Null and is_root_row = true)
             ORDER BY starting_node_id;
-        """ % {
-            'where_statement': where_statement,
-            'academic_year_id': "%s",
-            'link_type': '%s',
-            'root_category_name': ', '.join(["'{}'".format(name) for name in root_category_name])
-        }
+        """.format(where_statement=where_statement)
+
         with connection.cursor() as cursor:
-            parameters = child_leaf_ids + child_branch_ids + [
-                link_type.name if link_type else None,
-                link_type.name if link_type else None,
-                academic_year_id,
-                academic_year_id
-            ]
+            parameters = {
+                "child_branch_ids": tuple(child_branch_ids),
+                "child_leaf_ids": tuple(child_leaf_ids),
+                "link_type": link_type.name if link_type else None,
+                "academic_year_id": academic_year_id,
+                "root_categories_names": tuple(root_category_name)
+
+            }
             cursor.execute(root_query_template, parameters)
             return namedtuple_fetchall(cursor)
 
     def _build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
-        where_statement_leaf = ""
-        if child_leaf_ids:
-            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
-                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
-            }
-        where_statement_branch = ""
-        if child_branch_ids:
-            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
-                'child_ids': ','.join(["%s"] * len(child_branch_ids))
-            }
-        where_statement_academic_year = "(edyc.academic_year_id = {academic_year_id} " \
-                                        "OR bl.academic_year_id = {academic_year_id})".format(
-                                            academic_year_id=academic_year_id
-                                        )
-        if child_leaf_ids and child_branch_ids:
+        where_statement_leaf = "child_leaf_id in %(child_leaf_ids)s" if child_leaf_ids else ""
+
+        where_statement_branch = "child_branch_id in %(child_branch_ids)s" if child_branch_ids else ""
+        where_statement_academic_year = "(edyc.academic_year_id = %(academic_year_id)s " \
+                                        "OR bl.academic_year_id = %(academic_year_id)s)"
+        if academic_year_id:
+            where_statement = where_statement_academic_year
+        elif child_leaf_ids and child_branch_ids:
             where_statement = where_statement_leaf + ' OR ' + where_statement_branch
         elif child_leaf_ids and not child_branch_ids:
             where_statement = where_statement_leaf
-        elif academic_year_id:
-            where_statement = where_statement_academic_year
         else:
             where_statement = where_statement_branch
         return where_statement
@@ -309,7 +301,7 @@ class GroupElementYearManager(models.Manager):
                            0 AS level
                     FROM base_groupelementyear gey
                     INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE %(where_statement)s
+                    WHERE {where_statement}
                     AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
 
                     UNION ALL
@@ -331,18 +323,15 @@ class GroupElementYearManager(models.Manager):
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
             ORDER BY starting_node_id,  level DESC, "order";
-        """ % {
-            'where_statement': where_statement,
-            'academic_year_id': "%s",
-            'link_type': '%s',
-        }
+        """.format(where_statement=where_statement)
+
         with connection.cursor() as cursor:
-            parameters = child_leaf_ids + child_branch_ids + [
-                link_type.name if link_type else None,
-                link_type.name if link_type else None,
-                academic_year_id,
-                academic_year_id
-            ]
+            parameters = {
+                "child_branch_ids": tuple(child_branch_ids),
+                "child_leaf_ids": tuple(child_leaf_ids),
+                "link_type": link_type.name if link_type else None,
+                "academic_year_id": academic_year_id,
+            }
             cursor.execute(reverse_adjacency_query, parameters)
             return [
                 {
