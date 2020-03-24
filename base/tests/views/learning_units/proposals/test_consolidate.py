@@ -44,7 +44,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, get_current_
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -159,6 +159,7 @@ class TestConsolidateDelete(TestCase):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
+        cls.requirement_entity = EntityVersionFactory().entity
 
     def setUp(self):
         self.proposal = ProposalLearningUnitFactory(
@@ -169,7 +170,7 @@ class TestConsolidateDelete(TestCase):
             learning_unit_year__learning_unit__start_year=self.current_academic_year,
             learning_unit_year__learning_container_year__academic_year=self.current_academic_year,
             learning_unit_year__learning_container_year__container_type=learning_container_year_types.COURSE,
-            learning_unit_year__learning_container_year__requirement_entity=EntityVersionFactory().entity,
+            learning_unit_year__learning_container_year__requirement_entity=self.requirement_entity,
         )
         self.learning_unit_year = self.proposal.learning_unit_year
 
@@ -186,9 +187,14 @@ class TestConsolidateDelete(TestCase):
     @mock.patch("base.business.learning_unit_proposal.consolidate_proposals_and_send_report",
                 side_effect=lambda prop, author, send_mail: {})
     def test_when_proposal_and_can_consolidate_proposal_suppression_with_previous_year(self, mock_consolidate):
-        create_learning_units_year(self.academic_years[0].year,
-                                   self.academic_years[0].year,
-                                   self.learning_unit_year.learning_unit)
+        LearningUnitYearFactory(
+            academic_year=self.academic_years[0],
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_unit=self.learning_unit_year.learning_unit,
+            learning_container_year__academic_year=self.academic_years[0],
+            learning_container_year__container_type=learning_container_year_types.COURSE,
+            learning_container_year__requirement_entity=self.requirement_entity,
+        )
         response = self.client.post(self.url, data=self.post_data, follow=False)
 
         expected_redirect_url = reverse('learning_unit',
