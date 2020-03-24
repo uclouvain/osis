@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from collections import namedtuple
-
 from django.db.models import F
 
 
@@ -39,10 +37,10 @@ def convert_order_by_strings_to_expressions(order_by):
     return tuple(_convert_field_to_expression(field) for field in order_by)
 
 
-def namedtuple_fetchall(cursor):  # Taken from https://docs.djangoproject.com
+def dict_fetchall(cursor):  # Inspired from https://docs.djangoproject.com
     """
-    Return all rows from a cursor as a namedtuple
+    Return all rows from a cursor as a dict
     """
     desc = cursor.description
-    nt_result = namedtuple('Result', [col[0] for col in desc])
-    return [nt_result(*row) for row in cursor.fetchall()]
+    columns = [col[0] for col in desc]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]

@@ -40,7 +40,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from base.utils.db import namedtuple_fetchall
+from base.utils.db import dict_fetchall
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -144,7 +144,8 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )
-            SELECT * FROM adjacency_query
+            SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path 
+            FROM adjacency_query
             LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
             WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null 
             ORDER BY starting_node_id, level, "order";
@@ -155,19 +156,7 @@ class GroupElementYearManager(models.Manager):
                 "root_element_ids": tuple(root_elements_ids)
             }
             cursor.execute(adjacency_query, parameters)
-            return [
-                {
-                    'starting_node_id': row[0],
-                    'id': row[1],
-                    'child_branch_id': row[2],
-                    'child_leaf_id': row[3],
-                    'parent_id': row[4],
-                    'child_id': row[2] or row[3],
-                    'order': row[5],
-                    'level': row[6],
-                    'path': row[7],
-                } for row in cursor.fetchall()
-            ]
+            return dict_fetchall(cursor)
 
     def get_root_list(
             self,
@@ -245,7 +234,7 @@ class GroupElementYearManager(models.Manager):
 
             }
             cursor.execute(root_query_template, parameters)
-            return namedtuple_fetchall(cursor)
+            return dict_fetchall(cursor)
 
     def _build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
         where_statement_leaf = "child_leaf_id in %(child_leaf_ids)s" if child_leaf_ids else ""
@@ -313,7 +302,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
                 )
 
-            SELECT distinct starting_node_id, id, COALESCE(child_branch_id, child_leaf_id) AS child_id,  parent_id, "order", level
+            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
             ORDER BY starting_node_id,  level DESC, "order";
@@ -327,7 +316,7 @@ class GroupElementYearManager(models.Manager):
                 "academic_year_id": academic_year_id,
             }
             cursor.execute(reverse_adjacency_query, parameters)
-            return namedtuple_fetchall(cursor)
+            return dict_fetchall(cursor)
 
 
 class GroupElementYear(OrderedModel):

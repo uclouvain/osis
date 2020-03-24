@@ -76,9 +76,9 @@ def load_trees_from_children(
     )
     if not qs:
         return []
-    all_parents = set(obj.parent_id for obj in qs)
+    all_parents = set(obj["parent_id"] for obj in qs)
     parent_by_child_branch = {
-        obj.child_id: obj.parent_id for obj in qs
+        obj["child_id"]: obj["parent_id"] for obj in qs
     }
     root_ids = set(
         parent_id for parent_id in all_parents

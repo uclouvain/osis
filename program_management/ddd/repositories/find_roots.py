@@ -65,7 +65,7 @@ def find_roots(
 def _aggregate_child_root_list_into_roots_by_children_id(child_root_list):
     roots_by_children_id = collections.defaultdict(list)
     for child_root in child_root_list:
-        roots_by_children_id[child_root.child_id].append(child_root.root_id)
+        roots_by_children_id[child_root["child_id"]].append(child_root["root_id"])
     return roots_by_children_id
 
 

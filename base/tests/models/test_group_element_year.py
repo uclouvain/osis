@@ -224,8 +224,8 @@ class TestManagerGetAdjacencyList(TestCase):
             'id': self.level_1.pk,
             'child_branch_id':  self.level_1.child_branch_id,
             'child_leaf_id': None,
-            'parent_id': self.level_1.parent_id,
             'child_id': self.level_1.child_branch_id,
+            'parent_id': self.level_1.parent_id,
             'order': 0,
             'level': 0,
             'path': "|".join([str(self.level_1.parent_id), str(self.level_1.child_branch_id)])
@@ -269,15 +269,15 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         )
         self.assertEqual(len(reverse_adjacency_list), 1)
 
-        expected_first_elem = (
-            self.level_2.child_leaf_id,
-            self.level_2.pk,
-            self.level_2.child_leaf_id,
-            self.level_2.parent_id,
-            self.level_2.order,
-            0
-        )
-        self.assertEqual(reverse_adjacency_list[0], expected_first_elem)
+        expected_first_elem = {
+            'starting_node_id': self.level_2.child_leaf_id,
+            'id': self.level_2.pk,
+            'child_id': self.level_2.child_leaf_id,
+            'parent_id': self.level_2.parent_id,
+            'order': self.level_2.order,
+            'level': 0,
+        }
+        self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)
 
     def test_case_multiple_child_ids(self):
         adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_leaf_ids=[
@@ -331,7 +331,7 @@ class TestManagerGetReverseAdjacencyList(TestCase):
             child_branch_ids=[self.level_1.child_branch.id],
             link_type=LinkTypes.REFERENCE,
         )
-        result_parent_ids = [rec.parent_id for rec in reverse_adjacency_list]
+        result_parent_ids = [rec['parent_id'] for rec in reverse_adjacency_list]
         self.assertIn(link_reference.parent.id, result_parent_ids)
         self.assertNotIn(link_not_reference.parent.id, result_parent_ids)
 
@@ -370,7 +370,7 @@ class TestManagerGetRoots(TestCase):
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [(self.level_21.child_leaf.id, self.level_2.parent.id)]
+            [{"child_id": self.level_21.child_leaf.id, "root_id": self.level_2.parent.id}]
         )
 
     def test_when_child_branch_given_then_return_all_their_root(self):
@@ -379,7 +379,7 @@ class TestManagerGetRoots(TestCase):
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [(self.level_11.child_branch.id, self.level_11.parent.id)]
+            [{"child_id": self.level_11.child_branch.id, "root_id": self.level_11.parent.id}]
         )
 
     def test_when_academic_year_given_then_return_all_children_root_for_given_year(self):
@@ -387,9 +387,9 @@ class TestManagerGetRoots(TestCase):
                                                                  root_category_name=self.root_categories_name)
         self.assertCountEqual(
             child_root_list,
-            [(self.level_1.child_branch.id, self.level_1.parent.id),
-             (self.level_11.child_branch.id, self.level_11.parent.id),
-             (self.level_111.child_leaf.id, self.level_111.parent.id),
-             (self.level_2.child_branch.id, self.level_2.parent.id),
-             (self.level_21.child_leaf.id, self.level_2.parent.id)]
+            [{"child_id": self.level_1.child_branch.id, "root_id": self.level_1.parent.id},
+             {"child_id": self.level_11.child_branch.id, "root_id": self.level_11.parent.id},
+             {"child_id": self.level_111.child_leaf.id, "root_id": self.level_111.parent.id},
+             {"child_id": self.level_2.child_branch.id, "root_id": self.level_2.parent.id},
+             {"child_id": self.level_21.child_leaf.id, "root_id": self.level_2.parent.id}]
         )
