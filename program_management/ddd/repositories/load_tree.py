@@ -93,6 +93,12 @@ def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
     return {'{}_{}'.format(n.pk, n.type): n for n in nodes_list}
 
 
+def __convert_link_type_to_enum(link_data: dict):
+    link_type = link_data['link_type']
+    if link_type:
+        link_data['link_type'] = LinkTypes[link_type]
+
+
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
     group_element_year_qs = GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
@@ -121,6 +127,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     for gey_dict in group_element_year_qs:
         parent_id = gey_dict.pop('parent_id')
         child_id = gey_dict.pop('child_id')
+        __convert_link_type_to_enum(gey_dict)
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
         tree_links[tree_id] = link.factory.get_link(parent=None, child=None, **gey_dict)
