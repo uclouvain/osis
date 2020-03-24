@@ -32,7 +32,6 @@ from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
 
 from program_management.ddd.business_types import *
@@ -44,7 +43,7 @@ class ChildrenField(serializers.Serializer):
             **self.context,
             'path': "|".join([self.context['path'], str(value.child.pk)])
         }
-        if isinstance(value.child, node.NodeLearningUnitYear):
+        if value.child.type == NodeType.LEARNING_UNIT:
             return LeafViewSerializer(value, context=context).data
         return NodeViewSerializer(value, context=context).data
 
@@ -67,14 +66,7 @@ class NodeViewAttributeSerializer(serializers.Serializer):
     search_url = serializers.SerializerMethodField()
 
     def get_element_type(self, obj: 'Link'):
-        child_node = obj.child
-
-        if isinstance(child_node, node.NodeEducationGroupYear):
-            return NodeType.EDUCATION_GROUP.name
-        elif isinstance(child_node, node.NodeGroupYear):
-            return NodeType.GROUP.name
-        elif isinstance(child_node, node.NodeLearningClassYear):
-            return NodeType.LEARNING_CLASS.name
+        return obj.child.type.name
 
     def get_root(self, obj: 'Link'):
         return self.context['root'].pk

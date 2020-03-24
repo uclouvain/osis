@@ -38,9 +38,11 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 
 # Typing
+from program_management.models.enums.node_type import NodeType
+
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
-NodePk = int
+NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
@@ -49,7 +51,7 @@ def load(tree_root_id: int) -> 'ProgramTree':
 
     structure = GroupElementYear.objects.get_adjacency_list([tree_root_id])
     nodes = __load_tree_nodes(structure)
-    nodes.update({root_node.pk: root_node})
+    nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
     links = __load_tree_links(structure)
     prerequisites = __load_tree_prerequisites(tree_root_id, nodes)
     return __build_tree(root_node, structure, nodes, links, prerequisites)
@@ -85,10 +87,10 @@ def load_trees_from_children(
     return [load(root_id) for root_id in root_ids]
 
 
-def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodePk, 'Node']:
+def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
     ids = [link['id'] for link in tree_structure]
     nodes_list = load_node.load_multiple(ids)
-    return {n.pk: n for n in nodes_list}
+    return {'{}_{}'.format(n.pk, n.type): n for n in nodes_list}
 
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
@@ -129,7 +131,7 @@ def __load_tree_prerequisites(tree_root_id: int, nodes: dict):
     node_leaf_ids = [n.pk for n in nodes.values() if isinstance(n, node.NodeLearningUnitYear)]
     has_prerequisite_dict = load_prerequisite.load_has_prerequisite(tree_root_id, node_leaf_ids)
     is_prerequisite_dict = {
-        main_node_id: [nodes[id] for id in node_ids]
+        main_node_id: [nodes['{}_{}'.format(id, NodeType.LEARNING_UNIT)] for id in node_ids]
         for main_node_id, node_ids in load_prerequisite.load_is_prerequisite(tree_root_id, node_leaf_ids).items()
     }
     return {'has_prerequisite_dict': has_prerequisite_dict, 'is_prerequisite_dict': is_prerequisite_dict}
@@ -138,7 +140,7 @@ def __load_tree_prerequisites(tree_root_id: int, nodes: dict):
 def __build_tree(
         root_node: 'Node',
         tree_structure: TreeStructure,
-        nodes: Dict[NodePk, 'Node'],
+        nodes: Dict[NodeKey, 'Node'],
         links: Dict[LinkKey, 'Link'],
         prerequisites
 ) -> 'ProgramTree':
@@ -150,7 +152,7 @@ def __build_tree(
 def __build_children(
         root_path: 'Path',
         tree_structure: TreeStructure,
-        nodes: Dict[NodePk, 'Node'],
+        nodes: Dict[NodeKey, 'Node'],
         links: Dict[LinkKey, 'Link'],
         prerequisites
 ) -> List['Link']:
@@ -161,7 +163,9 @@ def __build_children(
         if structure['path'] == "|".join([root_path, str(structure['child_id'])])
     ]
     for child_structure in childs_structure:
-        child_node = copy.deepcopy(nodes[child_structure['child_id']])
+        child_id = child_structure['child_id']
+        ntype = NodeType.LEARNING_UNIT if child_structure['child_leaf_id'] else NodeType.EDUCATION_GROUP
+        child_node = nodes['{}_{}'.format(child_id, ntype)]
         child_node.children = __build_children(
             "|".join([root_path, str(child_node.pk)]),
             tree_structure,
@@ -174,10 +178,9 @@ def __build_children(
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        link_node = copy.deepcopy(
-            links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
-        )
-        link_node.parent = copy.deepcopy(nodes[child_structure['parent_id']])
+        parent_id = child_structure['parent_id']
+        link_node = links['_'.join([str(parent_id), str(child_id)])]
+        link_node.parent = nodes['{}_{}'.format(parent_id, NodeType.EDUCATION_GROUP)]
         link_node.child = child_node
         children.append(link_node)
     return children
