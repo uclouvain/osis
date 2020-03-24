@@ -458,7 +458,7 @@ class EducationGroupAdministrativedata(TestCase):
         cls.permission_access = Permission.objects.get(codename='can_access_education_group')
         cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
-        cls.education_group_year = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.education_group_year = EducationGroupYearBachelorFactory()
         cls.program_manager = ProgramManagerFactory(
             person=cls.person,
             education_group=cls.education_group_year.education_group,
