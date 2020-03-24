@@ -99,7 +99,7 @@ class GroupElementYearManager(models.Manager):
         if not root_elements_ids:
             return []
 
-        adjacency_query = """
+        adjacency_query_template = """
             WITH RECURSIVE
                 adjacency_query AS (
                     SELECT
@@ -150,13 +150,74 @@ class GroupElementYearManager(models.Manager):
             WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null 
             ORDER BY starting_node_id, level, "order";
         """
+        parameters = {
+            "root_element_ids": tuple(root_elements_ids)
+        }
+        return self.fetch_all(adjacency_query_template, parameters)
 
-        with connection.cursor() as cursor:
-            parameters = {
-                "root_element_ids": tuple(root_elements_ids)
-            }
-            cursor.execute(adjacency_query, parameters)
-            return dict_fetchall(cursor)
+    def get_reverse_adjacency_list(
+            self,
+            child_leaf_ids=None,
+            child_branch_ids=None,
+            academic_year_id=None,
+            link_type: LinkTypes = None
+    ):
+        child_leaf_ids = child_leaf_ids or []
+        child_branch_ids = child_branch_ids or []
+        if child_leaf_ids and not isinstance(child_leaf_ids, list):
+            raise Exception('child_leaf_ids must be an instance of list')
+        if child_branch_ids and not isinstance(child_branch_ids, list):
+            raise Exception('child_branch_ids must be an instance of list')
+        if not child_leaf_ids and not child_branch_ids:
+            return []
+
+        where_statement = self.__build_where_statement(None, child_branch_ids, child_leaf_ids)
+
+        reverse_adjacency_query_template = """
+            WITH RECURSIVE
+                reverse_adjacency_query AS (
+                    SELECT
+                        COALESCE(gey.child_leaf_id, gey.child_branch_id) as starting_node_id,
+                           gey.id,
+                           gey.child_branch_id,
+                           gey.child_leaf_id,
+                           gey.parent_id,
+                           gey.order,
+                           edyc.academic_year_id,
+                           0 AS level
+                    FROM base_groupelementyear gey
+                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+                    WHERE {where_statement}
+                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
+
+                    UNION ALL
+
+                    SELECT 	child.starting_node_id,
+                            parent.id,
+                            parent.child_branch_id,
+                            parent.child_leaf_id,
+                            parent.parent_id,
+                            parent.order,
+                            edyp.academic_year_id,
+                            child.level + 1
+                    FROM base_groupelementyear AS parent
+                    INNER JOIN reverse_adjacency_query AS child on parent.child_branch_id = child.parent_id
+                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+                )
+
+            SELECT distinct starting_node_id, id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level
+            FROM reverse_adjacency_query
+            WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
+            ORDER BY starting_node_id,  level DESC, "order";
+        """.format(where_statement=where_statement)
+
+        parameters = {
+            "child_branch_ids": tuple(child_branch_ids),
+            "child_leaf_ids": tuple(child_leaf_ids),
+            "link_type": link_type.name if link_type else None,
+            "academic_year_id": academic_year_id,
+        }
+        return self.fetch_all(reverse_adjacency_query_template, parameters)
 
     def get_root_list(
             self,
@@ -177,7 +238,7 @@ class GroupElementYearManager(models.Manager):
             return []
 
         # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
-        where_statement = self._build_where_statement(academic_year_id, child_branch_ids, child_leaf_ids)
+        where_statement = self.__build_where_statement(academic_year_id, child_branch_ids, child_leaf_ids)
         root_query_template = """
             WITH RECURSIVE
                 root_query AS (
@@ -224,21 +285,23 @@ class GroupElementYearManager(models.Manager):
             ORDER BY starting_node_id;
         """.format(where_statement=where_statement)
 
-        with connection.cursor() as cursor:
-            parameters = {
-                "child_branch_ids": tuple(child_branch_ids),
-                "child_leaf_ids": tuple(child_leaf_ids),
-                "link_type": link_type.name if link_type else None,
-                "academic_year_id": academic_year_id,
-                "root_categories_names": tuple(root_category_name)
+        parameters = {
+            "child_branch_ids": tuple(child_branch_ids),
+            "child_leaf_ids": tuple(child_leaf_ids),
+            "link_type": link_type.name if link_type else None,
+            "academic_year_id": academic_year_id,
+            "root_categories_names": tuple(root_category_name)
 
-            }
-            cursor.execute(root_query_template, parameters)
+        }
+        return self.fetch_all(root_query_template, parameters)
+
+    def fetch_all(self, query_template, parameters):
+        with connection.cursor() as cursor:
+            cursor.execute(query_template, parameters)
             return dict_fetchall(cursor)
 
-    def _build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
+    def __build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
         where_statement_leaf = "child_leaf_id in %(child_leaf_ids)s" if child_leaf_ids else ""
-
         where_statement_branch = "child_branch_id in %(child_branch_ids)s" if child_branch_ids else ""
         where_statement_academic_year = "(edyc.academic_year_id = %(academic_year_id)s " \
                                         "OR bl.academic_year_id = %(academic_year_id)s)"
@@ -251,72 +314,6 @@ class GroupElementYearManager(models.Manager):
         else:
             where_statement = where_statement_branch
         return where_statement
-
-    def get_reverse_adjacency_list(
-            self,
-            child_leaf_ids=None,
-            child_branch_ids=None,
-            academic_year_id=None,
-            link_type: LinkTypes = None
-    ):
-        child_leaf_ids = child_leaf_ids or []
-        child_branch_ids = child_branch_ids or []
-        if child_leaf_ids and not isinstance(child_leaf_ids, list):
-            raise Exception('child_leaf_ids must be an instance of list')
-        if child_branch_ids and not isinstance(child_branch_ids, list):
-            raise Exception('child_branch_ids must be an instance of list')
-        if not child_leaf_ids and not child_branch_ids:
-            return []
-
-        where_statement = self._build_where_statement(None, child_branch_ids, child_leaf_ids)
-
-        reverse_adjacency_query = """
-            WITH RECURSIVE
-                reverse_adjacency_query AS (
-                    SELECT
-                        COALESCE(gey.child_leaf_id, gey.child_branch_id) as starting_node_id,
-                           gey.id,
-                           gey.child_branch_id,
-                           gey.child_leaf_id,
-                           gey.parent_id,
-                           gey.order,
-                           edyc.academic_year_id,
-                           0 AS level
-                    FROM base_groupelementyear gey
-                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE {where_statement}
-                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
-
-                    UNION ALL
-
-                    SELECT 	child.starting_node_id,
-                            parent.id,
-                            parent.child_branch_id,
-                            parent.child_leaf_id,
-                            parent.parent_id,
-                            parent.order,
-                            edyp.academic_year_id,
-                            child.level + 1
-                    FROM base_groupelementyear AS parent
-                    INNER JOIN reverse_adjacency_query AS child on parent.child_branch_id = child.parent_id
-                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
-                )
-
-            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level
-            FROM reverse_adjacency_query
-            WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
-            ORDER BY starting_node_id,  level DESC, "order";
-        """.format(where_statement=where_statement)
-
-        with connection.cursor() as cursor:
-            parameters = {
-                "child_branch_ids": tuple(child_branch_ids),
-                "child_leaf_ids": tuple(child_leaf_ids),
-                "link_type": link_type.name if link_type else None,
-                "academic_year_id": academic_year_id,
-            }
-            cursor.execute(reverse_adjacency_query, parameters)
-            return dict_fetchall(cursor)
 
 
 class GroupElementYear(OrderedModel):
