@@ -193,10 +193,7 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 root_query AS (
                     SELECT
-                        CASE
-                            WHEN gey.child_leaf_id is not null then gey.child_leaf_id
-                            ELSE gey.child_branch_id
-                            END as starting_node_id,
+                        COALESCE(gey.child_leaf_id, gey.child_branch_id) as starting_node_id,
                         gey.id,
                         gey.child_branch_id,
                         gey.child_leaf_id,
@@ -288,10 +285,7 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 reverse_adjacency_query AS (
                     SELECT
-                        CASE
-                            WHEN gey.child_leaf_id is not null then gey.child_leaf_id
-                            ELSE gey.child_branch_id
-                        END as starting_node_id,
+                        COALESCE(gey.child_leaf_id, gey.child_branch_id) as starting_node_id,
                            gey.id,
                            gey.child_branch_id,
                            gey.child_leaf_id,
@@ -319,7 +313,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
                 )
 
-            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, "order", level
+            SELECT distinct starting_node_id, id, COALESCE(child_branch_id, child_leaf_id) AS child_id,  parent_id, "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
             ORDER BY starting_node_id,  level DESC, "order";
@@ -333,18 +327,7 @@ class GroupElementYearManager(models.Manager):
                 "academic_year_id": academic_year_id,
             }
             cursor.execute(reverse_adjacency_query, parameters)
-            return [
-                {
-                    'starting_node_id': row[0],
-                    'id': row[1],
-                    'child_branch_id': row[2],
-                    'child_leaf_id': row[3],
-                    'parent_id': row[4],
-                    'child_id': row[2] or row[3],
-                    'order': row[5],
-                    'level': row[6],
-                } for row in cursor.fetchall()
-            ]
+            return namedtuple_fetchall(cursor)
 
 
 class GroupElementYear(OrderedModel):

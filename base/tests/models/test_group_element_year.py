@@ -269,17 +269,15 @@ class TestManagerGetReverseAdjacencyList(TestCase):
         )
         self.assertEqual(len(reverse_adjacency_list), 1)
 
-        expected_first_elem = {
-            'starting_node_id': self.level_2.child_leaf_id,
-            'id': self.level_2.pk,
-            'child_branch_id': None,
-            'child_leaf_id': self.level_2.child_leaf_id,
-            'parent_id': self.level_2.parent_id,
-            'child_id': self.level_2.child_leaf_id,
-            'order': self.level_2.order,
-            'level': 0,
-        }
-        self.assertDictEqual(reverse_adjacency_list[0], expected_first_elem)
+        expected_first_elem = (
+            self.level_2.child_leaf_id,
+            self.level_2.pk,
+            self.level_2.child_leaf_id,
+            self.level_2.parent_id,
+            self.level_2.order,
+            0
+        )
+        self.assertEqual(reverse_adjacency_list[0], expected_first_elem)
 
     def test_case_multiple_child_ids(self):
         adjacency_list = GroupElementYear.objects.get_reverse_adjacency_list(child_leaf_ids=[
@@ -333,7 +331,7 @@ class TestManagerGetReverseAdjacencyList(TestCase):
             child_branch_ids=[self.level_1.child_branch.id],
             link_type=LinkTypes.REFERENCE,
         )
-        result_parent_ids = [rec['parent_id'] for rec in reverse_adjacency_list]
+        result_parent_ids = [rec.parent_id for rec in reverse_adjacency_list]
         self.assertIn(link_reference.parent.id, result_parent_ids)
         self.assertNotIn(link_not_reference.parent.id, result_parent_ids)
 
