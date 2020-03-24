@@ -35,6 +35,6 @@ class LearningUnitUtilization(LearningUnitGenericDetailView):
         context["group_element_years"] = self.object.child_leaf.select_related("parent")
         context["formations"] = find_roots(
             list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
-            parents_as_instances=True
+            as_instances=True
         )
         return context

@@ -66,7 +66,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         )
         education_group_root_ids = program_management.ddd.repositories.find_roots.find_roots(
             [learning_unit_year],
-            root_types=[GroupType.COMPLEMENTARY_MODULE]
+            additional_root_categories=[GroupType.COMPLEMENTARY_MODULE]
         ).get(learning_unit_year.id, [])
 
         return EducationGroupYear.objects.filter(

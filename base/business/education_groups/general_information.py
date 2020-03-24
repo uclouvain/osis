@@ -48,7 +48,7 @@ def publish(education_group_year):
 
     trainings = find_roots(
         [education_group_year],
-        parents_as_instances=True,
+        as_instances=True,
     ).get(education_group_year.pk, [])
 
     education_groups_to_publish = [education_group_year] + trainings \

@@ -167,7 +167,7 @@ class TestFindRelatedRootEducationGroups(TestCase):
         GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
         result = program_management.ddd.repositories.find_roots.find_roots(
             [self.child_leaf],
-            parents_as_instances=True,
+            as_instances=True,
             with_parents_of_parents=True,
         )
         self.assertCountEqual(
@@ -278,7 +278,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         )
         result = program_management.ddd.repositories.find_roots.find_roots(
             [self.child_leaf],
-            parents_as_instances=True,
+            as_instances=True,
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent])
 

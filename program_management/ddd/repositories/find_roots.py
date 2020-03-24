@@ -28,7 +28,7 @@ def find_all_roots_for_academic_year(academic_year_id):
 
 def find_roots(
         objects,
-        parents_as_instances=False,
+        as_instances=False,
         with_parents_of_parents=False,
         additional_root_categories: List[EducationGroupTypesEnum] = None
 ):
@@ -57,7 +57,7 @@ def find_roots(
         )
         roots_by_children_id.update(_group_roots_id_by_children_id(child_root_list))
 
-    if parents_as_instances:
+    if as_instances:
         return _convert_parent_ids_to_instances(roots_by_children_id)
 
     return roots_by_children_id

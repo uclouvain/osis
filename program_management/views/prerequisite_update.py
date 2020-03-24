@@ -64,7 +64,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
 
         formations = program_management.ddd.repositories.find_roots.find_roots(
             [learning_unit_year],
-            parents_as_instances=True,
+            as_instances=True,
             with_parents_of_parents=True,
         )
 

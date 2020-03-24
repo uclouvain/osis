@@ -94,7 +94,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
     def _parents(self):
         return program_management.ddd.repositories.find_roots.find_roots(
             [self.parent],
-            parents_as_instances=True
+            as_instances=True
         )[self.parent.pk] + [self.parent]
 
     @cached_property
