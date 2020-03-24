@@ -329,7 +329,7 @@ class CommonBaseForm:
     @staticmethod
     def _save_group_element_year(parent, child):
         if parent:
-            group_element_year.GroupElementYear.objects.get_or_create(parent, child_branch=child)
+            group_element_year.GroupElementYear.objects.get_or_create(parent=parent, child_branch=child)
 
     @property
     def errors(self):

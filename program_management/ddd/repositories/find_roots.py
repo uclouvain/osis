@@ -77,10 +77,13 @@ def _flatten_list_of_lists(list_of_lists):
 def _convert_parent_ids_to_instances(root_ids_by_object_id):
     flat_root_ids = _flatten_list_of_lists(root_ids_by_object_id.values())
     map_instance_by_id = {obj.id: obj for obj in education_group_year.search(id=flat_root_ids)}
-    return {
+    result = collections.defaultdict(list)
+    result.update({
         obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.acronym)
         for obj_id, parents in root_ids_by_object_id.items()
-    }
+    })
+    return result
+
 
 
 def _assert_same_objects_class(objects):
