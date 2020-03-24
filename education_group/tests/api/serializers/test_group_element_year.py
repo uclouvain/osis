@@ -61,12 +61,15 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        cls.gey_no_child_leaf = GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
+        cls.gey_no_child_leaf = GroupElementYearFactory(
+            parent=cls.training, child_branch=cls.common_core, child_leaf=None
+        )
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
-            credits=10
+            credits=10,
+            status=False
         )
         cls.luy_gey = GroupElementYearFactory(
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15
@@ -111,6 +114,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'acronym',
@@ -132,16 +136,24 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'code',
             'remark',
             'lecturing_volume',
             'practical_exercise_volume',
-            'credits',
-            'with_prerequisite'
+            'with_prerequisite',
+            'periodicity',
+            'quadrimester',
+            'status',
+            'proposal_type'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
+
+    def test_learning_unit_children_status_field_is_false_boolean(self):
+        luy = self.serializer.data['children'][0]['children'][0]
+        self.assertFalse(luy['status'])
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
@@ -184,7 +196,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         )
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
 
-    def test_get_appropriate_credits(self):
+    def test_get_appropriate_credits_for_luy(self):
         self.assertEqual(self.serializer.data['children'][0]['children'][0]['credits'],
                          self.luy_gey.relative_credits or self.luy_gey.child_leaf.credits)
 
@@ -210,6 +222,32 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], luy.credits,
+                         'should get absolute credits if no relative credits')
+
+    def test_get_appropriate_credits_for_egy(self):
+        egy = GroupFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=GroupType.SUB_GROUP.name,
+        )
+        gey = GroupElementYearFactory(
+            parent__education_group_type__name=GroupType.COMMON_CORE.name,
+            parent__academic_year=self.academic_year,
+            child_branch=egy,
+            child_leaf=None,
+            relative_credits=None
+        )
+        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+            'partial_acronym': gey.parent.partial_acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupTreeSerializer(
+            EducationGroupHierarchy(gey.parent),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+        self.assertEqual(serializer.data['children'][0]['credits'], egy.credits,
                          'should get absolute credits if no relative credits')
 
     def test_get_appropriate_relative_credits(self):
@@ -250,7 +288,6 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         )
 
     def expected_credits(self, absolute_credits, relative_credits):
-
         luy = LearningUnitYearFactory(
             academic_year=self.academic_year,
             learning_container_year__academic_year=self.academic_year,
@@ -343,6 +380,7 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'acronym',
@@ -428,6 +466,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'link_type',
             'link_type_text',
             'block',
+            'credits',
             'node_type',
             'subtype',
             'acronym',

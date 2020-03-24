@@ -34,6 +34,9 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
+from program_management.models.enums.node_type import NodeType
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeEducationGroupYearFactory
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
 from program_management.ddd.repositories import load_tree
 
@@ -150,6 +153,25 @@ class TestLoadTree(TestCase):
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
         self.assertFalse(leaf.has_proposal)
         self.assertIsNone(leaf.proposal_type)
+
+    def test_when_2_nodes_has_same_pk(self):
+        same_pk = self.root_node.education_group_year.pk
+        learning_unit = LearningUnitYearFactory(pk=same_pk)
+        GroupElementYearFactory(
+            parent=self.link_level_1.child_branch,
+            child_branch=None,
+            child_leaf=learning_unit
+        )
+        tree = load_tree.load(self.root_node.education_group_year.pk)
+        leaf_2 = tree.root_node.children[0].child.children[1].child
+        error_msg = """
+            A learningUnit and a Group could have the same 'node_id' because data are coming from different tables.
+            We must ensure that the 2 nodes are created separated from each other.
+        """
+        self.assertEqual(leaf_2.type, NodeType.LEARNING_UNIT, error_msg)
+        self.assertEqual(leaf_2.node_id, same_pk, error_msg)
+        self.assertEqual(tree.root_node.type, NodeType.EDUCATION_GROUP, error_msg)
+        self.assertEqual(tree.root_node.node_id, same_pk, error_msg)
 
 
 class TestLoadTreesFromChildren(TestCase):
