@@ -237,7 +237,6 @@ class GroupElementYearManager(models.Manager):
         if not child_leaf_ids and not child_branch_ids and not academic_year_id:
             return []
 
-        # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
         where_statement = self.__build_where_statement(academic_year_id, child_branch_ids, child_leaf_ids)
         root_query_template = """
             WITH RECURSIVE
