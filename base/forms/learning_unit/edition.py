@@ -31,11 +31,10 @@ from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
+from base.models.enums import learning_unit_year_subtypes
 
 
 # TODO Convert it in ModelForm
-from base.models.enums import learning_unit_year_subtypes
-
 
 class LearningUnitEndDateForm(forms.Form):
     EMPTY_LABEL = BLANK_CHOICE_DISPLAY
