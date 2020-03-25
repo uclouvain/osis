@@ -68,29 +68,27 @@ class TestNodeViewSerializer(SimpleTestCase):
 class TestNodeViewAttributeSerializer(SimpleTestCase):
     def setUp(self):
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
-        node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
-        node_child = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = LinkFactory(parent=node_parent, child=node_child)
+        self.node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
+        self.node_child = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        self.link = LinkFactory(parent=self.node_parent, child=self.node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
         self.serializer = NodeViewAttributeSerializer(self.link, context=self.context)
 
     def test_serialize_node_attr_ensure_detach_url(self):
-        expected_url = reverse('tree_detach_node', args=[self.root_node.pk]) + "?" + urlencode({
-            'path': self.context['path']
-        })
+        expected_url = reverse('group_element_year_delete', args=[
+            self.root_node.pk, self.node_child.pk, self.link.pk
+        ])
         self.assertEquals(self.serializer.data['detach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_attach_url(self):
-        expected_url = reverse('tree_attach_node', args=[self.root_node.pk]) + "?" + urlencode({
-            'to_path': self.context['path']
-        })
+        expected_url = reverse('education_group_attach', args=[self.root_node.pk, self.node_child.pk])
         self.assertEquals(self.serializer.data['attach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_modify_url(self):
-        expected_url = reverse('tree_update_link', args=[self.root_node.pk]) + "?" + urlencode({
-            'path': self.context['path']
-        })
+        expected_url = reverse('group_element_year_update', args=[
+            self.root_node.pk, self.node_child.pk, self.link.pk
+        ])
         self.assertEquals(self.serializer.data['modify_url'], expected_url)
 
     def test_serializer_node_attr_ensure_search_url(self):
