@@ -27,6 +27,7 @@ from typing import List
 
 from base.models.enums import prerequisite_operator
 
+
 PrerequisiteExpression = str  # Example : "(Prerequisite1 OR Prerequisite2) AND (prerequisite3)"
 
 

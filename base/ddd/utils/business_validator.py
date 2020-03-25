@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from abc import ABC
-from typing import List
+from typing import List, Tuple
 
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
 

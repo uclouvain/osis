@@ -28,6 +28,7 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -38,7 +39,7 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory, \
-    TrainingFactory, EducationGroupYearMasterFactory
+    TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
@@ -48,12 +49,13 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
     @classmethod
     def setUpTestData(cls):
         current_academic_year = create_current_academic_year()
-        cls.root = TrainingFactory(
-            academic_year=current_academic_year,
-            education_group_type__name=TrainingType.BACHELOR.name
-        )
+        root_group_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
+        cls.root = EducationGroupYearFactory(academic_year=current_academic_year,
+                                             education_group_type=root_group_type)
 
-        cls.child_branch = GroupFactory(academic_year=current_academic_year)
+        group_type = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        cls.child_branch = EducationGroupYearFactory(academic_year=current_academic_year,
+                                                     education_group_type=group_type)
         GroupElementYearFactory(parent=cls.root, child_branch=cls.child_branch)
 
         cls.child_leaf = LearningUnitYearFactory(academic_year=current_academic_year)
@@ -90,10 +92,9 @@ class TestFindRelatedRootEducationGroups(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.child_leaf = LearningUnitYearFactory(academic_year=cls.current_academic_year)
 
-        cls.root = TrainingFactory(
-            academic_year=cls.current_academic_year,
-            education_group_type__name=TrainingType.BACHELOR.name
-        )
+        root_group_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
+        cls.root = EducationGroupYearFactory(academic_year=cls.current_academic_year,
+                                             education_group_type=root_group_type)
 
     @mock.patch('base.models.group_element_year._raise_if_incorrect_instance')
     def test_objects_instances_check_is_called(self, mock_check_instance):
@@ -113,7 +114,6 @@ class TestFindRelatedRootEducationGroups(TestCase):
         expected_result = {
             self.child_leaf.id: [element_year.parent.id]
         }
-
         self.assertEqual(result, expected_result)
 
     def test_with_filters_case_childs_with_different_academic_years(self):
@@ -124,9 +124,10 @@ class TestFindRelatedRootEducationGroups(TestCase):
             group_element_year.find_learning_unit_roots([self.child_leaf, child_leaf_other_ac_year])
 
     def test_with_filters_case_direct_parent_is_root_and_not_matches_filter(self):
-        root = GroupFactory(
+        root = EducationGroupYearFactory(
             academic_year=self.current_academic_year,
-            education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
+            education_group_type=EducationGroupTypeFactory(name='Options choices',
+                                                           category=education_group_categories.GROUP)
         )
         GroupElementYearFactory(parent=root, child_branch=None, child_leaf=self.child_leaf)
         expected_result = {
@@ -136,10 +137,15 @@ class TestFindRelatedRootEducationGroups(TestCase):
         self.assertDictEqual(result, expected_result)
 
     def test_with_filters_case_root_in_2nd_level_and_direct_parent_matches_filter(self):
-        root = EducationGroupYearMasterFactory(academic_year=self.current_academic_year)
-        child_branch = TrainingFactory(
+        root = EducationGroupYearFactory(
             academic_year=self.current_academic_year,
-            education_group_type__name=TrainingType.MASTER_MD_120.name
+            education_group_type=EducationGroupTypeFactory(name='Master',
+                                                           category=education_group_categories.TRAINING)
+        )
+        child_branch = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=EducationGroupTypeFactory(name='Didactic Master',
+                                                           category=education_group_categories.TRAINING)
         )
         GroupElementYearFactory(parent=root, child_branch=child_branch)
         GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
@@ -151,9 +157,15 @@ class TestFindRelatedRootEducationGroups(TestCase):
         self.assertNotIn(root.id, result)
 
     def test_with_filters_case_multiple_parents_in_2nd_level(self):
-        root_2 = EducationGroupYearMasterFactory(academic_year=self.current_academic_year)
-        child_branch = GroupFactory(academic_year=self.current_academic_year)
-
+        root_2 = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=EducationGroupTypeFactory(name='Master',
+                                                           category=education_group_categories.TRAINING)
+        )
+        child_branch = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        )
         GroupElementYearFactory(parent=self.root, child_branch=child_branch)
         GroupElementYearFactory(parent=root_2, child_branch=child_branch)
         GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
@@ -163,8 +175,12 @@ class TestFindRelatedRootEducationGroups(TestCase):
         self.assertIn(root_2.id, result[self.child_leaf.id])
 
     def test_with_filters_case_objects_are_education_group_instance(self):
-        root = EducationGroupYearFactory(academic_year=self.current_academic_year)
-        child_branch = EducationGroupYearFactory(academic_year=self.current_academic_year)
+        root = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+        )
+        child_branch = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+        )
         GroupElementYearFactory(parent=root, child_branch=child_branch)
         result = group_element_year.find_learning_unit_roots([child_branch])
         expected_result = {
@@ -212,9 +228,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         self.assertIn(hierarchy['group_element_child'].parent.id, result[self.child_leaf.id])
 
     def test_all_group_types_of_category_training_stops_recursivity(self):
-        type_bachelor = EducationGroupTypeFactory(
-            name=TrainingType.BACHELOR.name, category=education_group_categories.TRAINING
-        )
+        type_bachelor = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
         hierarchy = self._build_hierarchy(self.current_academic_year, type_bachelor, self.child_leaf)
         result = group_element_year.find_learning_unit_roots([self.child_leaf])
         self.assertNotIn(hierarchy['group_element_root'].parent.id, result[self.child_leaf.id])
@@ -268,10 +282,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_roots(
             [self.child_leaf],
             luy=self.child_leaf,
-            recursive_conditions={
-                'stop': [GroupType.COMPLEMENTARY_MODULE.name],
-                'continue': []
-            }
+            is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
         )
         self.assertEqual(result[self.child_leaf.id], [group_element.parent.id])
 
@@ -284,10 +295,7 @@ class TestFindLearningUnitFormationRoots(TestCase):
         result = group_element_year.find_learning_unit_roots(
             [self.child_leaf],
             luy=self.child_leaf,
-            recursive_conditions={
-                'stop': [GroupType.COMPLEMENTARY_MODULE.name],
-                'continue': []
-            }
+            is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
         )
 
         self.assertEqual(result[self.child_leaf.id], [hierarchy['group_element_child'].parent.id])
@@ -463,14 +471,15 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        cls.root = EducationGroupYearMasterFactory(
+        cls.root = TrainingFactory(
             acronym='DROI2M',
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120,
             academic_year=cls.academic_year
         )
 
         finality_list = GroupFactory(
             acronym='LIST FINALITIES',
-            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
             academic_year=cls.academic_year
         )
 

@@ -30,19 +30,18 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearMasterFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
-
-LEARNING_UNIT_API_HEAD = 'learning_unit_api_v1:'
 
 
 class FilterEducationGroupRootsTestCase(APITestCase):
@@ -51,9 +50,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         cls.user = UserFactory()
 
         cls.academic_year = create_current_academic_year()
-        cls.training = EducationGroupYearMasterFactory(
-            academic_year=cls.academic_year, acronym='test2m', partial_acronym='test2m'
-        )
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
         cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
@@ -74,12 +71,12 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         )
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         GroupElementYearFactory(parent=cls.complementary_module, child_branch=None, child_leaf=cls.learning_unit_year)
-
+        cls.person = PersonFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
         }
-        cls.url = reverse(LEARNING_UNIT_API_HEAD + EducationGroupRootsList.name, kwargs=url_kwargs)
+        cls.url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs=url_kwargs)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -100,34 +97,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             }
         )
-
         self.assertEqual(response.data, serializer.data)
-
-    def test_get_finality_root_and_not_itself(self):
-        finality_root = EducationGroupYearMasterFactory(academic_year=self.academic_year)
-        finality = TrainingFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=TrainingType.MASTER_MD_120.name
-        )
-        GroupElementYearFactory(parent=finality_root, child_branch=finality, child_leaf=None)
-        GroupElementYearFactory(parent=finality, child_branch=None, child_leaf=self.learning_unit_year)
-
-        query_string = {'ignore_complementary_module': 'true'}
-        response = self.client.get(self.url, data=query_string)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id)
-
-        serializer = EducationGroupRootsListSerializer(
-            list(education_group_roots) + [finality_root],
-            many=True,
-            context={
-                'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_FR
-            }
-        )
-
-        self.assertCountEqual(response.data, serializer.data)
 
 
 class EducationGroupRootsListTestCase(APITestCase):
@@ -139,10 +109,7 @@ class EducationGroupRootsListTestCase(APITestCase):
                |-- Learning Unit Year
         """
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(
-            education_group_type__name=TrainingType.BACHELOR.name,
-            acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year
-        )
+        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
         cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
@@ -154,15 +121,15 @@ class EducationGroupRootsListTestCase(APITestCase):
             learning_container_year__academic_year=cls.academic_year
         )
         GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
-        cls.user = UserFactory()
+        cls.person = PersonFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
         }
-        cls.url = reverse(LEARNING_UNIT_API_HEAD + EducationGroupRootsList.name, kwargs=url_kwargs)
+        cls.url = reverse('learning_unit_api_v1:' + EducationGroupRootsList.name, kwargs=url_kwargs)
 
     def setUp(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.person.user)
 
     def test_get_not_authorized(self):
         self.client.force_authenticate(user=None)
@@ -179,7 +146,7 @@ class EducationGroupRootsListTestCase(APITestCase):
 
     def test_get_results_case_learning_unit_year_not_found(self):
         invalid_url = reverse(
-            LEARNING_UNIT_API_HEAD + EducationGroupRootsList.name,
+            'learning_unit_api_v1:' + EducationGroupRootsList.name,
             kwargs={'acronym': 'ACRO', 'year': 2019}
         )
         response = self.client.get(invalid_url)
@@ -219,15 +186,15 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             education_group_year=cls.education_group_year
         )
         PrerequisiteItemFactory(prerequisite=cls.prerequisite)
-        cls.user = UserFactory()
+        cls.person = PersonFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
             'year': cls.learning_unit_year.academic_year.year
         }
-        cls.url = reverse(LEARNING_UNIT_API_HEAD + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
+        cls.url = reverse('learning_unit_api_v1:' + LearningUnitPrerequisitesList.name, kwargs=url_kwargs)
 
     def setUp(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.person.user)
 
     def test_get_not_authorized(self):
         self.client.force_authenticate(user=None)
@@ -244,7 +211,7 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
 
     def test_get_results_case_learning_unit_year_not_found(self):
         invalid_url = reverse(
-            LEARNING_UNIT_API_HEAD + LearningUnitPrerequisitesList.name,
+            'learning_unit_api_v1:' + LearningUnitPrerequisitesList.name,
             kwargs={'acronym': 'ACRO', 'year': 2019}
         )
         response = self.client.get(invalid_url)
