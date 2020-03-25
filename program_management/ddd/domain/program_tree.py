@@ -26,9 +26,9 @@
 import copy
 from typing import List, Set
 
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from program_management.ddd.business_types import *
-from base.models.authorized_relationship import AuthorizedRelationshipList
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.models.enums import node_type
 
