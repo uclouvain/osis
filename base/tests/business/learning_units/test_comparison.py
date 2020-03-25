@@ -110,7 +110,7 @@ class LearningUnitYearComparaisonTest(TestCase):
                                        professional_integration=True,
                                        specific_title="Juridic law courses",
                                        specific_title_english=None,
-                                       quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1.name,
+                                       quadrimester=quadrimesters.Q1,
                                        session=learning_unit_year_session.SESSION_123,
                                        attribution_procedure=attribution_procedure.EXTERNAL
                                        )
