@@ -621,7 +621,7 @@ class TestExcludeUEFromdWorkbook(TestCase):
 def get_expected_data(gey, luy, main_gathering=None):
     gathering_str = "{} - {}".format(gey.parent.partial_acronym, gey.parent.title)
     if main_gathering:
-        main_gathering_str = "{} - {}".format(main_gathering.acronym, main_gathering.title)
+        main_gathering_str = "{} - {}".format(gey.parent.acronym, gey.parent.title)
     else:
         main_gathering_str = gathering_str
     expected = [luy.acronym,
