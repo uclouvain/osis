@@ -129,3 +129,8 @@ class TestHasModulePerms(TestCase):
 
     def test_user_has_not_module_perms(self):
         self.assertFalse(self.person.user.has_module_perms('non_existing_module'))
+
+    @mock.patch('django.contrib.auth.backends.ModelBackend.has_module_perms')
+    def test_ensure_fallback_to_model_backend_has_module_perms_when_no_relevant_roles(self, mock_has_module_perms):
+        self.person.user.has_module_perms('non_existing_module')
+        self.assertTrue(mock_has_module_perms.called)

@@ -52,7 +52,7 @@ class ObjectPermissionBackend(ModelBackend):
         all_perms = []
         for r in roles_assigned:
             all_perms += [key for key in r.rule_set().keys() if app_label in key]
-        return any(app_label in perm for perm in all_perms)
+        return any(app_label in perm for perm in all_perms) or super().has_module_perms(user_obj, app_label)
 
     def _get_group_permissions(self, user_obj, obj=None):
         """
