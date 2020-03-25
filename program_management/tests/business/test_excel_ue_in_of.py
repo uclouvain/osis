@@ -39,7 +39,8 @@ from base.models.enums import education_group_types
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.education_group_categories import Categories
 from base.tests.factories.business.learning_units import GenerateContainer
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
+    EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -82,7 +83,7 @@ CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_yr_root = TrainingFactory(acronym='root')
+        cls.education_group_yr_root = EducationGroupYearBachelorFactory(acronym='root')
         academic_yr = cls.education_group_yr_root.academic_year
         cls.child_leaves = GroupElementYearChildLeafFactory.create_batch(
             2,
