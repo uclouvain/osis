@@ -36,7 +36,6 @@ class Link:
         self,
         parent: 'Node',
         child: 'Node',
-        pk: int = None,
         relative_credits: int = None,
         min_credits: int = None,
         max_credits: int = None,
@@ -50,7 +49,6 @@ class Link:
         link_type: LinkTypes = None,
         order: int = None
     ):
-        self.pk = pk
         self.parent = parent
         self.child = child
         self.relative_credits = relative_credits
@@ -102,8 +100,7 @@ class LinkWithChildLeaf(Link):
 
 
 class LinkWithChildBranch(Link):
-    def __init__(self, *args, **kwargs):
-        super(LinkWithChildBranch, self).__init__(*args, **kwargs)
+    pass
 
 
 class LinkFactory:

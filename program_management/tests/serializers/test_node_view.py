@@ -36,7 +36,6 @@ from program_management.ddd.domain.link import Link
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import NodeViewAttributeSerializer, LeafViewAttributeSerializer, \
     NodeViewSerializer, LeafViewSerializer
-from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
@@ -45,7 +44,7 @@ class TestNodeViewSerializer(SimpleTestCase):
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
         node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
         node_child = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = LinkFactory(parent=node_parent, child=node_child)
+        self.link = Link(parent=node_parent, child=node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
         self.serializer = NodeViewSerializer(self.link, context=self.context)
@@ -70,7 +69,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
         node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
         node_child = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = LinkFactory(parent=node_parent, child=node_child)
+        self.link = Link(parent=node_parent, child=node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
         self.serializer = NodeViewAttributeSerializer(self.link, context=self.context)
@@ -114,7 +113,7 @@ class TestLeafViewSerializer(SimpleTestCase):
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
         node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
         leaf_child = NodeLearningUnitYearFactory(node_id=9, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = LinkFactory(parent=node_parent, child=leaf_child)
+        self.link = Link(parent=node_parent, child=leaf_child)
 
         self.context = {'path': '1|2|9', 'root': self.root_node}
         self.serializer = LeafViewSerializer(self.link, context=self.context)
@@ -191,7 +190,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
         node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
         leaf_child = NodeLearningUnitYearFactory(node_id=9, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = LinkFactory(parent=node_parent, child=leaf_child)
+        self.link = Link(parent=node_parent, child=leaf_child)
 
         self.context = {'path': '1|2|9', 'root': self.root_node}
         self.serializer = LeafViewAttributeSerializer(self.link, context=self.context)

@@ -36,7 +36,6 @@ class LinkFactory(factory.Factory):
         model = Link
         abstract = False
 
-    pk = factory.Sequence(lambda n: n+1)
     parent = factory.SubFactory(NodeGroupYearFactory)
     child = factory.SubFactory(NodeGroupYearFactory)
     relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
