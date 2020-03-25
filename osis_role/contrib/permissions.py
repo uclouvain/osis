@@ -45,6 +45,15 @@ class ObjectPermissionBackend(ModelBackend):
                 results.add(rule_set.test_rule(perm, user_obj, *args, **kwargs))
         return any(results) or super().has_perm(user_obj, perm, obj=kwargs.get('obj'))
 
+    def has_module_perms(self, user_obj, app_label, *args, **kwargs):
+        if not user_obj.is_active or user_obj.is_anonymous:
+            return False
+        roles_assigned = _get_roles_assigned_to_user(user_obj)
+        all_perms = []
+        for r in roles_assigned:
+            all_perms += [key for key in r.rule_set().keys() if app_label in key]
+        return any(app_label in perm for perm in all_perms)
+
     def _get_group_permissions(self, user_obj, obj=None):
         """
         Override method in order to fallback to default RBAC Django when role is not registered
@@ -80,14 +89,3 @@ def _add_role_queryset_to_perms_context(rule_set, perm, qs):
             return True
         rule_set[perm] = cache_role_qs_fn & rule_set[perm]
     return rule_set
-
-
-# TODO: move this logic into OsisRoleBackend
-def has_module_perms(user_obj, app_label):
-    if not user_obj.is_active or user_obj.is_anonymous:
-        return False
-    roles_assigned = _get_roles_assigned_to_user(user_obj)
-    all_perms = []
-    for r in roles_assigned:
-        all_perms += [key for key in r.rule_set().keys() if app_label in key]
-    return any(app_label in perm for perm in all_perms)

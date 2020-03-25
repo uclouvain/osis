@@ -33,7 +33,7 @@ from rules import RuleSet
 
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from osis_role.contrib.permissions import ObjectPermissionBackend, _add_role_queryset_to_perms_context, has_module_perms
+from osis_role.contrib.permissions import ObjectPermissionBackend, _add_role_queryset_to_perms_context
 
 
 class TestObjectPermissionBackend(TestCase):
@@ -125,7 +125,7 @@ class TestHasModulePerms(TestCase):
         self.addCleanup(patcher_role_manager.stop)
 
     def test_user_has_module_perms(self):
-        self.assertTrue(has_module_perms(self.person.user, self.module))
+        self.assertTrue(self.person.user.has_module_perms(self.module))
 
     def test_user_has_not_module_perms(self):
-        self.assertFalse(has_module_perms(self.person.user, 'nonexisting_module'))
+        self.assertFalse(self.person.user.has_module_perms('non_existing_module'))
