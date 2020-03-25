@@ -23,16 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from urllib.parse import urlencode
 
+from django.utils.translation import gettext_lazy as _
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
+
+from program_management.ddd.business_types import *
 
 
 class ChildrenField(serializers.Serializer):
@@ -49,19 +51,18 @@ class ChildrenField(serializers.Serializer):
 class NodeViewAttributeSerializer(serializers.Serializer):
     href = serializers.SerializerMethodField()
     root = serializers.SerializerMethodField()
-    group_element_year = serializers.IntegerField(source='pk')  # TODO :: rename this arg (impact javascript)
     element_id = serializers.IntegerField(source='child.pk')
     element_type = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
     attach_url = serializers.SerializerMethodField()
     detach_url = serializers.SerializerMethodField()
     modify_url = serializers.SerializerMethodField()
-    attach_disabled = serializers.BooleanField(default=False)  # TODO : To implement in OSIS-3954
-    attach_msg = serializers.CharField(default=None)  # TODO : To implement in OSIS-3954
-    detach_disabled = serializers.BooleanField(default=False)  # TODO : To implement in OSIS-3954
-    detach_msg = serializers.CharField(default=None)  # TODO : To implement in OSIS-3954
-    modification_disabled = serializers.BooleanField(default=False)  # TODO : To implement in OSIS-3954
-    modification_msg = serializers.CharField(default=None)  # TODO : To implement in OSIS-3954
+    attach_disabled = serializers.BooleanField(default=True)
+    attach_msg = serializers.CharField(default=None)
+    detach_disabled = serializers.BooleanField(default=True)
+    detach_msg = serializers.CharField(default=None)
+    modification_disabled = serializers.BooleanField(default=True)
+    modification_msg = serializers.CharField(default=None)
     search_url = serializers.SerializerMethodField()
 
     def get_element_type(self, obj: 'Link'):
@@ -78,20 +79,22 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         return reverse('education_group_read', args=[self.get_root(obj), obj.child.pk])
 
     def get_attach_url(self, obj: 'Link'):
-        return reverse('education_group_attach', args=[self.get_root(obj), obj.child.pk])
+        return reverse('tree_attach_node', args=[self.get_root(obj)]) + "?" + urlencode({
+            'to_path': self.context['path']
+        })
 
     def get_detach_url(self, obj: 'Link'):
-        return reverse('group_element_year_delete', args=[
-            self.get_root(obj), obj.child.pk, obj.pk
-        ]),
+        return reverse('tree_detach_node', args=[self.get_root(obj)]) + "?" + urlencode({
+            'path': self.context['path']
+        })
 
     def get_modify_url(self, obj: 'Link'):
-        return reverse('group_element_year_update', args=[
-            self.get_root(obj), obj.child.pk, obj.pk
-        ]),
+        return reverse('tree_update_link', args=[self.get_root(obj)]) + "?" + urlencode({
+            'path': self.context['path']
+        })
 
     def get_search_url(self, obj: 'Link'):
-        # if attach.can_attach_learning_units(self.education_group_year):  # TODO :: to implement in OSIS-3954
+        # if attach.can_attach_learning_units(self.education_group_year):
         #     return reverse('quick_search_learning_unit', args=[self.root.pk, self.education_group_year.pk])
         return reverse('quick_search_education_group', args=[self.get_root(obj), obj.child.pk])
 

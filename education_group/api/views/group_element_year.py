@@ -54,7 +54,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         self.check_object_permissions(self.request, education_group_year)
 
         tree = load_tree.load(education_group_year.id)
-        return link.factory.get_link(parent=None, child=tree.root_node)
+        return link.Link(parent=None, child=tree.root_node)
 
 
 class TrainingTreeView(EducationGroupTreeView):
