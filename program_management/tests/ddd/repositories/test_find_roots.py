@@ -130,6 +130,33 @@ class TestFindRelatedRootEducationGroups(TestCase):
         self.assertDictEqual(result, expected_result)
         self.assertNotIn(root.id, result)
 
+    def test_when_exclude_root_categories_is_set(self):
+        root = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=EducationGroupTypeFactory(
+                name=education_group_types.TrainingType.MASTER_MA_120.name,
+                category=education_group_categories.TRAINING
+            )
+        )
+        child_branch = EducationGroupYearFactory(
+            academic_year=self.current_academic_year,
+            education_group_type=EducationGroupTypeFactory(
+                name=education_group_types.TrainingType.MASTER_MD_120.name,
+                category=education_group_categories.TRAINING
+            )
+        )
+        GroupElementYearFactory(parent=root, child_branch=child_branch)
+        GroupElementYearFactory(parent=child_branch, child_branch=None, child_leaf=self.child_leaf)
+        result = program_management.ddd.repositories.find_roots.find_roots(
+            [self.child_leaf],
+            exclude_root_categories=[education_group_types.TrainingType.MASTER_MD_120]
+        )
+        expected_result = {
+            self.child_leaf.id: [root.id]
+        }
+        self.assertDictEqual(result, expected_result)
+        self.assertNotIn(root.id, result)
+
     def test_with_filters_case_multiple_parents_in_2nd_level(self):
         root_2 = EducationGroupYearFactory(
             academic_year=self.current_academic_year,

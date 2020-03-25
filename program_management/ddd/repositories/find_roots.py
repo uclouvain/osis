@@ -30,12 +30,14 @@ def find_roots(
         objects,
         as_instances=False,
         with_parents_of_parents=False,
-        additional_root_categories: List[EducationGroupTypesEnum] = None
+        additional_root_categories: List[EducationGroupTypesEnum] = None,
+        exclude_root_categories: List[EducationGroupTypesEnum] = None
 ):
     _assert_same_academic_year(objects)
     _assert_same_objects_class(objects)
 
-    root_categories = DEFAULT_ROOT_CATEGORIES | set(additional_root_categories or [])
+    root_categories = (DEFAULT_ROOT_CATEGORIES | set(additional_root_categories or [])) \
+        - set(exclude_root_categories or [])
     root_categories_names = [root_type.name for root_type in root_categories]
 
     child_branch_ids = [obj.id for obj in objects if isinstance(obj, EducationGroupYear)]
