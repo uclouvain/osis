@@ -83,12 +83,12 @@ class NodeViewAttributeSerializer(serializers.Serializer):
     def get_detach_url(self, obj: 'Link'):
         return reverse('group_element_year_delete', args=[
             self.get_root(obj), obj.child.pk, obj.pk
-        ]),
+        ])
 
     def get_modify_url(self, obj: 'Link'):
         return reverse('group_element_year_update', args=[
             self.get_root(obj), obj.child.pk, obj.pk
-        ]),
+        ])
 
     def get_search_url(self, obj: 'Link'):
         # if attach.can_attach_learning_units(self.education_group_year):  # TODO :: to implement in OSIS-3954
