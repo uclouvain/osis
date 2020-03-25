@@ -24,19 +24,18 @@
 #
 ##############################################################################
 
-import copy
 from typing import List, Dict, Any
 
 from django.db.models import Case, F, When, IntegerField
 
-from base.models.enums.link_type import LinkTypes
 from base.models import group_element_year
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import node, link
+from program_management.ddd.domain import node
+from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
-
 # Typing
 from program_management.models.enums.node_type import NodeType
 
@@ -94,6 +93,12 @@ def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
     return {'{}_{}'.format(n.pk, n.type): n for n in nodes_list}
 
 
+def __convert_link_type_to_enum(link_data: dict):
+    link_type = link_data['link_type']
+    if link_type:
+        link_data['link_type'] = LinkTypes[link_type]
+
+
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
     group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
@@ -103,6 +108,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
             output_field=IntegerField()
         )
     ).values(
+        'pk',
         'relative_credits',
         'min_credits',
         'max_credits',
@@ -122,9 +128,10 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     for gey_dict in group_element_year_qs:
         parent_id = gey_dict.pop('parent_id')
         child_id = gey_dict.pop('child_id')
+        __convert_link_type_to_enum(gey_dict)
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
-        tree_links[tree_id] = link.factory.get_link(parent=None, child=None, **gey_dict)
+        tree_links[tree_id] = link_factory.get_link(parent=None, child=None, **gey_dict)
     return tree_links
 
 

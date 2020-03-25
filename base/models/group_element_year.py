@@ -38,10 +38,13 @@ from reversion.admin import VersionAdmin
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.utils.db import dict_fetchall
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+COMMON_FILTER_TYPES = [MiniTrainingType.OPTION.name]
+DEFAULT_ROOT_TYPES = TrainingType.get_names() + MiniTrainingType.get_names()
 
 
 class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
@@ -59,9 +62,10 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
 
 def validate_block_value(value):
     max_authorized_value = 6
-    _error_msg = _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
-                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") %\
-        {'max_authorized_value': max_authorized_value}
+    _error_msg = _(
+        "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+        "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
+    ) % {'max_authorized_value': max_authorized_value}
 
     MinValueValidator(1, message=_error_msg)(value)
     if not all([
@@ -453,7 +457,7 @@ class GroupElementYear(OrderedModel):
     def _clean_link_type(self):
         if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
                                                   GroupType.MAJOR_LIST_CHOICE.name] and \
-           isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
+                isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
                 [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
             self.link_type = LinkTypes.REFERENCE.name
 

@@ -85,7 +85,6 @@ def _convert_parent_ids_to_instances(root_ids_by_object_id):
     return result
 
 
-
 def _assert_same_objects_class(objects):
     if not objects:
         return
