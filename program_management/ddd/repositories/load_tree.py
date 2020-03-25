@@ -108,6 +108,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
             output_field=IntegerField()
         )
     ).values(
+        'pk',
         'relative_credits',
         'min_credits',
         'max_credits',
