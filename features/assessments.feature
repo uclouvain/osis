@@ -6,7 +6,7 @@ Feature: Score encoding
   Scenario: Encoding of scores
     When Go to score encoding home page
     And Search learning units of the program manager offer
-    And Go encode scores for the first learning unit returned
+    And Go encode scores for a learning unit returned
     And Submit score for one student
     Then Scores should be updated
     When Click on encode scores
@@ -19,7 +19,7 @@ Feature: Score encoding
   Scenario: Injection of excel file
     When Go to score encoding home page
     And Search learning units of the program manager offer
-    And Go encode scores for the first learning unit returned
+    And Go encode scores for a learning unit returned
     And Clear all scores
     And Download excel
     Then Excel should be present
@@ -30,7 +30,7 @@ Feature: Score encoding
   Scenario: Double encoding of scores
     When Go to score encoding home page
     And Search learning units of the program manager offer
-    And Go encode scores for the first learning unit returned
+    And Go encode scores for a learning unit returned
     And Fill all scores
     And Click on double encode
     And Fill all scores

@@ -41,7 +41,6 @@ class LearningUnitsPage(pypom.Page):
 
     @property
     def results(self):
-
         return [self.LearningUnitElement(self, el) for el in self.find_elements(*self._results_selector)]
 
     class LearningUnitElement(pypom.Region):
@@ -73,7 +72,6 @@ class LearningUnitsViaPaperTabPage(pypom.Page):
 
     @property
     def results(self):
-
         return [self.LearningUnitElement(self, el) for el in self.find_elements(*self._results_selector)]
 
     class LearningUnitElement(pypom.Region):

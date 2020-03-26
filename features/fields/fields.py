@@ -55,6 +55,7 @@ class Field:
 
 
 class Link(Field):
+
     def __init__(self, page, by, selector, waiting_time=0):
         super().__init__(by, selector)
         self.page = page
@@ -80,6 +81,7 @@ class Link(Field):
 
 
 class InputField(Field):
+
     def __set__(self, obj, value):
         element = obj.wait.until(lambda o: obj.find_element(*self.locator))
         element.clear()
@@ -92,7 +94,6 @@ class InputField(Field):
 
 
 class TextAreaField(Field):
-
     def __set__(self, obj, value):
         element = obj.wait.until(lambda obj: obj.find_element(*self.locator))
         element.clear()
@@ -101,10 +102,10 @@ class TextAreaField(Field):
 
 
 class CkeditorField(Field):
-    """ For Ckeditor, the field is included in an iframe,
-    We need to go into the frame before send the value.
     """
-
+        For Ckeditor, the field is included in an iframe,
+        We need to go into the frame before send the value.
+    """
     def __set__(self, obj, value):
         element = obj.find_element(*self.locator)
         obj.driver.switch_to.frame(element)
@@ -127,6 +128,7 @@ class CkeditorField(Field):
 
 
 class SelectField(Field):
+
     def __get__(self, instance, owner):
         obj = super().__get__(instance, owner)
         return Select(self.element)
@@ -178,12 +180,14 @@ class SubmitField(ButtonField):
 
 
 class CharField(Field):
+
     @property
     def text(self):
         return self.element.text
 
 
 class Checkbox(Field):
+
     def __set__(self, obj, value: bool):
         element = obj.find_element(*self.locator)
         old_val = element.get_attribute('checked')
@@ -194,6 +198,7 @@ class Checkbox(Field):
 
 
 class RadioField(Field):
+
     def __set__(self, obj, value):
         element = obj.find_element(*self.locator)
 
@@ -204,6 +209,7 @@ class RadioField(Field):
 
 
 class SelectEntityVersionField(SelectField):
+
     def __set__(self, obj, value):
         value = EntityVersion.objects.filter(acronym=value).order_by('start_date').last().pk
         return super().__set__(obj, value)

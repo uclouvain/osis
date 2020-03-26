@@ -60,11 +60,10 @@ def step_impl(context: Context):
     page.submit()
 
 
-@when("Go encode scores for the first learning unit returned")
+@when("Go encode scores for a learning unit returned")
 def step_impl(context: Context):
     page = pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
-
-    page.results[0].encode()
+    random.choice(page.results).encode()
 
 
 @when("Submit score for one student")
@@ -176,11 +175,12 @@ def step_impl(context: Context):
 @when("Download pdf")
 def step_impl(context: Context):
     page = pages.LearningUnitsViaPaperTabPage(driver=context.browser)
-    page.results[0].download_pdf()
+    row_chosen = random.choice(page.results)
+    row_chosen.download_pdf()
     context.filename = "session_%s_%s_%s.pdf" % (
         page.academic_year.text.split("-")[0],
         page.number_session.text,
-        page.results[0].code.text
+        row_chosen.code.text
     )
 
 
