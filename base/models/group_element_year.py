@@ -428,8 +428,7 @@ class GroupElementYear(OrderedModel):
         self.clean()
         return super().save(force_insert, force_update, using, update_fields)
 
-    # FIXME Move all those validations into link and program tree validation when attaching and detaching via
-    #       business validators (OSIS-3954)
+    # DEPRECATED Move all those validations into forms with ddd validators
     def clean(self):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))

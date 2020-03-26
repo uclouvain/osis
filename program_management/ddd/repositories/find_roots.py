@@ -11,7 +11,7 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
 
 
-# FIXME Suppress this method when borrowed course filter is refactored OSIS-3376
+#  DEPRECATED Suppress this method when borrowed course filter is refactored OSIS-3376
 def find_all_roots_for_academic_year(academic_year_id):
     root_categories = DEFAULT_ROOT_CATEGORIES
     root_categories_names = [root_type.name for root_type in root_categories]
@@ -26,6 +26,7 @@ def find_all_roots_for_academic_year(academic_year_id):
     return roots_by_children_id
 
 
+#  FIXME move this function out of the repository or replace by using load_trees_from_children()
 def find_roots(
         objects,
         as_instances=False,

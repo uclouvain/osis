@@ -545,6 +545,7 @@ class ModificationPermission(LinkActionPermission):
             )
 
 
+#  DEPRECATED remove this function when EducationGroupHierarchy is removed
 def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
