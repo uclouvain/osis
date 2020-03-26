@@ -3,7 +3,6 @@ import random
 import factory
 
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
-from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory

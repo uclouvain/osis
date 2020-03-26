@@ -23,56 +23,47 @@
 # ############################################################################
 import tempfile
 
-from behave.runner import Context
 from django.conf import settings
 from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
-from features import factories as functional_factories
-from features.factories import users, score_encoding, learning_unit, education_group, organization, academic_year, reference
+from features.data import setup_data
 
 
 def before_all(context):
     context.download_directory = tempfile.mkdtemp('osis-selenium')
+
     fp = webdriver.FirefoxProfile()
     fp.set_preference('browser.download.dir', context.download_directory)
     fp.set_preference('browser.download.folderList', 2)
     fp.set_preference('browser.download.manager.showWhenStarting', False)
     fp.set_preference("intl.accept_languages", 'fr-be')
     fp.set_preference('pdfjs.disabled', True)
-    known_mimes = ['application/vnd.ms-excel',
-                   'application/pdf',
-                   'text/csv',
-                   'application/xls',
-                   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+    known_mimes = [
+        'application/vnd.ms-excel',
+        'application/pdf',
+        'text/csv',
+        'application/xls',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ]
     fp.set_preference('browser.helperApps.neverAsk.saveToDisk', ','.join(known_mimes))
+
     options = Options()
     if settings.SELENIUM_SETTINGS["VIRTUAL_DISPLAY"]:
         options.add_argument('-headless')
-    executable_path = settings.SELENIUM_SETTINGS["GECKO_DRIVER"]
-    context.browser = webdriver.Firefox(firefox_profile=fp, options=options, executable_path=executable_path)
 
-    screen_size = (settings.SELENIUM_SETTINGS['SCREEN_WIDTH'], settings.SELENIUM_SETTINGS['SCREEN_HIGH'])
-    context.browser.set_window_size(*screen_size)
+    context.browser = webdriver.Firefox(
+        firefox_profile=fp,
+        options=options,
+        executable_path=settings.SELENIUM_SETTINGS["GECKO_DRIVER"]
+    )
+    context.browser.set_window_size(
+        settings.SELENIUM_SETTINGS['SCREEN_WIDTH'],
+        settings.SELENIUM_SETTINGS['SCREEN_HIGH']
+    )
+
     setup_data(context)
-
-
-def setup_data(context: Context):
-    context.current_academic_year = functional_factories.academic_year.BusinessAcademicYearFactory().current_academic_year
-    functional_factories.reference.BusinessLanguageFactory()
-    functional_factories.organization.BusinessEntityVersionTreeFactory()
-    functional_factories.organization.BusinessCampusFactory()
-    functional_factories.users.BusinessUsersFactory()
-    functional_factories.score_encoding.ScoreEncodingFactory()
-    context.setup_data = functional_factories.learning_unit.LearningUnitBusinessFactory()
-    functional_factories.education_group.OfferBusinessFactory()
-
-    return context
-
-
-def before_scenario(context, scenario):
-    pass
 
 
 def after_all(context):

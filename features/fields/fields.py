@@ -32,10 +32,10 @@ from base.models.entity_version import EntityVersion
 
 
 class Field:
-    """ Field respects the descriptor pattern for the setter but not for the getter.
-     The purpose of this method, it is to allow the user to fetch the selenium node and to manipulate it.
-     """
-
+    """
+        Field respects the descriptor pattern for the setter but not for the getter.
+        The purpose of this method, it is to allow the user to fetch the selenium node and to manipulate it.
+    """
     def __init__(self, *locator):
         self.locator = locator
         self.element = None
