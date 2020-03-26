@@ -516,7 +516,11 @@ components:
           type: number
         administration_entity:
           type: string
+        administration_faculty:
+          type: string
         management_entity:
+          type: string
+        management_faculty:
           type: string
         partial_title:
           type: string
@@ -667,6 +671,8 @@ components:
           type: string
         management_entity:
           type: string
+        management_faculty:
+          type: string
         academic_year:
           type: number
         education_group_type:
@@ -707,6 +713,8 @@ components:
         code:
           type: string
         management_entity:
+          type: string
+        management_faculty:
           type: string
         academic_year:
           type: number
@@ -761,10 +769,7 @@ components:
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
-          allOf:
-            - $ref: '#/components/schemas/MiniTrainingTypeEnum'
-            - $ref: '#/components/schemas/TrainingTypeEnum'
-            - $ref: '#/components/schemas/GroupTypeEnum'
+          $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
           type: string
         children:

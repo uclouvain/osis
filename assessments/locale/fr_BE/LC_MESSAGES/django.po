@@ -69,6 +69,9 @@ msgstr "Valeur acceptée: %(justification_label_authorized)s "
 msgid "Acronym"
 msgstr "Acronyme"
 
+msgid "Acronym enrollment header"
+msgstr "Sigle"
+
 msgid "Add"
 msgstr "Ajouter"
 
@@ -414,6 +417,9 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Registration number header"
+msgstr "Noma"
+
 msgid "Remove"
 msgstr "Retirer"
 
@@ -504,6 +510,9 @@ msgid "Selected"
 msgstr "Sélectionné"
 
 msgid "Session"
+msgstr "Session"
+
+msgid "Session enrollment header"
 msgstr "Session"
 
 msgid "Session number"
