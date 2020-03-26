@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-19 14:23+0100\n"
+"POT-Creation-Date: 2020-03-19 07:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -473,6 +473,9 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+msgid "Cancel proposal"
+msgstr ""
+
 msgid "Cancel the proposal"
 msgstr ""
 
@@ -562,6 +565,9 @@ msgid "Common English title"
 msgstr ""
 
 msgid "Common core"
+msgstr ""
+
+msgid "Common part"
 msgstr ""
 
 msgid "Common title"
@@ -775,6 +781,9 @@ msgstr ""
 msgid "Do not assign"
 msgstr ""
 
+msgid "Do you want to cancel proposal?"
+msgstr ""
+
 msgid "Do you want to change the status of this proposals?"
 msgstr ""
 
@@ -785,9 +794,6 @@ msgid "Do you want to continue ?"
 msgstr ""
 
 msgid "Do you want to export the following informations"
-msgstr ""
-
-msgid "Do you want to get back to initial data?"
 msgstr ""
 
 msgid "Do you want to report the modifications done to the next years ?"
@@ -889,9 +895,6 @@ msgid "English comment"
 msgstr ""
 
 msgid "English title proper"
-msgstr ""
-
-msgid "English title proper to the partim"
 msgstr ""
 
 msgid "Enrolled"
@@ -1106,9 +1109,6 @@ msgid "Generate xls of learning units that are prerequisites for"
 msgstr ""
 
 msgid "Generate xls of learning units that have prerequisites"
-msgstr ""
-
-msgid "Get back to initial data"
 msgstr ""
 
 msgid "Global ID"
@@ -1847,6 +1847,11 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
+msgid ""
+"Part of the title which is common to the complete EU, to its partims and to "
+"its classes"
+msgstr ""
+
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
@@ -2167,6 +2172,9 @@ msgstr ""
 msgid "Real/Planned classrooms"
 msgstr ""
 
+msgid "Reason for failure"
+msgstr ""
+
 msgid "Received on"
 msgstr ""
 
@@ -2348,6 +2356,12 @@ msgid "Specific Conditions"
 msgstr ""
 
 msgid "Specific admission requirements"
+msgstr ""
+
+msgid "Specific complement (Full)"
+msgstr ""
+
+msgid "Specific complement (Partim)"
 msgstr ""
 
 msgid "Specifications"
@@ -2668,6 +2682,9 @@ msgid ""
 "The sum of the volumes of the entities must be equal to the global volume"
 msgstr ""
 
+msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
@@ -2806,9 +2823,6 @@ msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
-msgstr ""
-
-msgid "Title proper to the partim"
 msgstr ""
 
 msgid "To complete"
@@ -3489,6 +3503,9 @@ msgid "volume requirement entity"
 msgstr ""
 
 msgid "volume total requirement entities"
+msgstr ""
+
+msgid "without postponement"
 msgstr ""
 
 msgid "yes"
