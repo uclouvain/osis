@@ -1,6 +1,7 @@
 import random
 
 import factory
+from django.contrib.auth.models import Permission
 
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
@@ -25,6 +26,10 @@ class ScoreEncodingFactory:
             len(self.offers),
             offer_year=factory.Iterator(self.offers)
         )
+
+        perm = Permission.objects.filter(codename="can_access_scoreencoding").first()
+        for manager in self.program_managers:
+            manager.person.user.user_permissions.add(perm)
 
         academic_calendar = AcademicCalendarExamSubmissionFactory(academic_year__current=True)
         session_exam_calendar = SessionExamCalendarFactory(academic_calendar=academic_calendar)

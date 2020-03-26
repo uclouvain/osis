@@ -30,6 +30,8 @@ from django.contrib.auth.models import Permission
 from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 
+from features.forms.assessments import search_learning_units_form, encode_students_score_form, \
+    double_encode_students_score_form
 from features.pages.assessments import pages
 from assessments.views import upload_xls_utils
 from base.models.enums import exam_enrollment_justification_type
@@ -42,8 +44,6 @@ use_step_matcher("parse")
 @given("The program manager is logged")
 def step_impl(context: Context):
     context.program_manager = ProgramManager.objects.all().order_by('?')[0]
-    perm = Permission.objects.filter(codename="can_access_scoreencoding").first()
-    context.program_manager.person.user.user_permissions.add(perm)
     page = LoginPage(driver=context.browser, base_url=context.get_url('login')).open()
     page.login(context.program_manager.person.user.username)
 
@@ -56,7 +56,7 @@ def step_impl(context: Context):
 @when("Search learning units of the program manager offer")
 def step_impl(context: Context):
     page = pages.LearningUnitsPage(driver=context.browser, base_url=context.get_url('scores_encoding'))
-    page.training_select = context.program_manager.offer_year.id
+    search_learning_units_form.fill_form(page, context.program_manager)
     page.submit()
 
 
@@ -69,28 +69,15 @@ def step_impl(context: Context):
 @when("Submit score for one student")
 def step_impl(context: Context):
     page = pages.ScoreEncodingFormPage(driver=context.browser)
-    page.results[0].score = str(12)
+    scores_encoded = encode_students_score_form.fill_one_student_score(page)
     page.submit()
-    context.scores = [str(12)]
+    context.scores = scores_encoded
 
 
 @then("Scores should be updated")
 def step_impl(context: Context):
     page = pages.ScoreEncodingPage(driver=context.browser)
-    for result, score in zip(page.results, context.scores):
-        if score.isdecimal():
-            context.test.assertEqual(result.score.text, score)
-            context.test.assertEqual(result.justification.text, "-")
-        elif score in upload_xls_utils.AUTHORIZED_JUSTIFICATION_ALIASES:
-            context.test.assertEqual(result.score.text, "-")
-            justification_value = get_enum_value(
-                exam_enrollment_justification_type.JUSTIFICATION_TYPES,
-                upload_xls_utils.AUTHORIZED_JUSTIFICATION_ALIASES[score]
-            )
-            context.test.assertEqual(
-                result.justification.text,
-                _(justification_value)
-            )
+    assert_scores_updated(context, page)
 
 
 @when("Click on encode scores")
@@ -108,20 +95,14 @@ def step_impl(context: Context):
 @when("Fill all scores")
 def step_impl(context: Context):
     page = pages.ScoreEncodingFormPage(driver=context.browser)
-    results = page.results
-    context.scores = [str(random.randint(0, 20)) for i in range(20)]
-    for result, score in zip(results, context.scores):
-        result.score = score
+    context.scores = encode_students_score_form.fill_student_scores(page)
     page.submit()
 
 
 @when("Clear all scores")
 def step_impl(context: Context):
     page = pages.ScoreEncodingFormPage(driver=context.browser)
-    results = page.results
-    context.scores = ["" for i in range(20)]
-    for result, score in zip(results, context.scores):
-        result.score = score
+    context.scores = encode_students_score_form.clear_all_scores(page)
     page.submit()
 
 
@@ -158,11 +139,7 @@ def step_impl(context: Context):
 @when("Solve differences")
 def step_impl(context: Context):
     page = pages.DoubleScoreEncodingFormPage(driver=context.browser)
-    validations = [random.randint(1, 2) for i in range(20)]
-    for result, validation in zip(page.results, validations):
-        if result.score_1.text != result.score_2.text:
-            result.validate(validation)
-    context.scores = [result.score_final.text for result in page.results]
+    context.scores = double_encode_students_score_form.choose_final_scores(page)
     page.submit()
 
 
@@ -212,6 +189,24 @@ def update_xlsx(filename):
 
     wb.save(filename=filename)
     return scores
+
+
+def assert_scores_updated(context, page):
+    for result, score in zip(page.results, context.scores):
+        if score.isdecimal():
+            context.test.assertEqual(result.score.text, score)
+            context.test.assertEqual(result.justification.text, "-")
+
+        elif score in upload_xls_utils.AUTHORIZED_JUSTIFICATION_ALIASES:
+            context.test.assertEqual(result.score.text, "-")
+            justification_value = get_enum_value(
+                exam_enrollment_justification_type.JUSTIFICATION_TYPES,
+                upload_xls_utils.AUTHORIZED_JUSTIFICATION_ALIASES[score]
+            )
+            context.test.assertEqual(
+                result.justification.text,
+                _(justification_value)
+            )
 
 
 def get_enum_value(enum, key):
