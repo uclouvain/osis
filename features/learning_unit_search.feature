@@ -1,8 +1,7 @@
 Feature: Recherche des unités d'enseignements.
 
   Background:
-    Given La base de données est dans son état initial.
-    And L'utilisateur est loggé en tant que gestionnaire
+    Given L'utilisateur est loggé en tant que gestionnaire
     And Aller sur la page de recherche d'UE
     And Réinitialiser les critères de recherche
 

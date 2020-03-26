@@ -43,113 +43,116 @@ use_step_matcher("re")
 @step("Aller sur la page de recherche d'UE")
 def step_impl(context: Context):
     url = '/learning_units/by_activity/'
-    context.current_page = SearchLearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
+    SearchLearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
     context.test.assertEqual(context.browser.current_url, context.get_url(url))
 
 
 @step("Réinitialiser les critères de recherche")
 def step_impl(context: Context):
-    context.current_page.clear_button.click()
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.clear_button.click()
 
 
 @when("Sélectionner (?P<anac>.+) dans la zone de saisie « Anac\. »")
 def step_impl(context: Context, anac: str):
-    context.current_page.anac = anac
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.anac = anac
 
 
 @step("Cliquer sur le bouton Rechercher \(Loupe\)")
 def step_impl(context: Context):
-    context.current_page.search.click()
-    context.current_page.wait_for_page_to_load()
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.search.click()
+    page.wait_for_page_to_load()  # FIXME remove the implicit wait should be on the click
 
 
 @then("Le nombre total de résultat est (?P<result_count>.+)")
 def step_impl(context: Context, result_count: str):
-    context.test.assertEqual(context.current_page.count_result(), result_count)
+    page = SearchLearningUnitPage(driver=context.browser)
+    context.test.assertEqual(page.count_result(), result_count)
 
 
 @step("Dans la liste de résultat, le\(s\) premier\(s\) « Code » est\(sont\) bien (?P<acronym>.+)\.")
 def step_impl(context: Context, acronym: str):
+    page = SearchLearningUnitPage(driver=context.browser)
     acronyms = acronym.split(',')
-    acronyms_results = [result.acronym.text for result in context.current_page.proposal_results]
-    print(acronyms_results)
+    acronyms_results = [result.acronym.text for result in page.proposal_results]
     for row, acronym in enumerate(acronyms):
         context.test.assertTrue(acronym in acronyms_results)
 
 
 @when("Ouvrir le menu « Exporter »")
 def step_impl(context: Context):
-    context.current_page.export.click()
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.export.click()
 
 
 @step("Sélection « Liste personnalisée des unités d’enseignement »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.list_learning_units.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.list_learning_units.click()
 
 
 @step("Cocher les cases « Programmes/regroupements » et « Enseignant\(e\)s »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.with_program.click()
-    context.current_page.with_tutor.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.with_program.click()
+    page.with_tutor.click()
 
 
 @step("Cliquer sur « Produire Excel »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.generate_xls.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.generate_xls.click()
 
 
 @step("Sélectionner l’onglet « Propositions »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page = context.current_page.proposal_search.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.proposal_search.click()
 
 
 @step("Encoder le code d'une UE")
 def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
     context.learning_unit_year_to_research = LearningUnitYear.objects.all().order_by("?").first()
-    setattr(context.current_page, "acronym", context.learning_unit_year_to_research.acronym)
+    page.acronym = context.learning_unit_year_to_research.acronym
 
 
 @step("Encoder le type d'UE")
 def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
     context.type_to_search = random.choice(LearningContainerYearType.get_values())
-    setattr(context.current_page, "container_type", context.type_to_search)
+    page.container_type = context.type_to_search
 
 
 @step("Encoder l'entité d'UE")
 def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
     context.entity_to_search = EntityVersion.objects.all().order_by("?").first()
-    setattr(context.current_page, "requirement_entity", context.entity_to_search.acronym)
+    page.requirement_entity = context.entity_to_search.acronym
 
 
 @step("Encoder l'enseignant d'UE")
 def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
     context.tutor_to_search = Tutor.objects.all().order_by("?").first()
-    setattr(context.current_page, "tutor", context.tutor_to_search.person.full_name)
+    page.tutor = context.tutor_to_search.person.full_name
 
 
 @step("Dans la liste de résultat, l'UE doit apparaître")
 def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
     context.test.assertIn(
         context.learning_unit_year_to_research.acronym,
-        [result.acronym.text for result in context.current_page.results]
+        [result.acronym.text for result in page.results]
     )
 
 
 @step("Dans la liste de résultat, seul ce type doit apparaître")
 def step_impl(context: Context):
-    learning_unit_types_present_in_page = set([result.type.text for result in context.current_page.results])
+    page = SearchLearningUnitPage(driver=context.browser)
+    learning_unit_types_present_in_page = set([result.type.text for result in page.results])
     context.test.assertEqual(
         {context.type_to_search},
         learning_unit_types_present_in_page
@@ -158,7 +161,8 @@ def step_impl(context: Context):
 
 @step("Dans la liste de résultat, seul cette entité doit apparaître")
 def step_impl(context: Context):
-    learning_unit_entities_present_in_page = set([result.requirement_entity.text for result in context.current_page.results])
+    page = SearchLearningUnitPage(driver=context.browser)
+    learning_unit_entities_present_in_page = set([result.requirement_entity.text for result in page.results])
     if not learning_unit_entities_present_in_page:
         return None
     expected_entities = [context.entity_to_search] + list(context.entity_to_search.descendants)
@@ -169,7 +173,8 @@ def step_impl(context: Context):
 
 @step("Dans la liste de résultat, seul les UEs de l'enseignant doivent apparaître")
 def step_impl(context: Context):
-    learning_unit_acronyms_present_in_page = set([result.acronym.text for result in context.current_page.results])
+    page = SearchLearningUnitPage(driver=context.browser)
+    learning_unit_acronyms_present_in_page = set([result.acronym.text for result in page.results])
     if not learning_unit_acronyms_present_in_page:
         return None
     expected_luys = LearningUnitYear.objects.filter(
