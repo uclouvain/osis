@@ -65,9 +65,6 @@ TEMPLATES_BY_CATEGORY = {
 
 
 class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
-    flag = "education_group_create"
-    # rules = [can_create_education_group]
-    # raise_exception = True
     template_name = "education_group/blocks/form/education_group_type.html"
     form_class = EducationGroupTypeForm
 
@@ -90,7 +87,6 @@ class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
 
 
 @login_required
-@waffle_flag("education_group_create")
 @can_create_education_group
 def create_education_group(request, category, education_group_type_pk, root_id=None, parent_id=None):
     parent = get_object_or_none(EducationGroupYear, pk=parent_id)

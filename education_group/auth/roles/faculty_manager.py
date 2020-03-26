@@ -48,6 +48,8 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_link_to_management_entity &
                 predicates.is_program_edition_period_open,
+            'delete_all_educationgroup':
+                predicates.is_all_education_group_are_removable,
             'delete_educationgroup':
                 predicates.is_user_link_to_management_entity &
                 predicates.is_program_edition_period_open,

@@ -63,8 +63,9 @@ def _get_relevant_roles(user_obj, perm):
 
 
 def _get_roles_assigned_to_user(user_obj):
-    groups_assigned = user_obj.groups.values_list('name', flat=True)
-    return {r for r in role.role_manager.roles if r.group_name in groups_assigned}
+    if not hasattr(user_obj, '_group_cache'):
+        user_obj._group_cache = set(user_obj.groups.values_list('name', flat=True))
+    return {r for r in role.role_manager.roles if r.group_name in user_obj._group_cache}
 
 
 def _add_role_queryset_to_perms_context(rule_set, perm, qs):

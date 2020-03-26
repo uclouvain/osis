@@ -30,20 +30,16 @@ from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _, pgettext
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
 from base.models.enums import education_group_categories
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
 from base.models.enums.education_group_types import GroupType
-from base.templatetags.education_group import li_with_deletion_perm, \
-    button_order_with_permission, \
+from base.templatetags.education_group import button_order_with_permission, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent, li_with_update_perm
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
@@ -87,19 +83,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             "request": self.request,
             "root": self.education_group_year,
         }
-
-    def test_li_with_deletion_perm(self):
-        result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
-        self.assertEqual(
-            result, {
-                'load_modal': True,
-                'title': '',
-                'class_li': '',
-                'id_li': 'link_delete',
-                'url': self.url,
-                'text': DELETE_MSG
-            }
-        )
 
     @mock.patch('base.business.education_groups.perms.check_permission')
     @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
@@ -191,67 +174,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             "education_group_year": self.education_group_year,
             "request": RequestFactory().get("")
         }
-
-    def test_li_tag_case_not_in_education_group_edition_period(self):
-        """ This test ensure that as faculty manager, the li tag is disabled when outside of encoding period"""
-        self.academic_calendar.delete()
-
-        result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
-        self.assertEqual(
-            result, {
-                'load_modal': False,
-                'title': PERMISSION_DENIED_MSG,
-                'class_li': 'disabled',
-                'id_li': 'link_delete',
-                'url': "#",
-                'text': DELETE_MSG
-            }
-        )
-
-    def test_li_tag_case_education_group_edition_period_within_the_past(self):
-        academic_years = []
-        education_group = EducationGroupFactory(start_year=AcademicYearFactory(year=2013))
-        edys = []
-        for i in range(2014, AcademicYearFactory(current=True).year + 1):
-            aca_year = AcademicYearFactory(year=i)
-            academic_years.append(aca_year)
-            edys.append(TrainingFactory(academic_year=aca_year,
-                                        education_group=education_group,
-                                        management_entity=self.education_group_year.management_entity))
-
-        url = reverse('delete_education_group', args=[edys[-1].id, edys[-1].id])
-        context = {
-            "person": self.person,
-            "root": edys[-1],
-            "education_group_year": edys[-1],
-            "request": RequestFactory().get("")
-        }
-        result = li_with_deletion_perm(context, url, DELETE_MSG)
-        self.assertEqual(
-            {
-                'load_modal': False,
-                'title': PERMISSION_DENIED_MSG,
-                'class_li': 'disabled',
-                'id_li': 'link_delete',
-                'url': "#",
-                'text': DELETE_MSG
-            },
-            result
-        )
-
-    def test_li_tag_case_inside_education_group_edition_period(self):
-        result = li_with_deletion_perm(self.context, self.url, DELETE_MSG)
-        self.assertEqual(
-            result, {
-                'load_modal': True,
-                'text': DELETE_MSG,
-                'class_li': '',
-                'id_li': "link_delete",
-                'url': self.url,
-                'title': ''
-            }
-        )
-
 
     def test_button_edit_administrative_data_disabled(self):
         result = button_edit_administrative_data(self.context)

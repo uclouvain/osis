@@ -49,7 +49,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
-from base.views.education_groups.perms import can_change_education_group
 from program_management.forms.group_element_year import GroupElementYearFormset
 
 
@@ -69,26 +68,19 @@ def get_education_group_year_by_pk(request, root_id, education_group_year_id):
     )
 
 
+# TODO: Split view of update_certification_aims with update_education_group
 @login_required
-@permission_required('change_educationgroup', fn=get_education_group_year_by_pk)
 def update_education_group(request, root_id, education_group_year_id):
-    education_group_year = get_education_group_year_by_pk(request, root_id, education_group_year_id)
+    education_group_year = get_object_or_404(
+        EducationGroupYear.objects.select_related('education_group'),
+        pk=education_group_year_id
+    )
     person = request.user.person
-
-    # Store root in the instance to avoid to pass the root in methods
-    # it will be used in the templates.
-    education_group_year.root = root_id
 
     if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
             and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
         return _update_certificate_aims(request, root_id, education_group_year)
-
-    groupelementyear_formset = GroupElementYearFormset(
-        request.POST or None,
-        prefix='group_element_year_formset',
-        queryset=education_group_year.groupelementyear_set.all()
-    )
-    return _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset)
+    return update_education_group_year(request, root_id, education_group_year_id)
 
 
 def _update_certificate_aims(request, root_id, education_group_year):
@@ -106,10 +98,19 @@ def _update_certificate_aims(request, root_id, education_group_year):
     })
 
 
-def _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset):
-    # Protect the view
-    can_change_education_group(request.user, education_group_year)
+@login_required
+@permission_required('change_educationgroup', fn=get_education_group_year_by_pk)
+def update_education_group_year(request, root_id, education_group_year_id):
+    education_group_year = get_education_group_year_by_pk(request, root_id, education_group_year_id)
+    # Store root in the instance to avoid to pass the root in methods
+    # it will be used in the templates.
+    education_group_year.root = root_id
 
+    groupelementyear_formset = GroupElementYearFormset(
+        request.POST or None,
+        prefix='group_element_year_formset',
+        queryset=education_group_year.groupelementyear_set.all()
+    )
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     view_function = _get_view(education_group_year.education_group_type.category)
     return view_function(request, education_group_year, root, groupelementyear_formset)

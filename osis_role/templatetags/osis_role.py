@@ -1,5 +1,4 @@
 from django import template
-from django.contrib.auth.models import Group
 
 from osis_role import errors
 
@@ -22,6 +21,7 @@ def a_tag_has_perm(url, text, perm, user, obj=None):
 @register.inclusion_tag('a_template.html')
 def a_tag_modal_has_perm(url, text, perm, user, obj=None):
     return {
+        "class_a": "trigger_modal",
+        "load_modal": True,
         **a_tag_has_perm(url, text, perm, user, obj),
-        "load_modal": True
     }

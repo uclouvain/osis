@@ -12,6 +12,14 @@ from program_management.business.group_element_years import management
 
 
 @predicate(bind=True)
+def is_all_education_group_are_removable(self, user, education_group):
+    education_group_years = education_group.educationgroupyear_set.all()
+    return all(
+        user.has_perm('delete_educationgroup', education_group_year) for education_group_year in education_group_years
+    )
+
+
+@predicate(bind=True)
 @predicate_failed_msg(
     message=pgettext("male", "The user has not permission to create a %(category)s.") %
     {"category": Categories.GROUP.value}
