@@ -24,16 +24,12 @@
 #
 ##############################################################################
 
-import copy
-from typing import List, Dict, Any
+from typing import List
 
-from django.db.models import Case, F, When, IntegerField, Subquery, OuterRef
+from django.db.models import F, Subquery, OuterRef
 
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
-from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume

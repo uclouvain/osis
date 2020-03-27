@@ -25,20 +25,16 @@
 ##############################################################################
 from typing import List
 
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Value, Case, When, IntegerField, CharField, QuerySet, Q
+from django.db.models import F, Value, CharField, QuerySet, Q
 
-from base.models.education_group_type import EducationGroupType
+from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import AllTypes, EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.group_element_year import GroupElementYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
 from program_management.models.enums.node_type import NodeType
-
-from learning_unit.ddd.business_types import *
 
 
 def load_by_type(type: NodeType, element_id: int) -> node.Node:
@@ -66,7 +62,7 @@ def load_node_learning_unit_year(node_id: int) -> node.Node:
 
 # TODO :: create a new app group/ddd and move the fetch of Group, GroupYear into this new app? (like learning_unit?)
 def load_multiple(element_ids: List[int]) -> List[node.Node]:
-    qs = GroupElementYear.objects.filter(
+    qs = group_element_year.GroupElementYear.objects.filter(
         pk__in=element_ids
     ).filter(
         Q(child_leaf__isnull=False) | Q(child_branch__isnull=False)
@@ -92,8 +88,10 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 
     nodes_objects = [node.factory.get_node(**__convert_string_to_enum(node_data))
                      for node_data in __load_multiple_node_education_group_year(group_pks)]
+    nodes_objects += [node.factory.get_node(**__convert_string_to_enum(node_data))
+                      for node_data in __load_multiple_node_learning_unit_year(learning_unit_pks)]
 
-    return nodes_objects + __load_multiple_node_learning_unit_year(learning_unit_pks)
+    return nodes_objects
 
 
 def __convert_string_to_enum(node_data: dict) -> dict:
@@ -208,5 +206,5 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
             'volume_total_lecturing': lu.lecturing_volume.total_annual,
             'volume_total_practical': lu.practical_volume.total_annual,
         }
-        nodes.append(node.factory.get_node(**__convert_string_to_enum(node_data)))
+        nodes.append(node_data)
     return nodes

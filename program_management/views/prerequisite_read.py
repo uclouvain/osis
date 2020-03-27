@@ -27,6 +27,7 @@
 from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 
+import program_management.ddd.repositories.find_roots
 from base.business.education_groups import perms
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -97,8 +98,10 @@ class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):
         context = super().get_context_data()
 
         learning_unit_year = context["learning_unit_year"]
-        formations_id = group_element_year.find_learning_unit_roots([learning_unit_year]). \
-            get(learning_unit_year.id, [])
+        formations_id = program_management.ddd.repositories.find_roots.find_roots([learning_unit_year]).get(
+            learning_unit_year.id,
+            []
+        )
         qs = EducationGroupYear.objects.filter(id__in=formations_id)
         prefetch_prerequisites = Prefetch("prerequisite_set",
                                           Prerequisite.objects.filter(learning_unit_year=learning_unit_year),
