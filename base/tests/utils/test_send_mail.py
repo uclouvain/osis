@@ -26,7 +26,6 @@
 from unittest.mock import patch
 
 from django.test import TestCase
-from django.utils.translation import gettext as _
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -243,6 +242,10 @@ class TestSendMessage(TestCase):
                                  args.get('template_base_data').get('encoding_status'))
             else:
                 self.assertEqual('All the scores are encoded.', args.get('template_base_data').get('encoding_status'))
+
+    def test_get_encoding_status(self):
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, False), 'It remains notes to encode.')
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, False), 'Il reste encore des notes à encoder.')
 
 
 def add_message_template_txt():
