@@ -245,7 +245,8 @@ class TestSendMessage(TestCase):
 
     def test_get_encoding_status(self):
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, False), 'It remains notes to encode.')
-        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, False), 'Il reste encore des notes à encoder.')
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, False),
+                         'Il reste encore des notes à encoder.')
 
 
 def add_message_template_txt():
