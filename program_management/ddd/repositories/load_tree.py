@@ -30,6 +30,7 @@ from django.db.models import Case, F, When, IntegerField
 
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.link import factory as link_factory
@@ -93,10 +94,15 @@ def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
     return {'{}_{}'.format(n.pk, n.type): n for n in nodes_list}
 
 
-def __convert_link_type_to_enum(link_data: dict):
+def __convert_link_type_to_enum(link_data: dict) -> None:
     link_type = link_data['link_type']
     if link_type:
         link_data['link_type'] = LinkTypes[link_type]
+
+
+def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
+    if gey_dict.get('quadrimester'):
+        gey_dict['quadrimester'] = DerogationQuadrimester[gey_dict['quadrimester']]
 
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
@@ -129,6 +135,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         parent_id = gey_dict.pop('parent_id')
         child_id = gey_dict.pop('child_id')
         __convert_link_type_to_enum(gey_dict)
+        __convert_quadrimester_to_enum(gey_dict)
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
         tree_links[tree_id] = link_factory.get_link(parent=None, child=None, **gey_dict)

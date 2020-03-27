@@ -32,7 +32,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
-from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.academic_year import AcademicYear
@@ -278,8 +278,7 @@ class NodeLearningUnitYear(Node):
             proposal_type: ProposalType = None,
             learning_unit_type: LearningContainerYearType = None,
             other_remark: str = None,
-            # FIXME :: use the Enum DerogationQuadrimesterEnum instead when the FIXME inside is done
-            quadrimester: str = None,
+            quadrimester: DerogationQuadrimester = None,
             volume_total_lecturing: Decimal = None,
             volume_total_practical: Decimal = None,
             **common_node_kwargs

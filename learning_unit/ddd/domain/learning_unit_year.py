@@ -28,9 +28,7 @@ from _decimal import Decimal
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_type import ProposalType
-
-
-StrDerogationQuadrimesterEnum = str  # based on DerogationQuadrimesterEnum FIXME :: cf DerogationQuadrimesterEnum
+from base.models.enums.quadrimesters import DerogationQuadrimester
 
 
 class LecturingVolume:
@@ -67,7 +65,7 @@ class LearningUnitYear:
             status: bool = None,
             periodicity: PeriodicityEnum = None,
             other_remark: str = None,
-            quadrimester: StrDerogationQuadrimesterEnum = None,
+            quadrimester: DerogationQuadrimester = None,
 
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,

@@ -25,7 +25,7 @@
 ##############################################################################
 
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 
@@ -46,7 +46,7 @@ class Link:
         comment: str = None,
         comment_english: str = None,
         own_comment: str = None,
-        quadrimester_derogation: DerogationQuadrimesterEnum = None,
+        quadrimester_derogation: DerogationQuadrimester = None,
         link_type: LinkTypes = None,
         order: int = None
     ):

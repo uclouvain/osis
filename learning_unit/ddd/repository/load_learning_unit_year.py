@@ -30,6 +30,7 @@ from django.db.models import F, Subquery, OuterRef
 
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
@@ -103,4 +104,6 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
 def __convert_string_to_enum(learn_unit_data: dict) -> dict:
     subtype_str = learn_unit_data['type']
     learn_unit_data['type'] = LearningContainerYearType[subtype_str]
+    if learn_unit_data.get('quadrimester'):
+        learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
     return learn_unit_data
