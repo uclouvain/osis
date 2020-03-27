@@ -51,6 +51,11 @@ from base.tests.factories.user import UserFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
 from base.utils.cache import RequestCache
 
+from waffle.models import Flag
+from rest_framework import status
+
+EDUCATION_GROUPS_URL = "education_groups"
+
 FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
 TITLE_EDPH3 = "Edph training 3 [120], sciences"
@@ -62,7 +67,7 @@ class TestEducationGroupSearchView(TestCase):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.url = reverse("education_groups")
+        cls.url = reverse(EDUCATION_GROUPS_URL)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -95,6 +100,17 @@ class TestEducationGroupSearchView(TestCase):
         self.client.get(self.url, data=FILTER_DATA)
         cached_data = RequestCache(self.user, self.url).cached_data
         self.assertEqual(cached_data, FILTER_DATA)
+
+    def test_flag_version_program_exists(self):
+        Flag.objects.create(name='version_program')
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
+    def test_flag_version_program_not_exists(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTemplateUsed(response, 'education_group/search.html')
 
 
 class TestEducationGroupDataSearchFilter(TestCase):
@@ -158,7 +174,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         cls.user = PersonFactory().user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.form_class = EducationGroupFilter()._meta.form
-        cls.url = reverse("education_groups")
+        cls.url = reverse(EDUCATION_GROUPS_URL)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -449,7 +465,7 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
     def setUpTestData(cls):
         cls.academic_years = AcademicYearFactory.produce()
         cls.egys = EducationGroupYearFactory.create_batch(4)
-        cls.url = reverse("education_groups")
+        cls.url = reverse(EDUCATION_GROUPS_URL)
         cls.get_data = {
             "academic_year": str(cls.egys[0].academic_year.id),
         }
