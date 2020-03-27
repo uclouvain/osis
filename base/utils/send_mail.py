@@ -94,8 +94,8 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
             {'encoding_status': _get_encoding_status(receiver['receiver_lang'], all_encoded)
              }
         )
-        message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table], [receiver],
-                                                                template_base_data, subject_data)
+        message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table],
+                                                                [receiver], template_base_data, subject_data)
         message_service.send_messages(message_content)
     return None
 
