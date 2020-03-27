@@ -8,7 +8,7 @@ Feature: Recherche des unités d'enseignements.
   Scenario: En tant que gestionnaire, je recherche une UE par code
   When Encoder le code d'une UE
   And Cliquer sur le bouton Rechercher (Loupe)
-  Then Dans la liste de résultat, l'UE doit apparaître
+  Then La liste de résultat doit correspondre aux crières de recherche
 
 # TODO Generate UE of different container types
 #  Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par type
@@ -20,17 +20,17 @@ Feature: Recherche des unités d'enseignements.
   Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par entité
     When Encoder l'entité d'UE
     And Cliquer sur le bouton Rechercher (Loupe)
-    Then Dans la liste de résultat, seul cette entité doit apparaître
+    Then La liste de résultat doit correspondre aux crières de recherche
 
   Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par enseignant
     When Encoder l'enseignant d'UE
     And Cliquer sur le bouton Rechercher (Loupe)
-    Then Dans la liste de résultat, seul les UEs de l'enseignant doivent apparaître
+    Then La liste de résultat doit correspondre aux crières de recherche
 
   Scenario: En tant que gestionnaire facultaire ou central, je recherche des UE pour produire un Excel
     When Encoder le code d'une UE
     And Cliquer sur le bouton Rechercher (Loupe)
-    Then Dans la liste de résultat, l'UE doit apparaître
+    Then La liste de résultat doit correspondre aux crières de recherche
     When Ouvrir le menu « Exporter »
     And Sélection « Liste personnalisée des unités d’enseignement »
     And Cocher les cases « Programmes/regroupements » et « Enseignant(e)s »

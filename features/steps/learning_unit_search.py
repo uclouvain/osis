@@ -28,13 +28,11 @@ from behave import *
 from behave.runner import Context
 from django.utils.translation import gettext_lazy as _
 
-from base.models.education_group_type import EducationGroupType
-from base.models.entity_version import EntityVersion
-from base.models.enums import education_group_categories
+from base.models import tutor
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.tutor import Tutor
-from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
+from features.forms.learning_units import search_form
 from features.pages.learning_unit.pages import SearchLearningUnitPage
 
 use_step_matcher("re")
@@ -51,12 +49,6 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     page = SearchLearningUnitPage(driver=context.browser)
     page.clear_button.click()
-
-
-@when("Sélectionner (?P<anac>.+) dans la zone de saisie « Anac\. »")
-def step_impl(context: Context, anac: str):
-    page = SearchLearningUnitPage(driver=context.browser)
-    page.anac = anac
 
 
 @step("Cliquer sur le bouton Rechercher \(Loupe\)")
@@ -115,8 +107,8 @@ def step_impl(context: Context):
 @step("Encoder le code d'une UE")
 def step_impl(context: Context):
     page = SearchLearningUnitPage(driver=context.browser)
-    context.learning_unit_year_to_research = LearningUnitYear.objects.all().order_by("?").first()
-    page.acronym = context.learning_unit_year_to_research.acronym
+    form_values = search_form.fill_code(page)
+    context.search_form_values = form_values
 
 
 @step("Encoder le type d'UE")
@@ -129,24 +121,22 @@ def step_impl(context: Context):
 @step("Encoder l'entité d'UE")
 def step_impl(context: Context):
     page = SearchLearningUnitPage(driver=context.browser)
-    context.entity_to_search = EntityVersion.objects.all().order_by("?").first()
-    page.requirement_entity = context.entity_to_search.acronym
+    context.search_form_values = search_form.fill_entity(page)
 
 
 @step("Encoder l'enseignant d'UE")
 def step_impl(context: Context):
     page = SearchLearningUnitPage(driver=context.browser)
-    context.tutor_to_search = Tutor.objects.all().order_by("?").first()
-    page.tutor = context.tutor_to_search.person.full_name
+    context.search_form_values = search_form.fill_tutor(page)
 
 
-@step("Dans la liste de résultat, l'UE doit apparaître")
+@step("La liste de résultat doit correspondre aux crières de recherche")
 def step_impl(context: Context):
     page = SearchLearningUnitPage(driver=context.browser)
-    context.test.assertIn(
-        context.learning_unit_year_to_research.acronym,
-        [result.acronym.text for result in page.results]
-    )
+    search_criterias = context.search_form_values
+    assert_acronym_match(page.results, search_criterias.get("acronym", ""), context.test)
+    assert_requirement_entity_match(page.results, search_criterias.get("requirement_entity", ""), context.test)
+    assert_tutor_match(page.results, search_criterias.get("tutor", ""), context.test)
 
 
 @step("Dans la liste de résultat, seul ce type doit apparaître")
@@ -156,33 +146,6 @@ def step_impl(context: Context):
     context.test.assertEqual(
         {context.type_to_search},
         learning_unit_types_present_in_page
-    )
-
-
-@step("Dans la liste de résultat, seul cette entité doit apparaître")
-def step_impl(context: Context):
-    page = SearchLearningUnitPage(driver=context.browser)
-    learning_unit_entities_present_in_page = set([result.requirement_entity.text for result in page.results])
-    if not learning_unit_entities_present_in_page:
-        return None
-    expected_entities = [context.entity_to_search] + list(context.entity_to_search.descendants)
-    context.test.assertTrue(
-        {e.acronym for e in expected_entities} >= learning_unit_entities_present_in_page
-    )
-
-
-@step("Dans la liste de résultat, seul les UEs de l'enseignant doivent apparaître")
-def step_impl(context: Context):
-    page = SearchLearningUnitPage(driver=context.browser)
-    learning_unit_acronyms_present_in_page = set([result.acronym.text for result in page.results])
-    if not learning_unit_acronyms_present_in_page:
-        return None
-    expected_luys = LearningUnitYear.objects.filter(
-        learning_container_year__attributionnew__tutor=context.tutor_to_search
-    )
-    context.test.assertEqual(
-        {luy.acronym for luy in expected_luys},
-        learning_unit_acronyms_present_in_page
     )
 
 
@@ -197,3 +160,40 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     import time
     time.sleep(10)
+
+
+def assert_acronym_match(results: SearchLearningUnitPage.LearningUnitElement, acronym: str, assertions):
+    if not acronym:
+        return
+    for result in results:
+        assertions.assertIn(acronym, result.acronym.text)
+
+
+def assert_requirement_entity_match(
+        results: SearchLearningUnitPage.LearningUnitElement,
+        requirement_entity: str,
+        assertions
+):
+    if not requirement_entity:
+        return
+    for result in results:
+        assertions.assertEqual(result, result.requirement_entity.text)
+
+
+def assert_tutor_match(
+        results: SearchLearningUnitPage.LearningUnitElement,
+        tutor_obj: tutor.Tutor,
+        assertions
+):
+    if not tutor_obj:
+        return None
+    learning_unit_acronyms_present_in_page = set([result.acronym.text for result in results])
+    if not learning_unit_acronyms_present_in_page:
+        return None
+    expected_luys = LearningUnitYear.objects.filter(
+        learning_container_year__attributionnew__tutor=tutor_obj
+    )
+    assertions.assertEqual(
+        {luy.acronym for luy in expected_luys},
+        learning_unit_acronyms_present_in_page
+    )
