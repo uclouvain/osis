@@ -118,7 +118,7 @@ paths:
         - trainings
   /trainings/{year}/{acronym}/prerequisites:
     get:
-      description: Return the prerequisites of the learning units of the training
+      description: Return the prerequisites of the learning units of the training (standard version)
       operationId: trainings_prerequisites
       parameters:
         - in: path
