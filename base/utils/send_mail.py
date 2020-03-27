@@ -395,9 +395,6 @@ def get_enrollment_headers():
 
 
 def _get_encoding_status(language, all_encoded):
-    if all_encoded:
-        with translation.override(language):
-            return translation.gettext('All the scores are encoded.')
-    else:
-        with translation.override(language):
-            return translation.gettext('It remains notes to encode.')
+    message = 'All the scores are encoded.' if all_encoded else 'It remains notes to encode.'
+    with translation.override(language):
+        return translation.gettext(message)
