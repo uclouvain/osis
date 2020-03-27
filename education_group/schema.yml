@@ -600,6 +600,10 @@ components:
             type: string
         mandatory:
           type: boolean
+        position:
+          type: integer
+        group_number:
+          type: integer
     ArrayOfTraining:
       type: array
       items:
