@@ -565,5 +565,3 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude
         parent_id = group_elem_year.parent_id
         group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
     return group_elems_by_parent_id
-
-

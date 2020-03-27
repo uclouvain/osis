@@ -148,11 +148,11 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
                 )
-            SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id, 
-            COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path 
+            SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id,
+            COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path
             FROM adjacency_query
             LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
-            WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null 
+            WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null
             ORDER BY starting_node_id, level, "order";
         """
         parameters = {
@@ -210,7 +210,7 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
                 )
 
-            SELECT distinct starting_node_id, id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id, 
+            SELECT distinct starting_node_id, id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id,
             "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
@@ -279,7 +279,7 @@ class GroupElementYearManager(models.Manager):
                         ELSE false
                       END as is_root_row
                     FROM base_groupelementyear AS parent
-                    INNER JOIN root_query AS child on parent.child_branch_id = child.parent_id 
+                    INNER JOIN root_query AS child on parent.child_branch_id = child.parent_id
                     and child.is_root_row = false
                     INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
                     INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
@@ -287,7 +287,7 @@ class GroupElementYearManager(models.Manager):
 
             SELECT distinct starting_node_id AS child_id, parent_id AS root_id
             FROM root_query
-            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) 
+            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s)
             and (is_root_row is not Null and is_root_row = true)
             ORDER BY starting_node_id;
         """.format(where_statement=where_statement)

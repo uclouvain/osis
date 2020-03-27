@@ -47,5 +47,3 @@ class AcademicYear:
 
     def past(self) -> 'AcademicYear':
         return self.__class__(self.year - 1)
-
-
