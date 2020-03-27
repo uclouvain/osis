@@ -139,7 +139,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EducationGroupPrerequisites'
+                $ref: '#/components/schemas/ArrayOfEducationGroupPrerequisites'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -177,7 +177,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/EducationGroupPrerequisites'
+                $ref: '#/components/schemas/ArrayOfEducationGroupPrerequisites'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -562,6 +562,10 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    ArrayOfEducationGroupPrerequisites:
+      type: array
+      items:
+        $ref: '#/components/schemas/EducationGroupPrerequisites'
     EducationGroupPrerequisites:
       type: object
       properties:
@@ -571,6 +575,8 @@ components:
         code:
           type: string
         title:
+          type: string
+        main_operator:
           type: string
         prerequisites:
           type: array
@@ -594,8 +600,6 @@ components:
             type: string
         mandatory:
           type: boolean
-        logical_operator:
-          type: string
     ArrayOfTraining:
       type: array
       items:
