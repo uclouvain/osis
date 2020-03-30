@@ -32,14 +32,14 @@
 <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
      <li>
         {% url 'select_education_group_type' enums.GROUP as create_group_url %}
-        {% a_tag_modal_has_perm create_group_url _('New Education Group') 'add_group' user %}
+        {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
      </li>
      <li>
         {% url 'select_education_group_type' enums.TRAINING as create_training_url %}
-        {% a_tag_modal_has_perm create_training_url _('New Training') 'add_training' user %}
+        {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user %}
      </li>
      <li>
         {% url 'select_education_group_type' enums.MINI_TRAINING as create_mini_training_url %}
-        {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'add_minitraining' user %}
+        {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
      </li>
 </ul>

@@ -37,7 +37,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType
 from base.templatetags.education_group import button_order_with_permission, \
-    link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent, li_with_update_perm
+    link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -273,45 +273,3 @@ class TestEducationGroupDlWithParent(TestCase):
         self.education_group_year.partial_deliberation = False
         with self.assertRaises(FieldDoesNotExist):
             dl_with_parent(self.context, "not_a_real_attr")
-
-
-class TestEducationGroupUpdateTagAsProgramManager(TestCase):
-    """ This class will test the tag as program manager """
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.training = TrainingFactory(academic_year__year=2018)
-        cls.program_manager = ProgramManagerFactory(education_group=cls.training.education_group)
-        cls.context = {
-            'person': cls.program_manager.person,
-            'root': cls.training,
-            'education_group_year': cls.training,
-        }
-        cls.url = reverse('update_education_group', args=[cls.training.pk, cls.training.pk])
-        cls.request = RequestFactory().get("")
-
-    def test_is_program_manager_with_permission_to_edit(self):
-        result = li_with_update_perm(self.context, self.url, "")
-        self.assertEqual(
-            result, {
-                'load_modal': True,
-                'id_li': 'link_update',
-                'url': self.url,
-                'title': '',
-                'class_li': '',
-                'text': ''
-            }
-        )
-
-    def test_is_program_manager_without_permission_to_edit_because_not_program_manager(self):
-        result = li_with_update_perm({**self.context, 'education_group_year': TrainingFactory()}, self.url, "")
-        self.assertEqual(
-            result, {
-                'load_modal': False,
-                'id_li': 'link_update',
-                'url': '#',
-                'title': str(_("The user is not the program manager of the education group")),
-                'class_li': 'disabled',
-                'text': ''
-            }
-        )

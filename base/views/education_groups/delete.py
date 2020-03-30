@@ -41,7 +41,7 @@ class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependenci
     pk_url_kwarg = "education_group_year_id"
     template_name = "education_group/delete.html"
     context_object_name = "education_group"
-    permission_required = 'delete_all_educationgroup'
+    permission_required = 'base.delete_all_educationgroup'
 
     # DeleteViewWithDependencies
     success_message = _("The education group has been deleted.")

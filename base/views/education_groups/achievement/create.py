@@ -24,29 +24,39 @@
 #
 ############################################################################
 from django.views.generic import CreateView
+from rules.contrib.views import PermissionRequiredMixin
 
-from base.business.education_groups.perms import is_eligible_to_add_achievement
 from base.forms.education_group.achievement import EducationGroupAchievementForm, EducationGroupDetailedAchievementForm
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
 from base.views.mixins import AjaxTemplateMixin
 
 
-class CreateEducationGroupAchievement(AjaxTemplateMixin, EducationGroupAchievementMixin, CreateView):
+class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
+                                      CreateView):
     template_name = "education_group/blocks/form/update_achievement.html"
     form_class = EducationGroupAchievementForm
-    rules = [is_eligible_to_add_achievement]
+    rules = []
+    permission_required = 'base.add_educationgroupachievement'
 
     def form_valid(self, form):
         form.instance.education_group_year = self.education_group_year
         return super().form_valid(form)
 
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
 
-class CreateEducationGroupDetailedAchievement(AjaxTemplateMixin, EducationGroupDetailedAchievementMixin, CreateView):
+
+class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTemplateMixin,
+                                              EducationGroupDetailedAchievementMixin, CreateView):
     form_class = EducationGroupDetailedAchievementForm
     template_name = "education_group/blocks/form/update_achievement.html"
-    rules = [is_eligible_to_add_achievement]
+    rules = []
+    permission_required = 'base.add_educationgroupachievement'
 
     def form_valid(self, form):
         form.instance.education_group_achievement = self.education_group_achievement
         return super().form_valid(form)
+
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year

@@ -27,6 +27,7 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -84,7 +85,8 @@ def update_education_group(request, root_id, education_group_year_id):
 
 
 def _update_certificate_aims(request, root_id, education_group_year):
-    perms.is_eligible_to_edit_certificate_aims(request.user.person, education_group_year, raise_exception=True)
+    if not request.user.has_perm('base.change_educationgroupcertificateaim', education_group_year):
+        raise PermissionDenied()
 
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
@@ -99,7 +101,7 @@ def _update_certificate_aims(request, root_id, education_group_year):
 
 
 @login_required
-@permission_required('change_educationgroup', fn=get_education_group_year_by_pk)
+@permission_required('base.change_educationgroup', fn=get_education_group_year_by_pk)
 def update_education_group_year(request, root_id, education_group_year_id):
     education_group_year = get_education_group_year_by_pk(request, root_id, education_group_year_id)
     # Store root in the instance to avoid to pass the root in methods
@@ -255,10 +257,7 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": has_coorganization(education_group_year),
         "show_diploma_tab": form_education_group_year.show_diploma_tab(),
-        'can_change_coorganization': perms.is_eligible_to_change_coorganization(
-            person=request.user.person,
-            education_group=education_group_year,
-        ),
+        'can_change_coorganization': request.user.has_perm('base.change_educationgrouporganization', education_group_year),
         'group_element_years': groupelementyear_formset,
         "is_finality_types": education_group_year.is_finality
     })

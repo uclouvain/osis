@@ -173,19 +173,18 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
                                                                      tab_to_show=self.request.GET.get('tab_to_show'))
             context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
-            person=self.person,
-            education_group=context['object'],
+        context['can_change_education_group'] = self.request.user.has_perm(
+            'base.change_educationgroup',
+            context['object']
         )
-        context['can_change_coorganization'] = perms.is_eligible_to_change_coorganization(
-            person=self.person,
-            education_group=context['object'],
+        context['can_change_coorganization'] = self.request.user.has_perm(
+            'base.change_educationgrouporganization',
+            context['object']
         )
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
-
         return context
 
     def get(self, request, *args, **kwargs):
@@ -328,6 +327,8 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         )
         texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
         show_contacts = CONTACTS in sections_to_display['specific']
+        perm_name = 'base.change_commonpedagogyinformation' if self.object.is_common else \
+            'base.change_pedagogyinformation'
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
@@ -336,7 +337,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             ),
             'contacts': self._get_publication_contacts_group_by_type(),
             'show_contacts': show_contacts,
-            'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
+            'can_edit_information': self.request.user.has_perm(perm_name, self.object)
         })
         return context
 
@@ -584,9 +585,10 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 admission_condition=admission_condition,
                 section=section
             ).annotate_text(tab_lang)
+        perm_name = 'base.change_commonadmissioncondition' if is_common else 'base.change_admissioncondition'
         context.update({
             'admission_condition_form': admission_condition_form,
-            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object']),
+            'can_edit_information': self.request.user.has_perm(perm_name, self.object),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,

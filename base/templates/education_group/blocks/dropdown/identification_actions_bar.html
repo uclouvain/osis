@@ -35,15 +35,15 @@
         {# Create link #}
         <li>
             {% url 'select_education_group_type' enums.GROUP root.pk education_group_year.pk as create_group_url %}
-            {% a_tag_has_perm create_group_url _('New Education Group') 'add_group' user education_group_year %}
+            {% a_tag_has_perm create_group_url _('New Education Group') 'base.add_group' user education_group_year %}
         </li>
         <li>
             {% url 'select_education_group_type' enums.TRAINING root.pk education_group_year.pk as create_training_url %}
-            {% a_tag_has_perm create_training_url _('New Training') 'add_training' user education_group_year %}
+            {% a_tag_has_perm create_training_url _('New Training') 'base.add_training' user education_group_year %}
         </li>
         <li>
             {% url 'select_education_group_type' enums.MINI_TRAINING root.pk education_group_year.pk as create_mini_training_url %}
-            {% a_tag_has_perm create_mini_training_url _('New Mini-Training') 'add_minitraining' user education_group_year %}
+            {% a_tag_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user education_group_year %}
         </li>
 
         <li class="divider"></li>
@@ -67,7 +67,7 @@
         {# Paste link #}
         <li>
             {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
-            {% a_tag_modal_has_perm attach_url _('Paste') 'attach_educationgroup' user education_group_year %}
+            {% a_tag_modal_has_perm attach_url _('Paste') 'base.attach_educationgroup' user education_group_year %}
         </li>
         <li class="divider"></li>
 
@@ -76,7 +76,7 @@
         {% if group_to_parent and group_to_parent != "0" %}    {# We cannot detach root element #}
             <li>
                 {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
-                {% a_tag_modal_has_perm detach_url _('Detach') 'detach_educationgroup' user education_group_year %}
+                {% a_tag_modal_has_perm detach_url _('Detach') 'base.detach_educationgroup' user education_group_year %}
             </li>
              <li class="divider"></li>
         {% endif %}
@@ -85,16 +85,16 @@
         <li>
             {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
             {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
-                {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'change_educationgroup' user education_group_year %}
+                {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
             {% else %}
-                {% a_tag_has_perm update_url _('Modify') 'change_educationgroup' user education_group_year %}
+                {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
             {% endif %}
         </li>
 
         {# Delete link #}
         <li>
             {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
-            {% a_tag_has_perm delete_url _('Delete permanently') 'delete_all_educationgroup' user education_group_year.education_group %}
+            {% a_tag_has_perm delete_url _('Delete permanently') 'base.delete_all_educationgroup' user education_group_year.education_group %}
         </li>
 
         {# Postponement link #}

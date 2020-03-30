@@ -15,7 +15,7 @@ from program_management.business.group_element_years import management
 def is_all_education_group_are_removable(self, user, education_group):
     education_group_years = education_group.educationgroupyear_set.all()
     return all(
-        user.has_perm('delete_educationgroup', education_group_year) for education_group_year in education_group_years
+        user.has_perm('base.delete_educationgroup', education_group_year) for education_group_year in education_group_years
     )
 
 

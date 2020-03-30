@@ -32,8 +32,8 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, UpdateView
+from rules.contrib.views import PermissionRequiredMixin
 
-from base.business.education_groups.perms import is_eligible_to_change_achievement
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
     EducationGroupDetailedAchievementForm, EducationGroupAchievementCMSForm
 from base.models.education_group_year import EducationGroupYear
@@ -47,10 +47,11 @@ from cms.models import translated_text
 from cms.models.text_label import TextLabel
 
 
-class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
+class EducationGroupAchievementAction(PermissionRequiredMixin, EducationGroupAchievementMixin, FormView):
     form_class = ActionForm
     http_method_names = ('post',)
-    rules = [is_eligible_to_change_achievement]
+    rules = []
+    permission_required = 'base.change_educationgroupachievement'
 
     def form_valid(self, form):
         if form.cleaned_data['action'] == 'up':
@@ -63,28 +64,42 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
         display_error_messages(self.request, _("Invalid action"))
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_permission_object(self):
+        return self.get_object().education_group_year
 
-class UpdateEducationGroupAchievement(AjaxTemplateMixin, EducationGroupAchievementMixin, UpdateView):
+
+class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
+                                      UpdateView):
     template_name = "education_group/blocks/form/update_achievement.html"
     form_class = EducationGroupAchievementForm
-    rules = [is_eligible_to_change_achievement]
+    rules = []
+    permission_required = 'base.change_educationgroupachievement'
+
+    def get_permission_object(self):
+        return self.get_object().education_group_year
 
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
 
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
+
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):
-    pass
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
 
 
-class EducationGroupAchievementCMS(RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
+class EducationGroupAchievementCMS(PermissionRequiredMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin,
+                                   FormView):
     cms_text_label = None
     template_name = "education_group/blocks/modal/modal_pedagogy_edit.html"
 
     # RulesRequiredMixin
     raise_exception = True
-    rules = [is_eligible_to_change_achievement]
+    rules = []
+    permission_required = 'base.change_educationgroupachievement'
 
     def _call_rule(self, rule):
         """ Rules will be call with the person and the education_group_year"""
@@ -129,6 +144,9 @@ class EducationGroupAchievementCMS(RulesRequiredMixin, SuccessMessageMixin, Ajax
             elif trans_text['language'] == settings.LANGUAGE_CODE_EN:
                 initial['text_english'] = trans_text['text']
         return initial
+
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
