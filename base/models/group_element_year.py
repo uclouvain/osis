@@ -330,6 +330,7 @@ class GroupElementYear(OrderedModel):
 
     parent_element = models.ForeignKey(
         Element,
+        related_name='parent_element',
         null=True,
         on_delete=models.PROTECT,
     )
