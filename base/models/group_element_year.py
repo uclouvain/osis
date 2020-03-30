@@ -337,7 +337,7 @@ class GroupElementYear(OrderedModel):
 
     child_element = models.ForeignKey(
         Element,
-        related_name='child_elements',
+        related_name='children_elements',
         null=True,  # TODO: To remove after data migration
         on_delete=models.PROTECT,
     )
