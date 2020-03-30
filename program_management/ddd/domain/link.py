@@ -65,6 +65,11 @@ class Link:
         self.quadrimester_derogation = quadrimester_derogation
         self.link_type = link_type
         self.order = order
+        self._has_changed = False
+
+    @property
+    def has_changed(self):
+        return self._has_changed
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}

@@ -208,6 +208,8 @@ class Node:
         self.children.insert(new_index, link)
         self.children[old_index].order, self.children[new_index].order = \
             self.children[new_index].order, self.children[old_index].order
+        self.children[old_index]._has_changed = True
+        self.children[new_index]._has_changed = True
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:

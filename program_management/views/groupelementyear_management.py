@@ -40,7 +40,7 @@ from osis_common.utils.models import get_object_or_none
 
 
 #  TODO refactored view to use path in place of id
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories import load_tree, persist_tree
 from program_management.models.enums.node_type import NodeType
 
 
@@ -69,6 +69,7 @@ def management(request):
         source=source,
         http_referer=http_referer,
         parent_node=parent_node,
+        tree=tree
     )
     if response:
         return response
@@ -105,6 +106,7 @@ def _check_perm_for_management(request, element, group_element_year):
 def _up(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
     kwargs["parent_node"].up(group_element_year.id)
+    persist_tree.persist(kwargs["tree"])
     display_success_messages(request, success_msg)
 
 
@@ -113,6 +115,7 @@ def _up(request, group_element_year, *args, **kwargs):
 def _down(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
     kwargs["parent_node"].down(group_element_year.id)
+    persist_tree.persist(kwargs["tree"])
     display_success_messages(request, success_msg)
 
 
