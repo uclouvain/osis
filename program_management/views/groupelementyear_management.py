@@ -40,6 +40,10 @@ from osis_common.utils.models import get_object_or_none
 
 
 #  TODO refactored view to use path in place of id
+from program_management.ddd.repositories import load_tree
+from program_management.models.enums.node_type import NodeType
+
+
 @login_required
 @waffle_flag("education_group_update")
 def management(request):
@@ -48,6 +52,8 @@ def management(request):
     group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
     element_id = _get_data_from_request(request, 'element_id')
     element = _get_concerned_object(element_id, group_element_year)
+    tree = load_tree.load(root_id)
+    parent_node = tree.get_node_by_id_and_type(group_element_year.parent.id, NodeType.EDUCATION_GROUP)
 
     _check_perm_for_management(request, element, group_element_year)
 
@@ -62,6 +68,7 @@ def management(request):
         element=element,
         source=source,
         http_referer=http_referer,
+        parent_node=parent_node,
     )
     if response:
         return response
@@ -97,7 +104,7 @@ def _check_perm_for_management(request, element, group_element_year):
 @require_http_methods(['POST'])
 def _up(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
-    group_element_year.up()
+    kwargs["parent_node"].up(group_element_year.id)
     display_success_messages(request, success_msg)
 
 
@@ -105,7 +112,7 @@ def _up(request, group_element_year, *args, **kwargs):
 @require_http_methods(['POST'])
 def _down(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
-    group_element_year.down()
+    kwargs["parent_node"].down(group_element_year.id)
     display_success_messages(request, success_msg)
 
 
