@@ -39,6 +39,7 @@ from base.views.education_groups.select import get_clipboard_content_display, bu
 from osis_common.utils.models import get_object_or_none
 
 
+#  TODO refactored view to use path in place of id
 @login_required
 @waffle_flag("education_group_update")
 def management(request):
@@ -92,6 +93,7 @@ def _check_perm_for_management(request, element, group_element_year):
         perms.can_change_education_group(request.user, group_element_year.parent)
 
 
+#  TODO use ProgramTreeView to do up action on link
 @require_http_methods(['POST'])
 def _up(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
@@ -99,6 +101,7 @@ def _up(request, group_element_year, *args, **kwargs):
     display_success_messages(request, success_msg)
 
 
+#  TODO use ProgramTreeView to do down action on link
 @require_http_methods(['POST'])
 def _down(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}

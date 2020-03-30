@@ -186,6 +186,29 @@ class Node:
     def detach_child(self, node_id: int):
         self.children = [link for link in self.children if link.child.pk == node_id]
 
+    def get_link(self, link_id: int) -> 'Link':
+        return next((link for link in self.children if link.pk == link_id), None)
+
+    def up(self, link_id: int):
+        link = self.get_link(link_id)
+        old_index = self.children.index(link)
+        new_index = old_index - 1
+        if new_index >= 0:
+            self._swap_order(old_index, new_index, link)
+
+    def down(self, link_id: int):
+        link = self.get_link(link_id)
+        old_index = self.children.index(link)
+        new_index = old_index + 1
+        if new_index < len(self.children):
+            self._swap_order(old_index, new_index, link)
+
+    def _swap_order(self, old_index: int, new_index: int, link: 'Link'):
+        self.children.pop(old_index)
+        self.children.insert(new_index, link)
+        self.children[old_index].order, self.children[new_index].order = \
+            self.children[new_index].order, self.children[old_index].order
+
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
     _descendents = {}

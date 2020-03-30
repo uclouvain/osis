@@ -257,3 +257,48 @@ class TestGetAllChildrenAsLearningUnitNodes(SimpleTestCase):
         exepcted_order = [link0.child, link1.child, link2.child]
         error_msg = "This order is used for prerequisites in excel file."
         self.assertListEqual(result, exepcted_order, error_msg)
+
+
+class TestUpDownChildren(SimpleTestCase):
+
+    def setUp(self):
+        self.parent = NodeGroupYearFactory()
+        self.link0 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=0)
+        self.link1 = LinkFactory(parent=self.parent, child=NodeGroupYearFactory(), order=1)
+        self.link2 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=2)
+
+    def test_do_not_modify_order_when_applying_up_on_first_element(self):
+        self.parent.up(self.link0.pk)
+        self.assertListEqual(
+            self.parent.children,
+            [self.link0, self.link1, self.link2]
+        )
+
+    def test_up_action_on_link_should_increase_order_by_one(self):
+        self.parent.up(self.link1.pk)
+        self.assertListEqual(
+            self.parent.children,
+            [self.link1, self.link0, self.link2]
+        )
+        self.assertListEqual(
+            [self.link1.order, self.link0.order, self.link2.order],
+            [0, 1, 2]
+        )
+
+    def test_down_action_on_link_should_decrease_order_by_one(self):
+        self.parent.down(self.link1.pk)
+        self.assertListEqual(
+            self.parent.children,
+            [self.link0, self.link2, self.link1]
+        )
+        self.assertListEqual(
+            [self.link0.order, self.link2.order, self.link1.order],
+            [0, 1, 2]
+        )
+
+    def test_do_not_modify_order_when_applying_down_on_last_element(self):
+        self.parent.down(self.link2.pk)
+        self.assertListEqual(
+            self.parent.children,
+            [self.link0, self.link1, self.link2]
+        )
