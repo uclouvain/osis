@@ -61,17 +61,16 @@ $(document).ready(function () {
         return jQuery.param(data);
     }
 
-    function handleCopyOrCutAction(data, action) {
+    function handleCutAction(data, action) {
         let __ret = get_data_from_tree(data);
         let element_id = __ret.element_id;
         let group_element_year_id = __ret.group_element_year_id;
         $.ajax({
-            url: management_url,
+            url: cut_element_url,
             dataType: 'json',
             data: {
                 'element_id': element_id,
-                'group_element_year_id': group_element_year_id,
-                'action': action
+                'group_element_year_id': group_element_year_id
             },
             type: 'POST',
             success: function (jsonResponse) {
@@ -82,6 +81,28 @@ $(document).ready(function () {
             }
         });
     }
+
+    function handleCopyAction(data) {
+        let __ret = get_data_from_tree(data);
+        let element_id = __ret.element_id;
+        let group_element_year_id = __ret.group_element_year_id;
+        $.ajax({
+            url: copy_element_url,
+            dataType: 'json',
+            data: {
+                'element_id': element_id,
+                'group_element_year_id': group_element_year_id
+            },
+            type: 'POST',
+            success: function (jsonResponse) {
+                let clipboard = document.getElementById("clipboard");
+                clipboard.style.display = "block";
+                let clipboard_content = document.getElementById("clipboard_content");
+                clipboard_content.innerHTML = jsonResponse['success_message'];
+            }
+        });
+    }
+
 
     $documentTree.jstree({
             "core": {
@@ -111,14 +132,14 @@ $(document).ready(function () {
                                 return !get_data_from_tree(data).group_element_year_id;
                             },
                             "action": function (data) {
-                                handleCopyOrCutAction(data, "cut")
+                                handleCutAction(data)
                             }
                         },
 
                         "copy": {
                             "label": gettext("Copy"),
                             "action": function (data) {
-                                handleCopyOrCutAction(data, "copy")
+                                handleCopyAction(data)
                             }
                         },
 

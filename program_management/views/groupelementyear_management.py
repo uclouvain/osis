@@ -37,11 +37,84 @@ from base.views.common import display_success_messages
 from base.views.education_groups import perms
 from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
 from osis_common.utils.models import get_object_or_none
+from program_management.ddd.repositories import load_tree, persist_tree
+from program_management.models.enums.node_type import NodeType
 
 
 #  TODO refactored view to use path in place of id
-from program_management.ddd.repositories import load_tree, persist_tree
-from program_management.models.enums.node_type import NodeType
+@login_required
+@waffle_flag("education_group_update")
+@require_http_methods(['POST'])
+def up(request, root_id, education_group_year_id, group_element_year_id):
+    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
+    tree = load_tree.load(root_id)
+    parent_node = tree.get_node_by_id_and_type(group_element_year.parent.id, NodeType.EDUCATION_GROUP)
+    parent_node.up(group_element_year.id)
+    persist_tree.persist(tree)
+
+    _check_perm_for_management(request, group_element_year)
+
+    success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
+    display_success_messages(request, success_msg)
+
+    http_referer = request.META.get('HTTP_REFERER')
+    return redirect(http_referer)
+
+
+@login_required
+@waffle_flag("education_group_update")
+@require_http_methods(['POST'])
+def down(request, root_id, education_group_year_id, group_element_year_id):
+    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
+    tree = load_tree.load(root_id)
+    parent_node = tree.get_node_by_id_and_type(group_element_year.parent.id, NodeType.EDUCATION_GROUP)
+    parent_node.down(group_element_year.id)
+    persist_tree.persist(tree)
+
+    _check_perm_for_management(request, group_element_year)
+
+    success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
+    display_success_messages(request, success_msg)
+
+    http_referer = request.META.get('HTTP_REFERER')
+    return redirect(http_referer)
+
+
+@require_http_methods(['POST'])
+def copy_to_cache(request):
+    group_element_year_id = _get_data_from_request(request, 'group_element_year_id') or 0
+    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
+    element_id = _get_data_from_request(request, 'element_id')
+    element = _get_concerned_object(element_id, group_element_year)
+
+    return _cache_object(
+        request.user,
+        group_element_year,
+        object_to_cache=element,
+        action=ElementCache.ElementCacheAction.COPY.value
+    )
+
+
+@require_http_methods(['POST'])
+def cut_to_cache(request):
+    group_element_year_id = _get_data_from_request(request, 'group_element_year_id') or 0
+    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
+    element_id = _get_data_from_request(request, 'element_id')
+    element = _get_concerned_object(element_id, group_element_year)
+
+    action = ElementCache.ElementCacheAction.CUT.value
+    if not group_element_year:
+        action = ElementCache.ElementCacheAction.COPY.value
+    return _cache_object(
+        request.user,
+        group_element_year,
+        object_to_cache=element,
+        action=action
+    )
+
+
+def _get_data_from_request(request, name):
+    return getattr(request, request.method, {}).get(name)
 
 
 @login_required
@@ -54,8 +127,6 @@ def management(request):
     element = _get_concerned_object(element_id, group_element_year)
     tree = load_tree.load(root_id)
     parent_node = tree.get_node_by_id_and_type(group_element_year.parent.id, NodeType.EDUCATION_GROUP)
-
-    _check_perm_for_management(request, element, group_element_year)
 
     action_method = _get_action_method(request)
     source = _get_data_from_request(request, 'source')
@@ -77,10 +148,6 @@ def management(request):
     return redirect(http_referer)
 
 
-def _get_data_from_request(request, name):
-    return getattr(request, request.method, {}).get(name)
-
-
 def _get_concerned_object(element_id, group_element_year):
     if group_element_year and group_element_year.child_leaf:
         object_class = LearningUnitYear
@@ -90,18 +157,11 @@ def _get_concerned_object(element_id, group_element_year):
     return get_object_or_404(object_class, pk=element_id)
 
 
-def _check_perm_for_management(request, element, group_element_year):
-    actions_needing_perm_on_parent = [
-        "up",
-        "down",
-    ]
-
-    if _get_data_from_request(request, 'action') in actions_needing_perm_on_parent:
-        # In this case, element can be EducationGroupYear OR LearningUnitYear because we check perm on its parent
-        perms.can_change_education_group(request.user, group_element_year.parent)
+def _check_perm_for_management(request, group_element_year):
+    # In this case, element can be EducationGroupYear OR LearningUnitYear because we check perm on its parent
+    perms.can_change_education_group(request.user, group_element_year.parent)
 
 
-#  TODO use ProgramTreeView to do up action on link
 @require_http_methods(['POST'])
 def _up(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
@@ -110,7 +170,6 @@ def _up(request, group_element_year, *args, **kwargs):
     display_success_messages(request, success_msg)
 
 
-#  TODO use ProgramTreeView to do down action on link
 @require_http_methods(['POST'])
 def _down(request, group_element_year, *args, **kwargs):
     success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}

@@ -110,7 +110,9 @@
         const root_id = "{{ root_id }}";
         const url_resolver_match = "{% url_resolver_match %}";
         const tree = JSON.parse('{{ tree | escapejs }}');
-        const management_url = "{% url "education_groups_management" %}";
+        const cut_element_url = "{% url "cut_element" %}";
+        const copy_element_url = "{% url "copy_element" %}";
+
         const clear_clipboard_url = "{% url "education_group_clear_clipboard" %}";
         let clear_clipboard = document.getElementById("clear_clipboard");
         clear_clipboard.addEventListener("click", function(){

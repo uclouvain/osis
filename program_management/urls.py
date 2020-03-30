@@ -32,7 +32,8 @@ from program_management.views import groupelementyear_create, groupelementyear_d
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
-    url(r'^management/$', groupelementyear_management.management, name='education_groups_management'),
+    url(r'^cut_element/$', groupelementyear_management.cut_to_cache, name='cut_element'),
+    url(r'^copy_element/$', groupelementyear_management.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
             url(u'^attach/', groupelementyear_create.PasteElementFromCacheToSelectedTreeNode.as_view(),
@@ -47,7 +48,11 @@ urlpatterns = [
                 url(r'^move/$', groupelementyear_create.MoveGroupElementYearView.as_view(),
                     name='group_element_year_move'),
                 url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_update")
+                    name="group_element_year_update"),
+                url(r'^up/$', groupelementyear_management.up,
+                    name="group_element_year_up"),
+                url(r'^down/$', groupelementyear_management.down,
+                    name="group_element_year_down")
             ]))
         ])),
         url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),

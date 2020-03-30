@@ -51,12 +51,12 @@
 
                 {% flag "copy_education_group_to_cache" %}
                     <li id='select_li' {% if not group_to_parent or group_to_parent == "0" %}class="disabled"{% endif %}>
-                        <a href="#" {% if group_to_parent and group_to_parent != "0" %}onclick="select_education_group('cut')"{% endif %}>
+                        <a href="#" {% if group_to_parent and group_to_parent != "0" %}onclick="cut_element()"{% endif %}>
                             {% trans 'Cut' %}
                         </a>
                     </li>
                     <li id='select_li'>
-                        <a href="#" onclick="select_education_group('copy')" >
+                        <a href="#" onclick="copy_element()" >
                             {% trans 'Copy' %}
                         </a>
                     </li>
@@ -146,11 +146,22 @@
 {% block script %}
     <script>
         // FIXME move this method to common file
-        function select_education_group(action) {
+        function copy_element() {
             $.ajax({
                 type: "POST",
-                url: "{% url 'education_groups_management' %}",
-                data: {'element_id': {{ education_group_year.id }}, 'group_element_year_id': "{{ group_to_parent }}", 'action': action},
+                url: "{% url 'copy_element' %}",
+                data: {'element_id': {{ education_group_year.id }}, 'group_element_year_id': "{{ group_to_parent }}"},
+                dataType: 'json',
+                success: function (jsonResponse) {
+                    displayInfoMessage(jsonResponse, 'clipboard');
+                }
+            });
+        }
+        function cut_element() {
+            $.ajax({
+                type: "POST",
+                url: "{% url 'cut_element' %}",
+                data: {'element_id': {{ education_group_year.id }}, 'group_element_year_id': "{{ group_to_parent }}"},
                 dataType: 'json',
                 success: function (jsonResponse) {
                     displayInfoMessage(jsonResponse, 'clipboard');

@@ -801,7 +801,8 @@ class TestSelectAttach(TestCase):
             child_branch=cls.new_parent_education_group_year
         )
 
-        cls.url_management = reverse("education_groups_management")
+        cls.copy_element_url = reverse("copy_element")
+        cls.cut_element_url = reverse("cut_element")
         select_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": cls.child_education_group_year.id,
@@ -809,7 +810,6 @@ class TestSelectAttach(TestCase):
         }
         cls.copy_action_data = {
             **select_data,
-            **{'action': 'copy'}
         }
         cls.root = group_above_new_parent.parent
         cls.attach_action_data = {
@@ -833,7 +833,7 @@ class TestSelectAttach(TestCase):
 
     def test_copy_case_education_group(self):
         response = self.client.post(
-            self.url_management,
+            self.copy_element_url,
             data=self.copy_action_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
@@ -852,9 +852,8 @@ class TestSelectAttach(TestCase):
 
     def test_cut_case_education_group(self):
         cut_action_data = self.copy_action_data
-        cut_action_data['action'] = "cut"
         response = self.client.post(
-            self.url_management,
+            self.cut_element_url,
             data=cut_action_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
@@ -874,10 +873,9 @@ class TestSelectAttach(TestCase):
     def test_cut_when_group_element_year_not_given(self):
         """When user click on 'cut' action into the root element in the tree"""
         cut_action_data = dict(self.copy_action_data)
-        cut_action_data['action'] = "cut"
         del cut_action_data['group_element_year_id']
         self.client.post(
-            self.url_management,
+            self.cut_element_url,
             data=cut_action_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
@@ -925,7 +923,7 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.copy_action_data)
+        self.client.post(self.copy_element_url, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
@@ -963,7 +961,7 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.copy_action_data)
+        self.client.post(self.copy_element_url, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
@@ -1043,7 +1041,7 @@ class TestSelectAttach(TestCase):
 
         # Select :
         self.client.post(
-            self.url_management,
+            self.copy_element_url,
             data=self.copy_action_data
         )
 
