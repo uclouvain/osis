@@ -576,8 +576,9 @@ components:
           type: string
         title:
           type: string
-        main_operator:
+        prerequisites_string:
           type: string
+          example: (codeA OR codeB) AND (codeC)
         prerequisites:
           type: array
           items:
@@ -600,10 +601,6 @@ components:
             type: string
         mandatory:
           type: boolean
-        position:
-          type: integer
-        group_number:
-          type: integer
     ArrayOfTraining:
       type: array
       items:
