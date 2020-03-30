@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.templatetags.static import static
 from django.urls import reverse
@@ -32,7 +33,20 @@ from rest_framework import serializers
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.models.enums.node_type import NodeType
+
+
+def serialize_children(children: List['Link'], path: str, context=None) -> List[dict]:
+    serialized_children = []
+    for link in children:
+        child_path = path + PATH_SEPARATOR + str(link.child.pk)
+        if link.child.is_learning_unit():
+            serialized_node = _leaf_view_serializer(link, child_path, context=context)
+        else:
+            serialized_node = _get_node_view_serializer(link, child_path, context=context)
+        serialized_children.append(serialized_node)
+    return serialized_children
 
 
 class ChildrenField(serializers.Serializer):
@@ -96,6 +110,27 @@ class NodeViewAttributeSerializer(serializers.Serializer):
         return reverse('quick_search_education_group', args=[self.get_root(obj), obj.child.pk])
 
 
+def _get_node_view_attribute_serializer(link: 'Link', context=None) -> dict:
+    return {
+        'href': reverse('education_group_read', args=[context['root'].pk, link.child.pk]),
+        'root': context['root'].pk,
+        'group_element_year': link.pk,
+        'element_id': link.child.pk,
+        'element_type': link.child.type.name,
+        'title': link.child.code,
+        'attach_url': reverse('education_group_attach', args=[context['root'].pk, link.child.pk]),
+        'detach_url': reverse('group_element_year_delete', args=[context['root'].pk, link.child.pk, link.pk]),
+        'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
+        'attach_disabled': False,
+        'attach_msg': None,
+        'detach_disabled': False,
+        'detach_msg': None,
+        'modification_disabled': False,
+        'modification_msg': None,
+        'search_url': reverse('quick_search_education_group', args=[context['root'].pk, link.child.pk]),
+    }
+
+
 class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
     has_prerequisite = serializers.BooleanField(source='child.has_prerequisite')
     is_prerequisite = serializers.BooleanField(source='child.is_prerequisite')
@@ -127,6 +162,49 @@ class LeafViewAttributeSerializer(NodeViewAttributeSerializer):
             ProposalType.SUPPRESSION.name: "proposal proposal_suppression"
         }.get(obj.child.proposal_type) or ""
 
+#
+# def __comon_node_serializer(link : 'Link', path: str) -> dict:
+#     return {
+#         'path': path,
+#         'icon': None,
+#     }
+
+
+def __get_css_class(link: 'Link'):
+    return {
+       ProposalType.CREATION: "proposal proposal_creation",
+       ProposalType.MODIFICATION: "proposal proposal_modification",
+       ProposalType.TRANSFORMATION: "proposal proposal_transformation",
+       ProposalType.TRANSFORMATION_AND_MODIFICATION: "proposal proposal_transformation_modification",
+       ProposalType.SUPPRESSION: "proposal proposal_suppression"
+    }.get(link.child.proposal_type) or ""
+
+
+def __get_title(obj: 'Link') -> str:
+    title = obj.child.title
+    if obj.child.has_prerequisite and obj.child.is_prerequisite:
+        title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
+    elif obj.child.has_prerequisite:
+        title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
+    elif obj.child.is_prerequisite:
+        title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
+    return title
+
+
+def _leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -> dict:
+    attrs = _get_node_view_attribute_serializer(link, context=context)
+    attrs.update({
+        'path': path,
+        'icon': None,
+        'href': reverse('learning_unit_utilization', args=[context['root'].pk, link.child.pk]),
+        'has_prerequisite': link.child.has_prerequisite,
+        'is_prerequisite': link.child.is_prerequisite,
+        'css_class': __get_css_class(link),
+        'element_type': NodeType.LEARNING_UNIT.name,
+        'title': __get_title(link),
+    })
+    return attrs
+
 
 class CommonNodeViewSerializer(serializers.Serializer):
     path = serializers.SerializerMethodField()
@@ -153,6 +231,23 @@ class NodeViewSerializer(CommonNodeViewSerializer):
         return '%(code)s - %(title)s' % {'code': obj.child.code, 'title': obj.child.title}
 
 
+def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
+    print()
+    return {
+        'path': path,
+        'icon': __get_icon(link),
+        'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
+        'children': serialize_children(link.child.children, path + PATH_SEPARATOR + str(link.child.pk), context=context),
+        'a_attr': _get_node_view_attribute_serializer(link, context=context),
+    }
+
+
+def __get_icon(obj: 'Link'):
+    if obj.link_type == link_type.LinkTypes.REFERENCE:
+        return static('img/reference.jpg')
+    return None
+
+
 class LeafViewSerializer(CommonNodeViewSerializer):
     text = serializers.SerializerMethodField()
     a_attr = LeafViewAttributeSerializer(source='*')
@@ -171,3 +266,29 @@ class LeafViewSerializer(CommonNodeViewSerializer):
         elif obj.child.is_prerequisite:
             return "fa fa-arrow-right"
         return "far fa-file"
+
+
+def __get_learning_unit_node_icon(link: 'Link') -> str:
+    if link.child.has_prerequisite and link.child.is_prerequisite:
+        return "fa fa-exchange-alt"
+    elif link.child.has_prerequisite:
+        return "fa fa-arrow-left"
+    elif link.child.is_prerequisite:
+        return "fa fa-arrow-right"
+    return "far fa-file"
+
+
+def __get_learning_unit_node_text(link: 'Link', context=None):
+    text = link.child.code
+    if context['root'].year != link.child.year:
+        text += '|{}'.format(link.child.year)
+    return text
+
+
+def _leaf_view_serializer(link: 'Link', path: str, context=None) -> dict:
+    return {
+        'path': path,
+        'icon': __get_learning_unit_node_icon(link),
+        'text': __get_learning_unit_node_text(link, context=context),
+        'a_attr': _leaf_view_attribute_serializer(link, path, context=context),
+    }
