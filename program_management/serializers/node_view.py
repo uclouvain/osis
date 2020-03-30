@@ -112,7 +112,11 @@ def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
         'path': path,
         'icon': _get_group_node_icon(link),
         'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
-        'children': serialize_children(link.child.children, path + PATH_SEPARATOR + str(link.child.pk), context=context),
+        'children': serialize_children(
+            children=link.child.children,
+            path=path + PATH_SEPARATOR + str(link.child.pk),
+            context=context
+        ),
         'a_attr': _get_node_view_attribute_serializer(link, context=context),
     }
 
