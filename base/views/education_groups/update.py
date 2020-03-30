@@ -38,7 +38,6 @@ from rules.contrib.views import permission_required
 
 from base import models as mdl_base
 from base.business.education_group import has_coorganization
-from base.business.education_groups import perms
 from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm

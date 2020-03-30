@@ -8,8 +8,6 @@ from osis_role import errors
 from osis_role.errors import predicate_failed_msg
 from django.utils.translation import gettext_lazy as _, pgettext
 
-from program_management.business.group_element_years import management
-
 
 @predicate(bind=True)
 def is_all_education_group_are_removable(self, user, education_group):
@@ -63,15 +61,6 @@ def is_user_link_to_management_entity(self, user, education_group_year=None):
 @predicate_failed_msg(message=EventPermEducationGroupEdition.error_msg)
 def is_program_edition_period_open(self, user, education_group_year=None):
     return EventPermEducationGroupEdition(obj=education_group_year, raise_exception=False).is_open()
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message="")
-def is_maximum_child_not_reached(self, user, education_group_year=None):
-    if education_group_year:
-        # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
-        return not management.is_max_child_reached(education_group_year, "")
-    return None
 
 
 @predicate(bind=True)
