@@ -70,7 +70,7 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
         serialized_data = program_tree_view_serializer(self.tree)
         expected_keys = ['text', 'icon', 'children']
 
-        self.assertListEqual(list(serialized_data.keys()), expected_keys)
+        self.assertSetEqual(set(serialized_data.keys()), set(expected_keys))
 
     def test_serialize_program_tree_assert_node_child_element(self):
         serialized_data = program_tree_view_serializer(self.tree)
@@ -95,4 +95,4 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
 
         a_attr = serialized_data['children'][0]['a_attr']
         self.assertIsInstance(a_attr, dict)
-        self.assertListEqual(list(a_attr.keys()), expected_keys)
+        self.assertSetEqual(set(a_attr.keys()), set(expected_keys))
