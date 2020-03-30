@@ -70,28 +70,7 @@ def _get_node_view_attribute_serializer(link: 'Link', context=None) -> dict:
     }
 
 
-def __get_css_class(link: 'Link'):
-    return {
-       ProposalType.CREATION: "proposal proposal_creation",
-       ProposalType.MODIFICATION: "proposal proposal_modification",
-       ProposalType.TRANSFORMATION: "proposal proposal_transformation",
-       ProposalType.TRANSFORMATION_AND_MODIFICATION: "proposal proposal_transformation_modification",
-       ProposalType.SUPPRESSION: "proposal proposal_suppression"
-    }.get(link.child.proposal_type) or ""
-
-
-def __get_title(obj: 'Link') -> str:
-    title = obj.child.title
-    if obj.child.has_prerequisite and obj.child.is_prerequisite:
-        title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
-    elif obj.child.has_prerequisite:
-        title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
-    elif obj.child.is_prerequisite:
-        title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
-    return title
-
-
-def _leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -> dict:
+def _get_leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -> dict:
     attrs = _get_node_view_attribute_serializer(link, context=context)
     attrs.update({
         'path': path,
@@ -106,21 +85,51 @@ def _leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -> di
     return attrs
 
 
+def __get_css_class(link: 'Link'):
+    return {
+               ProposalType.CREATION: "proposal proposal_creation",
+               ProposalType.MODIFICATION: "proposal proposal_modification",
+               ProposalType.TRANSFORMATION: "proposal proposal_transformation",
+               ProposalType.TRANSFORMATION_AND_MODIFICATION: "proposal proposal_transformation_modification",
+               ProposalType.SUPPRESSION: "proposal proposal_suppression"
+           }.get(link.child.proposal_type) or ""
+
+
+def __get_title(obj: 'Link') -> str:
+    title = obj.child.title
+    if obj.child.has_prerequisite and obj.child.is_prerequisite:
+        title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
+    elif obj.child.has_prerequisite:
+        title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
+    elif obj.child.is_prerequisite:
+        title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
+    return title
+
+
 def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
     print()
     return {
         'path': path,
-        'icon': __get_icon(link),
+        'icon': _get_group_node_icon(link),
         'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
         'children': serialize_children(link.child.children, path + PATH_SEPARATOR + str(link.child.pk), context=context),
         'a_attr': _get_node_view_attribute_serializer(link, context=context),
     }
 
 
-def __get_icon(obj: 'Link'):
+def _get_group_node_icon(obj: 'Link'):
     if obj.link_type == link_type.LinkTypes.REFERENCE:
         return static('img/reference.jpg')
     return None
+
+
+def _leaf_view_serializer(link: 'Link', path: str, context=None) -> dict:
+    return {
+        'path': path,
+        'icon': __get_learning_unit_node_icon(link),
+        'text': __get_learning_unit_node_text(link, context=context),
+        'a_attr': _get_leaf_view_attribute_serializer(link, path, context=context),
+    }
 
 
 def __get_learning_unit_node_icon(link: 'Link') -> str:
@@ -138,12 +147,3 @@ def __get_learning_unit_node_text(link: 'Link', context=None):
     if context['root'].year != link.child.year:
         text += '|{}'.format(link.child.year)
     return text
-
-
-def _leaf_view_serializer(link: 'Link', path: str, context=None) -> dict:
-    return {
-        'path': path,
-        'icon': __get_learning_unit_node_icon(link),
-        'text': __get_learning_unit_node_text(link, context=context),
-        'a_attr': _leaf_view_attribute_serializer(link, path, context=context),
-    }

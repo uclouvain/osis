@@ -33,7 +33,7 @@ from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
-    _leaf_view_attribute_serializer, \
+    _get_leaf_view_attribute_serializer, \
     _leaf_view_serializer, _get_node_view_serializer
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -202,11 +202,11 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
 
     def test_serializer_node_attr_ensure_get_href(self):
         expected_url = reverse('learning_unit_utilization', args=[self.root_node.pk, self.link.child.pk])
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['href'], expected_url)
 
     def test_serializer_node_attr_ensure_get_element_type(self):
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['element_type'], NodeType.LEARNING_UNIT.name)
 
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
@@ -222,7 +222,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
     ):
         expected_title = "%s\n%s" % (self.link.child.title,
                                      _("The learning unit has prerequisites and is a prerequisite"))
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['title'], expected_title)
 
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
@@ -237,7 +237,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
             mock_has_prerequisite,
     ):
         expected_title = "%s\n%s" % (self.link.child.title, _("The learning unit is a prerequisite"))
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['title'], expected_title)
 
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
@@ -252,7 +252,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
             mock_has_prerequisite,
     ):
         expected_title = "%s\n%s" % (self.link.child.title, _("The learning unit has prerequisites"))
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['title'], expected_title)
 
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
@@ -267,41 +267,41 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
             mock_has_prerequisite,
     ):
         expected_title = self.link.child.title
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['title'], expected_title)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_creation(self):
         self.link.child.proposal_type = ProposalType.CREATION
         expected_css_class = "proposal proposal_creation"
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['css_class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_modification(self):
         self.link.child.proposal_type = ProposalType.MODIFICATION
         expected_css_class = "proposal proposal_modification"
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['css_class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_transformation(self):
         self.link.child.proposal_type = ProposalType.TRANSFORMATION
         expected_css_class = "proposal proposal_transformation"
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['css_class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_transformation_modification(self):
         self.link.child.proposal_type = ProposalType.TRANSFORMATION_AND_MODIFICATION
         expected_css_class = "proposal proposal_transformation_modification"
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['css_class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_proposal_suppression(self):
         self.link.child.proposal_type = ProposalType.SUPPRESSION
         expected_css_class = "proposal proposal_suppression"
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['css_class'], expected_css_class)
 
     def test_serializer_node_attr_ensure_get_css_class_no_proposal(self):
         self.link.child.proposal_type = None
         expected_css_class = ""
-        serialized_data = _leaf_view_attribute_serializer(self.link, self.path, context=self.context)
+        serialized_data = _get_leaf_view_attribute_serializer(self.link, self.path, context=self.context)
         self.assertEquals(serialized_data['css_class'], expected_css_class)
