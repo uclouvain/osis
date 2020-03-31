@@ -24,12 +24,13 @@
 #
 ##############################################################################
 import copy
-from typing import List, Set
+from typing import List, Set, Tuple
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from program_management.ddd.business_types import *
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
+    DetachNodeValidatorList
 from program_management.models.enums import node_type
 
 PATH_SEPARATOR = '|'
@@ -95,7 +96,7 @@ class ProgramTree:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
-    def get_node_by_id_and_class(self, node_id: int, node_class: 'Node') -> 'Node':
+    def get_node_by_id_and_class(self, node_id: int, node_class) -> 'Node':
         """
         Return the corresponding node based on the node_id value with respect to the class.
         :param node_id: int
@@ -120,19 +121,44 @@ class ProgramTree:
             return set(n for n in all_nodes if n.node_type in types)
         return all_nodes
 
-    def get_nodes_by_type(self, node_type_value) -> List['Node']:
-        return [node for node in self.get_all_nodes() if node.type == node_type_value]
+    def get_nodes_by_type(self, node_type_value) -> Set['Node']:
+        return {node for node in self.get_all_nodes() if node.type == node_type_value}
 
-    def get_codes_permitted_as_prerequisite(self):
+    def get_codes_permitted_as_prerequisite(self) -> List[str]:
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
-        return [node_obj.code for node_obj in learning_unit_nodes_contained_in_program]
+        return list(sorted(node_obj.code for node_obj in learning_unit_nodes_contained_in_program))
+
+    def get_nodes_that_are_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_all_nodes()
+                    if node_obj.is_learning_unit() and node_obj.is_prerequisite
+                ),
+                lambda node_obj: node_obj.code
+            )
+        )
+
+    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_all_nodes()
+                    if node_obj.is_learning_unit() and node_obj.has_prerequisite
+                ),
+                lambda node_obj: node_obj.code
+            )
+        )
+
+    def count_usage(self, node: 'Node') -> int:
+        return len(set(n for n in self.get_all_nodes() if n == node))
 
     # TODO :: unit test
-    def get_all_finalities(self):
+    def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
-    def get_greater_block_value(self):
+    def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()
         if not all_links:
             return 0
@@ -145,7 +171,12 @@ class ProgramTree:
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
-    def attach_node(self, node_to_attach: 'Node', path: Path = None, **link_attributes):
+    def attach_node(
+            self,
+            node_to_attach: 'Node',
+            path: Path = None,
+            **link_attributes
+    ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
         :param node_to_attach: Node to add on the tree
@@ -158,11 +189,11 @@ class ProgramTree:
             parent.add_child(node_to_attach, **link_attributes)
         return messages
 
-    def clean_attach_node(self, node_to_attach: 'Node', path: Path):
+    def clean_attach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
         validator = AttachNodeValidatorList(self, node_to_attach, path)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path: str):
+    def detach_node(self, path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
         """
         Detach a node from tree
         :param path: The path node to detach
@@ -172,7 +203,14 @@ class ProgramTree:
         parent = self.get_node(parent_path)
         if not node_id:
             raise Exception("You cannot detach root node")
-        parent.detach_child(node_id)
+        is_valid, messages = self.clean_detach_node(parent, path)
+        if is_valid:
+            parent.detach_child(node_id)
+        return is_valid, messages
+
+    def clean_detach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
+        validator = DetachNodeValidatorList(self, node_to_attach, path)
+        return validator.is_valid(), validator.messages
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

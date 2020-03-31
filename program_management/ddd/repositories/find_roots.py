@@ -6,7 +6,8 @@ from base.models import education_group_year, group_element_year
 from base.models import learning_unit_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
-
+from base.models.group_element_year import GroupElementYear
+from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 
 DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
 

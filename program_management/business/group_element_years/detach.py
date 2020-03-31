@@ -107,6 +107,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
             options_to_detach += [self.education_group_year]
         return options_to_detach
 
+    # FIXME :: DEPRECATED :: use HasPrerequisiteValidator or IsPrerequisiteValidator instead
     def _check_detach_prerequisite_rules(self):
         for formation in self._parents:
             luys_inside_formation = Counter(EducationGroupHierarchy(root=formation).get_learning_unit_year_list())

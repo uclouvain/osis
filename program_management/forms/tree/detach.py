@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.domain import program_tree, node
@@ -33,8 +34,8 @@ from program_management.ddd.service import detach_node_service
 class DetachNodeForm(forms.Form):
     path = forms.CharField(widget=forms.HiddenInput)
 
-    def __init__(self, tree: program_tree.ProgramTree, **kwargs):
-        self.tree = tree
+    def __init__(self, path_to_detach: str, **kwargs):
+        self.path_to_detach = path_to_detach
         super().__init__(**kwargs)
 
     def clean_path(self):
@@ -44,6 +45,18 @@ class DetachNodeForm(forms.Form):
         except node.NodeNotFoundException:
             raise forms.ValidationError(_("Invalid tree path"))
         return path
+
+    def is_valid(self):
+        is_valid = super(DetachNodeForm, self).is_valid()
+        if not is_valid:
+            return is_valid
+
+        messages = detach_node_service.detach_node(self.path_to_detach, commit=False)
+        error_messages = [msg for msg in messages if msg.is_error()]
+        if error_messages:
+            raise ValidationError(error_messages)
+
+        return True
 
     def save(self):
         return detach_node_service.detach_node(self.tree)

@@ -23,11 +23,69 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Set
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
+from base.models.group_element_year import GroupElementYear
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree import PATH_SEPARATOR
+from program_management.ddd.repositories import load_tree, persist_tree, persist_link
+from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
+from program_management.models.enums.node_type import NodeType
+
+from django.utils.translation import gettext as _
 
 
-def detach_node(tree: 'ProgramTree', path: 'Path' = None) -> List[BusinessValidationMessage]:
-    return tree.detach_node(path)
+# TODO :: unit tests
+def detach_node(path_to_detach: 'Path', commit=True) -> List[BusinessValidationMessage]:
+    if not path_to_detach:
+        return [BusinessValidationMessage(_('Invalid tree path'))]
+
+    root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
+
+    working_tree = load_tree.load(root_id)
+    node_to_detach = working_tree.get_node(path_to_detach)
+
+    is_valid, messages = working_tree.detach_node(path_to_detach)
+    messages += __check_is_prerequisite_in_other_trees(node_to_detach=node_to_detach)
+
+    if is_valid and commit:
+        persist_tree.delete_links(node_to_detach)
+
+    return messages
+
+
+def __check_is_prerequisite_in_other_trees(node_to_detach: 'Node') -> List['BusinessValidationMessage']:
+    messages = []
+    for tree in __get_trees_using_node(node_to_detach):
+        node_to_detach = tree.get_node_by_id_and_class(node_to_detach.pk, node_to_detach.__class__)
+        validator = IsPrerequisiteValidator(tree, node_to_detach)
+        if not validator.is_valid():
+            messages += validator.messages
+    return messages
+
+
+def __get_trees_using_node(node_to_detach: 'Node'):
+    node_id = node_to_detach.pk
+    if node_to_detach.is_learning_unit():
+        trees = load_tree.load_trees_from_children(child_branch_ids=None, child_leaf_ids=[node_id])
+    else:
+        trees = load_tree.load_trees_from_children(child_branch_ids=[node_id], child_leaf_ids=None)
+    return trees
+
+
+# # TODO :: remove this function when switching on new Model "Element" (chidl_leaf and child_branch will disappear)
+# def __get_type(path: str) -> NodeType:
+#     splitted_ids = path.split(PATH_SEPARATOR)
+#     child_id = int(splitted_ids[-1])
+#     parent_id = int(splitted_ids[-2])
+#     gey = GroupElementYear.objects.filter(
+#         parent_id=parent_id,
+#         child_id=child_id
+#     )
+#     if gey.child_branch_id:
+#         return NodeType.EDUCATION_GROUP
+#     elif gey.child_leaf_id:
+#         return NodeType.LEARNING_UNIT
+#     else:
+#         raise Exception("Bad record")

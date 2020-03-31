@@ -69,7 +69,6 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
 class DetachAuthorizedRelationshipValidator(BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', position_to_add: 'Node'):
         super(DetachAuthorizedRelationshipValidator, self).__init__()
-        self.tree = tree
         self.node_to_add = node_to_add
         self.parent = position_to_add
         self.auth_relations = tree.authorized_relationships

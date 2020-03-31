@@ -61,12 +61,12 @@ def __update_or_create_links(node: Node):
         __update_or_create_links(link.child)
 
 
-def __delete_links(node: Node):
+def delete_links(node: Node):
     child_ids = [link.child.pk for link in node.children]
 
     GroupElementYear.objects.filter(parent_id=node.pk).exclude(
         Q(child_branch_id__in=child_ids) | Q(child_leaf_id__in=child_ids)   # TODO: Quick fix before migration
     ).delete()
 
-    for link in node.children:
-        __delete_links(link.child)
+    # for link in node.children:  # FIXME :: Why delete links recursively?
+    #     __delete_links(link.child)
