@@ -47,14 +47,14 @@ from program_management.models.enums.node_type import NodeType
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def up(request, root_id, education_group_year_id, group_element_year_id):
-    _order_content(request, root_id, education_group_year_id, group_element_year_id, "up")
+    return _order_content(request, root_id, education_group_year_id, group_element_year_id, "up")
 
 
 @login_required
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def down(request, root_id, education_group_year_id, group_element_year_id):
-    _order_content(request, root_id, education_group_year_id, group_element_year_id, "down")
+    return _order_content(request, root_id, education_group_year_id, group_element_year_id, "down")
 
 
 def _order_content(
