@@ -13,7 +13,7 @@ def a_tag_has_perm(url, text, perm, user, obj=None):
         context.update({
             "url": "#",
             "class_a": "disabled",
-            "error_msg": errors.get_permission_errors(user, perm) or ""
+            "error_msg": errors.get_permission_error(user, perm) or ""
         })
     return context
 

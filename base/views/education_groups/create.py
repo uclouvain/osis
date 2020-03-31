@@ -100,7 +100,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
 
     perm = PERMS_BY_CATEGORY[category]
     if not request.user.has_perm(perm, parent):
-        raise PermissionDenied(errors.get_permission_errors(request.user, perm))
+        raise PermissionDenied(errors.get_permission_error(request.user, perm))
 
     request_cache = RequestCache(request.user, reverse('education_groups'))
     cached_data = request_cache.cached_data or {}

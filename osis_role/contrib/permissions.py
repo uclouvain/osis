@@ -36,7 +36,7 @@ class ObjectPermissionBackend(ModelBackend):
         if not user_obj.is_active or user_obj.is_anonymous:
             return False
 
-        errors.clear_cached_error_perms(user_obj, perm)
+        errors.clear_permission_error(user_obj, perm)
         results = set()
         for role_mdl in _get_relevant_roles(user_obj, perm):
             qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))

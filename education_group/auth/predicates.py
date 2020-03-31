@@ -13,7 +13,8 @@ from django.utils.translation import gettext_lazy as _, pgettext
 def is_all_education_group_are_removable(self, user, education_group):
     education_group_years = education_group.educationgroupyear_set.all()
     return all(
-        user.has_perm('base.delete_educationgroup', education_group_year) for education_group_year in education_group_years
+        user.has_perm('base.delete_educationgroup', education_group_year)
+        for education_group_year in education_group_years
     )
 
 
