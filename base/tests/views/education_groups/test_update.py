@@ -70,6 +70,7 @@ from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from program_management.models.enums import node_type
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -806,6 +807,7 @@ class TestSelectAttach(TestCase):
         select_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": cls.child_education_group_year.id,
+            "element_type": node_type.NodeType.EDUCATION_GROUP.name,
             "group_element_year_id": cls.initial_group_element_year.id,
         }
         cls.copy_action_data = {
@@ -845,7 +847,6 @@ class TestSelectAttach(TestCase):
             {
                 'modelname': management.EDUCATION_GROUP_YEAR,
                 'id': self.child_education_group_year.id,
-                'source_link_id': self.initial_group_element_year.pk,
                 'action': ElementCache.ElementCacheAction.COPY.value,
             }
         )

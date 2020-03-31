@@ -81,15 +81,14 @@ def down(request, root_id, education_group_year_id, group_element_year_id):
 
 @require_http_methods(['POST'])
 def copy_to_cache(request):
-    group_element_year_id = request.POST['group_element_year_id']
     element_id = request.POST['element_id']
+    element_type = request.POST['element_type']
 
-    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
-    element = _get_concerned_object(element_id, group_element_year)
+    element = _get_concerned_object(element_id, element_type)
 
     return _cache_object(
         request.user,
-        group_element_year,
+        None,
         object_to_cache=element,
         action=ElementCache.ElementCacheAction.COPY.value
     )
@@ -99,9 +98,10 @@ def copy_to_cache(request):
 def cut_to_cache(request):
     group_element_year_id = request.POST['group_element_year_id']
     element_id = request.POST['element_id']
+    element_type = request.POST['element_type']
 
     group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
-    element = _get_concerned_object(element_id, group_element_year)
+    element = _get_concerned_object(element_id, element_type)
 
     action = ElementCache.ElementCacheAction.CUT.value
     if not group_element_year:
@@ -114,8 +114,8 @@ def cut_to_cache(request):
     )
 
 
-def _get_concerned_object(element_id, group_element_year):
-    if group_element_year and group_element_year.child_leaf:
+def _get_concerned_object(element_id, element_type):
+    if element_type == NodeType.LEARNING_UNIT.name:
         object_class = LearningUnitYear
     else:
         object_class = EducationGroupYear

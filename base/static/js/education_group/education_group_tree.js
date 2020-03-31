@@ -64,13 +64,13 @@ $(document).ready(function () {
     function handleCutAction(data, action) {
         let __ret = get_data_from_tree(data);
         let element_id = __ret.element_id;
-        let group_element_year_id = __ret.group_element_year_id;
+        let element_type = __ret.element_type;
         $.ajax({
             url: cut_element_url,
             dataType: 'json',
             data: {
                 'element_id': element_id,
-                'group_element_year_id': group_element_year_id
+                'element_type': element_type
             },
             type: 'POST',
             success: function (jsonResponse) {
@@ -85,12 +85,14 @@ $(document).ready(function () {
     function handleCopyAction(data) {
         let __ret = get_data_from_tree(data);
         let element_id = __ret.element_id;
+        let element_type = __ret.element_type;
         let group_element_year_id = __ret.group_element_year_id;
         $.ajax({
             url: copy_element_url,
             dataType: 'json',
             data: {
                 'element_id': element_id,
+                'element_type': element_type,
                 'group_element_year_id': group_element_year_id
             },
             type: 'POST',
