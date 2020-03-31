@@ -107,7 +107,6 @@ def __get_title(obj: 'Link') -> str:
 
 
 def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
-    print()
     return {
         'path': path,
         'icon': _get_group_node_icon(link),
