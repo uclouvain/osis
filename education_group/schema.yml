@@ -707,10 +707,13 @@ components:
           type: string
         code:
           type: string
+        is_transition:
+          type: boolean
       required:
         - url
         - version_name
         - code
+        - is_transition
     PaginatedTraining:
       allOf:
         - $ref: '#/components/schemas/Pagination'
@@ -885,6 +888,8 @@ components:
               type: string
             version_name:
               type: string
+            is_transition:
+              type: boolean
             ares_ability:
               type: integer
             ares_graca:
