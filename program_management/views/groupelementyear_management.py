@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.http import HttpRequest
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -45,29 +47,31 @@ from program_management.models.enums.node_type import NodeType
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def up(request, root_id, education_group_year_id, group_element_year_id):
-    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
-    tree = load_tree.load(root_id)
-    parent_node = tree.get_node_by_id_and_type(group_element_year.parent.id, NodeType.EDUCATION_GROUP)
-    parent_node.up(group_element_year.id)
-    persist_tree.persist(tree)
-
-    perms.can_change_education_group(request.user, group_element_year.parent)
-
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child}
-    display_success_messages(request, success_msg)
-
-    http_referer = request.META.get('HTTP_REFERER')
-    return redirect(http_referer)
+    _order_content(request, root_id, education_group_year_id, group_element_year_id, "up")
 
 
 @login_required
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def down(request, root_id, education_group_year_id, group_element_year_id):
+    _order_content(request, root_id, education_group_year_id, group_element_year_id, "down")
+
+
+def _order_content(
+        request: HttpRequest,
+        root_id: int,
+        education_group_year_id: int,
+        group_element_year_id: int,
+        order_function_name: str
+):
     group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
+
     tree = load_tree.load(root_id)
+
     parent_node = tree.get_node_by_id_and_type(group_element_year.parent.id, NodeType.EDUCATION_GROUP)
-    parent_node.down(group_element_year.id)
+    order_function_name = getattr(parent_node, order_function_name)
+    order_function_name(group_element_year.id)
+
     persist_tree.persist(tree)
 
     perms.can_change_education_group(request.user, group_element_year.parent)
@@ -90,7 +94,7 @@ def copy_to_cache(request):
         request.user,
         None,
         object_to_cache=element,
-        action=ElementCache.ElementCacheAction.COPY.value
+        action=ElementCache.ElementCacheAction.COPY
     )
 
 
@@ -103,18 +107,15 @@ def cut_to_cache(request):
     group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
     element = _get_concerned_object(element_id, element_type)
 
-    action = ElementCache.ElementCacheAction.CUT.value
-    if not group_element_year:
-        action = ElementCache.ElementCacheAction.COPY.value
     return _cache_object(
         request.user,
         group_element_year,
         object_to_cache=element,
-        action=action
+        action=ElementCache.ElementCacheAction.CUT
     )
 
 
-def _get_concerned_object(element_id, element_type):
+def _get_concerned_object(element_id: int, element_type: str):
     if element_type == NodeType.LEARNING_UNIT.name:
         object_class = LearningUnitYear
     else:
@@ -123,8 +124,13 @@ def _get_concerned_object(element_id, element_type):
     return get_object_or_404(object_class, pk=element_id)
 
 
-def _cache_object(user, group_element_year, object_to_cache, action):
+def _cache_object(
+        user: User,
+        group_element_year: GroupElementYear,
+        object_to_cache,
+        action: ElementCache.ElementCacheAction
+):
     group_element_year_pk = group_element_year.pk if group_element_year else None
-    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action)
+    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action.value)
     success_msg = get_clipboard_content_display(object_to_cache, action)
     return build_success_json_response(success_msg)
