@@ -181,6 +181,7 @@ class Node:
 
     def add_child(self, node: 'Node', **kwargs):
         child = link_factory.get_link(parent=self, child=node, **kwargs)
+        child._has_changed = True
         self.children.append(child)
 
     def detach_child(self, node_id: int):
