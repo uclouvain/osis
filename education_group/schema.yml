@@ -148,44 +148,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
-  /trainings/{year}/{acronym}/versions/{version_name}/prerequisites:
-    get:
-      description: Return the prerequisites of the learning units of the version
-      operationId: versions_prerequisites
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: version_name
-          required: true
-          schema:
-            description: ''
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ArrayOfEducationGroupPrerequisites'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      tags:
-        - trainings
   /trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the training
