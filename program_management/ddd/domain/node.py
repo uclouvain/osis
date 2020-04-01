@@ -77,9 +77,8 @@ class Node:
             credits: Decimal = None
     ):
         self.node_id = node_id
-        if children is None:
-            children = []
         self.children = children
+        self._children = children or []
         self.node_type = node_type
         self.end_date = end_date
         self.code = code
@@ -108,6 +107,14 @@ class Node:
         if self._academic_year is None:
             self._academic_year = AcademicYear(self.year)
         return self._academic_year
+
+    @property
+    def children(self):
+        return sorted(self._children, key=lambda link_obj: link_obj.order or 0)
+
+    @children.setter
+    def children(self, new_children: List['Link']):
+        self._children = new_children
 
     def is_learning_unit(self):
         return self.type == NodeType.LEARNING_UNIT
@@ -181,8 +188,8 @@ class Node:
 
     def add_child(self, node: 'Node', **kwargs):
         child = link_factory.get_link(parent=self, child=node, **kwargs)
+        self._children.append(child)
         child._has_changed = True
-        self.children.append(child)
 
     def detach_child(self, node_id: int):
         self.children = [link for link in self.children if link.child.pk == node_id]

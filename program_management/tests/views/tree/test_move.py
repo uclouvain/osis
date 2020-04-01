@@ -38,7 +38,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerFactory, PersonWithPermissionsFactory
-from program_management.ddd.domain import node
+from program_management.ddd.domain import link
 
 
 @override_flag('education_group_update', active=True)
@@ -91,7 +91,7 @@ class TestUp(TestCase):
         response = self.client.get(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch.object(node.Node, "up")
+    @mock.patch("program_management.ddd.service.order_link_service.up_link")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_up_case_success(self, mock_permission, mock_up):
         mock_permission.return_value = True
@@ -185,7 +185,7 @@ class TestDown(TestCase):
         response = self.client.get(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch.object(node.Node, "down")
+    @mock.patch("program_management.ddd.service.order_link_service.down_link")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_down_case_success(self, mock_permission, mock_down):
         mock_permission.return_value = True

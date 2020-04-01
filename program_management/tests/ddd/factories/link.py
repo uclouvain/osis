@@ -50,4 +50,4 @@ class LinkFactory(factory.Factory):
         if not self.parent.children:
             self.parent.children = [self]
         else:
-            self.parent.children.append(self)
+            self.parent.children = self.parent.children + [self]
