@@ -108,7 +108,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             self.learning_unit_year = LearningUnitYear.objects.select_related('academic_year').prefetch_related(
                 'learning_unit__learningunityear_set'
             ).annotate(
-                min_proposal_year=Min(Subquery(proposal_years))
+                min_proposal_year=Subquery(Min(proposal_years))
             ).get(id=self.trans_text.reference)
 
             self.last_postponed_academic_year = None
