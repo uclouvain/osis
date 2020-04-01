@@ -87,16 +87,16 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         self._save_translated_text()
         return self.text_label, self.last_postponed_academic_year
 
-    def _adapt_range_if_proposal(self):
-        ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
-        proposal = ProposalLearningUnit.objects.filter(
+    def _get_ac_year_postponement_year(self):
+        proposals = ProposalLearningUnit.objects.filter(
             learning_unit_year__learning_unit=self.learning_unit_year.learning_unit,
             learning_unit_year__academic_year__year__gt=self.learning_unit_year.academic_year.year
-        ).order_by('learning_unit_year__academic_year__year').first()
-        # - 1 because last postponed luy is the one before the proposal
-        if proposal and proposal.learning_unit_year.academic_year.year - 1 <= ac_year_postponement_range.last().year:
-            return ac_year_postponement_range.filter(
-                year__lte=proposal.learning_unit_year.academic_year.year
+        ).order_by('learning_unit_year__academic_year__year')
+
+        ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
+        if proposals:
+            return ac_year_postponement_range.exclude(
+                year__gte=proposals.first().learning_unit_year.academic_year.year
             )
         return ac_year_postponement_range
 
@@ -114,7 +114,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
 
             self.last_postponed_academic_year = None
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
-                ac_year_postponement_range = self._adapt_range_if_proposal()
+                ac_year_postponement_range = self._get_ac_year_postponement_year()
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
                 cms = {"language": self.trans_text.language,
                        "text_label": self.text_label,
