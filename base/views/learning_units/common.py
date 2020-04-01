@@ -26,7 +26,7 @@
 import re
 
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Prefetch
+from django.db.models import Prefetch, OuterRef, Min, Subquery
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 
@@ -40,6 +40,7 @@ from base.business.learning_units.perms import learning_unit_year_permissions, l
 from base.models import proposal_learning_unit
 from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
 
@@ -115,6 +116,10 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
 
 
 def get_common_context_learning_unit_year(learning_unit_year_id, person):
+    proposal_years = ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=OuterRef('learning_unit'),
+        learning_unit_year__academic_year__year__gt=OuterRef('academic_year__year')
+    ).values('learning_unit_year__academic_year__year')
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -123,6 +128,8 @@ def get_common_context_learning_unit_year(learning_unit_year_id, person):
             'learning_unit__learningunityear_set',
             queryset=LearningUnitYear.objects.select_related('academic_year')
         )
+    ).annotate(
+        min_proposal_year=Min(Subquery(proposal_years))
     )
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     return {
