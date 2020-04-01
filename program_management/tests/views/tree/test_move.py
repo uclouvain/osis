@@ -59,7 +59,7 @@ class TestUp(TestCase):
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse(
             "group_element_year_up",
-            args=[cls.education_group_year.id, cls.education_group_year.id, cls.group_element_year_3.id]
+            args=[cls.education_group_year.id, cls.group_element_year_3.id]
         )
         cls.post_valid_data = {}
 
@@ -153,7 +153,7 @@ class TestDown(TestCase):
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse(
             "group_element_year_down",
-            args=[cls.education_group_year.id, cls.education_group_year.id, cls.group_element_year_3.id]
+            args=[cls.education_group_year.id, cls.group_element_year_3.id]
         )
         cls.post_valid_data = {}
 

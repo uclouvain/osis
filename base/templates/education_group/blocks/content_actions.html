@@ -26,12 +26,12 @@
 
 <div class="btn-group  pull-right" role="group" aria-label="actions">
     <form id="form_up_{{ group_child.id }}" method="POST" style="display:inline;"
-          action="{% url 'group_element_year_up' root.pk education_group_year.pk group.pk %}">
+          action="{% url 'group_element_year_up' root.pk group.pk %}">
         {% csrf_token %}
         {% button_order_with_permission _("Go up") "btn_operation_up_"|addstr:group.id "up" %}
     </form>
     <form id="form_down_{{ group_child.id }}" method="POST" style="display:inline;"
-          action="{% url 'group_element_year_down' root.pk education_group_year.pk group.pk %}">
+          action="{% url 'group_element_year_down' root.pk group.pk %}">
         {% csrf_token %}
         {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
     </form>

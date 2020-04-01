@@ -69,9 +69,6 @@ class ProgramTree:
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
-    def get_links(self):
-        return _links_from_root(self.root_node)
-
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
 
@@ -140,6 +137,9 @@ class ProgramTree:
 
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
+
+    def get_link_by_pk(self, link_pk: int) -> 'Link':
+        return next((link for link in self.get_all_links() if link.pk == link_pk), None)
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
