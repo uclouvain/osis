@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd.business_types import *
 
 

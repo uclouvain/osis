@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory
