@@ -55,9 +55,9 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
 
     def form_valid(self, form):
         if form.cleaned_data['action'] == 'up':
-            program_management.views.tree.move.up()
+            self.get_object().up()
         elif form.cleaned_data['action'] == 'down':
-            program_management.views.tree.move.down()
+            self.get_object().down()
         return super().form_valid(form)
 
     def form_invalid(self, form):
