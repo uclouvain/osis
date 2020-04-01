@@ -91,8 +91,6 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         proposal_years = ProposalLearningUnit.objects.filter(
             learning_unit_year__learning_unit=self.learning_unit_year.learning_unit,
             learning_unit_year__academic_year__year__gt=self.learning_unit_year.academic_year.year
-        ).order_by(
-            'learning_unit_year__academic_year__year'
         ).values_list('learning_unit_year__academic_year__year', flat=True)
         ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
         if proposal_years:
