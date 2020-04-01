@@ -132,5 +132,5 @@ def _cache_object(
 ):
     group_element_year_pk = group_element_year.pk if group_element_year else None
     ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action.value)
-    success_msg = get_clipboard_content_display(object_to_cache, action)
+    success_msg = get_clipboard_content_display(object_to_cache, action.value)
     return build_success_json_response(success_msg)

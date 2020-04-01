@@ -50,45 +50,9 @@ $(document).ready(function () {
         };
     }
 
-    function build_url_data(element_id, group_element_year_id, action) {
-        var data = {
-            'root_id': root_id,
-            'element_id': element_id,
-            'group_element_year_id': group_element_year_id,
-            'action': action,
-            'source': url_resolver_match
-        };
-        return jQuery.param(data);
-    }
-
-    function handleCutAction(data, action) {
-        let __ret = get_data_from_tree(data);
-        let element_id = __ret.element_id;
-        let element_type = __ret.element_type;
+    function handleCutAction(element_id, element_type, group_element_year_id) {
         $.ajax({
             url: cut_element_url,
-            dataType: 'json',
-            data: {
-                'element_id': element_id,
-                'element_type': element_type
-            },
-            type: 'POST',
-            success: function (jsonResponse) {
-                let clipboard = document.getElementById("clipboard");
-                clipboard.style.display = "block";
-                let clipboard_content = document.getElementById("clipboard_content");
-                clipboard_content.innerHTML = jsonResponse['success_message'];
-            }
-        });
-    }
-
-    function handleCopyAction(data) {
-        let __ret = get_data_from_tree(data);
-        let element_id = __ret.element_id;
-        let element_type = __ret.element_type;
-        let group_element_year_id = __ret.group_element_year_id;
-        $.ajax({
-            url: copy_element_url,
             dataType: 'json',
             data: {
                 'element_id': element_id,
@@ -97,14 +61,35 @@ $(document).ready(function () {
             },
             type: 'POST',
             success: function (jsonResponse) {
-                let clipboard = document.getElementById("clipboard");
-                clipboard.style.display = "block";
-                let clipboard_content = document.getElementById("clipboard_content");
-                clipboard_content.innerHTML = jsonResponse['success_message'];
+                displayInfoMessage(jsonResponse, 'clipboard');
             }
         });
     }
 
+    function handleCopyAction(element_id, element_type) {
+        $.ajax({
+            url: copy_element_url,
+            dataType: 'json',
+            data: {
+                'element_id': element_id,
+                'element_type': element_type
+            },
+            type: 'POST',
+            success: function (jsonResponse) {
+                displayInfoMessage(jsonResponse, 'clipboard');
+            }
+        });
+    }
+
+    $(".copy-element").click(function (event) {
+        handleCopyAction(current_element_id, element_type );
+        event.preventDefault();
+    });
+
+    $(".cut-element").click(function (event) {
+        handleCutAction(current_element_id, element_type, group_element_year_id);
+        event.preventDefault();
+    });
 
     $documentTree.jstree({
             "core": {
@@ -134,14 +119,17 @@ $(document).ready(function () {
                                 return !get_data_from_tree(data).group_element_year_id;
                             },
                             "action": function (data) {
-                                handleCutAction(data)
+                                const node_data = get_data_from_tree(data);
+                                handleCutAction(node_data.element_id, node_data.element_type,
+                                    node_data.group_element_year_id)
                             }
                         },
 
                         "copy": {
                             "label": gettext("Copy"),
                             "action": function (data) {
-                                handleCopyAction(data)
+                                const node_data = get_data_from_tree(data);
+                                handleCopyAction(node_data.element_id, node_data.element_type)
                             }
                         },
 

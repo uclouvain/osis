@@ -124,6 +124,9 @@
                 }
             });
         });
+        var current_element_id = {{ current_node.node_id }};
+        var element_type = "{{ current_node.type }}";
+        var group_element_year_id = "{{ group_to_parent }}";
     </script>
     <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}">
     </script>
