@@ -100,6 +100,14 @@ class Link:
     def is_link_with_group(self):
         return self.child.is_group()
 
+    def order_up(self):
+        self.order -= 1
+        self._has_changed = True
+
+    def order_down(self):
+        self.order += 1
+        self._has_changed = True
+
 
 class LinkWithChildLeaf(Link):
     def __init__(self, *args, **kwargs):

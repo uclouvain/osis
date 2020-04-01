@@ -40,6 +40,7 @@ from base.views.education_groups import perms
 from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.repositories import load_tree, persist_tree
+from program_management.ddd.service import order_link_service
 from program_management.models.enums.node_type import NodeType
 
 
@@ -47,36 +48,35 @@ from program_management.models.enums.node_type import NodeType
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def up(request, root_id, link_id):
-    return _order_content(request, root_id, link_id, "up")
+    return _order_content(request, root_id, link_id, order_link_service.up_link)
 
 
 @login_required
 @waffle_flag("education_group_update")
 @require_http_methods(['POST'])
 def down(request, root_id, link_id):
-    return _order_content(request, root_id, link_id, "down")
+    return _order_content(request, root_id, link_id, order_link_service.down_link)
 
 
 def _order_content(
         request: HttpRequest,
         root_id: int,
         link_id: int,
-        order_function_name: str
+        order_function
 ):
     # FIXME When perm refactored remove this code so as to use ddd domain objects
     group_element_year = get_object_or_none(GroupElementYear, pk=link_id)
     perms.can_change_education_group(request.user, group_element_year.parent)
 
     tree = load_tree.load(root_id)
-    link = tree.get_link_by_pk(link_id)
+    link_to_order = tree.get_link_by_pk(link_id)
+    parent_node = link_to_order.parent
 
-    parent_node = link.parent
-    order_function_name = getattr(parent_node, order_function_name)
-    order_function_name(link.pk)
+    order_function(parent_node, link_to_order)
 
     persist_tree.persist(tree)
 
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': link.child.code}
+    success_msg = _("The %(acronym)s has been moved") % {'acronym': link_to_order.child.code}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
