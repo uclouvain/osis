@@ -411,7 +411,7 @@ class TestLearningAchievementPostponement(TestCase):
         create_response = self._create_achievements(code_name=1)
         self.assertEqual(create_response.status_code, 200)
         achievements = LearningAchievement.objects.filter(language__code=FR_CODE_LANGUAGE)
-        postponed_achievements = achievements.exclude(earning_unit_year__academic_year__year__gte=proposal_year)
+        postponed_achievements = achievements.exclude(learning_unit_year__academic_year__year__gte=proposal_year)
         not_postponed_achievements = achievements.filter(learning_unit_year__academic_year__year__gte=proposal_year)
         for achievement in postponed_achievements:
             self.assertEqual(achievement.text, 'text')
