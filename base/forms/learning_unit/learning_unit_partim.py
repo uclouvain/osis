@@ -206,7 +206,7 @@ class PartimForm(LearningUnitBaseForm):
         # Save learning unit
         learning_unit = self.learning_unit_form.save(
             start_year=self.start_anac if self.start_anac else start_year,
-            end_year=end_anac,
+            end_year=end_anac if end_anac.year > self.start_anac.year else self.start_anac,
             learning_container=lcy.learning_container,
             commit=commit
         )
