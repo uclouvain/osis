@@ -120,7 +120,9 @@ Documentation: [How to write predicate ?](https://github.com/dfunckt/django-rule
 
 `osis_role` provide a [context](https://github.com/dfunckt/django-rules/blob/master/README.rst#invocation-context) with queryset of the role accessible on every predicate
 
--       @predicate(bind=True)
+-       from rules import predicate
+
+        @predicate(bind=True)
         def is_linked_to_management_entity(self, user, obj):
             role_qs = self.context['role_qs']       # role_qs is already filtered by connected user
             return role_qs.filter(entity=obj.management_entity_id).exists()
@@ -128,20 +130,78 @@ Documentation: [How to write predicate ?](https://github.com/dfunckt/django-rule
 Permissions in views
 --------------------
 `osis_role` is based on `rules` package and `rules` comes with a set of view decorators to help you enforce authorization in your views.
+`osis_role` wraps some functionalities of rules.
+
 
 Documentation: [How to protect views ?](https://github.com/dfunckt/django-rules/blob/master/README.rst#permissions-in-views)
 
+<ins>Class Based View style: </ins>
+-       from osis_role.contrib.views import PermissionRequiredMixin
+        ...
+        
+        class CreateObject(PermissionRequiredMixin, CreateView):
+            ....
+            permission_required = 'base.add_object'
+            ....
+            
+            def get_permission_object(self):
+                # Default behaviour and can be overrided
+                return self.get_object()
+
+<ins>Function Based View style: </ins>
+-       from osis_role.contrib.views import permission_required
+        ...
+
+        def get_object_by_pk(request, object_id):
+            return get_object_or_404(
+                ObjectModel.objects.select_related(...),
+                pk=object_id,
+            )
+
+        @permission_required('base.change_educationgroup', fn=get_object_by_pk)
+        def create_object(request, object_id):
+            ....
+            
+            
 
 Permissions in code
 --------------------
 
-TODO....
+`osis_role` is based on the default auth module provided by Django. 
+
+If you want to test if a user have permission, you can use has_perm method provided in User Model:
+
+-       def can_access_obj(user, obj):
+            return user.has_perm("base.view_object", obj)
 
 Error management
 ----------------
 
-TODO....
+`osis_role` use an `error` module which manage error related to a specific permission.
 
+`osis_role` provide a decorator which allow you to set permission message on rules precidate.
+
+-       from rules import predicate
+        from osis_role.errors import predicate_failed_msg
+
+        @predicate(bind=True)
+        @predicate_failed_msg(message="You don't have access because not linked to management entity")
+        def is_linked_to_management_entity(self, user, obj):
+            role_qs = self.context['role_qs']       # role_qs is already filtered by connected user
+            return role_qs.filter(entity=obj.management_entity_id).exists()
+
+
+
+If you want to set manually the error message according to a permission, you can use :
+
+-       from osis_role import errors
+
+        def can_access_education_group(user, education_group):
+            perm_name = "base.view_educationgroup"
+            has_perm = user.has_perm(perm_name, education_group)
+            if not has_perm:
+                error.set_permission_error(user, perm_name, ""You don't have access")
+            return has_perm
 
 
 Synchronize RBAC <> ABAC
