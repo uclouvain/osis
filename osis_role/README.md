@@ -17,6 +17,7 @@ Table of Contents
   - [Permissions in views](#permissions-in-views)
   - [Permissions in code](#permissions-in-code)
   - [Error management](#error-management)
+  - [Template Tags](#template-tags)
   - [Synchronize RBAC <> ABAC](#synchronize-rbac--abac)
 - [Managing OSIS-Role](#osis-role-management)
   - [Via administration](#via-administration)
@@ -169,7 +170,7 @@ Permissions in code
 
 `osis_role` is based on the default auth module provided by Django. 
 
-If you want to test if a user have permission, you can use has_perm method provided in User Model:
+If you want to test if a user has permission, you can use has_perm method provided in User Model:
 
 -       def can_access_obj(user, obj):
             return user.has_perm("base.view_object", obj)
@@ -177,9 +178,9 @@ If you want to test if a user have permission, you can use has_perm method provi
 Error management
 ----------------
 
-`osis_role` use an `error` module which manage error related to a specific permission.
+`osis_role` uses an `error` module which manage error related to a specific permission.
 
-`osis_role` provide a decorator which allow you to set permission message on rules precidate.
+`osis_role` provides a decorator which allow you to set permission message on rules precidate.
 
 -       from rules import predicate
         from osis_role.errors import predicate_failed_msg
@@ -192,16 +193,60 @@ Error management
 
 
 
-If you want to set manually the error message according to a permission, you can use :
+If you want to dynamically set the error message according to a permission, you can use :
 
 -       from osis_role import errors
 
-        def can_access_education_group(user, education_group):
-            perm_name = "base.view_educationgroup"
-            has_perm = user.has_perm(perm_name, education_group)
+        def update_object(user, object):
+            perm_name = "base.view_object"
+            has_perm = user.has_perm(perm_name, object)
             if not has_perm:
-                error.set_permission_error(user, perm_name, ""You don't have access")
+                errors.set_permission_error(user, perm_name, ""You don't have access")
             return has_perm
+
+
+Template tags
+-------------
+
+`osis_role` provide multiples templatetags 
+
+- <b>a_tag_has_perm</b>: Display <a/> tag with error message as a tooltip when permission denied
+        
+        {% load osis_role %}
+        .......
+        <div>
+             {% a_tag_has_perm create_obj_url _('New Object') 'base.add_obj' user %}                    
+        </div>
+
+- <b>a_tag_modal_has_perm</b>: same as a_tag_has_perm but load url into a modal
+        
+       {% load osis_role %}
+        .......
+        <div>
+             {% a_tag_modal_has_perm create_obj_url _('New Object') 'base.add_obj' user %}                    
+        </div>
+
+- <b>has_perm</b>: Evaluate permission according to user and ressource
+        
+        {% load osis_role %}
+        .......
+        {% has_perm 'base.change_obj' user obj as can_change_obj %}
+        {% if can_change_obj %}
+            <button>Edit Object</button>
+        {% endif %}
+
+- <b>has_module_perms</b>: Evaluate if there are at least one permission valid within an application
+
+        {% load osis_role %}
+        .......
+        {% has_module_perms user 'base' as can_access_base_app %}
+        {% if can_access_base_app %}
+            <ul> 
+                <li>Create Object</li>
+                <li> ... </li>
+                ...
+            </ul>
+        {% endif %}
 
 
 Synchronize RBAC <> ABAC
