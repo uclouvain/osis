@@ -239,7 +239,7 @@ Template tags
             <button>Edit Object</button>
         {% endif %}
 
-- <b>has_module_perms</b>: Evaluate if there are at least one permission valid within an application
+- <b>has_module_perms</b>: Evaluate if there is at least one permission valid within an application
 
         {% load osis_role %}
         .......
