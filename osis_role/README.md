@@ -193,7 +193,11 @@ Error management
 
 
 
-If you want to dynamically set the error message according to a permission, you can use :
+If you want to dynamically set the error message, you can use :
+
+-       errors.set_permission_error(user, perm_name, custom_msg)
+
+This method should be called when a user does not fulfill a required permission, as in this example:
 
 -       from osis_role import errors
 
