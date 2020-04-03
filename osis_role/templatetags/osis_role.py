@@ -36,4 +36,3 @@ def has_perm(perm, user, obj=None):
 @register.simple_tag
 def has_module_perms(user, app_label):
     return user.has_module_perms(app_label)
-
