@@ -10,8 +10,6 @@ $(document).ready(function () {
 
     let $documentTree = $('#panel_file_tree');
     if ($documentTree.length) {
-        console.log("Hello ");
-        console.log($documentTree);
         const copy_element_url = $documentTree.attr("data-copyUrl");
         const cut_element_url = $documentTree.attr("data-cutUrl");
 
@@ -362,14 +360,6 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
 
 
 function setListenerForCutElements() {
-    $(".copy-element").click(function (event) {
-        const url = event.target.dataset.url;
-        const element_id = event.target.dataset.element_id;
-        const element_type = event.target.dataset.element_type;
-        handleCopyAction(url, element_id, element_type);
-        event.preventDefault();
-    });
-
     $(".cut-element").click(function (event) {
         const url = event.target.dataset.url;
         const element_id = event.target.dataset.element_id;
