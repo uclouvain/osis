@@ -43,7 +43,7 @@ urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
         url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
         url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
-        url(r'^prerequisite', TrainingPrerequisites.as_view({'get': 'list'}), name=TrainingPrerequisites.name)
+        url(r'^prerequisites$', TrainingPrerequisites.as_view({'get': 'list'}), name=TrainingPrerequisites.name)
     ])),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
     url(
