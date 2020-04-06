@@ -429,3 +429,24 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertListEqual([], copied_link_1_1_1.children)
         self.assertNotIn(link1_1_1, result)
         self.assertNotIn(link1_1_1_1, result)
+
+
+class TestGetLink(SimpleTestCase):
+    def setUp(self):
+        self.tree = ProgramTreeFactory()
+        self.root = self.tree.root_node
+        self.link1 = LinkFactory(parent=self.root)
+        self.link11 = LinkFactory(parent=self.link1.child, child=NodeLearningUnitYearFactory())
+        self.link12 = LinkFactory(parent=self.link11.child)
+        self.link2 = LinkFactory(parent=self.root, child=NodeLearningUnitYearFactory())
+
+    def test_should_return_none_when_link_does_not_exist_for_parent_and_child_in_tree(self):
+        result = self.tree.get_link(parent=self.root, child=self.link11.child)
+        self.assertIsNone(result)
+
+    def test_should_return_link_when_link_exists_for_parent_and_child_in_tree(self):
+        result = self.tree.get_link(parent=self.link2.parent, child=self.link2.child)
+        self.assertEqual(
+            result,
+            self.link2
+        )

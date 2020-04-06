@@ -138,8 +138,8 @@ class ProgramTree:
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
 
-    def get_link_by_pk(self, link_pk: int) -> 'Link':
-        return next((link for link in self.get_all_links() if link.pk == link_pk), None)
+    def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
+        return next((link for link in self.get_all_links() if link.parent == parent and link.child == child), None)
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)

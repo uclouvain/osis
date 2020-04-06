@@ -41,6 +41,7 @@ from base.views.education_groups.select import get_clipboard_content_display, bu
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.repositories import load_tree, persist_tree
 from program_management.ddd.service import order_link_service
+from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
 
@@ -68,15 +69,11 @@ def _order_content(
     group_element_year = get_object_or_none(GroupElementYear, pk=link_id)
     perms.can_change_education_group(request.user, group_element_year.parent)
 
-    tree = load_tree.load(root_id)
-    link_to_order = tree.get_link_by_pk(link_id)
-    parent_node = link_to_order.parent
+    child_node_type = node_type.NodeType.EDUCATION_GROUP if isinstance(group_element_year.child, EducationGroupYear) \
+        else node_type.NodeType.LEARNING_UNIT
+    order_function(root_id, group_element_year.parent.id, group_element_year.child.id, child_node_type)
 
-    order_function(parent_node, link_to_order)
-
-    persist_tree.persist(tree)
-
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': link_to_order.child.code}
+    success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child.acronym}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
