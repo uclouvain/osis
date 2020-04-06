@@ -548,21 +548,13 @@ components:
     PrerequisiteItem:
       type: object
       properties:
+        code:
+          type: string
         url:
           type: string
           format: uri
         title:
           type: string
-        absolute_credits:
-          type: number
-        relative_credits:
-          type: number
-        block:
-          type: array
-          items:
-            type: string
-        mandatory:
-          type: boolean
     ArrayOfTraining:
       type: array
       items:
