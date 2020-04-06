@@ -76,7 +76,7 @@ class EducationGroupRead(TestCase):
         cls.education_group_language_child_1 = \
             EducationGroupLanguageFactory(education_group_year=cls.education_group_child_1)
 
-        cls.user = PersonWithPermissionsFactory("can_access_education_group").user
+        cls.user = PersonWithPermissionsFactory("view_educationgroup").user
         cls.url = reverse("education_group_read", args=[cls.education_group_parent.id, cls.education_group_child_1.id])
 
     def setUp(self):
@@ -192,7 +192,7 @@ class TestReadEducationGroup(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         CentralManagerGroupFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
         cls.academic_year = AcademicYearFactory(current=True)
 
     def setUp(self):
@@ -245,7 +245,7 @@ class TestReadEducationGroup(TestCase):
     def test_show_and_edit_coorganization(self):
         user = UserFactory()
         person = PersonFactory(user=user)
-        user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         person.user.user_permissions.add(Permission.objects.get(codename='change_educationgroup'))
         training_not_2m = EducationGroupYearFactory(
             education_group_type__category=TRAINING,
@@ -393,7 +393,7 @@ class EducationGroupDiplomas(TestCase):
                                                               education_group_type=type_training)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
         cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
         cls.url = reverse("education_group_diplomas",
                           args=[cls.education_group_parent.pk, cls.education_group_child.id])
 
@@ -539,7 +539,7 @@ class TestUtilizationTab(TestCase):
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_2)
         cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
 
         AcademicYearFactory(current=True)
         cls.url = reverse(
@@ -610,7 +610,7 @@ class TestContent(TestCase):
         )
 
         cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
 
         cls.url = reverse(
             "education_group_content",

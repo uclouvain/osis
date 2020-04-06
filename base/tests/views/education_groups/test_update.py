@@ -1182,7 +1182,7 @@ class TestCertificateAimView(TestCase):
         cls.training = TrainingFactory(academic_year=cls.academic_year)
 
         cls.program_manager = ProgramManagerFactory(education_group=cls.training.education_group)
-        read_permission = Permission.objects.get(codename='can_access_education_group')
+        read_permission = Permission.objects.get(codename='view_educationgroup')
         cls.program_manager.person.user.user_permissions.add(read_permission)
 
     def setUp(self):

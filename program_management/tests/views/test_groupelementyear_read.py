@@ -68,7 +68,7 @@ class TestReadPdfContent(TestCase):
         education_group_year = EducationGroupYearFactory(academic_year=academic_year)
         GroupElementYearFactory(parent=education_group_year,
                                 child_branch__academic_year=academic_year)
-        cls.person = CentralManagerFactory("can_access_education_group")
+        cls.person = CentralManagerFactory("view_educationgroup")
         cls.url = reverse(
             "group_content",
             kwargs={

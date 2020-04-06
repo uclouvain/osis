@@ -66,7 +66,7 @@ class PublicationContactViewSetupTest(TestCase):
         )
 
         # Create a central manager and linked it to entity of training
-        cls.person = CentralManagerFactory("change_educationgroup", "can_access_education_group")
+        cls.person = CentralManagerFactory("change_educationgroup", "view_educationgroup")
         PersonEntityFactory(person=cls.person, entity=cls.training.management_entity)
 
     def setUp(self):

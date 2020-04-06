@@ -47,7 +47,7 @@ class TestPostpone(TestCase):
 
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="change_educationgroup"))
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
 
         cls.education_group = EducationGroupFactory(end_year=cls.next_academic_year)
         cls.education_group_year = TrainingFactory(academic_year=cls.current_academic_year,

@@ -54,7 +54,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
 
         cls.user = UserFactory()
         cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group',
+            'view_educationgroup',
             'change_educationgroupachievement',
             'delete_educationgroupachievement',
             user=cls.user
@@ -175,7 +175,7 @@ class TestEducationGroupAchievementCMSSetup(TestCase):
     def setUp(self):
         self.user = UserFactory()
         self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        self.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         self.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
         self.education_group_year = EducationGroupYearFactory()
         PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)

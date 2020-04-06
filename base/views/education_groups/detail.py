@@ -123,7 +123,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
     pk_url_kwarg = 'education_group_year_id'
 
     # PermissionRequiredMixin
-    permission_required = 'base.can_access_education_group'
+    permission_required = 'base.view_educationgroup'
     raise_exception = True
 
     # FIXME: resolve dependency in other ways

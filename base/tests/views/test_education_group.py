@@ -91,7 +91,7 @@ class EducationGroupGeneralInformations(TestCase):
             reference=cls.education_group_child.id,
         )
 
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
 
         cls.url = reverse(
             "education_group_general_informations",
@@ -234,7 +234,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
             language=settings.LANGUAGE_CODE_EN,
         )
         cls.person = PersonWithPermissionsFactory(
-            "can_access_education_group",
+            "view_educationgroup",
             "change_pedagogyinformation",
             "change_commonpedagogyinformation"
         )
@@ -330,7 +330,7 @@ class EducationGroupPublishViewTestCase(TestCase):
         cls.academic_year = create_current_academic_year()
         cls.training = TrainingFactory(academic_year=cls.academic_year)
         cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
-        cls.person = PersonWithPermissionsFactory('can_access_education_group')
+        cls.person = PersonWithPermissionsFactory('view_educationgroup')
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -375,7 +375,7 @@ class EducationGroupViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
         cls.template_name = "education_group/tab_administrative_data.html"
 
     def setUp(self):
@@ -452,10 +452,10 @@ class EducationGroupAdministrativedata(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group', 'can_edit_education_group_administrative_data'
+            'view_educationgroup', 'can_edit_education_group_administrative_data'
         )
 
-        cls.permission_access = Permission.objects.get(codename='can_access_education_group')
+        cls.permission_access = Permission.objects.get(codename='view_educationgroup')
         cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
         cls.education_group_year = EducationGroupYearBachelorFactory()
@@ -711,7 +711,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
 
         cls.person = PersonWithPermissionsFactory(
-            "can_access_education_group",
+            "view_educationgroup",
             "change_admissioncondition",
             "change_commonadmissioncondition",
         )

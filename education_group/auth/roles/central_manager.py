@@ -24,7 +24,7 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
     class Meta:
         verbose_name = _("Central manager")
         verbose_name_plural = _("Central managers")
-        group_name = "central_manager"  # TODO: Must be renamed in central_managers after complete migration
+        group_name = "central_managers"
 
     @classmethod
     def rule_set(cls):
@@ -107,4 +107,12 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_link_to_management_entity
+            ,
+            'base.can_edit_education_group_administrative_data':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_user_link_to_management_entity
+            ,
+            'base.change_educationgroupcontent': rules.always_allow
+            ,
         })

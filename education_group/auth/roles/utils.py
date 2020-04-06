@@ -1,7 +1,4 @@
-from django.contrib.postgres.fields import ArrayField
-
 from education_group.auth.scope import Scope
-from django.db import models
 
 
 class EducationGroupTypeScopeRoleMixin:

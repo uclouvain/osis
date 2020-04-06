@@ -51,7 +51,7 @@ class TestEducationGroupSkillsAchievements(TestCase):
         cls.education_group_year = EducationGroupYearBachelorFactory(
             academic_year=AcademicYearFactory(current=True)
         )
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
 
     def setUp(self):
         self.mocked_perm = self.perm_patcher.start()

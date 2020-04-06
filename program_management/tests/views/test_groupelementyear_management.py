@@ -55,7 +55,7 @@ class TestUp(TestCase):
                                                            child_branch__academic_year=cls.academic_year)
 
         cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("education_groups_management")
         cls.post_valid_data = {
             "root_id": cls.education_group_year.id,
@@ -151,7 +151,7 @@ class TestDown(TestCase):
                                                            child_branch__academic_year=cls.current_academic_year)
 
         cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("education_groups_management")
         cls.post_valid_data = {
             "root_id": cls.education_group_year.id,

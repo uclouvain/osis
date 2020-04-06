@@ -51,7 +51,7 @@ class TestDetach(TestCase):
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch__academic_year=cls.academic_year)
         cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,
             cls.education_group_year.id,
@@ -144,7 +144,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
             child_leaf=cls.luy
         )
         cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,
             cls.education_group_year.id,

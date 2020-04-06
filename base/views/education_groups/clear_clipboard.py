@@ -32,7 +32,7 @@ from base.utils.cache import ElementCache
 
 @login_required
 @require_POST
-@permission_required('base.can_access_education_group', raise_exception=True)
+@permission_required('base.view_educationgroup', raise_exception=True)
 def clear_clipboard(request):
     if request.is_ajax():
         ElementCache(request.user).clear()

@@ -38,7 +38,7 @@ class TestClearClipboard(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("education_group_clear_clipboard")
-        cls.central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
+        cls.central_manager = CentralManagerFactory("view_educationgroup", user__superuser=False)
 
     def test_when_not_logged(self):
         response = self.client.post(self.url)
