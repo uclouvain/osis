@@ -110,7 +110,8 @@ class Node:
 
     @property
     def children(self):
-        return sorted(self._children, key=lambda link_obj: link_obj.order or 0)
+        self._children.sort(key=lambda link_obj: link_obj.order or 0)
+        return self._children
 
     @children.setter
     def children(self, new_children: List['Link']):
