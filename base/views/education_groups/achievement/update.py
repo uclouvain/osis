@@ -47,7 +47,7 @@ from cms.models import translated_text
 from cms.models.text_label import TextLabel
 
 
-class EducationGroupAchievementAction(PermissionRequiredMixin, EducationGroupAchievementMixin, FormView):
+class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
     form_class = ActionForm
     http_method_names = ('post',)
     rules = []
@@ -82,17 +82,13 @@ class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
     form_class = EducationGroupDetailedAchievementForm
 
-    def get_permission_object(self):
-        return self.education_group_achievement.education_group_year
-
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):
     def get_permission_object(self):
         return self.education_group_achievement.education_group_year
 
 
-class EducationGroupAchievementCMS(PermissionRequiredMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin,
-                                   FormView):
+class EducationGroupAchievementCMS(RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
     cms_text_label = None
     template_name = "education_group/blocks/modal/modal_pedagogy_edit.html"
 
