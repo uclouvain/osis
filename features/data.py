@@ -14,7 +14,7 @@ def setup_data(context: Context):
     functional_factories.reference.BusinessLanguageFactory()
     functional_factories.structure.BusinessEntityVersionTreeFactory()
     functional_factories.structure.BusinessCampusFactory()
-    functional_factories.users.BusinessUsersFactory()
+    context.users = functional_factories.users.BusinessUsersFactory()
     functional_factories.score_encoding.ScoreEncodingFactory()
     context.setup_data = functional_factories.learning_unit.LearningUnitBusinessFactory()
     functional_factories.education_group.OfferBusinessFactory()

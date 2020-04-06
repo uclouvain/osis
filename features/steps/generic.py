@@ -35,7 +35,8 @@ from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums import entity_type
-from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION, LEARNING_UNIT_EDITION_FACULTY_MANAGERS
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION, LEARNING_UNIT_EDITION_FACULTY_MANAGERS, \
+    LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
@@ -61,7 +62,7 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire facultaire")
 def step_impl(context: Context):
-    context.user = context.setup_data.faculty_manager.user
+    context.user = context.users.faculty_manager.user
 
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("faculty_manager", 'Faculty_Manager')
@@ -71,7 +72,7 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire central")
 def step_impl(context: Context):
-    context.user = context.setup_data.central_manager.user
+    context.user = context.users.central_manager.user
 
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("central_manager", 'Central_Manager')
@@ -149,6 +150,14 @@ def step_impl(context: Context):
         data_year=current_academic_year(),
         reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
+
+    calendar.save()
+    calendar = AcademicCalendarFactory(
+        academic_year=current_academic_year(),
+        data_year=current_academic_year(),
+        reference=LEARNING_UNIT_EDITION_CENTRAL_MANAGERS)
+    calendar.end_date = (datetime.now() + timedelta(days=1)).date()
+
     calendar.save()
 
 

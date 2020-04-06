@@ -34,6 +34,7 @@ from base.models.campus import Campus
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES, FACULTY
+from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
@@ -101,6 +102,7 @@ class BusinessLearningUnitFactory(LearningUnitFactory):
         )
         academic_years = AcademicYear.objects.filter(
             year__gt=obj.start_year.year,
+            year__lte=2025  # FIXME should not surpass current_academic_year + 6
         )
         if obj.end_year:
             academic_years = academic_years.filter(year__lte=obj.end_year.year)
@@ -118,7 +120,7 @@ class BusinessLearningUnitContainerYearFactory(LearningContainerYearFactory):
 
 
 class BusinessLearningUnitYearFactory(LearningUnitYearFullFactory):
-    campus = factory.LazyFunction(lambda: Campus.objects.all().order_by("?").first())
+    campus = factory.LazyFunction(lambda: Campus.objects.filter(organization__type=MAIN).order_by("?").first())
     internship_subtype = None
     learning_container_year = factory.SubFactory(
         BusinessLearningUnitContainerYearFactory,

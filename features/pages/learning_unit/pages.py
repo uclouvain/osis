@@ -101,6 +101,7 @@ class NewLearningUnitPage(pypom.Page):
     credits = InputField(By.ID, "id_credits")
     lieu_denseignement = SelectField(By.ID, "id_campus")
     intitule_commun = InputField(By.ID, "id_common_title")
+    intitule_commun_english = InputField(By.ID, "id_common_title_english")
     entite_resp_cahier_des_charges = Select2Field(
         By.XPATH, "//*[@id='LearningUnitYearForm']/div[2]/div[1]/div[2]/div/div/div[3]/div/span")
     entite_dattribution = Select2Field(
@@ -179,19 +180,32 @@ class SpecificationPage(pypom.Page):
 
 class LearningUnitPage(CommonPageMixin, pypom.Page):
     actions = ButtonField(By.ID, "dLabel")
-    edit_button = Link('LearningUnitEditPage', By.CSS_SELECTOR, "#link_edit_lu > a")
     proposal_edit = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_modification > a")
     edit_proposal_button = Link(EditLearningUnitProposalPage, By.CSS_SELECTOR, "#link_proposal_edit > a")
     proposal_suppression = Link(LearningUnitProposalEndYearPage, By.CSS_SELECTOR, "#link_proposal_suppression > a")
     new_partim = Link(NewPartimPage, By.ID, "new_partim")
     go_to_full = ButtonField(By.ID, "full_acronym")
 
+    code = Field(By.ID, "id_acronym")
     credits = Field(By.ID, "id_credits")
+    status = CharField(By.ID, "id_status")
+    quadrimester = Field(By.ID, "id_quadrimester")
+    session_derogation = Field(By.ID, "id_session")
+    periodicity = Field(By.ID, "id_periodicity")
+
     annee_academique = Field(By.ID, "id_end_year")
     tab_training = Link(LearningUnitTrainingPage, By.ID, "training_link")
     tab_attribution = Link(LearningUnitAttributionPage, By.ID, "attributions_link")
     tab_description = Link(DescriptionPage, By.ID, "description_link")
     tab_specification = Link(SpecificationPage, By.ID, "specification_link")
+
+    def __init__(self, *args, **kwargs):
+        self._edit_button()
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def _edit_button(cls):
+        cls.edit_button = Link(LearningUnitEditPage, By.CSS_SELECTOR, "#link_edit_lu > a")
 
     def is_li_edit_link_disabled(self):
         return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
