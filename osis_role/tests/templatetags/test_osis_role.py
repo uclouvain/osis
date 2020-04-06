@@ -75,3 +75,27 @@ class TestATagModalHasPerm(SimpleTestCase):
             osis_role.a_tag_modal_has_perm(self.url, self.text, "dummy-perm", self.user),
             expected_context
         )
+
+
+class TestHasPermTag(SimpleTestCase):
+    def setUp(self):
+        self.user = UserFactory.build()
+        self.obj = UserFactory.build()
+
+    @mock.patch('rules.templatetags.rules.has_perm', return_value=True)
+    def test_ensure_has_perm_tag_call_django_rules(self, mock_rules_has_perm):
+        self.assertTrue(
+            osis_role.has_perm("dummy-perm", self.user, obj=self.obj)
+        )
+        mock_rules_has_perm.assert_called_once_with("dummy-perm", self.user, self.obj)
+
+
+class TestHasModulePermsTag(SimpleTestCase):
+    def setUp(self):
+        self.user = UserFactory.build()
+        self.obj = UserFactory.build()
+
+    @mock.patch('django.contrib.auth.models._user_has_module_perms', return_value=True)
+    def test_ensure_has_perm_tag_call_django_rules(self, mock_user_has_module_perms):
+        self.assertTrue(osis_role.has_module_perms(self.user, "dummy-appmodule"))
+        mock_user_has_module_perms.assert_called_once_with(self.user, "dummy-appmodule")

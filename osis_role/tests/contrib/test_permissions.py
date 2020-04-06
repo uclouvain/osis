@@ -119,6 +119,7 @@ class TestAddRoleQuerysetToRuleSet(TestCase):
         _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', QuerySet())
         self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
 
+
 class TestHasModulePerms(TestCase):
     @classmethod
     def setUpClass(cls):

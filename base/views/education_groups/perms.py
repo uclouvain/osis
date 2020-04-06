@@ -26,12 +26,11 @@
 from django.contrib.auth.mixins import AccessMixin, ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from waffle.models import Flag
 
 from base.business.education_groups import perms as business_perms
 from base.models.education_group_year import EducationGroupYear
 from base.models.person import Person
-
-from waffle.models import Flag
 
 
 def can_change_education_group(user, education_group):
