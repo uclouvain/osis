@@ -81,7 +81,7 @@ class TestDetachNodeView(TestCase):
         ])
 
         response = self.client.get(self.url, data={'path': path_to_detach})
-        self.assertTemplateUsed(response, 'tree/detach_confirmation.html')
+        self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
 
         self.assertTrue('form' in response.context)
         self.assertIsInstance(response.context['form'], DetachNodeForm)
@@ -89,7 +89,7 @@ class TestDetachNodeView(TestCase):
 
     def test_post_with_invalid_path(self):
         response = self.client.post(self.url, data={'path': 'dummy_path'})
-        self.assertTemplateUsed(response, 'tree/detach_confirmation.html')
+        self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
 
         self.assertTrue('form' in response.context)
         self.assertIsInstance(response.context['form'], DetachNodeForm)

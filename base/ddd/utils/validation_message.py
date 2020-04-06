@@ -62,3 +62,23 @@ class BusinessValidationMessage:
     @staticmethod
     def contains_errors(messages: List['BusinessValidationMessage']) -> bool:
         return any(msg.is_error() for msg in messages)
+
+
+class BusinessValidationMessageList:
+    def __init__(self, messages: List[BusinessValidationMessage]):
+        self.messages = messages
+
+    def contains_errors(self) -> bool:
+        return bool(self.errors)
+
+    @property
+    def errors(self) -> List['BusinessValidationMessage']:
+        return [msg for msg in self.messages if msg.is_error()]
+
+    @property
+    def warnings(self) -> List['BusinessValidationMessage']:
+        return [msg for msg in self.messages if msg.is_warning()]
+
+    @property
+    def success(self) -> List['BusinessValidationMessage']:
+        return [msg for msg in self.messages if msg.is_success()]

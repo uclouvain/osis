@@ -85,7 +85,7 @@ class IsPrerequisiteValidator(BusinessValidator):
 
 class HasPrerequisiteValidator(BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'NodeLearningUnitYear', path: 'Path'):
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'NodeLearningUnitYear'):
         super(HasPrerequisiteValidator, self).__init__()
         self.node_to_detach = node_to_detach
         self.tree = tree

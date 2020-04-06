@@ -72,8 +72,8 @@ class DetachNodeValidatorList(BusinessListValidator):
 
     success_messages = []
 
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path: 'Path'):
-        detach_from = tree.get_node(path)
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
+        detach_from = tree.get_node(path_to_parent)
         self.add_success_message(_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
             'child': node_to_detach,
             'parent': detach_from,
@@ -90,8 +90,8 @@ class DetachNodeValidatorList(BusinessListValidator):
             self.validators = [
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
                 MinimumEditableYearValidator(tree),
-                IsPrerequisiteValidator(tree, node_to_detach, path),
-                HasPrerequisiteValidator(tree, node_to_detach, path),
+                IsPrerequisiteValidator(tree, node_to_detach),
+                HasPrerequisiteValidator(tree, node_to_detach),
             ]
 
         else:

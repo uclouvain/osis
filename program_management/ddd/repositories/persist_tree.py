@@ -34,7 +34,7 @@ from program_management.ddd.domain.node import Node, NodeEducationGroupYear, Nod
 @transaction.atomic
 def persist(tree: program_tree.ProgramTree) -> None:
     __update_or_create_links(tree.root_node)
-    __delete_links(tree.root_node)
+    delete_links(tree.root_node)
 
 
 def __update_or_create_links(node: Node):
@@ -61,6 +61,8 @@ def __update_or_create_links(node: Node):
         __update_or_create_links(link.child)
 
 
+#  TODO :: 1 fichier de persist par objet métier
+
 def delete_links(node: Node):
     child_ids = [link.child.pk for link in node.children]
 
@@ -70,3 +72,9 @@ def delete_links(node: Node):
 
     # for link in node.children:  # FIXME :: Why delete links recursively?
     #     __delete_links(link.child)
+
+def delete_link(parent: 'Node', child: 'Node'):
+    if child.is_group():
+        GroupElementYear.objects.filter(parent_id=parent.pk, child_branch_id=child.pk)
+    else:
+        GroupElementYear.objects.filter(parent_id=parent.pk, child_leaf_id=child.pk)

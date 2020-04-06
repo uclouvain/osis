@@ -135,7 +135,7 @@ class ProgramTree:
                     node_obj for node_obj in self.get_all_nodes()
                     if node_obj.is_learning_unit() and node_obj.is_prerequisite
                 ),
-                lambda node_obj: node_obj.code
+                key=lambda node_obj: node_obj.code
             )
         )
 
@@ -146,7 +146,7 @@ class ProgramTree:
                     node_obj for node_obj in self.get_all_nodes()
                     if node_obj.is_learning_unit() and node_obj.has_prerequisite
                 ),
-                lambda node_obj: node_obj.code
+                key=lambda node_obj: node_obj.code
             )
         )
 
@@ -203,13 +203,17 @@ class ProgramTree:
         parent = self.get_node(parent_path)
         if not node_id:
             raise Exception("You cannot detach root node")
-        is_valid, messages = self.clean_detach_node(parent, path)
+        is_valid, messages = self.clean_detach_node(self.get_node(path), parent_path)
         if is_valid:
             parent.detach_child(node_id)
         return is_valid, messages
 
-    def clean_detach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = DetachNodeValidatorList(self, node_to_attach, path)
+    def clean_detach_node(
+            self,
+            node_to_detach: 'Node',
+            path_to_parent: Path
+    ) -> Tuple[bool, List['BusinessValidationMessage']]:
+        validator = DetachNodeValidatorList(self, node_to_detach, path_to_parent)
         return validator.is_valid(), validator.messages
 
 

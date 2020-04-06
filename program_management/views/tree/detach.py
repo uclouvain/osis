@@ -24,32 +24,73 @@
 #
 ##############################################################################
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
+from base.views.common import display_business_messages, display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
-from program_management.ddd.repositories import load_tree
-from program_management.forms.tree.detach import DetachNodeForm
+from program_management.ddd.service import detach_node_service
+from program_management.forms.tree.detach import DetachNodeForm, business_messages_serializer
+from django.utils.translation import gettext_lazy as _
 
 
 class DetachNodeView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/detach_confirmation.html"
     form_class = DetachNodeForm
+    # partial_reload = True
 
-    def get_form_kwargs(self):
-        return {
-            **super().get_form_kwargs(),
-            'tree': load_tree.load(self.kwargs['root_id']),
-        }
+    # def get_form_kwargs(self):
+    #     return {
+    #         **super().get_form_kwargs(),
+    #         'path_to_detach': self.request.POST.get('path_to_detach')
+    #     }
+
+    def get_context_data(self, **kwargs):
+        context = super(DetachNodeView, self).get_context_data(**kwargs)
+        message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
+        display_warning_messages(self.request, message_list.warnings)
+        display_error_messages(self.request, message_list.errors)
+        context['detach_ok'] = not message_list.contains_errors()
+        context['confirmation_message'] = _("Are you sure you want to detach ?")
+        return context
 
     def get_initial(self):
+        print()
         return {
             **super().get_initial(),
             'path': self.request.GET.get('path')
         }
 
     def form_valid(self, form):
-        form.save()
+        message_list = form.save()
+        display_business_messages(self.request, message_list.messages)
         return super().form_valid(form)
 
     def get_success_url(self):
         return ""
+
+
+# class DetachNodeView2(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):
+#     template_name = "tree/detach_confirmation.html"
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(DetachNodeView2, self).get_context_data(**kwargs)
+#         message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
+#         display_business_messages(self.request, message_list.messages)
+#         context['detach_ok'] = not message_list.contains_errors()
+#         context['confirmation_message'] = _("Are you sure you want to detach ?")
+#         return context
+#
+#     def get_initial(self):
+#         print()
+#         return {
+#             **super().get_initial(),
+#             'path': self.request.GET.get('path')
+#         }
+#
+#     def form_valid(self, form):
+#         message_list = form.save()
+#         display_business_messages(self.request, message_list.messages)
+#         return super().form_valid(form)
+#
+#     def get_success_url(self):
+#         return ""

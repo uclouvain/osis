@@ -31,32 +31,65 @@ from program_management.ddd.domain import program_tree, node
 from program_management.ddd.service import detach_node_service
 
 
+# TODO :: déplacer dans serializers
+def business_messages_serializer(message_list: 'BusinessValidationMessageList') -> dict:
+    return {
+        'errors': [str(msg) for msg in message_list.errors],
+        'warnings': [str(msg) for msg in message_list.warnings],
+        'success': [str(msg) for msg in message_list.success],
+    }
+
+
 class DetachNodeForm(forms.Form):
     path = forms.CharField(widget=forms.HiddenInput)
 
-    def __init__(self, path_to_detach: str, **kwargs):
-        self.path_to_detach = path_to_detach
-        super().__init__(**kwargs)
+    _warnings = None
 
-    def clean_path(self):
-        path = self.cleaned_data['path']
-        try:
-            self.tree.get_node(path)
-        except node.NodeNotFoundException:
-            raise forms.ValidationError(_("Invalid tree path"))
-        return path
+    _business_messages = None
 
-    def is_valid(self):
-        is_valid = super(DetachNodeForm, self).is_valid()
-        if not is_valid:
-            return is_valid
+    # def __init__(self, **kwargs):
+    # self.path_to_detach = path_to_detach
+    # super().__init__(**kwargs)
 
-        messages = detach_node_service.detach_node(self.path_to_detach, commit=False)
-        error_messages = [msg for msg in messages if msg.is_error()]
-        if error_messages:
-            raise ValidationError(error_messages)
+    # def clean_path(self):
+    #     path = self.cleaned_data['path']
+    #     try:
+    #         self.tree.get_node(path)
+    #     except node.NodeNotFoundException:
+    #         raise forms.ValidationError(_("Invalid tree path"))
+    #     return path
 
-        return True
+    @property
+    def confirmation_message(self):
+        return _("Are you sure you want to detach ?")
+
+    # def is_valid(self):
+    #     is_valid = super(DetachNodeForm, self).is_valid()
+    #     if not is_valid:
+    #         return is_valid
+    #
+    #     message_list = detach_node_service.detach_node(self.cleaned_data['path'], commit=False)
+    #     self._business_messages = message_list.messages
+    #     serialized_messages = business_messages_serializer(message_list.messages)
+    #
+    #     if message_list.contains_errors():
+    #         raise ValidationError(serialized_messages['error'])
+    #     # raise ValidationError(_('error message test'))
+    #
+    #     self._warnings = serialized_messages['warnings']
+    #
+    #     return True
+
+    @property
+    def business_messages(self):
+        if self._business_messages is None:
+            self._business_messages = []
+        return self._business_messages
+    # @property
+    # def warnings(self):
+    #     if self._warnings is None:
+    #         self._warnings = []
+    #     return [_('Warning message test')]
 
     def save(self):
-        return detach_node_service.detach_node(self.tree)
+        return detach_node_service.detach_node(self.cleaned_data['path'])

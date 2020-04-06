@@ -25,11 +25,11 @@
 ##############################################################################
 from typing import List, Set
 
-from base.ddd.utils.validation_message import BusinessValidationMessage
+from base.ddd.utils.validation_message import BusinessValidationMessage, BusinessValidationMessageList, MessageLevel
 from base.models.group_element_year import GroupElementYear
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.repositories import load_tree, persist_tree, persist_link
+from program_management.ddd.repositories import load_tree, persist_tree
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.models.enums.node_type import NodeType
 
@@ -37,9 +37,9 @@ from django.utils.translation import gettext as _
 
 
 # TODO :: unit tests
-def detach_node(path_to_detach: 'Path', commit=True) -> List[BusinessValidationMessage]:
+def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessageList:
     if not path_to_detach:
-        return [BusinessValidationMessage(_('Invalid tree path'))]
+        return BusinessValidationMessageList(messages=[BusinessValidationMessage(_('Invalid tree path'))])
 
     root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
 
@@ -50,11 +50,13 @@ def detach_node(path_to_detach: 'Path', commit=True) -> List[BusinessValidationM
     messages += __check_is_prerequisite_in_other_trees(node_to_detach=node_to_detach)
 
     if is_valid and commit:
-        persist_tree.delete_links(node_to_detach)
+        parent_path = PATH_SEPARATOR.join(path_to_detach.split(PATH_SEPARATOR)[:-1])
+        persist_tree.delete_link(working_tree.get_node(parent_path), node_to_detach)  # TODO :: use the tree.persist() !
 
-    return messages
+    return BusinessValidationMessageList(messages=messages)
 
 
+# TODO :: 1 fichier de service par objet métier (1 prerequisite_service?)
 def __check_is_prerequisite_in_other_trees(node_to_detach: 'Node') -> List['BusinessValidationMessage']:
     messages = []
     for tree in __get_trees_using_node(node_to_detach):
