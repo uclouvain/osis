@@ -41,7 +41,8 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
         self.tree = ProgramTree(root_node=self.root_node)
 
-        url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': 2018, 'acronym': 'LBIR100B'})
+        url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': self.root_node.year,
+                                                                               'acronym': self.root_node.code})
         self.request = RequestFactory().get(url)
         self.serializer = EducationGroupPrerequisitesSerializer(self.ldroi100a, context={
             'request': self.request,
