@@ -45,7 +45,8 @@ class UsersGenerator:
         self.students = StudentFactory.create_batch(100)
         self.program_managers = ProgramManagerFactory.create_batch(
             5,
-            offer_year__academic_year__current=True
+            offer_year__academic_year__current=True,
+            person__language=settings.LANGUAGE_CODE_FR
         )
 
         perm = Permission.objects.filter(codename="can_access_scoreencoding").first()

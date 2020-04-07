@@ -63,7 +63,6 @@ class LearningUnitFactoryWithAnnualizedData(LearningUnitFactory):
         initial_learning_unit_year = LearningUnitYearWithComponentsFactory(
             academic_year=start_year,
             learning_unit=obj,
-            learning_container_year__container_type=learning_container_year_types.COURSE,
             subtype=learning_unit_year_subtypes.FULL,
             **kwargs
         )

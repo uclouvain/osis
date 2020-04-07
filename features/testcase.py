@@ -25,7 +25,10 @@ from behave_django.testcase import BehaviorDrivenTestCase
 from django.utils.translation import gettext_lazy as _
 
 from assessments.views import upload_xls_utils
+from base.models import tutor
 from base.models.enums import exam_enrollment_justification_type
+from base.models.learning_unit_year import LearningUnitYear
+from features.pages.learning_unit.pages import SearchLearningUnitPage
 
 
 class OsisTestCase(BehaviorDrivenTestCase):
@@ -55,9 +58,38 @@ class OsisTestCase(BehaviorDrivenTestCase):
                     _(justification_value)
                 )
 
+    def assertLearningUnitResultsMatchCriteria(self, page_results: list, search_criteria: dict):
+        acronym = search_criteria.get("acronym", "")
+        requirement_entity = search_criteria.get("requirement_entity", "")
+        container_type = search_criteria.get("container_type", "")
+
+        for result in page_results:
+            self.assertIn(acronym, result.acronym.text)
+            self.assertIn(requirement_entity, result.requirement_entity.text)
+            self.assertIn(container_type, result.type.text)
+
 
 def get_enum_value(enum, key):
     return next(
         (v for k, v in enum if k == key),
         None
+    )
+
+
+def assert_tutor_match(
+        results: SearchLearningUnitPage.LearningUnitElement,
+        tutor_obj: tutor.Tutor,
+        assertions
+):
+    if not tutor_obj:
+        return None
+    learning_unit_acronyms_present_in_page = set([result.acronym.text for result in results])
+    if not learning_unit_acronyms_present_in_page:
+        return None
+    expected_luys = LearningUnitYear.objects.filter(
+        learning_container_year__attributionnew__tutor=tutor_obj
+    )
+    assertions.assertEqual(
+        {luy.acronym for luy in expected_luys},
+        learning_unit_acronyms_present_in_page
     )

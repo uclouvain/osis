@@ -6,28 +6,26 @@ Feature: Recherche des unités d'enseignements.
     And Réinitialiser les critères de recherche
 
   Scenario: En tant que gestionnaire, je recherche une UE par code
-  When Encoder le code d'une UE
-  And Cliquer sur le bouton Rechercher (Loupe)
-  Then La liste de résultat doit correspondre aux crières de recherche
+    When Encoder le code d'une UE
+    And Cliquer sur le bouton Rechercher (Loupe)
+    Then La liste de résultat doit correspondre aux crières de recherche
 
-# TODO Generate UE of different container types
-#  Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par type
-#    When Encoder le type d'UE
-#    And Cliquer sur le bouton Rechercher (Loupe)
-#    Then Dans la liste de résultat, seul ce type doit apparaître
-
+  Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par type
+    When Encoder le type d'UE
+    And Cliquer sur le bouton Rechercher (Loupe)
+    Then La liste de résultat doit correspondre aux crières de recherche
 
   Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par entité
     When Encoder l'entité d'UE
     And Cliquer sur le bouton Rechercher (Loupe)
     Then La liste de résultat doit correspondre aux crières de recherche
 
-  Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par enseignant
-    When Encoder l'enseignant d'UE
-    And Cliquer sur le bouton Rechercher (Loupe)
-    Then La liste de résultat doit correspondre aux crières de recherche
+#  TODO Should verify by going into attribution of one learning unit
+#  Scenario: En tant que gestionnaire facultaire ou central, je recherche des UEs par enseignant
+#    When Encoder l'enseignant d'UE
+#    And Cliquer sur le bouton Rechercher (Loupe)
+#    Then La liste de résultat doit correspondre aux crières de recherche
 
-    #  FIXME Check why excel not in temp
   Scenario: En tant que gestionnaire facultaire ou central, je recherche des UE pour produire un Excel
     When Encoder le code d'une UE
     And Cliquer sur le bouton Rechercher (Loupe)

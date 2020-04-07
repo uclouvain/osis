@@ -21,31 +21,33 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
+
 from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.tutor import Tutor
 from features.pages.learning_unit import pages
 
 
-def fill_code(
-        page: pages.SearchLearningUnitPage,
-) -> dict:
+def fill_code(page: pages.SearchLearningUnitPage) -> dict:
     learning_unit_year_to_research = LearningUnitYear.objects.all().order_by("?").first()
     page.acronym = learning_unit_year_to_research.acronym
     return {"acronym": learning_unit_year_to_research.acronym}
 
 
-def fill_entity(
-        page: pages.SearchLearningUnitPage,
-) -> dict:
+def fill_container_type(page: pages.SearchLearningUnitPage) -> dict:
+    container_type_to_search = random.choice(page.container_type.options).text
+    page.container_type = container_type_to_search
+    return {"container_type": container_type_to_search}
+
+
+def fill_entity(page: pages.SearchLearningUnitPage) -> dict:
     entity_to_search = EntityVersion.objects.all().order_by("?").first()
     page.requirement_entity = entity_to_search.acronym
     return {"requirement_entity": entity_to_search.acronym}
 
 
-def fill_tutor(
-        page: pages.SearchLearningUnitPage,
-) -> dict:
+def fill_tutor(page: pages.SearchLearningUnitPage) -> dict:
     tutor_to_search = Tutor.objects.all().order_by("?").first()
     page.tutor = tutor_to_search.person.full_name
     return {"tutor": tutor_to_search}

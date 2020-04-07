@@ -30,6 +30,7 @@ import factory
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion
+from base.models.enums import learning_container_year_types
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.organization_type import MAIN
 from base.tests.factories.learning_unit import LearningUnitFactoryWithAnnualizedData
@@ -45,7 +46,23 @@ class LearningUnitGenerator:
             year__gte=LEARNING_UNIT_START_YEAR,
             year__lte=compute_max_academic_year_adjournment()
         )
-        self.learning_units = LearningUnitFactoryWithAnnualizedData.create_batch(
+        self.learning_units = self._create_courses(academic_years_range, entities_version, campuses)
+        self.learning_units.extend(self._create_other_types(academic_years_range, entities_version, campuses))
+
+    def _create_courses(self, academic_years_range, entities_version, campuses):
+        return LearningUnitFactoryWithAnnualizedData.create_batch(
+            40,
+            start_year__year=LEARNING_UNIT_START_YEAR,
+            learningunityears__academic_years=academic_years_range,
+            learningunityears__learning_container_year__container_type=learning_container_year_types.COURSE,
+            learningunityears__learning_container_year__requirement_entity=factory.Iterator(
+                entities_version, getter=lambda ev: ev.entity
+            ),
+            learningunityears__campus=factory.LazyFunction(lambda: random.choice(campuses))
+        )
+
+    def _create_other_types(self, academic_years_range, entities_version, campuses):
+        return LearningUnitFactoryWithAnnualizedData.create_batch(
             40,
             start_year__year=LEARNING_UNIT_START_YEAR,
             learningunityears__academic_years=academic_years_range,
