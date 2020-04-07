@@ -4,6 +4,11 @@ function bindNoSpinner(elem){
     linkButtonNoSpinnerClicked = elem ? elem.hasClass("no_spinner") : false;
 }
 
+function showOverlaySpinner() {
+    $("#loader").show();
+    document.getElementById("overlay_fadein").style.display = "block";
+}
+
 function closeOverlaySpinner(){
     $("#loader").hide();
     document.getElementById("overlay").style.display = "none";
@@ -31,7 +36,12 @@ $( document ).on( 'keyup', function ( e ) {
 
 window.addEventListener('beforeunload', function (e) {
     if (! linkButtonNoSpinnerClicked) {
-        $("#loader").show();
-        document.getElementById("overlay_fadein").style.display = "block";
+        showOverlaySpinner();
     }
+});
+
+$(document).ajaxStart(function(){
+    showOverlaySpinner();
+}).ajaxStop(function(){
+    closeOverlaySpinner();
 });
