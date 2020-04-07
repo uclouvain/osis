@@ -27,11 +27,9 @@ from django.utils.translation import gettext as _
 
 from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
-from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -60,7 +58,6 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
-                DetachRootForbiddenValidator(tree, node_to_add),
             ]
 
         else:
@@ -83,7 +80,6 @@ class DetachNodeValidatorList(BusinessListValidator):
             self.validators = [
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
-                DetachRootForbiddenValidator(tree, node_to_detach),
             ]
 
         elif node_to_detach.is_learning_unit():

@@ -184,7 +184,7 @@ class Node:
         self.children.append(child)
 
     def detach_child(self, node_id: int):
-        self.children = [link for link in self.children if link.child.pk == node_id]
+        self.children = [link for link in self.children if link.child.pk != node_id]
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:

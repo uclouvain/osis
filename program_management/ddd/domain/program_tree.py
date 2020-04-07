@@ -29,9 +29,12 @@ from typing import List, Set, Tuple
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
 from program_management.ddd.business_types import *
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     DetachNodeValidatorList
 from program_management.models.enums import node_type
+
+from django.utils.translation import gettext_lazy as _
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -51,6 +54,9 @@ class ProgramTree:
 
     def is_master_2m(self):
         return self.root_node.is_master_2m()
+
+    def is_root(self, node: 'Node'):
+        return self.root_node == node
 
     def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
         result = []
@@ -192,19 +198,20 @@ class ProgramTree:
         validator = AttachNodeValidatorList(self, node_to_attach, path)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
+    def detach_node(self, path_to_node_to_detach: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
         """
         Detach a node from tree
-        :param path: The path node to detach
+        :param path_to_node_to_detach: The path node to detach
         :return:
         """
-        parent_path, *node_id = path.rsplit(PATH_SEPARATOR, 1)
+        node_to_detach = self.get_node(path_to_node_to_detach)
+        if self.is_root(node_to_detach):
+            return False, [BusinessValidationMessage(_("Cannot perform detach action on root."), MessageLevel.ERROR)]
+        parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
         parent = self.get_node(parent_path)
-        if not node_id:
-            raise Exception("You cannot detach root node")
-        is_valid, messages = self.clean_detach_node(self.get_node(path), parent_path)
+        is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
         if is_valid:
-            parent.detach_child(node_id)
+            parent.detach_child(node_to_detach.pk)
         return is_valid, messages
 
     def clean_detach_node(

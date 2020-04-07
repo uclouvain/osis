@@ -24,15 +24,16 @@
 #
 ##############################################################################
 import inspect
-
+from unittest.mock import patch
 from django.test import SimpleTestCase
 
-from base.ddd.utils.validation_message import MessageLevel
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
-from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.ddd.domain.program_tree import ProgramTree, PATH_SEPARATOR, build_path
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
+    DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -40,6 +41,7 @@ from program_management.tests.ddd.factories.node import NodeEducationGroupYearFa
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
+from django.utils.translation import gettext_lazy as _
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
@@ -530,3 +532,47 @@ class TestGetAllFinalities(SimpleTestCase):
             link3.child,
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+
+class TestDetachNode(SimpleTestCase):
+
+    def setUp(self):
+        self.success_message = BusinessValidationMessage("Success message", MessageLevel.SUCCESS)
+        self.error_message = BusinessValidationMessage("Error message", MessageLevel.ERROR)
+
+    def test_when_path_to_detach_is_root_node(self):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node)
+        path_to_detach = str(tree.root_node.pk)
+        result_is_valid, result_messages = tree.detach_node(path_to_detach)
+        self.assertFalse(result_is_valid)
+        expected_result = [
+            BusinessValidationMessage(_("Cannot perform detach action on root."), MessageLevel.ERROR)
+        ]
+        self.assertListEqual(result_messages, expected_result)
+
+    @patch.object(DetachNodeValidatorList, 'messages')
+    @patch.object(DetachNodeValidatorList, 'is_valid')
+    def test_when_validator_list_is_valid(self, mock_is_valid, mock_messages):
+        mock_is_valid.return_value = True
+        mock_messages.return_value = [self.success_message]
+        tree = ProgramTreeFactory()
+        link = LinkFactory(parent=tree.root_node)
+        path_to_detach = build_path(link.parent, link.child)
+        result_is_valid, result_messages = tree.detach_node(path_to_detach)
+        self.assertTrue(result_is_valid)
+        self.assertListEqual(result_messages.return_value, [self.success_message])
+        self.assertNotIn(link, tree.root_node.children)
+
+    @patch.object(DetachNodeValidatorList, 'messages')
+    @patch.object(DetachNodeValidatorList, 'is_valid')
+    def test_when_validator_list_is_not_valid(self, mock_is_valid, mock_messages):
+        mock_is_valid.return_value = False
+        mock_messages.return_value = [self.error_message]
+        tree = ProgramTreeFactory()
+        link = LinkFactory(parent=tree.root_node)
+        path_to_detach = build_path(link.parent, link.child)
+        result_is_valid, result_messages = tree.detach_node(path_to_detach)
+        self.assertFalse(result_is_valid)
+        self.assertListEqual(result_messages.return_value, [self.error_message])
+        self.assertIn(link, tree.root_node.children)
