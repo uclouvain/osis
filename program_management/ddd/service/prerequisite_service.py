@@ -25,28 +25,25 @@
 ##############################################################################
 from typing import List
 
-from django.utils.translation import gettext as _
-
-from base.ddd.utils.validation_message import BusinessValidationMessageList
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.repositories import load_tree, persist_tree
-from program_management.ddd.service import prerequisite_service
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 
 
-def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessageList:
-    if not path_to_detach:
-        return BusinessValidationMessageList(messages=[BusinessValidationMessage(_('Invalid tree path'))])
+def check_is_prerequisite_in_trees_using_node(node_to_detach: 'Node') -> List['BusinessValidationMessage']:
+    messages = []
+    for tree in __get_trees_using_node(node_to_detach):
+        node_to_detach = tree.get_node_by_id_and_class(node_to_detach.pk, node_to_detach.__class__)
+        validator = IsPrerequisiteValidator(tree, node_to_detach)
+        if not validator.is_valid():
+            messages += validator.messages
+    return messages
 
-    root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
 
-    working_tree = load_tree.load(root_id)
-    node_to_detach = working_tree.get_node(path_to_detach)
-
-    is_valid, messages = working_tree.detach_node(path_to_detach)
-    messages += prerequisite_service.check_is_prerequisite_in_trees_using_node(node_to_detach=node_to_detach)
-
-    if is_valid and commit:
-        persist_tree.persist(working_tree)  # TODO :: unit tests persist !
-
-    return BusinessValidationMessageList(messages=messages)
+def __get_trees_using_node(node_to_detach: 'Node'):
+    node_id = node_to_detach.pk
+    if node_to_detach.is_learning_unit():
+        trees = load_tree.load_trees_from_children(child_branch_ids=None, child_leaf_ids=[node_id])
+    else:
+        trees = load_tree.load_trees_from_children(child_branch_ids=[node_id], child_leaf_ids=None)
+    return trees

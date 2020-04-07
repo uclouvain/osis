@@ -47,6 +47,9 @@ class BusinessValidationMessage:
             return other == self.message
         return other.message == self.message
 
+    def __hash__(self):
+        return hash(self.message + str(self.level))
+
     def __str__(self):
         return "%(level)s %(msg)s" % {'level': self.level, 'msg': self.message}
 

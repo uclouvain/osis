@@ -28,6 +28,7 @@ from typing import List, Set, Tuple
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
@@ -102,8 +103,10 @@ class ProgramTree:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
+    @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
     def get_node_by_id_and_class(self, node_id: int, node_class) -> 'Node':
         """
+        DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
         Return the corresponding node based on the node_id value with respect to the class.
         :param node_id: int
         :param node_class: a Node subclass
@@ -122,6 +125,7 @@ class ProgramTree:
         Return a flat set of all nodes present in the tree
         :return: list of Node
         """
+        self.get_node_by_id_and_class
         all_nodes = set([self.root_node] + _nodes_from_root(self.root_node))
         if types:
             return set(n for n in all_nodes if n.node_type in types)
