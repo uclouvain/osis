@@ -7,7 +7,13 @@ from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.organization import MainOrganizationFactory
 
 
-class BusinessEntityVersionTreeFactory:
+class StructureGenerator:
+    def __init__(self):
+        self.entity_tree = EntityVersionTreeGenerator()
+        self.campuses = CampusGenerator()
+
+
+class EntityVersionTreeGenerator:
 
     class Node:
         def __init__(self, element: EntityVersion):
@@ -50,7 +56,7 @@ class BusinessEntityVersionTreeFactory:
         )
 
 
-class BusinessCampusFactory:
+class CampusGenerator:
     def __init__(self):
         main_organization = MainOrganizationFactory()
-        self.main_campus = CampusFactory.create_batch(5, organization=main_organization)
+        self.main_campuses = CampusFactory.create_batch(5, organization=main_organization)

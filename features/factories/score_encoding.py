@@ -3,6 +3,7 @@ import random
 import factory
 from django.contrib.auth.models import Permission
 
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_calendar import AcademicCalendarExamSubmissionFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
@@ -21,7 +22,7 @@ class ScoreEncodingFactory:
         self.students = StudentFactory.create_batch(100)
 
         self.offers = OfferYearFactory.create_batch(5, academic_year__current=True)
-        self.learning_units = LearningUnitYearFactory.create_batch(20, academic_year__current=True)
+        self.learning_units = list(LearningUnitYear.objects.all()[0:20])
         self.program_managers = ProgramManagerFactory.create_batch(
             len(self.offers),
             offer_year=factory.Iterator(self.offers)

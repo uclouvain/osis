@@ -41,7 +41,7 @@ from base.models.enums.entity_type import FACULTY
 from base.models.learning_unit_year import LearningUnitYear
 from features.forms.learning_units import update_form, create_form
 from features.pages.learning_unit.pages import LearningUnitPage, LearningUnitEditPage, NewLearningUnitProposalPage, \
-    SearchLearningUnitPage, NewPartimPage, NewLearningUnitPage
+    SearchLearningUnitPage, NewPartimPage, NewLearningUnitPage, EditLearningUnitProposalPage
 from django.utils.translation import gettext_lazy as _
 
 use_step_matcher("parse")
@@ -197,6 +197,26 @@ def step_impl(context: Context, value: str, field: str):
         raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
 
 
+@step("Recherche proposition Encoder {value} comme {field}")
+def step_impl(context: Context, value: str, field: str):
+    page = SearchLearningUnitPage(driver=context.browser)
+    slug_field = slugify(field).replace('-', '_')
+    if hasattr(page, slug_field):
+        setattr(page, slug_field, value)
+    else:
+        raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
+
+
+@step("Proposition Encoder {value} comme {field}")
+def step_impl(context: Context, value: str, field: str):
+    page = EditLearningUnitProposalPage(driver=context.browser)
+    slug_field = slugify(field).replace('-', '_')
+    if hasattr(page, slug_field):
+        setattr(page, slug_field, value)
+    else:
+        raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
+
+
 @step("Encoder année suivante")
 def step_impl(context: Context):
     page = LearningUnitEditPage(driver=context.browser)
@@ -252,6 +272,12 @@ def step_impl(context: Context):
 @step("Cliquer sur le bouton « Enregistrer »")
 def step_impl(context: Context):
     page = LearningUnitEditPage(driver=context.browser)
+    page.save_button.click()
+
+
+@step("Proposition Cliquer sur le bouton « Enregistrer »")
+def step_impl(context: Context):
+    page = EditLearningUnitProposalPage(driver=context.browser)
     page.save_button.click()
 
 

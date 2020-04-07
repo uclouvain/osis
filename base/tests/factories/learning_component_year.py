@@ -29,14 +29,13 @@ from decimal import Decimal
 import factory.fuzzy
 
 from base.models.enums import learning_component_year_type
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class LearningComponentYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.LearningComponentYear"
 
-    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
+    learning_unit_year = factory.SubFactory("base.tests.factories.learning_unit_year.LearningUnitYearFactory")
     acronym = factory.Sequence(lambda n: '%d' % n)
     type = factory.Iterator(learning_component_year_type.LEARNING_COMPONENT_YEAR_TYPES, getter=operator.itemgetter(0))
     comment = factory.Sequence(lambda n: 'Comment-%d' % n)

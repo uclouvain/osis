@@ -29,14 +29,16 @@ from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import SuperUserFactory
 
 
-class BusinessUsersFactory:
+class UsersGenerator:
     def __init__(self):
         self.superuser = SuperUserFactory()
         self.faculty_manager = BusinessFacultyManagerFactory()
         self.central_manager = BusinessCentralManagerFactory()
+        self.tutors = TutorFactory.create_batch(60)
 
 
 PERMISSIONS = (

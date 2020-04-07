@@ -14,15 +14,15 @@ Feature: Propositions d’UE
     And Aller sur la page de detail de l'ue: <acronym>
     When Cliquer sur le menu « Actions »
     And Cliquer sur « Modifier la proposition »
-    And Encoder Accepté comme Etat
-    And Cliquer sur le bouton « Enregistrer »
+    And Proposition Encoder Accepté comme Etat
+    And Proposition Cliquer sur le bouton « Enregistrer »
 
     And Aller sur la page de recherche d'UE
     And Sélectionner l’onglet « Propositions »
     And Réinitialiser les critères de recherche
 
     When Encoder année suivante
-    And Encoder <acronym> comme Code
+    And Recherche proposition Encoder <acronym> comme Code
     And Cliquer sur le bouton Rechercher (Loupe)
 
     Then Vérifier que le dossier <acronym> est bien Accepté
@@ -35,7 +35,7 @@ Feature: Propositions d’UE
     And Réinitialiser les critères de recherche
 
     When Encoder année suivante
-    And Encoder <acronym> comme Code
+    And Recherche proposition Encoder <acronym> comme Code
     And Cliquer sur le bouton Rechercher (Loupe)
     Then Vérifier que <acronym> n'est pas en proposition.
 

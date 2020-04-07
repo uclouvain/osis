@@ -39,6 +39,7 @@ from base.signals.publisher import compute_all_scores_encodings_deadlines
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory, \
     CloseAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from features import data
 
 
 class AcademicCalendarTest(TestCase):
@@ -49,6 +50,7 @@ class AcademicCalendarTest(TestCase):
         cls.past_date = fake.past_date()
 
     def test_start_date_higher_than_end_date(self):
+        data.setup_data_bis()
         with self.assertRaises(StartDateHigherThanEndDateException):
             AcademicCalendarFactory(start_date=self.future_date, end_date=self.past_date)
 

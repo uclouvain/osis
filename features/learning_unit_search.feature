@@ -27,6 +27,7 @@ Feature: Recherche des unités d'enseignements.
     And Cliquer sur le bouton Rechercher (Loupe)
     Then La liste de résultat doit correspondre aux crières de recherche
 
+    #  FIXME Check why excel not in temp
   Scenario: En tant que gestionnaire facultaire ou central, je recherche des UE pour produire un Excel
     When Encoder le code d'une UE
     And Cliquer sur le bouton Rechercher (Loupe)

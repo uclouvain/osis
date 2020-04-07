@@ -4,7 +4,7 @@ from reference.tests.factories.language import LanguageFactory
 from testing.providers import LANGUAGES
 
 
-class BusinessLanguageFactory:
+class ReferenceDataGenerator:
     def __init__(self):
         self.languages = LanguageFactory.create_batch(
             len(LANGUAGES),
