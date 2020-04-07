@@ -153,7 +153,6 @@ class ProgramTree:
     def count_usage(self, node: 'Node') -> int:
         return len(set(n for n in self.get_all_nodes() if n == node))
 
-    # TODO :: unit test
     def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)

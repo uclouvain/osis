@@ -458,3 +458,75 @@ class TestGetCodesPermittedAdPrerequisite(SimpleTestCase):
         result = self.tree.get_codes_permitted_as_prerequisite()
         expected_result_order = ['c1', 'c2', 'c3']
         self.assertListEqual(result, expected_result_order)
+
+
+class TestGetAllFinalities(SimpleTestCase):
+
+    def setUp(self):
+        self.tree = ProgramTreeFactory(root_node__node_type=TrainingType.PGRM_MASTER_120)
+        self.finalities_group = NodeGroupYearFactory(node_type=GroupType.FINALITY_120_LIST_CHOICE)
+        LinkFactory(parent=self.tree.root_node, child=self.finalities_group)
+
+    def test_result_is_set_instance(self):
+        msg = "Rsult chould be a set only for performance."
+        self.assertIsInstance(self.tree.get_all_finalities(), set, msg)
+
+    def test_when_contains_no_finalities(self):
+        LinkFactory(parent=self.tree.root_node, child__node_type=GroupType.COMMON_CORE)
+        self.assertSetEqual(self.tree.get_all_finalities(), set())
+
+    def test_when_program_is_empty(self):
+        self.assertSetEqual(ProgramTreeFactory().get_all_finalities(), set())
+
+    def test_when_contains_master_ma_120(self):
+        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120))
+        expected_result = {
+            link.child
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+    def test_when_contains_master_md_120(self):
+        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120))
+        expected_result = {
+            link.child
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+    def test_when_contains_master_ms_120(self):
+        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120))
+        expected_result = {
+            link.child
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+    def test_when_contains_master_ma_180_240(self):
+        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_180_240))
+        expected_result = {
+            link.child
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+    def test_when_contains_master_md_180_240(self):
+        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_180_240))
+        expected_result = {
+            link.child
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+    def test_when_contains_master_ms_180_240(self):
+        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_180_240))
+        expected_result = {
+            link.child
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
+
+    def test_when_contains_multiple_finalities(self):
+        link1 = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120))
+        link2 = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120))
+        link3 = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120))
+        expected_result = {
+            link1.child,
+            link2.child,
+            link3.child,
+        }
+        self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
