@@ -1,7 +1,5 @@
-{% extends "education_group/tab_identification.html" %}
+{% load static %}
 {% load i18n %}
-{% load format %}
-{% load static education_group %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -25,24 +23,30 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block details %}
-    {% with  parent=parent_training %}
-        <div class="row">
-            <div class="col-md-7" style="margin-top: 10px">
-                {% include 'education_group/blocks/informations.html' %}
-            </div>
-            <div class="col-md-5" style="margin-top: 10px">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
-                        {% dl_with_parent "main_teaching_campus" %}
-                    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="version_nane">{%  trans 'Version name' %}</label><br>
+                    <span id="version_name">{{ program_version_form.displayed_version.version_name }}</span>
                 </div>
-                {% include "blocks/panel/reversion.html" %}
-
-
+                <div class="col-md-6">
+                    <label for="is_transition">{%  trans 'Transition' %}</label><br>
+                    <span id="is_transition">{{ program_version_form.displayed_version.is_transition| yesno:_("yes,no") |title }}</span>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="version_nane">{%  trans 'Title in French' %}</label><br>
+                    <span id="version_name">{{ program_version_form.displayed_version.title_fr | default_if_none:'' }}</span>
+                </div>
+                <div class="col-md-6">
+                    <label for="is_transition">{%  trans 'Title in English' %}</label><br>
+                    <span id="version_name">{{ program_version_form.displayed_version.title_en | default_if_none:'' }}</span>
+                </div>
             </div>
         </div>
-        {% include 'education_group/blocks/remarks.html' %}
-    {% endwith %}
-{% endblock %}
+    </div>
+

@@ -1,5 +1,7 @@
-{% extends "learning_unit/tree_layout_detail.html" %}
+{% extends "education_group/tab_identification.html" %}
 {% load i18n %}
+{% load format %}
+{% load static education_group %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -23,17 +25,27 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
+{% block details %}
+    {% with  parent=parent_training %}
+        {% if program_version_form.is_particular  %}
+            {% include  "education_group/blocks/panel/panel_version_information.html" %}
+        {% endif %}
+        <div class="row">
+            <div class="col-md-7" style="margin-top: 10px">
+                {% include 'education_group/blocks/informations.html' %}
+            </div>
+            <div class="col-md-5" style="margin-top: 10px">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
+                        {% dl_with_parent "main_teaching_campus" %}
+                    </div>
+                </div>
+                {% include "blocks/panel/reversion.html" %}
 
-{% block details%}
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <p>
-                <a href="{% url 'learning_unit' learning_unit_year.id %}">
-                    <ins>{{ learning_unit_year.acronym }}</ins>
-                </a>
-                {% trans 'is using in' %} :
-            </p>
-            {% include "../education_group/blocks/table_utilizations.html" with learning_unit_year=learning_unit_year %}
+
+            </div>
         </div>
-    </div>
+        {% include 'education_group/blocks/remarks.html' %}
+    {% endwith %}
 {% endblock %}

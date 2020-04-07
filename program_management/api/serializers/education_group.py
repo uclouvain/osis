@@ -34,9 +34,13 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
 
     def get_url(self, obj, view_name, request, format):
         kwargs = {
-            'root_id': obj.pk,
-            'education_group_year_id': obj.pk
+            'education_group_year_id': obj.educationgroupversion.offer.id
         }
+        if obj.educationgroupversion.is_transition:
+            view_name = 'education_group_read_transition'
+        if obj.educationgroupversion.version_name and obj.educationgroupversion.version_name != '':
+            kwargs.update({'version_name': obj.educationgroupversion.version_name})
+
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
 

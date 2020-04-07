@@ -45,7 +45,7 @@
             {% if group.child_branch %}
                 <td style="width:8%">{{ group.child_branch.acronym }}</td>
                 <td>
-                    <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
+                    <a href="{% url 'education_group_read' offer.pk group.child_branch.pk %}"
                        id="lnk_education_group_{{ group.pk }}">{{ group.child_branch.partial_acronym }}</a>
                 </td>
                 <td style="width:25%">

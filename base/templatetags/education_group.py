@@ -40,6 +40,10 @@ from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
 from program_management.templatetags.group_element_year import get_action_with_permission
+from base.models.education_group import EducationGroup
+
+VERSIONED_FIELDS = ('acronym', 'partial_acronym', 'active', 'credits', 'constraint_type', 'min_constraint',
+                    'max_constraint', 'main_teaching_campus', 'remark', 'remark_english', 'start_year', 'end_year')
 
 register = template.Library()
 
@@ -77,9 +81,9 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
-    root = context['root']
+    offer = context['offer']
     education_group_year = context['education_group_year']
-    url = reverse('postpone_education_group', args=[root.pk, education_group_year.pk])
+    url = reverse('postpone_education_group', args=[offer.pk, education_group_year.pk])
 
     try:
         last_academic_year = education_group_year.academic_year.past()
@@ -254,15 +258,21 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
     obj = context["education_group_year"]
     parent = context["parent"]
 
-    return dl_with_parent_without_context(key, obj, parent, dl_title=dl_title, class_dl=class_dl,
-                                          default_value=default_value)
+    return dl_with_parent_without_context(
+        key, obj, parent, dl_title=dl_title,
+        class_dl=_get_css(key,
+                          class_dl, context["program_version_form"] and context["program_version_form"].is_particular),
+        default_value=default_value)
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
-def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None):
+def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, version_label=None,
+                                   is_particular=False):
     value = None
     parent_value = None
     if obj:
+        if isinstance(obj, EducationGroup):
+            class_dl = _get_css(key, class_dl, is_particular)
         value = get_verbose_field_value(obj, key)
 
         if not dl_title:
@@ -272,6 +282,8 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
             parent_value = get_verbose_field_value(parent, key)
         else:
             parent, parent_value = None, None
+        if key == "acronym" and version_label:
+            value = "{}[{}]".format(value, version_label)
 
     return {
         'label': _(dl_title),
@@ -291,3 +303,20 @@ def _bool_to_string(value):
         return "yes" if value else "no"
 
     return str(value)
+
+
+@register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
+def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value=None):
+    obj = context["education_group_year"]
+    parent = context["parent"]
+
+    return dl_with_parent_without_context(
+        key, obj, parent, dl_title=dl_title,
+        class_dl=_get_css(key, class_dl,
+                          context["program_version_form"] and context["program_version_form"].is_particular),
+        default_value=default_value,
+        version_label=context['program_version_form'].additional_title)
+
+
+def _get_css(key, class_dl, is_particular):
+    return "{} version_value".format(class_dl) if is_particular and key in VERSIONED_FIELDS else class_dl

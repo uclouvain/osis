@@ -39,6 +39,8 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.models.enums.node_type import NodeType
+from program_management.models.education_group_version import EducationGroupVersion
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -46,10 +48,12 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
-def load(tree_root_id: int) -> 'ProgramTree':
+def load(tree_root_id: int, version_name, transition, year, acronym) -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
-
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
+    version = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year,
+                                                   version_name=version_name,
+                                                   is_transition=transition).first()
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
     links = __load_tree_links(structure)
@@ -199,3 +203,14 @@ def __build_children(
         link_node.child = child_node
         children.append(link_node)
     return children
+
+
+def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
+    qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
+        .select_related('offer').order_by('version_name')
+
+    qs = qs.values('is_transition', 'version_name', 'offer', 'title_fr', 'title_en')
+    results = []
+    for elem in qs:
+        results.append(ProgramTreeVersion(**elem, tree=load_tree))
+    return results

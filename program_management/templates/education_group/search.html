@@ -194,7 +194,7 @@
             ];
 
             initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
-            {{items_per_page}}, "{% url 'education_groups' %}", columnDefs);
+            {{items_per_page}}, "{% url 'version_program' %}", columnDefs);
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params

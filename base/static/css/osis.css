@@ -535,3 +535,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     vertical-align: middle;
     margin-left: 5px;
 }
+
+.version_value {
+    color: #5CB85C;
+}

@@ -27,8 +27,12 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% dl_with_parent 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
-            {% dl_with_parent 'partial_acronym' class_dl="col-md-6" %}
+            {%  if program_version_form.is_particular %}
+                {% dl_with_parent_version 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
+            {% else %}
+                {% dl_with_parent 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
+            {% endif %}
+            {% dl_with_parent 'partial_acronym' class_dl="col-md-6 css_complementary" %}
             {% dl_with_parent_without_context 'category' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
             {% dl_with_parent_without_context 'name' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
 

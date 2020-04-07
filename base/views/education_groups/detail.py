@@ -79,6 +79,11 @@ from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.enums import node_type
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 from webservices.business import CONTACT_INTRO_KEY
+from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
+from django.db.models import Prefetch
+from program_management.serializers.program_tree_view import program_tree_view_serializer
+from program_management.forms.program_version import ProgramVersionForm
+from program_management.models.education_group_version import EducationGroupVersion
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -144,8 +149,16 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return self.request.user.person
 
     @cached_property
-    def root(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
+    def offer(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
+
+    @cached_property
+    def version_name(self):
+        return self.kwargs.get('version_name', '')
+
+    @cached_property
+    def transition(self):
+        return self.kwargs.get('transition', False)
 
     @cached_property
     def starting_academic_year(self):
@@ -158,9 +171,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['person'] = self.person
 
         # FIXME same param
-        context['root'] = self.root
-        context['root_id'] = self.root.pk
-        context['parent'] = self.root
+        context['offer'] = self.offer
+        context['offer_id'] = self.offer.pk
+        context['parent'] = self.offer
         context['parent_training'] = self.object.parent_by_training()
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
@@ -171,7 +184,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            program_tree = load_tree.load(self.root.id)
+            program_tree = load_tree.load(self.offer.id,
+                                          '' if self.version_name == '-' else self.version_name,
+                                          self.transition == 'transition',
+                                          self.offer.academic_year.year,
+                                          self.offer.acronym)
             serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
             context["current_node"] = program_tree.get_node_by_id_and_type(
@@ -192,11 +209,27 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
 
+        list_of_versions = find_all_program_tree_versions(self.offer.acronym, self.offer.academic_year.year, False)
+        program_version_form = ProgramVersionForm(list_of_versions=list_of_versions,
+                                                  version_name=self.version_name,
+                                                  transition=self.transition)
+
+        context['program_version_form'] = program_version_form
+
         return context
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+        if self.offer:
+            url_name = 'education_group_read'
+            kwargs_dict = {'education_group_year_id': self.offer.pk}
+            if self.transition:
+                url_name = 'education_group_read_transition'
+            if self.version_name != '':
+                kwargs_dict.update({'version_name': self.version_name})
+            default_url = reverse(url_name, kwargs=kwargs_dict)
+        else:
+            default_url = reverse('education_group_read', args=[self.offer.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if not self.can_show_view():

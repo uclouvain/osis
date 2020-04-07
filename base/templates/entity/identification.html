@@ -27,7 +27,7 @@
 
 {% if can_user_post %}
     {% block style %}
-        {% include "education_group/blocks/datetimepicker_imports_css.html" %}
+        {% include "../../../program_management/templates/education_group/blocks/datetimepicker_imports_css.html" %}
     {% endblock style %}
 {% endif %}
 
@@ -144,6 +144,6 @@
 
 {% if can_user_post %}
     {% block script %}
-        {% include "education_group/blocks/datetimepicker_imports_js.html" %}
+        {% include "../../../program_management/templates/education_group/blocks/datetimepicker_imports_js.html" %}
     {% endblock script %}
 {% endif %}
