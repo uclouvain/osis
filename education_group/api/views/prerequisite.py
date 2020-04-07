@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
@@ -34,36 +33,42 @@ from education_group.api.serializers.prerequisite import EducationGroupPrerequis
 from program_management.ddd.repositories import load_tree
 
 
-class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, viewsets.ViewSet):
+class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.ListAPIView):
     """
         Return the prerequisites of an education group
     """
     name = 'education_group_prerequisites'
     serializer_class = EducationGroupPrerequisitesSerializer
-    base_queryset = EducationGroupYear.objects.all().select_related('education_group_type', 'academic_year')
+    queryset = EducationGroupYear.objects.all().select_related('education_group_type', 'academic_year')
     pagination_class = None
     filter_backends = ()
 
-    def list(self, request, year=None, acronym=None):
-        egy = get_object_or_404(
-            self.base_queryset,
+    def get_queryset(self):
+        context = self.get_serializer_context()
+        return context['tree'].get_nodes_that_have_prerequisites()
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        return get_object_or_404(
+            self.queryset,
             acronym__iexact=acronym,
             academic_year__year=year
         )
+
+    def get_serializer_context(self):
+        egy = self.get_object()
         tree = load_tree.load(egy.id)
         serializer_context = {
-            'request': request,
+            'request': self.request,
             'tree': tree
         }
-        serializer = EducationGroupPrerequisitesSerializer(tree.get_nodes_that_have_prerequisites(),
-                                                           many=True,
-                                                           context=serializer_context)
-        return JsonResponse(serializer.data, safe=False)
+        return serializer_context
 
 
 class TrainingPrerequisites(EducationGroupYearPrerequisites):
     name = 'training_prerequisites'
-    base_queryset = EducationGroupYear.objects.filter(
+    queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.TRAINING
     ).select_related(
         'education_group_type',
@@ -73,10 +78,19 @@ class TrainingPrerequisites(EducationGroupYearPrerequisites):
 
 class MiniTrainingPrerequisites(EducationGroupYearPrerequisites):
     name = 'mini_training_prerequisites'
-    base_queryset = EducationGroupYear.objects.filter(
+    queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.MINI_TRAINING
     ).select_related(
         'education_group_type',
         'academic_year',
     )
+
+    def get_object(self):
+        acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        return get_object_or_404(
+            self.queryset,
+            partial_acronym__iexact=acronym,
+            academic_year__year=year
+        )
 
