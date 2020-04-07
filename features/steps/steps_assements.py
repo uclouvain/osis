@@ -26,16 +26,11 @@ import random
 
 from behave import *
 from behave.runner import Context
-from django.contrib.auth.models import Permission
-from django.utils.translation import gettext_lazy as _
-from openpyxl import load_workbook
 
-from features.forms.assessments import search_learning_units_form, encode_students_score_form, \
-    double_encode_students_score_form
-from features.pages.assessments import pages
-from assessments.views import upload_xls_utils
-from base.models.enums import exam_enrollment_justification_type
 from base.models.program_manager import ProgramManager
+from features.forms.assessments import search_learning_units_form, encode_students_score_form, \
+    double_encode_students_score_form, encode_xlsx_score
+from features.pages.assessments import pages
 from features.pages.common import LoginPage
 
 use_step_matcher("parse")
@@ -77,7 +72,7 @@ def step_impl(context: Context):
 @then("Scores should be updated")
 def step_impl(context: Context):
     page = pages.ScoreEncodingPage(driver=context.browser)
-    assert_scores_updated(context, page)
+    context.test.assertScoresEqual(page.results, context.scores)
 
 
 @when("Click on encode scores")
@@ -125,7 +120,7 @@ def step_impl(context: Context):
     page = pages.ScoreEncodingPage(driver=context.browser)
     filename = page.get_excel_filename()
     full_path = os.path.join(context.download_directory, filename)
-    context.scores = update_xlsx(full_path)
+    context.scores = encode_xlsx_score.update_xlsx(full_path)
 
 
 @when("Inject excel file")
@@ -165,52 +160,3 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     full_path = os.path.join(context.download_directory, context.filename)
     context.test.assertTrue(os.path.exists(full_path), full_path)
-
-
-def update_xlsx(filename):
-    wb = load_workbook(filename)
-
-    sheet = wb.active
-    scores = []
-
-    current_row = 13
-    while sheet['E{}'.format(current_row)].value:
-        score_or_justification = bool(random.getrandbits(1))
-        selected_column = 'I' if score_or_justification else 'J'
-
-        if score_or_justification:
-            value = str(random.randint(0, 20))
-        else:
-            value = random.choice(('A', 'T'))
-
-        sheet['{}{}'.format(selected_column, current_row)] = value
-        scores.append(value)
-        current_row += 1
-
-    wb.save(filename=filename)
-    return scores
-
-
-def assert_scores_updated(context, page):
-    for result, score in zip(page.results, context.scores):
-        if score.isdecimal():
-            context.test.assertEqual(result.score.text, score)
-            context.test.assertEqual(result.justification.text, "-")
-
-        elif score in upload_xls_utils.AUTHORIZED_JUSTIFICATION_ALIASES:
-            context.test.assertEqual(result.score.text, "-")
-            justification_value = get_enum_value(
-                exam_enrollment_justification_type.JUSTIFICATION_TYPES,
-                upload_xls_utils.AUTHORIZED_JUSTIFICATION_ALIASES[score]
-            )
-            context.test.assertEqual(
-                result.justification.text,
-                _(justification_value)
-            )
-
-
-def get_enum_value(enum, key):
-    return next(
-        (v for k, v in enum if k == key),
-        None
-    )
