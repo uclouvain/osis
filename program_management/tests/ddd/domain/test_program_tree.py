@@ -429,3 +429,32 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertListEqual([], copied_link_1_1_1.children)
         self.assertNotIn(link1_1_1, result)
         self.assertNotIn(link1_1_1_1, result)
+
+
+class TestGetCodesPermittedAdPrerequisite(SimpleTestCase):
+
+    def setUp(self):
+        self.tree = ProgramTreeFactory()
+
+    def test_when_tree_contains_learning_units(self):
+        link_with_learn_unit = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
+        link_with_group = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
+        result = self.tree.get_codes_permitted_as_prerequisite()
+        expected_result = [link_with_learn_unit.child.code]
+        self.assertListEqual(result, expected_result)
+        self.assertNotIn(link_with_group.child.code, result)
+
+    def test_when_tree_contains_only_groups(self):
+        link_with_group1 = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
+        link_with_group2 = LinkFactory(parent=self.tree.root_node, child=NodeGroupYearFactory())
+        result = self.tree.get_codes_permitted_as_prerequisite()
+        expected_result = []
+        self.assertListEqual(result, expected_result)
+
+    def test_list_ordered_by_code(self):
+        link_with_learn_unit1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c2'))
+        link_with_learn_unit2 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c1'))
+        link_with_learn_unit3 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory(code='c3'))
+        result = self.tree.get_codes_permitted_as_prerequisite()
+        expected_result_order = ['c1', 'c2', 'c3']
+        self.assertListEqual(result, expected_result_order)
