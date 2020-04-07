@@ -147,11 +147,11 @@ class LearningComponentYear(SerializableModel):
 
         strategies = {
             None: LearningComponentYearQuadriNoStrategy,
-            quadrimesters.Q1: LearningComponentYearQ1Strategy,
-            quadrimesters.Q2: LearningComponentYearQ2Strategy,
-            quadrimesters.Q1and2: LearningComponentYearQ1and2Strategy,
-            quadrimesters.Q1or2: LearningComponentYearQ1or2Strategy,
-            quadrimesters.Q3: LearningComponentYearQuadriNoStrategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1.name: LearningComponentYearQ1Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q2.name: LearningComponentYearQ2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1and2.name: LearningComponentYearQ1and2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1or2.name: LearningComponentYearQ1or2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q3.name: LearningComponentYearQuadriNoStrategy,
         }
 
         try:
@@ -188,14 +188,6 @@ class LearningComponentYear(SerializableModel):
     def set_repartition_volumes(self, repartition_volumes):
         for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type().items():
             setattr(self, attr, repartition_volumes[entity_container_type])
-
-
-def volume_total_verbose(learning_component_years):
-    q1 = next((component['total'] for component in learning_component_years
-               if component['type'] == LECTURING), 0)
-    q2 = next((component['total'] for component in learning_component_years
-               if component['type'] == PRACTICAL_EXERCISES), 0)
-    return "%(q1)gh + %(q2)gh" % {"q1": q1, "q2": q2}
 
 
 def find_by_id(learning_component_year_id):

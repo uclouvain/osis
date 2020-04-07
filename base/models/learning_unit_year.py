@@ -37,10 +37,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from program_management.ddd import repositories
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import entity_version
-from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
@@ -225,7 +225,7 @@ class LearningUnitYear(SerializableModel):
                                choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
                                verbose_name=_('Session derogation'))
     quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('Quadrimester'),
-                                    choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS)
+                                    choices=quadrimesters.LearningUnitYearQuadrimester.choices())
 
     attribution_procedure = models.CharField(
         max_length=20, blank=True, null=True,
@@ -297,14 +297,14 @@ class LearningUnitYear(SerializableModel):
         else:
             return False
 
-    @property
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def complete_title(self):
         complete_title = self.specific_title
         if self.learning_container_year:
             complete_title = ' - '.join(filter(None, [self.learning_container_year.common_title, self.specific_title]))
         return complete_title
 
-    @property
+    @property    # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def complete_title_english(self):
         complete_title_english = self.specific_title_english
         if self.learning_container_year:
@@ -334,6 +334,12 @@ class LearningUnitYear(SerializableModel):
 
     def find_list_group_element_year(self):
         return self.child_leaf.filter(child_leaf=self).select_related('parent')
+
+    def get_learning_unit_previous_year(self):
+        try:
+            return self.learning_unit.learningunityear_set.get(academic_year__year=(self.academic_year.year - 1))
+        except LearningUnitYear.DoesNotExist:
+            return None
 
     def get_learning_unit_next_year(self):
         try:
@@ -512,7 +518,7 @@ class LearningUnitYear(SerializableModel):
         ).exists()
 
     def has_or_is_prerequisite(self, education_group_year):
-        formations = group_element_year.find_learning_unit_roots([education_group_year])[education_group_year.id]
+        formations = repositories.find_roots.find_roots([education_group_year])[education_group_year.id]
         return PrerequisiteItem.objects.filter(
             Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
