@@ -50,8 +50,7 @@ def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessag
     messages += __check_is_prerequisite_in_other_trees(node_to_detach=node_to_detach)
 
     if is_valid and commit:
-        parent_path = PATH_SEPARATOR.join(path_to_detach.split(PATH_SEPARATOR)[:-1])
-        persist_tree.delete_link(working_tree.get_node(parent_path), node_to_detach)  # TODO :: use the tree.persist() !
+        persist_tree.persist(working_tree)  # TODO :: unit tests persist !
 
     return BusinessValidationMessageList(messages=messages)
 
@@ -74,20 +73,3 @@ def __get_trees_using_node(node_to_detach: 'Node'):
     else:
         trees = load_tree.load_trees_from_children(child_branch_ids=[node_id], child_leaf_ids=None)
     return trees
-
-
-# # TODO :: remove this function when switching on new Model "Element" (chidl_leaf and child_branch will disappear)
-# def __get_type(path: str) -> NodeType:
-#     splitted_ids = path.split(PATH_SEPARATOR)
-#     child_id = int(splitted_ids[-1])
-#     parent_id = int(splitted_ids[-2])
-#     gey = GroupElementYear.objects.filter(
-#         parent_id=parent_id,
-#         child_id=child_id
-#     )
-#     if gey.child_branch_id:
-#         return NodeType.EDUCATION_GROUP
-#     elif gey.child_leaf_id:
-#         return NodeType.LEARNING_UNIT
-#     else:
-#         raise Exception("Bad record")

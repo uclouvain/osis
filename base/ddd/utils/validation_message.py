@@ -68,6 +68,9 @@ class BusinessValidationMessageList:
     def __init__(self, messages: List[BusinessValidationMessage]):
         self.messages = messages
 
+    def __eq__(self, other):
+        return self.messages == other.messages
+
     def contains_errors(self) -> bool:
         return bool(self.errors)
 
