@@ -38,7 +38,6 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.language import LanguageFactory
@@ -59,7 +58,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
         model = EducationGroupYear
         django_get_or_create = ('partial_acronym', 'academic_year',)
 
-    education_group = factory.SubFactory(EducationGroupFactory)
+    education_group = factory.SubFactory("base.tests.factories.education_group.EducationGroupFactory")
     academic_year = factory.SubFactory(AcademicYearFactory)
     acronym = ""
     partial_acronym = ""

@@ -23,27 +23,46 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+import random
+
 import factory
 
-from base.business.education_groups import postponement
-from base.models.academic_year import AcademicYear
+from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_types
-from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
-from base.tests.factories.education_group import EducationGroupFactory
+from base.models.enums.entity_type import FACULTY
+from base.models.enums.organization_type import MAIN
+from base.tests.factories.education_group import EducationGroupWithAnnualizedDataDactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
     MiniTrainingEducationGroupTypeFactory, GroupEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+
+OFFER_START_YEAR = 2015
 
 
-class OfferBusinessFactory:
+class EducationGroupsGenerator:
     def __init__(self):
-        BusinessEducationGroupTypeFactory()
-        BusinessOfferFactory()
+        self.education_group_types = EducationGroupTypeGenerator()
+
+        entities_version = list(EntityVersion.objects.filter(entity_type=FACULTY).select_related("entity"))
+        campuses = list(Campus.objects.filter(organization__type=MAIN))
+        academic_years_range = AcademicYear.objects.filter(
+            year__gte=OFFER_START_YEAR,
+            year__lte=compute_max_academic_year_adjournment()
+        )
+        self.education_groups = EducationGroupWithAnnualizedDataDactory.create_batch(
+            20,
+            start_year__year=OFFER_START_YEAR,
+            educationgroupyears__academic_years=academic_years_range,
+            educationgroupyears__management_entity=factory.Iterator(
+                entities_version, getter=lambda ev: ev.entity
+            ),
+            educationgroupyears__administration_entity=factory.LazyAttribute(lambda o: o.management_entity),
+            educationgroupyears__enrollment_campus=factory.LazyFunction(lambda: random.choice(campuses))
+        )
 
 
-class BusinessEducationGroupTypeFactory:
+class EducationGroupTypeGenerator:
     def __init__(self):
         self.trainings = TrainingEducationGroupTypeFactory.create_batch(
             len(list(education_group_types.TrainingType))
@@ -54,38 +73,3 @@ class BusinessEducationGroupTypeFactory:
         self.groups = GroupEducationGroupTypeFactory.create_batch(
             len(list(education_group_types.GroupType))
         )
-
-
-class BusinessOfferFactory:
-    def __init__(self):
-        self.offers = BusinessEducationGroupFactory.create_batch(
-            20,
-            start_year__year=2015
-        )
-
-
-class BusinessEducationGroupFactory(EducationGroupFactory):
-    @factory.post_generation
-    def educationgroupyears(obj, create, extracted, **kwargs):
-        starting_education_group_year = BusinessEducationGroupYearFactory(
-            education_group=obj,
-            academic_year=obj.start_year,
-            **kwargs
-        )
-        academic_years = AcademicYear.objects.filter(year__gt=obj.start_year.year)
-        if obj.end_year:
-            academic_years = academic_years.filter(year__lte=obj.end_year.year)
-
-        for acy in academic_years:
-            postponement.duplicate_education_group_year(
-                starting_education_group_year,
-                acy
-            )
-
-
-class BusinessEducationGroupYearFactory(EducationGroupYearFactory):
-    management_entity = factory.LazyFunction(
-        lambda: EntityVersion.objects.filter(entity_type__in=PEDAGOGICAL_ENTITY_TYPES).order_by("?").first().entity
-    )
-    administration_entity = factory.LazyAttribute(lambda o: o.management_entity)
-    enrollment_campus = factory.LazyFunction(lambda: Campus.objects.all().order_by("?").first())
