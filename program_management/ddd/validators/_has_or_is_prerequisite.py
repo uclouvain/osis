@@ -56,11 +56,9 @@ class IsPrerequisiteValidator(BusinessValidator):
         super(IsPrerequisiteValidator, self).__init__()
         self.node_to_detach = node_to_detach
         self.tree = tree
-        # self.position_to_detach = tree.get_node(path)
 
     def validate(self):
         nodes_that_are_prerequisites = self._get_nodes_that_are_prerequisite(self.node_to_detach)
-        # TODO :: unit test
         if nodes_that_are_prerequisites:
             codes_that_are_prerequisite = [node.code for node in self.tree.get_nodes_that_are_prerequisites()]
             self.add_error_message(
@@ -72,12 +70,16 @@ class IsPrerequisiteValidator(BusinessValidator):
                 }
             )
 
-    def _get_nodes_that_are_prerequisite(self, search_under_node: 'Node'):
+    def _get_nodes_that_are_prerequisite(self, search_under_node: 'Node'):  # TODO : move into ProgramTree?
+        nodes_that_are_prerequisites = []
         learning_units_children = search_under_node.get_all_children_as_learning_unit_nodes()
-        return [
+        if search_under_node.is_learning_unit() and search_under_node.is_prerequisite:
+            nodes_that_are_prerequisites.append(search_under_node)
+        nodes_that_are_prerequisites += [
             n for n in learning_units_children
             if n.is_prerequisite and not self._is_reused_in_tree(n)
         ]
+        return nodes_that_are_prerequisites
 
     def _is_reused_in_tree(self, node_to_detach: 'Node') -> bool:
         return self.tree.count_usage(node_to_detach) > 1
