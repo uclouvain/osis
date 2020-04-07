@@ -24,11 +24,14 @@
 #
 ############################################################################
 from django.conf import settings
+from django.contrib.auth.models import Permission
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.student import StudentFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import SuperUserFactory
 
@@ -39,6 +42,15 @@ class UsersGenerator:
         self.faculty_manager = BusinessFacultyManagerFactory()
         self.central_manager = BusinessCentralManagerFactory()
         self.tutors = TutorFactory.create_batch(60)
+        self.students = StudentFactory.create_batch(100)
+        self.program_managers = ProgramManagerFactory.create_batch(
+            5,
+            offer_year__academic_year__current=True
+        )
+
+        perm = Permission.objects.filter(codename="can_access_scoreencoding").first()
+        for manager in self.program_managers:
+            manager.person.user.user_permissions.add(perm)
 
 
 PERMISSIONS = (
