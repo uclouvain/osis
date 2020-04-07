@@ -2,6 +2,7 @@ import random
 
 import factory
 
+from base.models.academic_year import current_academic_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.program_manager import ProgramManager
 from base.models.student import Student
@@ -16,9 +17,10 @@ from base.tests.factories.session_examen import SessionExamFactory
 
 class ScoreEncodingFactory:
     def __init__(self):
+        current_acy = current_academic_year()
         self.students = list(Student.objects.all())
 
-        self.learning_units = list(LearningUnitYear.objects.all()[0:20])
+        self.learning_units = list(LearningUnitYear.objects.filter(academic_year=current_acy)[0:20])
         self.program_managers = ProgramManager.objects.all().select_related("offer_year")
         self.offers = [manager.offer_year for manager in self.program_managers]
 
