@@ -77,9 +77,6 @@ class ProgramTree:
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
-    def get_links(self):
-        return _links_from_root(self.root_node)
-
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
 
@@ -104,18 +101,18 @@ class ProgramTree:
             raise node.NodeNotFoundException
 
     @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
-    def get_node_by_id_and_class(self, node_id: int, node_class) -> 'Node':
+    def get_node_by_id_and_class(self, node_id: int, node_type) -> 'Node':
         """
         DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
         Return the corresponding node based on the node_id value with respect to the class.
         :param node_id: int
-        :param node_class: a Node subclass
+        :param node_type: NodeType
         :return: Node
         """
         return next(
             (
                 node for node in self.get_all_nodes()
-                if node.node_id == node_id and isinstance(node, node_class)
+                if node.node_id == node_id and node.type == node_type
             ),
             None
         )
@@ -125,7 +122,6 @@ class ProgramTree:
         Return a flat set of all nodes present in the tree
         :return: list of Node
         """
-        self.get_node_by_id_and_class
         all_nodes = set([self.root_node] + _nodes_from_root(self.root_node))
         if types:
             return set(n for n in all_nodes if n.node_type in types)
@@ -175,6 +171,9 @@ class ProgramTree:
 
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
+
+    def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
+        return next((link for link in self.get_all_links() if link.parent == parent and link.child == child), None)
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
