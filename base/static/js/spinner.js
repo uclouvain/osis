@@ -1,4 +1,6 @@
 let linkButtonNoSpinnerClicked = false;
+
+//sync spinner is always active on page load
 const spinnerActive = {sync: true, async: false};
 
 function bindNoSpinner(elem){
