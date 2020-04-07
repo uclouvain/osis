@@ -36,7 +36,6 @@ from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
-from program_management.ddd.service import detach_node_service
 from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -52,7 +51,6 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     @cached_property
     def strategy(self):
         obj = self.get_object()
-        detach_node_service.detach_node(self.get_root().id, obj.child_branch.id)
         strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
         return strategy_class(obj)
 
