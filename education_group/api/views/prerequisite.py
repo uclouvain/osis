@@ -37,7 +37,7 @@ class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.L
     """
         Return the prerequisites of an education group
     """
-    name = 'education_group_prerequisites'
+    name = 'education_group-prerequisites'
     serializer_class = EducationGroupPrerequisitesSerializer
     queryset = EducationGroupYear.objects.all().select_related('education_group_type', 'academic_year')
     pagination_class = None
@@ -67,7 +67,7 @@ class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.L
 
 
 class TrainingPrerequisites(EducationGroupYearPrerequisites):
-    name = 'training_prerequisites'
+    name = 'training-prerequisites'
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.TRAINING
     ).select_related(
@@ -77,7 +77,7 @@ class TrainingPrerequisites(EducationGroupYearPrerequisites):
 
 
 class MiniTrainingPrerequisites(EducationGroupYearPrerequisites):
-    name = 'mini_training_prerequisites'
+    name = 'mini_training-prerequisites'
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.MINI_TRAINING
     ).select_related(

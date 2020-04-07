@@ -56,9 +56,9 @@ class PrerequisiteItemSerializer(BaseCommomSerializer):
 class EducationGroupPrerequisitesSerializer(BaseCommomSerializer):
     code = serializers.CharField(read_only=True)
     prerequisites_string = serializers.CharField(source='prerequisite', read_only=True)
-    prerequisite = serializers.SerializerMethodField()
+    prerequisites = serializers.SerializerMethodField()
 
-    def get_prerequisite(self, obj: 'Node'):
+    def get_prerequisites(self, obj: 'Node'):
         list_nodes = []
         for prig in obj.prerequisite.prerequisite_item_groups:
             for prerequisite in prig.prerequisite_items:
