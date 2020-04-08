@@ -142,8 +142,8 @@ class ProgramTree:
         return list(
             sorted(
                 (
-                    node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and node_obj.has_prerequisite
+                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+                    if node_obj.has_prerequisite
                 ),
                 key=lambda node_obj: node_obj.code
             )
