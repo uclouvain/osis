@@ -25,9 +25,11 @@ from behave_django.testcase import BehaviorDrivenTestCase
 from django.utils.translation import gettext_lazy as _
 
 from assessments.views import upload_xls_utils
+from base.forms.utils import choice_field
 from base.models import tutor
 from base.models.enums import exam_enrollment_justification_type
 from base.models.learning_unit_year import LearningUnitYear
+from features.pages import learning_unit
 from features.pages.learning_unit.pages import SearchLearningUnitPage
 
 
@@ -67,6 +69,22 @@ class OsisTestCase(BehaviorDrivenTestCase):
             self.assertIn(acronym, result.acronym.text)
             self.assertIn(requirement_entity, result.requirement_entity.text)
             self.assertIn(container_type, result.type.text)
+
+    def assertLearningUnitHasBeenUpdated(self, page: learning_unit.pages.LearningUnitPage, form_data: dict):
+        status = _("Active") if form_data["actif"] else _("Inactive")
+        session_derogation = form_data["session_derogation"] \
+            if form_data["session_derogation"] != choice_field.BLANK_CHOICE_DISPLAY else '-'
+        quadrimester = form_data["quadrimester"] \
+            if form_data["quadrimester"] != choice_field.BLANK_CHOICE_DISPLAY else '-'
+        credits = form_data.get("credits", "")
+        periodicity = form_data.get("periodicity", "") \
+            if form_data.get("periodicity", "") != choice_field.BLANK_CHOICE_DISPLAY else '-'
+
+        self.assertEqual(page.status.text, status)
+        self.assertEqual(page.session_derogation.text, session_derogation)
+        self.assertEqual(page.quadrimester.text, quadrimester)
+        self.assertIn(periodicity, page.periodicity.text)
+        self.assertIn(str(credits), page.credits.text)
 
 
 def get_enum_value(enum, key):

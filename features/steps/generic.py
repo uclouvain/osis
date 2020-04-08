@@ -62,7 +62,7 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire facultaire")
 def step_impl(context: Context):
-    context.user = context.users.faculty_manager.user
+    context.user = context.data.faculty_manager.user
 
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("faculty_manager", 'Faculty_Manager')
@@ -72,7 +72,7 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire central")
 def step_impl(context: Context):
-    context.user = context.users.central_manager.user
+    context.user = context.data.central_manager.user
 
     page = LoginPage(driver=context.browser, base_url=context.get_url('/login/')).open()
     page.login("central_manager", 'Central_Manager')

@@ -31,7 +31,6 @@ Feature: Mise à jour en gestion journalière
 
     When Cliquer sur le menu « Actions »
     And Cliquer sur le menu « Modifier »
-    And Décocher la case « Actif »
     And Le gestionnaire central remplit le formulaire d'édition des UE
     And Cliquer sur le bouton « Enregistrer »
     And A la question, « voulez-vous reporter » répondez « oui »

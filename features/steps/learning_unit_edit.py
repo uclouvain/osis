@@ -32,6 +32,7 @@ from django.utils.text import slugify
 from selenium.webdriver.common.by import By
 from waffle.models import Flag
 
+from base.forms.utils import choice_field
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.campus import Campus
@@ -43,6 +44,9 @@ from features.forms.learning_units import update_form, create_form
 from features.pages.learning_unit.pages import LearningUnitPage, LearningUnitEditPage, NewLearningUnitProposalPage, \
     SearchLearningUnitPage, NewPartimPage, NewLearningUnitPage, EditLearningUnitProposalPage
 from django.utils.translation import gettext_lazy as _
+
+from features.steps.utils.query import get_random_learning_unit_outside_of_person_entities, \
+    get_random_learning_unit_inside_of_person_entities
 
 use_step_matcher("parse")
 
@@ -67,9 +71,7 @@ def step_impl(context: Context):
 
 @given("Aller sur la page de detail d'une UE ne faisant pas partie de la faculté")
 def step_impl(context: Context):
-    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
-    entities = [ev.entity for ev in entities_version]
-    luy = LearningUnitYear.objects.exclude(learning_container_year__requirement_entity__in=entities).order_by("?")[0]
+    luy = get_random_learning_unit_outside_of_person_entities(context.user.person)
     url = reverse('learning_unit', args=[luy.pk])
 
     LearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
@@ -77,12 +79,7 @@ def step_impl(context: Context):
 
 @given("Aller sur la page de detail d'une UE faisant partie de la faculté")
 def step_impl(context: Context):
-    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
-    entities = [ev.entity for ev in entities_version]
-    luy = LearningUnitYear.objects.filter(
-        learning_container_year__requirement_entity__in=entities,
-        academic_year=current_academic_year()
-    ).order_by("?")[0]
+    luy = get_random_learning_unit_inside_of_person_entities(context.user.person)
     context.learning_unit_year = luy
     url = reverse('learning_unit', args=[luy.pk])
 
@@ -115,12 +112,6 @@ def step_impl(context):
     page.edit_button.click()
 
 
-@step("Décocher la case « Actif »")
-def step_impl(context: Context):
-    page = LearningUnitEditPage(driver=context.browser)
-    page.actif = False
-
-
 @step("Le gestionnaire faculatire remplit le formulaire d'édition des UE")
 def step_impl(context: Context):
     page = LearningUnitEditPage(driver=context.browser)
@@ -148,23 +139,7 @@ def step_impl(context: Context):
 @step("Vérifier UE a été mis à jour")
 def step_impl(context: Context):
     page = LearningUnitPage(driver=context.browser)
-    assert_actif_equal(context.test, context.form_data["actif"], page.status.text)
-    assert_choice_equal(context.test, page.session_derogation.text, context.form_data["session_derogation"])
-    assert_choice_equal(context.test, page.quadrimester.text, context.form_data["quadrimester"])
-    if "credits" in context.form_data:
-        context.test.assertEqual(context.form_data["credits"], int(page.credits.text))
-    if "periodicity" in context.form_data:
-        assert_choice_equal(context.test, page.periodicity, context.form_data["periodicity"])
-
-
-def assert_choice_equal(assertions, display_value, input_value):
-    expected_value = input_value if input_value != '---------' else '-'
-    assertions.assertEqual(display_value, expected_value)
-
-
-def assert_actif_equal(assertions, status_boolean_value, status_text_value):
-    status_expected_value = _("Active") if status_boolean_value else _("Inactive")
-    assertions.assertEqual(status_text_value, status_expected_value)
+    context.test.assertLearningUnitHasBeenUpdated(page, context.form_data)
 
 
 @step("Encoder pour le partim {value} comme {field}")
@@ -224,51 +199,6 @@ def step_impl(context: Context):
     page.anac = str(AcademicYear.objects.get(year=year))
 
 
-@step("Encoder Anac de fin supérieure")
-def step_impl(context: Context):
-    page = LearningUnitEditPage(driver=context.browser)
-    current_acy = current_academic_year()
-    academic_year = AcademicYear.objects.filter(year__gt=current_acy.year, year__lt=current_acy.year+6).order_by("?")[0]
-    context.anac = academic_year
-    page.anac_de_fin = str(academic_year)
-
-
-@step("Encoder Dossier")
-def step_impl(context: Context):
-    page = NewLearningUnitProposalPage(driver=context.browser)
-    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
-    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
-    random_entity_version = random.choice(faculties)
-    value = "{}12".format(random_entity_version.acronym)
-    page.dossier = value
-
-
-@step("Encoder Lieu d’enseignement")
-def step_impl(context: Context):
-    page = LearningUnitEditPage(driver=context.browser)
-    random_campus = Campus.objects.all().order_by("?")[0]
-    page.lieu_denseignement = random_campus.id
-
-
-@step("Encoder Entité resp. cahier des charges")
-def step_impl(context: Context):
-    page = LearningUnitEditPage(driver=context.browser)
-    ev = EntityVersion.objects.get(entity__personentity__person=context.user.person)
-    entities_version = [ev] + list(ev.descendants)
-    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
-    random_entity_version = random.choice(faculties)
-    page.entite_resp_cahier_des_charges = random_entity_version.acronym
-
-
-@step("Encoder Entité d’attribution")
-def step_impl(context: Context):
-    page = LearningUnitEditPage(driver=context.browser)
-    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
-    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
-    random_entity_version = random.choice(faculties)
-    page.entite_dattribution = random_entity_version.acronym
-
-
 @step("Cliquer sur le bouton « Enregistrer »")
 def step_impl(context: Context):
     page = LearningUnitEditPage(driver=context.browser)
@@ -302,60 +232,6 @@ def step_impl(context):
     page.no_postponement.click()
 
 
-@then("Vérifier que le cours est bien {status}")
-def step_impl(context: Context, status: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(By.ID, "id_status").text, status)
-
-
-@step("Vérifier que le Quadrimestre est bien {value}")
-def step_impl(context: Context, value: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(By.ID, "id_quadrimester").text, value)
-
-
-@step("Vérifier que la Session dérogation est bien {value}")
-def step_impl(context: Context, value: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(By.ID, "id_session").text, value)
-
-
-@step("Vérifier que le volume Q1 pour la partie magistrale est bien {value}")
-def step_impl(context: Context, value: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(
-        By.XPATH,
-        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[1]/td[3]'
-    ).text, value)
-
-
-@step("Vérifier que le volume Q2 pour la partie magistrale est bien {value}")
-def step_impl(context: Context, value: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(
-        By.XPATH,
-        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[1]/td[4]'
-    ).text, value)
-
-
-@step("Vérifier que le volume Q1 pour la partie pratique est bien {value}")
-def step_impl(context: Context, value: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(
-        By.XPATH,
-        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[2]/td[3]'
-    ).text, value)
-
-
-@step("Vérifier que la volume Q2 pour la partie pratique est bien {value}")
-def step_impl(context: Context, value: str):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(
-        By.XPATH,
-        '//*[@id="identification"]/div/div[1]/div[3]/div/table/tbody/tr[2]/td[4]'
-    ).text, value)
-
-
 @given("La période de modification des programmes n’est pas en cours")
 def step_impl(context: Context):
     calendar = AcademicCalendar.objects.filter(academic_year=current_academic_year(),
@@ -381,12 +257,6 @@ def step_impl(context, field, value):
     context.test.assertIn(value, getattr(page, slug_field).text)
 
 
-@step("Vérifier que la Périodicité est bien {value}")
-def step_impl(context, value):
-    page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(page.find_element(By.ID, "id_periodicity").text, value)
-
-
 @step("Rechercher la même UE dans une année supérieure")
 def step_impl(context: Context):
     luy = LearningUnitYear.objects.filter(
@@ -407,28 +277,10 @@ def step_impl(context):
     context.current_page = page.new_partim.click()
 
 
-@then("Vérifier que le partim {acronym} a bien été créé de 2019-20 à 2024-25.")
-def step_impl(context, acronym: str):
-    page = LearningUnitPage(context.browser, context.browser.current_url)
-    page.wait_for_page_to_load()
-    for i in range(2019, 2025):
-        string_to_check = "{} ({}-".format(acronym, i)
-        context.test.assertIn(string_to_check, page.success_messages.text)
-
-
 @then("Vérifier que l'UE a bien été créé")
 def step_impl(context):
     page = LearningUnitPage(context.browser, context.browser.current_url)
     context.test.assertEqual(page.code.text, context.form_data["code"])
-
-
-@then("Vérifier que le partim a bien été créé de 2019-20 à 2024-25.")
-def step_impl(context):
-    page = LearningUnitPage(context.browser, context.browser.current_url)
-    page.wait_for_page_to_load()
-    for i in range(2019, 2021):
-        string_to_check = "{}3 ({}-".format(context.learning_unit_year.acronym, i)
-        context.test.assertIn(string_to_check, page.success_messages.text)
 
 
 @then("Vérifier que le partim a bien été créé")
@@ -446,17 +298,6 @@ def step_impl(context: Context, acronym: str):
     page.wait_for_page_to_load()
 
 
-@then("Vérifier que le cours parent {acronym} contient bien {number} partims.")
-def step_impl(context, acronym, number):
-    # Slow page...
-    time.sleep(5)
-
-    page = LearningUnitPage(driver=context.browser)
-    list_partims = page.find_element(By.ID, "list_partims").text
-    expected_string = ' , '.join([str(i + 1) for i in range(3)])
-    context.test.assertEqual(list_partims, expected_string)
-
-
 @step("Cliquer sur le menu « Nouvelle UE »")
 def step_impl(context: Context):
     page = SearchLearningUnitPage(driver=context.browser)
@@ -468,25 +309,3 @@ def step_impl(context: Context):
     Flag.objects.update_or_create(name='learning_achievement_update', defaults={"authenticated": True})
     Flag.objects.update_or_create(name='learning_unit_create', defaults={"authenticated": True})
     Flag.objects.update_or_create(name='learning_unit_proposal_create', defaults={"authenticated": True})
-
-
-@then("la valeur de {field} est bien {value}")
-def step_impl(context, field, value):
-    """
-    :type context: behave.runner.Context
-    """
-    page = LearningUnitPage(driver=context.browser)
-    slug_field = slugify(field).replace('-', '_')
-    msg = getattr(page, slug_field).text.strip()
-    context.test.assertEqual(msg, value.strip())
-
-
-@then("Vérifier que la zone {field} est bien grisée")
-def step_impl(context, field):
-    """
-    :type context: behave.runner.Context
-    """
-    page = LearningUnitEditPage(driver=context.browser)
-    slug_field = slugify(field).replace('-', '_')
-
-    context.test.assertFalse(getattr(page, slug_field).is_enabled())
