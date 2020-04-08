@@ -215,7 +215,7 @@ class ProgramTree:
         parent = self.get_node(parent_path)
         is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
         if is_valid:
-            parent.detach_child(node_to_detach.pk)
+            parent.detach_child(node_to_detach)
         return is_valid, messages
 
     def clean_detach_node(

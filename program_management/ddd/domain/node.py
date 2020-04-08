@@ -61,6 +61,8 @@ class Node:
 
     _academic_year = None
 
+    _deleted_children = None
+
     code = None
     year = None
     type = None
@@ -85,6 +87,7 @@ class Node:
         self.title = title
         self.year = year
         self.credits = credits
+        self._deleted_children = set()
 
     def __eq__(self, other):
         return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
@@ -187,13 +190,15 @@ class Node:
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def add_child(self, node: 'Node', **kwargs):
-        child = link_factory.get_link(parent=self, child=node, **kwargs)
+    def add_child(self, node: 'Node', **link_attrs):
+        child = link_factory.get_link(parent=self, child=node, **link_attrs)
         self._children.append(child)
         child._has_changed = True
 
-    def detach_child(self, node_id: int):
-        self.children = [link for link in self.children if link.child.pk != node_id]
+    def detach_child(self, node_to_detach: 'Node'):
+        link_to_detach = next(link for link in self.children if link.child == node_to_detach)
+        self._deleted_children.add(link_to_detach)
+        self.children.remove(link_to_detach)
 
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)

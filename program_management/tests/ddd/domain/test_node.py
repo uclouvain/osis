@@ -278,3 +278,27 @@ class TestChildren(SimpleTestCase):
             self.parent.children,
             [link0, link1, link2]
         )
+
+
+class TestDetachChild(SimpleTestCase):
+    def test_when_child_not_in_children(self):
+        link = LinkFactory()
+        unexisting_child = NodeGroupYearFactory()
+        with self.assertRaises(StopIteration):
+            link.parent.detach_child(unexisting_child)
+
+    def test_when_child_is_correctly_detached(self):
+        common_parent = NodeGroupYearFactory()
+        link1 = LinkFactory(parent=common_parent)
+        link2 = LinkFactory(parent=common_parent)
+        link3 = LinkFactory(parent=common_parent)
+
+        common_parent.detach_child(link1.child)
+
+        expected_result = [link2, link3]
+        assertion_msg = "Link {} should have been removed from children".format(link1)
+        self.assertListEqual(common_parent.children, expected_result, assertion_msg)
+
+        assertion_msg = "Link {} should have been added to deleted children".format(link1)
+        expected_result = {link1}
+        self.assertSetEqual(common_parent._deleted_children, expected_result,assertion_msg)

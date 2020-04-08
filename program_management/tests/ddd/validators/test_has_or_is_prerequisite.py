@@ -28,11 +28,9 @@ from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType
-from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
-from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
