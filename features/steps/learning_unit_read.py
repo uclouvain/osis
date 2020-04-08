@@ -27,7 +27,7 @@ from behave import *
 from behave.runner import Context
 from selenium.webdriver.common.by import By
 
-from attribution.models.attribution_new import AttributionNew
+import program_management.views.tree.move
 
 use_step_matcher("parse")
 
@@ -155,7 +155,7 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page.up.click()
+    program_management.views.tree.move.up.click()
     time.sleep(1)
 
 
