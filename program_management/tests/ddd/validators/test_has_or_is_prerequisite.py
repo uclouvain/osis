@@ -28,9 +28,9 @@ from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
 from base.models.enums.education_group_types import TrainingType, GroupType
-from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
+from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -98,3 +98,23 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
         test = validator.is_valid()
         self.assertTrue(test)
         self.assertListEqual(validator.messages, [], msg)
+
+
+class TestHasPrerequisiteValidator(SimpleTestCase):
+
+    def test_when_node_to_detach_is_group(self):
+        node_to_detach = NodeGroupYearFactory()
+        link = LinkFactory(child=node_to_detach)
+        tree = ProgramTreeFactory(root_node=link.parent)
+        validator = HasPrerequisiteValidator(tree, node_to_detach)
+        with self.assertRaises(AttributeError):
+            assertion_message = "This validator is pertinent only for NodeLearningUnitYear objects"
+            validator.is_valid()
+
+    def test_when_node_to_detach_is_learning_unit_and_has_prerequisite(self):
+        # TODO :: to implement in OSIS-4531
+        pass
+
+    def test_when_node_to_detach_is_learning_unit_and_has_no_prerequisite(self):
+        # TODO :: to implement in OSIS-4531
+        pass
