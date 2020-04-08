@@ -151,7 +151,6 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
     class Meta:
         model = EducationGroupYear
         field_classes = {
-            #"management_entity": ManagementEntitiesVersionChoiceField,
             "main_teaching_campus": MainCampusChoiceField,
             "enrollment_campus": MainCampusChoiceField,
             "education_group_type": EducationGroupTypeModelChoiceField,
