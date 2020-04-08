@@ -199,13 +199,25 @@ class LearningUnitPage(CommonPageMixin, pypom.Page):
     tab_description = Link(DescriptionPage, By.ID, "description_link")
     tab_specification = Link(SpecificationPage, By.ID, "specification_link")
 
+    proposal_state = Field(By.ID, "id_proposal_state")
+
     def __init__(self, *args, **kwargs):
         self._edit_button()
+        self._consolidate_proposal()
+        self._confirm_consolidate()
         super().__init__(*args, **kwargs)
 
     @classmethod
     def _edit_button(cls):
         cls.edit_button = Link(LearningUnitEditPage, By.CSS_SELECTOR, "#link_edit_lu > a")
+
+    @classmethod
+    def _consolidate_proposal(cls):
+        cls.consolidate_proposal = Link(LearningUnitPage, By.CSS_SELECTOR, "#link_consolidate_proposal > a")
+
+    @classmethod
+    def _confirm_consolidate(cls):
+        cls.confirm_consolidate = Link(LearningUnitPage, By.ID, "id_confirm_consolidate")
 
     def is_li_edit_link_disabled(self):
         return "disabled" in self.find_element(By.ID, "link_edit_lu").get_attribute("class")
@@ -300,7 +312,8 @@ class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
         requirement_entity = CharField(By.CSS_SELECTOR, "td:nth-child(6)")
 
     class ProposalLearningUnitElement(pypom.Region):
-        acronym = CharField(By.CSS_SELECTOR, "td:nth-child(3)")
+        acronym = Link(LearningUnitPage, By.CSS_SELECTOR, "td:nth-child(3)")
+        proposal_type = CharField(By.CSS_SELECTOR, "td:nth-child(8)")
 
     @property
     def results(self):
@@ -317,3 +330,8 @@ class SearchLearningUnitPage(CommonPageMixin, pypom.Page):
     def find_acronym_in_table(self, row: int = 1):
         selector = '#table_learning_units > tbody > tr:nth-child({}) > td.col-acronym > a'.format(row)
         return self.find_element(By.CSS_SELECTOR, selector).text
+
+
+class SearchProposalPage(SearchLearningUnitPage):
+    URL_TEMPLATE = None
+    proposal_type = SelectField(By.ID, 'id_proposal_type')

@@ -35,9 +35,8 @@ use_step_matcher("re")
 
 @step("Aller sur la page de recherche d'UE")
 def step_impl(context: Context):
-    url = '/learning_units/by_activity/'
+    url = 'learning_units'
     SearchLearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
-    context.test.assertEqual(context.browser.current_url, context.get_url(url))
 
 
 @step("Réinitialiser les critères de recherche")

@@ -1,5 +1,6 @@
 Feature: Recherche des organisations.
 
+  # FIXME Should not create user with permission
   Background:
     Given La base de données est dans son état initial.
     And L'utilisateur a la permission can_access_student.

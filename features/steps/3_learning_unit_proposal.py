@@ -28,7 +28,6 @@ from behave.runner import Context
 from django.urls import reverse
 from selenium.webdriver.common.by import By
 
-from base.models.academic_year import current_academic_year
 from base.models.entity import Entity
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -61,7 +60,6 @@ def step_impl(context: Context, acronym: str, year: str):
 
 @given("Aller sur la page de detail de l'ue: {acronym}")
 def step_impl(context: Context, acronym: str):
-    year = current_academic_year().year + 1
     luy = LearningUnitYear.objects.get(acronym=acronym)
     url = reverse('learning_unit', args=[luy.pk])
 
@@ -118,15 +116,6 @@ def step_impl(context):
     page.back_to_initial_yes.click()
 
 
-@step("Cliquer sur « Oui » pour consolider")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    page = SearchLearningUnitPage(driver=context.browser)
-    page.consolidate_yes.click()
-
-
 @then("Vérifier que la proposition {acronym} a été {msg}.")
 def step_impl(context, acronym, msg):
     """
@@ -135,16 +124,6 @@ def step_impl(context, acronym, msg):
     page = LearningUnitPage(driver=context.browser)
     context.test.assertIn(acronym, page.success_messages.text)
     context.test.assertIn(msg, page.success_messages.text)
-
-
-@step("Cliquer sur « Consolider »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    page = SearchLearningUnitPage(driver=context.browser)
-    page.find_element(By.ID, 'btn_modal_consolidate').click()
-    time.sleep(1)
 
 
 @step("Cliquer sur le menu « Mettre en proposition de modification »")
