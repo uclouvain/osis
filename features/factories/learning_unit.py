@@ -69,7 +69,16 @@ class LearningUnitGenerator:
         return self._create_learning_units(n=n)
 
     def create_learning_units_in_creation_proposal(self, proposal_academic_year):
-        learning_units = self.create_all_types(n=5)
+        proposal_academic_year_obj = next(acy for acy in self.academic_years_range if acy.year == proposal_academic_year)
+        learning_units = LearningUnitFactoryWithAnnualizedData.create_batch(
+            5,
+            start_year__year=proposal_academic_year,
+            learningunityears__academic_years=[proposal_academic_year_obj],
+            learningunityears__learning_container_year__requirement_entity=factory.Iterator(
+                self.entities_version, getter=lambda ev: ev.entity
+            ),
+            learningunityears__campus=factory.LazyFunction(lambda: random.choice(self.campuses)),
+        )
 
         luys_obj = LearningUnitYear.objects.filter(
             learning_unit__in=learning_units,

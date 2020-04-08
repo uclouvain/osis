@@ -25,6 +25,7 @@ import random
 
 from behave import *
 from behave.runner import Context
+from django.utils.translation import gettext_lazy as _
 
 from features.forms.learning_units import search_proposal_form, update_proposal_form
 from features.pages.learning_unit.pages import SearchProposalPage, EditLearningUnitProposalPage, LearningUnitPage
@@ -88,8 +89,5 @@ def step_impl(context: Context):
 @step("Vérifier que la proposition a été consolidée avec succès")
 def step_impl(context: Context):
     page = LearningUnitPage(driver=context.browser)
-    context.test.assertEqual(
-        page.proposal_state.text,
-        context.form_data["proposal_state"]
-    )
+    context.test.assertIn(str(_('successfully consolidated')), page.success_messages.text)
 
