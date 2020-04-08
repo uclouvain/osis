@@ -142,26 +142,6 @@ def step_impl(context: Context):
     context.test.assertLearningUnitHasBeenUpdated(page, context.form_data)
 
 
-@step("Encoder pour le partim {value} comme {field}")
-def step_impl(context: Context, value: str, field: str):
-    page = NewPartimPage(driver=context.browser)
-    slug_field = slugify(field).replace('-', '_')
-    if hasattr(page, slug_field):
-        setattr(page, slug_field, value)
-    else:
-        raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
-
-
-@step("Encoder pour nouvelle UE {value} comme {field}")
-def step_impl(context: Context, value: str, field: str):
-    page = NewLearningUnitPage(driver=context.browser)
-    slug_field = slugify(field).replace('-', '_')
-    if hasattr(page, slug_field):
-        setattr(page, slug_field, value)
-    else:
-        raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
-
-
 @step("Encoder {value} comme {field}")
 def step_impl(context: Context, value: str, field: str):
     page = LearningUnitEditPage(driver=context.browser)
