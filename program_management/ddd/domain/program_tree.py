@@ -32,6 +32,7 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     DetachNodeValidatorList
 from program_management.models.enums import node_type
@@ -208,8 +209,11 @@ class ProgramTree:
         :param path_to_node_to_detach: The path node to detach
         :return:
         """
+        validator = PathValidator(path_to_node_to_detach)
+        if not validator.is_valid():
+            return False, validator.messages
         node_to_detach = self.get_node(path_to_node_to_detach)
-        if self.is_root(node_to_detach):
+        if self.is_root(node_to_detach):  # TODO :: use a Validator instead?
             return False, [BusinessValidationMessage(_("Cannot perform detach action on root."), MessageLevel.ERROR)]
         parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
         parent = self.get_node(parent_path)

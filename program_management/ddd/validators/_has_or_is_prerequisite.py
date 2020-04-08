@@ -93,7 +93,6 @@ class HasPrerequisiteValidator(BusinessValidator):
         self.tree = tree
 
     def validate(self):
-        # TODO :: unit test
         if self.node_to_detach.has_prerequisite:
             codes_that_have_prerequisites = [node.code for node in self.tree.get_nodes_that_have_prerequisites()]
             self.add_warning_message(

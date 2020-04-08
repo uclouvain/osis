@@ -23,32 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
 from django.utils.translation import gettext as _
 
-from base.ddd.utils.validation_message import BusinessValidationMessageList
+from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree import PATH_SEPARATOR
-from program_management.ddd.repositories import load_tree, persist_tree
-from program_management.ddd.service import prerequisite_service
-from program_management.ddd.validators._path_validator import PathValidator
 
 
-def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessageList:
-    validator = PathValidator(path_to_detach)
-    if not validator.is_valid():
-        return BusinessValidationMessageList(messages=validator.messages)
+class PathValidator(BusinessValidator):
 
-    root_id = int(path_to_detach.split(PATH_SEPARATOR)[0])
+    def __init__(self, path: 'Path'):
+        super(PathValidator, self).__init__()
+        self.path = path
 
-    working_tree = load_tree.load(root_id)
-    node_to_detach = working_tree.get_node(path_to_detach)
-
-    is_valid, messages = working_tree.detach_node(path_to_detach)
-    messages += prerequisite_service.check_is_prerequisite_in_trees_using_node(node_to_detach=node_to_detach)
-
-    if is_valid and commit:
-        persist_tree.persist(working_tree)  # TODO :: unit tests persist !
-
-    return BusinessValidationMessageList(messages=messages)
+    def validate(self):
+        if not self.path:
+            self.add_error_message(_('Invalid tree path'))
+        else:
+            try:
+                root_ids = [int(node_id) for node_id in self.path.split('|')]
+            except Exception as e:
+                self.add_error_message(_('Invalid tree path'))

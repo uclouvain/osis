@@ -25,9 +25,12 @@
 ##############################################################################
 from unittest import mock
 
+from django.contrib.messages import get_messages
+from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 
+from base.ddd.utils.validation_message import BusinessValidationMessageList, BusinessValidationMessage
 from base.tests.factories.person import PersonFactory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.detach import DetachNodeForm
@@ -74,7 +77,8 @@ class TestDetachNodeView(TestCase):
             response = getattr(self.client, method)(self.url)
             self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    def test_get_ensure_path_args_is_set_as_initial_on_form(self):
+    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
+    def test_get_ensure_path_args_is_set_as_initial_on_form(self, mock):
         path_to_detach = "|".join([
             str(self.tree.root_node.pk),
             str(self.tree.root_node.children[0].child.pk)
@@ -89,14 +93,15 @@ class TestDetachNodeView(TestCase):
 
     def test_post_with_invalid_path(self):
         response = self.client.post(self.url, data={'path': 'dummy_path'})
-        self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
 
-        self.assertTrue('form' in response.context)
-        self.assertIsInstance(response.context['form'], DetachNodeForm)
-        self.assertTrue(response.context['form'].errors['path'])
+        messages = [m.message for m in get_messages(response.wsgi_request)]
 
-    @mock.patch('program_management.forms.tree.detach.DetachNodeForm.save', return_value=None)
+        self.assertListEqual(messages, ['Invalid tree path'])
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+    @mock.patch('program_management.forms.tree.detach.DetachNodeForm.save')
     def test_post_with_valid_path_ensure_form_save_called(self, mock_form_save):
+        mock_form_save.return_value = BusinessValidationMessageList(messages=[BusinessValidationMessage('Success')])
         path_to_detach = "|".join([
             str(self.tree.root_node.pk),
             str(self.tree.root_node.children[0].child.pk)

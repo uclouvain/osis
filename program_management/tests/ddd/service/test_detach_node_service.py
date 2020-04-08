@@ -54,7 +54,7 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
 
         self._patch_persist_tree()
         self._patch_load_tree()
-        self._patch_load_trees_from_children()
+        self._patch_check_is_prerequisite()
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
@@ -67,11 +67,12 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load = patcher_load.start()
         self.mock_load.return_value = self.tree
 
-    def _patch_load_trees_from_children(self):
+    def _patch_check_is_prerequisite(self):
         check_prereq = "program_management.ddd.service.prerequisite_service.check_is_prerequisite_in_trees_using_node"
         patcher_load = patch(check_prereq)
         self.addCleanup(patcher_load.stop)
         self.mock_check_is_prerequisite = patcher_load.start()
+        self.mock_check_is_prerequisite.return_value = []
 
     def test_when_path_to_detach_is_none(self):
         path_to_detach = None
@@ -110,7 +111,7 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertIn("Error is Prerequisite in Tree3", result.messages, assertion_msg)
 
     def test_when_commit_is_true(self):
-        detach_node_service.detach_node(self.path_to_detach, commit=True)
+        result = detach_node_service.detach_node(self.path_to_detach, commit=True)
         self.assertTrue(self.mock_persist.called)
 
     def test_when_commit_is_false(self):

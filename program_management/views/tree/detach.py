@@ -34,7 +34,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class DetachNodeView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
-    template_name = "tree/detach_confirmation.html"
+    template_name = "tree/detach_confirmation_inner.html"
     form_class = DetachNodeForm
     # partial_reload = True
 
@@ -66,7 +66,7 @@ class DetachNodeView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return ""
+        return
 
 
 # class DetachNodeView2(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):

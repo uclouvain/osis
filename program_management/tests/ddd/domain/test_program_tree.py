@@ -25,13 +25,16 @@
 ##############################################################################
 import inspect
 from unittest.mock import patch
+
 from django.test import SimpleTestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
-from program_management.ddd.domain.program_tree import ProgramTree, PATH_SEPARATOR, build_path
+from program_management.ddd.domain.program_tree import ProgramTree, build_path
+from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     DetachNodeValidatorList
 from program_management.models.enums import node_type
@@ -41,7 +44,6 @@ from program_management.tests.ddd.factories.node import NodeEducationGroupYearFa
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
-from django.utils.translation import gettext_lazy as _
 
 
 class TestGetNodeProgramTree(SimpleTestCase):
@@ -81,17 +83,17 @@ class TestGetNodeByIdAndTypeProgramTree(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_None_when_no_node_present_with_corresponding_node_id(self):
-        result = self.tree.get_node_by_id_and_type(2, node_type.NodeType.LEARNING_UNIT)
+        result = self.tree.get_node_by_id_and_class(2, node_type.NodeType.LEARNING_UNIT)
         self.assertIsNone(result)
 
     def test_should_return_node_matching_specific_node_id_with_respect_to_class(self):
-        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.LEARNING_UNIT)
+        result = self.tree.get_node_by_id_and_class(1, node_type.NodeType.LEARNING_UNIT)
         self.assertEqual(
             result,
             self.learning_unit_node
         )
 
-        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.GROUP)
+        result = self.tree.get_node_by_id_and_class(1, node_type.NodeType.GROUP)
         self.assertEqual(
             result,
             self.subgroup_node
@@ -188,10 +190,12 @@ class TestDetachNodeProgramTree(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.link1.parent)
 
     def test_detach_node_case_invalid_path(self):
-        with self.assertRaises(node.NodeNotFoundException):
-            self.tree.detach_node(path="dummy_path")
+        is_valid, messages = self.tree.detach_node("dummy_path")
+        self.assertFalse(is_valid)
+        self.assertListEqual(messages, [BusinessValidationMessage('Invalid tree path', level=MessageLevel.ERROR)])
 
-    def test_detach_node_case_valid_path(self):
+    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
+    def test_detach_node_case_valid_path(self, mock):
         path_to_detach = "|".join([
             str(self.link1.parent.pk),
             str(self.link1.child.pk),
@@ -205,8 +209,10 @@ class TestDetachNodeProgramTree(SimpleTestCase):
         )
 
     def test_detach_node_case_try_to_detach_root_node(self):
-        with self.assertRaises(Exception):
-            self.tree.detach_node(str(self.link1.parent.pk))
+        is_valid, messages = self.tree.detach_node(str(self.link1.parent.pk))
+        self.assertFalse(is_valid)
+        expected_error = BusinessValidationMessage(_("Cannot perform detach action on root."), level=MessageLevel.ERROR)
+        self.assertListEqual(messages, [expected_error])
 
 
 class TestGetParentsUsingNodeAsReference(SimpleTestCase):

@@ -33,7 +33,6 @@ from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequi
 def check_is_prerequisite_in_trees_using_node(node_to_detach: 'Node') -> List['BusinessValidationMessage']:
     messages = []
     for tree in __get_trees_using_node(node_to_detach):
-        node_to_detach = tree.get_node_by_id_and_class(node_to_detach.pk, node_to_detach.__class__)
         validator = IsPrerequisiteValidator(tree, node_to_detach)
         if not validator.is_valid():
             messages += validator.messages
