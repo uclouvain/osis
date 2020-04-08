@@ -3,8 +3,8 @@ from django.test import SimpleTestCase, RequestFactory
 from rest_framework.reverse import reverse
 
 from base.models.enums import prerequisite_operator
-from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializer, \
-    PrerequisiteItemSerializer
+from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializerLearningUnit, \
+    LearningUnitBaseSerializer
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -44,7 +44,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': self.root_node.year,
                                                                                'acronym': self.root_node.code})
         self.request = RequestFactory().get(url)
-        self.serializer = EducationGroupPrerequisitesSerializer(self.ldroi100a, context={
+        self.serializer = EducationGroupPrerequisitesSerializerLearningUnit(self.ldroi100a, context={
             'request': self.request,
             'language': settings.LANGUAGE_CODE_EN,
             'tree': self.tree
@@ -77,13 +77,13 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
             self.assertEqual(str(self.ldroi100a.prerequisite), self.serializer.data.get('prerequisites_string'))
 
 
-class TestPrerequisiteItemSerializer(SimpleTestCase):
+class TestLearningUnitBaseSerializer(SimpleTestCase):
     def setUp(self):
         self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
 
         url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': 2018, 'acronym': 'LDROI1300'})
         self.request = RequestFactory().get(url)
-        self.serializer = PrerequisiteItemSerializer(self.ldroi1300, context={
+        self.serializer = LearningUnitBaseSerializer(self.ldroi1300, context={
             'request': self.request,
             'language': settings.LANGUAGE_CODE_EN,
         })

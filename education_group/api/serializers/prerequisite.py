@@ -31,9 +31,10 @@ from learning_unit.api.serializers.utils import LearningUnitDDDHyperlinkedIdenti
 from program_management.ddd.domain.node import Node
 
 
-class BaseCommomSerializer(serializers.Serializer):
+class LearningUnitBaseSerializer(serializers.Serializer):
     title = serializers.SerializerMethodField()
     url = LearningUnitDDDHyperlinkedIdentityField(read_only=True)
+    code = serializers.CharField(read_only=True)
 
     def get_title(self, obj: 'Node'):
         if self.context.get('language') == settings.LANGUAGE_CODE_EN:
@@ -49,12 +50,7 @@ class BaseCommomSerializer(serializers.Serializer):
         return complete_title
 
 
-class PrerequisiteItemSerializer(BaseCommomSerializer):
-    code = serializers.CharField(read_only=True)
-
-
-class EducationGroupPrerequisitesSerializer(BaseCommomSerializer):
-    code = serializers.CharField(read_only=True)
+class EducationGroupPrerequisitesSerializerLearningUnit(LearningUnitBaseSerializer):
     prerequisites_string = serializers.CharField(source='prerequisite', read_only=True)
     prerequisites = serializers.SerializerMethodField()
 
@@ -64,8 +60,6 @@ class EducationGroupPrerequisitesSerializer(BaseCommomSerializer):
             for prerequisite in prig.prerequisite_items:
                 node = self.context.get('tree').get_node_by_code_and_year(prerequisite.code, prerequisite.year)
                 list_nodes.append(node)
-        return PrerequisiteItemSerializer(list_nodes,
-                                          many=True,
-                                          context=self.context).data
+        return LearningUnitBaseSerializer(list_nodes, many=True, context=self.context).data
 
 

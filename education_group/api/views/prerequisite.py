@@ -29,7 +29,7 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializer
+from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializerLearningUnit
 from program_management.ddd.repositories import load_tree
 
 
@@ -38,8 +38,8 @@ class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.L
         Return the prerequisites of an education group
     """
     name = 'education_group-prerequisites'
-    serializer_class = EducationGroupPrerequisitesSerializer
-    queryset = EducationGroupYear.objects.all().select_related('education_group_type', 'academic_year')
+    serializer_class = EducationGroupPrerequisitesSerializerLearningUnit
+    queryset = EducationGroupYear.objects.all().select_related('academic_year')
     pagination_class = None
     filter_backends = ()
 
@@ -86,11 +86,11 @@ class MiniTrainingPrerequisites(EducationGroupYearPrerequisites):
     )
 
     def get_object(self):
-        acronym = self.kwargs['partial_acronym']
+        partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
         return get_object_or_404(
             self.queryset,
-            partial_acronym__iexact=acronym,
+            partial_acronym__iexact=partial_acronym,
             academic_year__year=year
         )
 
