@@ -46,6 +46,20 @@ def step_impl(context: Context):
     page.search.click()
 
 
+@step("Rechercher propositions de suppression")
+def step_impl(context: Context):
+    page = SearchProposalPage(driver=context.browser)
+    context.form_data = search_proposal_form.fill_search_suppression_proposal(page)
+    page.search.click()
+
+
+@step("Rechercher propositions de modification")
+def step_impl(context: Context):
+    page = SearchProposalPage(driver=context.browser)
+    context.form_data = search_proposal_form.fill_search_modification_proposal(page)
+    page.search.click()
+
+
 @step("Sélectionner une proposition")
 def step_impl(context: Context):
     page = SearchProposalPage(driver=context.browser)

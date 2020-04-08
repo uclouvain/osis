@@ -137,6 +137,11 @@ class LearningUnitGenerator:
                 initial_data=copy_learning_unit_data(luy)
             )
 
+        acy = AcademicYear.objects.get(year=proposal_academic_year)
+        for lu in learning_units:
+            lu.end_date = acy
+            lu.save()
+
         return learning_units
 
     def _create_learning_units(self, n=60, **kwargs):

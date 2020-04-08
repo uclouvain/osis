@@ -29,3 +29,15 @@ def fill_search_creation_proposal(page: pages.SearchProposalPage):
     proposal_type = ProposalType.CREATION.name
     page.proposal_type = proposal_type
     return {"proposal_type": proposal_type}
+
+
+def fill_search_suppression_proposal(page: pages.SearchProposalPage):
+    proposal_type = ProposalType.SUPPRESSION.name
+    page.proposal_type = proposal_type
+    return {"proposal_type": proposal_type}
+
+
+def fill_search_modification_proposal(page: pages.SearchProposalPage):
+    proposal_type = ProposalType.MODIFICATION.name
+    page.proposal_type = proposal_type
+    return {"proposal_type": proposal_type}
