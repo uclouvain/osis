@@ -24,7 +24,7 @@
 #
 ############################################################################
 from django.views.generic import CreateView
-from rules.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.achievement import EducationGroupAchievementForm, EducationGroupDetailedAchievementForm
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
@@ -36,7 +36,6 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
                                       CreateView):
     template_name = "education_group/blocks/form/update_achievement.html"
     form_class = EducationGroupAchievementForm
-    rules = []
     permission_required = 'base.add_educationgroupachievement'
 
     def form_valid(self, form):
@@ -44,14 +43,13 @@ class CreateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin
         return super().form_valid(form)
 
     def get_permission_object(self):
-        return self.education_group_achievement.education_group_year
+        return self.education_group_year
 
 
 class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTemplateMixin,
                                               EducationGroupDetailedAchievementMixin, CreateView):
     form_class = EducationGroupDetailedAchievementForm
     template_name = "education_group/blocks/form/update_achievement.html"
-    rules = []
     permission_required = 'base.add_educationgroupachievement'
 
     def form_valid(self, form):
@@ -59,4 +57,4 @@ class CreateEducationGroupDetailedAchievement(PermissionRequiredMixin, AjaxTempl
         return super().form_valid(form)
 
     def get_permission_object(self):
-        return self.education_group_achievement.education_group_year
+        return self.education_group_year

@@ -100,7 +100,7 @@ def _update_certificate_aims(request, root_id, education_group_year):
 
 
 @login_required
-@permission_required('base.change_educationgroup', fn=get_education_group_year_by_pk)
+@permission_required('base.change_educationgroup', fn=get_education_group_year_by_pk, raise_exception=True)
 def update_education_group_year(request, root_id, education_group_year_id):
     education_group_year = get_education_group_year_by_pk(request, root_id, education_group_year_id)
     # Store root in the instance to avoid to pass the root in methods

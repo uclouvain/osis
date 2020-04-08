@@ -26,7 +26,7 @@
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from rules.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.business.education_groups import delete
 from base.models.education_group import EducationGroup

@@ -181,9 +181,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.locmem_cache.clear()
         self.patch = mock.patch.object(utils.cache, 'cache', self.locmem_cache)
         self.patch.start()
-
-    def tearDown(self):
-        self.patch.stop()
+        self.addCleanup(self.patch.stop)
 
     def test_get_request(self):
         response = self.client.get(self.url, data={})

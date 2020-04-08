@@ -42,9 +42,9 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
-from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.person import PersonFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 
 DELETE_MSG = _("delete education group")
 PERMISSION_DENIED_MSG = _("This education group is not editable during this period.")
@@ -63,13 +63,8 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     def setUpTestData(cls):
         academic_year = AcademicYearFactory(year=2020)
         cls.education_group_year = TrainingFactory(academic_year=academic_year)
-        cls.person = CentralManagerFactory(
-            "delete_educationgroup",
-            "change_educationgroup",
-            "add_educationgroup",
-            "can_edit_education_group_administrative_data"
-        )
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        cls.person = PersonFactory()
+        CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
         cls.url = reverse('delete_education_group', args=[cls.education_group_year.id, cls.education_group_year.id])
 
@@ -152,8 +147,8 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
     def setUpTestData(cls):
         academic_year = AcademicYearFactory(year=2020)
         cls.education_group_year = TrainingFactory(academic_year=academic_year)
-        cls.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        cls.person = PersonFactory()
+        FacultyManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
         # Create an academic calendar in order to check permission [Faculty can modify when period is opened]
         cls.academic_calendar = AcademicCalendarFactory(
@@ -214,7 +209,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             self.assertEqual(result, {"title": message,
                                       "id": "id", "value": "edit", 'disabled': disabled_status,
                                       'icon': "glyphicon glyphicon-edit"})
-
 
 
 class TestEducationGroupDlWithParent(TestCase):

@@ -44,7 +44,7 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base import models as mdl
-from base.business.education_group import can_user_edit_administrative_data, has_coorganization
+from base.business import education_group as education_group_business
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
@@ -261,7 +261,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
-        context["show_coorganization"] = has_coorganization(self.object)
+        context["show_coorganization"] = education_group_business.has_coorganization(self.object)
         context["is_finality_types"] = context["education_group_year"].is_finality
         return context
 
@@ -481,7 +481,8 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
             'course_enrollment_dates': course_enrollment_dates,
             'mandataries': mandataries,
             'pgm_mgrs': pgm_mgrs,
-            "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
+            "can_edit_administrative_data":
+                education_group_business.can_user_edit_administrative_data(self.request.user, self.object)
         })
         context.update(get_sessions_dates(self.object))
 

@@ -30,7 +30,7 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
-from rules.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm, \
     EducationGroupEntityPublicationContactForm

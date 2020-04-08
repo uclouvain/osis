@@ -159,6 +159,12 @@ class EntityVersionQuerySet(models.QuerySet):
         tree = self.get_tree(entity, date)
         return self.filter(pk__in=[node['id'] for node in tree[1:]]).order_by('acronym')
 
+    def pedagogical_entities(self):
+        return self.filter(
+            Q(entity__organization__type=MAIN),
+            Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
+        )
+
 
 class EntityVersion(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
@@ -531,12 +537,7 @@ def _get_all_children(entity_version_id, direct_children_by_entity_version_id):
 
 
 def find_pedagogical_entities_version():
-    return find_all_current_entities_version().filter(
-        Q(entity__organization__type=MAIN),
-        Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
-    ).order_by(
-        'acronym'
-    )
+    return find_all_current_entities_version().pedagogical_entities().order_by('acronym')
 
 
 def find_latest_version_by_entity(entity, date):

@@ -12,7 +12,7 @@ class TestCentralManager(SimpleTestCase):
 
     def test_assert_group_name_meta_property(self):
         instance = CentralManager()
-        self.assertEquals(instance._meta.group_name, "central_manager")
+        self.assertEquals(instance._meta.group_name, "central_managers")
 
     def test_assert_rule_sets_class_method(self):
         self.assertIsInstance(

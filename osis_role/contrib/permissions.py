@@ -39,11 +39,10 @@ class ObjectPermissionBackend(ModelBackend):
         errors.clear_permission_error(user_obj, perm)
         results = set()
         for role_mdl in _get_relevant_roles(user_obj, perm):
-            qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))
-            if qs.exists():
-                rule_set = role_mdl.rule_set()
-                _add_role_queryset_to_perms_context(rule_set, perm, qs)
-                results.add(rule_set.test_rule(perm, user_obj, *args, **kwargs))
+            rule_set = role_mdl.rule_set()
+            role_qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))
+            _add_role_queryset_to_perms_context(rule_set, perm, role_qs)
+            results.add(rule_set.test_rule(perm, user_obj, *args, **kwargs))
         return any(results) or super().has_perm(user_obj, perm, obj=kwargs.get('obj'))
 
     def has_module_perms(self, user_obj, app_label, *args, **kwargs):

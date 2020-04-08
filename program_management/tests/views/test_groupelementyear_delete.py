@@ -37,7 +37,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.utils.cache import ElementCache
 
@@ -50,7 +50,7 @@ class TestDetach(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch__academic_year=cls.academic_year)
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerForUEFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,
@@ -143,7 +143,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
             child_branch=None,
             child_leaf=cls.luy
         )
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerForUEFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,

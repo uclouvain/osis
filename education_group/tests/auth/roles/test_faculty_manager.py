@@ -12,7 +12,7 @@ class TestFacultyManager(SimpleTestCase):
 
     def test_assert_group_name_meta_property(self):
         instance = FacultyManager()
-        self.assertEquals(instance._meta.group_name, "faculty_manager")
+        self.assertEquals(instance._meta.group_name, "faculty_managers")
 
     def test_assert_rule_sets_class_method(self):
         self.assertIsInstance(

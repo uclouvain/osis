@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from rules.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
@@ -33,18 +33,18 @@ from base.views.mixins import DeleteViewWithDependencies
 class DeleteEducationGroupAchievement(PermissionRequiredMixin, EducationGroupAchievementMixin,
                                       DeleteViewWithDependencies):
     template_name = "education_group/delete.html"
-    rules = []
     permission_required = 'base.delete_educationgroupachievement'
+    raise_exception = True
 
     def get_permission_object(self):
-        return self.education_group_achievement.education_group_year
+        return self.education_group_year
 
 
 class DeleteEducationGroupDetailedAchievement(PermissionRequiredMixin,
                                               EducationGroupDetailedAchievementMixin, DeleteViewWithDependencies):
     template_name = "education_group/delete.html"
-    rules = []
     permission_required = 'base.delete_educationgroupachievement'
+    raise_exception = True
 
     def get_permission_object(self):
-        return self.education_group_achievement.education_group_year
+        return self.education_group_year

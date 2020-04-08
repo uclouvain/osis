@@ -1994,6 +1994,11 @@
                     "is_institution_administrator",
                     "base",
                     "person"
+                ],
+                [
+                    "change_educationgroupcertificateaim",
+                    "base",
+                    "educationgroupcertificateaim"
                 ]
             ]
         }
