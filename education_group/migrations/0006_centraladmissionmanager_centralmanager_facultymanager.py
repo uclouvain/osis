@@ -84,7 +84,7 @@ def create_central_admission_rows(apps, shema_editor):
 
     central_admission_managers = Person.objects.filter(user__groups__name='sic')
     for central_admission_manager in central_admission_managers:
-        CentralAdmissionManager.objects.create(person=central_admission_manager.pk)
+        CentralAdmissionManager.objects.create(person=central_admission_manager)
 
     sic_group = Group.objects.filter(name='sic').first()
     if sic_group:
