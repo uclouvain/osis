@@ -32,12 +32,24 @@ from django.utils.translation import gettext as _
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_postpone_education_group, \
     is_eligible_to_change_education_group_content
+from base.models import program_manager
 from base.models.academic_year import AcademicYear
 from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
 
 register = template.Library()
+
+
+# TODO: Remove when migration of Program Manager is done with OSIS-Role Module
+@register.simple_tag
+def have_only_access_to_certficiate_aims(user, education_group_year):
+    """
+    [Backward-compatibility] This templatetag as been created in order to allow
+    program_manager to be redirected to update_certificate_aims
+    """
+    return program_manager.is_program_manager(user, education_group=education_group_year.education_group) \
+        and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
