@@ -48,14 +48,10 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
-def load(tree_root_id: int, version_name, transition, year, acronym) -> 'ProgramTree':
+def load(tree_root_id: int) -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
-    version = EducationGroupVersion.objects.filter(offer__acronym=acronym,
-                                                   offer__academic_year__year=year,
-                                                   version_name=version_name,
-                                                   is_transition=transition)\
-        .select_related('root_group', 'offer').first()
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
+
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
     links = __load_tree_links(structure)

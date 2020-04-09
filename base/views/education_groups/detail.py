@@ -77,13 +77,11 @@ from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.find_roots import find_roots
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.enums import node_type
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from webservices.business import CONTACT_INTRO_KEY
 from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.forms.program_version import ProgramVersionForm
-from program_management.models.education_group_version import EducationGroupVersion
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -185,11 +183,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            program_tree = load_tree.load(self.offer.id,
-                                          '' if self.version_name == '-' else self.version_name,
-                                          self.transition == 'transition',
-                                          self.offer.academic_year.year,
-                                          self.offer.acronym)
+            program_tree = load_tree.load(self.offer.id)
             serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
             context["current_node"] = program_tree.get_node_by_id_and_type(
