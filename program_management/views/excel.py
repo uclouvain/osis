@@ -29,7 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import EducationGroupYear
-from base.utils.download import set_download_cookie
+from osis_common.decorators.download import set_download_cookie
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel

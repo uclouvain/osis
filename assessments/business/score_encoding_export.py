@@ -33,7 +33,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
-from base.utils.download import set_download_cookie
+from osis_common.decorators.download import set_download_cookie
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
           _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof')]
