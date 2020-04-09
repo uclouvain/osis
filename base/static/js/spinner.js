@@ -30,7 +30,7 @@ function isDownloadCompleted(){
 
 $(document).ready(function() {
     closeOverlaySpinner();
-    $('.no_spinner').click(() => {
+    $('.download').click(() => {
         downloadInterval = setInterval(isDownloadCompleted, 2000);
     });
 });
