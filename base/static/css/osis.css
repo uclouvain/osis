@@ -537,5 +537,6 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .version_value {
-    color: #5CB85C;
+    color: grey;
+    font-style: italic;;
 }

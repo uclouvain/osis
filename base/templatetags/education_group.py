@@ -270,9 +270,9 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
                                    is_particular=False):
     value = None
     parent_value = None
+
+    class_dl = _get_css(key, class_dl, is_particular)
     if obj:
-        if isinstance(obj, EducationGroup):
-            class_dl = _get_css(key, class_dl, is_particular)
         value = get_verbose_field_value(obj, key)
 
         if not dl_title:
@@ -319,4 +319,6 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
 
 
 def _get_css(key, class_dl, is_particular):
-    return "{} version_value".format(class_dl) if is_particular and key in VERSIONED_FIELDS else class_dl
+    return "{} version_value".format(class_dl) if is_particular and key not in VERSIONED_FIELDS else class_dl
+
+
