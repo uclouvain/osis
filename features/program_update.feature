@@ -72,10 +72,3 @@ Feature: Modification de programme
     And Ouvrir LDRMM900R dans l’arbre
     And LDROI2108 se trouve bien dans l'arbre sous LDRMM900R
     And LDROI2108 ne se trouve plus bien dans l'arbre sous LDRCC900R
-
-# Created by ndizera at 11/03/2020
-Feature: #Enter feature name here
-  # Enter feature description here
-
-  Scenario: # Enter scenario name here
-    # Enter steps here

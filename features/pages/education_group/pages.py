@@ -36,6 +36,30 @@ class AttachModalPage(AjaxModal):
     save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 6)
 
 
+class NewTrainingPage(pypom.Page):
+    sigleintitule_abrege = InputField(By.ID, 'id_acronym')
+    code = InputField(By.ID, 'id_partial_acronym')
+    intitule_en_francais = InputField(By.ID, 'id_title')
+    intitule_en_anglais = InputField(By.ID, 'id_title_english')
+    entite_de_gestion = SelectEntityVersionField(By.ID, 'id_management_entity')
+    entite_dadministration = SelectEntityVersionField(By.ID, 'id_administration_entity')
+    intitule_du_diplome = InputField(By.ID, 'id_diploma_printing_title')
+
+    tab_diploma = ButtonField(By.ID, 'lnk_diplomas_certificats')
+
+    def __init__(self, *args, **kwargs):
+        self._save_button()
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def _save_button(cls):
+        cls.save_button = Link(EducationGroupPage, By.ID, 'btn-confirm')
+
+
+class UpdateTrainingPage(NewTrainingPage):
+    fin = SelectField(By.ID, 'id_end_year')
+
+
 class EducationGroupPage(CommonPageMixin, pypom.Page):
     sigleintitule_abrege = Field(
         By.CSS_SELECTOR,
@@ -55,7 +79,7 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
     )
     actions = ButtonField(By.ID, 'dLabel')
     end_year = Field(By.ID, "end_year")
-    modify = Link('UpdateTrainingPage', By.CSS_SELECTOR, '#link_update > a', 1)
+    modify = Link(UpdateTrainingPage, By.CSS_SELECTOR, '#link_update > a', 1)
     delete = ButtonField(By.CSS_SELECTOR, '#link_delete > a', 1)
     select_first = ButtonField(By.CSS_SELECTOR, "#select_li > a", 1)
 
@@ -94,7 +118,7 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
 
         action_chains = ActionChains(self.driver)
         child = node.find_element(By.CSS_SELECTOR, 'a')
-        action_cains.context_click(child).perform()
+        action_chains.context_click(child).perform()
         return child
 
     def attach_node_tree(self, acronym, parent=None):
@@ -115,23 +139,6 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
         return "Identification" in self.find_element(
             By.CSS_SELECTOR, 'li.active[role=presentation]'
         ).text and not self.find_element(By.ID, 'modal_dialog_id').is_displayed()
-
-
-class NewTrainingPage(pypom.Page):
-    sigleintitule_abrege = InputField(By.ID, 'id_acronym')
-    code = InputField(By.ID, 'id_partial_acronym')
-    intitule_en_francais = InputField(By.ID, 'id_title')
-    intitule_en_anglais = InputField(By.ID, 'id_title_english')
-    entite_de_gestion = SelectEntityVersionField(By.ID, 'id_management_entity')
-    entite_dadministration = SelectEntityVersionField(By.ID, 'id_administration_entity')
-    intitule_du_diplome = InputField(By.ID, 'id_diploma_printing_title')
-
-    tab_diploma = ButtonField(By.ID, 'lnk_diplomas_certificats')
-    save_button = Link(EducationGroupPage, By.ID, 'btn-confirm', waiting_time=3)
-
-
-class UpdateTrainingPage(NewTrainingPage):
-    fin = SelectField(By.ID, 'id_end_year')
 
 
 class SearchEducationGroupPage(CommonPageMixin, pypom.Page):

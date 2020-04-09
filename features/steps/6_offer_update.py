@@ -30,7 +30,8 @@ from django.urls import reverse
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from features.pages.education_group.pages import EducationGroupPage
+from features.forms.education_groups import update_form
+from features.pages.education_group.pages import EducationGroupPage, UpdateTrainingPage
 
 use_step_matcher("parse")
 
@@ -47,7 +48,7 @@ def step_impl(context: Context, acronym: str, year: str):
 @given("Aller sur la page de detail d'une formation en année académique courante")
 def step_impl(context: Context):
     egy = EducationGroupYear.objects.filter(
-        academic_year=context.setup_data.current_academic_year,
+        academic_year=context.data.current_academic_year,
         education_group_type__category=education_group_categories.TRAINING
     ).order_by('?').first()
     url = reverse('education_group_read', args=[egy.pk, egy.pk])
@@ -55,27 +56,36 @@ def step_impl(context: Context):
     context.egy_modified = egy
 
     context.current_page = EducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
-    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+
+
+@when("Offre cliquer sur le menu « Actions »")
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.actions.click()
 
 
 @then("Vérifier que la dernière année d'organisation de la formation a été mis à jour")
 def step_impl(context: Context):
     end_year_displayed = context.current_page.end_year.text
-    context.test.assertEqual(context.end_year_chosen, end_year_displayed)
+    context.test.assertEqual(context.form_data["end_year"], end_year_displayed)
 
 
 @step("Encoder année de fin")
 def step_impl(context: Context):
-    end_year_chosen = AcademicYear.objects.filter(
-        year__gt=context.current_academic_year.year
-    ).order_by('?').first()
-    context.current_page.fin = str(end_year_chosen)
-    context.end_year_chosen = str(end_year_chosen)
+    page = UpdateTrainingPage(driver=context.browser)
+    context.form_data = update_form.fill_end_year(page, context.data.current_academic_year)
 
 
 @when("Cliquer sur « Modifier »")
 def step_impl(context):
-    context.current_page = context.current_page.modify.click()
+    page = EducationGroupPage(driver=context.browser)
+    page.modify.click()
+
+
+@step("Offre cliquer sur le bouton « Enregistrer »")
+def step_impl(context: Context):
+    page = UpdateTrainingPage(driver=context.browser)
+    page.save_button.click()
 
 
 @then("Vérifier que la formation {acronym} a bien été mise à jour de {start_year} à {end_year}")

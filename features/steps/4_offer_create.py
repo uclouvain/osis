@@ -31,7 +31,7 @@ from waffle.models import Flag
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.tests.factories.education_group_year import string_generator
-from features.pages.education_group.pages import SearchEducationGroupPage
+from features.pages.education_group.pages import SearchEducationGroupPage, UpdateTrainingPage
 
 use_step_matcher("parse")
 
@@ -75,14 +75,13 @@ def step_impl(context):
 
 
 @step("Si une modal d'avertissement s'affiche, cliquer sur « oui »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
+def step_impl(context: Context):
     try:
-        context.current_page.find_element(By.CSS_SELECTOR,
-                                          '#confirm-modal > div > div > div.modal-footer > button.btn.btn-warning'
-                                          ).click()
+        page = UpdateTrainingPage(driver=context.browser)
+        page.find_element(
+            By.CSS_SELECTOR,
+            '#confirm-modal > div > div > div.modal-footer > button.btn.btn-warning'
+        ).click()
     except NoSuchElementException:
         pass
 
