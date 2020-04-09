@@ -83,10 +83,9 @@ def update_education_group(request, root_id, education_group_year_id):
     return update_education_group_year(request, root_id, education_group_year_id)
 
 
+@permission_required('base.change_educationgroupcertificateaim',
+                     fn=lambda request, root_id, education_group_year: education_group_year)
 def _update_certificate_aims(request, root_id, education_group_year):
-    if not request.user.has_perm('base.change_educationgroupcertificateaim', education_group_year):
-        raise PermissionDenied()
-
     root = get_object_or_404(EducationGroupYear, pk=root_id)
     form_certificate_aims = CertificateAimsForm(request.POST or None, instance=education_group_year)
     if form_certificate_aims.is_valid():

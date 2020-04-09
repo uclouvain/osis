@@ -32,9 +32,9 @@ from base.models.education_group_year import EducationGroupYear
 from program_management.business.group_element_years import postponement
 
 ERRORS_MSG = {
-    "base.add_educationgroup": _("The user has not permission to create education groups."),
-    "base.change_educationgroup": _("The user has not permission to change education groups."),
-    "base.delete_educationgroup": _("The user has not permission to delete education groups."),
+    "base.add_educationgroup": _("The user does not have permission to create education groups."),
+    "base.change_educationgroup": _("The user does not have permission to change education groups."),
+    "base.delete_educationgroup": _("The user does not have permission to delete education groups."),
     "base.change_educationgroupcontent": _("The user is not allowed to change education group content.")
 }
 

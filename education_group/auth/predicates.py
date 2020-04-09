@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _, pgettext
 
 
 @predicate(bind=True)
-def is_all_education_group_are_removable(self, user, education_group):
+def are_all_education_group_years_removable(self, user, education_group):
     education_group_years = education_group.educationgroupyear_set.all()
     return all(
         user.has_perm('base.delete_educationgroup', education_group_year)
@@ -20,7 +20,7 @@ def is_all_education_group_are_removable(self, user, education_group):
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message=pgettext("male", "The user has not permission to create a %(category)s.") %
+    message=pgettext("male", "The user does not have permission permission to create a %(category)s.") %
     {"category": Categories.GROUP.value}
 )
 def is_not_orphan_group(self, user, education_group_year=None):
@@ -51,7 +51,7 @@ def is_education_group_type_authorized_according_to_user_scope(self, user, educa
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not attached to the management entity"))
-def is_user_link_to_management_entity(self, user, education_group_year=None):
+def is_user_attached_to_management_entity(self, user, education_group_year=None):
     if education_group_year:
         user_entity_ids = self.context['role_qs'].get_entities_ids()
         return education_group_year.management_entity_id in user_entity_ids

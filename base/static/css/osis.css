@@ -536,7 +536,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     margin-left: 5px;
 }
 
-.dropdown-menu>li>a.disabled {
+.dropdown-menu > li > a.disabled {
     color: #777!important;
     cursor: not-allowed!important;
 }

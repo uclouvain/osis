@@ -13,7 +13,7 @@ from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 
 
-class TestUserLinkedToManagementEntity(TestCase):
+class TestUserAttachedToManagementEntity(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.root_entity_version = EntityVersionFactory(parent=None)
@@ -45,7 +45,7 @@ class TestUserLinkedToManagementEntity(TestCase):
             entity=self.entity_version_level_1.entity,
             with_child=False
         )
-        self.assertTrue(predicates.is_user_link_to_management_entity(self.person.user, self.education_group_year))
+        self.assertTrue(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
     def test_user_manage_entity_and_child_of_education_group_year(self):
         FacultyManagerFactory(
@@ -53,7 +53,7 @@ class TestUserLinkedToManagementEntity(TestCase):
             entity=self.entity_version_level_1.entity,
             with_child=True
         )
-        self.assertTrue(predicates.is_user_link_to_management_entity(self.person.user, self.education_group_year))
+        self.assertTrue(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
     def test_user_manage_only_parent_entity_of_education_group_year(self):
         FacultyManagerFactory(
@@ -61,7 +61,7 @@ class TestUserLinkedToManagementEntity(TestCase):
             entity=self.root_entity_version.entity,
             with_child=False
         )
-        self.assertFalse(predicates.is_user_link_to_management_entity(self.person.user, self.education_group_year))
+        self.assertFalse(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
     def test_user_manage_parent_entity_and_its_children_which_are_management_entity_education_group_year(self):
         FacultyManagerFactory(
@@ -69,7 +69,7 @@ class TestUserLinkedToManagementEntity(TestCase):
             entity=self.root_entity_version.entity,
             with_child=True
         )
-        self.assertTrue(predicates.is_user_link_to_management_entity(self.person.user, self.education_group_year))
+        self.assertTrue(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
     def test_user_manage_multiple_entity_but_none_are_management_entity_of_education_group_year(self):
         new_entity_version = EntityVersionFactory(parent=self.root_entity_version.entity)
@@ -77,7 +77,7 @@ class TestUserLinkedToManagementEntity(TestCase):
         for entity in [self.root_entity_version.entity, new_entity_version.entity]:
             FacultyManagerFactory(person=self.person, entity=entity, with_child=False)
 
-        self.assertFalse(predicates.is_user_link_to_management_entity(self.person.user, self.education_group_year))
+        self.assertFalse(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
 
 class TestEducationGroupYearOlderOrEqualsThanLimitSettings(TestCase):

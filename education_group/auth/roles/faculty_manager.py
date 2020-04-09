@@ -33,7 +33,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
             'base.view_educationgroup': rules.always_allow,
             'base.add_training': osis_role_predicates.always_deny(
-                message=pgettext("female", "The user has not permission to create a %(category)s.") %
+                message=pgettext("female", "The user does not have permission to create a %(category)s.") %
                 {"category": Categories.TRAINING.value}
             ),
             'base.add_minitraining':
@@ -48,24 +48,24 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity &
+                predicates.is_user_attached_to_management_entity &
                 predicates.is_program_edition_period_open,
             'base.delete_all_educationgroup':
-                predicates.is_all_education_group_are_removable,
+                predicates.are_all_education_group_years_removable,
             'base.delete_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity &
+                predicates.is_user_attached_to_management_entity &
                 predicates.is_program_edition_period_open,
             'base.attach_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity &
+                predicates.is_user_attached_to_management_entity &
                 predicates.is_program_edition_period_open,
             'base.detach_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity &
+                predicates.is_user_attached_to_management_entity &
                 predicates.is_program_edition_period_open,
             'base.change_educationgroupcertificateaim':
                 osis_role_predicates.always_deny(
@@ -75,22 +75,22 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.change_commonpedagogyinformation':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity,
+                predicates.is_user_attached_to_management_entity,
             'base.change_pedagogyinformation':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity
+                predicates.is_user_attached_to_management_entity
             ,
             'base.change_commonadmissioncondition':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity &
+                predicates.is_user_attached_to_management_entity &
                 predicates.is_program_edition_period_open
             ,
             'base.change_admissioncondition':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity &
+                predicates.is_user_attached_to_management_entity &
                 predicates.is_program_edition_period_open
             ,
             'base.change_educationgrouporganization': osis_role_predicates.always_deny(
@@ -100,17 +100,17 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity
+                predicates.is_user_attached_to_management_entity
             ,
             'base.change_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity
+                predicates.is_user_attached_to_management_entity
             ,
             'base.delete_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_link_to_management_entity
+                predicates.is_user_attached_to_management_entity
             ,
             'base.can_edit_education_group_administrative_data': rules.always_deny
             ,
