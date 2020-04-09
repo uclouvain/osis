@@ -191,6 +191,12 @@ class GroupFilter(FilterSet):
         ).annotate(
             entity_management_version=Subquery(management_entity)
         ).annotate(
+            version=Case(
+                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
+                     then=Value(PARTICULAR)),
+                default=Value(STANDARD),
+                output_field=CharField(),)
+        ).annotate(
             complete_title_fr=Case(
                 When(Q(educationgroupversion__is_transition=True) &
                      Q(educationgroupversion__version_name=''),
