@@ -31,7 +31,7 @@ from waffle.models import Flag
 from base.models.entity_version import EntityVersion
 from base.models.enums.entity_type import FACULTY
 from base.tests.factories.education_group_year import string_generator
-from features.pages.education_group.pages import SearchEducationGroupPage, UpdateTrainingPage
+from features.pages.education_group.pages import SearchEducationGroupPage, UpdateTrainingPage, EducationGroupPage
 
 use_step_matcher("parse")
 
@@ -44,13 +44,21 @@ def step_impl(context: Context):
 
 
 @given("Aller sur la page Catalogue de formations / Formation")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
+def step_impl(context: Context):
     url = '/educationgroups/'
-    context.current_page = SearchEducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
-    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+    SearchEducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
+
+
+@step("Offre réinitialiser les critères de recherche")
+def step_impl(context: Context):
+    page = SearchEducationGroupPage(driver=context.browser)
+    page.clear_button.click()
+
+
+@step("Offre Cliquer sur le bouton Rechercher (Loupe)")
+def step_impl(context: Context):
+    page = SearchEducationGroupPage(driver=context.browser)
+    page.search.click()
 
 
 @step("Cliquer sur « Nouvelle Formation »")
@@ -59,11 +67,9 @@ def step_impl(context):
 
 
 @step("Cliquer sur « Oui, je confirme »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page = context.current_page.confirm_modal.click()
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.confirm_modal.click()
 
 
 @step("Cliquer sur l'onglet Diplômes/Certificats")

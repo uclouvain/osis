@@ -7,14 +7,14 @@ Feature: Suppression d'offre.
 
   Scenario: En tant que gestionnaire central, je dois pouvoir supprimer une offre.
     Given Aller sur la page Catalogue de formations / Formation
-    And Réinitialiser les critères de recherche
-    And Cliquer sur le bouton Rechercher (Loupe)
+    And Offre réinitialiser les critères de recherche
+    And Offre Cliquer sur le bouton Rechercher (Loupe)
 
     And Cliquer sur le premier sigle dans la liste de résultats
-    When Cliquer sur le menu « Actions »
+    When Offre cliquer sur le menu « Actions »
     And Cliquer sur « Supprimer »
     And Cliquer sur « Oui, je confirme »
 
     Given Aller sur la page Catalogue de formations / Formation
-    And Cliquer sur le bouton Rechercher (Loupe)
+    And Offre Cliquer sur le bouton Rechercher (Loupe)
     Then Vérifier que l'offre n'apparaît plus dans la liste

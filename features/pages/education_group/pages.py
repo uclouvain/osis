@@ -83,8 +83,6 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
     delete = ButtonField(By.CSS_SELECTOR, '#link_delete > a', 1)
     select_first = ButtonField(By.CSS_SELECTOR, "#select_li > a", 1)
 
-    confirm_modal = Link('SearchEducationGroupPage', By.CSS_SELECTOR, '.modal-footer>input[type=submit]')
-
     toggle_tree = ButtonField(By.CSS_SELECTOR, '#panel-data > div.panel-heading > div > a')
     open_first_node_tree = ButtonField(By.CSS_SELECTOR, '#panel_file_tree > ul > li > i')
 
@@ -93,6 +91,14 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
 
     attach = Link(CopyModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a', 2)
     detach = Link(DetachModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(5) > a', 2)
+
+    def __init__(self, *args, **kwargs):
+        self._confirm_modal()
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def _confirm_modal(cls):
+        cls.confirm_modal = Link(SearchEducationGroupPage, By.CSS_SELECTOR, '.modal-footer>input[type=submit]')
 
     def get_name_first_children(self) -> list:
         children = self.find_elements(By.CSS_SELECTOR, '#panel_file_tree > ul > li > ul > li')
@@ -152,15 +158,22 @@ class SearchEducationGroupPage(CommonPageMixin, pypom.Page):
     new_training = ButtonField(By.CSS_SELECTOR, '#link_create_training > a', 1)
     new_mini_training = ButtonField(By.CSS_SELECTOR, '#link_create_mini_training > a', 1)
 
-    first_row = Link('EducationGroupPage', By.CSS_SELECTOR,
+    first_row = Link(EducationGroupPage, By.CSS_SELECTOR,
                      '#table_education_groups > tbody > tr:nth-child(1) > td:nth-child(2) > a')
 
     type_de_formation = SelectField(By.ID, "id_name")
     confirm_modal = Link(NewTrainingPage, By.CSS_SELECTOR, '.modal-footer>input.btn-primary')
     clear_button = ButtonField(By.ID, 'btn_clear_filter')
-    search = Link('SearchEducationGroupPage', By.CSS_SELECTOR, 'button.btn-primary', 1)
 
     quick_search = Link(QuickSearchPage, By.ID, 'quick-search', 1)
+
+    def __init__(self, *args, **kwargs):
+        self._search()
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def _search(cls):
+        cls.search = Link(SearchEducationGroupPage, By.CSS_SELECTOR, 'button.btn-primary', 1)
 
     def count_result(self):
         text = self.find_element(

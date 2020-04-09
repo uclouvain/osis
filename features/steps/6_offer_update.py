@@ -55,7 +55,7 @@ def step_impl(context: Context):
 
     context.egy_modified = egy
 
-    context.current_page = EducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
+    EducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
 
 
 @when("Offre cliquer sur le menu « Actions »")
