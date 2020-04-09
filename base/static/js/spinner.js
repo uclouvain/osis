@@ -3,6 +3,11 @@ let linkButtonNoSpinnerClicked = false;
 const spinnerActive = {sync: true, async: false};
 let downloadInterval;
 
+//TODO : remove this after all submodules have removed no_spinner class
+function bindNoSpinner(elem){
+    linkButtonNoSpinnerClicked = elem ? elem.hasClass("no_spinner") : false;
+}
+
 function showOverlaySpinner(async= false) {
     $('#loader, #overlay-fade-in').show();
     spinnerActive[async ? 'async' : 'sync'] = true;
@@ -33,6 +38,19 @@ $(document).ready(function() {
     $('.download').click(() => {
         downloadInterval = setInterval(isDownloadCompleted, 2000);
     });
+
+
+    //TODO : remove this after all submodules have removed no_spinner class
+    //bind no spinner for backward compatibility
+    $('a, button').on('click submit', function (e) {
+        bindNoSpinner($(this));
+    });
+    ["formAjaxSubmit:onSubmit", "prepareXls:onClick"].forEach( evt =>
+        document.addEventListener(evt, function (e) {
+            bindNoSpinner(e.detail);
+        })
+    );
+    //
 });
 
 $(document).on('keyup', function (e) {
