@@ -31,7 +31,7 @@ from mock import patch
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.enums import prerequisite_operator
+from base.models.enums import prerequisite_operator, education_group_categories
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializerLearningUnit
@@ -44,9 +44,6 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory, No
 class TrainingPrerequisitesTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
-
-    def setUp(self):
         """
         root_node
         |-----common_core
@@ -57,46 +54,50 @@ class TrainingPrerequisitesTestCase(APITestCase):
                   |---- LDROI100A (UE)
         :return:
         """
-        self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
-        self.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
-        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
-        self.ldroi120b = NodeLearningUnitYearFactory(node_id=4, code="LDROI120B", title="Séminaire", year=2018)
-        self.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
-        self.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        cls.person = PersonFactory()
+        cls.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
+        cls.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
+        cls.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
+        cls.ldroi120b = NodeLearningUnitYearFactory(node_id=4, code="LDROI120B", title="Séminaire", year=2018)
+        cls.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
+        cls.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
 
-        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
-        self.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
+        cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
+        cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
 
-        self.root_egy = EducationGroupYearFactory(id=self.root_node.node_id,
-                                                  acronym=self.root_node.code,
-                                                  title=self.root_node.title,
-                                                  academic_year__year=self.root_node.year)
+        cls.root_egy = EducationGroupYearFactory(id=cls.root_node.node_id,
+                                                 education_group_type__category=education_group_categories.TRAINING,
+                                                 acronym=cls.root_node.code,
+                                                 title=cls.root_node.title,
+                                                 academic_year__year=cls.root_node.year)
 
-        LinkFactory(parent=self.root_node, child=self.common_core)
-        LinkFactory(parent=self.common_core, child=self.ldroi100a)
-        LinkFactory(parent=self.root_node, child=self.subgroup1)
-        LinkFactory(parent=self.subgroup1, child=self.ldroi120b)
-        LinkFactory(parent=self.subgroup1, child=self.subgroup2)
-        LinkFactory(parent=self.subgroup2, child=self.ldroi100a)
+        LinkFactory(parent=cls.root_node, child=cls.common_core)
+        LinkFactory(parent=cls.common_core, child=cls.ldroi100a)
+        LinkFactory(parent=cls.root_node, child=cls.subgroup1)
+        LinkFactory(parent=cls.subgroup1, child=cls.ldroi120b)
+        LinkFactory(parent=cls.subgroup1, child=cls.subgroup2)
+        LinkFactory(parent=cls.subgroup2, child=cls.ldroi100a)
 
-        self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        self.p_group.add_prerequisite_item('LDROI1300', 2018)
-        self.p_group.add_prerequisite_item('LAGRO2400', 2018)
+        cls.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
+        cls.p_group.add_prerequisite_item('LDROI1300', 2018)
+        cls.p_group.add_prerequisite_item('LAGRO2400', 2018)
 
         p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
-        p_req.add_prerequisite_item_group(self.p_group)
-        self.ldroi100a.set_prerequisite(p_req)
+        p_req.add_prerequisite_item_group(cls.p_group)
+        cls.ldroi100a.set_prerequisite(p_req)
 
-        self.tree = ProgramTree(root_node=self.root_node)
+        cls.tree = ProgramTree(root_node=cls.root_node)
 
-        self.url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': self.root_node.year,
-                                                                                    'acronym': self.root_node.code})
-        self.request = RequestFactory().get(self.url)
-        self.serializer = EducationGroupPrerequisitesSerializerLearningUnit(self.ldroi100a, context={
-            'request': self.request,
+        cls.url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': cls.root_node.year,
+                                                                                   'acronym': cls.root_node.code})
+        cls.request = RequestFactory().get(cls.url)
+        cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
+            'request': cls.request,
             'language': settings.LANGUAGE_CODE_EN,
-            'tree': self.tree
+            'tree': cls.tree
         })
+
+    def setUp(self):
         self.client.force_authenticate(user=self.person.user)
 
     def test_get_not_authorized(self):
@@ -130,3 +131,98 @@ class TrainingPrerequisitesTestCase(APITestCase):
 
         with self.subTest('Test response'):
             self.assertEqual([self.serializer.data], response.json())
+
+
+class MiniTrainingPrerequisitesTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        root_node
+        |-----common_core
+             |---- LDROI100A (UE)
+        |----subgroup1
+             |---- LDROI120B (UE)
+             |----subgroup2
+                  |---- LDROI100A (UE)
+        :return:
+        """
+        cls.person = PersonFactory()
+        cls.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
+        cls.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
+        cls.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
+        cls.ldroi120b = NodeLearningUnitYearFactory(node_id=4, code="LDROI120B", title="Séminaire", year=2018)
+        cls.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
+        cls.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+
+        cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
+        cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
+
+        cls.root_egy = EducationGroupYearFactory(id=cls.root_node.node_id,
+                                                 education_group_type__category=
+                                                 education_group_categories.MINI_TRAINING,
+                                                 partial_acronym=cls.root_node.code,
+                                                 title=cls.root_node.title,
+                                                 academic_year__year=cls.root_node.year)
+
+        LinkFactory(parent=cls.root_node, child=cls.common_core)
+        LinkFactory(parent=cls.common_core, child=cls.ldroi100a)
+        LinkFactory(parent=cls.root_node, child=cls.subgroup1)
+        LinkFactory(parent=cls.subgroup1, child=cls.ldroi120b)
+        LinkFactory(parent=cls.subgroup1, child=cls.subgroup2)
+        LinkFactory(parent=cls.subgroup2, child=cls.ldroi100a)
+
+        cls.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
+        cls.p_group.add_prerequisite_item('LDROI1300', 2018)
+        cls.p_group.add_prerequisite_item('LAGRO2400', 2018)
+
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req.add_prerequisite_item_group(cls.p_group)
+        cls.ldroi100a.set_prerequisite(p_req)
+
+        cls.tree = ProgramTree(root_node=cls.root_node)
+
+        cls.url = reverse('education_group_api_v1:mini_training-prerequisites', kwargs={'year': cls.root_node.year,
+                                                                                        'partial_acronym':
+                                                                                            cls.root_node.code})
+        cls.request = RequestFactory().get(cls.url)
+        cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
+            'request': cls.request,
+            'language': settings.LANGUAGE_CODE_EN,
+            'tree': cls.tree
+        })
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            with self.subTest(method):
+                response = getattr(self.client, method)(self.url)
+                self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results_case_education_group_year_not_found(self):
+        invalid_url = reverse('education_group_api_v1:mini_training-prerequisites', kwargs={
+            'partial_acronym': 'ACRO',
+            'year': 2019
+        })
+        response = self.client.get(invalid_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch('education_group.api.views.prerequisite.MiniTrainingPrerequisites.get_queryset')
+    def test_get_results(self, mock_get_queryset):
+        mock_get_queryset.return_value = self.tree.get_nodes_that_have_prerequisites()
+        response = self.client.get(self.url)
+        with self.subTest('Test status code'):
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        with self.subTest('Test response'):
+            self.assertEqual([self.serializer.data], response.json())
+
