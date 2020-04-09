@@ -43,7 +43,7 @@ register = template.Library()
 
 # TODO: Remove when migration of Program Manager is done with OSIS-Role Module
 @register.simple_tag
-def have_only_access_to_certficiate_aims(user, education_group_year):
+def have_only_access_to_certificate_aims(user, education_group_year):
     """
     [Backward-compatibility] This templatetag as been created in order to allow
     program_manager to be redirected to update_certificate_aims

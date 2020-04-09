@@ -38,7 +38,7 @@ from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType
 from base.templatetags.education_group import button_order_with_permission, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent, \
-    have_only_access_to_certficiate_aims
+    have_only_access_to_certificate_aims
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -282,18 +282,18 @@ class TestHaveOnlyAccessCertificateAims(TestCase):
 
     def test_have_only_access_certificates_aims_case_no_role(self):
         self.assertFalse(
-            have_only_access_to_certficiate_aims(self.person.user, self.education_group_year)
+            have_only_access_to_certificate_aims(self.person.user, self.education_group_year)
         )
 
     def test_have_only_access_certificates_aims_case_only_program_manager(self):
         ProgramManagerFactory(education_group=self.education_group_year.education_group, person=self.person)
         self.assertTrue(
-            have_only_access_to_certficiate_aims(self.person.user, self.education_group_year)
+            have_only_access_to_certificate_aims(self.person.user, self.education_group_year)
         )
 
     def test_have_only_access_certificates_aims_case_program_manager_and_central_manager(self):
         ProgramManagerFactory(education_group=self.education_group_year.education_group, person=self.person)
         CentralManagerFactory(person=self.person)
         self.assertFalse(
-            have_only_access_to_certficiate_aims(self.person.user, self.education_group_year)
+            have_only_access_to_certificate_aims(self.person.user, self.education_group_year)
         )
