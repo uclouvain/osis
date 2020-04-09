@@ -32,7 +32,7 @@
                 <br>
                 <form method="post" id="form_detach_confirm" action="{{ request.get_full_path }}">
                     {% csrf_token %}
-                    {{ confirmation_message }}
+                    <p>{% trans "Are you sure you want to detach ?" %}</p>
                 </form>
 
                 <div class="modal-footer">

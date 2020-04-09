@@ -27,7 +27,7 @@ from _decimal import Decimal
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
@@ -132,6 +132,15 @@ class Node:
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
+    def is_option(self) -> bool:  # TODO :: unit test
+        return self.node_type == MiniTrainingType.OPTION
+
+    def is_option_list_choice(self) -> bool:  # TODO :: unit test
+        return self.node_type == GroupType.OPTION_LIST_CHOICE
+
+    def contains_options(self) -> bool:  # TODO :: unit test
+        return any(l for l in self.get_all_children() if l.child.is_option())
+
     def get_all_children(
             self,
             ignore_children_from: Set[EducationGroupTypesEnum] = None,
@@ -143,6 +152,9 @@ class Node:
                 continue
             children |= link.child.get_all_children(ignore_children_from=ignore_children_from)
         return children
+
+    def get_option_list(self) -> Set['Node']:  # TODO :: unit test
+        return {l.child for l in self.get_all_children() if l.child.is_option()}
 
     def get_all_children_as_nodes(
             self,

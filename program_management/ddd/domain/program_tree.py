@@ -28,7 +28,7 @@ from collections import Counter
 from typing import List, Set, Tuple
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
@@ -69,7 +69,13 @@ class ProgramTree:
                     result.append(link.parent)
         return result
 
-    def get_parents(self, path: Path) -> List['Node']:
+    def get_option_list(self):  # TODO :: unit test
+        tree_without_finalities = self.prune(
+            ignore_children_from={GroupType.FINALITY_120_LIST_CHOICE, GroupType.FINALITY_180_LIST_CHOICE}
+        )
+        return tree_without_finalities.root_node.get_option_list()
+
+    def get_parents(self, path: Path) -> List['Node']:  # TODO :: unit tests
         result = []
         str_nodes = path.split(PATH_SEPARATOR)
         if len(str_nodes) > 1:
@@ -177,7 +183,7 @@ class ProgramTree:
     def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
         return next((link for link in self.get_all_links() if link.parent == parent and link.child == child), None)
 
-    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':  # TODO :: unit tests
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 

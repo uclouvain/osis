@@ -47,14 +47,21 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
 def load(tree_root_id: int) -> 'ProgramTree':
-    root_node = load_node.load_node_education_group_year(tree_root_id)
+    return load_trees([tree_root_id])[0]
 
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
-    nodes = __load_tree_nodes(structure)
-    nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
-    links = __load_tree_links(structure)
-    prerequisites = __load_tree_prerequisites(tree_root_id, nodes)
-    return __build_tree(root_node, structure, nodes, links, prerequisites)
+
+def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
+    trees = []
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
+    for tree_root_id in tree_root_ids:
+        root_node = load_node.load_node_education_group_year(tree_root_id)  # TODO :: load_multiple for performance !!
+        nodes = __load_tree_nodes(structure)
+        nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
+        links = __load_tree_links(structure)
+        prerequisites = __load_tree_prerequisites(tree_root_id, nodes)
+        tree = __build_tree(root_node, structure, nodes, links, prerequisites)
+        trees.append(tree)
+    return trees
 
 
 def load_trees_from_children(
@@ -85,7 +92,7 @@ def load_trees_from_children(
         if not parent_by_child_branch.get(parent_id)
     )
     # TODO :: performance (get all trees in one single query)
-    return [load(root_id) for root_id in root_ids]
+    return load_trees(list(root_ids))
 
 
 def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:

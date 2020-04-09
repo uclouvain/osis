@@ -150,6 +150,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 }
             )
 
+    # FiXME :: DEPRECATED :: Use DetachOptionValidator instead
     def _check_detach_options_rules(self):
         """
         In context of 2M when we detach an option [or group which contains option], we must ensure that

@@ -28,10 +28,10 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.program_tree import build_path
+from program_management.ddd.domain.program_tree import build_path, ProgramTree
 from program_management.ddd.service import detach_node_service
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -44,10 +44,11 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
 
     def setUp(self):
         self.root_node = NodeEducationGroupYearFactory(
-            node_type=TrainingType.BACHELOR
+            node_type=TrainingType.BACHELOR,
+            node_id=1
         )
+        self.link = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=2))
         self.tree = ProgramTreeFactory(root_node=self.root_node)
-        self.link = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
         self.root_path = str(self.root_node.node_id)
         self.node_to_detach = self.link.child
         self.path_to_detach = build_path(self.link.parent, self.link.child)
@@ -55,6 +56,7 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_persist_tree()
         self._patch_load_tree()
         self._patch_check_is_prerequisite()
+        self._patch_load_trees_from_children()
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
@@ -72,7 +74,13 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         patcher_load = patch(check_prereq)
         self.addCleanup(patcher_load.stop)
         self.mock_check_is_prerequisite = patcher_load.start()
-        self.mock_check_is_prerequisite.return_value = []
+        self.mock_check_is_prerequisite.return_value = BusinessValidationMessageList(messages=[])
+
+    def _patch_load_trees_from_children(self):
+        patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")
+        self.addCleanup(patcher_load.stop)
+        self.mock_load_tress_from_children = patcher_load.start()
+        self.mock_load_tress_from_children.return_value = [self.tree]
 
     def test_when_path_to_detach_is_none(self):
         path_to_detach = None
@@ -98,11 +106,11 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
 
     @patch('program_management.ddd.service.prerequisite_service.check_is_prerequisite_in_trees_using_node')
     def test_when_node_is_prerequisite_in_other_trees(self, mock_is_prerequisite_other_trees):
-        is_prerequisite_errors = [
+        is_prerequisite_errors = BusinessValidationMessageList(messages=[
             BusinessValidationMessage('Error is Prerequisite in Tree1', MessageLevel.ERROR),
             BusinessValidationMessage('Error is Prerequisite in Tree2', MessageLevel.ERROR),
             BusinessValidationMessage('Error is Prerequisite in Tree3', MessageLevel.ERROR),
-        ]
+        ])
         mock_is_prerequisite_other_trees.return_value = is_prerequisite_errors
         result = detach_node_service.detach_node(self.path_to_detach)
         assertion_msg = "Should have 3 errors, because the node is used in 3 programs trees where it is a prerequisite"
@@ -110,8 +118,11 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertIn("Error is Prerequisite in Tree2", result.messages, assertion_msg)
         self.assertIn("Error is Prerequisite in Tree3", result.messages, assertion_msg)
 
-    def test_when_commit_is_true(self):
-        result = detach_node_service.detach_node(self.path_to_detach, commit=True)
+    @patch.object(ProgramTree, 'detach_node', return_value=(True, []))
+    def test_when_commit_is_true(self, mock):
+        detach_node_service.detach_node(self.path_to_detach, commit=True)
+        if not self.mock_persist.called:
+            print()
         self.assertTrue(self.mock_persist.called)
 
     def test_when_commit_is_false(self):

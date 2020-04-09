@@ -61,7 +61,7 @@ class TestCheckIsPrerequisiteInTreesUsingNode(SimpleTestCase, ValidatorPatcherMi
 
         result = prerequisite_service.check_is_prerequisite_in_trees_using_node(self.node_to_detach)
         assertion_msg = "Should have 3 errors, because the node is used in 3 programs where it is a prerequisite"
-        self.assertEqual(result.count('error is prerequisite'), 3, assertion_msg)
+        self.assertEqual(result.messages.count('error is prerequisite'), 3, assertion_msg)
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
     def test_when_node_is_not_prerequisite_in_any_trees(self, mock_load):
@@ -71,4 +71,4 @@ class TestCheckIsPrerequisiteInTreesUsingNode(SimpleTestCase, ValidatorPatcherMi
 
         result = prerequisite_service.check_is_prerequisite_in_trees_using_node(self.node_to_detach)
         assertion_msg = "Should have any error, because the node is used in 3 programs without being a prerequisite"
-        self.assertListEqual(result, [], assertion_msg)
+        self.assertListEqual(result.messages, [], assertion_msg)

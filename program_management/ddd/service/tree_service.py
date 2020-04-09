@@ -23,23 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from base.ddd.utils.validation_message import BusinessValidationMessageList
 from program_management.ddd.business_types import *
-from program_management.ddd.service.tree_service import search_trees_using_node
-from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
+from program_management.ddd.repositories import load_tree
 
 
-def check_is_prerequisite_in_trees_using_node(
-        node_to_detach: 'Node',
-        trees_using_node: List['ProgramTree'] = None
-) -> BusinessValidationMessageList:
-    if not trees_using_node:
-        trees_using_node = search_trees_using_node(node_to_detach)
-    messages = []
-    for tree in trees_using_node:
-        validator = IsPrerequisiteValidator(tree, node_to_detach)
-        if not validator.is_valid():
-            messages += validator.messages
-    return BusinessValidationMessageList(messages=messages)
+def search_trees_using_node(node_to_detach: 'Node'):
+    node_id = node_to_detach.pk
+    if node_to_detach.is_learning_unit():
+        trees = load_tree.load_trees_from_children(child_branch_ids=None, child_leaf_ids=[node_id])
+    else:
+        trees = load_tree.load_trees_from_children(child_branch_ids=[node_id], child_leaf_ids=None)
+    return trees
