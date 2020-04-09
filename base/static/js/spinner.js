@@ -1,29 +1,39 @@
 let linkButtonNoSpinnerClicked = false;
 
+//sync spinner is always active on page load
+const spinnerActive = {sync: true, async: false};
+
 function bindNoSpinner(elem){
-    linkButtonNoSpinnerClicked = elem ? elem.hasClass("no_spinner") : false;
+    linkButtonNoSpinnerClicked = elem ? elem.hasClass('no_spinner') : false;
 }
 
-function closeOverlaySpinner(){
-    $("#loader").hide();
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("overlay_fadein").style.display = "none";
+function showOverlaySpinner(async= false) {
+    $('#loader, #overlay-fade-in').show();
+    spinnerActive[async ? 'async' : 'sync'] = true;
 }
 
-$( document ).ready(function() {
+function closeOverlaySpinner(async= false){
+    // hide according to initial trigger
+    if(spinnerActive[async ? 'async' : 'sync'] && !spinnerActive[!async ? 'async' : 'sync']) {
+        $('#loader, #overlay, #overlay-fade-in').hide();
+        spinnerActive[async ? 'async' : 'sync'] = false;
+    }
+}
+
+$(document).ready(function() {
     closeOverlaySpinner();
     $('a, button').on('click submit', function (e) {
         bindNoSpinner($(this));
     });
 
-    ["formAjaxSubmit:onSubmit", "prepareXls:onClick"].forEach( evt =>
+    ["formAjaxSubmit:onSubmit", "prepareXls:onClick"].forEach(evt =>
         document.addEventListener(evt, function (e) {
             bindNoSpinner(e.detail);
         })
     );
 });
 
-$( document ).on( 'keyup', function ( e ) {
+$(document).on('keyup', function (e) {
     if ( e.key === 'Escape' ) { // ESC
         closeOverlaySpinner();
     }
@@ -31,7 +41,12 @@ $( document ).on( 'keyup', function ( e ) {
 
 window.addEventListener('beforeunload', function (e) {
     if (! linkButtonNoSpinnerClicked) {
-        $("#loader").show();
-        document.getElementById("overlay_fadein").style.display = "block";
+        showOverlaySpinner();
     }
+});
+
+$(document).ajaxStart(function(){
+    showOverlaySpinner(true);
+}).ajaxStop(function(){
+    closeOverlaySpinner(true);
 });
