@@ -21,17 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import random
 from behave import *
 from behave.runner import Context
+from django.utils.text import slugify
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from waffle.models import Flag
 
-from base.models.entity_version import EntityVersion
-from base.models.enums.entity_type import FACULTY
-from base.tests.factories.education_group_year import string_generator
-from features.pages.education_group.pages import SearchEducationGroupPage, UpdateTrainingPage, EducationGroupPage
+from features.forms.education_groups import create_form
+from features.pages.education_group.pages import SearchEducationGroupPage, UpdateTrainingPage, EducationGroupPage, \
+    NewTrainingPage
 
 use_step_matcher("parse")
 
@@ -49,6 +48,12 @@ def step_impl(context: Context):
     SearchEducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
 
 
+@when("Recherche offre Cliquer sur le menu « Actions »")
+def step_impl(context: Context):
+    page = SearchEducationGroupPage(driver=context.browser)
+    page.actions.click()
+
+
 @step("Offre réinitialiser les critères de recherche")
 def step_impl(context: Context):
     page = SearchEducationGroupPage(driver=context.browser)
@@ -63,7 +68,30 @@ def step_impl(context: Context):
 
 @step("Cliquer sur « Nouvelle Formation »")
 def step_impl(context):
-    context.current_page.new_training.click()
+    page = SearchEducationGroupPage(driver=context.browser)
+    page.new_training.click()
+
+
+@step("Sélectionner le type de formation à {value}")
+def step_impl(context: Context, value: str):
+    page = SearchEducationGroupPage(driver=context.browser)
+    page.type_de_formation = value
+
+
+@step("Encoder {value} comme {field}")
+def step_impl(context: Context, value: str, field: str):
+    page = NewTrainingPage(driver=context.browser)
+    slug_field = slugify(field).replace('-', '_')
+    if hasattr(page, slug_field):
+        setattr(page, slug_field, value)
+    else:
+        raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
+
+
+@step("Offre création Cliquer sur le bouton « Enregistrer »")
+def step_impl(context: Context):
+    page = NewTrainingPage(driver=context.browser)
+    page.save_button.click()
 
 
 @step("Cliquer sur « Oui, je confirme »")
@@ -74,10 +102,8 @@ def step_impl(context: Context):
 
 @step("Cliquer sur l'onglet Diplômes/Certificats")
 def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.tab_diploma.click()
+    page = NewTrainingPage(driver=context.browser)
+    page.tab_diploma.click()
 
 
 @step("Si une modal d'avertissement s'affiche, cliquer sur « oui »")
@@ -104,16 +130,22 @@ def step_impl(context, acronym, start_year, end_year):
 
 @then("Vérifier que la formation {acronym} à bien été créée")
 def step_impl(context, acronym):
+    page = EducationGroupPage(driver=context.browser)
     string_to_check = "créée avec succès"
-    context.test.assertIn(string_to_check, context.current_page.success_messages.text)
+    context.test.assertIn(string_to_check, page.success_messages.text)
+
+
+@then("Vérifier que le champ {field} est bien {value}")
+def step_impl(context, field, value):
+    page = EducationGroupPage(driver=context.browser)
+    slug_field = slugify(field).replace('-', '_')
+    context.test.assertIn(value, getattr(page, slug_field).text)
 
 
 @step("Cliquer sur « Nouvelle Mini-Formation »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.new_mini_training.click()
+def step_impl(context: Context):
+    page = SearchEducationGroupPage(driver=context.browser)
+    page.new_mini_training.click()
 
 
 @when("Ouvrir l'arbre")
@@ -139,30 +171,13 @@ def step_impl(context, code, children):
         context.test.assertIn(child, children_in_tree[i])
 
 
-@step("Encoder Entité de gestion")
+@step("Remplir formulaire de création de formation")
 def step_impl(context: Context):
-    ev = EntityVersion.objects.get(entity__personentity__person=context.user.person)
-    entities_version = [ev] + list(ev.descendants)
-    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
-    random_entity_version = random.choice(faculties)
-    context.current_page.entite_de_gestion = random_entity_version.acronym
+    page = NewTrainingPage(driver=context.browser)
+    context.form_data = create_form.fill_training_form(page, context.user.person)
 
 
-@step("Encoder Entité d’administration")
+@step("Remplir formulaire de création de mini-formation")
 def step_impl(context: Context):
-    entities_version = EntityVersion.objects.get(entity__personentity__person=context.user.person).descendants
-    faculties = [ev for ev in entities_version if ev.entity_type == FACULTY]
-    random_entity_version = random.choice(faculties)
-    context.current_page.entite_dadministration = random_entity_version.acronym
-
-
-@step("Encoder intitulé français")
-def step_impl(context: Context):
-    title = string_generator()
-    context.current_page.intitule_en_francais = title
-
-
-@step("Encoder intitulé anglais")
-def step_impl(context: Context):
-    title = string_generator()
-    context.current_page.intitule_en_anglais = title
+    page = NewTrainingPage(driver=context.browser)
+    context.form_data = create_form.fill_mini_training_form(page, context.user.person)

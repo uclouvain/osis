@@ -21,30 +21,22 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import random
-import time
 from datetime import datetime, timedelta
 
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
 from django.utils.text import slugify
-from selenium.webdriver.common.by import By
 from waffle.models import Flag
 
-from base.forms.utils import choice_field
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year, AcademicYear
-from base.models.campus import Campus
 from base.models.entity_version import EntityVersion
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.entity_type import FACULTY
 from base.models.learning_unit_year import LearningUnitYear
 from features.forms.learning_units import update_form, create_form
-from features.pages.learning_unit.pages import LearningUnitPage, LearningUnitEditPage, NewLearningUnitProposalPage, \
-    SearchLearningUnitPage, NewPartimPage, NewLearningUnitPage, EditLearningUnitProposalPage
-from django.utils.translation import gettext_lazy as _
-
+from features.pages.learning_unit.pages import LearningUnitPage, LearningUnitEditPage, SearchLearningUnitPage, \
+    NewPartimPage, NewLearningUnitPage
 from features.steps.utils.query import get_random_learning_unit_outside_of_person_entities, \
     get_random_learning_unit_inside_of_person_entities
 
@@ -142,16 +134,6 @@ def step_impl(context: Context):
     context.test.assertLearningUnitHasBeenUpdated(page, context.form_data)
 
 
-@step("Encoder {value} comme {field}")
-def step_impl(context: Context, value: str, field: str):
-    page = LearningUnitEditPage(driver=context.browser)
-    slug_field = slugify(field).replace('-', '_')
-    if hasattr(page, slug_field):
-        setattr(page, slug_field, value)
-    else:
-        raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
-
-
 @step("Encoder année suivante")
 def step_impl(context: Context):
     page = LearningUnitEditPage(driver=context.browser)
@@ -202,13 +184,6 @@ def step_impl(context):
     """
     page = LearningUnitEditPage(driver=context.browser)
     context.current_page = page.with_postponement.click()
-
-
-@then("Vérifier que le champ {field} est bien {value}")
-def step_impl(context, field, value):
-    page = LearningUnitPage(driver=context.browser)
-    slug_field = slugify(field).replace('-', '_')
-    context.test.assertIn(value, getattr(page, slug_field).text)
 
 
 @step("Rechercher la même UE dans une année supérieure")
