@@ -38,7 +38,7 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         }
         if obj.educationgroupversion.is_transition:
             view_name = 'education_group_read_transition'
-        if obj.educationgroupversion.version_name and obj.educationgroupversion.version_name != '':
+        if obj.educationgroupversion.version_name != '':
             kwargs.update({'version_name': obj.educationgroupversion.version_name})
 
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)

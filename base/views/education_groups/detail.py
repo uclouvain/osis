@@ -150,7 +150,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     @cached_property
     def offer(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
+        return EducationGroupYear.objects.select_related('academic_year')\
+            .get(pk=self.kwargs.get("education_group_year_id"))
 
     @cached_property
     def version_name(self):

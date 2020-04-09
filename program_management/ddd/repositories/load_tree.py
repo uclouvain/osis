@@ -50,9 +50,11 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 def load(tree_root_id: int, version_name, transition, year, acronym) -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
-    version = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year,
+    version = EducationGroupVersion.objects.filter(offer__acronym=acronym,
+                                                   offer__academic_year__year=year,
                                                    version_name=version_name,
-                                                   is_transition=transition).first()
+                                                   is_transition=transition)\
+        .select_related('root_group', 'offer').first()
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})

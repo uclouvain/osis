@@ -49,27 +49,25 @@ class ProgramVersionForm(forms.Form):
 
         for a_version in self.version_list:
             is_current = self.is_current(a_version)
-            if is_current:
-                self.url_identification_tab = _compute_url(a_version, a_version.offer)
             self.version_list_for_url.append({
                 'url': _compute_url(a_version, a_version.offer),
                 'version_name': '-' if a_version.version_name == '' else a_version.version_name,
-                'transition': 'transition' if a_version.is_transition else '-',
                 'version_label': 'Standard' if a_version.version_label == '' else a_version.version_label,
                 'selected': 'selected' if is_current else ''})
+
             if is_current:
+                self.url_identification_tab = _compute_url(a_version, a_version.offer)
                 if a_version.is_transition and a_version.version_name == '':
                     self.additional_title = 'Transition'
                 else:
                     self.additional_title = a_version.version_label
 
-        self.is_standard = True if self.version_name == '' else False
+        self.is_standard = self.version_name == ''
 
         super().__init__(*args, **kwargs)
 
     def is_current(self, a_version):
-        is_current = True if a_version.version_name == self.version_name \
-                             and a_version.is_transition == self.transition else False
+        is_current = a_version.version_name == self.version_name and a_version.is_transition == self.transition
         if is_current:
             self.displayed_version = a_version
             if a_version.version_name or a_version.is_transition:
@@ -98,12 +96,10 @@ def find_version(current_version_name: str, current_transition: bool, list_of_ve
 
     for a_version in list_of_version:
         if a_version.version_name == current_version_name:
-            if current_transition:
-                if not a_version.is_standard:
-                    return a_version.version_label
-            else:
-                if a_version.is_standard:
-                    return a_version.version_label
+            is_particular = current_transition and not a_version.is_standard
+            is_standard = not current_transition and a_version.is_standard
+            if is_particular or is_standard:
+                return a_version.version_label
     return None
 
 
