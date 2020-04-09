@@ -537,6 +537,6 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 }
 
 .dropdown-menu > li > a.disabled {
-    color: #777!important;
-    cursor: not-allowed!important;
+    color: #777;
+    cursor: not-allowed;
 }

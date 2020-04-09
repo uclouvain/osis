@@ -20,7 +20,7 @@ def are_all_education_group_years_removable(self, user, education_group):
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message=pgettext("male", "The user does not have permission permission to create a %(category)s.") %
+    message=pgettext("male", "The user does not have permission to create a %(category)s.") %
     {"category": Categories.GROUP.value}
 )
 def is_not_orphan_group(self, user, education_group_year=None):
