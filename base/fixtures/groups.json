@@ -1946,11 +1946,6 @@
                     "educationgroup"
                 ],
                 [
-                    "change_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
                     "can_access_learningunit",
                     "base",
                     "learningunit"

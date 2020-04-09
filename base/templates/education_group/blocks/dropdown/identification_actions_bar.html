@@ -84,10 +84,15 @@
         {# Update link #}
         <li>
             {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
-            {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
-                {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
+            {% have_only_access_to_certificate_aims user education_group_year as only_certificate_aims %}
+            {% if only_certificate_aims %}
+                {% a_tag_modal_has_perm update_url _('Modify') 'base.change_educationgroupcertificateaim' user education_group_year %}
             {% else %}
-                {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
+                {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
+                    {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
+                {% else %}
+                    {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
+                {% endif %}
             {% endif %}
         </li>
 
