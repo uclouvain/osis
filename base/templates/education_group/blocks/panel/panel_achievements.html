@@ -62,7 +62,7 @@
                             {% url "education_group_achievements_actions" parent.pk education_group_year.pk achievement.pk as action_url %}
                             {% url 'update_education_group_achievement' root.pk education_group_year.pk achievement.pk as update_url %}
                             {% url 'delete_education_group_achievement' root.pk education_group_year.pk achievement.pk as delete_url %}
-                            {% include "education_group/blocks/form/../form/achievement_action_bar.html" with obj=achievement %}
+                            {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
                         {% endif %}
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                                         {% url "education_group_detailed_achievements_actions" parent.pk education_group_year.pk  achievement.pk detail_achievement.pk as action_url %}
                                         {% url 'update_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as update_url %}
                                         {% url 'delete_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as delete_url %}
-                                        {% include "education_group/blocks/form/../form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
+                                        {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
                                     {% endif %}
                                 </div>
                             </div>

@@ -26,6 +26,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block details %}
+
     {% with  parent=parent_training %}
         {% if program_version_form.is_particular  %}
             {% include  "education_group/blocks/panel/panel_version_information.html" %}
@@ -38,13 +39,8 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         {% dl_with_parent_without_context 'acronym' education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
-                        {% if program_version_form.is_particular %}
-                            {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') is_particular=True %}
-                            {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') is_particular=True %}
-                        {% else %}
-                            {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') %}
-                            {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') %}
-                        {% endif %}
+                        {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') is_particular=program_version_form.is_particular %}
+                        {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') is_particular=program_version_form.is_particular %}
                         {% dl_with_parent "main_teaching_campus" %}
                     </div>
                 </div>
