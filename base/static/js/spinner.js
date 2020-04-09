@@ -1,11 +1,7 @@
 let linkButtonNoSpinnerClicked = false;
-
 //sync spinner is always active on page load
 const spinnerActive = {sync: true, async: false};
-
-function bindNoSpinner(elem){
-    linkButtonNoSpinnerClicked = elem ? elem.hasClass('no_spinner') : false;
-}
+let downloadInterval;
 
 function showOverlaySpinner(async= false) {
     $('#loader, #overlay-fade-in').show();
@@ -20,17 +16,23 @@ function closeOverlaySpinner(async= false){
     }
 }
 
+//handle spinner for download file
+function isDownloadCompleted(){
+    if(document.cookie.includes('download')){
+        closeOverlaySpinner();
+        // delete cookie setting an expired date
+        document.cookie = "download=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        if(downloadInterval) {
+            clearInterval(downloadInterval)
+        }
+    }
+}
+
 $(document).ready(function() {
     closeOverlaySpinner();
-    $('a, button').on('click submit', function (e) {
-        bindNoSpinner($(this));
+    $('.no_spinner').click(() => {
+        downloadInterval = setInterval(isDownloadCompleted, 2000);
     });
-
-    ["formAjaxSubmit:onSubmit", "prepareXls:onClick"].forEach(evt =>
-        document.addEventListener(evt, function (e) {
-            bindNoSpinner(e.detail);
-        })
-    );
 });
 
 $(document).on('keyup', function (e) {
