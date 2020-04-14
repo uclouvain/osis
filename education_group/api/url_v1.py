@@ -28,8 +28,8 @@ from django.conf.urls import url, include
 from education_group.api.views.group import GroupDetail, GroupTitle
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
 from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrainingTitle, MiniTrainingList
-from education_group.api.views.prerequisite import TrainingPrerequisites, MiniTrainingPrerequisites
 from education_group.api.views.training import TrainingList, TrainingDetail, TrainingTitle
+from program_management.api.views.prerequisite import TrainingPrerequisites, MiniTrainingPrerequisites
 
 app_name = "education_group"
 

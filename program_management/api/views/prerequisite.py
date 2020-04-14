@@ -29,16 +29,16 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializerLearningUnit
+from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer
 from program_management.ddd.repositories import load_tree
 
 
-class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.ListAPIView):
+class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIView):
     """
         Return the prerequisites of an education group
     """
     name = 'education_group-prerequisites'
-    serializer_class = EducationGroupPrerequisitesSerializerLearningUnit
+    serializer_class = ProgramTreePrerequisitesSerializer
     queryset = EducationGroupYear.objects.all().select_related('academic_year')
     pagination_class = None
     filter_backends = ()
@@ -67,7 +67,7 @@ class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.L
         return serializer_context
 
 
-class TrainingPrerequisites(EducationGroupYearPrerequisites):
+class TrainingPrerequisites(ProgramTreePrerequisites):
     name = 'training-prerequisites'
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.TRAINING
@@ -77,7 +77,7 @@ class TrainingPrerequisites(EducationGroupYearPrerequisites):
     )
 
 
-class MiniTrainingPrerequisites(EducationGroupYearPrerequisites):
+class MiniTrainingPrerequisites(ProgramTreePrerequisites):
     name = 'mini_training-prerequisites'
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.MINI_TRAINING

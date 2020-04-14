@@ -2,8 +2,8 @@ from django.test import SimpleTestCase, RequestFactory, override_settings
 from rest_framework.reverse import reverse
 
 from base.models.enums import prerequisite_operator
-from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializerLearningUnit, \
-    LearningUnitBaseSerializer
+from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer, \
+    NodeBaseSerializer
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -56,7 +56,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': self.root_node.year,
                                                                                'acronym': self.root_node.code})
         self.request = RequestFactory().get(url)
-        self.serializer = EducationGroupPrerequisitesSerializerLearningUnit(self.ldroi100a, context={
+        self.serializer = ProgramTreePrerequisitesSerializer(self.ldroi100a, context={
             'request': self.request,
             'language': 'fr',
             'tree': self.tree
@@ -100,7 +100,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
 
         url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': 2018, 'acronym': 'LDROI1300'})
         self.request = RequestFactory().get(url)
-        self.serializer = LearningUnitBaseSerializer(self.ldroi1300, context={
+        self.serializer = NodeBaseSerializer(self.ldroi1300, context={
             'request': self.request,
             'language': 'fr',
         })

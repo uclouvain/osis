@@ -33,7 +33,7 @@ from rest_framework.test import APITestCase
 from base.models.enums import prerequisite_operator, education_group_categories
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
-from education_group.api.serializers.prerequisite import EducationGroupPrerequisitesSerializerLearningUnit
+from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -115,7 +115,7 @@ class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
         cls.url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': cls.root_node.year,
                                                                                    'acronym': cls.root_node.code})
         cls.request = RequestFactory().get(cls.url)
-        cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
+        cls.serializer = ProgramTreePrerequisitesSerializer(cls.ldroi100a, context={
             'request': cls.request,
             'language': 'fr',
             'tree': cls.tree
@@ -170,7 +170,7 @@ class MiniTrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase)
                                                                                         'partial_acronym':
                                                                                             cls.root_node.code})
         cls.request = RequestFactory().get(cls.url)
-        cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
+        cls.serializer = ProgramTreePrerequisitesSerializer(cls.ldroi100a, context={
             'request': cls.request,
             'language': 'fr',
             'tree': cls.tree
