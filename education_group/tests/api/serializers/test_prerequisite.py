@@ -74,7 +74,8 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
     def test_read_prerequisite_on_training(self):
         with self.subTest('title'):
-            self.assertEqual(self.ldroi100a.common_title_en, self.serializer.data.get('title'))
+            self.assertEqual(self.ldroi100a.common_title_fr + ' - ' + self.ldroi100a.specific_title_fr,
+                             self.serializer.data.get('title'))
 
         with self.subTest('url'):
             url = reverse('learning_unit_api_v1:learningunits_read',
@@ -91,7 +92,11 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
 class TestLearningUnitBaseSerializer(SimpleTestCase):
     def setUp(self):
-        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
+        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
+                                                     code="LDROI1300",
+                                                     common_title_fr="Introduction droit",
+                                                     specific_title_fr="Partie 1",
+                                                     year=2018)
 
         url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': 2018, 'acronym': 'LDROI1300'})
         self.request = RequestFactory().get(url)
@@ -110,7 +115,8 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
 
     def test_read(self):
         with self.subTest('title'):
-            self.assertEqual(self.ldroi1300.common_title_en, self.serializer.data.get('title'))
+            self.assertEqual(self.ldroi1300.common_title_fr + ' - ' + self.ldroi1300.specific_title_fr,
+                             self.serializer.data.get('title'))
 
         with self.subTest('url'):
             url = reverse('learning_unit_api_v1:learningunits_read',
