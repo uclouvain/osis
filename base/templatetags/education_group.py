@@ -40,12 +40,10 @@ from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
 from program_management.templatetags.group_element_year import get_action_with_permission
-from base.models.education_group import EducationGroup
-
-VERSIONED_FIELDS = ('acronym', 'partial_acronym', 'active', 'credits', 'constraint_type', 'min_constraint',
-                    'max_constraint', 'main_teaching_campus', 'remark', 'remark_english', 'start_year', 'end_year')
 
 register = template.Library()
+
+UN_VERSIONED_OF_FIELD = "of_unversioned_field"
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
@@ -248,30 +246,34 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
+def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, versioned_field=False):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
     the method will try to fetch the parent's value and display it in another style
     (strong, blue).
     """
-    obj = context["education_group_year"]
+    is_particular = context["program_version_form"] and context["program_version_form"].is_particular
+    if versioned_field and key not in ('active', 'main_teaching_campus'):#Todo bizarre je pense que c'est 2 champs devraient être dans group_year selon le fichie xls de hang
+        obj = context["root_group"]
+    else:
+        obj = context["education_group_year"]
+
     parent = context["parent"]
 
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
-        class_dl=_get_css(key,
-                          class_dl, context["program_version_form"] and context["program_version_form"].is_particular),
-        default_value=default_value)
+        class_dl=class_dl,
+        default_value=default_value, is_particular=is_particular, versioned_field=versioned_field)
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
 def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, version_label=None,
-                                   is_particular=False):
+                                   is_particular=False, versioned_field=False):
+
     value = None
     parent_value = None
 
-    class_dl = _get_css(key, class_dl, is_particular)
     if obj:
         value = get_verbose_field_value(obj, key)
 
@@ -284,14 +286,19 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
             parent, parent_value = None, None
         if key == "acronym" and version_label:
             value = "{}[{}]".format(value, version_label)
+    class_dl = _get_css(class_dl, is_particular, versioned_field)
 
-    return {
+    dl_dict = {
         'label': _(dl_title),
         'value': _bool_to_string(value),
         'parent_value': _bool_to_string(parent_value),
         'class_dl': class_dl,
         'default_value': default_value,
     }
+    if is_particular and not versioned_field:
+        dl_dict.update({'title_dl': _('The value of this attribute is inherited from the standard OF')})
+
+    return dl_dict
 
 
 def _bool_to_string(value):
@@ -306,19 +313,36 @@ def _bool_to_string(value):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value=None):
-    obj = context["education_group_year"]
+def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value=None, versioned_field=False):
+    if versioned_field:
+        obj = context["education_group_year"]
+    else:
+        obj = context["root_group"]
     parent = context["parent"]
+
+    is_particular = context["program_version_form"] and context["program_version_form"].is_particular
 
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
-        class_dl=_get_css(key, class_dl,
-                          context["program_version_form"] and context["program_version_form"].is_particular),
+        class_dl=_get_css(class_dl, is_particular, versioned_field),
         default_value=default_value,
-        version_label=context['program_version_form'].additional_title)
+        version_label=context['program_version_form'].additional_title,
+        is_particular=is_particular,
+        versioned_field=versioned_field)
 
 
-def _get_css(key, class_dl, is_particular):
-    return "{} version_value".format(class_dl) if is_particular and key not in VERSIONED_FIELDS else class_dl
+def _get_css(class_dl, is_particular, version_field):
+    return "{} {}".format(class_dl, UN_VERSIONED_OF_FIELD) if is_particular and not version_field else class_dl
 
 
+@register.simple_tag
+def get_version_url_with_tab_to_show(**kwargs):
+    tab_to_show = kwargs['tab_to_show']
+    version = kwargs['version']
+    if tab_to_show == "show_content":
+        main_url = version.get('url_content')
+    elif tab_to_show == 'show_utilization':
+        main_url = version.get('url_utilization')
+    else:
+        main_url = version.get('url_identification')
+    return "{}?tab_to_show={}".format(main_url, tab_to_show)

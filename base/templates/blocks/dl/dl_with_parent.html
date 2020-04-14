@@ -1,5 +1,5 @@
 {% load i18n %}
-<dl class="{{ class_dl }}">
+<dl class="{{ class_dl }}" {% if title_dl %}title="{{ title_dl }}"{% endif %}>
     <dt style="margin-bottom: 5px;">{{ label|capfirst }}</dt>
     <dd>
         {% if value %}

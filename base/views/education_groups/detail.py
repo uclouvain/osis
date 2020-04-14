@@ -82,6 +82,7 @@ from program_management.ddd.repositories.load_tree import find_all_program_tree_
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.forms.program_version import ProgramVersionForm
+from program_management.models.education_group_version import EducationGroupVersion
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -183,6 +184,21 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
+            # TODO remplacera la version de load_tree.load existante actuellement
+            # program_tree = load_tree.load(self.offer.id,
+            #                               '' if self.version_name == '-' else self.version_name,
+            #                               self.transition == 'transition',
+            #                               self.offer.academic_year.year,
+            #                               self.offer.acronym)
+            # TODO en attendant la nouvelle verion du load_tree je vais récupéréer le groupry comme ceci
+            version = EducationGroupVersion.objects.filter(offer__acronym=self.offer.acronym,
+                                                           offer__academic_year__year=self.offer.academic_year.year,
+                                                           version_name=self.version_name,
+                                                           is_transition=self.transition) \
+                .select_related('root_group', 'offer').first()
+            if version:
+                context['root_group'] = version.root_group
+                context['offer'] = version.offer
             program_tree = load_tree.load(self.offer.id)
             serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)

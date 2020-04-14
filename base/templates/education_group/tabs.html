@@ -40,15 +40,16 @@
             </a>
         </li>
     {% endif %}
-    {% if not program_version_form.is_particular %}
-        {% if show_diploma %}
-            <li role="presentation" {% if request.path == url_diplomas_tab %} offer="active" {% endif %}>
-                <a id="link_diploma" href="{% url 'education_group_diplomas' offer.pk education_group_year.pk %}?tab_to_show=show_diploma{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
-                    {% trans 'Diplomas /  Certificates' %}
-                </a>
-            </li>
+        {% if not program_version_form.is_particular %}
+            {% if show_diploma %}
+                <li role="presentation" {% if request.path == url_diplomas_tab %} offer="active" {% endif %}>
+                    <a id="link_diploma" href="{% url 'education_group_diplomas' offer.pk education_group_year.pk %}?tab_to_show=show_diploma{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                        {% trans 'Diplomas /  Certificates' %}
+                    </a>
+                </li>
+            {% endif %}
         {% endif %}
-        {% if show_administrative %}
+        {% if show_administrative and not program_version_form.is_particular %}
             <li role="presentation" {% if request.path == url_administrative_tab %} class="active" {% endif %}>
                 <a id="link_administrative" href="{% url 'education_group_administrative' offer.pk education_group_year.pk %}?tab_to_show=show_administrative{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}"
                    role="tab">
@@ -56,23 +57,24 @@
                 </a>
             </li>
         {% endif %}
+
         {% if show_content %}
-            <li role="presentation" {% if request.path == url_content_tab %} class="active" {% endif %}>
-                <a id="link_content" href="{% url 'education_group_content' offer.pk education_group_year.pk %}?tab_to_show=show_content{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+            <li role="presentation" {% if request.path == program_version_form.url_content_tab %} class="active" {% endif %}>
+                <a id="link_content" href="{{program_version_form.url_content_tab}}?tab_to_show=show_content{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
                     {% trans 'Content' %}
                 </a>
             </li>
         {% endif %}
 
         {% if show_utilization %}
-            <li role="presentation" {% if request.path == url_utilization_tab %} class="active" {% endif %}>
-                <a id="link_utilization" href="{% url 'education_group_utilization' offer.pk education_group_year.pk %}?tab_to_show=show_utilization{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+            <li role="presentation" {% if request.path == program_version_form.url_utilization_tab %} class="active" {% endif %}>
+                <a id="link_utilization" href="{{program_version_form.url_utilization_tab}}?tab_to_show=show_utilization{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
                     {% trans 'Utilizations' %}
                 </a>
             </li>
         {% endif %}
 
-        {% if show_general_information %}
+        {% if show_general_information and not program_version_form.is_particular %}
             <li role="presentation" {% if request.path == url_general_informations_tab %} class="active" {% endif %}>
                 <a id="link_general_information"
                    href="{% url 'education_group_general_informations' offer.pk education_group_year.pk %}?tab_to_show=show_general_information{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
@@ -80,7 +82,8 @@
                 </a>
             </li>
         {% endif %}
-        {% if show_skills_and_achievements %}
+
+        {% if show_skills_and_achievements and not program_version_form.is_particular %}
             <li role="presentation" {% if request.path == url_skill_achievements_tab %} class="active" {% endif %}>
                 <a id="link_skill_achievements"
                    href="{% url 'education_group_skills_achievements' offer.pk education_group_year.pk %}?tab_to_show=show_skills_and_achievements{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
@@ -88,7 +91,8 @@
                 </a>
             </li>
         {% endif %}
-        {% if show_admission_conditions %}
+
+        {% if show_admission_conditions and not program_version_form.is_particular %}
             <li role="presentation" {% if request.path == url_admission_conditions_tab %} class="active"{% endif %}>
                 <a id="link_content"
                    href="{% url 'education_group_year_admission_condition_edit' offer.pk education_group_year.pk %}?tab_to_show=show_admission_conditions{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
@@ -96,5 +100,4 @@
                 </a>
             </li>
         {% endif %}
-    {% endif %}
 </ul>

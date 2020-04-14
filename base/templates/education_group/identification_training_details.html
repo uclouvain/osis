@@ -51,30 +51,15 @@
                             {% dl_with_parent 'dissertation' class_dl="col-md-6" %}
                         </div>
                         {% dl_with_parent 'university_certificate' %}
-                        <dl>
-                            <dt>{% trans 'Decree category' %}</dt>
-                            <dd>
-                                {{ education_group_year.get_decree_category_display|default:"" }}
-                            </dd>
-                        </dl>
-                        <dl>
-                            <dt>{% trans 'Rate code' %}</dt>
-                            <dd>
-                                {% if education_group_year.rate_code %}
-                                    {% trans education_group_year.get_rate_code_display %}
-                                {% endif %}
-                            </dd>
-                        </dl>
-                        <dl>
-                            <dt>{% trans 'Primary language' %}</dt>
-                            <dd>{{ education_group_year.primary_language }}</dd>
-                        </dl>
+                        {% dl_with_parent 'decree_category' dl_title=_('Decree category') default_value="" %}
+                        {% dl_with_parent 'rate_code' dl_title=_('Rate code') default_value="" %}
+                        {% dl_with_parent 'primary_language' dl_title=_('Primary language') default_value="" %}
                         {% dl_with_parent 'english_activities' %}
                         {% dl_with_parent 'other_language_activities' %}
                         {% dl_with_parent 'main_domain' %}
 
                         {# TODO dl_with_parent needs to manage list #}
-                        <div>
+                        <div {% if program_version_form.is_particular  %} class="of_unversioned_field"{% endif %}>
                             <label>{% trans 'secondary domains'|title %}</label><br>
                             {% if education_group_year.secondary_domains %}
                                 <ul>{{ education_group_year.secondary_domains.all | unordered_list }}</ul>
@@ -85,10 +70,7 @@
                             {% endif %}
                             <br>
                         </div>
-                        <dl>
-                            <dt>{% trans 'ISCED domain' %}</dt>
-                            <dd>{{ education_group_year.isced_domain | default_if_none:'' }}</dd>
-                        </dl>
+                        {% dl_with_parent 'isced_domain' dl_title=_('ISCED domain') default_value="" %}
                         {% dl_with_parent 'internal_comment' %}
                     </div>
                 </div>
@@ -96,11 +78,11 @@
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
-                        {% dl_with_parent_without_context "acronym" education_group_year.administration_entity_version parent.administration_entity_version dl_title=_("Administration entity") %}
-                        {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') is_particular=program_version_form.is_particular %}
-                        {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified')  is_particular=program_version_form.is_particular %}
-                        {% dl_with_parent "main_teaching_campus" %}
+                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") is_particular=program_version_form.is_particular%}
+                        {% dl_with_parent_without_context "acronym" education_group_year.administration_entity_version parent.administration_entity_version dl_title=_("Administration entity") is_particular=program_version_form.is_particular %}
+                        {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') is_particular=program_version_form.is_particular versioned_field=True %}
+                        {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') is_particular=program_version_form.is_particular versioned_field=True %}
+                        {% dl_with_parent "main_teaching_campus" versioned_field=True %}
                         {% dl_with_parent "enrollment_campus" %}
                         {% dl_with_parent "other_campus_activities" %}
                     </div>
@@ -146,6 +128,7 @@
                 },
                 "order": [[2, "desc"], [0, "asc"]]
             });
+            $('.of_unversioned_field div label').attr('title', "{% trans 'The value of this attribute is inherited from the standard OF' %}")
         });
     </script>
 {% endblock %}

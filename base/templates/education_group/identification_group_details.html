@@ -37,8 +37,8 @@
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
-                        {% dl_with_parent "main_teaching_campus" %}
+                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") is_particular=program_version_form.is_particular %}
+                        {% dl_with_parent "main_teaching_campus" versioned_fied=True%}
                     </div>
                 </div>
                 {% include "blocks/panel/reversion.html" %}

@@ -27,6 +27,10 @@ from operator import attrgetter
 from django import forms
 from django.urls import reverse
 
+IDENTIFICATION_URL_NAME = 'education_group_read'
+CONTENT_URL_NAME = 'education_group_content'
+UTILIZATION_URL_NAME = 'education_group_utilization'
+
 
 class ProgramVersionForm(forms.Form):
 
@@ -37,6 +41,8 @@ class ProgramVersionForm(forms.Form):
     additional_title = None     # complement following the OF acronym if it's a particular version
     displayed_version = None
     url_identification_tab = None
+    url_content_tab = None
+    url_utilization_tab = None
     is_particular = False
 
     def __init__(self, *args, **kwargs):
@@ -50,13 +56,18 @@ class ProgramVersionForm(forms.Form):
         for a_version in self.version_list:
             is_current = self.is_current(a_version)
             self.version_list_for_url.append({
-                'url': _compute_url(a_version, a_version.offer),
+                'url_identification': _compute_url(IDENTIFICATION_URL_NAME, a_version, a_version.offer),
+                'url_content': _compute_url(CONTENT_URL_NAME, a_version, a_version.offer),
+                'url_utilization': _compute_url(UTILIZATION_URL_NAME, a_version, a_version.offer),
                 'version_name': '-' if a_version.version_name == '' else a_version.version_name,
                 'version_label': 'Standard' if a_version.version_label == '' else a_version.version_label,
                 'selected': 'selected' if is_current else ''})
 
             if is_current:
-                self.url_identification_tab = _compute_url(a_version, a_version.offer)
+                self.url_identification_tab = _compute_url(IDENTIFICATION_URL_NAME, a_version, a_version.offer)
+                self.url_content_tab = _compute_url(CONTENT_URL_NAME, a_version, a_version.offer)
+                self.url_utilization_tab = _compute_url(UTILIZATION_URL_NAME, a_version, a_version.offer)
+
                 if a_version.is_transition and a_version.version_name == '':
                     self.additional_title = 'Transition'
                 else:
@@ -103,11 +114,11 @@ def find_version(current_version_name: str, current_transition: bool, list_of_ve
     return None
 
 
-def _compute_url(a_version, offer_id):
+def _compute_url(basic_url, a_version, offer_id):
     kwargs = {'education_group_year_id': offer_id}
-    url_name = 'education_group_read'
+    url_name = basic_url
     if a_version.is_transition:
-        url_name = 'education_group_read_transition'
+        url_name = '{}_transition'.format(basic_url)
 
     if a_version.version_name:
         kwargs.update({'version_name': a_version.version_name})

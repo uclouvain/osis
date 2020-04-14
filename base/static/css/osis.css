@@ -536,7 +536,6 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     margin-left: 5px;
 }
 
-.version_value {
+.of_unversioned_field{
     color: grey;
-    font-style: italic;;
 }
