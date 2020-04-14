@@ -25,7 +25,7 @@
 ##############################################################################
 
 from django.conf import settings
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from mock import patch
 from rest_framework import status
@@ -41,6 +41,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
+@override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
 class EducationGroupPrerequisitesBaseTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):

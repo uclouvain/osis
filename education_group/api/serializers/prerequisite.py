@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from rest_framework import serializers
 
 from learning_unit.api.serializers.utils import LearningUnitDDDHyperlinkedIdentityField
@@ -37,12 +36,9 @@ class LearningUnitBaseSerializer(serializers.Serializer):
     code = serializers.CharField(read_only=True)
 
     def get_title(self, obj: 'Node'):
-        if self.context.get('language') == settings.LANGUAGE_CODE_EN:
-            specific_title = obj.specific_title_en
-            common_title = obj.common_title_en
-        else:
-            specific_title = obj.specific_title_fr
-            common_title = obj.common_title_fr
+        lang = self.context.get('language').lower()
+        specific_title = getattr(obj, 'specific_title_{}'.format(lang))
+        common_title = getattr(obj, 'common_title_{}'.format(lang))
 
         complete_title = specific_title
         if common_title:

@@ -59,10 +59,11 @@ class EducationGroupYearPrerequisites(LanguageContextSerializerMixin, generics.L
     def get_serializer_context(self):
         egy = self.get_object()
         tree = load_tree.load(egy.id)
-        serializer_context = {
+        serializer_context = super().get_serializer_context()
+        serializer_context.update({
             'request': self.request,
             'tree': tree
-        }
+        })
         return serializer_context
 
 

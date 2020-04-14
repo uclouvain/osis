@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.test import SimpleTestCase, RequestFactory
+from django.test import SimpleTestCase, RequestFactory, override_settings
 from rest_framework.reverse import reverse
 
 from base.models.enums import prerequisite_operator
@@ -11,6 +11,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
+@override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
 class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
     def setUp(self):
         """
