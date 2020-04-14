@@ -39,6 +39,7 @@ from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 
+#  TODO MODIFY test to use ddd objects and mock loading of program tree
 class TestUpdateLearningUnitPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
