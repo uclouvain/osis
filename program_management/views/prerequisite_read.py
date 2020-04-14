@@ -29,14 +29,12 @@ from django.utils.translation import gettext_lazy as _
 
 import program_management.ddd.repositories.find_roots
 from base.business.education_groups import perms
-from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.prerequisite import Prerequisite
 from base.views.common import display_warning_messages
 from osis_common.utils.models import get_object_or_none
-from program_management.business.learning_units.prerequisite import \
-    get_prerequisite_acronyms_which_are_outside_of_education_group
+from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import LearningUnitGenericDetailView
 
 
@@ -75,10 +73,16 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
 
     def add_warning_messages(self, context):
         root = context["root"]
-        prerequisite = context["prerequisite"]
         learning_unit_year = context["learning_unit_year"]
-        learning_unit_inconsistent = get_prerequisite_acronyms_which_are_outside_of_education_group(root, prerequisite)\
-            if prerequisite else []
+        node_luy = self.program_tree.get_node_by_id_and_type(learning_unit_year.id, NodeType.LEARNING_UNIT)
+        prerequisite_of_luy = node_luy.prerequisite
+        code_prerequisites = []
+        for group in prerequisite_of_luy.prerequisite_item_groups:
+            for item in group.prerequisite_items:
+                code_prerequisites.append(item.code)
+        code_that_can_be_prerequisite = self.program_tree.get_codes_permitted_as_prerequisite()
+
+        learning_unit_inconsistent = set(code_prerequisites) - set(code_that_can_be_prerequisite)
         if learning_unit_inconsistent:
             display_warning_messages(
                 self.request,
