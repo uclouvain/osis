@@ -35,7 +35,7 @@ from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
 from program_management.ddd.domain import node
-from program_management.views.generic import LearningUnitGenericUpdateView
+from program_management.views.generic import LearningUnitGenericUpdateView, NO_PREREQUISITES
 
 
 class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
@@ -60,19 +60,9 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         context = super().get_context_data()
         context["show_prerequisites"] = True
 
-        learning_unit_year = context["learning_unit_year"]
         education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
 
-        #  TODO load prerequisite for specific formation
-        formations = program_management.ddd.repositories.find_roots.find_roots(
-            [learning_unit_year],
-            as_instances=True,
-            with_parents_of_parents=True,
-        )
-
-        formations_set = set(flatten([parents for child_id, parents in formations.items()]))
-
-        if education_group_year_root not in formations_set:
+        if education_group_year_root.education_group_type.name in NO_PREREQUISITES:
             raise PermissionDenied(
                 _("You must be in the context of a training to modify the prerequisites to a learning unit "
                     "(current context: %(partial_acronym)s - %(acronym)s)") % {
