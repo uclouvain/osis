@@ -41,7 +41,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-class TrainingPrerequisitesTestCase(APITestCase):
+class EducationGroupPrerequisitesBaseTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         """
@@ -65,12 +65,6 @@ class TrainingPrerequisitesTestCase(APITestCase):
         cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
         cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
 
-        cls.root_egy = EducationGroupYearFactory(id=cls.root_node.node_id,
-                                                 education_group_type__category=education_group_categories.TRAINING,
-                                                 acronym=cls.root_node.code,
-                                                 title=cls.root_node.title,
-                                                 academic_year__year=cls.root_node.year)
-
         LinkFactory(parent=cls.root_node, child=cls.common_core)
         LinkFactory(parent=cls.common_core, child=cls.ldroi100a)
         LinkFactory(parent=cls.root_node, child=cls.subgroup1)
@@ -88,6 +82,20 @@ class TrainingPrerequisitesTestCase(APITestCase):
 
         cls.tree = ProgramTree(root_node=cls.root_node)
 
+    def setUp(self):
+        self.client.force_authenticate(user=self.person.user)
+
+
+class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.root_egy = EducationGroupYearFactory(id=cls.root_node.node_id,
+                                                 education_group_type__category=education_group_categories.TRAINING,
+                                                 acronym=cls.root_node.code,
+                                                 title=cls.root_node.title,
+                                                 academic_year__year=cls.root_node.year)
+
         cls.url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': cls.root_node.year,
                                                                                    'acronym': cls.root_node.code})
         cls.request = RequestFactory().get(cls.url)
@@ -96,9 +104,6 @@ class TrainingPrerequisitesTestCase(APITestCase):
             'language': settings.LANGUAGE_CODE_EN,
             'tree': cls.tree
         })
-
-    def setUp(self):
-        self.client.force_authenticate(user=self.person.user)
 
     def test_get_not_authorized(self):
         self.client.force_authenticate(user=None)
@@ -133,29 +138,10 @@ class TrainingPrerequisitesTestCase(APITestCase):
             self.assertEqual([self.serializer.data], response.json())
 
 
-class MiniTrainingPrerequisitesTestCase(APITestCase):
+class MiniTrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
     @classmethod
     def setUpTestData(cls):
-        """
-        root_node
-        |-----common_core
-             |---- LDROI100A (UE)
-        |----subgroup1
-             |---- LDROI120B (UE)
-             |----subgroup2
-                  |---- LDROI100A (UE)
-        :return:
-        """
-        cls.person = PersonFactory()
-        cls.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
-        cls.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
-        cls.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
-        cls.ldroi120b = NodeLearningUnitYearFactory(node_id=4, code="LDROI120B", title="Séminaire", year=2018)
-        cls.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
-        cls.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
-
-        cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
-        cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
+        super().setUpTestData()
 
         cls.root_egy = EducationGroupYearFactory(id=cls.root_node.node_id,
                                                  education_group_type__category=
@@ -163,23 +149,6 @@ class MiniTrainingPrerequisitesTestCase(APITestCase):
                                                  partial_acronym=cls.root_node.code,
                                                  title=cls.root_node.title,
                                                  academic_year__year=cls.root_node.year)
-
-        LinkFactory(parent=cls.root_node, child=cls.common_core)
-        LinkFactory(parent=cls.common_core, child=cls.ldroi100a)
-        LinkFactory(parent=cls.root_node, child=cls.subgroup1)
-        LinkFactory(parent=cls.subgroup1, child=cls.ldroi120b)
-        LinkFactory(parent=cls.subgroup1, child=cls.subgroup2)
-        LinkFactory(parent=cls.subgroup2, child=cls.ldroi100a)
-
-        cls.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
-        cls.p_group.add_prerequisite_item('LDROI1300', 2018)
-        cls.p_group.add_prerequisite_item('LAGRO2400', 2018)
-
-        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
-        p_req.add_prerequisite_item_group(cls.p_group)
-        cls.ldroi100a.set_prerequisite(p_req)
-
-        cls.tree = ProgramTree(root_node=cls.root_node)
 
         cls.url = reverse('education_group_api_v1:mini_training-prerequisites', kwargs={'year': cls.root_node.year,
                                                                                         'partial_acronym':
@@ -190,9 +159,6 @@ class MiniTrainingPrerequisitesTestCase(APITestCase):
             'language': settings.LANGUAGE_CODE_EN,
             'tree': cls.tree
         })
-
-    def setUp(self):
-        self.client.force_authenticate(user=self.person.user)
 
     def test_get_not_authorized(self):
         self.client.force_authenticate(user=None)
@@ -225,4 +191,3 @@ class MiniTrainingPrerequisitesTestCase(APITestCase):
 
         with self.subTest('Test response'):
             self.assertEqual([self.serializer.data], response.json())
-
