@@ -28,6 +28,8 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from program_management.ddd.domain.prerequisite import construct_prerequisite_from_expression
+from program_management.ddd.repositories import persist_prerequisite
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
 from program_management.models.enums.node_type import NodeType
@@ -58,6 +60,21 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         self.check_can_update_prerequisite()
 
         return context
+
+    def form_valid(self, form):
+        prerequisite_obj = construct_prerequisite_from_expression(
+            form.cleaned_data["prerequisite_string"],
+            self.get_root().academic_year.year
+        )
+        persist_prerequisite.persist(
+            self.program_tree.root_node,
+            self.program_tree.get_node_by_id_and_type(
+                int(self.kwargs["learning_unit_year_id"]),
+                NodeType.LEARNING_UNIT
+            ),
+            prerequisite_obj
+        )
+        return super().form_valid(form)
 
     #  FIXME refactor permission with new permission module
     def check_can_update_prerequisite(self):

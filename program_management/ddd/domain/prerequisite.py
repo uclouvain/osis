@@ -149,4 +149,4 @@ def _detect_main_operator_in_string(prerequisite_string: PrerequisiteExpression)
     elif re.match(MULTIPLE_PREREQUISITES_REGEX_AND, prerequisite_string):
         return AND
     else:
-        return None
+        return AND
