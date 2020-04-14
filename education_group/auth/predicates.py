@@ -81,7 +81,8 @@ def is_maximum_child_not_reached_for_training_category(self, user, education_gro
 @predicate(bind=True)
 def is_maximum_child_not_reached_for_mini_training_category(self, user, education_group_year=None):
     if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year, Categories.MINI_TRAINING.name)
+        return _is_maximum_child_not_reached_for_category(self, user, education_group_year,
+                                                          Categories.MINI_TRAINING.name)
     return None
 
 

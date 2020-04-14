@@ -38,13 +38,11 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             ),
             'base.add_minitraining':
                 predicates.is_program_edition_period_open &
-                predicates.is_maximum_child_not_reached_for_mini_training_category
-            ,
+                predicates.is_maximum_child_not_reached_for_mini_training_category,
             'base.add_group':
                 predicates.is_not_orphan_group &
                 predicates.is_program_edition_period_open &
-                predicates.is_maximum_child_not_reached_for_group_category
-            ,
+                predicates.is_maximum_child_not_reached_for_group_category,
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
@@ -70,8 +68,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.change_educationgroupcertificateaim':
                 osis_role_predicates.always_deny(
                     message=_('Certificate aim can only be edited by program manager')
-                )
-            ,
+                ),
             'base.change_commonpedagogyinformation':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
@@ -79,41 +76,32 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.change_pedagogyinformation':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_attached_to_management_entity
-            ,
+                predicates.is_user_attached_to_management_entity,
             'base.change_commonadmissioncondition':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_program_edition_period_open
-            ,
+                predicates.is_program_edition_period_open,
             'base.change_admissioncondition':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_program_edition_period_open
-            ,
+                predicates.is_program_edition_period_open,
             'base.change_educationgrouporganization': osis_role_predicates.always_deny(
                     message=_('Coorganization can only be changed by central manager')
-                )
-            ,
+                ),
             'base.add_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_attached_to_management_entity
-            ,
+                predicates.is_user_attached_to_management_entity,
             'base.change_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_attached_to_management_entity
-            ,
+                predicates.is_user_attached_to_management_entity,
             'base.delete_educationgroupachievement':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_attached_to_management_entity
-            ,
-            'base.can_edit_education_group_administrative_data': rules.always_deny
-            ,
-            'base.change_educationgroupcontent': rules.always_allow
-            ,
+                predicates.is_user_attached_to_management_entity,
+            'base.can_edit_education_group_administrative_data': rules.always_deny,
+            'base.change_educationgroupcontent': rules.always_allow,
         })

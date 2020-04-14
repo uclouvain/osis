@@ -255,7 +255,8 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": has_coorganization(education_group_year),
         "show_diploma_tab": form_education_group_year.show_diploma_tab(),
-        'can_change_coorganization': request.user.has_perm('base.change_educationgrouporganization', education_group_year),
+        'can_change_coorganization':
+            request.user.has_perm('base.change_educationgrouporganization', education_group_year),
         'group_element_years': groupelementyear_formset,
         "is_finality_types": education_group_year.is_finality
     })
