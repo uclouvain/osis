@@ -28,8 +28,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.domain.node import Node
-from program_management.ddd.domain.prerequisite import PrerequisiteExpression
-from program_management.ddd.validators._prerequisite_expression_syntax import ACRONYM_REGEX
+from program_management.ddd.domain.prerequisite import PrerequisiteExpression, ACRONYM_REGEX
 
 
 class PrerequisiteItemsValidator(BusinessValidator):

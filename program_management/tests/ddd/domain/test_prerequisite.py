@@ -27,6 +27,7 @@ from django.test import SimpleTestCase
 
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain.prerequisite import NullPrerequisite
 
 
 class TestPrerequisiteItem(SimpleTestCase):
@@ -93,3 +94,20 @@ class TestPrerequisite(SimpleTestCase):
 
         expected_str = '(LDROI1300 OR LAGRO2400) AND LDROI1400'
         self.assertEquals(str(p_req), expected_str)
+
+
+class TestConstructPrerequisiteFromExpression(SimpleTestCase):
+    def test_return_null_prerequisite_when_empty_expression_given(self):
+        self.assertIsInstance(
+            prerequisite.construct_prerequisite_from_expression("", 2019),
+            NullPrerequisite
+        )
+
+    def test_return_prerequisite_object_when_expression_given(self):
+        prerequisite_expression = "LOSIS4525 OU (LMARC5823 ET BRABD6985)"
+
+        prerequisite_obj = prerequisite.construct_prerequisite_from_expression(prerequisite_expression, 2019)
+        self.assertEqual(
+            prerequisite_expression,
+            str(prerequisite_obj)
+        )
