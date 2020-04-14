@@ -28,28 +28,27 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.models.prerequisite import Prerequisite
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
-from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
+from program_management.forms.prerequisite import PrerequisiteForm
+from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import LearningUnitGenericUpdateView
 
 
 class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
     template_name = "learning_unit/tab_prerequisite_update.html"
-    form_class = LearningUnitPrerequisiteForm  # TODO Update form to use ddd domain objects
+    form_class = PrerequisiteForm
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
-        try:
-            instance = Prerequisite.objects.get(education_group_year=self.kwargs["root_id"],
-                                                learning_unit_year=self.kwargs["learning_unit_year_id"])
-        except Prerequisite.DoesNotExist:
-            instance = Prerequisite(
-                education_group_year=self.get_root(),
-                learning_unit_year=self.object
-            )
-        form_kwargs["instance"] = instance
+        node = self.program_tree.get_node_by_id_and_type(
+            int(self.kwargs["learning_unit_year_id"]),
+            NodeType.LEARNING_UNIT
+        )
         form_kwargs["codes_permitted"] = self.program_tree.get_codes_permitted_as_prerequisite()
+        form_kwargs["node"] = node
+        form_kwargs["initial"] = {
+            "prerequisite_string": str(node.prerequisite)
+        }
         return form_kwargs
 
     def get_context_data(self, **kwargs):

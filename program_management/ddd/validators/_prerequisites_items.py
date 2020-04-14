@@ -43,7 +43,7 @@ class PrerequisiteItemsValidator(BusinessValidator):
         codes_used_in_prerequisite_string = self._extract_acronyms()
         codes_used_but_not_permitted = set(codes_used_in_prerequisite_string) - set(self.codes_permitted)
         if codes_used_but_not_permitted:
-            for code in codes_used_in_prerequisite_string:
+            for code in codes_used_but_not_permitted:
                 self.add_error_message(
                     _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': code}
                 )

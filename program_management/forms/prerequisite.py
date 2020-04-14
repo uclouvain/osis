@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import re
+from typing import List
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -33,6 +34,41 @@ from base.models import prerequisite_item
 from base.models.enums.prerequisite_operator import OR, AND
 from base.models.prerequisite import Prerequisite, prerequisite_syntax_validator, MULTIPLE_PREREQUISITES_REGEX_OR, \
     MULTIPLE_PREREQUISITES_REGEX_AND
+from program_management.ddd.domain.node import Node
+from program_management.ddd.validators.validators_by_business_action import UpdatePrerequisiteValidatorList
+
+
+class PrerequisiteForm(forms.Form):
+    prerequisite_string = forms.CharField(
+        label=_("Prerequisite"),
+        required=False,
+        help_text=_(
+            "<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators are OU or ET.</li><li>The "
+            "operator must be the same inside all parentheses (groups).</li><li>The operator that linked groups must "
+            "be different than the one that linked LU inside groups (parentheses).</li><li>The LU code cannot include "
+            "spaces (ex: LDROI1001 and not LDROI&nbsp;1001).</li></ul></p><p><b>Examples</b>:<ul><li>A OU B OU C: "
+            "valid</li><li>A ET B ET C : valid</li><li>A ET (B OU C) ET (D OU E): valid</li><li>A ET (B OU C) OU (D OU "
+            "E): not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) ET (D ET E): not valid"
+            "</li></ul>"
+        ),
+    )
+
+    def __init__(self, codes_permitted: List[str], node: Node, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.codes_permitted = codes_permitted
+        self.node = node
+
+    def clean_prerequisite_string(self):
+        prerequisite_string = self.cleaned_data["prerequisite_string"]
+        validator = UpdatePrerequisiteValidatorList(prerequisite_string, self.node, self.codes_permitted)
+        if not validator.is_valid():
+            for error_message in validator.error_messages:
+                self.add_error("prerequisite_string", error_message.message)
+        return prerequisite_string
+
+    def save(self, commit=False):
+        pass
 
 
 class LearningUnitPrerequisiteForm(forms.ModelForm):

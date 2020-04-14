@@ -23,13 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.test import TestCase
+import mock
+from django.test import TestCase, SimpleTestCase
 
 from base.models.prerequisite import Prerequisite
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
-from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
+from program_management.forms.prerequisite import LearningUnitPrerequisiteForm, PrerequisiteForm
+from program_management.tests.ddd.factories.node import NodeFactory
+
+
+class TestPrerequisiteForm(SimpleTestCase):
+    @mock.patch("program_management.forms.prerequisite.UpdatePrerequisiteValidatorList")
+    def test_is_valid_call_prerequisite_validators(self, mock_prerequisite_validator):
+        prerequisite_string = "LOSIS1452 OU LPORT5896"
+        codes_permitted = list(),
+        node = NodeFactory()
+
+        form = PrerequisiteForm(
+            codes_permitted,
+            node,
+            data={"prerequisite_string": prerequisite_string}
+        )
+        form.is_valid()
+        self.assertTrue(mock_prerequisite_validator.called)
 
 
 class TestPrerequisiteForm(TestCase):

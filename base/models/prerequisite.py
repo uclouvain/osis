@@ -37,6 +37,8 @@ from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
+
+#  FIXME move to validators
 AND_OPERATOR = "ET"
 OR_OPERATOR = 'OU'
 ACRONYM_REGEX = learning_unit.LEARNING_UNIT_ACRONYM_REGEX_ALL.lstrip('^').rstrip('$')
