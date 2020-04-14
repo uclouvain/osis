@@ -40,7 +40,7 @@ from program_management.views.generic import LearningUnitGenericUpdateView
 
 class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
     template_name = "learning_unit/tab_prerequisite_update.html"
-    form_class = LearningUnitPrerequisiteForm
+    form_class = LearningUnitPrerequisiteForm  # TODO Update form to use ddd domain objects
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
@@ -58,10 +58,12 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
+        context["show_prerequisites"] = True
 
         learning_unit_year = context["learning_unit_year"]
         education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
 
+        #  TODO load prerequisite for specific formation
         formations = program_management.ddd.repositories.find_roots.find_roots(
             [learning_unit_year],
             as_instances=True,
