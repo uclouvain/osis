@@ -11,7 +11,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-@override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
+@override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
 class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
     def setUp(self):
         """
@@ -22,10 +22,22 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         """
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
         self.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
-        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
+        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3,
+                                                     code="LDROI100A",
+                                                     common_title_fr="Introduction",
+                                                     specific_title_fr="Partie 1",
+                                                     year=2018)
 
-        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
-        self.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
+        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
+                                                     code="LDROI1300",
+                                                     common_title_fr="Introduction droit",
+                                                     specific_title_fr="Partie 1",
+                                                     year=2018)
+        self.lagro2400 = NodeLearningUnitYearFactory(node_id=8,
+                                                     code="LAGRO2400",
+                                                     common_title_fr="Séminaire agro",
+                                                     specific_title_fr="Partie 1",
+                                                     year=2018)
 
         LinkFactory(parent=self.root_node, child=self.common_core)
         LinkFactory(parent=self.common_core, child=self.ldroi100a)
@@ -47,7 +59,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         self.request = RequestFactory().get(url)
         self.serializer = EducationGroupPrerequisitesSerializerLearningUnit(self.ldroi100a, context={
             'request': self.request,
-            'language': settings.LANGUAGE_CODE_EN,
+            'language': settings.LANGUAGE_CODE_FR,
             'tree': self.tree
         })
 
@@ -86,7 +98,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
         self.request = RequestFactory().get(url)
         self.serializer = LearningUnitBaseSerializer(self.ldroi1300, context={
             'request': self.request,
-            'language': settings.LANGUAGE_CODE_EN,
+            'language': settings.LANGUAGE_CODE_FR,
         })
 
     def test_contains_expected_fields(self):

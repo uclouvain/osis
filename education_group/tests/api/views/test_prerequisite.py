@@ -41,7 +41,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
-@override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
+@override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
 class EducationGroupPrerequisitesBaseTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -58,13 +58,29 @@ class EducationGroupPrerequisitesBaseTestCase(APITestCase):
         cls.person = PersonFactory()
         cls.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
         cls.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
-        cls.ldroi100a = NodeLearningUnitYearFactory(node_id=3, code="LDROI100A", title="Introduction", year=2018)
-        cls.ldroi120b = NodeLearningUnitYearFactory(node_id=4, code="LDROI120B", title="Séminaire", year=2018)
+        cls.ldroi100a = NodeLearningUnitYearFactory(node_id=3,
+                                                    code="LDROI100A",
+                                                    common_title_fr="Introduction",
+                                                    specific_title_fr="Partie 1",
+                                                    year=2018)
+        cls.ldroi120b = NodeLearningUnitYearFactory(node_id=4,
+                                                    code="LDROI120B",
+                                                    common_title_fr="Séminaire",
+                                                    specific_title_fr="Partie 1",
+                                                    year=2018)
         cls.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
         cls.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
 
-        cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7, code="LDROI1300", title="Introduction droit", year=2018)
-        cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8, code="LAGRO2400", title="Séminaire agro", year=2018)
+        cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
+                                                    code="LDROI1300",
+                                                    common_title_fr="Introduction droit",
+                                                    specific_title_fr="Partie 1",
+                                                    year=2018)
+        cls.lagro2400 = NodeLearningUnitYearFactory(node_id=8,
+                                                    code="LAGRO2400",
+                                                    common_title_fr="Séminaire agro",
+                                                    specific_title_fr="Partie 1",
+                                                    year=2018)
 
         LinkFactory(parent=cls.root_node, child=cls.common_core)
         LinkFactory(parent=cls.common_core, child=cls.ldroi100a)
@@ -102,7 +118,7 @@ class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
         cls.request = RequestFactory().get(cls.url)
         cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
             'request': cls.request,
-            'language': settings.LANGUAGE_CODE_EN,
+            'language': settings.LANGUAGE_CODE_FR,
             'tree': cls.tree
         })
 
@@ -157,7 +173,7 @@ class MiniTrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase)
         cls.request = RequestFactory().get(cls.url)
         cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
             'request': cls.request,
-            'language': settings.LANGUAGE_CODE_EN,
+            'language': settings.LANGUAGE_CODE_FR,
             'tree': cls.tree
         })
 
