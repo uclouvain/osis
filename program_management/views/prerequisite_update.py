@@ -24,18 +24,14 @@
 #
 ##############################################################################
 
-from django.contrib.admin.utils import flatten
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-import program_management.ddd.repositories.find_roots
-from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
-from base.models import group_element_year
-from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
-from program_management.ddd.domain import node
-from program_management.views.generic import LearningUnitGenericUpdateView, NO_PREREQUISITES
+from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
+from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
+from program_management.views.generic import LearningUnitGenericUpdateView
 
 
 class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
@@ -60,18 +56,17 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         context = super().get_context_data()
         context["show_prerequisites"] = True
 
-        education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
-
-        if education_group_year_root.education_group_type.name in NO_PREREQUISITES:
-            raise PermissionDenied(
-                _("You must be in the context of a training to modify the prerequisites to a learning unit "
-                    "(current context: %(partial_acronym)s - %(acronym)s)") % {
-                        'acronym': education_group_year_root.acronym,
-                        'partial_acronym': education_group_year_root.partial_acronym
-                    }
-            )
+        self.check_can_update_prerequisite()
 
         return context
+
+    #  FIXME refactor permission with new permission module
+    def check_can_update_prerequisite(self):
+        validator = AuthorizedRootTypeForPrerequisite(self.program_tree.root_node)
+        if not validator.is_valid():
+            raise PermissionDenied(
+                [msg.message for msg in validator.error_messages]
+            )
 
     def get_success_message(self, cleaned_data):
         return _("Prerequisites saved.")
