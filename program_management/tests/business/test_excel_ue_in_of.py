@@ -36,10 +36,11 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
+    EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -50,7 +51,6 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
-from program_management.business.excel import _get_blocks_prerequisite_of
 from program_management.business.excel_ue_in_of import EducationGroupYearLearningUnitsContainedToExcel, FIX_TITLES, \
     _get_headers, optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, \
     _get_attribution_line, optional_header_for_required_entity, optional_header_for_active, \
@@ -83,7 +83,7 @@ CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_yr_root = TrainingFactory(acronym='root')
+        cls.education_group_yr_root = EducationGroupYearBachelorFactory(acronym='root')
         academic_yr = cls.education_group_yr_root.academic_year
         cls.child_leaves = GroupElementYearChildLeafFactory.create_batch(
             2,
@@ -93,29 +93,35 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         for node, acronym in zip(cls.child_leaves, ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]):
             node.child_leaf.acronym = acronym
             node.child_leaf.save()
-        cls.edy_node_1_training = TrainingFactory(academic_year=academic_yr,
-                                                  education_group_type__category=Categories.TRAINING.name,
-                                                  partial_acronym="{}_T".format(PARTIAL_ACRONYM),
-                                                  title="{}_T".format(TITLE))
+        cls.edy_node_1_training = EducationGroupYearBachelorFactory(
+            academic_year=academic_yr,
+            partial_acronym="{}_T".format(PARTIAL_ACRONYM),
+            title="{}_T".format(TITLE)
+        )
         cls.node_1 = GroupElementYearFactory(
             child_branch=cls.edy_node_1_training, child_leaf=None, parent=cls.education_group_yr_root
         )
-        cls.edy_node_1_1_group = EducationGroupYearFactory(academic_year=academic_yr,
-                                                           education_group_type__category=Categories.GROUP.name)
+        cls.edy_node_1_1_group = GroupFactory(academic_year=academic_yr)
 
-        cls.node_1_1 = GroupElementYearFactory(child_branch=cls.edy_node_1_1_group,
-                                               child_leaf=None,
-                                               parent=cls.edy_node_1_training)
-        cls.child_leave_node_11 = GroupElementYearChildLeafFactory(
-            parent=cls.edy_node_1_1_group, is_mandatory=True
+        cls.node_1_1 = GroupElementYearFactory(
+            child_branch=cls.edy_node_1_1_group,
+            child_leaf=None,
+            parent=cls.edy_node_1_training
         )
-        cls.edy_node_1_1_1_group_type = EducationGroupYearFactory(academic_year=academic_yr,
-                                                                  education_group_type__category=Categories.GROUP.name)
+        cls.child_leave_node_11 = GroupElementYearChildLeafFactory(
+            parent=cls.edy_node_1_1_group,
+            is_mandatory=True
+        )
+        cls.edy_node_1_1_1_group_type = GroupFactory(academic_year=academic_yr)
 
-        cls.node_1_1_1_group = GroupElementYearFactory(child_branch=cls.edy_node_1_1_1_group_type, child_leaf=None,
-                                                       parent=cls.edy_node_1_1_group)
+        cls.node_1_1_1_group = GroupElementYearFactory(
+            child_branch=cls.edy_node_1_1_1_group_type,
+            child_leaf=None,
+            parent=cls.edy_node_1_1_group
+        )
         cls.child_leave_node_111 = GroupElementYearChildLeafFactory(
-            parent=cls.edy_node_1_1_1_group_type, is_mandatory=True
+            parent=cls.edy_node_1_1_1_group_type,
+            is_mandatory=True
         )
 
         cls.luy_children_in_tree = [child.child_leaf for child in cls.child_leaves]
@@ -495,7 +501,6 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_build_validate_html_list_to_string_wrong_method(self):
         self.assertEqual(_build_validate_html_list_to_string('Test', None), 'Test')
-        self.assertEqual(_build_validate_html_list_to_string('Test', _get_blocks_prerequisite_of), 'Test')
 
     def test_row_height_not_populated(self):
         custom_form = CustomXlsForm({})
