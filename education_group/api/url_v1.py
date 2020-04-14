@@ -29,7 +29,6 @@ from education_group.api.views.group import GroupDetail, GroupTitle
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
 from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrainingTitle, MiniTrainingList
 from education_group.api.views.training import TrainingList, TrainingDetail, TrainingTitle
-from program_management.api.views.prerequisite import TrainingPrerequisites, MiniTrainingPrerequisites
 
 app_name = "education_group"
 
@@ -43,7 +42,6 @@ urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
         url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
         url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
-        url(r'^prerequisites$', TrainingPrerequisites.as_view(), name=TrainingPrerequisites.name),
     ])),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
     url(
@@ -54,7 +52,6 @@ urlpatterns = [
     url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
         url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
         url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
-        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), name=MiniTrainingPrerequisites.name),
     ])),
     url(
         r'^groups/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',
