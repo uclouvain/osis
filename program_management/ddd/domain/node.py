@@ -132,14 +132,8 @@ class Node:
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
-    def is_option(self) -> bool:  # TODO :: unit test
+    def is_option(self) -> bool:
         return self.node_type == MiniTrainingType.OPTION
-
-    def is_option_list_choice(self) -> bool:  # TODO :: unit test
-        return self.node_type == GroupType.OPTION_LIST_CHOICE
-
-    def contains_options(self) -> bool:  # TODO :: unit test
-        return any(l for l in self.get_all_children() if l.child.is_option())
 
     def get_all_children(
             self,
@@ -153,7 +147,7 @@ class Node:
             children |= link.child.get_all_children(ignore_children_from=ignore_children_from)
         return children
 
-    def get_option_list(self) -> Set['Node']:  # TODO :: unit test
+    def get_option_list(self) -> Set['Node']:
         return {l.child for l in self.get_all_children() if l.child.is_option()}
 
     def get_all_children_as_nodes(

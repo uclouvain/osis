@@ -302,3 +302,34 @@ class TestDetachChild(SimpleTestCase):
         assertion_msg = "Link {} should have been added to deleted children".format(link1)
         expected_result = {link1}
         self.assertSetEqual(common_parent._deleted_children, expected_result,assertion_msg)
+
+
+class TestIsOption(SimpleTestCase):
+    def test_when_node_is_option(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)
+        self.assertTrue(node.is_option())
+
+    def test_when_node_is_not_option(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
+        self.assertFalse(node.is_option())
+
+
+class TestGetOptionsList(SimpleTestCase):
+    def test_when_has_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual(node.get_option_list(), set())
+
+    def test_when_node_is_option(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)
+        self.assertEqual(node.get_option_list(), set(), "Should not contains himself in children options list")
+
+    def test_when_has_direct_child_option(self):
+        link = LinkFactory(child__node_type=MiniTrainingType.OPTION)
+        expected_result = {link.child}
+        self.assertEqual(link.parent.get_option_list(), expected_result, "Should contain direct children")
+
+    def test_when_sub_child_is_option(self):
+        link1 = LinkFactory(child__node_type=GroupType.OPTION_LIST_CHOICE)
+        link2 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
+        expected_result = {link2.child}
+        self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")
