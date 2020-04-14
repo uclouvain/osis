@@ -30,7 +30,7 @@ from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
-from base.models.enums.education_group_types import TrainingType, GroupType
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
 from program_management.ddd.domain.program_tree import ProgramTree, build_path
@@ -603,3 +603,31 @@ class TestDetachNode(SimpleTestCase):
         self.assertFalse(result_is_valid)
         self.assertListEqual(result_messages.return_value, [self.error_message])
         self.assertIn(link, tree.root_node.children)
+
+
+class TestGet2mOptionList(SimpleTestCase):
+
+    def setUp(self):
+        self.program_2m = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120)
+        self.finality_choice = NodeGroupYearFactory(node_type=GroupType.FINALITY_120_LIST_CHOICE)
+        self.option_list_choice = NodeGroupYearFactory(node_type=GroupType.OPTION_LIST_CHOICE)
+
+        LinkFactory(parent=self.program_2m, child=self.finality_choice)
+        LinkFactory(parent=self.program_2m, child=self.option_list_choice)
+
+        self.tree_2m = ProgramTreeFactory(root_node=self.program_2m)
+
+    def test_when_option_is_inside_finality_120(self):
+        LinkFactory(parent=self.finality_choice, child__node_type=MiniTrainingType.OPTION)
+        self.assertSetEqual(self.tree_2m.get_2m_option_list(), set(), "Should not take options from finalities 120")
+
+    def test_when_option_is_inside_finality_180(self):
+        link = LinkFactory(parent=self.program_2m, child__node_type=GroupType.FINALITY_180_LIST_CHOICE)
+        LinkFactory(parent=link.child, child__node_type=MiniTrainingType.OPTION)
+        self.assertSetEqual(self.tree_2m.get_2m_option_list(), set(), "Should not take options from finalities 180")
+
+    def test_when_option_is_child_of_2m(self):
+        link = LinkFactory(parent=self.option_list_choice, child__node_type=MiniTrainingType.OPTION)
+        expected_result = {link.child}
+        assertion_msg = "Should take option (child) from option list choice in 2M master program."
+        self.assertSetEqual(self.tree_2m.get_2m_option_list(), expected_result, assertion_msg)

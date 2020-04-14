@@ -80,7 +80,7 @@ class DetachOptionValidator(BusinessValidator):
         options_to_detach = self.get_options_to_detach()
         if options_to_detach:
             for tree_2m in self.trees_2m:
-                counter_options = Counter(tree_2m.get_option_list())
+                counter_options = Counter(tree_2m.get_2m_option_list())
                 counter_options.subtract(options_to_detach)
                 options_to_check = [opt for opt, count in counter_options.items() if count == 0]
                 if not options_to_check:
