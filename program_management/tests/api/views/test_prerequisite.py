@@ -41,7 +41,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory, No
 
 
 @override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
-class EducationGroupPrerequisitesBaseTestCase(APITestCase):
+class ProgramTreePrerequisitesBaseTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         """
@@ -102,7 +102,7 @@ class EducationGroupPrerequisitesBaseTestCase(APITestCase):
         self.client.force_authenticate(user=self.person.user)
 
 
-class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
+class TrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -135,7 +135,7 @@ class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
                 response = getattr(self.client, method)(self.url)
                 self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_get_results_case_education_group_year_not_found(self):
+    def test_get_results_case_training_not_found(self):
         invalid_url = reverse('education_group_api_v1:training-prerequisites', kwargs={
             'acronym': 'ACRO',
             'year': 2019
@@ -154,7 +154,7 @@ class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
             self.assertEqual([self.serializer.data], response.json())
 
 
-class MiniTrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
+class MiniTrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
