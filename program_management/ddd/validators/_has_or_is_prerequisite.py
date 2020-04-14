@@ -70,7 +70,7 @@ class IsPrerequisiteValidator(BusinessValidator):
                 }
             )
 
-    def _get_nodes_that_are_prerequisite(self, search_under_node: 'Node'):  # TODO : move into ProgramTree?
+    def _get_nodes_that_are_prerequisite(self, search_under_node: 'Node'):
         nodes_that_are_prerequisites = []
         learning_units_children = search_under_node.get_all_children_as_learning_unit_nodes()
         if search_under_node.is_learning_unit() and search_under_node.is_prerequisite:

@@ -183,7 +183,7 @@ class ProgramTree:
     def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
         return next((link for link in self.get_all_links() if link.parent == parent and link.child == child), None)
 
-    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':  # TODO :: unit tests
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
