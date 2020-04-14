@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.test import SimpleTestCase, RequestFactory, override_settings
 from rest_framework.reverse import reverse
 
@@ -59,7 +58,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         self.request = RequestFactory().get(url)
         self.serializer = EducationGroupPrerequisitesSerializerLearningUnit(self.ldroi100a, context={
             'request': self.request,
-            'language': settings.LANGUAGE_CODE_FR,
+            'language': 'fr',
             'tree': self.tree
         })
 
@@ -98,7 +97,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
         self.request = RequestFactory().get(url)
         self.serializer = LearningUnitBaseSerializer(self.ldroi1300, context={
             'request': self.request,
-            'language': settings.LANGUAGE_CODE_FR,
+            'language': 'fr',
         })
 
     def test_contains_expected_fields(self):

@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.conf import settings
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from mock import patch
@@ -118,7 +117,7 @@ class TrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase):
         cls.request = RequestFactory().get(cls.url)
         cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
             'request': cls.request,
-            'language': settings.LANGUAGE_CODE_FR,
+            'language': 'fr',
             'tree': cls.tree
         })
 
@@ -173,7 +172,7 @@ class MiniTrainingPrerequisitesTestCase(EducationGroupPrerequisitesBaseTestCase)
         cls.request = RequestFactory().get(cls.url)
         cls.serializer = EducationGroupPrerequisitesSerializerLearningUnit(cls.ldroi100a, context={
             'request': cls.request,
-            'language': settings.LANGUAGE_CODE_FR,
+            'language': 'fr',
             'tree': cls.tree
         })
 
