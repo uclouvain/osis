@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 #############################################################################
+import itertools
 
 from django.db import models
 from reversion.admin import VersionAdmin
@@ -30,6 +31,7 @@ from reversion.admin import VersionAdmin
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.utils.translation import gettext_lazy as _
 
 
 class PrerequisiteAdmin(VersionAdmin, OsisModelAdmin):
@@ -38,6 +40,7 @@ class PrerequisiteAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('education_group_year__academic_year',)
     search_fields = ['learning_unit_year__acronym', 'education_group_year__acronym',
                      'education_group_year__partial_acronym']
+    readonly_fields = ('prerequisite_string',)
 
 
 class Prerequisite(models.Model):
@@ -74,3 +77,28 @@ class Prerequisite(models.Model):
     @property
     def secondary_operator(self):
         return OR if self.main_operator == AND else AND
+
+    @property
+    def prerequisite_string(self):
+        return self._get_acronyms_string()
+
+    # FIXME Merge method with base/business/education_groups/excel.py and base/templatetags/prerequisite.py
+    def _get_acronyms_string(self, display_method=None):
+        prerequisite_items = self.prerequisiteitem_set.all().order_by('group_number', 'position')
+        prerequisites_fragments = []
+        for num_group, records_in_group in itertools.groupby(prerequisite_items, lambda rec: rec.group_number):
+            list_records = list(records_in_group)
+            predicate_format = "({})" if len(list_records) > 1 else "{}"
+            join_secondary_operator = " {} ".format(_(self.secondary_operator))
+            predicate = predicate_format.format(
+                join_secondary_operator.join(
+                    map(
+                        lambda rec: display_method(rec, self.learning_unit_year.academic_year)
+                        if display_method else rec.learning_unit.acronym,
+                        list_records
+                    )
+                )
+            )
+            prerequisites_fragments.append(predicate)
+        join_main_operator = " {} ".format(_(self.main_operator))
+        return join_main_operator.join(prerequisites_fragments)
