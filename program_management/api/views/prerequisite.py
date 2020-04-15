@@ -35,9 +35,9 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIView):
     """
-        Return the prerequisites of an education group
+        Return the prerequisites of a program tree
     """
-    name = 'education_group-prerequisites'
+    name = 'program_tree-prerequisites'
     serializer_class = ProgramTreePrerequisitesSerializer
     queryset = EducationGroupVersion.objects.all().select_related('offer__academic_year')
     # queryset = EducationGroupYear.objects.all().select_related('academic_year')
@@ -90,10 +90,11 @@ class MiniTrainingPrerequisites(ProgramTreePrerequisites):
         partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version', '')
+        is_transition = self.request.query_params.get('is_transition', False)
         return get_object_or_404(
             self.queryset,
             version_name=version_name,
-            is_transition=False,
+            is_transition=is_transition,
             offer__partial_acronym__iexact=partial_acronym,
             offer__academic_year__year=year
         )
