@@ -40,7 +40,6 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
     name = 'program_tree-prerequisites'
     serializer_class = ProgramTreePrerequisitesSerializer
     queryset = EducationGroupVersion.objects.all().select_related('offer__academic_year')
-    # queryset = EducationGroupYear.objects.all().select_related('academic_year')
     pagination_class = None
     filter_backends = ()
 
@@ -51,9 +50,8 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        # version_name = self.request.query_params.get('version_name', '')
         version_name = self.kwargs.get('version_name', '')
-        is_transition = self.request.query_params.get('is_transition', False)
+        is_transition = self.kwargs['transition']
         return get_object_or_404(
             self.queryset,
             version_name__iexact=version_name,
@@ -64,7 +62,7 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
 
     def get_serializer_context(self):
         egv = self.get_object()
-        tree = load_tree.load(egv.offer.id)  # pas sûr de offer.id
+        tree = load_tree.load(egv.offer.id)
         serializer_context = super().get_serializer_context()
         serializer_context.update({
             'request': self.request,
@@ -89,8 +87,8 @@ class MiniTrainingPrerequisites(ProgramTreePrerequisites):
     def get_object(self):
         partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
-        version_name = self.kwargs.get('version', '')
-        is_transition = self.request.query_params.get('is_transition', False)
+        version_name = self.kwargs.get('version_name', '')
+        is_transition = self.kwargs['transition']
         return get_object_or_404(
             self.queryset,
             version_name=version_name,

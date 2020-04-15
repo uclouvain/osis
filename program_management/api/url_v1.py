@@ -31,14 +31,27 @@ app_name = "program_management"
 
 urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
-        url(r'^(?P<version_name>[\w]+)/prerequisites$', TrainingPrerequisites.as_view(),
+        url(r'^(?P<version_name>[\w]+)/', include([
+            url(r'^transition/prerequisites$', TrainingPrerequisites.as_view(), {'transition': True},
+                name=TrainingPrerequisites.name),
+            url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
+                name=TrainingPrerequisites.name),
+        ])),
+        url(r'^transition/prerequisites$', TrainingPrerequisites.as_view(), {'transition': True},
             name=TrainingPrerequisites.name),
-        url(r'^prerequisites$', TrainingPrerequisites.as_view(), name='{}_official'.format(TrainingPrerequisites.name)),
+        url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(TrainingPrerequisites.name)),
     ])),
     url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
-        url(r'^(?P<version_name>[\w]+)/prerequisites$', MiniTrainingPrerequisites.as_view(),
+        url(r'^(?P<version_name>[\w]+)/', include([
+            url(r'^transition/prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': True},
+                name=MiniTrainingPrerequisites.name),
+            url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
+                name=MiniTrainingPrerequisites.name),
+        ])),
+        url(r'^transition/prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': True},
             name=MiniTrainingPrerequisites.name),
-        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(),
+        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
             name='{}_official'.format(MiniTrainingPrerequisites.name)),
     ])),
 ]
