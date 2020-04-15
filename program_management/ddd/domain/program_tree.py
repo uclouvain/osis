@@ -138,7 +138,7 @@ class ProgramTree:
     def get_nodes_by_type(self, node_type_value) -> List['Node']:
         return [node for node in self.get_all_nodes() if node.type == node_type_value]
 
-    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
+    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
         return list(
             sorted(
                 (

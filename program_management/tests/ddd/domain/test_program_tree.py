@@ -28,9 +28,10 @@ import inspect
 from django.test import SimpleTestCase
 
 from base.ddd.utils.validation_message import MessageLevel
+from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import node
+from program_management.ddd.domain import node, prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.models.enums import node_type
@@ -472,3 +473,29 @@ class TestGetNodeByCodeAndYearProgramTree(SimpleTestCase):
                 result,
                 self.subgroup_node
             )
+
+
+class TestGetNodesThatHavePrerequisites(SimpleTestCase):
+
+    def setUp(self) -> None:
+        self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
+        self.link_with_child = LinkFactory(
+            parent=self.link_with_root.child,
+            child=NodeLearningUnitYearFactory(common_title_fr="child__child__ROOT",
+                                              year=self.link_with_root.parent.year),
+        )
+        self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
+
+    def test_when_tree_has_not_node_that_have_prerequisites(self):
+        self.assertEqual(self.tree.get_nodes_that_have_prerequisites(), [])
+
+    def test_when_tree_has_node_that_have_prerequisites(self):
+        p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
+        p_group.add_prerequisite_item('BLA', self.link_with_child.child.year)
+
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req.add_prerequisite_item_group(p_group)
+        self.link_with_child.child.set_prerequisite(p_req)
+
+        result = self.tree.get_nodes_that_have_prerequisites()
+        self.assertEqual(result, [self.link_with_child.child])
