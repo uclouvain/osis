@@ -93,9 +93,9 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year)\
-                                   .select_related(
-                                        'education_group_year__academic_year',
-                                        'education_group_year__education_group_type',
-                                        'learning_unit_year__academic_year',
-                                   ).prefetch_related('prerequisiteitem_set')
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
+            'education_group_year__academic_year',
+            'education_group_year__education_group_type',
+            'learning_unit_year__academic_year',
+            'education_group_version__offer'
+        ).prefetch_related('prerequisiteitem_set')

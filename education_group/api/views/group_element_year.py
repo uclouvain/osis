@@ -28,10 +28,8 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
-from education_group.models.group_year import GroupYear
 from program_management.ddd.domain import link
 from program_management.ddd.repositories import load_tree
 from program_management.models.element import Element
