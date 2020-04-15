@@ -32,6 +32,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
@@ -78,6 +79,7 @@ class UpdatePrerequisiteValidatorList(BusinessListValidator):
             program_tree: 'ProgramTree'
     ):
         self.validators = [
+            AuthorizedRootTypeForPrerequisite(program_tree.root_node),
             PrerequisiteExpressionSyntaxValidator(prerequisite_string),
             PrerequisiteItemsValidator(prerequisite_string, node, program_tree)
         ]

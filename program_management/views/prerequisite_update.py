@@ -63,17 +63,13 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         return context
 
     def form_valid(self, form):
-        prerequisite_obj = prerequisite_domain.factory.from_expression(
-            form.cleaned_data["prerequisite_string"],
-            self.get_root().academic_year.year
+        node = self.program_tree.get_node_by_id_and_type(
+            int(self.kwargs["learning_unit_year_id"]),
+            NodeType.LEARNING_UNIT
         )
-        persist_prerequisite.persist(
-            self.program_tree.root_node,
-            self.program_tree.get_node_by_id_and_type(
-                int(self.kwargs["learning_unit_year_id"]),
-                NodeType.LEARNING_UNIT
-            ),
-            prerequisite_obj
+        self.program_tree.set_prerequisite(
+            form.cleaned_data["prerequisite_string"],
+            node
         )
         return super().form_valid(form)
 

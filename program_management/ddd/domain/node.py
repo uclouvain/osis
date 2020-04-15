@@ -310,6 +310,7 @@ class NodeLearningUnitYear(Node):
         self.quadrimester = quadrimester
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
+        self.has_changed = False
 
     @property
     def has_prerequisite(self) -> bool:
@@ -328,6 +329,7 @@ class NodeLearningUnitYear(Node):
 
     def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite
+        self.has_changed = True
 
 
 class NodeLearningClassYear(Node):
