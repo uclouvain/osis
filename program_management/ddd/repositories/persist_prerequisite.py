@@ -24,46 +24,58 @@
 from django.db import transaction
 
 from base.models import education_group_year, learning_unit_year, prerequisite_item, learning_unit
-from program_management.ddd.domain.node import Node
-from program_management.ddd.domain.prerequisite import Prerequisite
-from base.models import prerequisite as prerequisite_db
+from base.models import prerequisite as prerequisite_model
+from program_management.ddd.domain import prerequisite as prerequisite_domain
+from program_management.ddd.domain.node import NodeLearningUnitYear, NodeEducationGroupYear
 
 
 @transaction.atomic
-def persist(root_node: Node, node: Node, prerequisite: Prerequisite) -> None:
-    root_education_group_year = education_group_year.EducationGroupYear.objects.get(id=root_node.node_id)
-    node_learning_unit = learning_unit_year.LearningUnitYear.objects.get(id=node.node_id)
+def persist(
+        node_education_group_year: NodeEducationGroupYear,
+        node_learning_unit_year_obj: NodeLearningUnitYear,
+        prerequisite: prerequisite_domain.Prerequisite
+) -> None:
+    education_group_year_obj = education_group_year.EducationGroupYear.objects.get(
+        id=node_education_group_year.node_id
+    )
+    learning_unit_year_obj = learning_unit_year.LearningUnitYear.objects.get(
+        id=node_learning_unit_year_obj.node_id
+    )
 
-    prerequisite_obj, created = prerequisite_db.Prerequisite.objects.get_or_create(
-        education_group_year=root_education_group_year,
-        learning_unit_year=node_learning_unit,
+    prerequisite_model_obj, created = prerequisite_model.Prerequisite.objects.get_or_create(
+        education_group_year=education_group_year_obj,
+        learning_unit_year=learning_unit_year_obj,
         defaults={"main_operator": prerequisite.main_operator}
     )
-    _delete_old_items(prerequisite_obj)
-    _persist_prerequisite_items(prerequisite_obj, prerequisite)
+    _delete_prerequisite_items(prerequisite_model_obj)
+    _persist_prerequisite_items(prerequisite_model_obj, prerequisite)
 
 
-def _persist_prerequisite_items(prerequisite_db_obj, prerequisite: Prerequisite):
-    for group_number, group in enumerate(prerequisite.prerequisite_item_groups, 1):
-        for position, code in enumerate(group.prerequisite_items, 1):
-            learning_unit_obj = get_by_acronym_with_highest_academic_year(code)
+def _delete_prerequisite_items(prerequisite_model_obj: prerequisite_model.Prerequisite):
+    items = prerequisite_model_obj.prerequisiteitem_set.all()
+    for item in items:
+        item.delete()
+
+
+def _persist_prerequisite_items(
+        prerequisite_model_obj: prerequisite_model.Prerequisite,
+        prerequisite_domain_obj: prerequisite_domain.Prerequisite
+):
+    for group_number, group in enumerate(prerequisite_domain_obj.prerequisite_item_groups, 1):
+        for position, item in enumerate(group.prerequisite_items, 1):
+
+            learning_unit_obj = _get_learning_unit_of_prerequisite_item(item)
+
             prerequisite_item.PrerequisiteItem.objects.create(
-                prerequisite=prerequisite_db_obj,
+                prerequisite=prerequisite_model_obj,
                 learning_unit=learning_unit_obj,
                 group_number=group_number,
                 position=position,
             )
 
 
-def get_by_acronym_with_highest_academic_year(acronym):
+def _get_learning_unit_of_prerequisite_item(prerequisite_item_domain_obj: prerequisite_domain.PrerequisiteItem):
     return learning_unit.LearningUnit.objects.filter(
-        learningunityear__acronym=acronym
-    ).order_by(
-        'learningunityear__academic_year__year'
-    ).last()
-
-
-def _delete_old_items(prerequisite_db):
-    items = prerequisite_db.prerequisiteitem_set.all()
-    for item in items:
-        item.delete()
+        learningunityear__acronym=prerequisite_item_domain_obj.code,
+        learningunityear__academic_year__year=prerequisite_item_domain_obj.year
+    ).first()
