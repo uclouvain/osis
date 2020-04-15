@@ -66,6 +66,9 @@ class BusinessValidator(ABC):
     def add_error_message(self, msg: str):
         self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.ERROR))
 
+    def add_warning_message(self, msg: str):
+        self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.WARNING))
+
     def add_messages(self, messages: List[BusinessValidationMessage]):
         for msg in messages:
             self.add_message(msg)

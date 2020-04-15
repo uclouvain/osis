@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-14 08:46+0200\n"
+"POT-Creation-Date: 2020-04-15 12:50+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -82,6 +82,7 @@ msgstr ""
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
+#, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
 msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
@@ -279,6 +280,7 @@ msgstr[1] ""
 "Les finalités \"%(acronym)s\" ont une date de fin plus grande que le "
 "programme %(root_acronym)s."
 
+#, python-format
 msgid ""
 "Finality \"%(code)s\" has an end date greater than %(root_code)s program."
 msgid_plural ""
@@ -287,8 +289,8 @@ msgstr[0] ""
 "La finalité \"%(code)s\" a une date de fin plus grande que le programme "
 "%(root_code)s."
 msgstr[1] ""
-"Les finalités \"%(code)s\" ont une date de fin plus grande que le "
-"programme %(root_code)s."
+"Les finalités \"%(code)s\" ont une date de fin plus grande que le programme "
+"%(root_code)s."
 
 msgid "Firstname"
 msgstr "Prénom"
@@ -387,12 +389,6 @@ msgstr "Nom du professeur responsable de programme"
 msgid "No"
 msgstr "Non"
 
-#, python-format
-msgid "No match has been found for this learning unit :  %(acronym)s"
-msgstr ""
-"Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
-"%(acronym)s"
-
 msgid "No result!"
 msgstr "Aucun résultat!"
 
@@ -440,11 +436,11 @@ msgstr[1] ""
 "Les options \"%(acronym)s\" doivent être présentes dans le programme "
 "%(root_acronym)s."
 
+#, python-format
 msgid "Option \"%(code)s\" must be present in %(root_code)s program."
 msgid_plural "Options \"%(code)s\" must be present in %(root_code)s program."
 msgstr[0] ""
-"L'option \"%(code)s\" doit être présente dans le programme "
-"%(root_code)s."
+"L'option \"%(code)s\" doit être présente dans le programme %(root_code)s."
 msgstr[1] ""
 "Les options \"%(code)s\" doivent être présentes dans le programme "
 "%(root_code)s."
@@ -454,7 +450,6 @@ msgstr "Au choix"
 
 msgid "Other informations"
 msgstr "Autres informations"
-
 
 msgid "Particulière"
 msgstr "Particulière"
@@ -487,6 +482,11 @@ msgid "Prerequisite"
 msgid_plural "Prerequisites"
 msgstr[0] "Prérequis"
 msgstr[1] "Prérequis"
+
+#, fuzzy
+#| msgid "Prerequisites saved."
+msgid "Prerequisites are invalid"
+msgstr "Prérequis enregistrés."
 
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
@@ -747,21 +747,13 @@ msgstr ""
 msgid "You cannot modify content for %(education_group_types)s"
 msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_types)s"
 
+#, python-format
 msgid ""
 "You must be in the context of a training to modify the prerequisites of a "
 "learning unit (current context: %(title)s)"
 msgstr ""
 "Vous devez être dans le contexte d'une formation pour modifier les prérequis "
 "d'une unité d'enseignement (contexte actuel: %(title)s"
-
-#, python-format
-msgid ""
-"You must be in the context of a training to modify the prerequisites to a "
-"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
-msgstr ""
-"Vous devez être dans le contexte d'une formation pour modifier les prérequis "
-"d'une unité d'enseignement (contexte actuel: %(partial_acronym)s - "
-"%(acronym)s)"
 
 msgid "bibliography"
 msgstr ""
@@ -821,3 +813,16 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
+
+#~ msgid "No match has been found for this learning unit :  %(acronym)s"
+#~ msgstr ""
+#~ "Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
+#~ "%(acronym)s"
+
+#~ msgid ""
+#~ "You must be in the context of a training to modify the prerequisites to a "
+#~ "learning unit (current context: %(partial_acronym)s - %(acronym)s)"
+#~ msgstr ""
+#~ "Vous devez être dans le contexte d'une formation pour modifier les "
+#~ "prérequis d'une unité d'enseignement (contexte actuel: "
+#~ "%(partial_acronym)s - %(acronym)s)"

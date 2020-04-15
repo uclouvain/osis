@@ -24,38 +24,55 @@
 from django.test import SimpleTestCase
 
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestPrerequisiteItemsValidator(SimpleTestCase):
-    def test_should_be_valid_when_empty_prerequisite_string(self):
-        prerequisite_string = ""
-        codes_permitted = list()
-        node = NodeLearningUnitYearFactory()
-        self.assertTrue(
-            PrerequisiteItemsValidator(prerequisite_string, node, codes_permitted).is_valid()
+    def setUp(self):
+        self.program_tree = ProgramTreeFactory()
+        LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="LOSIS1121")
+        )
+        LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="MARC2547")
+        )
+        LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="MECK8960")
+        )
+        LinkFactory(
+            parent=self.program_tree.root_node,
+            child=NodeLearningUnitYearFactory(code="BREM5890")
         )
 
-    def test_should_be_invalid_when_codes_used_in_prerequisite_string_are_not_permitted(self):
-        prerequisite_string = "LOSIS1121 ET MARC2547"
-        codes_permitted = ["LOSIS1121"]
+    def test_should_be_valid_when_empty_prerequisite_string(self):
+        prerequisite_string = ""
+        node = NodeLearningUnitYearFactory()
+        self.assertTrue(
+            PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
+        )
+
+    def test_should_be_invalid_when_codes_used_in_prerequisite_are_not_present_in_program_tree(self):
+        prerequisite_string = "LOSIS1121 ET MARC2589"
         node = NodeLearningUnitYearFactory()
         self.assertFalse(
-            PrerequisiteItemsValidator(prerequisite_string, node, codes_permitted).is_valid()
+            PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
 
     def test_should_be_invalid_when_codes_used_in_prerequisite_string_is_node_code(self):
         prerequisite_string = "LOSIS1121 ET MARC2547"
-        codes_permitted = ["LOSIS1121", "MARC2547"]
         node = NodeLearningUnitYearFactory(code="LOSIS1121")
         self.assertFalse(
-            PrerequisiteItemsValidator(prerequisite_string, node, codes_permitted).is_valid()
+            PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )
 
     def test_should_be_valid_when_codes_used_in_prerequisite_string_are_permitted(self):
         prerequisite_string = "LOSIS1121 ET MARC2547 ET (BREM5890 OU MECK8960)"
-        codes_permitted = ["LOSIS1121", "MARC2547", "MECK8960", "BREM5890"]
         node = NodeLearningUnitYearFactory()
         self.assertTrue(
-            PrerequisiteItemsValidator(prerequisite_string, node, codes_permitted).is_valid()
+            PrerequisiteItemsValidator(prerequisite_string, node, self.program_tree).is_valid()
         )

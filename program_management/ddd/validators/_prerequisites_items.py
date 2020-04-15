@@ -22,8 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import re
-from typing import List
-
+from program_management.ddd.business_types import *
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
@@ -36,12 +35,13 @@ class PrerequisiteItemsValidator(BusinessValidator):
             self,
             prerequisite_string: PrerequisiteExpression,
             node: NodeLearningUnitYear,
-            codes_permitted: List[str]
+            program_tree: 'ProgramTree'
     ):
         super().__init__()
         self.prerequisite_string = prerequisite_string
-        self.codes_permitted = codes_permitted
         self.node = node
+        self.program_tree = program_tree
+        self.codes_permitted = self.program_tree.get_codes_permitted_as_prerequisite()
 
     def validate(self, *args, **kwargs):
         codes_used_in_prerequisite_string = self._extract_acronyms()
@@ -49,8 +49,17 @@ class PrerequisiteItemsValidator(BusinessValidator):
         if codes_used_but_not_permitted:
             for code in codes_used_but_not_permitted:
                 self.add_error_message(
-                    _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': code}
+                    _("The learning unit %(acronym)s is not contained inside the formation") % {'acronym': code}
                 )
+
+            self.add_warning_message(
+                _("The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
+                  "are not inside the selected training %(root)s") % {
+                    "prerequisites": ", ".join(codes_used_but_not_permitted),
+                    "learning_unit": self.node,
+                    "root": self.program_tree.root_node,
+                }
+            )
 
         if self.node.code in codes_used_in_prerequisite_string:
             self.add_error_message(

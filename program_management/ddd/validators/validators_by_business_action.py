@@ -79,6 +79,6 @@ class UpdatePrerequisiteValidatorList(BusinessListValidator):
     ):
         self.validators = [
             PrerequisiteExpressionSyntaxValidator(prerequisite_string),
-            PrerequisiteItemsValidator(prerequisite_string, node, program_tree.get_codes_permitted_as_prerequisite())
+            PrerequisiteItemsValidator(prerequisite_string, node, program_tree)
         ]
         super().__init__()
