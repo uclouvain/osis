@@ -36,7 +36,8 @@ class NodeBaseSerializer(serializers.Serializer):
     code = serializers.CharField(read_only=True)
 
     def get_title(self, obj: 'Node'):
-        lang = self.context.get('language').lower()
+        lang = self.context.get('language', 'fr').lower()
+        lang = 'fr' if lang == 'fr-be' else lang
         specific_title = getattr(obj, 'specific_title_{}'.format(lang))
         common_title = getattr(obj, 'common_title_{}'.format(lang))
 
