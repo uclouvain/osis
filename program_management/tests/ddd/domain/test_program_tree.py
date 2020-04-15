@@ -429,3 +429,46 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertListEqual([], copied_link_1_1_1.children)
         self.assertNotIn(link1_1_1, result)
         self.assertNotIn(link1_1_1_1, result)
+
+
+class TestGetNodeByCodeAndYearProgramTree(SimpleTestCase):
+    def setUp(self):
+        self.year = 2020
+        link = LinkFactory(child=NodeGroupYearFactory(node_id=1, code='AAAA', year=self.year))
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=1,
+                                                                                                       code='BBBB',
+                                                                                                       year=self.year))
+        self.learning_unit_node = link_with_learning_unit.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_None_when_no_node_present_with_corresponding_code_and_year(self):
+        result = self.tree.get_node_by_code_and_year('bla', 2019)
+        with self.subTest('Wrong code and year'):
+            self.assertIsNone(result)
+
+        result = self.tree.get_node_by_code_and_year('BBBB', 2019)
+        with self.subTest('Wrong year, good code'):
+            self.assertIsNone(result)
+
+        result = self.tree.get_node_by_code_and_year('bla', 2020)
+        with self.subTest('Wrong code, good year'):
+            self.assertIsNone(result)
+
+    def test_should_return_node_matching_specific_code_and_year(self):
+        result = self.tree.get_node_by_code_and_year('BBBB', self.year)
+        with self.subTest('Test for NodeLearningUnitYear'):
+            self.assertEqual(
+                result,
+                self.learning_unit_node
+            )
+
+        result = self.tree.get_node_by_code_and_year('AAAA', self.year)
+        with self.subTest('Test for NodeGroupYear'):
+            self.assertEqual(
+                result,
+                self.subgroup_node
+            )

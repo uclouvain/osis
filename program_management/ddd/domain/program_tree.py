@@ -112,9 +112,9 @@ class ProgramTree:
 
     def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
         """
-        Return the corresponding node based on the node_id value with respect to the class.
-        :param node_id: int
-        :param node_class: a Node subclass
+        Return the corresponding node based on the code and year.
+        :param code: str
+        :param year: int
         :return: Node
         """
         return next(
