@@ -31,7 +31,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
@@ -42,7 +42,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2020)
-        cls.education_group_year_parent = TrainingFactory(academic_year=cls.academic_year)
+        cls.education_group_year_parent = EducationGroupYearBachelorFactory(academic_year=cls.academic_year)
         cls.learning_unit_year_child = LearningUnitYearFakerFactory(
             learning_container_year__academic_year=cls.academic_year
         )
@@ -91,6 +91,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_context(self):
         response = self.client.get(self.url)
+
         context = response.context
         self.assertEqual(
             context['root'],
