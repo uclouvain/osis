@@ -48,7 +48,8 @@ class TestPersistPrerequisite(TestCase):
         self.luy2 = LearningUnitYearFactory(acronym="MARC4123", academic_year__current=True)
 
     def test_when_null_prerequisite_given(self):
-        persist_prerequisite.persist(self.root_node, self.node, NullPrerequisite())
+        self.node.prerequisite = NullPrerequisite()
+        persist_prerequisite.persist(self.root_node, self.node)
 
         prerequisite_obj = Prerequisite.objects.get(education_group_year__id=self.root_node.node_id)
         self.assertFalse(
@@ -56,11 +57,12 @@ class TestPersistPrerequisite(TestCase):
         )
 
     def test_should_create_prerequisite(self):
-        prerequisite_obj = prerequisite.construct_prerequisite_from_expression(
+        prerequisite_obj = prerequisite.factory.from_expression(
             "LOSIS4525 OU MARC4123",
             self.current_academic_year.year
         )
-        persist_prerequisite.persist(self.root_node, self.node, prerequisite_obj)
+        self.node.prerequisite = prerequisite_obj
+        persist_prerequisite.persist(self.root_node, self.node)
 
         prerequisite_obj = Prerequisite.objects.get(education_group_year__id=self.root_node.node_id)
         self.assertTrue(
@@ -73,7 +75,8 @@ class TestPersistPrerequisite(TestCase):
             learning_unit_year=self.learning_unit_year,
             items__groups=((self.luy1,), (self.luy2,))
         )
-        persist_prerequisite.persist(self.root_node, self.node, NullPrerequisite())
+        self.node.prerequisite = NullPrerequisite()
+        persist_prerequisite.persist(self.root_node, self.node)
 
         prerequisite_obj = Prerequisite.objects.get(education_group_year__id=self.root_node.node_id)
         self.assertFalse(

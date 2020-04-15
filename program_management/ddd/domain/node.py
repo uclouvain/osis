@@ -85,6 +85,7 @@ class Node:
         self.title = title
         self.year = year
         self.credits = credits
+        self.has_changed = False
 
     def __eq__(self, other):
         return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
@@ -310,7 +311,6 @@ class NodeLearningUnitYear(Node):
         self.quadrimester = quadrimester
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
-        self.has_changed = False
 
     @property
     def has_prerequisite(self) -> bool:

@@ -29,12 +29,22 @@ from django.db.models import Q
 from base.models.group_element_year import GroupElementYear
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
+from program_management.ddd.repositories import persist_prerequisite
+from program_management.models.enums.node_type import NodeType
 
 
 @transaction.atomic
 def persist(tree: program_tree.ProgramTree) -> None:
     __update_or_create_links(tree.root_node)
     __delete_links(tree.root_node)
+    __update_prerequisites(tree)
+
+
+def __update_prerequisites(tree: program_tree.ProgramTree):
+    all_learning_unit_nodes = tree.get_nodes_by_type(NodeType.LEARNING_UNIT)
+    learning_unit_nodes_modified = [node for node in all_learning_unit_nodes if node.has_changed]
+    for node in learning_unit_nodes_modified:
+        persist_prerequisite.persist(tree.root_node, node)
 
 
 def __update_or_create_links(node: Node):

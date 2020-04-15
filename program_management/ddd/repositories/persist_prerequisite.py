@@ -33,7 +33,6 @@ from program_management.ddd.domain.node import NodeLearningUnitYear, NodeEducati
 def persist(
         node_education_group_year: NodeEducationGroupYear,
         node_learning_unit_year_obj: NodeLearningUnitYear,
-        prerequisite: prerequisite_domain.Prerequisite
 ) -> None:
     education_group_year_obj = education_group_year.EducationGroupYear.objects.get(
         id=node_education_group_year.node_id
@@ -41,6 +40,7 @@ def persist(
     learning_unit_year_obj = learning_unit_year.LearningUnitYear.objects.get(
         id=node_learning_unit_year_obj.node_id
     )
+    prerequisite = node_learning_unit_year_obj.prerequisite
 
     prerequisite_model_obj, created = prerequisite_model.Prerequisite.objects.get_or_create(
         education_group_year=education_group_year_obj,
