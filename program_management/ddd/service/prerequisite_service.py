@@ -35,7 +35,7 @@ def check_is_prerequisite_in_trees_using_node(
         node_to_detach: 'Node',
         trees_using_node: List['ProgramTree'] = None
 ) -> BusinessValidationMessageList:
-    if not trees_using_node:
+    if trees_using_node is None:
         trees_using_node = search_trees_using_node(node_to_detach)
     messages = []
     for tree in trees_using_node:
