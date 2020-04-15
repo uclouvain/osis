@@ -111,53 +111,58 @@ class NullPrerequisite(Prerequisite):
         return ""
 
 
-def construct_prerequisite_from_expression(prerequisite_expression: PrerequisiteExpression, year: int) -> Prerequisite:
-    if not prerequisite_expression:
-        return NullPrerequisite()
+class PrerequisiteFactory:
+    def from_expression(self, prerequisite_expression: PrerequisiteExpression, year: int) -> Prerequisite:
+        if not prerequisite_expression:
+            return NullPrerequisite()
 
-    main_operator = _detect_main_operator_in_string(prerequisite_expression)
-    secondary_operator = AND if main_operator == OR else OR
-    prerequisite_item_groups = get_grouped_items_from_string(
-        prerequisite_expression,
-        main_operator,
-        secondary_operator,
-        year
-    )
-
-    return Prerequisite(main_operator, prerequisite_item_groups)
-
-
-def get_grouped_items_from_string(
-        prerequisite_string: PrerequisiteExpression,
-        main_operator: str,
-        secondary_operator: str,
-        year: int
-) -> List[PrerequisiteItemGroup]:
-    main_operator_splitter = ' ET ' if main_operator == AND else ' OU '
-    secondary_operator_splitter = ' OU ' if main_operator == AND else ' ET '
-
-    groups = prerequisite_string.split(main_operator_splitter)
-
-    return [
-        PrerequisiteItemGroup(
+        main_operator = self._detect_main_operator_in_string(prerequisite_expression)
+        secondary_operator = AND if main_operator == OR else OR
+        prerequisite_item_groups = self._get_grouped_items_from_string(
+            prerequisite_expression,
+            main_operator,
             secondary_operator,
-            split_group_into_items(group, secondary_operator_splitter, year)
-        ) for group in groups
-    ]
+            year
+        )
+
+        return Prerequisite(main_operator, prerequisite_item_groups)
+
+    @classmethod
+    def _get_grouped_items_from_string(
+            cls,
+            prerequisite_string: PrerequisiteExpression,
+            main_operator: str,
+            secondary_operator: str,
+            year: int
+    ) -> List[PrerequisiteItemGroup]:
+        main_operator_splitter = ' ET ' if main_operator == AND else ' OU '
+        secondary_operator_splitter = ' OU ' if main_operator == AND else ' ET '
+
+        groups = prerequisite_string.split(main_operator_splitter)
+
+        return [
+            PrerequisiteItemGroup(
+                secondary_operator,
+                cls._split_group_into_items(group, secondary_operator_splitter, year)
+            ) for group in groups
+        ]
+
+    @classmethod
+    def _split_group_into_items(cls, group: str, operator: str, year: int) -> List[PrerequisiteItem]:
+        group = cls._remove_parenthesis(group)
+        group = group.split(operator)
+        group_of_learning_units = [PrerequisiteItem(item, year) for item in group]
+        return group_of_learning_units
+
+    @classmethod
+    def _remove_parenthesis(cls, string: str):
+        return re.sub('[()]', "", string)
+
+    @classmethod
+    def _detect_main_operator_in_string(cls, prerequisite_string: PrerequisiteExpression) -> str:
+        if re.match(MULTIPLE_PREREQUISITES_REGEX_OR, prerequisite_string):
+            return OR
+        return AND
 
 
-def split_group_into_items(group, operator, year) -> List[PrerequisiteItem]:
-    group = _remove_parenthesis(group)
-    group = group.split(operator)
-    group_of_learning_units = [PrerequisiteItem(item, year) for item in group]
-    return group_of_learning_units
-
-
-def _remove_parenthesis(string: str):
-    return re.sub('[()]', "", string)
-
-
-def _detect_main_operator_in_string(prerequisite_string: PrerequisiteExpression) -> str:
-    if re.match(MULTIPLE_PREREQUISITES_REGEX_OR, prerequisite_string):
-        return OR
-    return AND
+factory = PrerequisiteFactory()

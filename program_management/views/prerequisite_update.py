@@ -28,7 +28,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.domain.prerequisite import construct_prerequisite_from_expression
+from program_management.ddd.domain import prerequisite as prerequisite_domain
 from program_management.ddd.repositories import persist_prerequisite
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
@@ -63,7 +63,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         return context
 
     def form_valid(self, form):
-        prerequisite_obj = construct_prerequisite_from_expression(
+        prerequisite_obj = prerequisite_domain.factory.from_expression(
             form.cleaned_data["prerequisite_string"],
             self.get_root().academic_year.year
         )

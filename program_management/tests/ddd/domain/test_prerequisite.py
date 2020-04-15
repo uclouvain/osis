@@ -103,14 +103,14 @@ class TestPrerequisite(SimpleTestCase):
 class TestConstructPrerequisiteFromExpression(SimpleTestCase):
     def test_return_null_prerequisite_when_empty_expression_given(self):
         self.assertIsInstance(
-            prerequisite.construct_prerequisite_from_expression("", 2019),
+            prerequisite.factory.from_expression("", 2019),
             NullPrerequisite
         )
 
     def test_return_prerequisite_object_when_expression_given(self):
         prerequisite_expression = "LOSIS4525 OU (LMARC5823 ET BRABD6985)"
 
-        prerequisite_obj = prerequisite.construct_prerequisite_from_expression(prerequisite_expression, 2019)
+        prerequisite_obj = prerequisite.factory.from_expression(prerequisite_expression, 2019)
         self.assertEqual(
             prerequisite_expression,
             str(prerequisite_obj)
