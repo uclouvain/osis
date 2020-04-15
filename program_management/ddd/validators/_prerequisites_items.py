@@ -27,12 +27,17 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.domain.prerequisite import PrerequisiteExpression, ACRONYM_REGEX
 
 
 class PrerequisiteItemsValidator(BusinessValidator):
-    def __init__(self, prerequisite_string: PrerequisiteExpression, node: Node, codes_permitted: List[str]):
+    def __init__(
+            self,
+            prerequisite_string: PrerequisiteExpression,
+            node: NodeLearningUnitYear,
+            codes_permitted: List[str]
+    ):
         super().__init__()
         self.prerequisite_string = prerequisite_string
         self.codes_permitted = codes_permitted

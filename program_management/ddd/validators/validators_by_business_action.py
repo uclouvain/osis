@@ -71,7 +71,12 @@ class AttachNodeValidatorList(BusinessListValidator):
 
 
 class UpdatePrerequisiteValidatorList(BusinessListValidator):
-    def __init__(self, prerequisite_string: 'PrerequisiteExpression', node: 'Node', codes_permitted: List[str]):
+    def __init__(
+            self,
+            prerequisite_string: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear',
+            codes_permitted: List[str]
+    ):
         self.validators = [
             PrerequisiteExpressionSyntaxValidator(prerequisite_string),
             PrerequisiteItemsValidator(prerequisite_string, node, codes_permitted)
