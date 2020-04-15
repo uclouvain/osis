@@ -38,7 +38,6 @@ class PrerequisiteAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('education_group_year__academic_year',)
     search_fields = ['learning_unit_year__acronym', 'education_group_year__acronym',
                      'education_group_year__partial_acronym']
-    readonly_fields = ('prerequisite_string',)
 
 
 class Prerequisite(models.Model):

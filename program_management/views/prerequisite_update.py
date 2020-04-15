@@ -40,6 +40,10 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
     template_name = "learning_unit/tab_prerequisite_update.html"
     form_class = PrerequisiteForm
 
+    def dispatch(self, request, *args, **kwargs):
+        self.check_can_update_prerequisite()
+        return super().dispatch(request, *args, **kwargs)
+
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
         node = self.program_tree.get_node_by_id_and_type(
@@ -56,9 +60,6 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         context["show_prerequisites"] = True
-
-        self.check_can_update_prerequisite()
-
         return context
 
     def form_valid(self, form):
