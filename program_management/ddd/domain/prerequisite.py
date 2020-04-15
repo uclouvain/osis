@@ -88,6 +88,7 @@ class Prerequisite:
         self.main_operator = main_operator
 
         self.prerequisite_item_groups = prerequisite_item_groups or []
+        self.has_changed = False
 
     def add_prerequisite_item_group(self, group: PrerequisiteItemGroup):
         self.prerequisite_item_groups.append(group)

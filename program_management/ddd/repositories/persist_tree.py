@@ -42,7 +42,7 @@ def persist(tree: program_tree.ProgramTree) -> None:
 
 def __update_prerequisites(tree: program_tree.ProgramTree):
     all_learning_unit_nodes = tree.get_nodes_by_type(NodeType.LEARNING_UNIT)
-    learning_unit_nodes_modified = [node for node in all_learning_unit_nodes if node.has_changed]
+    learning_unit_nodes_modified = [node for node in all_learning_unit_nodes if node.prerequisite.has_changed]
     for node in learning_unit_nodes_modified:
         persist_prerequisite.persist(tree.root_node, node)
 
