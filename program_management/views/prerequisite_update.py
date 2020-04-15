@@ -50,7 +50,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
             int(self.kwargs["learning_unit_year_id"]),
             NodeType.LEARNING_UNIT
         )
-        form_kwargs["codes_permitted"] = self.program_tree.get_codes_permitted_as_prerequisite()
+        form_kwargs["program_tree"] = self.program_tree
         form_kwargs["node"] = node
         form_kwargs["initial"] = {
             "prerequisite_string": str(node.prerequisite)

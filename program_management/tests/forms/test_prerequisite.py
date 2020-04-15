@@ -28,17 +28,18 @@ from django.test import SimpleTestCase
 
 from program_management.forms.prerequisite import PrerequisiteForm
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class TestPrerequisiteForm(SimpleTestCase):
     @mock.patch("program_management.forms.prerequisite.UpdatePrerequisiteValidatorList")
     def test_is_valid_call_prerequisite_validators(self, mock_prerequisite_validator):
         prerequisite_string = "LOSIS1452 OU LPORT5896"
-        codes_permitted = list(),
+        program_tree = ProgramTreeFactory(),
         node = NodeLearningUnitYearFactory()
 
         form = PrerequisiteForm(
-            codes_permitted,
+            program_tree,
             node,
             data={"prerequisite_string": prerequisite_string}
         )

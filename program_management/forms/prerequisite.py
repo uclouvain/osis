@@ -29,6 +29,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.domain.node import NodeLearningUnitYear
+from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import UpdatePrerequisiteValidatorList
 
 
@@ -47,15 +48,15 @@ class PrerequisiteForm(forms.Form):
         ),
     )
 
-    def __init__(self, codes_permitted: List[str], node: NodeLearningUnitYear, *args, **kwargs):
+    def __init__(self, program_tree: ProgramTree, node: NodeLearningUnitYear, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.codes_permitted = codes_permitted
+        self.program_tree = program_tree
         self.node = node
 
     def clean_prerequisite_string(self):
         prerequisite_string = self.cleaned_data["prerequisite_string"]
-        validator = UpdatePrerequisiteValidatorList(prerequisite_string, self.node, self.codes_permitted)
+        validator = UpdatePrerequisiteValidatorList(prerequisite_string, self.node, self.program_tree)
         if not validator.is_valid():
             for error_message in validator.error_messages:
                 self.add_error("prerequisite_string", error_message.message)

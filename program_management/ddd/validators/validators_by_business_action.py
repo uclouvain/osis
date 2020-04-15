@@ -75,10 +75,10 @@ class UpdatePrerequisiteValidatorList(BusinessListValidator):
             self,
             prerequisite_string: 'PrerequisiteExpression',
             node: 'NodeLearningUnitYear',
-            codes_permitted: List[str]
+            program_tree: 'ProgramTree'
     ):
         self.validators = [
             PrerequisiteExpressionSyntaxValidator(prerequisite_string),
-            PrerequisiteItemsValidator(prerequisite_string, node, codes_permitted)
+            PrerequisiteItemsValidator(prerequisite_string, node, program_tree.get_codes_permitted_as_prerequisite())
         ]
         super().__init__()
