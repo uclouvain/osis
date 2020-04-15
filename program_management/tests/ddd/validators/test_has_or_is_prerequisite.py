@@ -31,6 +31,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
+from program_management.tests.ddd.factories.prerequisite import make_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -64,7 +65,7 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
         self.assertFalse(validator.is_valid())
         expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
                              "are prerequisite in %(formation)s: %(learning_units)s") % {
-                               "acronym": node_to_detach.code,
+                               "acronym": node_to_detach.title,
                                "formation": self.tree.root_node.title,
                                "learning_units": link_with_child_is_prerequisite.child.code
                            }
@@ -73,17 +74,17 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
     def test_when_children_of_node_to_detach_are_prerequisites(self):
         node_to_detach = self.common_core
         link1 = LinkFactory(
-            parent=self.common_core,
+            parent=node_to_detach,
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
         )
-        link2 = LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[link1.child]))
+        link2 = LinkFactory(parent=node_to_detach, child=NodeLearningUnitYearFactory(is_prerequisite_of=[link1.child]))
         validator = IsPrerequisiteValidator(self.tree, node_to_detach)
         self.assertFalse(validator.is_valid())
         expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
                              "are prerequisite in %(formation)s: %(learning_units)s") % {
-                               "acronym": node_to_detach.code,
+                               "acronym": node_to_detach.title,
                                "formation": self.tree.root_node.title,
-                               "learning_units": ", ".join((link1.child.code, link2.child.code))
+                               "learning_units": ", ".join((link2.child.code, link1.child.code))
                            }
         self.assertListEqual(validator.messages, [expected_message])
 
@@ -102,19 +103,61 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
 
 class TestHasPrerequisiteValidator(SimpleTestCase):
 
-    def test_when_node_to_detach_is_group(self):
+    def setUp(self):
+        self.node_is_prerequisite = NodeLearningUnitYearFactory()
+
+        node_has_prerequisite = NodeLearningUnitYearFactory()
+        node_has_prerequisite.set_prerequisite(make_prerequisite(self.node_is_prerequisite))
+        self.node_has_prerequisite = node_has_prerequisite
+
+    def test_when_node_to_detach_is_group_and_not_contains_prerequisites(self):
         node_to_detach = NodeGroupYearFactory()
         link = LinkFactory(child=node_to_detach)
         tree = ProgramTreeFactory(root_node=link.parent)
         validator = HasPrerequisiteValidator(tree, node_to_detach)
-        with self.assertRaises(AttributeError):
-            assertion_message = "This validator is pertinent only for NodeLearningUnitYear objects"
-            validator.is_valid()
+        self.assertTrue(validator.is_valid())
+
+    def test_when_node_to_detach_is_group_and_contains_prerequisites(self):
+        node_to_detach = NodeGroupYearFactory()
+
+        link = LinkFactory(child=node_to_detach)
+        LinkFactory(parent=node_to_detach, child=self.node_has_prerequisite)
+        LinkFactory(parent=self.node_has_prerequisite, child=self.node_is_prerequisite)
+
+        tree = ProgramTreeFactory(root_node=link.parent)
+
+        validator = HasPrerequisiteValidator(tree, node_to_detach)
+        self.assertTrue(validator.is_valid())
+        expected_message = _("The prerequisites for the following learning units contained in education group year "
+                             "%(acronym)s will we deleted: %(learning_units)s") % {
+                               "acronym": tree.root_node.title,
+                               "learning_units": self.node_has_prerequisite.code
+                           }
+        self.assertListEqual([expected_message], validator.warning_messages)
 
     def test_when_node_to_detach_is_learning_unit_and_has_prerequisite(self):
-        # TODO :: to implement in OSIS-4531
-        pass
+        node_to_detach_has_prerequisite = self.node_has_prerequisite
+
+        link = LinkFactory(child=node_to_detach_has_prerequisite)
+
+        tree = ProgramTreeFactory(root_node=link.parent)
+
+        validator = HasPrerequisiteValidator(tree, node_to_detach_has_prerequisite)
+        self.assertTrue(validator.is_valid())
+        expected_message = _("The prerequisites for the following learning units contained in education group year "
+                             "%(acronym)s will we deleted: %(learning_units)s") % {
+                               "acronym": tree.root_node.title,
+                               "learning_units": node_to_detach_has_prerequisite.code
+                           }
+        self.assertListEqual([expected_message], validator.warning_messages)
 
     def test_when_node_to_detach_is_learning_unit_and_has_no_prerequisite(self):
-        # TODO :: to implement in OSIS-4531
-        pass
+        node_to_detach_without_prerequisite = NodeLearningUnitYearFactory()
+
+        link = LinkFactory(child=node_to_detach_without_prerequisite)
+
+        tree = ProgramTreeFactory(root_node=link.parent)
+
+        validator = HasPrerequisiteValidator(tree, node_to_detach_without_prerequisite)
+        self.assertTrue(validator.is_valid())
+        self.assertListEqual(validator.warning_messages, [])
