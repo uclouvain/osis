@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.test import SimpleTestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain import prerequisite
@@ -59,7 +60,7 @@ class TestPrerequisiteGroupItem(SimpleTestCase):
         p_group.add_prerequisite_item('LDROI1200', 2018)
         p_group.add_prerequisite_item('LAGRO2200', 2018)
 
-        expected_str = 'LDROI1200 OR LAGRO2200'
+        expected_str = 'LDROI1200 {OR} LAGRO2200'.format(OR=_(prerequisite_operator.OR))
         self.assertEquals(str(p_group), expected_str)
 
 
@@ -84,7 +85,7 @@ class TestPrerequisite(SimpleTestCase):
         p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
         p_req.add_prerequisite_item_group(self.p_group)
 
-        expected_str = 'LDROI1300 OR LAGRO2400'
+        expected_str = 'LDROI1300 {OR} LAGRO2400'.format(OR=_(prerequisite_operator.OR))
         self.assertEquals(str(p_req), expected_str)
 
     def test_case_assert_str_method_with_multiple_groups(self):
@@ -92,7 +93,10 @@ class TestPrerequisite(SimpleTestCase):
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group_2)
 
-        expected_str = '(LDROI1300 OR LAGRO2400) AND LDROI1400'
+        expected_str = '(LDROI1300 {OR} LAGRO2400) {AND} LDROI1400'.format(
+            OR=_(prerequisite_operator.OR),
+            AND=_(prerequisite_operator.AND)
+        )
         self.assertEquals(str(p_req), expected_str)
 
 
