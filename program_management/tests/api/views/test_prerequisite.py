@@ -38,6 +38,7 @@ from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 @override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
@@ -111,9 +112,11 @@ class TrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
                                                  acronym=cls.root_node.code,
                                                  title=cls.root_node.title,
                                                  academic_year__year=cls.root_node.year)
+        cls.egv_root = EducationGroupVersionFactory(offer=cls.root_egy,
+                                                    version_name='')
 
-        cls.url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': cls.root_node.year,
-                                                                                   'acronym': cls.root_node.code})
+        cls.url = reverse('program_management_api_v1:training-prerequisites_official',
+                          kwargs={'year': cls.root_node.year, 'acronym': cls.root_node.code})
         cls.request = RequestFactory().get(cls.url)
         cls.serializer = ProgramTreePrerequisitesSerializer(cls.ldroi100a, context={
             'request': cls.request,
@@ -136,14 +139,12 @@ class TrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
                 self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_results_case_training_not_found(self):
-        invalid_url = reverse('education_group_api_v1:training-prerequisites', kwargs={
-            'acronym': 'ACRO',
-            'year': 2019
-        })
+        invalid_url = reverse('program_management_api_v1:training-prerequisites_official',
+                              kwargs={'acronym': 'ACRO', 'year': 2019})
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch('education_group.api.views.prerequisite.TrainingPrerequisites.get_queryset')
+    @patch('program_management.api.views.prerequisite.TrainingPrerequisites.get_queryset')
     def test_get_results(self, mock_get_queryset):
         mock_get_queryset.return_value = self.tree.get_nodes_that_have_prerequisites()
         response = self.client.get(self.url)
@@ -166,9 +167,11 @@ class MiniTrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
                                                  title=cls.root_node.title,
                                                  academic_year__year=cls.root_node.year)
 
-        cls.url = reverse('education_group_api_v1:mini_training-prerequisites', kwargs={'year': cls.root_node.year,
-                                                                                        'partial_acronym':
-                                                                                            cls.root_node.code})
+        cls.egv_root = EducationGroupVersionFactory(offer=cls.root_egy,
+                                                    version_name='')
+
+        cls.url = reverse('program_management_api_v1:mini_training-prerequisites_official',
+                          kwargs={'year': cls.root_node.year, 'partial_acronym': cls.root_node.code})
         cls.request = RequestFactory().get(cls.url)
         cls.serializer = ProgramTreePrerequisitesSerializer(cls.ldroi100a, context={
             'request': cls.request,
@@ -190,15 +193,13 @@ class MiniTrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
                 response = getattr(self.client, method)(self.url)
                 self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def test_get_results_case_education_group_year_not_found(self):
-        invalid_url = reverse('education_group_api_v1:mini_training-prerequisites', kwargs={
-            'partial_acronym': 'ACRO',
-            'year': 2019
-        })
+    def test_get_results_case_mini_training_not_found(self):
+        invalid_url = reverse('program_management_api_v1:mini_training-prerequisites_official',
+                              kwargs={'partial_acronym': 'ACRO', 'year': 2019})
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch('education_group.api.views.prerequisite.MiniTrainingPrerequisites.get_queryset')
+    @patch('program_management.api.views.prerequisite.MiniTrainingPrerequisites.get_queryset')
     def test_get_results(self, mock_get_queryset):
         mock_get_queryset.return_value = self.tree.get_nodes_that_have_prerequisites()
         response = self.client.get(self.url)

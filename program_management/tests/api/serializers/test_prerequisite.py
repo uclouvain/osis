@@ -53,7 +53,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
         self.tree = ProgramTree(root_node=self.root_node)
 
-        url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': self.root_node.year,
+        url = reverse('program_management_api_v1:training-prerequisites', kwargs={'year': self.root_node.year,
                                                                                'acronym': self.root_node.code})
         self.request = RequestFactory().get(url)
         self.serializer = ProgramTreePrerequisitesSerializer(self.ldroi100a, context={
@@ -98,7 +98,7 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
                                                      specific_title_fr="Partie 1",
                                                      year=2018)
 
-        url = reverse('education_group_api_v1:training-prerequisites', kwargs={'year': 2018, 'acronym': 'LDROI1300'})
+        url = reverse('program_management_api_v1:training-prerequisites', kwargs={'year': 2018, 'acronym': 'LDROI1300'})
         self.request = RequestFactory().get(url)
         self.serializer = NodeBaseSerializer(self.ldroi1300, context={
             'request': self.request,

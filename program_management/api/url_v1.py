@@ -31,9 +31,14 @@ app_name = "program_management"
 
 urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
-        url(r'^prerequisites$', TrainingPrerequisites.as_view(), name=TrainingPrerequisites.name),
+        url(r'^(?P<version_name>[\w]+)/prerequisites$', TrainingPrerequisites.as_view(),
+            name=TrainingPrerequisites.name),
+        url(r'^prerequisites$', TrainingPrerequisites.as_view(), name='{}_official'.format(TrainingPrerequisites.name)),
     ])),
     url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
-        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), name=MiniTrainingPrerequisites.name),
+        url(r'^(?P<version_name>[\w]+)/prerequisites$', MiniTrainingPrerequisites.as_view(),
+            name=MiniTrainingPrerequisites.name),
+        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(),
+            name='{}_official'.format(MiniTrainingPrerequisites.name)),
     ])),
 ]
