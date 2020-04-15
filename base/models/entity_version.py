@@ -27,18 +27,22 @@ import collections
 import datetime
 from collections import OrderedDict
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models, connection
 from django.db.models import Q
+from django.db.models.expressions import F, RawSQL
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django_cte import CTEQuerySet, With
 from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
 from base.models.enums.organization_type import MAIN
+from base.models.utils.func import ArrayConcat
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from osis_common.utils.datetime import get_tzinfo
 
@@ -51,7 +55,13 @@ PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS = [
 SQL_RECURSIVE_QUERY = """\
 WITH RECURSIVE under_entity AS (
 
-    SELECT id, acronym, parent_id, entity_id, '{{}}'::INT[] AS parents, '{date}'::DATE AS date, 0 AS level
+    SELECT id,
+           acronym,
+           parent_id,
+           entity_id,
+           '{{}}'::INT[] AS parents,
+           '{date}'::DATE AS date,
+           0 AS level
     FROM base_entityversion WHERE entity_id IN ({list_entities})
 
     UNION ALL
@@ -103,7 +113,7 @@ class EntityVersionAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ['entity_type']
 
 
-class EntityVersionQuerySet(models.QuerySet):
+class EntityVersionQuerySet(CTEQuerySet):
     def current(self, date):
         if date:
             return self.filter(Q(end_date__gte=date) | Q(end_date__isnull=True), start_date__lte=date, )
@@ -112,6 +122,57 @@ class EntityVersionQuerySet(models.QuerySet):
 
     def entity(self, entity):
         return self.filter(entity=entity)
+
+    def with_children(self, date=None):
+        """
+        Use a Common Table Expression to construct the hierarchy of children entities
+
+        :param date: Date to filter the entity versions on (default: now)
+        :return: a CTE queryset that can be used as is, or joined again on
+        EntityVersion to get more info, e.g.:
+
+        qs = cte.join(EntityVersion, id=cte.col.id).with_cte(cte).filter(
+            entity_type='FACULTY',
+        )
+
+        It can also be used as is, to get only the fields used in CTE:
+        qs = cte.queryset().with_cte(cte)
+        :rtype: With
+        """
+        if date is None:
+            date = now()
+
+        def children_entities(cte):
+            """ This function is used for the recursive SQL query """
+            # self here is an EntityVersion queryset
+            return self.values(
+                "id",
+                "entity_id",
+                "parent_id",
+                children=RawSQL(
+                    # start the array with the current entity
+                    "ARRAY[entity_id]", [],
+                    output_field=ArrayField(models.IntegerField()),
+                ),
+            ).union(
+                # recursive union: get descendants with entity_id = parent_id
+                cte.join(EntityVersion, entity_id=cte.col.parent_id).filter(
+                    Q(end_date__gte=date) | Q(end_date__isnull=True),
+                    start_date__lte=date,
+                ).values(
+                    "id",
+                    "entity_id",
+                    "parent_id",
+                    children=ArrayConcat(
+                        # Prepend the child to the array
+                        F("entity_id"), cte.col.children,
+                        output_field=ArrayField(models.IntegerField()),
+                    ),
+                ),
+                all=True,
+            )
+
+        return With.recursive(children_entities)
 
     def get_tree(self, entities, date=None):
         """
