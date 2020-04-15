@@ -32,6 +32,7 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum, Tra
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     DetachNodeValidatorList
@@ -120,7 +121,7 @@ class ProgramTree:
         return next(
             (
                 node for node in self.get_all_nodes()
-                if node.node_id == node_id and node.type == node_type
+                if node.node_id == node_id and node.node_type == node_type
             ),
             None
         )
@@ -218,15 +219,27 @@ class ProgramTree:
         validator = PathValidator(path_to_node_to_detach)
         if not validator.is_valid():
             return False, validator.messages
-        node_to_detach = self.get_node(path_to_node_to_detach)
-        if self.is_root(node_to_detach):  # TODO :: use a Validator instead?
-            return False, [BusinessValidationMessage(_("Cannot perform detach action on root."), MessageLevel.ERROR)]
+
+        validator = DetachRootValidator(self, path_to_node_to_detach)
+        if not validator.is_valid():
+            return False, validator.messages
+
         parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
         parent = self.get_node(parent_path)
+        node_to_detach = self.get_node(path_to_node_to_detach)
         is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
         if is_valid:
             parent.detach_child(node_to_detach)
+            self.remove_prerequisites(node_to_detach)
         return is_valid, messages
+
+    def remove_prerequisites(self, detached_node: 'Node'):
+        if detached_node.is_learning_unit():
+            to_remove = [detached_node] if detached_node.has_prerequisite else []
+        else:
+            to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
+        for n in to_remove:
+            n.remove_all_prerequisite_items()
 
     def clean_detach_node(
             self,

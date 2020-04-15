@@ -33,6 +33,7 @@ from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMe
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
+from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree, build_path
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
@@ -42,6 +43,7 @@ from program_management.tests.ddd.factories.authorized_relationship import Autho
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
@@ -567,6 +569,17 @@ class TestDetachNode(SimpleTestCase):
         self.success_message = BusinessValidationMessage("Success message", MessageLevel.SUCCESS)
         self.error_message = BusinessValidationMessage("Error message", MessageLevel.ERROR)
 
+    def test_when_path_is_not_valid(self):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node)
+        path_to_detach = "Invalid path"
+        result_is_valid, result_messages = tree.detach_node(path_to_detach)
+        self.assertFalse(result_is_valid)
+        expected_result = [
+            BusinessValidationMessage(_("Invalid tree path"), MessageLevel.ERROR)
+        ]
+        self.assertListEqual(result_messages, expected_result)
+
     def test_when_path_to_detach_is_root_node(self):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node)
@@ -590,6 +603,32 @@ class TestDetachNode(SimpleTestCase):
         self.assertTrue(result_is_valid)
         self.assertListEqual(result_messages.return_value, [self.success_message])
         self.assertNotIn(link, tree.root_node.children)
+
+    @patch.object(DetachNodeValidatorList, 'messages')
+    @patch.object(DetachNodeValidatorList, 'is_valid')
+    def test_when_validator_list_is_valid_and_node_contains_node_that_has_prerequisites(
+            self,
+            mock_is_valid,
+            mock_messages
+    ):
+        mock_is_valid.return_value = True
+        mock_messages.return_value = [self.success_message]
+
+        node_that_has_prerequisite = NodeLearningUnitYearFactory()
+        node_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[node_that_has_prerequisite])
+        node_that_has_prerequisite.set_prerequisite(cast_to_prerequisite(node_that_is_prerequisite))
+        initial_items = node_that_has_prerequisite.prerequisite.get_all_prerequisite_items()
+        self.assertListEqual(initial_items, [PrerequisiteItem(node_that_is_prerequisite.code, node_that_is_prerequisite.year)])
+
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
+        link = LinkFactory(parent=tree.root_node, child=node_that_has_prerequisite)
+        path_to_detach = build_path(link.parent, link.child)
+        result_is_valid, result_messages = tree.detach_node(path_to_detach)
+        self.assertTrue(result_is_valid)
+        self.assertListEqual(result_messages.return_value, [self.success_message])
+        self.assertNotIn(link, tree.root_node.children)
+        self.assertListEqual(node_that_has_prerequisite.prerequisite.get_all_prerequisite_items(), [])
 
     @patch.object(DetachNodeValidatorList, 'messages')
     @patch.object(DetachNodeValidatorList, 'is_valid')

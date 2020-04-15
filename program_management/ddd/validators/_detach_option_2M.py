@@ -50,7 +50,10 @@ class DetachOptionValidator(BusinessValidator):
             tree for tree in trees_using_node if tree.is_master_2m()
         ]
         for tree in self.trees_2m:
-            assert tree.get_node_by_id_and_class(self.node_to_detach.node_id, self.node_to_detach.node_type)
+            try:
+                assert tree.get_node_by_id_and_class(self.node_to_detach.node_id, self.node_to_detach.node_type)
+            except AssertionError:
+                print()
         # msg = "This validator need the children of the node to add. Please load the complete Tree from the Node to Add"
         # assert isinstance(tree_from_node_to_add, program_tree.ProgramTree), msg
         # if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():

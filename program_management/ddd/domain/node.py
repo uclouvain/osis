@@ -340,6 +340,9 @@ class NodeLearningUnitYear(Node):
     def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite
 
+    def remove_all_prerequisite_items(self) -> None:
+        self.prerequisite.remove_all_prerequisite_items()
+
 
 class NodeLearningClassYear(Node):
 

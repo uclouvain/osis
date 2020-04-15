@@ -25,23 +25,30 @@
 ############################################################################
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, FormView
 
 from base.utils.cache import ElementCache
-from base.views.common import display_error_messages, display_success_messages, display_warning_messages
+from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
+    display_business_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
+from program_management.ddd.domain.program_tree import PATH_SEPARATOR
+from program_management.ddd.service import detach_node_service
+from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     template_name = "group_element_year/confirm_detach_inner.html"
+
+    form_class = DetachNodeForm
 
     # TODO :: [MOVED OK]
     raise_exception = True
@@ -51,59 +58,99 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())
 
-    @cached_property
-    def strategy(self):
-        obj = self.get_object()
-        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
-        return strategy_class(obj)
+    # @cached_property
+    # def strategy(self):
+    #     obj = self.get_object()
+    #     strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+    #     return strategy_class(obj)
 
     # TODO :: [MOVED OK]
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(DetachGroupElementYearView, self).get_context_data(**kwargs)
+        message_list = detach_node_service.detach_node(self.path_to_node_to_detach, commit=False)
+        display_warning_messages(self.request, message_list.warnings)
+        display_error_messages(self.request, message_list.errors)
+        if not message_list.contains_errors():
+            context['confirmation_message'] = self.confirmation_message
+        return context
+
+    @property
+    def confirmation_message(self):
         msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
         if hasattr(self.object.child, 'partial_acronym'):
             msg = "%(partial_acronym)s - %(acronym)s" % {
                 "acronym": msg,
                 "partial_acronym": self.object.child.partial_acronym
             }
-
-        if self.strategy.is_valid():
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
-                "acronym": msg
-            }
-            display_warning_messages(self.request, self.strategy.warnings)
-        else:
-            display_error_messages(self.request, self.strategy.errors)
-        return context
-
-    def delete(self, request, *args, **kwargs):
-        obj = self.get_object()
-        if not self.strategy.is_valid():
-            return JsonResponse({"error": True})
-        self.strategy.post_valid()
-
-        # TODO :: [MOVED OK]
-        success_msg = _("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-            'child': obj.child,
-            'parent': obj.parent,
+        return _("Are you sure you want to detach %(acronym)s ?") % {
+            "acronym": msg
         }
 
-        # TODO :: [MOVED OK]
-        self._remove_element_from_clipboard_if_stored(obj)
+    @cached_property
+    def path_to_node_to_detach(self) -> str:
+        return self.request.GET.get('path')
 
-        display_success_messages(request, success_msg)
+    def get_initial(self):
+        return {
+            **super().get_initial(),
+            'path': self.path_to_node_to_detach
+        }
+
+    # @property
+    # def parent_id(self):
+    #     return self.path_to_node_to_detach.split('|')[-2]
+    #
+    # @property
+    # def child_id_to_detach(self):
+    #     return self.path_to_node_to_detach.split('|')[-1]
+    #
+    # def get_object(self):
+    #     obj = self.model.objects.filter(
+    #         parent_id=self.parent_id
+    #     ).filter(
+    #         Q(child_branch_id=self.child_id_to_detach) | Q(child_leaf_id=self.child_id_to_detach)
+    #     ).get()
+    #     return obj
+    #
+    # @property
+    # def object(self):
+    #     if self._object is None:
+    #         self._object = self.get_object()
+    #     return self._object
+
+    def delete(self, request, *args, **kwargs):
+        # obj = self.get_object()
+        # if not self.strategy.is_valid():
+        #     return JsonResponse({"error": True})
+        # self.strategy.post_valid()
+
+        message_list = detach_node_service.detach_node(self.path_to_node_to_detach)
+        display_business_messages(self.request, message_list.messages)
+
+        if message_list.contains_errors():
+            return JsonResponse({"error": True})
+
+        self._remove_element_from_clipboard_if_stored(self.path_to_node_to_detach)
+
         return super().delete(request, *args, **kwargs)
 
+    # def form_valid(self, form):
+    #     message_list = form.save()
+    #     display_business_messages(self.request, message_list.messages)
+    #     self._remove_element_from_clipboard_if_stored(form.cleaned_data['path'])
+    #     return super().form_valid(form)
+
     # TODO :: [MOVED OK]
-    def _remove_element_from_clipboard_if_stored(self, obj_detached):
+    def _remove_element_from_clipboard_if_stored(self, path: str):
         element_cache = ElementCache(self.request.user)
-        obj_detached = obj_detached.child_branch or obj_detached.child_leaf
-        if element_cache.equals(obj_detached):
+        detached_element_id = int(path.split(PATH_SEPARATOR)[-1])
+        if element_cache.equals(detached_element_id):
             element_cache.clear()
 
     # TODO :: [MOVED OK]
     def get_success_url(self):
         # We can just reload the page
+        print()
         return
 
     # TODO :: [MOVED OK]

@@ -31,7 +31,7 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
-from program_management.tests.ddd.factories.prerequisite import make_prerequisite
+from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -107,7 +107,7 @@ class TestHasPrerequisiteValidator(SimpleTestCase):
         self.node_is_prerequisite = NodeLearningUnitYearFactory()
 
         node_has_prerequisite = NodeLearningUnitYearFactory()
-        node_has_prerequisite.set_prerequisite(make_prerequisite(self.node_is_prerequisite))
+        node_has_prerequisite.set_prerequisite(cast_to_prerequisite(self.node_is_prerequisite))
         self.node_has_prerequisite = node_has_prerequisite
 
     def test_when_node_to_detach_is_group_and_not_contains_prerequisites(self):

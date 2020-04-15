@@ -23,50 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
+from collections import Counter
+from typing import List
 
-import factory.fuzzy
-
-from base.models.enums import prerequisite_operator
-from program_management.ddd.domain.prerequisite import PrerequisiteItem, PrerequisiteItemGroup, Prerequisite
+from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.business_types import *
+from base.ddd.utils.business_validator import BusinessValidator
 
 
-class PrerequisiteItemFactory(factory.Factory):
-    class Meta:
-        model = PrerequisiteItem
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'Code-%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+# Implemented from GroupElementYear._check_same_academic_year_parent_child_branch
+from program_management.models.enums.node_type import NodeType
 
 
-class PrerequisiteItemGroupFactory(factory.Factory):
-    class Meta:
-        model = PrerequisiteItemGroup
-        abstract = False
+class DetachRootValidator(BusinessValidator):
 
-    operator = factory.Iterator(prerequisite_operator.PREREQUISITES_OPERATORS, getter=operator.itemgetter(0))
-    prerequisite_items = []
+    def __init__(self, tree: 'ProgramTree', path_to_detach: 'Path'):
+        super(DetachRootValidator, self).__init__()
+        self.path_to_detach = path_to_detach
+        self.tree = tree
 
-
-class PrerequisiteFactory(factory.Factory):
-    class Meta:
-        model = Prerequisite
-        abstract = False
-
-    main_operator = prerequisite_operator.AND
-    prerequisite_item_groups = []
-
-
-def cast_to_prerequisite(node: 'NodeLearningUnitYear') -> Prerequisite:
-    return PrerequisiteFactory(
-        prerequisite_item_groups=[
-            PrerequisiteItemGroupFactory(
-                prerequisite_items=[
-                    PrerequisiteItemFactory(code=node.code, year=node.year),
-                ]
-            ),
-        ]
-    )
+    def validate(self):
+        if self.tree.is_root(self.tree.get_node(self.path_to_detach)):
+            self.add_error_message(_("Cannot perform detach action on root."))

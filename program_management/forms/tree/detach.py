@@ -31,15 +31,6 @@ from program_management.ddd.domain import program_tree, node
 from program_management.ddd.service import detach_node_service
 
 
-# TODO :: déplacer dans serializers
-def business_messages_serializer(message_list: 'BusinessValidationMessageList') -> dict:
-    return {
-        'errors': [str(msg) for msg in message_list.errors],
-        'warnings': [str(msg) for msg in message_list.warnings],
-        'success': [str(msg) for msg in message_list.success],
-    }
-
-
 class DetachNodeForm(forms.Form):
     path = forms.CharField(widget=forms.HiddenInput)
 

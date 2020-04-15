@@ -26,11 +26,14 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from base.models.education_group_year import EducationGroupYear
+from base.models.group_element_year import GroupElementYear
 from base.utils.cache import ElementCache
 from base.views.common import display_business_messages
 from base.views.common import display_error_messages, display_warning_messages
@@ -59,6 +62,22 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())
 
+    @property
+    def parent_id(self):
+        return self.path_to_detach.split('|')[-2]
+
+    @property
+    def child_id_to_detach(self):
+        return self.path_to_detach.split('|')[-1]
+
+    @property
+    def path_to_detach(self):
+        return self.request.GET.get('path')
+
+    @property
+    def root_id(self):
+        return self.path_to_detach.split('|')[0]
+
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
         message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
@@ -73,6 +92,19 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             **super().get_initial(),
             'path': self.request.GET.get('path')
         }
+
+    def get_object(self):
+        obj = self.model.objects.filter(
+            parent_id=self.parent_id
+        ).filter(
+            Q(child_branch_id=self.child_id_to_detach) | Q(child_leaf_id=self.child_id_to_detach)
+        ).get()
+        return obj
+
+    def object(self):
+        if self._object is None:
+            self._object = self.get_object()
+        return self._object
 
     def form_valid(self, form):
         message_list = form.save()

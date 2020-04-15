@@ -31,6 +31,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.ddd.utils.validation_message import BusinessValidationMessageList, BusinessValidationMessage
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.detach import DetachNodeForm
@@ -59,7 +60,8 @@ class TestDetachNodeView(TestCase):
                 |---LBIR1110 (UE)
            |----LBIR101G (subgroup)
         """
-        root_node = NodeEducationGroupYearFactory(code="BIR1BA")
+        education_group = EducationGroupYearFactory(partial_acronym="BIR1BA")
+        root_node = NodeEducationGroupYearFactory(node_id=education_group.pk, code=education_group.partial_acronym)
         common_core = NodeEducationGroupYearFactory(code="LBIR150T")
         learning_unit_node = NodeLearningUnitYearFactory(code='LBIR1110')
         subgroup = NodeEducationGroupYearFactory(code="LBIR101G")
