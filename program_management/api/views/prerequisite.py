@@ -37,7 +37,7 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
     """
         Return the prerequisites of a program tree
     """
-    name = 'program_tree-prerequisites'
+    NAME = 'program_tree-prerequisites'
     serializer_class = ProgramTreePrerequisitesSerializer
     queryset = EducationGroupVersion.objects.all().select_related('offer__academic_year')
     pagination_class = None
@@ -61,8 +61,8 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
         )
 
     def get_serializer_context(self):
-        egv = self.get_object()
-        tree = load_tree.load(egv.offer.id)
+        education_group_version = self.get_object()
+        tree = load_tree.load(education_group_version.offer.id)
         serializer_context = super().get_serializer_context()
         serializer_context.update({
             'request': self.request,
@@ -72,15 +72,15 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
 
 
 class TrainingPrerequisites(ProgramTreePrerequisites):
-    name = 'training-prerequisites'
-    queryset = queryset = EducationGroupVersion.objects.filter(
+    NAME = 'training-prerequisites'
+    queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.TRAINING
     ).select_related('offer__education_group_type', 'offer__academic_year')
 
 
 class MiniTrainingPrerequisites(ProgramTreePrerequisites):
-    name = 'mini_training-prerequisites'
-    queryset = queryset = EducationGroupVersion.objects.filter(
+    NAME = 'mini_training-prerequisites'
+    queryset = EducationGroupVersion.objects.filter(
         offer__education_group_type__category=education_group_categories.MINI_TRAINING
     ).select_related('offer__education_group_type', 'offer__academic_year')
 
