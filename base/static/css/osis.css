@@ -536,6 +536,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     margin-left: 5px;
 }
 
-.of_unversioned_field{
-    color: grey;
+.dropdown-menu > li > a.disabled {
+    color: #777;
+    cursor: not-allowed;
 }
