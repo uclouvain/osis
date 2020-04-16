@@ -62,18 +62,20 @@ class ProgramTreeVersion:
             tree: 'ProgramTree',
             version_name: str = STANDARD,
             is_transition: bool = False,
-            offer: EducationGroupYear = None,
+            offer_id: int = None,
             title_fr: str = None,
-            title_en: str = None,
+            title_en: str = None
     ):
         self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
+
         if self.is_standard:
             self.version_label = 'Transition' if is_transition else ''
         else:
             self.version_label = '{}-Transition'.format(version_name) if is_transition else version_name
-        self.offer = offer
+
+        self.offer_id = offer_id
         self.title_fr = title_fr
         self.title_en = title_en
 

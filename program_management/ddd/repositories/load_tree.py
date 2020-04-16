@@ -49,15 +49,16 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
 def load(tree_root_id: int) -> 'ProgramTree':
-# TODO a utiliser quand on utilisera le ddd def load(tree_root_id: int, version_name, transition, year, acronym) -> 'ProgramTree':
+    # TODO a utiliser quand on utilisera le ddd def load(tree_root_id: int, version_name, transition, year, acronym)
+    #  -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
-# TODO a utiliser quand on utilisera le ddd
-#     version = EducationGroupVersion.objects.filter(offer__acronym=acronym,
-#                                                    offer__academic_year__year=year,
-#                                                    version_name=version_name,
-#                                                    is_transition=transition)\
-#         .select_related('root_group', 'offer').first()
-#     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
+    # TODO a utiliser quand on utilisera le ddd
+    #     version = EducationGroupVersion.objects.filter(offer__acronym=acronym,
+    #                                                    offer__academic_year__year=year,
+    #                                                    version_name=version_name,
+    #                                                    is_transition=transition)\
+    #         .select_related('root_group', 'offer').first()
+    #     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
@@ -214,7 +215,7 @@ def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = Tr
     qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
         .select_related('offer').order_by('version_name')
 
-    qs = qs.values('is_transition', 'version_name', 'offer', 'title_fr', 'title_en')
+    qs = qs.values('is_transition', 'version_name', 'offer_id', 'title_fr', 'title_en')
     results = []
     for elem in qs:
         results.append(ProgramTreeVersion(**elem, tree=load_tree))

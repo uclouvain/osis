@@ -51,42 +51,27 @@ class ProgramVersionForm(forms.Form):
         tab_to_show = kwargs.pop('tab_to_show')
         self.version_list_for_url = []
 
-        self.version_list = ordered_list(self.version_view)
+        self.version_list = _ordered_list(self.version_view)
 
         for a_version in self.version_list:
             is_current = self.is_current(a_version)
             self.version_list_for_url.append({
                 'url_identification': _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME,
-                                                                                     a_version.version_name,
-                                                                                     a_version.is_transition,
-                                                                                     a_version.offer),
-                'url_content': _compute_url_used_in_dropdown_list_of_versions(CONTENT_URL_NAME,
-                                                                              a_version.version_name,
-                                                                              a_version.is_transition,
-                                                                              a_version.offer),
-                'url_utilization': _compute_url_used_in_dropdown_list_of_versions(UTILIZATION_URL_NAME,
-                                                                                  a_version.version_name,
-                                                                                  a_version.is_transition,
-                                                                                  a_version.offer),
+                                                                                     a_version),
+                'url_content': _compute_url_used_in_dropdown_list_of_versions(CONTENT_URL_NAME, a_version),
+                'url_utilization': _compute_url_used_in_dropdown_list_of_versions(UTILIZATION_URL_NAME, a_version),
                 'version_name': '-' if a_version.version_name == '' else a_version.version_name,
                 'version_label': 'Standard' if a_version.version_label == '' else a_version.version_label,
                 'selected': 'selected' if is_current else '',
-                'url_to_go_to': _get_version_url_with_tab_to_show(a_version, tab_to_show, a_version.offer)
+                'url_to_go_to': _get_version_url_with_tab_to_show(a_version, tab_to_show, a_version.offer_id)
             })
 
             if is_current:
                 self.url_identification_tab = _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME,
-                                                                                             a_version.version_name,
-                                                                                             a_version.is_transition,
-                                                                                             a_version.offer)
-                self.url_content_tab = _compute_url_used_in_dropdown_list_of_versions(CONTENT_URL_NAME,
-                                                                                      a_version.version_name,
-                                                                                      a_version.is_transition,
-                                                                                      a_version.offer)
+                                                                                             a_version)
+                self.url_content_tab = _compute_url_used_in_dropdown_list_of_versions(CONTENT_URL_NAME, a_version)
                 self.url_utilization_tab = _compute_url_used_in_dropdown_list_of_versions(UTILIZATION_URL_NAME,
-                                                                                          a_version.version_name,
-                                                                                          a_version.is_transition,
-                                                                                          a_version.offer)
+                                                                                          a_version)
                 if a_version.is_transition and a_version.version_name == '':
                     self.additional_title = 'Transition'
                 else:
@@ -103,13 +88,14 @@ class ProgramVersionForm(forms.Form):
         return is_current
 
 
-def ordered_list(version_list):
+def _ordered_list(version_list):
     # List has to be ordered like this
     # Standard version first
     # Transition version second
     # and the particular versions ordered by version_label
     standard_vers = []
     particular_vers = []
+
     for version in version_list:
         if version.is_standard:
             standard_vers.append(version)
@@ -118,29 +104,6 @@ def ordered_list(version_list):
 
     return sorted(standard_vers, key=attrgetter("version_label")) + sorted(particular_vers,
                                                                            key=attrgetter("version_label"))
-
-
-def find_version(current_version_name: str, current_transition: bool, list_of_version):
-
-    for a_version in list_of_version:
-        if a_version.version_name == current_version_name:
-            is_particular = current_transition and not a_version.is_standard
-            is_standard = not current_transition and a_version.is_standard
-            if is_particular or is_standard:
-                return a_version.version_label
-    return None
-
-
-def _compute_url_used_in_dropdown_list_of_versions(basic_url, version_name, is_transition, offer_id):
-    kwargs = {'education_group_year_id': offer_id}
-    url_name = basic_url
-    if is_transition:
-        url_name = '{}_transition'.format(basic_url)
-
-    if version_name:
-        kwargs.update({'version_name': version_name})
-
-    return reverse(url_name, kwargs=kwargs)
 
 
 def _get_version_url_with_tab_to_show(a_version, tab_to_show, offer_id):
@@ -152,6 +115,18 @@ def _get_version_url_with_tab_to_show(a_version, tab_to_show, offer_id):
         basic_url = IDENTIFICATION_URL_NAME
 
     kwargs = {'education_group_year_id': offer_id}
+    url_name = basic_url
+    if a_version.is_transition:
+        url_name = '{}_transition'.format(basic_url)
+
+    if a_version.version_name:
+        kwargs.update({'version_name': a_version.version_name})
+
+    return reverse(url_name, kwargs=kwargs)
+
+
+def _compute_url_used_in_dropdown_list_of_versions(basic_url, a_version):
+    kwargs = {'education_group_year_id': a_version.offer_id}
     url_name = basic_url
     if a_version.is_transition:
         url_name = '{}_transition'.format(basic_url)
