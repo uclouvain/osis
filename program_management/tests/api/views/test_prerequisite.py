@@ -53,6 +53,9 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
              |---- LDROI120B (UE)
              |----subgroup2
                   |---- LDROI100A (UE)
+             |----subgroup3
+                  |---- LDROI1300 (UE)
+                  |---- LAGRO2400 (UE)
         :return:
         """
         cls.person = PersonFactory()
@@ -70,6 +73,7 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
                                                     year=2018)
         cls.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
         cls.subgroup2 = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        cls.subgroup3 = NodeGroupYearFactory(node_id=10, code="LSUBGR190G", title="Sous-groupe 3", year=2018)
 
         cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
                                                     code="LDROI1300",
@@ -87,7 +91,10 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
         LinkFactory(parent=cls.root_node, child=cls.subgroup1)
         LinkFactory(parent=cls.subgroup1, child=cls.ldroi120b)
         LinkFactory(parent=cls.subgroup1, child=cls.subgroup2)
+        LinkFactory(parent=cls.subgroup1, child=cls.subgroup3)
         LinkFactory(parent=cls.subgroup2, child=cls.ldroi100a)
+        LinkFactory(parent=cls.subgroup3, child=cls.ldroi1300)
+        LinkFactory(parent=cls.subgroup3, child=cls.lagro2400)
 
         cls.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
         cls.p_group.add_prerequisite_item('LDROI1300', 2018)

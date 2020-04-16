@@ -17,22 +17,26 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         root_node
         |-----common_core
              |---- LDROI100A (UE)
+        |-----subgroup1
+             |---- LDROI1300 (UE)
+             |---- LAGRO2400 (UE)
         :return:
         """
         self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100B", title="Bachelier en droit", year=2018)
         self.common_core = NodeGroupYearFactory(node_id=2, code="LGROUP100A", title="Tronc commun", year=2018)
-        self.ldroi100a = NodeLearningUnitYearFactory(node_id=3,
+        self.subgroup1 = NodeGroupYearFactory(node_id=3, code="LGROUP101A", title="Sous-groupe 1", year=2018)
+        self.ldroi100a = NodeLearningUnitYearFactory(node_id=4,
                                                      code="LDROI100A",
                                                      common_title_fr="Introduction",
                                                      specific_title_fr="Partie 1",
                                                      year=2018)
 
-        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
+        self.ldroi1300 = NodeLearningUnitYearFactory(node_id=5,
                                                      code="LDROI1300",
                                                      common_title_fr="Introduction droit",
                                                      specific_title_fr="Partie 1",
                                                      year=2018)
-        self.lagro2400 = NodeLearningUnitYearFactory(node_id=8,
+        self.lagro2400 = NodeLearningUnitYearFactory(node_id=6,
                                                      code="LAGRO2400",
                                                      common_title_fr="Séminaire agro",
                                                      specific_title_fr="Partie 1",
@@ -40,6 +44,9 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
 
         LinkFactory(parent=self.root_node, child=self.common_core)
         LinkFactory(parent=self.common_core, child=self.ldroi100a)
+        LinkFactory(parent=self.root_node, child=self.subgroup1)
+        LinkFactory(parent=self.subgroup1, child=self.ldroi1300)
+        LinkFactory(parent=self.subgroup1, child=self.lagro2400)
 
         self.p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
         self.p_group.add_prerequisite_item('LDROI1300', 2018)
