@@ -36,8 +36,10 @@ from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROU
 from base.models.learning_unit import LearningUnit
 from base.models.person_entity import PersonEntity
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.person import FacultyManagerFactory, PersonFactory, CentralManagerFactory
+from base.tests.factories.person import FacultyManagerForUEFactory, CentralManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
+from base.tests.functionals.test_education_group import LoginPage
 from features.pages.common import LoginPage
 
 use_step_matcher("parse")
@@ -71,7 +73,7 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire")
 def step_impl(context: Context):
-    manager_factory = random.choice([FacultyManagerFactory, CentralManagerFactory])
+    manager_factory = random.choice([FacultyManagerForUEFactory, CentralManagerForUEFactory])
     context.user = manager_factory(
         'can_access_learningunit',
         'can_edit_learningunit_date',
