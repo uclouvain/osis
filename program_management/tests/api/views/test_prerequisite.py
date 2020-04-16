@@ -48,7 +48,7 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
         """
         root_node
         |-----common_core
-             |---- LDROI100A (UE)
+             |---- LDROI100A (UE) Prerequisites: LDROI1300 AND LAGRO2400
         |----subgroup1
              |---- LDROI120B (UE)
              |----subgroup2

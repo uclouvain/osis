@@ -16,7 +16,7 @@ class TestEducationGroupPrerequisitesSerializer(SimpleTestCase):
         """
         root_node
         |-----common_core
-             |---- LDROI100A (UE)
+             |---- LDROI100A (UE) Prerequisites: LDROI1300 AND LAGRO2400
         |-----subgroup1
              |---- LDROI1300 (UE)
              |---- LAGRO2400 (UE)
