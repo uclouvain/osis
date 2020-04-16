@@ -13,13 +13,6 @@ def populate_uuid_domain_isced(apps, schema_editor):
         item.save()
 
 
-def reverse_migration(apps, schema_editor):
-    """
-    No need to empty uuid field, it will be deleted in migration reverse
-    """
-    pass
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ('reference', '0002_auto_20190308_1450'),
@@ -31,7 +24,7 @@ class Migration(migrations.Migration):
             name='uuid',
             field=models.UUIDField(blank=True, null=True),
         ),
-        migrations.RunPython(populate_uuid_domain_isced, reverse_migration),
+        migrations.RunPython(populate_uuid_domain_isced, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='domainisced',
             name='uuid',
