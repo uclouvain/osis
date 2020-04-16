@@ -34,7 +34,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-from waffle.decorators import waffle_flag
 from rules.contrib.views import permission_required
 
 from base import models as mdl_base
@@ -53,10 +52,8 @@ from base.views.common import display_success_messages, display_warning_messages
 from program_management.forms.group_element_year import GroupElementYearFormset
 
 
-@login_required
-@waffle_flag("education_group_update")
-def update_education_group(request, root_id, education_group_year_id):
-    education_group_year = get_object_or_404(
+def get_education_group_year_by_pk(request, root_id, education_group_year_id):
+    return get_object_or_404(
         EducationGroupYear.objects.select_related('education_group_type').prefetch_related(
             Prefetch(
                 'groupelementyear_set',
@@ -79,10 +76,6 @@ def update_education_group(request, root_id, education_group_year_id):
         pk=education_group_year_id
     )
     person = request.user.person
-
-    # Store root in the instance to avoid to pass the root in methods
-    # it will be used in the templates.
-    education_group_year.offer = root_id
 
     if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
             and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
