@@ -44,11 +44,13 @@ class ProgramVersionForm(forms.Form):
     url_content_tab = None
     url_utilization_tab = None
     is_particular = False
+    url_to_go_to = None
 
     def __init__(self, *args, **kwargs):
         self.version_name = kwargs.pop('version_name')
         self.transition = kwargs.pop('transition')
         self.version_view = kwargs.pop('list_of_versions')
+        tab_to_show = kwargs.pop('tab_to_show')
         self.version_list_for_url = []
 
         self.version_list = ordered_list(self.version_view)
@@ -61,13 +63,14 @@ class ProgramVersionForm(forms.Form):
                 'url_utilization': _compute_url(UTILIZATION_URL_NAME, a_version, a_version.offer),
                 'version_name': '-' if a_version.version_name == '' else a_version.version_name,
                 'version_label': 'Standard' if a_version.version_label == '' else a_version.version_label,
-                'selected': 'selected' if is_current else ''})
+                'selected': 'selected' if is_current else '',
+                'url_to_go_to': get_version_url_with_tab_to_show(a_version, tab_to_show,  a_version.offer)
+            })
 
             if is_current:
                 self.url_identification_tab = _compute_url(IDENTIFICATION_URL_NAME, a_version, a_version.offer)
                 self.url_content_tab = _compute_url(CONTENT_URL_NAME, a_version, a_version.offer)
                 self.url_utilization_tab = _compute_url(UTILIZATION_URL_NAME, a_version, a_version.offer)
-
                 if a_version.is_transition and a_version.version_name == '':
                     self.additional_title = 'Transition'
                 else:
@@ -115,6 +118,25 @@ def find_version(current_version_name: str, current_transition: bool, list_of_ve
 
 
 def _compute_url(basic_url, a_version, offer_id):
+    kwargs = {'education_group_year_id': offer_id}
+    url_name = basic_url
+    if a_version.is_transition:
+        url_name = '{}_transition'.format(basic_url)
+
+    if a_version.version_name:
+        kwargs.update({'version_name': a_version.version_name})
+
+    return reverse(url_name, kwargs=kwargs)
+
+
+def get_version_url_with_tab_to_show(a_version, tab_to_show, offer_id):
+    if tab_to_show == "show_content":
+        basic_url = CONTENT_URL_NAME
+    elif tab_to_show == 'show_utilization':
+        basic_url = UTILIZATION_URL_NAME
+    else:
+        basic_url = IDENTIFICATION_URL_NAME
+
     kwargs = {'education_group_year_id': offer_id}
     url_name = basic_url
     if a_version.is_transition:

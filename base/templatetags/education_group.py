@@ -334,15 +334,3 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
 def _get_css(class_dl, is_particular, version_field):
     return "{} {}".format(class_dl, UN_VERSIONED_OF_FIELD) if is_particular and not version_field else class_dl
 
-
-@register.simple_tag
-def get_version_url_with_tab_to_show(**kwargs):
-    tab_to_show = kwargs['tab_to_show']
-    version = kwargs['version']
-    if tab_to_show == "show_content":
-        main_url = version.get('url_content')
-    elif tab_to_show == 'show_utilization':
-        main_url = version.get('url_utilization')
-    else:
-        main_url = version.get('url_identification')
-    return "{}?tab_to_show={}".format(main_url, tab_to_show)

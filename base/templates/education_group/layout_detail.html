@@ -75,8 +75,7 @@
                         <select class="form-control"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             {% for version in program_version_form.version_list_for_url %}
-                                {% get_version_url_with_tab_to_show version=version tab_to_show=request.GET.tab_to_show as version_url_with_tab_to_show%}
-                                <option value="{{ version_url_with_tab_to_show }}"
+                                <option value="{{ version|get_item:'url_to_go_to' }}?tab_to_show={{ request.GET.tab_to_show }}"
                                 {% if version|get_item:'selected' == "selected" %}
                                             selected="selected"
                                         {% endif %}>{{ version|get_item:'version_label' }}</option>

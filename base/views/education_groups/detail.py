@@ -223,7 +223,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         list_of_versions = find_all_program_tree_versions(self.offer.acronym, self.offer.academic_year.year, False)
         program_version_form = ProgramVersionForm(list_of_versions=list_of_versions,
                                                   version_name=self.version_name,
-                                                  transition=self.transition)
+                                                  transition=self.transition,
+                                                  tab_to_show=self.request.GET.get('tab_to_show'))
 
         context['program_version_form'] = program_version_form
 
