@@ -32,7 +32,6 @@ class TestAuthorizedRootTypeForPrerequisite(SimpleTestCase):
     def test_is_valid_should_return_false_when_root_type_is_group(self):
         root_node = NodeGroupYearFactory(group=True)
         validator = AuthorizedRootTypeForPrerequisite(root_node)
-        validator.validate()
         self.assertFalse(validator.is_valid())
 
     def test_is_valid_should_return_false_when_root_type_is_option_or_mobility_partnership(self):
@@ -41,7 +40,6 @@ class TestAuthorizedRootTypeForPrerequisite(SimpleTestCase):
             with self.subTest(type=node_type):
                 root_node = NodeGroupYearFactory(node_type=node_type)
                 validator = AuthorizedRootTypeForPrerequisite(root_node)
-                validator.validate()
                 self.assertFalse(validator.is_valid())
 
     def test_is_valid_should_return_false_when_root_type_is_a_finality(self):
@@ -50,7 +48,6 @@ class TestAuthorizedRootTypeForPrerequisite(SimpleTestCase):
             with self.subTest(type=node_type):
                 root_node = NodeGroupYearFactory(node_type=node_type)
                 validator = AuthorizedRootTypeForPrerequisite(root_node)
-                validator.validate()
                 self.assertFalse(validator.is_valid())
 
     def test_is_valid_should_return_true_when_root_type_is_of_other_type(self):
@@ -60,5 +57,4 @@ class TestAuthorizedRootTypeForPrerequisite(SimpleTestCase):
             with self.subTest(type=node_type):
                 root_node = NodeGroupYearFactory(node_type=node_type)
                 validator = AuthorizedRootTypeForPrerequisite(root_node)
-                validator.validate()
                 self.assertTrue(validator.is_valid())
