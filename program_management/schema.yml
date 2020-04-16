@@ -16,10 +16,86 @@ info:
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
 paths:
+  /trainings/{year}/{acronym}/{version_name}/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the training version
+      operationId: training_prerequisites_version
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+            name: version_name
+            required: true
+            schema:
+              description: ''
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/{version_name}/transition/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the training version (transition)
+      operationId: training_prerequisites_version_transition
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+            name: version_name
+            required: true
+            schema:
+              description: ''
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
   /trainings/{year}/{acronym}/prerequisites:
     get:
       description: Return the prerequisites of the learning units of the training (standard version)
-      operationId: training_prerequisites
+      operationId: training_prerequisites_official
       parameters:
         - in: path
           name: year
@@ -48,10 +124,118 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
+  /trainings/{year}/{acronym}/transition/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the training (standard version transition)
+      operationId: training_prerequisites_transition
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /mini_trainings/{year}/{acronym}/{version_name}/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the mini-training version
+      operationId: mini-training_prerequisites_version
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+            name: version_name
+            required: true
+            schema:
+              description: ''
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/{version_name}/transition/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the mini-training version transition
+      operationId: mini-training_prerequisites_version_transition
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+            name: version_name
+            required: true
+            schema:
+              description: ''
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
   /mini_trainings/{year}/{acronym}/prerequisites:
     get:
       description: Return the prerequisites of the learning units of the mini-training (standard version)
-      operationId: mini-training_prerequisites
+      operationId: mini-training_prerequisites_official
       parameters:
         - in: path
           name: year
@@ -79,7 +263,39 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-        - trainings
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/transition/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the mini-training (standard version transition)
+      operationId: mini-training_prerequisites_transition
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
 components:
   securitySchemes:
     Token:
