@@ -25,12 +25,19 @@ from django.db import transaction
 
 from base.models import education_group_year, learning_unit_year, prerequisite_item, learning_unit
 from base.models import prerequisite as prerequisite_model
-from program_management.ddd.domain import prerequisite as prerequisite_domain
+from program_management.ddd.domain import prerequisite as prerequisite_domain, program_tree
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeEducationGroupYear
+from program_management.models.enums.node_type import NodeType
 
 
-@transaction.atomic
-def persist(
+def persist(tree: program_tree.ProgramTree):
+    all_learning_unit_nodes = tree.get_nodes_by_type(NodeType.LEARNING_UNIT)
+    learning_unit_nodes_modified = [node for node in all_learning_unit_nodes if node.prerequisite.has_changed]
+    for node in learning_unit_nodes_modified:
+        _persist(tree.root_node, node)
+
+
+def _persist(
         node_education_group_year: NodeEducationGroupYear,
         node_learning_unit_year_obj: NodeLearningUnitYear,
 ) -> None:

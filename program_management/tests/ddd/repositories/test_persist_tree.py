@@ -99,15 +99,12 @@ class TestSaveTree(TestCase):
         self.assertEquals(GroupElementYear.objects.all().count(), 0)
 
 
-class TestSavePrerequisites(TestCase):
-    @mock.patch("program_management.ddd.repositories.persist_prerequisite.persist")
-    def test_call_persist_prerequisite_on_changed_node(self, mock_persist_prerequisite):
+class TestPersistPrerequisites(TestCase):
+    @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
+    def test_call_persist_(self, mock_persist_prerequisite):
         tree = ProgramTreeFactory()
-        link1 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
-        link2 = LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
-
-        link1.child.set_prerequisite(NullPrerequisite())
+        LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
 
         persist_tree.persist(tree)
 
-        mock_persist_prerequisite.assert_called_once_with(tree.root_node, link1.child)
+        mock_persist_prerequisite.assert_called_once_with(tree)

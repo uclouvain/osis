@@ -105,7 +105,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             self.education_group_year_parent.verbose
         )
 
-    @mock.patch("program_management.ddd.repositories.persist_prerequisite.persist")
+    @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
     def test_post_data_simple_prerequisite(self, mock_persist):
         luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
         GroupElementYearChildLeafFactory(parent=self.education_group_year_parent, child_leaf=luy_1)
