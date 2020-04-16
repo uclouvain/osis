@@ -34,17 +34,15 @@ UTILIZATION_URL_NAME = 'education_group_utilization'
 
 class ProgramVersionForm(forms.Form):
 
-    is_standard = False
     version_name = None
 
-    version_list_for_url = None
-    additional_title = None     # complement following the OF acronym if it's a particular version
-    displayed_version = None
-    url_identification_tab = None
-    url_content_tab = None
-    url_utilization_tab = None
-    is_particular = False
-    url_to_go_to = None
+    version_list_for_url = None     # list of versions to display in dropdown list
+    additional_title = None         # complement following the OF acronym if it's a particular version
+    displayed_version = None        # current version displayed in screen
+    url_identification_tab = None   # url for identification tab
+    url_content_tab = None          # url for content tab
+    url_utilization_tab = None      # url for utilization tab
+    is_particular = False           # used to define css for unversioned field
 
     def __init__(self, *args, **kwargs):
         self.version_name = kwargs.pop('version_name')
@@ -58,25 +56,41 @@ class ProgramVersionForm(forms.Form):
         for a_version in self.version_list:
             is_current = self.is_current(a_version)
             self.version_list_for_url.append({
-                'url_identification': _compute_url(IDENTIFICATION_URL_NAME, a_version, a_version.offer),
-                'url_content': _compute_url(CONTENT_URL_NAME, a_version, a_version.offer),
-                'url_utilization': _compute_url(UTILIZATION_URL_NAME, a_version, a_version.offer),
+                'url_identification': _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME,
+                                                                                     a_version.version_name,
+                                                                                     a_version.is_transition,
+                                                                                     a_version.offer),
+                'url_content': _compute_url_used_in_dropdown_list_of_versions(CONTENT_URL_NAME,
+                                                                              a_version.version_name,
+                                                                              a_version.is_transition,
+                                                                              a_version.offer),
+                'url_utilization': _compute_url_used_in_dropdown_list_of_versions(UTILIZATION_URL_NAME,
+                                                                                  a_version.version_name,
+                                                                                  a_version.is_transition,
+                                                                                  a_version.offer),
                 'version_name': '-' if a_version.version_name == '' else a_version.version_name,
                 'version_label': 'Standard' if a_version.version_label == '' else a_version.version_label,
                 'selected': 'selected' if is_current else '',
-                'url_to_go_to': get_version_url_with_tab_to_show(a_version, tab_to_show,  a_version.offer)
+                'url_to_go_to': _get_version_url_with_tab_to_show(a_version, tab_to_show, a_version.offer)
             })
 
             if is_current:
-                self.url_identification_tab = _compute_url(IDENTIFICATION_URL_NAME, a_version, a_version.offer)
-                self.url_content_tab = _compute_url(CONTENT_URL_NAME, a_version, a_version.offer)
-                self.url_utilization_tab = _compute_url(UTILIZATION_URL_NAME, a_version, a_version.offer)
+                self.url_identification_tab = _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME,
+                                                                                             a_version.version_name,
+                                                                                             a_version.is_transition,
+                                                                                             a_version.offer)
+                self.url_content_tab = _compute_url_used_in_dropdown_list_of_versions(CONTENT_URL_NAME,
+                                                                                      a_version.version_name,
+                                                                                      a_version.is_transition,
+                                                                                      a_version.offer)
+                self.url_utilization_tab = _compute_url_used_in_dropdown_list_of_versions(UTILIZATION_URL_NAME,
+                                                                                          a_version.version_name,
+                                                                                          a_version.is_transition,
+                                                                                          a_version.offer)
                 if a_version.is_transition and a_version.version_name == '':
                     self.additional_title = 'Transition'
                 else:
                     self.additional_title = a_version.version_label
-
-        self.is_standard = self.version_name == ''
 
         super().__init__(*args, **kwargs)
 
@@ -117,19 +131,19 @@ def find_version(current_version_name: str, current_transition: bool, list_of_ve
     return None
 
 
-def _compute_url(basic_url, a_version, offer_id):
+def _compute_url_used_in_dropdown_list_of_versions(basic_url, version_name, is_transition, offer_id):
     kwargs = {'education_group_year_id': offer_id}
     url_name = basic_url
-    if a_version.is_transition:
+    if is_transition:
         url_name = '{}_transition'.format(basic_url)
 
-    if a_version.version_name:
-        kwargs.update({'version_name': a_version.version_name})
+    if version_name:
+        kwargs.update({'version_name': version_name})
 
     return reverse(url_name, kwargs=kwargs)
 
 
-def get_version_url_with_tab_to_show(a_version, tab_to_show, offer_id):
+def _get_version_url_with_tab_to_show(a_version, tab_to_show, offer_id):
     if tab_to_show == "show_content":
         basic_url = CONTENT_URL_NAME
     elif tab_to_show == 'show_utilization':
