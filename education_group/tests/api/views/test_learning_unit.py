@@ -252,6 +252,7 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             partial_acronym='LDROI1000',
             academic_year=cls.academic_year
         )
+        cls.version = EducationGroupVersionFactory(offer=cls.education_group_year)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
