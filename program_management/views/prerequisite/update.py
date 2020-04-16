@@ -28,6 +28,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from base.ddd.utils.validation_message import MessageLevel
 from program_management.ddd.repositories import persist_tree
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
@@ -66,7 +67,10 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
             int(self.kwargs["learning_unit_year_id"]),
             NodeType.LEARNING_UNIT
         )
-        self.program_tree.set_prerequisite(form.cleaned_data["prerequisite_string"], node)
+        messages = self.program_tree.set_prerequisite(form.cleaned_data["prerequisite_string"], node)
+        error_messages = [msg for msg in messages if msg.level == MessageLevel.ERROR]
+        if error_messages:
+            raise PermissionDenied([msg.message for msg in error_messages])
         persist_tree.persist(self.program_tree)
         return super().form_valid(form)
 
@@ -74,9 +78,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
     def check_can_update_prerequisite(self):
         validator = AuthorizedRootTypeForPrerequisite(self.program_tree.root_node)
         if not validator.is_valid():
-            raise PermissionDenied(
-                [msg.message for msg in validator.error_messages]
-            )
+            raise PermissionDenied([msg.message for msg in validator.error_messages])
 
     def get_success_message(self, cleaned_data):
         return _("Prerequisites saved.")

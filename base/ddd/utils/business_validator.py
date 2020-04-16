@@ -40,6 +40,7 @@ class BusinessValidator(ABC):
     def __init__(self, *args, **kwargs):
         self._messages = []
 
+    #  FIXME can not return success messages when error messages present
     @property
     def messages(self) -> List[BusinessValidationMessage]:
         return self._messages + (self.success_messages or [])

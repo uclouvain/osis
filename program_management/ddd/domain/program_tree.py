@@ -183,7 +183,7 @@ class ProgramTree:
             self,
             prerequisite_expression: 'PrerequisiteExpression',
             node: 'NodeLearningUnitYear'
-    ):
+    ) -> (bool, List['BusinessValidationMessage']):
         validator = UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
