@@ -32,7 +32,6 @@ from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import node
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
@@ -60,7 +59,7 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
     is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     for tree_root_id in tree_root_ids:
-        root_node = load_node.load_node_education_group_year(tree_root_id)
+        root_node = load_node.load_node_education_group_year(tree_root_id)  # TODO : use load_multiple
         unique_key = '{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP)
         nodes[unique_key] = root_node
         tree_prerequisites = {
@@ -191,11 +190,12 @@ def __build_children(
         prerequisites
 ) -> List['Link']:
     children = []
+    # TODO :: fix big problem of recursivity with DROI2M...
     parent_id_from_path = int(root_path.split('|')[-1]) if root_path else None
     for child_structure in map_node_id_with_tree_structure.get(parent_id_from_path) or []:
         child_id = child_structure['child_id']
         if not child_id:
-            continue
+            continue  # TODO :: To remove when child_leaf an child_branch will disappear !
         ntype = NodeType.LEARNING_UNIT if child_structure['child_leaf_id'] else NodeType.EDUCATION_GROUP
         child_node = nodes['{}_{}'.format(child_id, ntype)]
         child_node.children = __build_children(

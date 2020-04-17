@@ -110,7 +110,7 @@ class ProgramTree:
             raise node.NodeNotFoundException
 
     @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
-    def get_node_by_id_and_class(self, node_id: int, node_type) -> 'Node':
+    def get_node_by_id_and_type(self, node_id: int, node_type) -> 'Node':
         """
         DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
         Return the corresponding node based on the node_id value with respect to the class.

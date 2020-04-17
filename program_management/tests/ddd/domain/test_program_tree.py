@@ -85,17 +85,17 @@ class TestGetNodeByIdAndTypeProgramTree(SimpleTestCase):
         self.tree = ProgramTreeFactory(root_node=self.root_node)
 
     def test_should_return_None_when_no_node_present_with_corresponding_node_id(self):
-        result = self.tree.get_node_by_id_and_class(2, node_type.NodeType.LEARNING_UNIT)
+        result = self.tree.get_node_by_id_and_type(2, node_type.NodeType.LEARNING_UNIT)
         self.assertIsNone(result)
 
     def test_should_return_node_matching_specific_node_id_with_respect_to_class(self):
-        result = self.tree.get_node_by_id_and_class(1, node_type.NodeType.LEARNING_UNIT)
+        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.LEARNING_UNIT)
         self.assertEqual(
             result,
             self.learning_unit_node
         )
 
-        result = self.tree.get_node_by_id_and_class(1, node_type.NodeType.GROUP)
+        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.GROUP)
         self.assertEqual(
             result,
             self.subgroup_node
