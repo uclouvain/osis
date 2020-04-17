@@ -25,45 +25,42 @@
 ##############################################################################
 from unittest import mock
 
-from django.contrib.messages import get_messages
-from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
+from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages, constants as MSG
+from django.http import HttpResponseNotFound, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.ddd.utils.validation_message import BusinessValidationMessageList, BusinessValidationMessage
+from base.ddd.utils.validation_message import BusinessValidationMessageList, BusinessValidationMessage, MessageLevel
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory
-from program_management.ddd.domain.program_tree import ProgramTree
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.person import CentralManagerFactory
+from base.utils.cache import ElementCache
+from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 
 
 @override_flag('education_group_update', active=True)
 class TestDetachNodeView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super().setUpTestData()
-        cls.person = PersonFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
+                                                         child_branch__academic_year=cls.academic_year)
+        cls.person = CentralManagerFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.path = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
+        cls.url = reverse("tree_detach_node", args=[
+            cls.education_group_year.id,
+        ]) + "?path=%s" % cls.path
 
     def setUp(self):
-        self.tree = self.setUpTreeData()
-
-        self.path_to_detach = "|".join([
-            str(self.tree.root_node.pk),
-            str(self.tree.root_node.children[0].child.pk)
-        ])
-
-        self.url = reverse("tree_detach_node", kwargs={'root_id': self.tree.root_node.pk}) + "?path=%s" % self.path_to_detach
         self.client.force_login(self.person.user)
-
-        self._mock_fetch_tree()
         self._mock_perms()
-
-    def _mock_fetch_tree(self):
-        fetch_tree_patcher = mock.patch('program_management.ddd.repositories.load_tree.load', return_value=self.tree)
-        fetch_tree_patcher.start()
-        self.addCleanup(fetch_tree_patcher.stop)
+        self._mock_authorized_relationship_validator()
 
     def _mock_perms(self):
         self.perm_patcher = mock.patch(
@@ -73,20 +70,104 @@ class TestDetachNodeView(TestCase):
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
 
-    def setUpTreeData(self):
-        """
-           |BIR1BA
-           |----LBIR150T (common-core)
-                |---LBIR1110 (UE)
-           |----LBIR101G (subgroup)
-        """
-        education_group = EducationGroupYearFactory(partial_acronym="BIR1BA")
-        root_node = NodeEducationGroupYearFactory(node_id=education_group.pk, code=education_group.partial_acronym)
-        common_core = NodeEducationGroupYearFactory(code="LBIR150T")
-        learning_unit_node = NodeLearningUnitYearFactory(code='LBIR1110')
-        subgroup = NodeEducationGroupYearFactory(code="LBIR101G")
+    def _mock_authorized_relationship_validator(self):
+        self.validator_patcher = mock.patch.object(
+            DetachAuthorizedRelationshipValidator,
+            "validate"
+        )
+        self.mocked_validator = self.validator_patcher.start()
+        self.addCleanup(self.validator_patcher.stop)
 
-        common_core.add_child(learning_unit_node)
-        root_node.add_child(common_core)
-        root_node.add_child(subgroup)
-        return ProgramTree(root_node)
+    def test_edit_case_user_not_logged(self):
+        self.client.logout()
+
+        response = self.client.post(self.url)
+
+        expected_redirection_url = '/login/?next={}'.format(self.url)
+        self.assertRedirects(response, expected_redirection_url)
+
+    def test_allowed_http_method_when_user_is_not_logged(self):
+        self.client.logout()
+
+        allowed_method = ['get', 'post']
+        for method in allowed_method:
+            response = getattr(self.client, method)(self.url)
+            self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
+    def test_get_ensure_path_args_is_set_as_initial_on_form(self, mock):
+
+        response = self.client.get(self.url, data={'path': self.path})
+        self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
+
+        self.assertTrue('form' in response.context)
+        self.assertIsInstance(response.context['form'], DetachNodeForm)
+        self.assertDictEqual(response.context['form'].initial, {'path': self.path})
+
+    def test_post_with_invalid_path(self):
+        response = self.client.post(self.url, data={'path': 'dummy_path'})
+
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+
+        self.assertListEqual(messages, ['Invalid tree path'])
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    @override_flag('education_group_update', active=False)
+    def test_detach_case_flag_disabled(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertTemplateUsed(response, "page_not_found.html")
+
+    def test_detach_case_user_not_have_access(self):
+        self.mocked_perm.return_value = False
+        response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_access_denied.html")
+
+    def test_detach_case_get_with_ajax_success(self):
+        response = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "tree/detach_confirmation_inner.html")
+
+    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_detach_case_post_success(self, mock_permission, mock_service):
+        mock_permission.return_value = True
+        mock_service.return_value = BusinessValidationMessageList(
+            messages=[BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
+        )
+
+        response = self.client.post(
+            self.url,
+            follow=True,
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            data={'path': self.path}
+        )
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertJSONEqual(str(response.content, encoding='utf8'), {'success': True})
+        self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
+        self.assertTrue(mock_service.called)
+
+    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_detach_when_element_is_in_clipboard(self, mock_permission, mock_delete):
+        ElementCache(self.person.user).save_element_selected(
+            self.group_element_year.child_branch,
+            source_link_id=self.group_element_year.id
+        )
+        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path})
+        error_msg = "The clipboard should be cleared if detached element is in clipboard"
+        self.assertFalse(ElementCache(self.person.user).cached_data, error_msg)
+
+    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_detach_when_clipboard_filled_with_different_detached_element(self, mock_permission, mock_delete):
+        element_cached = EducationGroupYearFactory()
+        ElementCache(self.person.user).save_element_selected(
+            element_cached,
+        )
+        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path})
+        error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
+        self.assertEqual(ElementCache(self.person.user).cached_data['id'], element_cached.id, error_msg)
