@@ -49,10 +49,6 @@ def detach_node(path_to_detach: 'Path', commit=True) -> BusinessValidationMessag
 
     messages = []
     messages += __check_detach_option(working_tree, path_to_detach, other_trees_using_node)
-    messages += prerequisite_service.check_is_prerequisite_in_trees_using_node(
-        node_to_detach=node_to_detach,
-        trees_using_node=other_trees_using_node
-    ).messages
 
     is_valid, _messages = working_tree.detach_node(path_to_detach)
     messages += _messages
