@@ -26,9 +26,10 @@
 from unittest import mock
 
 from django.contrib.messages import get_messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
+from waffle.testutils import override_flag
 
 from base.ddd.utils.validation_message import BusinessValidationMessageList, BusinessValidationMessage
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -38,6 +39,7 @@ from program_management.forms.tree.detach import DetachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 
 
+@override_flag('education_group_update', active=True)
 class TestDetachNodeView(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -46,12 +48,30 @@ class TestDetachNodeView(TestCase):
 
     def setUp(self):
         self.tree = self.setUpTreeData()
-        self.url = reverse("tree_detach_node", kwargs={'root_id': self.tree.root_node.pk})
+
+        self.path_to_detach = "|".join([
+            str(self.tree.root_node.pk),
+            str(self.tree.root_node.children[0].child.pk)
+        ])
+
+        self.url = reverse("tree_detach_node", kwargs={'root_id': self.tree.root_node.pk}) + "?path=%s" % self.path_to_detach
         self.client.force_login(self.person.user)
 
+        self._mock_fetch_tree()
+        self._mock_perms()
+
+    def _mock_fetch_tree(self):
         fetch_tree_patcher = mock.patch('program_management.ddd.repositories.load_tree.load', return_value=self.tree)
         fetch_tree_patcher.start()
         self.addCleanup(fetch_tree_patcher.stop)
+
+    def _mock_perms(self):
+        self.perm_patcher = mock.patch(
+            "program_management.business.group_element_years.perms.is_eligible_to_detach_group_element_year",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
     def setUpTreeData(self):
         """
@@ -70,44 +90,3 @@ class TestDetachNodeView(TestCase):
         root_node.add_child(common_core)
         root_node.add_child(subgroup)
         return ProgramTree(root_node)
-
-    def test_allowed_http_method_when_user_is_not_logged(self):
-        self.client.logout()
-
-        allowed_method = ['get', 'post']
-        for method in allowed_method:
-            response = getattr(self.client, method)(self.url)
-            self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
-    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
-    def test_get_ensure_path_args_is_set_as_initial_on_form(self, mock):
-        path_to_detach = "|".join([
-            str(self.tree.root_node.pk),
-            str(self.tree.root_node.children[0].child.pk)
-        ])
-
-        response = self.client.get(self.url, data={'path': path_to_detach})
-        self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
-
-        self.assertTrue('form' in response.context)
-        self.assertIsInstance(response.context['form'], DetachNodeForm)
-        self.assertDictEqual(response.context['form'].initial, {'path': path_to_detach})
-
-    def test_post_with_invalid_path(self):
-        response = self.client.post(self.url, data={'path': 'dummy_path'})
-
-        messages = [m.message for m in get_messages(response.wsgi_request)]
-
-        self.assertListEqual(messages, ['Invalid tree path'])
-        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
-
-    @mock.patch('program_management.forms.tree.detach.DetachNodeForm.save')
-    def test_post_with_valid_path_ensure_form_save_called(self, mock_form_save):
-        mock_form_save.return_value = BusinessValidationMessageList(messages=[BusinessValidationMessage('Success')])
-        path_to_detach = "|".join([
-            str(self.tree.root_node.pk),
-            str(self.tree.root_node.children[0].child.pk)
-        ])
-        self.client.post(self.url, data={'path': path_to_detach})
-
-        self.assertTrue(mock_form_save.called)

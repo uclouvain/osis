@@ -121,7 +121,7 @@ class ProgramTree:
         return next(
             (
                 node for node in self.get_all_nodes()
-                if node.node_id == node_id and node.node_type == node_type
+                if node.node_id == node_id and node.type == node_type
             ),
             None
         )

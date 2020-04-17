@@ -83,14 +83,14 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
         display_warning_messages(self.request, message_list.warnings)
         display_error_messages(self.request, message_list.errors)
-        context['detach_ok'] = not message_list.contains_errors()
+        context['detach_ok'] = not message_list.contains_errors()  # TODO :: fix confirmaiton message
         return context
 
     def get_initial(self):
         print()
         return {
             **super().get_initial(),
-            'path': self.request.GET.get('path')
+            'path': self.path_to_detach
         }
 
     def get_object(self):
@@ -109,13 +109,19 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def form_valid(self, form):
         message_list = form.save()
         display_business_messages(self.request, message_list.messages)
+        if message_list.contains_errors():
+            return self.form_invalid(form)
         self._remove_element_from_clipboard_if_stored(form.cleaned_data['path'])
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        print()
+        return super(DetachNodeView, self).form_invalid(form)
 
     def _remove_element_from_clipboard_if_stored(self, path: str):
         element_cache = ElementCache(self.request.user)
         detached_element_id = int(path.split(PATH_SEPARATOR)[-1])
-        if element_cache.equals(detached_element_id):
+        if element_cache and element_cache.equals_element(detached_element_id):
             element_cache.clear()
 
     def get_success_url(self):
