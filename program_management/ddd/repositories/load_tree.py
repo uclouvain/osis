@@ -54,6 +54,7 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     trees = []
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
     for tree_root_id in tree_root_ids:
+        # TODO :: performance !
         root_node = load_node.load_node_education_group_year(tree_root_id)
         nodes = __load_tree_nodes(structure)
         nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})

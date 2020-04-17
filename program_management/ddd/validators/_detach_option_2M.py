@@ -29,9 +29,7 @@ from typing import List
 from django.utils.translation import ngettext
 
 from base.ddd.utils.business_validator import BusinessValidator
-from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import program_tree
 
 
 # Implmented from _check_detach_options_rules
@@ -41,7 +39,12 @@ class DetachOptionValidator(BusinessValidator):
     this options must exist in parent context (2m)
     """
 
-    def __init__(self, working_tree: 'ProgramTree', path_to_node_to_detach: 'Path', trees_using_node: List['ProgramTree']):
+    def __init__(
+            self,
+            working_tree: 'ProgramTree',
+            path_to_node_to_detach: 'Path',
+            trees_using_node: List['ProgramTree']
+    ):
         super(DetachOptionValidator, self).__init__()
         self.working_tree = working_tree
         self.path_to_node_to_detach = path_to_node_to_detach
@@ -50,24 +53,7 @@ class DetachOptionValidator(BusinessValidator):
             tree for tree in trees_using_node if tree.is_master_2m()
         ]
         for tree in self.trees_2m:
-            try:
-                assert tree.get_node_by_id_and_class(self.node_to_detach.node_id, self.node_to_detach.node_type)
-            except AssertionError:
-                print()
-        # msg = "This validator need the children of the node to add. Please load the complete Tree from the Node to Add"
-        # assert isinstance(tree_from_node_to_add, program_tree.ProgramTree), msg
-        # if tree_from_node_to_add.root_node.is_finality() or tree_from_node_to_add.get_all_finalities():
-        #     assert_error_msg = "To use correctly this validator, make sure the ProgramTree root is of type 2M"
-        #     assert tree_2m.root_node.node_type in TrainingType.root_master_2m_types_enum(), assert_error_msg
-        # root_id = int(path_to_node_to_detach.split('|')[0])
-        # self.working_tree = next(
-        #     tree for tree in trees_containg_node
-        #     if tree.root_node.node_id == root_id
-        # )
-        # self.tree_from_node_to_detach = ProgramTree(root_node=self.working_tree.get_node(path_to_node_to_detach))
-
-    # def get_options_from_finality(self, finality: 'Node'):
-    #     return finality.get_all_children_as_nodes(take_only={MiniTrainingType.OPTION})
+            assert tree.get_node_by_id_and_class(self.node_to_detach.node_id, self.node_to_detach.node_type)
 
     def get_options_to_detach(self):
         result = []
@@ -75,9 +61,6 @@ class DetachOptionValidator(BusinessValidator):
             result.append(self.node_to_detach)
         result += self.node_to_detach.get_option_list()
         return result
-
-    # def get_trees_2m(self):
-    #     return [tree for tree in self.trees_containing_node if tree.is_master_2m()]
 
     def validate(self):
         options_to_detach = self.get_options_to_detach()
@@ -103,20 +86,3 @@ class DetachOptionValidator(BusinessValidator):
                                 "finality_acronym": finality.title
                             }
                         )
-
-    # def is_options_to_detach_inside_2m(self):
-    #     """
-    #     :return:  False if the options to detach are inside a finality.
-    #     True if not (in this case, we are inside the OPTION_LIST_CHOICE of 2M).
-    #     """
-    #     option_list_node_from_current_tree = self.working_tree.get_option_list_choice(self.path_to_node_to_detach)
-    #     for tree in self.trees_2m:
-    #         # Note : current working tree could be sth else than a 2M tree (e.g. Finality, OPTION_LIST_CHOICE...)
-    #         # So, we need to retrieve the option_list_choice from the context of the 2M trees
-    #         option_list_node_from_2m_tree = tree.get_node_by_id_and_class(
-    #             option_list_node_from_current_tree.node_id,
-    #             option_list_node_from_current_tree.node_type
-    #         )
-    #         if any(parent for parent in tree.get_parents_nodes(option_list_node_from_2m_tree) if parent.is_finality()):
-    #             return False
-    #     return True

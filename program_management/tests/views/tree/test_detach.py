@@ -52,10 +52,10 @@ class TestDetachNodeView(TestCase):
                                                          child_branch__academic_year=cls.academic_year)
         cls.person = CentralManagerFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.path = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
+        cls.path_to_detach = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
         cls.url = reverse("tree_detach_node", args=[
             cls.education_group_year.id,
-        ]) + "?path=%s" % cls.path
+        ]) + "?path=%s" % cls.path_to_detach
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -97,12 +97,12 @@ class TestDetachNodeView(TestCase):
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
     def test_get_ensure_path_args_is_set_as_initial_on_form(self, mock):
 
-        response = self.client.get(self.url, data={'path': self.path})
+        response = self.client.get(self.url, data={'path': self.path_to_detach})
         self.assertTemplateUsed(response, 'tree/detach_confirmation_inner.html')
 
         self.assertTrue('form' in response.context)
         self.assertIsInstance(response.context['form'], DetachNodeForm)
-        self.assertDictEqual(response.context['form'].initial, {'path': self.path})
+        self.assertDictEqual(response.context['form'].initial, {'path': self.path_to_detach})
 
     def test_post_with_invalid_path(self):
         response = self.client.post(self.url, data={'path': 'dummy_path'})
@@ -142,7 +142,7 @@ class TestDetachNodeView(TestCase):
             self.url,
             follow=True,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-            data={'path': self.path}
+            data={'path': self.path_to_detach}
         )
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -157,7 +157,9 @@ class TestDetachNodeView(TestCase):
             self.group_element_year.child_branch,
             source_link_id=self.group_element_year.id
         )
-        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path})
+        self.client.post(
+            self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach}
+        )
         error_msg = "The clipboard should be cleared if detached element is in clipboard"
         self.assertFalse(ElementCache(self.person.user).cached_data, error_msg)
 
@@ -168,6 +170,6 @@ class TestDetachNodeView(TestCase):
         ElementCache(self.person.user).save_element_selected(
             element_cached,
         )
-        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path})
+        self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach})
         error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
         self.assertEqual(ElementCache(self.person.user).cached_data['id'], element_cached.id, error_msg)

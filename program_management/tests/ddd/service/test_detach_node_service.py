@@ -121,8 +121,6 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
     @patch.object(ProgramTree, 'detach_node', return_value=(True, []))
     def test_when_commit_is_true(self, mock):
         detach_node_service.detach_node(self.path_to_detach, commit=True)
-        if not self.mock_persist.called:
-            print()
         self.assertTrue(self.mock_persist.called)
 
     def test_when_commit_is_false(self):

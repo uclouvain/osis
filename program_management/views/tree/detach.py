@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.shortcuts import render
@@ -32,12 +31,10 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.group_element_year import GroupElementYear
 from base.utils.cache import ElementCache
 from base.views.common import display_business_messages
 from base.views.common import display_error_messages, display_warning_messages
-from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin
+from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.service import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
@@ -51,13 +48,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
 
     raise_exception = True
     rules = [group_element_year_perms.can_detach_group_element_year]
-    # partial_reload = True
-
-    # def get_form_kwargs(self):
-    #     return {
-    #         **super().get_form_kwargs(),
-    #         'path_to_detach': self.request.POST.get('path_to_detach')
-    #     }
 
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())
@@ -87,7 +77,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return context
 
     def get_initial(self):
-        print()
         return {
             **super().get_initial(),
             'path': self.path_to_detach
@@ -115,7 +104,6 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print()
         return super(DetachNodeView, self).form_invalid(form)
 
     def _remove_element_from_clipboard_if_stored(self, path: str):
@@ -143,30 +131,3 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
                               {'access_message': _('You are not eligible to detach this item')})
 
         return super(DetachNodeView, self).dispatch(request, *args, **kwargs)
-
-
-# class DetachNodeView2(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):
-#     template_name = "tree/detach_confirmation.html"
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(DetachNodeView2, self).get_context_data(**kwargs)
-#         message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
-#         display_business_messages(self.request, message_list.messages)
-#         context['detach_ok'] = not message_list.contains_errors()
-#         context['confirmation_message'] = _("Are you sure you want to detach ?")
-#         return context
-#
-#     def get_initial(self):
-#         print()
-#         return {
-#             **super().get_initial(),
-#             'path': self.request.GET.get('path')
-#         }
-#
-#     def form_valid(self, form):
-#         message_list = form.save()
-#         display_business_messages(self.request, message_list.messages)
-#         return super().form_valid(form)
-#
-#     def get_success_url(self):
-#         return ""
