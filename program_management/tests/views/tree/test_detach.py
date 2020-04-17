@@ -36,8 +36,8 @@ from base.ddd.utils.validation_message import BusinessValidationMessageList, Bus
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory
 from base.utils.cache import ElementCache
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
 
