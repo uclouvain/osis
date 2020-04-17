@@ -105,6 +105,7 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
         self.client.force_authenticate(user=self.person.user)
 
 
+@override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
 class TrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
     @classmethod
     def setUpTestData(cls):
@@ -157,6 +158,7 @@ class TrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
             self.assertEqual([self.serializer.data], response.json())
 
 
+@override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
 class MiniTrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
     @classmethod
     def setUpTestData(cls):
