@@ -25,6 +25,7 @@ from unittest import mock
 
 from django.test import TestCase
 
+from base.models.enums import prerequisite_operator
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -86,6 +87,27 @@ class TestPersistPrerequisite(TestCase):
         self.assertTrue(
             PrerequisiteItem.objects.filter(prerequisite=prerequisite_obj)
         )
+
+    def test_should_update_main_operator(self):
+        prerequisite_obj = prerequisite.factory.from_expression(
+            "LOSIS4525 OU MARC4123",
+            self.current_academic_year.year
+        )
+        self.node.prerequisite = prerequisite_obj
+        _persist_prerequisite._persist(self.root_node, self.node)
+
+        prerequisite_obj = prerequisite.factory.from_expression(
+            "LOSIS4525 ET MARC4123",
+            self.current_academic_year.year
+        )
+        self.node.prerequisite = prerequisite_obj
+        _persist_prerequisite._persist(self.root_node, self.node)
+
+        prerequisite_obj = Prerequisite.objects.get(
+            education_group_year__id=self.root_node.node_id,
+            main_operator=prerequisite_operator.AND
+        )
+        self.assertTrue(prerequisite_obj)
 
     def test_should_empty_existing_prerequisites(self):
         PrerequisiteFactory(

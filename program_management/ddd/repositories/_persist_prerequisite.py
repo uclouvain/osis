@@ -49,7 +49,7 @@ def _persist(
     )
     prerequisite = node_learning_unit_year_obj.prerequisite
 
-    prerequisite_model_obj, created = prerequisite_model.Prerequisite.objects.get_or_create(
+    prerequisite_model_obj, created = prerequisite_model.Prerequisite.objects.update_or_create(
         education_group_year=education_group_year_obj,
         learning_unit_year=learning_unit_year_obj,
         defaults={"main_operator": prerequisite.main_operator}
