@@ -49,6 +49,8 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     raise_exception = True
     rules = [group_element_year_perms.can_detach_group_element_year]
 
+    _object = None
+
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())
 
@@ -68,12 +70,25 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def root_id(self):
         return self.path_to_detach.split('|')[0]
 
+    @property
+    def confirmation_message(self):
+        msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
+        if hasattr(self.object.child, 'partial_acronym'):
+            msg = "%(partial_acronym)s - %(acronym)s" % {
+                "acronym": msg,
+                "partial_acronym": self.object.child.partial_acronym
+            }
+        return _("Are you sure you want to detach %(acronym)s ?") % {
+            "acronym": msg
+        }
+
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
         message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
         display_warning_messages(self.request, message_list.warnings)
         display_error_messages(self.request, message_list.errors)
-        context['detach_ok'] = not message_list.contains_errors()  # TODO :: fix confirmaiton message
+        if not message_list.contains_errors():
+            context['confirmation_message'] = self.confirmation_message
         return context
 
     def get_initial(self):
@@ -90,6 +105,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         ).get()
         return obj
 
+    @property
     def object(self):
         if self._object is None:
             self._object = self.get_object()
