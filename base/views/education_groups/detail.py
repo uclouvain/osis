@@ -78,11 +78,10 @@ from program_management.ddd.repositories.find_roots import find_roots
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.enums import node_type
 from webservices.business import CONTACT_INTRO_KEY
-from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
+from program_management.ddd.repositories.load_tree import find_all_program_tree_versions, \
+    find_all_versions_academic_year
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
-from program_management.forms.program_version import ProgramVersionForm
-from program_management.models.education_group_version import EducationGroupVersion
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -190,15 +189,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
             #                               self.transition == 'transition',
             #                               self.offer.academic_year.year,
             #                               self.offer.acronym)
-            # TODO en attendant la nouvelle verion du load_tree je vais récupéréer le groupry comme ceci
-            version = EducationGroupVersion.objects.filter(offer__acronym=self.offer.acronym,
-                                                           offer__academic_year__year=self.offer.academic_year.year,
-                                                           version_name=self.version_name,
-                                                           is_transition=self.transition) \
-                .select_related('root_group', 'offer').first()
-            if version:
-                context['root_group'] = version.root_group
-                context['offer'] = version.offer
             program_tree = load_tree.load(self.offer.id)
             serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
@@ -221,12 +211,16 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['form_xls_custom'] = CustomXlsForm()
 
         list_of_versions = find_all_program_tree_versions(self.offer.acronym, self.offer.academic_year.year, False)
-        program_version_form = ProgramVersionForm(list_of_versions=list_of_versions,
-                                                  version_name=self.version_name,
-                                                  transition=self.transition,
-                                                  tab_to_show=self.request.GET.get('tab_to_show'))
-
-        context['program_version_form'] = program_version_form
+        version = _current_version(list_of_versions, self.version_name, self.transition)
+        context['displayed_version'] = version
+        if version:
+            context['root_group'] = version.root_group
+        context['list_of_versions'] = find_all_program_tree_versions(self.offer.acronym,
+                                                                     self.offer.academic_year.year,
+                                                                     False)
+        context['academic_years'] = find_all_versions_academic_year(self.offer.acronym,
+                                                                    self.version_name,
+                                                                    self.transition)
 
         return context
 
@@ -685,3 +679,9 @@ def get_appropriate_common_admission_condition(edy):
         common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
         return common_admission_condition
     return None
+
+
+def _current_version(versions, version_name, transition):
+    for a_version in versions:
+        if a_version.version_name == version_name and a_version.is_transition == transition:
+            return a_version

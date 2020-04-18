@@ -192,8 +192,8 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
     the method will try to fetch the parent's value and display it in another style
     (strong, blue).
     """
-    is_particular = context["program_version_form"] and context["program_version_form"].is_particular
-    if versioned_field and key not in ('active', 'main_teaching_campus'):#Todo bizarre je pense que c'est 2 champs devraient être dans group_year selon le fichie xls de hang
+    is_standard = context["displayed_version"].is_standard
+    if versioned_field:
         obj = context["root_group"]
     else:
         obj = context["education_group_year"]
@@ -203,13 +203,13 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
         class_dl=class_dl,
-        default_value=default_value, is_particular=is_particular, versioned_field=versioned_field)
+        default_value=default_value, is_standard=is_standard, versioned_field=versioned_field)
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
 def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, version_label=None,
-                                   is_particular=False, versioned_field=False):
-
+                                   is_standard=False, versioned_field=False):
+    is_particular = not is_standard
     value = None
     parent_value = None
 
@@ -259,17 +259,23 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
         obj = context["root_group"]
     parent = context["parent"]
 
-    is_particular = context["program_version_form"] and context["program_version_form"].is_particular
+    is_standard = context["displayed_version"].is_standard
 
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
-        class_dl=_get_css(class_dl, is_particular, versioned_field),
+        class_dl=_get_css(class_dl, not is_standard, versioned_field),
         default_value=default_value,
-        version_label=context['program_version_form'].additional_title,
-        is_particular=is_particular,
+        version_label=additional_title(context['displayed_version']),
+        is_standard=is_standard,
         versioned_field=versioned_field)
 
 
 def _get_css(class_dl, is_particular, version_field):
     return "{} {}".format(class_dl, UN_VERSIONED_OF_FIELD) if is_particular and not version_field else class_dl
 
+
+def additional_title(version):
+    if version.is_transition and version.version_name == '':
+        return 'Transition'
+    else:
+        return version.version_label

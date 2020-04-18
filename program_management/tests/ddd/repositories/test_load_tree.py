@@ -28,6 +28,8 @@ from django.test import TestCase
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -35,10 +37,12 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeEducationGroupYearFactory
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.ddd.repositories import load_tree
+
+VERSION_NAME = 'CEMS'
+EDY_ACRONYM = 'CHIM1BA'
 
 
 class TestLoadTree(TestCase):
@@ -269,3 +273,33 @@ class TestLoadTreesFromChildren(TestCase):
         result = load_tree.load_trees_from_children(child_branch_ids=[child.id], link_type=LinkTypes.REFERENCE)
         expected_result = [load_tree.load(parent_node_type_reference.education_group_year.id)]
         self.assertListEqual(result, expected_result)
+
+
+class TestLoadVersionTree(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
+        cls.education_group = EducationGroupFactory()
+        cls.education_group_year = EducationGroupYearFactory(education_group=cls.education_group,
+                                                             academic_year=cls.academic_year,
+                                                             acronym=EDY_ACRONYM)
+        cls.education_group_year_next = EducationGroupYearFactory(education_group=cls.education_group,
+                                                                  academic_year=cls.next_academic_year,
+                                                                  acronym=EDY_ACRONYM)
+        cls.education_group_version = EducationGroupVersionFactory(version_name=VERSION_NAME,
+                                                                   is_transition=False,
+                                                                   offer=cls.education_group_year)
+        cls.education_group_version_next = EducationGroupVersionFactory(version_name=VERSION_NAME,
+                                                                        is_transition=False,
+                                                                        offer=cls.education_group_year_next)
+
+    def test_find_all_program_tree_versions(self):
+        results = list(load_tree.find_all_program_tree_versions(EDY_ACRONYM, self.academic_year.year, False))
+        self.assertEqual(len(results), 1)
+        self.assertCountEqual(
+            results[0].organized_years,
+            [self.academic_year.year, self.next_academic_year.year]
+        )
+
+

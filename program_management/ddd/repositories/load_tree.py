@@ -26,8 +26,8 @@
 
 from typing import List, Dict, Any
 
-from django.db.models import Case, F, When, IntegerField
-
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Case, F, When, IntegerField, Subquery, OuterRef
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -41,6 +41,11 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
 from program_management.models.enums.node_type import NodeType
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import IntegerField, ExpressionWrapper
+from education_group.models.group_year import GroupYear
+
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -215,8 +220,41 @@ def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = Tr
     qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
         .select_related('offer').order_by('version_name')
 
-    qs = qs.values('is_transition', 'version_name', 'offer_id', 'title_fr', 'title_en')
     results = []
-    for elem in qs:
+
+    for elt in qs:
+        elem = {
+            'is_transition': elt.is_transition,
+            'version_name': elt.version_name,
+            'offer_id': elt.offer_id,
+            'title_fr': elt.title_fr,
+            'title_en': elt.title_en,
+            'root_group': elt.root_group
+        }
         results.append(ProgramTreeVersion(**elem, tree=load_tree))
     return results
+
+
+def find_all_versions_academic_year(acronym: str,
+                                    version_name: str,
+                                    is_transition: bool) -> List['EducationGroupVersionAcademicYear']:
+    qs = GroupYear.objects.filter(educationgroupversion__offer__acronym=acronym,
+                                  educationgroupversion__version_name=version_name,
+                                  educationgroupversion__is_transition=is_transition) \
+        .distinct('educationgroupversion__offer__academic_year')
+    results = []
+    for elem in qs:
+        results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))
+    return results
+
+#
+#
+# def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
+#     qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
+#         .select_related('offer').order_by('version_name')
+#
+#     qs = qs.values('is_transition', 'version_name', 'offer_id', 'title_fr', 'title_en')
+#     results = []
+#     for elem in qs:
+#         results.append(ProgramTreeVersion(**elem, tree=load_tree))
+#     return results

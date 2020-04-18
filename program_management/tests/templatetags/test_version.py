@@ -26,13 +26,13 @@
 import random
 
 from django.test import TestCase
+
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from program_management.forms.program_version import _compute_url_used_in_dropdown_list_of_versions, \
-    IDENTIFICATION_URL_NAME, _ordered_list
+from program_management.templatetags.version import compute_url, IDENTIFICATION_URL_NAME, ordered_version_list
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
-class TestProgramVersionForm(TestCase):
+class TestVersionTemplateTags(TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -42,7 +42,7 @@ class TestProgramVersionForm(TestCase):
         a_version = ProgramTreeVersionFactory(version_name='',
                                               is_transition=False,
                                               offer_id=self.education_group_year.id)
-        an_url = _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME, a_version)
+        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/identification/".format(self.education_group_year.id)
         self.assertEqual(an_url, expected_url)
 
@@ -50,7 +50,7 @@ class TestProgramVersionForm(TestCase):
         a_version = ProgramTreeVersionFactory(version_name='',
                                               is_transition=True,
                                               offer_id=self.education_group_year.id)
-        an_url = _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME, a_version)
+        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/transition/identification/".format(self.education_group_year.id)
         self.assertEqual(an_url, expected_url)
 
@@ -58,7 +58,7 @@ class TestProgramVersionForm(TestCase):
         a_version = ProgramTreeVersionFactory(version_name='ICHEC',
                                               is_transition=False,
                                               offer_id=self.education_group_year.id)
-        an_url = _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME, a_version)
+        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/{}/identification/".format(self.education_group_year.id, 'ICHEC')
         self.assertEqual(an_url, expected_url)
 
@@ -66,7 +66,7 @@ class TestProgramVersionForm(TestCase):
         a_version = ProgramTreeVersionFactory(version_name='ICHEC',
                                               is_transition=True,
                                               offer_id=self.education_group_year.id)
-        an_url = _compute_url_used_in_dropdown_list_of_versions(IDENTIFICATION_URL_NAME, a_version)
+        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/transition/{}/identification/".format(self.education_group_year.id, 'ICHEC')
         self.assertEqual(an_url, expected_url)
 
@@ -93,7 +93,7 @@ class TestProgramVersionForm(TestCase):
         while cpt < 10:
             random.shuffle(versions)
             self.assertListEqual(
-                _ordered_list(versions),
+                ordered_version_list(versions),
                 [standard_version, standard_transition_version, cems_version, cems_transition_version, ichec_version]
             )
             cpt += 1

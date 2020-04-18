@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load education_group format i18n static %}
+{% load education_group format i18n static version %}
 
 {% block title %}
     <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
@@ -55,30 +55,31 @@
                                 name="academic_year"
                                 id="id_academic_year_search"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
-                                    {% if program_version_form.version_name != '' %}
-                                        <option value="{% url "education_group_read" edy.pk program_version_form.version_name %}"
-                                                {% if edy == education_group_year %} selected="selected" {% endif %}>
-                                            {{ edy.academic_year }}
-                                        </option>
-                                    {% else %}
-                                        <option value="{% url "education_group_read" edy.pk %}"
-                                                {% if edy == education_group_year %} selected="selected" {% endif %}>
-                                            {{ edy.academic_year }}
-                                        </option>
-                                    {% endif %}
+                            {% for version_academic_year in academic_years %}
+                                {% url_dropdown_academic_year version_academic_year.education_group_id.id as url_to_go %}
+                                    <option value="{{ url_to_go }}"
+                                    {% if version_academic_year.education_group_id.id == offer.id %}
+                                            selected="selected"
+                                        {% endif %}>
+                                        {{ version_academic_year.academic_year.year }}
+                                    </option>
+
                             {% endfor %}
                         </select>
                     </label>
-                     {% if program_version_form.version_list_for_url %}
+                     {% if list_of_versions %}
                      <label>
+                     {% ordered_version_list list_of_versions as ordered_list_of_versions %}
                         <select class="form-control"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for version in program_version_form.version_list_for_url %}
-                                <option value="{{ version|get_item:'url_to_go_to' }}?tab_to_show={{ request.GET.tab_to_show }}"
-                                {% if version|get_item:'selected' == "selected" %}
+                            {% for version in ordered_list_of_versions %}
+                                {% url_dropdown version as url_to_go %}
+                                <option value="{{ url_to_go }}"
+                                {% if version.version_name == displayed_version.version_name and version.is_transition == displayed_version.is_transition %}
                                             selected="selected"
-                                        {% endif %}>{{ version|get_item:'version_label' }}</option>
+                                {% endif %}>
+                                    {{ version|version_label }}
+                                </option>
                             {% endfor %}
                         </select>
                         </label>

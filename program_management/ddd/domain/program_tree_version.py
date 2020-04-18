@@ -64,21 +64,24 @@ class ProgramTreeVersion:
             is_transition: bool = False,
             offer_id: int = None,
             title_fr: str = None,
-            title_en: str = None
+            title_en: str = None,
+            root_group = None
     ):
         self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
-
-        if self.is_standard:
-            self.version_label = 'Transition' if is_transition else ''
-        else:
-            self.version_label = '{}-Transition'.format(version_name) if is_transition else version_name
-
         self.offer_id = offer_id
         self.title_fr = title_fr
         self.title_en = title_en
+        self.root_group = root_group
 
     @property
     def is_standard(self):
         return self.version_name == STANDARD
+
+    @property
+    def version_label(self):
+        if self.is_standard:
+            return 'Transition' if self.is_transition else ''
+        else:
+            return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
