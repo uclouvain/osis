@@ -111,9 +111,11 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
 
         self.assertFalse(validator.is_valid())
 
-        max_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-            "types": str(self.tree.authorized_relationships.get_authorized_children_types(self.authorized_parent.node_type))
-        }
+        max_error_msg = _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
+                          "has already reached the limit.") % {
+                            'child_types': another_authorized_child.node_type.value,
+                            'parent': self.authorized_parent
+                        }
         self.assertIn(max_error_msg, validator.error_messages)
         self.assertEqual(len(validator.error_messages), 1)
 
@@ -150,7 +152,13 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
     def test_when_relation_is_not_authorized(self):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         validator = DetachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
-        self.assertTrue(validator.is_valid())
+        self.assertFalse(validator.is_valid())
+        expected_error_msg = _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+            'child_types': unauthorized_child.node_type.value,
+            'parent': self.authorized_parent,
+            'parent_type': self.authorized_parent.node_type.value,
+        }
+        self.assertIn(expected_error_msg, validator.error_messages)
 
     def test_when_parent_has_no_children_yet(self):
         another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
@@ -163,9 +171,10 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
         self.assertTrue(validator.is_valid())
 
     def test_when_parent_has_children_but_minimum_is_not_reached(self):
-        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)
         another_authorized_parent.add_child(another_authorized_child)
+        another_authorized_parent.add_child(self.authorized_child)
         tree = ProgramTreeFactory(
             root_node=another_authorized_parent,
             authorized_relationships=self.authorized_relationships
@@ -178,9 +187,7 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         validator = DetachAuthorizedRelationshipValidator(self.tree, another_authorized_child, self.authorized_parent)
         self.assertFalse(validator.is_valid())
-        error_msg = _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-                      "has already reached the limit.") % {
-                        'child_types': self.authorized_child.node_type.value,
-                        'parent': self.authorized_parent
-                    }
-        self.assertIn(error_msg, validator.error_messages)
+        expected_error_msg = _("The parent must have at least one child of type(s) \"%(types)s\".") % {
+            "types": str(another_authorized_child.node_type.value)
+        }
+        self.assertIn(expected_error_msg, validator.error_messages)

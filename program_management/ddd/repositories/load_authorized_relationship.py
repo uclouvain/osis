@@ -25,9 +25,10 @@
 ##############################################################################
 from base.models.authorized_relationship import AuthorizedRelationship as ModelRelationship, \
     AuthorizedRelationshipObject, AuthorizedRelationshipList
+from program_management.ddd.repositories.load_node import convert_node_type_enum
 
 
-def load() -> AuthorizedRelationshipList:
+def load() -> AuthorizedRelationshipList:  # TODO :: add unit tests
     authorized_relationships = []
     qs = ModelRelationship.objects.all().values(
         'parent_type__name',
@@ -38,8 +39,8 @@ def load() -> AuthorizedRelationshipList:
     for obj in qs:
         authorized_relationships.append(
             AuthorizedRelationshipObject(
-                obj['parent_type__name'],
-                obj['child_type__name'],
+                convert_node_type_enum(obj['parent_type__name']),
+                convert_node_type_enum(obj['child_type__name']),
                 obj['min_count_authorized'],
                 obj['max_count_authorized'],
             )

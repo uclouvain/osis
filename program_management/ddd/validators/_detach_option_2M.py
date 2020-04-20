@@ -53,7 +53,7 @@ class DetachOptionValidator(BusinessValidator):
             tree for tree in trees_using_node if tree.is_master_2m()
         ]
         for tree in self.trees_2m:
-            assert tree.get_node_by_id_and_type(self.node_to_detach.node_id, self.node_to_detach.node_type)
+            assert tree.get_node_by_id_and_type(self.node_to_detach.node_id, self.node_to_detach.type)
 
     def get_options_to_detach(self):
         result = []
