@@ -28,7 +28,7 @@ from django.contrib.auth.models import Permission
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
-from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
+from base.tests.factories.person import FacultyManagerForUEFactory, CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.student import StudentFactory
@@ -69,7 +69,7 @@ PERMISSIONS = (
 )
 
 
-class BusinessFacultyManagerFactory(FacultyManagerFactory):
+class BusinessFacultyManagerFactory(FacultyManagerForUEFactory):
     def __init__(self, *args, **kwargs):
         permissions = PERMISSIONS
         factory_parameters = {
@@ -89,7 +89,7 @@ class BusinessFacultyManagerFactory(FacultyManagerFactory):
         )
 
 
-class BusinessCentralManagerFactory(CentralManagerFactory):
+class BusinessCentralManagerFactory(CentralManagerForUEFactory):
     def __init__(self, *args, **kwargs):
         permissions = PERMISSIONS
         factory_parameters = {

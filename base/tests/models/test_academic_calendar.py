@@ -50,7 +50,7 @@ class AcademicCalendarTest(TestCase):
         cls.past_date = fake.past_date()
 
     def test_start_date_higher_than_end_date(self):
-        data.setup_data_bis()
+        data.FunctionalTestData()
         with self.assertRaises(StartDateHigherThanEndDateException):
             AcademicCalendarFactory(start_date=self.future_date, end_date=self.past_date)
 

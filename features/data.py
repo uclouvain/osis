@@ -1,8 +1,9 @@
 from behave.runner import Context
+from django.core import management
 
 from features import factories as functional_factories
 from features.factories import academic_year, reference, structure, users, score_encoding, learning_unit, \
-    education_group
+    education_group, program
 from features.factories.attribution import AttributionGenerator
 
 
@@ -18,7 +19,22 @@ class FunctionalTestData:
         self._generate_learning_units_data()
         self._generate_attributions()
         self._generate_education_groups()
+
+        self._load_fixtures()
+
+        self._generate_programs()
         self._generate_score_encoding_data()
+
+    def _load_fixtures(self):
+        fixtures = ("authorized_relationship", "waffle_flags.json", "waffle_switches.json")
+        management.call_command(
+            'loaddata',
+            *fixtures,
+            **{'verbosity': 0}
+        )
+        management.call_command(
+            "load_validation_rules",
+        )
 
     def _generate_base_data(self):
         academic_year_generator = functional_factories.academic_year.AcademicYearGenerator()
@@ -55,6 +71,5 @@ class FunctionalTestData:
     def _generate_score_encoding_data(self):
         functional_factories.score_encoding.ScoreEncodingFactory()
 
-
-def setup_data_bis():
-    FunctionalTestData()
+    def _generate_programs(self):
+        functional_factories.program.ProgramGenerators()

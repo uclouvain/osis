@@ -39,7 +39,6 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.person import FacultyManagerForUEFactory, CentralManagerForUEFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
-from base.tests.functionals.test_education_group import LoginPage
 from features.pages.common import LoginPage
 
 use_step_matcher("parse")

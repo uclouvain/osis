@@ -53,6 +53,17 @@ def generate_title(education_group_year):
     return '{obj.academic_year} {gen_str}'.format(obj=education_group_year, gen_str=string_generator()).lower()
 
 
+def generate_partial_acronym():
+    sigle_ele = "".join(random.choices(string.ascii_uppercase, k=5))
+    cnum = "".join(random.choices(string.digits, k=3))
+    subdivision = random.choice(string.ascii_uppercase)
+    return "{sigle_ele}{cnum}{subdivision}".format(
+        sigle_ele=sigle_ele,
+        cnum=cnum,
+        subdivision=subdivision
+    )
+
+
 class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EducationGroupYear
@@ -101,7 +112,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
             if self.partial_acronym == "":
                 self.partial_acronym = exrex.getone(self.rules['partial_acronym'].regex_rule).upper()
         except KeyError:
-            self.partial_acronym = string_generator(7)
+            self.partial_acronym = generate_partial_acronym()
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):
