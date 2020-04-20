@@ -27,7 +27,7 @@
 {% endcomment %}
 {% block details %}
     {% with  parent=parent_training %}
-        {% if not displayed_version.is_standard  %}
+        {% if not current_version.is_standard  %}
             {% include  "education_group/blocks/panel/panel_version_information.html" %}
         {% endif %}
         <div class="row">
@@ -37,7 +37,7 @@
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") is_standard=displayed_version.is_standard %}
+                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") is_standard=current_version.is_standard %}
                         {% dl_with_parent "main_teaching_campus" versioned_fied=True%}
                     </div>
                 </div>

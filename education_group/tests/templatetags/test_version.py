@@ -41,7 +41,7 @@ class TestVersionTemplateTags(TestCase):
     def test_compute_url_with_standard(self):
         a_version = ProgramTreeVersionFactory(version_name='',
                                               is_transition=False,
-                                              offer_id=self.education_group_year.id)
+                                              offer=self.education_group_year)
         an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/identification/".format(self.education_group_year.id)
         self.assertEqual(an_url, expected_url)
@@ -49,7 +49,7 @@ class TestVersionTemplateTags(TestCase):
     def test_compute_url_with_standard_transition(self):
         a_version = ProgramTreeVersionFactory(version_name='',
                                               is_transition=True,
-                                              offer_id=self.education_group_year.id)
+                                              offer=self.education_group_year)
         an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/transition/identification/".format(self.education_group_year.id)
         self.assertEqual(an_url, expected_url)
@@ -57,7 +57,7 @@ class TestVersionTemplateTags(TestCase):
     def test_compute_url_with_particular(self):
         a_version = ProgramTreeVersionFactory(version_name='ICHEC',
                                               is_transition=False,
-                                              offer_id=self.education_group_year.id)
+                                              offer=self.education_group_year)
         an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/{}/identification/".format(self.education_group_year.id, 'ICHEC')
         self.assertEqual(an_url, expected_url)
@@ -65,7 +65,7 @@ class TestVersionTemplateTags(TestCase):
     def test_compute_url_with_particular_transition(self):
         a_version = ProgramTreeVersionFactory(version_name='ICHEC',
                                               is_transition=True,
-                                              offer_id=self.education_group_year.id)
+                                              offer=self.education_group_year)
         an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
         expected_url = "/educationgroups/{}/transition/{}/identification/".format(self.education_group_year.id, 'ICHEC')
         self.assertEqual(an_url, expected_url)
@@ -73,21 +73,21 @@ class TestVersionTemplateTags(TestCase):
     def test_ordered_list(self):
         ichec_version = ProgramTreeVersionFactory(version_name='ICHEC',
                                                   is_transition=True,
-                                                  offer_id=self.education_group_year.id)
+                                                  offer=self.education_group_year)
 
         cems_transition_version = ProgramTreeVersionFactory(version_name='CEMS',
                                                             is_transition=True,
-                                                            offer_id=self.education_group_year.id)
+                                                            offer=self.education_group_year)
 
         cems_version = ProgramTreeVersionFactory(version_name='CEMS',
                                                  is_transition=False,
-                                                 offer_id=self.education_group_year.id)
+                                                 offer=self.education_group_year)
         standard_version = ProgramTreeVersionFactory(version_name='',
                                                      is_transition=False,
-                                                     offer_id=self.education_group_year.id)
+                                                     offer=self.education_group_year)
         standard_transition_version = ProgramTreeVersionFactory(version_name='',
                                                                 is_transition=True,
-                                                                offer_id=self.education_group_year.id)
+                                                                offer=self.education_group_year)
         versions = [ichec_version, cems_transition_version, cems_version, standard_version, standard_transition_version]
         cpt = 0
         while cpt < 10:

@@ -161,6 +161,15 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return self.kwargs.get('transition', False)
 
     @cached_property
+    def all_versions_available(self):
+        return find_all_program_tree_versions(self.offer.acronym, self.offer.academic_year.year, False)
+
+    @cached_property
+    def current_version(self):
+        return next((version for version in self.all_versions_available if
+                     version.version_name == self.version_name and version.is_transition == self.transition), None)
+
+    @cached_property
     def starting_academic_year(self):
         return starting_academic_year()
 
@@ -170,12 +179,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         # This objects are mandatory for all education group views
         context['person'] = self.person
 
-        context['displayed_version'] = self.displayed_version
-        if self.displayed_version:
-            context['root_group'] = self.displayed_version.root_group
-        context['list_of_versions'] = find_all_program_tree_versions(self.offer.acronym,
-                                                                     self.offer.academic_year.year,
-                                                                     False)
+        context['current_version'] = self.current_version
+        if self.current_version:
+            context['root_group'] = self.current_version.root_group
+        context['all_versions_available'] = self.all_versions_available
         context['academic_years'] = find_all_versions_academic_year(self.offer.acronym,
                                                                     self.version_name,
                                                                     self.transition)
@@ -223,11 +230,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        list_of_versions = find_all_program_tree_versions(self.offer.acronym, self.offer.academic_year.year, False)
-        self.displayed_version = _current_version(list_of_versions, self.version_name, self.transition)
-
         if self.offer:
-            default_url = build_url_identification_tab(self.displayed_version)
+            default_url = build_url_identification_tab(self.current_version)
         else:
             default_url = reverse('education_group_read', args=[self.offer.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
@@ -244,20 +248,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def show_diploma(self):
         return self.object.education_group_type.category == TRAINING and not self.object.is_common \
-               and self.displayed_version.is_standard
+               and self.current_version.is_standard
 
     def show_general_information(self):
         return not self.object.acronym.startswith('common-') and \
                self.is_general_info_and_condition_admission_in_display_range() and \
                self.object.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys() and \
-               self.displayed_version.is_standard
+               self.current_version.is_standard
 
     def show_administrative(self):
         return self.object.education_group_type.category == "TRAINING" and \
                self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
                                                              TrainingType.PGRM_MASTER_180_240.name] and \
                not self.object.is_common \
-               and self.displayed_version.is_standard
+               and self.current_version.is_standard
 
     def show_content(self):
         return not self.object.is_common
@@ -270,14 +274,14 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
                self.object.education_group_type.name in itertools.chain(TrainingType.with_admission_condition(),
                                                                         MiniTrainingType.with_admission_condition()) \
                and self.is_general_info_and_condition_admission_in_display_range()\
-               and self.displayed_version.is_standard
+               and self.current_version.is_standard
 
     def show_skills_and_achievements(self):
         return not self.object.is_common and \
                self.object.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
                                                                         MiniTrainingType.with_admission_condition()) \
                and self.is_general_info_and_condition_admission_in_display_range() \
-               and self.displayed_version.is_standard
+               and self.current_version.is_standard
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \

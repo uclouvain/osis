@@ -29,22 +29,22 @@
             <div class="row">
                 <div class="col-md-6">
                     <label for="version_nane">{%  trans 'Version name' %}</label><br>
-                    <span id="version_name">{{ displayed_version.version_name }}</span>
+                    <span id="version_name">{{ current_version.version_name }}</span>
                 </div>
                 <div class="col-md-6">
                     <label for="is_transition">{%  trans 'Transition' %}</label><br>
-                    <span id="is_transition">{{ displayed_version.is_transition| yesno:_("yes,no") |title }}</span>
+                    <span id="is_transition">{{ current_version.is_transition| yesno:_("yes,no") |title }}</span>
                 </div>
             </div>
             <br>
             <div class="row">
                 <div class="col-md-6">
                     <label for="version_nane">{%  trans 'Title in French' %}</label><br>
-                    <span id="version_name">{{ displayed_version.title_fr | default_if_none:'' }}</span>
+                    <span id="version_name">{{ current_version.title_fr | default_if_none:'' }}</span>
                 </div>
                 <div class="col-md-6">
                     <label for="is_transition">{%  trans 'Title in English' %}</label><br>
-                    <span id="version_name">{{ displayed_version.title_en | default_if_none:'' }}</span>
+                    <span id="version_name">{{ current_version.title_en | default_if_none:'' }}</span>
                 </div>
             </div>
         </div>

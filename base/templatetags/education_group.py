@@ -192,7 +192,6 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
     the method will try to fetch the parent's value and display it in another style
     (strong, blue).
     """
-    is_standard = context["displayed_version"].is_standard
     if versioned_field:
         obj = context["root_group"]
     else:
@@ -203,7 +202,7 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
         class_dl=class_dl,
-        default_value=default_value, is_standard=is_standard, versioned_field=versioned_field)
+        default_value=default_value, is_standard=context["current_version"].is_standard, versioned_field=versioned_field)
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
@@ -259,13 +258,13 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
         obj = context["root_group"]
     parent = context["parent"]
 
-    is_standard = context["displayed_version"].is_standard
+    is_standard = context["current_version"].is_standard
 
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
         class_dl=_get_css(class_dl, not is_standard, versioned_field),
         default_value=default_value,
-        version_label=additional_title(context['displayed_version']),
+        version_label=additional_title(context['current_version']),
         is_standard=is_standard,
         versioned_field=versioned_field)
 

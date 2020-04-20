@@ -67,15 +67,15 @@
                             {% endfor %}
                         </select>
                     </label>
-                     {% if list_of_versions %}
+                     {% if all_versions_available %}
                      <label>
-                     {% ordered_version_list list_of_versions as ordered_list_of_versions %}
+                     {% ordered_version_list all_versions_available as ordered_versions_available %}
                         <select class="form-control"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for version in ordered_list_of_versions %}
+                            {% for version in ordered_versions_available %}
                                 {% url_dropdown version as url_to_go %}
                                 <option value="{{ url_to_go }}"
-                                {% if version.version_name == displayed_version.version_name and version.is_transition == displayed_version.is_transition %}
+                                {% if version.version_name == current_version.version_name and version.is_transition == current_version.is_transition %}
                                             selected="selected"
                                 {% endif %}>
                                     {{ version|version_label }}
