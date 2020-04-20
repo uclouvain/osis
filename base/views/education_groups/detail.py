@@ -230,7 +230,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if self.offer:
+        if self.current_version:
             default_url = build_url_identification_tab(self.current_version)
         else:
             default_url = reverse('education_group_read', args=[self.offer.pk, self.get_object().pk])
