@@ -51,7 +51,7 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
-def load_version(version_name: str, transition: bool, year: int, acronym: str) -> 'ProgramTreeVersion':
+def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
     education_group_version = EducationGroupVersion.objects.get(
         offer__acronym=acronym,
         offer__academic_year__year=year,

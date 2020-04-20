@@ -44,7 +44,7 @@ from reversion.models import Version
 
 from base import models as mdl
 from base.business import education_group as education_group_business
-from base.business.education_groups import perms, general_information
+from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
@@ -200,16 +200,15 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            # TODO remplacera la version de load_tree.load existante actuellement
-            # program_tree = load_tree.load(self.offer.id,
-            #                               '' if self.version_name == '-' else self.version_name,
-            #                               self.transition == 'transition',
-            #                               self.offer.academic_year.year,
-            #                               self.offer.acronym)
-            program_tree = load_tree.load(self.offer.id)
-            serialized_data = program_tree_view_serializer(program_tree)
+            program_tree_version = load_tree.load_version(
+                self.offer.acronym,
+                self.offer.academic_year.year,
+                self.version_name,
+                self.transition
+            )
+            serialized_data = program_tree_view_serializer(program_tree_version.tree)
             context['tree'] = json.dumps(serialized_data)
-            context["current_node"] = program_tree.get_node_by_id_and_type(
+            context["current_node"] = program_tree_version.tree.get_node_by_id_and_type(
                 self.object.id,
                 node_type.NodeType.EDUCATION_GROUP
             )
