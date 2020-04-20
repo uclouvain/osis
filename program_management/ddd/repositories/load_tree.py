@@ -226,7 +226,7 @@ def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = Tr
         elem = {
             'is_transition': elt.is_transition,
             'version_name': elt.version_name,
-            'offer_id': elt.offer_id,
+            'offer': elt.offer,
             'title_fr': elt.title_fr,
             'title_en': elt.title_en,
             'root_group': elt.root_group

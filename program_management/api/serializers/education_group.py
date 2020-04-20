@@ -26,6 +26,7 @@
 from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
+from education_group.templatetags.version import build_url_identification_tab
 
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -33,15 +34,7 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         super().__init__(view_name='education_group_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        kwargs = {
-            'education_group_year_id': obj.educationgroupversion.offer.id
-        }
-        if obj.educationgroupversion.is_transition:
-            view_name = 'education_group_read_transition'
-        if obj.educationgroupversion.version_name != '':
-            kwargs.update({'version_name': obj.educationgroupversion.version_name})
-
-        return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
+        return build_url_identification_tab(obj.educationgroupversion)
 
 
 class EducationGroupSerializer(serializers.Serializer):

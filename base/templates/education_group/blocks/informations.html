@@ -27,7 +27,7 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {%  if displayed_version.is_standard %}
+            {%  if displayed_version.is_standard and not displayed_version.is_transition %}
                 {% dl_with_parent 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
             {% else %}
                 {% dl_with_parent_version 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title' versioned_field=True %}

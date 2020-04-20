@@ -51,14 +51,15 @@ def build_url_utilization_tab(a_version):
     return compute_url(UTILIZATION_URL_NAME, a_version)
 
 
-def compute_url(basic_url, a_version):
-    kwargs = {'education_group_year_id': a_version.offer_id}
+def compute_url(basic_url, a_version=None):
+    kwargs = {'education_group_year_id': a_version.offer.id}
     url_name = basic_url
-    if a_version.is_transition:
-        url_name = '{}_transition'.format(basic_url)
+    if a_version:
+        if a_version.is_transition:
+            url_name = '{}_transition'.format(basic_url)
 
-    if a_version.version_name:
-        kwargs.update({'version_name': a_version.version_name})
+        if a_version.version_name:
+            kwargs.update({'version_name': a_version.version_name})
 
     return reverse(url_name, kwargs=kwargs)
 
@@ -68,7 +69,7 @@ def url_dropdown(context, a_version):
     request = context['request']
     return _get_version_url_with_tab_to_show(a_version.version_name,
                                              request.GET.get('tab_to_show'),
-                                             a_version.offer_id,
+                                             a_version.offer.id,
                                              a_version.is_transition)
 
 

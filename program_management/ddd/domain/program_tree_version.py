@@ -62,7 +62,7 @@ class ProgramTreeVersion:
             tree: 'ProgramTree',
             version_name: str = STANDARD,
             is_transition: bool = False,
-            offer_id: int = None,
+            offer: int = None,
             title_fr: str = None,
             title_en: str = None,
             root_group = None
@@ -70,7 +70,7 @@ class ProgramTreeVersion:
         self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
-        self.offer_id = offer_id
+        self.offer = offer
         self.title_fr = title_fr
         self.title_en = title_en
         self.root_group = root_group

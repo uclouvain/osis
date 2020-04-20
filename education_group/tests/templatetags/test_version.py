@@ -28,7 +28,7 @@ import random
 from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from program_management.templatetags.version import compute_url, IDENTIFICATION_URL_NAME, ordered_version_list
+from education_group.templatetags.version import compute_url, IDENTIFICATION_URL_NAME, ordered_version_list
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 

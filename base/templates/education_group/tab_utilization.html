@@ -29,7 +29,8 @@
 {% endblock %}
 
 {% block details %}
-    <a href="{% url 'education_group_read' education_group_year.id  %}"
+    {% build_url_identification_tab displayed_version as url_identification %}
+    <a href="{{url_identification}}"
        id="lnk_offer_{education_group_year.id}}">{{ education_group_year.verbose }}</a>
     {% trans 'is using in' %} :
     <br><br>
