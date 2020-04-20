@@ -7,8 +7,8 @@ from base.models.enums.education_group_categories import Categories
 from education_group.auth import predicates
 from education_group.auth.roles.utils import EducationGroupTypeScopeRoleMixin
 from education_group.auth.scope import Scope
-from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import admin as osis_role_admin
+from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import predicates as osis_role_predicates
 
 
@@ -81,12 +81,12 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_program_edition_period_open,
+                (predicates.is_continuing_education_group_year | predicates.is_program_edition_period_open),
             'base.change_admissioncondition':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity &
-                predicates.is_program_edition_period_open,
+                (predicates.is_continuing_education_group_year | predicates.is_program_edition_period_open),
             'base.change_educationgrouporganization': osis_role_predicates.always_deny(
                     message=_('Coorganization can only be changed by central manager')
                 ),
