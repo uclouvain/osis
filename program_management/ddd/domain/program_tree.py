@@ -40,6 +40,8 @@ from program_management.models.enums import node_type
 
 from django.utils.translation import gettext_lazy as _
 
+from program_management.models.enums.node_type import NodeType
+
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
@@ -110,7 +112,7 @@ class ProgramTree:
             raise node.NodeNotFoundException
 
     @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
-    def get_node_by_id_and_type(self, node_id: int, node_type) -> 'Node':
+    def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
         """
         DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
         Return the corresponding node based on the node_id value with respect to the class.
