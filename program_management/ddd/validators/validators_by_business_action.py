@@ -31,9 +31,12 @@ from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
+from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
+from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
+from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -94,4 +97,22 @@ class DetachNodeValidatorList(BusinessListValidator):
 
         else:
             raise AttributeError("Unknown instance of node")
+        super().__init__()
+
+
+class UpdatePrerequisiteValidatorList(BusinessListValidator):
+
+    success_messages = ['Success']  # TODO :: set to correct success message
+
+    def __init__(
+            self,
+            prerequisite_string: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear',
+            program_tree: 'ProgramTree'
+    ):
+        self.validators = [
+            AuthorizedRootTypeForPrerequisite(program_tree.root_node),
+            PrerequisiteExpressionSyntaxValidator(prerequisite_string),
+            PrerequisiteItemsValidator(prerequisite_string, node, program_tree)
+        ]
         super().__init__()

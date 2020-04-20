@@ -36,6 +36,9 @@ from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     DetachNodeValidatorList
+from program_management.ddd.domain import prerequisite
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
+    UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
 
 from django.utils.translation import gettext_lazy as _
@@ -210,6 +213,29 @@ class ProgramTree:
 
     def clean_attach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
         validator = AttachNodeValidatorList(self, node_to_attach, path)
+        return validator.is_valid(), validator.messages
+
+    def set_prerequisite(
+            self,
+            prerequisite_expression: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear'
+    ) -> List['BusinessValidationMessage']:
+        """
+        Set prerequisite for the node corresponding to the path.
+        """
+        is_valid, messages = self.clean_set_prerequisite(prerequisite_expression, node)
+        if is_valid:
+            node.set_prerequisite(
+                prerequisite.factory.from_expression(prerequisite_expression, self.root_node.year)
+            )
+        return messages
+
+    def clean_set_prerequisite(
+            self,
+            prerequisite_expression: 'PrerequisiteExpression',
+            node: 'NodeLearningUnitYear'
+    ) -> (bool, List['BusinessValidationMessage']):
+        validator = UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
     def detach_node(self, path_to_node_to_detach: Path) -> Tuple[bool, List['BusinessValidationMessage']]:

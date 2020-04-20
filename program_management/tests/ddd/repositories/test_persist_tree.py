@@ -24,6 +24,8 @@
 #
 ##############################################################################
 from unittest.mock import patch
+from unittest import mock
+
 from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
@@ -34,6 +36,8 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
 from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -155,3 +159,14 @@ class TestPersistTree(TestCase):
             'order',
         ]
         pass
+
+
+class TestPersistPrerequisites(TestCase):
+    @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
+    def test_call_persist_(self, mock_persist_prerequisite):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
+
+        persist_tree.persist(tree)
+
+        mock_persist_prerequisite.assert_called_once_with(tree)

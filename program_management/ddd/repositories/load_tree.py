@@ -33,6 +33,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.ddd.domain.prerequisite import Prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
@@ -207,7 +208,7 @@ def __build_children(
         )
 
         if child_node.is_learning_unit():
-            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
+            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
         link_node = links['_'.join([str(parent_id), str(child_id)])]
