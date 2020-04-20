@@ -101,4 +101,4 @@ class DetachAuthorizedRelationshipValidator(BusinessValidator):
 
 class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
     def validate(self):
-        pass  # cf. AttachLearningUnitYearStrategy.id_valid
+        pass  # cf. AttachLearningUnitYearStrategy.id_valid  # TODO :: to implement !

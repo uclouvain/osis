@@ -43,8 +43,8 @@ class BusinessValidator(ABC):
     @property
     def messages(self) -> List[BusinessValidationMessage]:
         """
-        :return: All warnings, error, and success messages if validator is valid.
-        Return only warnings and success if validator is not valid.
+        :return: All warnings and success messages if validator is valid.
+        Return only errors and warnings if validator is not valid.
         """
         result = self._messages
         if not any(msg for msg in result if msg.is_error):

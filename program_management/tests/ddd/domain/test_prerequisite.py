@@ -124,7 +124,7 @@ class TestRemovePrerequisiteItem(SimpleTestCase):
         prerequisite = PrerequisiteFactory(prerequisite_item_groups=[])
         self.assertIsNone(prerequisite.remove_prerequisite_item('code', 2018))
         self.assertListEqual(prerequisite.get_all_prerequisite_items(), [])
-        self.assertFalse(prerequisite._has_changed)
+        self.assertFalse(prerequisite.has_changed)
 
     def test_when_item_to_remove_does_not_exist(self):
         existing_item = PrerequisiteItemFactory()
@@ -138,7 +138,7 @@ class TestRemovePrerequisiteItem(SimpleTestCase):
         inexisting_year = 99999
         self.assertIsNone(prerequisite.remove_prerequisite_item("Inexisting code", inexisting_year))
         self.assertListEqual(prerequisite.get_all_prerequisite_items(), [existing_item])
-        self.assertTrue(prerequisite._has_changed)
+        self.assertTrue(prerequisite.has_changed)
 
     def test_when_item_to_remove_exist(self):
         existing_item = PrerequisiteItemFactory()
@@ -151,7 +151,7 @@ class TestRemovePrerequisiteItem(SimpleTestCase):
         )
         self.assertIsNone(prerequisite.remove_prerequisite_item(existing_item.code, existing_item.year))
         self.assertListEqual(prerequisite.get_all_prerequisite_items(), list())
-        self.assertTrue(prerequisite._has_changed)
+        self.assertTrue(prerequisite.has_changed)
 
 
 class TestgetAllPrerequisiteItems(SimpleTestCase):
