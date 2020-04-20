@@ -34,7 +34,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 
@@ -52,7 +52,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             child_leaf=cls.learning_unit_year_child,
             child_branch=None
         )
-        cls.person = CentralManagerFactory("change_educationgroup", 'can_access_education_group')
+        cls.person = CentralManagerForUEFactory("change_educationgroup", 'view_educationgroup')
         PersonEntityFactory(person=cls.person,
                             entity=cls.education_group_year_parent.management_entity)
 
