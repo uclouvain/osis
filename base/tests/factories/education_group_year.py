@@ -178,6 +178,11 @@ class EducationGroupYearCommonFactory(EducationGroupYearFactory):
     )
 
 
-class ContinuingEducationGroupYearFactory(EducationGroupYearFactory):
+class ContinuingEducationTrainingFactory(EducationGroupYearFactory):
     acronym = 'acronym-FC'
     partial_acronym = 'acronym-FC'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        category=education_group_categories.TRAINING,
+        name=factory.fuzzy.FuzzyChoice(TrainingType.continuing_education_types())
+    )

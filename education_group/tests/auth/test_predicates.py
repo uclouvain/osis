@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -215,7 +215,7 @@ class TestIsContinuingEducationGroupYear(TestCase):
         self.addCleanup(self.predicate_context_mock.stop)
 
     def test_case_is_continuing_education_group_year(self):
-        education_group_year = ContinuingEducationGroupYearFactory()
+        education_group_year = ContinuingEducationTrainingFactory()
         self.assertTrue(
             predicates.is_continuing_education_group_year(
                 self.user,

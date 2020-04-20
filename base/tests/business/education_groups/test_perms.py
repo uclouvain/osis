@@ -34,7 +34,8 @@ from base.models.academic_calendar import get_academic_calendar_by_date_and_refe
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
+    EducationGroupYearMasterFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from education_group.auth.scope import Scope
@@ -101,10 +102,10 @@ class TestFacultyManagerRolePerms(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.entity = EntityFactory()
         cls.faculty_manager = FacultyManagerFactory(entity=cls.entity)
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.other_education_group_year = EducationGroupYearMasterFactory(
             academic_year=cls.current_academic_year, management_entity=cls.entity
         )
-        cls.continuing_education_group_year = ContinuingEducationGroupYearFactory(
+        cls.continuing_education_group_year = ContinuingEducationTrainingFactory(
             academic_year=cls.current_academic_year, management_entity=cls.entity
         )
 
@@ -149,7 +150,7 @@ class TestFacultyManagerRolePerms(TestCase):
         _assert_can_edit_view_information(
             test_case=self,
             view_name='education_group_year_admission_condition_edit',
-            object_id=self.education_group_year.id,
+            object_id=self.other_education_group_year.id,
             can_edit=True
         )
 
@@ -158,7 +159,7 @@ class TestFacultyManagerRolePerms(TestCase):
         _assert_can_edit_view_information(
             test_case=self,
             view_name='education_group_skills_achievements',
-            object_id=self.education_group_year.id,
+            object_id=self.other_education_group_year.id,
             can_edit=True
         )
 
@@ -169,11 +170,11 @@ class TestFacultyIUFCManagerRolePerms(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.entity = EntityFactory()
         cls.faculty_manager_iufc = FacultyManagerFactory(scopes=[Scope.IUFC.name], entity=cls.entity)
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.other_education_group_year = EducationGroupYearMasterFactory(
             academic_year=cls.current_academic_year, management_entity=cls.entity
         )
-        cls.continuing_education_group_year = ContinuingEducationGroupYearFactory(
-            academic_year=cls.current_academic_year, management_entity=cls.entity
+        cls.continuing_education_group_year = ContinuingEducationTrainingFactory(
+            academic_year=cls.current_academic_year, management_entity=cls.entity,
         )
 
     def setUp(self):
@@ -186,10 +187,17 @@ class TestFacultyIUFCManagerRolePerms(TestCase):
             'base.views.education_groups.achievement.detail.EducationGroupSkillsAchievements.can_show_view',
             return_value=True
         )
+
+        self.get_common_admission_condition_patcher = patch(
+            'base.views.education_groups.detail.get_appropriate_common_admission_condition',
+            return_value=None
+        )
         self.show_condition_patcher.start()
         self.show_skills_patcher.start()
+        self.get_common_admission_condition_patcher.start()
         self.addCleanup(self.show_condition_patcher.stop)
         self.addCleanup(self.show_skills_patcher.stop)
+        self.addCleanup(self.get_common_admission_condition_patcher.stop)
 
     def test_faculty_manager_iufc_can_edit_conditions_for_continuing_education_group_year(self):
         _assert_can_edit_view_information(
@@ -207,13 +215,12 @@ class TestFacultyIUFCManagerRolePerms(TestCase):
             can_edit=True
         )
 
-    @patch('base.views.education_groups.detail.get_appropriate_common_admission_condition', return_value=None)
     @patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_faculty_manager_iufc_cannot_edit_conditions_for_egy_period_open(self, mock_is_open, mock_common):
+    def test_faculty_manager_iufc_cannot_edit_conditions_for_egy_period_open(self, mock_is_open):
         _assert_can_edit_view_information(
             test_case=self,
             view_name='education_group_year_admission_condition_edit',
-            object_id=self.education_group_year.id,
+            object_id=self.other_education_group_year.id,
             can_edit=False
         )
 
@@ -222,7 +229,7 @@ class TestFacultyIUFCManagerRolePerms(TestCase):
         _assert_can_edit_view_information(
             test_case=self,
             view_name='education_group_skills_achievements',
-            object_id=self.education_group_year.id,
+            object_id=self.other_education_group_year.id,
             can_edit=False
         )
 
