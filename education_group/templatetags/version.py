@@ -65,34 +65,35 @@ def compute_url(basic_url, a_version=None):
 
 
 @register.inclusion_tag('education_group/blocks/dropdown/versions.html')
-def url_dropdown(all_versions_available, current_version, tab_to_show):
+def dropdown_versions(all_versions_available, current_version, tab_to_show):
     lst = []
-    ordered_versions_available = ordered_version_list(all_versions_available)
+    ordered_versions_available = _ordered_version_list(all_versions_available)
+
     for a_version in ordered_versions_available:
         lst.append({
-            'version_value': version_label(a_version),
+            'text': version_label(a_version),
             'selected':
-                'selected = "selected"' if a_version.version_name == current_version.version_name
-                                           and a_version.is_transition == current_version.is_transition else '',
-            'url_to_go': _get_version_url_with_tab_to_show(a_version.version_name,
-                                                           tab_to_show,
-                                                           a_version.offer.id,
-                                                           a_version.is_transition)
+                a_version.version_name == current_version.version_name and
+                a_version.is_transition == current_version.is_transition,
+            'value': _get_version_url_with_tab_to_show(a_version.version_name,
+                                                       tab_to_show,
+                                                       a_version.offer.id,
+                                                       a_version.is_transition)
         })
     return {'ordered_versions_available': lst}
 
 
 @register.inclusion_tag('education_group/blocks/dropdown/version_years.html')
-def url_dropdown_academic_year(offer_id, current_version, academic_years, tab_to_show):
+def dropdown_academic_years(offer_id, current_version, academic_years, tab_to_show):
     lst = []
     for version_by_year in academic_years:
         lst.append(
-            {'year': version_by_year.academic_year.year,
-             'selected': 'selected = "selected"' if version_by_year.education_group_id.id == offer_id else '',
-             'url_to_go': _get_version_url_with_tab_to_show(current_version.version_name,
-                                                            tab_to_show,
-                                                            version_by_year.education_group_id.id,
-                                                            current_version.is_transition)
+            {'text': version_by_year.academic_year.year,
+             'selected': version_by_year.education_group_id.id == offer_id,
+             'value': _get_version_url_with_tab_to_show(current_version.version_name,
+                                                        tab_to_show,
+                                                        version_by_year.education_group_id.id,
+                                                        current_version.is_transition)
              }
         )
     return {'version_academic_years': lst}
@@ -122,8 +123,7 @@ def version_label(a_version):
     return _('Standard') if a_version.version_name == '' and not a_version.is_transition else a_version.version_label
 
 
-@register.simple_tag
-def ordered_version_list(version_list):
+def _ordered_version_list(version_list):
     # List has to be ordered like this
     # Standard version first
     # Transition version second
