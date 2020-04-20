@@ -42,10 +42,13 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
     queryset = EducationGroupVersion.objects.all().select_related('offer__academic_year')
     pagination_class = None
     filter_backends = ()
+    tree = None
+
+    def get_tree(self):
+        return self.tree
 
     def get_queryset(self):
-        context = self.get_serializer_context()
-        return context['tree'].get_nodes_that_have_prerequisites()
+        return self.get_tree().get_nodes_that_have_prerequisites() if self.get_tree() else None
 
     def get_object(self):
         acronym = self.kwargs['acronym']
@@ -62,11 +65,11 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
 
     def get_serializer_context(self):
         education_group_version = self.get_object()
-        tree = load_tree.load(education_group_version.offer.id)
+        self.tree = load_tree.load(education_group_version.offer.id)
         serializer_context = super().get_serializer_context()
         serializer_context.update({
             'request': self.request,
-            'tree': tree
+            'tree': self.get_tree()
         })
         return serializer_context
 

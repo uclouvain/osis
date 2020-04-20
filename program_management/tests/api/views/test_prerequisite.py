@@ -70,7 +70,7 @@ class ProgramTreePrerequisitesBaseTestCase(APITestCase):
                                                     specific_title_fr="Partie 1",
                                                     year=2018)
         cls.subgroup1 = NodeGroupYearFactory(node_id=5, code="LSUBGR100G", title="Sous-groupe 1", year=2018)
-        cls.subgroup2 = NodeGroupYearFactory(node_id=10, code="LSUBGR190G", title="Sous-groupe 3", year=2018)
+        cls.subgroup2 = NodeGroupYearFactory(node_id=10, code="LSUBGR190G", title="Sous-groupe 2", year=2018)
 
         cls.ldroi1300 = NodeLearningUnitYearFactory(node_id=7,
                                                     code="LDROI1300",
@@ -147,15 +147,15 @@ class TrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch('program_management.api.views.prerequisite.TrainingPrerequisites.get_queryset')
-    def test_get_results(self, mock_get_queryset):
-        mock_get_queryset.return_value = self.tree.get_nodes_that_have_prerequisites()
+    @patch('program_management.api.views.prerequisite.TrainingPrerequisites.get_tree')
+    def test_get_results(self, mock_tree):
+        mock_tree.return_value = self.tree
         response = self.client.get(self.url)
         with self.subTest('Test status code'):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         with self.subTest('Test response'):
-            self.assertEqual([self.serializer.data], response.json())
+            self.assertEqual(response.data, [self.serializer.data])
 
 
 @override_settings(LANGUAGES=[('fr', 'Français'), ], LANGUAGE_CODE='fr')
@@ -203,12 +203,12 @@ class MiniTrainingPrerequisitesTestCase(ProgramTreePrerequisitesBaseTestCase):
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @patch('program_management.api.views.prerequisite.MiniTrainingPrerequisites.get_queryset')
-    def test_get_results(self, mock_get_queryset):
-        mock_get_queryset.return_value = self.tree.get_nodes_that_have_prerequisites()
+    @patch('program_management.api.views.prerequisite.MiniTrainingPrerequisites.get_tree')
+    def test_get_results(self, mock_tree):
+        mock_tree.return_value = self.tree
         response = self.client.get(self.url)
         with self.subTest('Test status code'):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         with self.subTest('Test response'):
-            self.assertEqual([self.serializer.data], response.json())
+            self.assertEqual(response.data, [self.serializer.data])
