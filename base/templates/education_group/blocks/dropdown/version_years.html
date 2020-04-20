@@ -1,0 +1,13 @@
+{% load i18n version %}
+<label>
+    <select class="form-control"
+            name="academic_year"
+            id="id_academic_year_search"
+            onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+            {%  for elt in version_academic_years %}
+                <option value="{{ elt.url_to_go }}" {{ elt.selected }}>
+                    {{ elt.year }}
+                    </option>
+            {% endfor %}
+    </select>
+</label>

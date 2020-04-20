@@ -50,23 +50,7 @@
                 </a>
 
                 {% if offer == education_group_year %}
-                    <label>
-                        <select class="form-control"
-                                name="academic_year"
-                                id="id_academic_year_search"
-                                onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for version_academic_year in academic_years %}
-                                {% url_dropdown_academic_year version_academic_year.education_group_id.id as url_to_go %}
-                                    <option value="{{ url_to_go }}"
-                                    {% if version_academic_year.education_group_id.id == offer.id %}
-                                            selected="selected"
-                                        {% endif %}>
-                                        {{ version_academic_year.academic_year.year }}
-                                    </option>
-
-                            {% endfor %}
-                        </select>
-                    </label>
+                    {% url_dropdown_academic_year offer.id current_version academic_years request.GET.tab_to_show %}
                      {% if all_versions_available %}
                      <label>
                      {% ordered_version_list all_versions_available as ordered_versions_available %}

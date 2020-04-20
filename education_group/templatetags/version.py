@@ -73,14 +73,20 @@ def url_dropdown(context, a_version):
                                              a_version.is_transition)
 
 
-@register.simple_tag(takes_context=True)
-def url_dropdown_academic_year(context, offer_id):
-    a_version = context['current_version']
-    request = context['request']
-    return _get_version_url_with_tab_to_show(a_version.version_name,
-                                             request.GET.get('tab_to_show'),
-                                             offer_id,
-                                             a_version.is_transition)
+@register.inclusion_tag('education_group/blocks/dropdown/version_years.html')
+def url_dropdown_academic_year(offer_id, current_version, academic_years, tab_to_show):
+    lst = []
+    for version_by_year in academic_years:
+        lst.append(
+            {'year': version_by_year.academic_year.year,
+             'selected': 'selected = "selected"' if version_by_year.education_group_id.id == offer_id else '',
+             'url_to_go': _get_version_url_with_tab_to_show(current_version.version_name,
+                                                            tab_to_show,
+                                                            version_by_year.education_group_id.id,
+                                                            current_version.is_transition)
+             }
+        )
+    return {'version_academic_years': lst}
 
 
 def _get_version_url_with_tab_to_show(version_name, tab_to_show, offer_id, is_transition):
