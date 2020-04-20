@@ -38,7 +38,6 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import Prerequisite, NullPrerequisite
-
 from program_management.models.enums.node_type import NodeType
 
 
@@ -168,6 +167,16 @@ class Node:
     @property
     def children_as_nodes(self) -> List['Node']:
         return [link.child for link in self.children]
+
+    @property
+    def children_and_reference_children(self) -> List['Link']:
+        links = []
+        for link in self.children:
+            if link.link_type != LinkTypes.REFERENCE:
+                links.append(link)
+            else:
+                links += link.child.children
+        return links
 
     def get_children_types(self, include_nodes_used_as_reference=False) -> List[EducationGroupTypesEnum]:
         if not include_nodes_used_as_reference:
