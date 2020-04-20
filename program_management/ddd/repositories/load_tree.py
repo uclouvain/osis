@@ -66,8 +66,8 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
             'is_prerequisite_dict': is_prerequisites.get(tree_root_id) or {},
         }
-        sstructure = [s for s in structure if s['starting_node_id'] == tree_root_id]
-        tree = __build_tree(root_node, sstructure, nodes, links, tree_prerequisites)
+        structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
+        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
         trees.append(tree)
         del nodes[unique_key]
     return trees
@@ -176,7 +176,8 @@ def __build_tree(
 ) -> 'ProgramTree':
     structure_by_parent = {}  # For performance
     for s_dict in tree_structure:
-        structure_by_parent.setdefault(s_dict['parent_id'], []).append(s_dict)
+        parent_path = '|'.join(s_dict['path'].split('|')[:-1])
+        structure_by_parent.setdefault(parent_path, []).append(s_dict)
     root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
     tree = ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
     return tree
@@ -184,23 +185,22 @@ def __build_tree(
 
 def __build_children(
         root_path: 'Path',
-        map_node_id_with_tree_structure: Dict[NodeId, TreeStructure],
+        map_parent_path_with_tree_structure: Dict['Path', TreeStructure],
         nodes: Dict[NodeKey, 'Node'],
         links: Dict[LinkKey, 'Link'],
         prerequisites
 ) -> List['Link']:
     children = []
-    # TODO :: fix big problem of recursivity with DROI2M...
-    parent_id_from_path = int(root_path.split('|')[-1]) if root_path else None
-    for child_structure in map_node_id_with_tree_structure.get(parent_id_from_path) or []:
+    for child_structure in map_parent_path_with_tree_structure.get(root_path) or []:
         child_id = child_structure['child_id']
-        if not child_id:
-            continue  # TODO :: To remove when child_leaf an child_branch will disappear !
+        parent_id = child_structure['parent_id']
+        if not child_id or not parent_id:
+            continue  # TODO :: To remove when child_leaf and child_branch will disappear !
         ntype = NodeType.LEARNING_UNIT if child_structure['child_leaf_id'] else NodeType.EDUCATION_GROUP
         child_node = nodes['{}_{}'.format(child_id, ntype)]
         child_node.children = __build_children(
             child_structure['path'],
-            map_node_id_with_tree_structure,
+            map_parent_path_with_tree_structure,
             nodes,
             links,
             prerequisites
@@ -210,7 +210,6 @@ def __build_children(
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        parent_id = child_structure['parent_id']
         link_node = links['_'.join([str(parent_id), str(child_id)])]
         link_node.parent = nodes['{}_{}'.format(parent_id, NodeType.EDUCATION_GROUP)]
         link_node.child = child_node
