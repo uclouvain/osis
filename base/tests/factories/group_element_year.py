@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import string
+import random
 
 import factory.fuzzy
 
@@ -39,12 +40,11 @@ def _generate_block_value():
 
     Ex: "", "156", "2", "456" and so on
     """
-    rand = factory.fuzzy._random
 
     population = list(range(1, 7))
-    k = rand.randint(0, len(population))
+    k = random.randint(0, len(population))
 
-    sample = rand.sample(population, k)
+    sample = random.sample(population, k)
     sample.sort()
 
     return int("".join([str(element) for element in sample])) if sample else None

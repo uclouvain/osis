@@ -21,30 +21,62 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db.models import Prefetch
+import itertools
+import random
+from typing import Dict, List
 
-from base.business.education_groups import create
-from base.models.education_group import EducationGroup
+from base.models.academic_year import current_academic_year
+from base.models.authorized_relationship import AuthorizedRelationship
+from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 
 
 class ProgramGenerators:
     def __init__(self):
-        self.trainings = EducationGroup.objects.filter(
-            educationgroupyear__education_group_type__category=education_group_categories.TRAINING
-        ).prefetch_related(
-            Prefetch(
-                "educationgroupyear_set",
-                EducationGroupYear.objects.order_by("academic_year__year"),
-                to_attr="educationgroupyears"
-            )
+        self.trainings = EducationGroupYear.objects.filter(
+            academic_year=current_academic_year()
+        ).select_related("education_group_type")
+        self.learning_unit_years = list(LearningUnitYear.objects.filter(
+            academic_year=current_academic_year()
+        ))
+
+        self.relationships = self._load_authorized_relationships()
+        self.create_structure()
+
+    def _load_authorized_relationships(self) -> Dict[EducationGroupType, List[AuthorizedRelationship]]:
+        all_relationships = AuthorizedRelationship.objects.all().order_by(
+            "parent_type"
+        ).select_related(
+            "parent_type",
+            "child_type"
         )
+        result = {}
+        relationships_group_by_parent = itertools.groupby(all_relationships, lambda relationship: relationship.parent_type)
+        for parent, parent_relationships in relationships_group_by_parent:
+            result[parent] = list(parent_relationships)
+        return result
 
-        self._create_initial_structure()
-
-    def _create_initial_structure(self):
+    def create_structure(self):
         for training in self.trainings:
-            create.create_initial_group_element_year_structure(list(training.educationgroupyears))
+            self._create_structure(training)
 
-        EducationGroupYear.objects.exclude(education_group_type__category=education_group_categories.TRAINING)
+    def _create_structure(self, education_group_year_obj: EducationGroupYear, level=3):
+        if level <= 0 and education_group_year_obj.education_group_type.learning_unit_child_allowed:
+            GroupElementYearChildLeafFactory(
+                parent=education_group_year_obj,
+                child_leaf=random.choice(self.learning_unit_years)
+            )
+
+        relationships = self.relationships.get(education_group_year_obj.education_group_type, [])
+        for relationship in relationships:
+            generate = bool(random.randint(0, 1))
+            if not (relationship.min_count_authorized == 1 or generate):
+                continue
+            grp = GroupElementYearFactory(
+                parent=education_group_year_obj,
+                child_branch__education_group_type=relationship.child_type
+            )
+            self._create_structure(grp.child_branch, level=level-1)
+
