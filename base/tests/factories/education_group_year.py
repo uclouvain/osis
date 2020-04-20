@@ -176,3 +176,8 @@ class EducationGroupYearCommonFactory(EducationGroupYearFactory):
         name=MiniTrainingType.DEEPENING.name,
         category=education_group_categories.MINI_TRAINING
     )
+
+
+class ContinuingEducationGroupYearFactory(EducationGroupYearFactory):
+    acronym = 'acronym-FC'
+    partial_acronym = 'acronym-FC'

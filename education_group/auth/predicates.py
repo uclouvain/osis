@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
 from base.business.event_perms import EventPermEducationGroupEdition
@@ -6,7 +7,6 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_categories import Categories
 from osis_role import errors
 from osis_role.errors import predicate_failed_msg
-from django.utils.translation import gettext_lazy as _, pgettext
 
 
 @predicate(bind=True)
@@ -62,6 +62,11 @@ def is_user_attached_to_management_entity(self, user, education_group_year=None)
 @predicate_failed_msg(message=EventPermEducationGroupEdition.error_msg)
 def is_program_edition_period_open(self, user, education_group_year=None):
     return EventPermEducationGroupEdition(obj=education_group_year, raise_exception=False).is_open()
+
+
+@predicate(bind=True)
+def is_continuing_education_group_year(self, user, education_group_year=None):
+    return education_group_year and education_group_year.is_continuing_education_education_group_year
 
 
 @predicate(bind=True)

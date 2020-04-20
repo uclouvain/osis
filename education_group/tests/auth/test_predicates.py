@@ -3,7 +3,7 @@ from django.test import TestCase, override_settings
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -194,6 +194,41 @@ class TestIsEditionProgramPeriodOpen(TestCase):
             predicates.is_program_edition_period_open(
                 self.user,
                 self.education_group_year
+            )
+        )
+
+
+class TestIsContinuingEducationGroupYear(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory.build()
+
+    def setUp(self):
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_case_is_continuing_education_group_year(self):
+        education_group_year = ContinuingEducationGroupYearFactory()
+        self.assertTrue(
+            predicates.is_continuing_education_group_year(
+                self.user,
+                education_group_year
+            )
+        )
+
+    def test_case_is_not_continuing_education_group_year(self):
+        education_group_year = EducationGroupYearFactory()
+        self.assertFalse(
+            predicates.is_continuing_education_group_year(
+                self.user,
+                education_group_year
             )
         )
 
