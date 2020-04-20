@@ -64,13 +64,22 @@ def compute_url(basic_url, a_version=None):
     return reverse(url_name, kwargs=kwargs)
 
 
-@register.simple_tag(takes_context=True)
-def url_dropdown(context, a_version):
-    request = context['request']
-    return _get_version_url_with_tab_to_show(a_version.version_name,
-                                             request.GET.get('tab_to_show'),
-                                             a_version.offer.id,
-                                             a_version.is_transition)
+@register.inclusion_tag('education_group/blocks/dropdown/versions.html')
+def url_dropdown(all_versions_available, current_version, tab_to_show):
+    lst = []
+    ordered_versions_available = ordered_version_list(all_versions_available)
+    for a_version in ordered_versions_available:
+        lst.append({
+            'version_value': version_label(a_version),
+            'selected':
+                'selected = "selected"' if a_version.version_name == current_version.version_name
+                                           and a_version.is_transition == current_version.is_transition else '',
+            'url_to_go': _get_version_url_with_tab_to_show(a_version.version_name,
+                                                           tab_to_show,
+                                                           a_version.offer.id,
+                                                           a_version.is_transition)
+        })
+    return {'ordered_versions_available': lst}
 
 
 @register.inclusion_tag('education_group/blocks/dropdown/version_years.html')

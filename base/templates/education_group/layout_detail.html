@@ -51,22 +51,8 @@
 
                 {% if offer == education_group_year %}
                     {% url_dropdown_academic_year offer.id current_version academic_years request.GET.tab_to_show %}
-                     {% if all_versions_available %}
-                     <label>
-                     {% ordered_version_list all_versions_available as ordered_versions_available %}
-                        <select class="form-control"
-                                onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for version in ordered_versions_available %}
-                                {% url_dropdown version as url_to_go %}
-                                <option value="{{ url_to_go }}"
-                                {% if version.version_name == current_version.version_name and version.is_transition == current_version.is_transition %}
-                                            selected="selected"
-                                {% endif %}>
-                                    {{ version|version_label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        </label>
+                    {% if all_versions_available %}
+                        {% url_dropdown all_versions_available current_version request.GET.tab_to_show %}
                     {% endif %}
                 {% endif %}
                 <div class="pull-right" style="margin-right: 15px;">
