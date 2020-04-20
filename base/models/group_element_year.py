@@ -107,20 +107,15 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 adjacency_query AS (
                     SELECT
-                        parent_id as starting_node_id,
+                        parent_element_id as starting_node_id,
                         id,
-                        child_branch_id,
-                        child_leaf_id,
-                        parent_id,
+                        child_element_id,
+                        parent_element_id,
                         "order",
                         0 AS level,
-                        CAST(parent_id || '|' ||
+                        CAST(parent_element_id || '|' ||
                             (
-                                CASE
-                                WHEN child_branch_id is not null
-                                    THEN child_branch_id
-                                    ELSE child_leaf_id
-                                END
+                                child_element_id
                             ) as varchar(1000)
                         ) As path
                     FROM base_groupelementyear
@@ -130,29 +125,25 @@ class GroupElementYearManager(models.Manager):
 
                     SELECT parent.starting_node_id,
                            child.id,
-                           child.child_branch_id,
-                           child.child_leaf_id,
-                           child.parent_id,
+                           child.child_element_id,
+                           child.parent_element_id,
                            child.order,
                            parent.level + 1,
                            CAST(
                                 parent.path || '|' ||
                                     (
-                                        CASE
-                                        WHEN child.child_branch_id is not null
-                                            THEN child.child_branch_id
-                                            ELSE child.child_leaf_id
-                                        END
+                                        child.child_element_id
                                     ) as varchar(1000)
                                ) as path
                     FROM base_groupelementyear AS child
-                    INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
+                    INNER JOIN adjacency_query AS parent on parent.child_element_id = child.parent_element_id
                 )
-            SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id,
-            COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path
+            SELECT distinct starting_node_id, adjacency_query.id, child_element_id, parent_element_id,
+                   child_element_id AS child_id, "order", level, path
             FROM adjacency_query
-            LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
-            WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null
+            JOIN program_management_element elem on elem.id = adjacency_query.child_element_id
+            LEFT JOIN base_learningunityear bl on bl.id = elem.learning_unit_year_id
+            WHERE bl.id is null or bl.learning_container_year_id is not null
             ORDER BY starting_node_id, level, "order";
         """
         parameters = {
@@ -160,6 +151,7 @@ class GroupElementYearManager(models.Manager):
         }
         return self.fetch_all(adjacency_query_template, parameters)
 
+    # TODO: Change reverse queryset in order to take account of new model
     def get_reverse_adjacency_list(
             self,
             child_leaf_ids=None,

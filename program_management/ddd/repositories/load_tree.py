@@ -26,8 +26,7 @@
 
 from typing import List, Dict, Any
 
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Case, F, When, IntegerField, Subquery, OuterRef
+from django.db.models import Case, F, When
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -42,8 +41,7 @@ from program_management.models.enums.node_type import NodeType
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import IntegerField, ExpressionWrapper
+from django.db.models import IntegerField
 from education_group.models.group_year import GroupYear
 
 
@@ -53,17 +51,28 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
+def load_version(version_name: str, transition: bool, year: int, acronym: str) -> 'ProgramTreeVersion':
+    education_group_version = EducationGroupVersion.objects.get(
+        offer__acronym=acronym,
+        offer__academic_year__year=year,
+        version_name=version_name,
+        is_transition=transition
+    )
+
+    tree = load(education_group_version.root_group_id)
+    return ProgramTreeVersion(
+        tree,
+        education_group_version.version_name,
+        education_group_version.is_transition,
+        education_group_version.offer_id,
+        education_group_version.title_fr,
+        education_group_version.title_en,
+        tree.root_node
+    )
+
+
 def load(tree_root_id: int) -> 'ProgramTree':
-    # TODO a utiliser quand on utilisera le ddd def load(tree_root_id: int, version_name, transition, year, acronym)
-    #  -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
-    # TODO a utiliser quand on utilisera le ddd
-    #     version = EducationGroupVersion.objects.filter(offer__acronym=acronym,
-    #                                                    offer__academic_year__year=year,
-    #                                                    version_name=version_name,
-    #                                                    is_transition=transition)\
-    #         .select_related('root_group', 'offer').first()
-    #     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
@@ -246,15 +255,3 @@ def find_all_versions_academic_year(acronym: str,
     for elem in qs:
         results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))
     return results
-
-#
-#
-# def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
-#     qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
-#         .select_related('offer').order_by('version_name')
-#
-#     qs = qs.values('is_transition', 'version_name', 'offer_id', 'title_fr', 'title_en')
-#     results = []
-#     for elem in qs:
-#         results.append(ProgramTreeVersion(**elem, tree=load_tree))
-#     return results
