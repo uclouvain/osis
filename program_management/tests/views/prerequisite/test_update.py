@@ -52,7 +52,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             child_leaf=cls.learning_unit_year_child,
             child_branch=None
         )
-        cls.person = CentralManagerForUEFactory("change_educationgroup", 'can_access_education_group')
+        cls.person = CentralManagerForUEFactory("change_educationgroup", 'view_educationgroup')
         PersonEntityFactory(person=cls.person,
                             entity=cls.education_group_year_parent.management_entity)
 
