@@ -80,10 +80,10 @@ def dropdown_versions(all_versions_available, current_version, tab_to_show):
                                                        a_version.offer.id,
                                                        a_version.is_transition)
         })
-    return {'ordered_versions_available': lst}
+    return {'options': lst}
 
 
-@register.inclusion_tag('education_group/blocks/dropdown/version_years.html')
+@register.inclusion_tag('education_group/blocks/dropdown/versions.html')
 def dropdown_academic_years(offer_id, current_version, academic_years, tab_to_show):
     lst = []
     for version_by_year in academic_years:
@@ -96,7 +96,7 @@ def dropdown_academic_years(offer_id, current_version, academic_years, tab_to_sh
                                                         current_version.is_transition)
              }
         )
-    return {'version_academic_years': lst}
+    return {'options': lst}
 
 
 def _get_version_url_with_tab_to_show(version_name, tab_to_show, offer_id, is_transition):

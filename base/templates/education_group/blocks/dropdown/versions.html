@@ -25,10 +25,10 @@
 <label>
     <select class="form-control"
             onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-        {% for version in ordered_versions_available %}
-            <option value="{{ version.value }}"
-                    {% if version.selected %} selected="selected"{% endif %}>
-                {{ version.text }}
+        {% for option in options %}
+            <option value="{{ option.value }}"
+                    {% if option.selected %} selected="selected"{% endif %}>
+                {{ option.text }}
             </option>
         {% endfor %}
     </select>
