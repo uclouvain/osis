@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -682,9 +682,3 @@ def get_appropriate_common_admission_condition(edy):
         common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
         return common_admission_condition
     return None
-
-
-def _current_version(versions, version_name, transition):
-    for a_version in versions:
-        if a_version.version_name == version_name and a_version.is_transition == transition:
-            return a_version
