@@ -54,6 +54,7 @@ from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.detail import CatalogGenericDetailView, EducationGroupGenericDetailView
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
 class EducationGroupRead(TestCase):
@@ -61,8 +62,11 @@ class EducationGroupRead(TestCase):
     def setUpTestData(cls):
         academic_year = AcademicYearFactory(current=True)
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_parent)
         cls.education_group_child_1 = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_child_1)
         cls.education_group_child_2 = EducationGroupYearFactory(acronym="Child_2", academic_year=academic_year)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_child_2)
 
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child_1)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child_2)
@@ -194,6 +198,7 @@ class TestReadEducationGroup(TestCase):
 
     def test_training_template_used(self):
         training = TrainingFactory()
+        StandardEducationGroupVersionFactory(offer=training)
         url = reverse("education_group_read", args=[training.pk, training.pk])
         expected_template = "education_group/identification_training_details.html"
 
@@ -202,6 +207,7 @@ class TestReadEducationGroup(TestCase):
 
     def test_mini_training_template_used(self):
         mini_training = MiniTrainingFactory()
+        StandardEducationGroupVersionFactory(offer=mini_training)
         url = reverse("education_group_read", args=[mini_training.pk, mini_training.pk])
         expected_template = "education_group/identification_mini_training_details.html"
 
@@ -210,6 +216,7 @@ class TestReadEducationGroup(TestCase):
 
     def test_group_template_used(self):
         group = GroupFactory()
+        StandardEducationGroupVersionFactory(offer=group)
         url = reverse("education_group_read", args=[group.pk, group.pk])
         expected_template = "education_group/identification_group_details.html"
 
@@ -221,6 +228,7 @@ class TestReadEducationGroup(TestCase):
             education_group_type__category=TRAINING,
             education_group_type__name=TrainingType.CAPAES.name
         )
+        StandardEducationGroupVersionFactory(offer=training_not_2m)
         url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
 
         response = self.client.get(url)
@@ -231,6 +239,7 @@ class TestReadEducationGroup(TestCase):
             education_group_type__category=TRAINING,
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
+        StandardEducationGroupVersionFactory(offer=training_2m)
         url = reverse("education_group_read", args=[training_2m.pk, training_2m.pk])
 
         response = self.client.get(url)
@@ -243,6 +252,7 @@ class TestReadEducationGroup(TestCase):
             education_group_type__name=TrainingType.CAPAES.name,
             academic_year=self.academic_year
         )
+        StandardEducationGroupVersionFactory(offer=training_not_2m)
         url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
         self.client.force_login(person.user)
 
@@ -258,6 +268,7 @@ class TestReadEducationGroup(TestCase):
 
     def test_context_contains_show_tabs_args(self):
         group = GroupFactory()
+        StandardEducationGroupVersionFactory(offer=group)
         url = reverse("education_group_read", args=[group.pk, group.pk])
 
         response = self.client.get(url)
@@ -283,6 +294,7 @@ class TestReadEducationGroup(TestCase):
         )
 
         training = TrainingFactory()
+        StandardEducationGroupVersionFactory(offer=training)
         url = reverse("education_group_read", args=[training.pk, training.pk])
         response = self.client.get(url)
         self.assertNotEqual(response.context["current_academic_year"], starting_academic_year)
@@ -293,6 +305,7 @@ class TestReadEducationGroup(TestCase):
             academic_year=self.academic_year,
             education_group_type=EducationGroupTypeFactory(name=TrainingType.BACHELOR.name)
         )
+        StandardEducationGroupVersionFactory(offer=main_common)
         url = reverse("education_group_read", args=[main_common.pk, main_common.pk])
 
         response = self.client.get(url)
@@ -310,6 +323,7 @@ class TestReadEducationGroup(TestCase):
         agregation_common = EducationGroupYearCommonAgregationFactory(
             academic_year=self.academic_year
         )
+        StandardEducationGroupVersionFactory(offer=agregation_common)
 
         url = reverse("education_group_read", args=[agregation_common.pk, agregation_common.pk])
 
@@ -328,6 +342,7 @@ class TestReadEducationGroup(TestCase):
         edy = EducationGroupYearFactory(
             academic_year=AcademicYearFactory(year=self.academic_year.year + 2),
         )
+        StandardEducationGroupVersionFactory(offer=edy)
 
         url = reverse("education_group_read", args=[edy.pk, edy.pk])
 
@@ -340,6 +355,7 @@ class TestReadEducationGroup(TestCase):
         edy = EducationGroupYearFactory(
             academic_year=AcademicYearFactory(year=2016),
         )
+        StandardEducationGroupVersionFactory(offer=edy)
 
         url = reverse("education_group_read", args=[edy.pk, edy.pk])
 
@@ -355,6 +371,7 @@ class TestReadEducationGroup(TestCase):
             academic_year=self.academic_year,
             education_group_type=group_type,
         )
+        StandardEducationGroupVersionFactory(offer=group)
         url = reverse("education_group_read", args=[group.pk, group.pk])
         response = self.client.get(url)
 
@@ -367,6 +384,7 @@ class TestReadEducationGroup(TestCase):
             academic_year=self.academic_year,
             education_group_type=common_type,
         )
+        StandardEducationGroupVersionFactory(offer=group)
         url = reverse("education_group_read", args=[group.pk, group.pk])
         response = self.client.get(url)
 
@@ -380,8 +398,10 @@ class EducationGroupDiplomas(TestCase):
         type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
                                                                education_group_type=type_training)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_parent)
         cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
                                                               education_group_type=type_training)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_child)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
         cls.user = UserFactory()
         cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
@@ -421,6 +441,7 @@ class EducationGroupDiplomas(TestCase):
         url = reverse("education_group_diplomas",
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
+        StandardEducationGroupVersionFactory(offer=mini_training_education_group_year)
         expected_url = reverse("education_group_read",
                                args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         self.assertEqual(expected_url, response.url)
@@ -442,6 +463,7 @@ class EducationGroupDiplomas(TestCase):
                       )
 
         response = self.client.get(url)
+        StandardEducationGroupVersionFactory(offer=group_education_group_year)
         expected_url = reverse("education_group_read",
                                args=[group_education_group_year.id, group_education_group_year.id])
         self.assertEqual(expected_url, response.url)
@@ -510,6 +532,7 @@ class TestUtilizationTab(TestCase):
         cls.academic_year = AcademicYearFactory()
         cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_year_2)
         cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
@@ -564,6 +587,7 @@ class TestContent(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         cls.education_group_year_1 = EducationGroupYearFactory(academic_year=cls.current_academic_year)
+        StandardEducationGroupVersionFactory(offer=cls.education_group_year_1)
         cls.education_group_year_2 = EducationGroupYearFactory(academic_year=cls.current_academic_year)
         cls.education_group_year_3 = EducationGroupYearFactory(academic_year=cls.current_academic_year)
         cls.learning_unit_year_1 = LearningUnitYearFactory()
