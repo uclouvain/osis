@@ -156,7 +156,10 @@ class ElementCache(OsisCache):
         )
 
     def equals_element(self, element_id: int) -> bool:
-        return self.cached_data['id'] == element_id
+        return (
+            self.cached_data
+            and self.cached_data['id'] == element_id
+        )
 
     def save_element_selected(
             self,
