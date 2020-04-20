@@ -54,7 +54,7 @@ class BusinessValidationMessage:
         return "%(msg)s" % {'msg': self.message}
 
     def __repr__(self):
-        return  "%(level)s %(msg)s" % {'level': self.level, 'msg': self.message}
+        return "%(level)s %(msg)s" % {'level': self.level, 'msg': self.message}
 
     def is_error(self):
         return self.level == MessageLevel.ERROR
