@@ -31,4 +31,4 @@ use_step_matcher("re")
 @step("suspend")
 def step_impl(context: Context):
     import time
-    time.sleep(10)
+    time.sleep(60)

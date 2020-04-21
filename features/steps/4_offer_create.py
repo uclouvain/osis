@@ -30,7 +30,8 @@ from waffle.models import Flag
 
 from features.forms.education_groups import create_form
 from features.pages.education_group.pages import SearchEducationGroupPage, UpdateTrainingPage, EducationGroupPage, \
-    NewTrainingPage
+    NewTrainingPage, QuickSearchPage
+from features.steps.utils import query
 
 use_step_matcher("parse")
 
@@ -86,6 +87,20 @@ def step_impl(context: Context, value: str, field: str):
         setattr(page, slug_field, value)
     else:
         raise AttributeError(page.__class__.__name__ + " has no " + slug_field)
+
+
+@step("Offre Encoder le code d'une UE")
+def step_impl(context: Context):
+    page = QuickSearchPage(driver=context.browser)
+    code = query.get_random_learning_unit().acronym
+    page.code = code
+    context.luy_to_attach = code
+
+
+@step("Cliquer sur le bouton Rechercher (recherche rapide)")
+def step_impl(context: Context):
+    page = QuickSearchPage(driver=context.browser)
+    page.search.click()
 
 
 @step("Offre création Cliquer sur le bouton « Enregistrer »")
@@ -149,11 +164,26 @@ def step_impl(context: Context):
 
 
 @when("Ouvrir l'arbre")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.toggle_tree.click()
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.toggle_tree.click()
+
+
+@when("Ouvrir l'entiereté de l'arbre")
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.open_all()
+
+
+@when("Sélectionner un tronc commun dans l'arbre")
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    root_element_id = page.panel_tree().root_node.element.get_attribute("element_id")
+    acronym = query.get_random_element_from_tree(int(root_element_id))
+    element = next(
+        node for node in page.panel_tree().nodes() if acronym in node.text
+    )
+    element.click()
 
 
 @then("Vérifier que le(s) enfant(s) de {code} sont bien {children}")

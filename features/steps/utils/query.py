@@ -21,10 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.models import person, learning_unit_year
+import random
+
+from base.models import person, learning_unit_year, education_group_year
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import EntityVersion
+from base.models.enums.education_group_types import GroupType
 from base.models.learning_unit_year import LearningUnitYear
+from program_management.ddd.repositories import load_tree
 
 
 def get_random_learning_unit_outside_of_person_entities(
@@ -48,3 +52,17 @@ def get_random_learning_unit_inside_of_person_entities(
         learning_container_year__requirement_entity__in=entities,
         academic_year__year=current_academic_year().year
     ).order_by("?")[0]
+
+
+def get_random_learning_unit() -> learning_unit_year.LearningUnitYear:
+    return LearningUnitYear.objects.filter(
+        academic_year__year=current_academic_year().year
+    ).order_by("?")[0]
+
+
+def get_random_element_from_tree(
+        tree_node_id: int
+) -> str:
+    tree = load_tree.load(tree_node_id)
+    nodes = tree.get_all_nodes(types={GroupType.COMMON_CORE})
+    return random.choice(list(nodes)).code

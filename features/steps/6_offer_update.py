@@ -31,7 +31,8 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from features.forms.education_groups import update_form
-from features.pages.education_group.pages import EducationGroupPage, UpdateTrainingPage
+from features.pages.education_group.pages import EducationGroupPage, UpdateTrainingPage, QuickSearchPage, \
+    AttachModalPage
 
 use_step_matcher("parse")
 
@@ -62,6 +63,12 @@ def step_impl(context: Context):
 def step_impl(context: Context):
     page = EducationGroupPage(driver=context.browser)
     page.actions.click()
+
+
+@when("Offre Cliquer sur l'action recherche rapide")
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.quick_search.click()
 
 
 @then("Vérifier que la dernière année d'organisation de la formation a été mis à jour")
@@ -118,12 +125,21 @@ def step_impl(context, acronym):
 
 @step("Cliquer sur la recherche rapide")
 def step_impl(context):
-    context.current_page = context.current_page.quick_search.click()
+    page = EducationGroupPage(driver=context.browser)
+    page.quick_search.click()
 
 
-@step("Cliquer sur « Sélectionner »")
+@step("Selectionner le premier resultat (recherche rapide)")
 def step_impl(context):
-    context.current_page.select_first.click()
+    page = QuickSearchPage(driver=context.browser)
+    print(page.code.text)
+    page.select_first = True
+
+
+@step("Cliquer sur Ajouter (recherche rapide)")
+def step_impl(context):
+    page = QuickSearchPage(driver=context.browser)
+    page.attach.click()
 
 
 @step("Fermer la modal")
@@ -133,7 +149,8 @@ def step_impl(context):
 
 @step("Selectionner l'onglet d'unité d'enseignement")
 def step_impl(context):
-    context.current_page.lu_tab.click()
+    page = QuickSearchPage(driver=context.browser)
+    page.lu_tab.click()
 
 
 @step("Dans l'arbre, cliquer sur {action} sur {acronym}.")
@@ -160,9 +177,18 @@ def step_impl(context, parent, action, acronym):
 
 @step("Cliquer sur « Enregistrer » dans la modal")
 def step_impl(context):
-    result = context.current_page.save_modal.click()
-    if result:
-        context.current_page = result
+    page = AttachModalPage(driver=context.browser)
+    page.save_modal.click()
+
+
+@step("Vérifier que l'UE se trouve bien dans l'arbre")
+def step_impl(context):
+    page = EducationGroupPage(driver=context.browser)
+    nodes = page.panel_tree().nodes()
+    context.test.assertIn(
+        context.luy_to_attach,
+        [node.text for node in nodes]
+    )
 
 
 @then("Vérifier que {acronym} a été mis à jour")

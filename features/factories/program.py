@@ -64,10 +64,13 @@ class ProgramGenerators:
 
     def _create_structure(self, education_group_year_obj: EducationGroupYear, level=3):
         if level <= 0 and education_group_year_obj.education_group_type.learning_unit_child_allowed:
-            GroupElementYearChildLeafFactory(
-                parent=education_group_year_obj,
-                child_leaf=random.choice(self.learning_unit_years)
-            )
+            number_lu = random.randint(3, 5)
+            luys = random.choices(self.learning_unit_years, k=number_lu)
+            for luy in luys:
+                GroupElementYearChildLeafFactory(
+                    parent=education_group_year_obj,
+                    child_leaf=luy
+                )
 
         relationships = self.relationships.get(education_group_year_obj.education_group_type, [])
         for relationship in relationships:
@@ -76,7 +79,8 @@ class ProgramGenerators:
                 continue
             grp = GroupElementYearFactory(
                 parent=education_group_year_obj,
-                child_branch__education_group_type=relationship.child_type
+                child_branch__education_group_type=relationship.child_type,
+                child_branch__management_entity=education_group_year_obj.management_entity
             )
             self._create_structure(grp.child_branch, level=level-1)
 

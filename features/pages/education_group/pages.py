@@ -1,24 +1,28 @@
 import time
+from typing import List
 
 import pypom
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 
-from features.fields.fields import InputField, ButtonField, Link, SelectField, Field, SelectEntityVersionField
+from features.fields.fields import InputField, ButtonField, Link, SelectField, Field, SelectEntityVersionField, LinkBis, \
+    Checkbox
 from features.pages.common import AjaxModal, CommonPageMixin
 
 
 class QuickSearchPage(AjaxModal):
-    code = InputField(By.ID, 'id_search_text')
-    search = ButtonField(By.CSS_SELECTOR, '#form-modal > div > div.col-md-1.col-md-offset-2 > button', 1)
-    select_first = ButtonField(
+    code = InputField(By.ID, 'id_acronym')
+    search = ButtonField(By.ID, 'btn-submit-quicksearch')
+    select_first = Checkbox(
         By.CSS_SELECTOR,
-        '#form-modal-ajax-content > div.modal-body > div.row > div > table > tbody > tr > td:nth-child(1) > button'
+        '#table-objects td:nth-child(1) > input'
     )
+    attach = ButtonField(By.ID, 'button-attach')
 
-    lu_tab = ButtonField(By.CSS_SELECTOR, '#form-modal-ajax-content > div.modal-body > ul > li:nth-child(1) > a', 1)
+    lu_tab = ButtonField(By.ID, 'link-quick-search-learningunit')
 
-    eg_tab = ButtonField(By.CSS_SELECTOR, '#form-modal-ajax-content > div.modal-body > ul > li:nth-child(2) > a')
+    eg_tab = ButtonField(By.ID, 'link-quick-search-educationgroup')
 
     close = Link('EducationGroupPage', By.CSS_SELECTOR, '#form-modal-ajax-content > div.modal-header > button')
 
@@ -32,8 +36,7 @@ class DetachModalPage(AjaxModal):
 
 
 class AttachModalPage(AjaxModal):
-    type_de_lien = SelectField(By.ID, 'id_link_type')
-    save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 6)
+    save_modal = ButtonField(By.ID, 'btn-submit-links')
 
 
 class NewTrainingPage(pypom.Page):
@@ -83,10 +86,10 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
     delete = ButtonField(By.CSS_SELECTOR, '#link_delete > a', 1)
     select_first = ButtonField(By.CSS_SELECTOR, "#select_li > a", 1)
 
-    toggle_tree = ButtonField(By.CSS_SELECTOR, '#panel-data > div.panel-heading > div > a')
+    toggle_tree = ButtonField(By.ID, 'btn-toggle-tree')
     open_first_node_tree = ButtonField(By.CSS_SELECTOR, '#panel_file_tree > ul > li > i')
 
-    quick_search = Link(QuickSearchPage, By.ID, 'quick-search', 1)
+    quick_search = Link(QuickSearchPage, By.ID, 'quick-search')
     save_modal = Link('EducationGroupPage', By.CSS_SELECTOR, '.modal-footer > .btn-primary', 4)
 
     attach = Link(CopyModalPage, By.CSS_SELECTOR, 'body > ul > li:nth-child(4) > a', 2)
@@ -145,6 +148,25 @@ class EducationGroupPage(CommonPageMixin, pypom.Page):
         return "Identification" in self.find_element(
             By.CSS_SELECTOR, 'li.active[role=presentation]'
         ).text and not self.find_element(By.ID, 'modal_dialog_id').is_displayed()
+
+    def panel_tree(self):
+        return self.PanelTree(self)
+
+    _open_all = LinkBis(By.CSS_SELECTOR, '.jstree-contextmenu > li:nth-child(9) > a')
+
+    def open_all(self):
+        action_chains = ActionChains(self.driver)
+        action_chains.context_click(self.panel_tree().root_node.element).perform()
+        self._open_all.click()
+
+    class PanelTree(pypom.Region):
+
+        _root_locator = (By.ID, "scrollableDiv")
+
+        root_node = LinkBis(By.ID, "j1_1_anchor")
+
+        def nodes(self) -> List[WebElement]:
+            return self.find_elements(By.CSS_SELECTOR, ".jstree-children a")
 
 
 class SearchEducationGroupPage(CommonPageMixin, pypom.Page):

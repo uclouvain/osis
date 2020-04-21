@@ -80,6 +80,16 @@ class Link(Field):
         return new_page
 
 
+class LinkBis(Field):
+    def __init__(self, by, selector):
+        super().__init__(by, selector)
+
+    def click(self):
+        # Scroll to the top. The button can be under the navbar.
+        self.current_page.driver.execute_script("window.scrollTo(0, 0);")
+        self.element.click()
+
+
 class InputField(Field):
 
     def __set__(self, obj, value):
