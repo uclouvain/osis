@@ -107,7 +107,6 @@ class BusinessListValidator(BusinessValidator):
 
     def __init__(self):
         super(BusinessListValidator, self).__init__()
-        assert self.success_messages, "Please set the 'success_messages' attribute"
 
     def validate(self):
         for validator in self.validators:
