@@ -29,6 +29,7 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from program_management.tests.factories.element import ElementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
 
@@ -56,15 +57,20 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+    # FIXME :: DEPRECATED - Use parent_element instead
     parent = factory.SubFactory(EducationGroupYearFactory)
+    # FIXME :: DEPRECATED - Use child_element instead
     child_branch = factory.SubFactory(EducationGroupYearFactory,
                                       academic_year=factory.SelfAttribute("..parent.academic_year"))
     relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
+    # FIXME :: DEPRECATED - Use child_element instead
     child_leaf = None
     is_mandatory = FuzzyBoolean()
     link_type = None
     order = None
     block = factory.LazyFunction(_generate_block_value)
+    parent_element = factory.SubFactory(ElementFactory)
+    child_element = factory.SubFactory(ElementFactory)
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):
