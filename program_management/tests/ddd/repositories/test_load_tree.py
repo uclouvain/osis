@@ -31,7 +31,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -57,13 +57,8 @@ class TestLoadTree(TestCase):
                 |-- leaf
         """
         cls.root_node = ElementEducationGroupYearFactory()
-        #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
-        cls.link_level_1 = GroupElementYearFactory(parent=cls.root_node.education_group_year)
-        cls.link_level_2 = GroupElementYearFactory(
-            parent=cls.link_level_1.child_branch,
-            child_branch=None,
-            child_leaf=LearningUnitYearFactory()
-        )
+        cls.link_level_1 = GroupElementYearFactory(parent_element=cls.root_node)
+        cls.link_level_2 = GroupElementYearChildLeafFactory(parent_element=cls.link_level_1.child_element)
 
     def test_case_tree_root_not_exist(self):
         unknown_tree_root_id = -1
@@ -71,21 +66,19 @@ class TestLoadTree(TestCase):
             load_tree.load(unknown_tree_root_id)
 
     def test_fields_to_load(self):
-        #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
-        educ_group = self.root_node.education_group_year
-        tree = load_tree.load(educ_group.pk)
-        self.assertEqual(tree.root_node.credits, educ_group.credits, "Field used to load prerequisites excel")
+        group_year = self.root_node.group_year
+        tree = load_tree.load(group_year.pk)
+        self.assertEqual(tree.root_node.credits, group_year.credits, "Field used to load prerequisites excel")
 
     def test_case_tree_root_with_multiple_level(self):
-        #  TODO: Change to root_node.group_year_id when migration of group_element_year is done
-        education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
+        education_group_program_tree = load_tree.load(self.root_node.group_year_id)
         self.assertIsInstance(education_group_program_tree, program_tree.ProgramTree)
 
         self.assertIsInstance(education_group_program_tree.root_node, node.NodeEducationGroupYear)
         self.assertEqual(len(education_group_program_tree.root_node.children), 1)
         self.assertEqual(
             education_group_program_tree.root_node.children[0].child.title,
-            self.link_level_1.child_branch.acronym
+            self.link_level_1.child_element.acronym
         )
 
     # TODO : move this into test_load_prerequisite
@@ -147,31 +140,30 @@ class TestLoadTree(TestCase):
     def test_case_load_tree_leaf_node_have_a_proposal(self):
         proposal_types = ProposalType.get_names()
         for p_type in proposal_types:
-            proposal = ProposalLearningUnitFactory(learning_unit_year=self.link_level_2.child_leaf)
+            proposal = ProposalLearningUnitFactory(learning_unit_year=self.link_level_2.child_element)
             with self.subTest(msg=p_type):
                 proposal.type = p_type
                 proposal.save()
 
-                education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
+                education_group_program_tree = load_tree.load(self.root_node.group_year_id)
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
                 self.assertTrue(leaf.has_proposal)
                 self.assertEquals(leaf.proposal_type, p_type)
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
-        education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
+        education_group_program_tree = load_tree.load(self.root_node.group_year_id)
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
         self.assertFalse(leaf.has_proposal)
         self.assertIsNone(leaf.proposal_type)
 
     def test_when_2_nodes_has_same_pk(self):
-        same_pk = self.root_node.education_group_year.pk
+        same_pk = self.root_node.group_year_id
         learning_unit = LearningUnitYearFactory(pk=same_pk)
-        GroupElementYearFactory(
-            parent=self.link_level_1.child_branch,
-            child_branch=None,
-            child_leaf=learning_unit
+        GroupElementYearChildLeafFactory(
+            parent_element=self.link_level_1.child_element,
+            child_element=learning_unit
         )
-        tree = load_tree.load(self.root_node.education_group_year.pk)
+        tree = load_tree.load(self.root_node.group_year_id)
         leaf_2 = tree.root_node.children[0].child.children[1].child
         error_msg = """
             A learningUnit and a Group could have the same 'node_id' because data are coming from different tables.

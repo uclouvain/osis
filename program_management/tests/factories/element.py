@@ -47,6 +47,7 @@ class ElementFactory(factory.DjangoModelFactory):
     learning_class_year = None
 
 
+# TODO REMOVE
 class ElementEducationGroupYearFactory(ElementFactory):
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
 
