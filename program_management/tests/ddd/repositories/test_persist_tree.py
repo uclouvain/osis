@@ -142,24 +142,6 @@ class TestPersistTree(TestCase):
         assertion_msg = "No changes made, so function GroupelementYear.delete() should not have been called"
         self.assertFalse(mock.called, assertion_msg)
 
-    def test_fields_persisted(self):
-        # TODO :: to implement with attach_node action ! Should assert all link values are correctly persisted in DB
-        fields_to_test = [
-            'relative_credits',
-            'min_credits',
-            'max_credits',
-            'is_mandatory',
-            'block',
-            'access_condition',
-            'comment',
-            'comment_english',
-            'own_comment',
-            'quadrimester_derogation',
-            'link_type',
-            'order',
-        ]
-        pass
-
 
 class TestPersistPrerequisites(TestCase):
     @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
