@@ -116,10 +116,9 @@ class Prerequisite:
             self.remove_prerequisite_item(prerequisite_item.code, prerequisite_item.year)
 
     def remove_prerequisite_item(self, code: str, year: int) -> None:
-        if self.prerequisite_item_groups:
-            for prereq_item_group in self.prerequisite_item_groups:
-                prereq_item_group.remove_prerequisite_item(PrerequisiteItem(code=code, year=year))
-            self.has_changed = True
+        for prereq_item_group in self.prerequisite_item_groups:
+            prereq_item_group.remove_prerequisite_item(PrerequisiteItem(code=code, year=year))
+        self.has_changed = True
 
     def __str__(self) -> PrerequisiteExpression:
         def _format_group(group: PrerequisiteItemGroup):
