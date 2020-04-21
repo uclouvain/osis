@@ -79,7 +79,7 @@ class IsPrerequisiteValidator(BusinessValidator):
             n for n in learning_units_children
             if n.is_prerequisite and not self._is_reused_in_tree(n)
         ]
-        return nodes_that_are_prerequisites
+        return sorted(nodes_that_are_prerequisites, key=lambda n: n.code)
 
     def _is_reused_in_tree(self, node_to_detach: 'Node') -> bool:
         return self.tree.count_usage(node_to_detach) > 1

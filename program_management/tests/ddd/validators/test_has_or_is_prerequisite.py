@@ -84,7 +84,7 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
                              "are prerequisite in %(formation)s: %(learning_units)s") % {
                                "acronym": node_to_detach.title,
                                "formation": self.tree.root_node.title,
-                               "learning_units": ", ".join((link2.child.code, link1.child.code))
+                               "learning_units": ", ".join(sorted((link2.child.code, link1.child.code)))
                            }
         self.assertListEqual(validator.messages, [expected_message])
 

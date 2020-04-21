@@ -54,25 +54,12 @@ class TestDetachNodeView(TestCase):
         cls.path_to_detach = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
         cls.url = reverse("tree_detach_node", args=[
             cls.education_group_year.id,
-        ]) + "?path=/{}/".format(cls.path_to_detach)
+        ]) + "?path={}".format(cls.path_to_detach)
 
     def setUp(self):
-        # self.url = self._format_url()
         self.client.force_login(self.person.user)
         self._mock_perms()
         self._mock_authorized_relationship_validator()
-
-    # def _format_url(self):
-    #     query_dictionary = QueryDict('', mutable=True)
-    #     query_dictionary.update(
-    #         {
-    #             'path': self.path_to_detach
-    #         }
-    #     )
-    #     base_url = reverse("tree_detach_node", args=[
-    #         self.education_group_year.id,
-    #     ])
-    #     return '{base_url}?{querystring}'.format(base_url=base_url, querystring=query_dictionary.urlencode(safe='/'))
 
     def _mock_perms(self):
         self.perm_patcher = mock.patch(
