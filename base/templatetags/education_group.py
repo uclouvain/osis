@@ -212,7 +212,7 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
 def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, version_label=None,
                                    is_standard=False, versioned_field=False):
-    is_particular = not is_standard
+
     value = None
     parent_value = None
 
@@ -230,7 +230,7 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
     if key == "acronym" and version_label:
         value = "{}[{}]".format(value, version_label)
 
-    class_dl = _get_css(class_dl, is_particular, versioned_field)
+    class_dl = _get_css(class_dl, is_standard, versioned_field)
 
     dl_dict = {
         'label': _(dl_title),
@@ -239,7 +239,7 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
         'class_dl': class_dl,
         'default_value': default_value,
     }
-    if is_particular and not versioned_field:
+    if not is_standard and not versioned_field:
         dl_dict.update({'title_dl': _('The value of this attribute is inherited from the standard OF')})
 
     return dl_dict
@@ -256,5 +256,5 @@ def _bool_to_string(value):
     return str(value)
 
 
-def _get_css(class_dl, is_particular, version_field):
-    return "{} {}".format(class_dl, UN_VERSIONED_OF_FIELD) if is_particular and not version_field else class_dl
+def _get_css(class_dl, is_standard, version_field):
+    return "{} {}".format(class_dl, UN_VERSIONED_OF_FIELD) if not is_standard and not version_field else class_dl
