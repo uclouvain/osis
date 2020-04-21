@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_types import TrainingType, GroupType
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
@@ -159,8 +160,6 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
 
     def test_ensure_not_getting_direct_child_of_reference_link(self):
         training = TrainingFactory(
-            acronym='BIR1BA',
-            partial_acronym='LBIR100B',
             academic_year=self.academic_year,
             education_group_type__name=TrainingType.BACHELOR.name
         )
@@ -171,7 +170,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
         GroupElementYearFactory(
             parent=training, child_branch=common_core, child_leaf=None, link_type=LinkTypes.REFERENCE.name
         )
-        GroupElementYearFactory(parent=common_core, child_branch=None, child_leaf=self.learning_unit_year)
+        luy = LearningUnitYearFactory(academic_year=self.academic_year)
+        GroupElementYearFactory(parent=common_core, child_branch=None, child_leaf=luy)
         url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
             'acronym': training.acronym,
             'year': self.academic_year.year
@@ -183,7 +183,36 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
                 'language': settings.LANGUAGE_CODE_EN
             }
         )
-        self.assertNotIn(common_core, serializer.data['children'])
+        self.assertEqual(len(serializer.data['children']), 1)
+        self.assertEqual(serializer.data['children'][0]['code'], luy.acronym)
+
+    def test_ensure_not_getting_direct_child_of_reference_link_except_minor_reference(self):
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=TrainingType.BACHELOR.name
+        )
+        minor = MiniTrainingFactory(
+            education_group_type__name=MiniTrainingType.ACCESS_MINOR.name,
+            academic_year=self.academic_year
+        )
+        GroupElementYearFactory(
+            parent=training, child_branch=minor, child_leaf=None, link_type=LinkTypes.REFERENCE.name
+        )
+        luy = LearningUnitYearFactory(academic_year=self.academic_year)
+        GroupElementYearFactory(parent=minor, child_branch=None, child_leaf=luy)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(training.id).root_node),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+        self.assertEqual(len(serializer.data['children']), 1)
+        self.assertEqual(serializer.data['children'][0]['code'], minor.partial_acronym)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)

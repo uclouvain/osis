@@ -27,7 +27,7 @@ from _decimal import Decimal
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
@@ -168,15 +168,24 @@ class Node:
     def children_as_nodes(self) -> List['Node']:
         return [link.child for link in self.children]
 
-    @property
-    def children_and_reference_children(self) -> List['Link']:
+    def children_and_reference_children(
+            self,
+            keep_reference_of_type: Set[EducationGroupTypesEnum] = None
+    ) -> List['Link']:
+        def is_link_to_keep(link: 'Link', keep_reference_of_type: Set[EducationGroupTypesEnum]):
+            in_types_to_keep = keep_reference_of_type and link.child.node_type in keep_reference_of_type
+            return link.link_type != LinkTypes.REFERENCE or in_types_to_keep
+
         links = []
         for link in self.children:
-            if link.link_type != LinkTypes.REFERENCE:
+            if is_link_to_keep(link, keep_reference_of_type):
                 links.append(link)
             else:
                 links += link.child.children
         return links
+
+    def get_children_and_only_reference_children_except_minors_reference(self) -> List['Link']:
+        return self.children_and_reference_children(keep_reference_of_type=set(MiniTrainingType.minors_enum()))
 
     def get_children_types(self, include_nodes_used_as_reference=False) -> List[EducationGroupTypesEnum]:
         if not include_nodes_used_as_reference:

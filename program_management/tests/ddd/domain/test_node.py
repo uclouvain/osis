@@ -167,14 +167,24 @@ class TestGetChildrenTypes(SimpleTestCase):
 class TestGetChildrenAndReferenceChildren(SimpleTestCase):
     def test_when_no_children(self):
         node = NodeGroupYearFactory()
-        self.assertEqual([], node.children_and_reference_children)
+        self.assertEqual([], node.children_and_reference_children())
 
     def test_get_only_children_of_reference_link(self):
         link = LinkFactory(link_type=LinkTypes.REFERENCE)
         LinkFactory(parent=link.child)
-        result = link.parent.children_and_reference_children
+        result = link.parent.children_and_reference_children()
         self.assertListEqual(
             link.child.children,
+            result
+        )
+
+    def test_get_only_children_of_reference_link_except_minors(self):
+        minor = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
+        link_ref = LinkFactory(link_type=LinkTypes.REFERENCE, child=minor)
+        LinkFactory(parent=link_ref.child)
+        result = link_ref.parent.get_children_and_only_reference_children_except_minors_reference()
+        self.assertListEqual(
+            [link_ref],
             result
         )
 
