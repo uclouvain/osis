@@ -264,17 +264,10 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
         key, obj, parent, dl_title=dl_title,
         class_dl=_get_css(class_dl, not is_standard, versioned_field),
         default_value=default_value,
-        version_label=additional_title(context['current_version']),
+        version_label=context['current_version'].version_label,
         is_standard=is_standard,
         versioned_field=versioned_field)
 
 
 def _get_css(class_dl, is_particular, version_field):
     return "{} {}".format(class_dl, UN_VERSIONED_OF_FIELD) if is_particular and not version_field else class_dl
-
-
-def additional_title(version):
-    if version.is_transition and version.version_name == '':
-        return 'Transition'
-    else:
-        return version.version_label
