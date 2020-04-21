@@ -202,7 +202,11 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
     return dl_with_parent_without_context(
         key, obj, parent, dl_title=dl_title,
         class_dl=class_dl,
-        default_value=default_value, is_standard=context["current_version"].is_standard, versioned_field=versioned_field)
+        default_value=default_value, is_standard=context["current_version"].is_standard,
+        versioned_field=versioned_field,
+        version_label="{}".format(context["current_version"].version_label)
+        if key == "acronym" and context["current_version"].version_label else None
+    )
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
@@ -222,8 +226,10 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
             parent_value = get_verbose_field_value(parent, key)
         else:
             parent, parent_value = None, None
-        if key == "acronym" and version_label:
-            value = "{}[{}]".format(value, version_label)
+
+    if key == "acronym" and version_label:
+        value = "{}[{}]".format(value, version_label)
+
     class_dl = _get_css(class_dl, is_particular, versioned_field)
 
     dl_dict = {
@@ -248,25 +254,6 @@ def _bool_to_string(value):
         return "yes" if value else "no"
 
     return str(value)
-
-
-@register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value=None, versioned_field=False):
-    if versioned_field:
-        obj = context["education_group_year"]
-    else:
-        obj = context["root_group"]
-    parent = context["parent"]
-
-    is_standard = context["current_version"].is_standard
-
-    return dl_with_parent_without_context(
-        key, obj, parent, dl_title=dl_title,
-        class_dl=_get_css(class_dl, not is_standard, versioned_field),
-        default_value=default_value,
-        version_label=context['current_version'].version_label,
-        is_standard=is_standard,
-        versioned_field=versioned_field)
 
 
 def _get_css(class_dl, is_particular, version_field):

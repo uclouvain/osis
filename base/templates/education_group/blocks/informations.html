@@ -30,7 +30,7 @@
             {%  if current_version.is_standard and not current_version.is_transition %}
                 {% dl_with_parent 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
             {% else %}
-                {% dl_with_parent_version 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title' versioned_field=True %}
+                {% dl_with_parent 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title' versioned_field=True %}
             {% endif %}
             {% dl_with_parent 'partial_acronym' class_dl="col-md-6" versioned_field=True %}
             {% dl_with_parent_without_context 'category' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" is_standard=current_version.is_standard%}
