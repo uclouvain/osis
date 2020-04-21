@@ -61,14 +61,21 @@ class IsPrerequisiteValidator(BusinessValidator):
         nodes_that_are_prerequisites = self._get_nodes_that_are_prerequisite(self.node_to_detach)
         if nodes_that_are_prerequisites:
             codes_that_are_prerequisite = [node.code for node in nodes_that_are_prerequisites]
-            self.add_error_message(
-                _("Cannot detach education group year %(acronym)s as the following learning units "
-                  "are prerequisite in %(formation)s: %(learning_units)s") % {
-                    "acronym": self.node_to_detach.title,
-                    "formation": self.tree.root_node.title,
-                    "learning_units": ", ".join(codes_that_are_prerequisite)
-                }
-            )
+            if self.node_to_detach.is_learning_unit():
+                self.add_error_message(
+                    _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                        "acronym": self.node_to_detach.code
+                    }
+                )
+            else:
+                self.add_error_message(
+                    _("Cannot detach education group year %(acronym)s as the following learning units "
+                      "are prerequisite in %(formation)s: %(learning_units)s") % {
+                        "acronym": self.node_to_detach.title,
+                        "formation": self.tree.root_node.title,
+                        "learning_units": ", ".join(codes_that_are_prerequisite)
+                    }
+                )
 
     def _get_nodes_that_are_prerequisite(self, search_under_node: 'Node'):
         nodes_that_are_prerequisites = []

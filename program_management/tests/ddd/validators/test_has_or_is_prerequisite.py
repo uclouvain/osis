@@ -55,6 +55,23 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
         self.assertTrue(validator.is_valid())
         self.assertListEqual(validator.messages, [])
 
+    def test_when_node_to_detach_is_group_and_children_are_prerequisite(self):
+        node_to_detach = self.common_core
+        link = LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
+        link_with_child_that_is_prerequisite = LinkFactory(
+            parent=self.common_core,
+            child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
+        )
+        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
+        self.assertFalse(validator.is_valid())
+        expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
+                             "are prerequisite in %(formation)s: %(learning_units)s") % {
+                               "acronym": node_to_detach.title,
+                               "formation": self.tree.root_node.title,
+                               "learning_units": link_with_child_that_is_prerequisite.child.code
+                           }
+        self.assertListEqual(validator.messages, [expected_message])
+
     def test_when_node_to_detach_is_prerequisite(self):
         link_with_child_is_prerequisite = LinkFactory(
             parent=self.common_core,
@@ -63,12 +80,10 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
         node_to_detach = link_with_child_is_prerequisite.child
         validator = IsPrerequisiteValidator(self.tree, node_to_detach)
         self.assertFalse(validator.is_valid())
-        expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
-                             "are prerequisite in %(formation)s: %(learning_units)s") % {
-                               "acronym": node_to_detach.title,
-                               "formation": self.tree.root_node.title,
-                               "learning_units": link_with_child_is_prerequisite.child.code
-                           }
+        expected_message = _(
+            "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
+                "acronym": node_to_detach.code
+            }
         self.assertListEqual(validator.messages, [expected_message])
 
     def test_when_children_of_node_to_detach_are_prerequisites(self):

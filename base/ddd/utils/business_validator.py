@@ -42,10 +42,10 @@ class BusinessValidator(ABC):
         if self.success_messages is None:
             self.success_messages = []
         self.success_messages = [
-            BusinessValidationMessage(msg, MessageLevel.SUCCESS)
+            BusinessValidationMessage(msg, MessageLevel.SUCCESS) if isinstance(msg, str) else msg
             for msg in self.success_messages
-            if isinstance(msg, str)
         ]
+        print()
 
     @property
     def messages(self) -> List[BusinessValidationMessage]:

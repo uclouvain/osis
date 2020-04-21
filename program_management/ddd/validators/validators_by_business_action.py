@@ -70,14 +70,8 @@ class AttachNodeValidatorList(BusinessListValidator):
 
 class DetachNodeValidatorList(BusinessListValidator):
 
-    success_messages = []
-
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
         detach_from = tree.get_node(path_to_parent)
-        self.add_success_message(_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-            'child': node_to_detach,
-            'parent': detach_from,
-        })  # TODO :: unit test
 
         if node_to_detach.is_group():
             self.validators = [
@@ -98,6 +92,11 @@ class DetachNodeValidatorList(BusinessListValidator):
         else:
             raise AttributeError("Unknown instance of node")
         super().__init__()
+
+        self.add_success_message(_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
+            'child': node_to_detach,
+            'parent': detach_from,
+        })  # TODO :: unit test
 
 
 class UpdatePrerequisiteValidatorList(BusinessListValidator):

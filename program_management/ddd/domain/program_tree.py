@@ -257,8 +257,8 @@ class ProgramTree:
         node_to_detach = self.get_node(path_to_node_to_detach)
         is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
         if is_valid:
-            parent.detach_child(node_to_detach)
             self.remove_prerequisites(node_to_detach)
+            parent.detach_child(node_to_detach)
         return is_valid, messages
 
     def remove_prerequisites(self, detached_node: 'Node'):

@@ -190,6 +190,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                     )
 
 
+# FiXME :: DEPRECATED :: Use IsPrerequisiteValidator instead
 class DetachLearningUnitYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
         self.parent = link.parent
