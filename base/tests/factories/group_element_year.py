@@ -29,7 +29,6 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from program_management.tests.factories.element import ElementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
 
@@ -69,8 +68,8 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     link_type = None
     order = None
     block = factory.LazyFunction(_generate_block_value)
-    parent_element = factory.SubFactory(ElementFactory)
-    child_element = factory.SubFactory(ElementFactory)
+    parent_element = None
+    child_element = None
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):
