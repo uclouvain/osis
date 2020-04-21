@@ -69,23 +69,23 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
 
 # Implemented from CheckAuthorizedRelationship (management.py)
 class DetachAuthorizedRelationshipValidator(BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', position_to_add: 'Node'):
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', detach_from: 'Node'):
         super(DetachAuthorizedRelationshipValidator, self).__init__()
         self.node_to_detach = node_to_detach
-        self.parent = position_to_add
+        self.detach_from = detach_from
         self.auth_relations = tree.authorized_relationships
 
     def validate(self):
-        if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_detach.node_type):
+        if not self.auth_relations.is_authorized(self.detach_from.node_type, self.node_to_detach.node_type):
             self.add_error_message(
                 _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
                     'child_types': self.node_to_detach.node_type.value,
-                    'parent': self.parent,
-                    'parent_type': self.parent.node_type.value,
+                    'parent': self.detach_from,
+                    'parent_type': self.detach_from.node_type.value,
                 }
             )
         else:
-            if self.is_minimum_children_types_reached(self.parent, self.node_to_detach):
+            if self.is_minimum_children_types_reached(self.detach_from, self.node_to_detach):
                 self.add_error_message(
                     _("The parent must have at least one child of type(s) \"%(types)s\".") % {
                         "types": str(self.node_to_detach.node_type.value)
