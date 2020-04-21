@@ -45,7 +45,6 @@ class BusinessValidator(ABC):
             BusinessValidationMessage(msg, MessageLevel.SUCCESS) if isinstance(msg, str) else msg
             for msg in self.success_messages
         ]
-        print()
 
     @property
     def messages(self) -> List[BusinessValidationMessage]:
