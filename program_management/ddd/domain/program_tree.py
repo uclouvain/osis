@@ -75,9 +75,9 @@ class ProgramTree:
                     result.append(link.parent)
         return result
 
-    def get_2m_option_list(self):
+    def get_2m_option_list(self):  # TODO :: unit tests
         tree_without_finalities = self.prune(
-            ignore_children_from={GroupType.FINALITY_120_LIST_CHOICE, GroupType.FINALITY_180_LIST_CHOICE}
+            ignore_children_from=set(TrainingType.finality_types_enum())
         )
         return tree_without_finalities.root_node.get_option_list()
 

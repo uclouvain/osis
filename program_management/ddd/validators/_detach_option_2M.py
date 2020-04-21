@@ -33,7 +33,7 @@ from program_management.ddd.business_types import *
 
 
 # Implmented from _check_detach_options_rules
-class DetachOptionValidator(BusinessValidator):
+class DetachOptionValidator(BusinessValidator):  # TODO :: to unit test !!
     """
     In context of MA/MD/MS when we add an option [or group which contains options],
     this options must exist in parent context (2m)
@@ -64,7 +64,7 @@ class DetachOptionValidator(BusinessValidator):
 
     def validate(self):
         options_to_detach = self.get_options_to_detach()
-        if options_to_detach:
+        if options_to_detach and not self._is_inside_finality():
             for tree_2m in self.trees_2m:
                 counter_options = Counter(tree_2m.get_2m_option_list())
                 counter_options.subtract(options_to_detach)
@@ -86,3 +86,7 @@ class DetachOptionValidator(BusinessValidator):
                                 "finality_acronym": finality.title
                             }
                         )
+
+    def _is_inside_finality(self):
+        parents = self.working_tree.get_parents(self.path_to_node_to_detach)
+        return any(p.is_finality() for p in parents)
