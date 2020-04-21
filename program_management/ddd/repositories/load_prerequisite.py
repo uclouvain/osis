@@ -43,10 +43,6 @@ LearningUnitYearId = int
 IsPrerequisiteOfNodeId = int
 
 
-def load_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
-    return load_has_prerequisite_multiple([tree_root_id], node_ids)
-
-
 def load_has_prerequisite_multiple(
         tree_root_ids: List[int],
         nodes: Dict[str, 'Node']

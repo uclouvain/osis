@@ -102,8 +102,6 @@ class DetachNodeValidatorList(BusinessListValidator):
 
 class UpdatePrerequisiteValidatorList(BusinessListValidator):
 
-    success_messages = ['Success']  # TODO :: set to correct success message
-
     def __init__(
             self,
             prerequisite_string: 'PrerequisiteExpression',

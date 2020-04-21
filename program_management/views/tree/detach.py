@@ -129,6 +129,7 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
             element_cache.clear()
 
     def get_success_url(self):
+        # We can just reload the page
         return
 
     @method_decorator(login_required)

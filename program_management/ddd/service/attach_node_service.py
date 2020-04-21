@@ -81,7 +81,6 @@ def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List[Busin
             tree for tree in load_tree.load_trees_from_children(child_branch_ids=finality_ids)
             if tree.is_master_2m()
         ]
-        # TODO :: Use clean_attach_node instead of calling validators
         for tree_2m in trees_2m:
             validator = AttachFinalityEndDateValidator(tree_2m, tree_from_node_to_attach)
             if not validator.is_valid():

@@ -45,6 +45,7 @@ from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
+# TODO :: to remove into OSIS-4645
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     template_name = "group_element_year/confirm_detach_inner.html"
 
@@ -58,11 +59,11 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def _call_rule(self, rule):
         return rule(self.request.user, self.get_object())
 
-    # @cached_property
-    # def strategy(self):
-    #     obj = self.get_object()
-    #     strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
-    #     return strategy_class(obj)
+    @cached_property
+    def strategy(self):
+        obj = self.get_object()
+        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+        return strategy_class(obj)
 
     # TODO :: [MOVED OK]
     def get_context_data(self, **kwargs):
@@ -96,34 +97,7 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
             'path': self.path_to_node_to_detach
         }
 
-    # @property
-    # def parent_id(self):
-    #     return self.path_to_node_to_detach.split('|')[-2]
-    #
-    # @property
-    # def child_id_to_detach(self):
-    #     return self.path_to_node_to_detach.split('|')[-1]
-    #
-    # def get_object(self):
-    #     obj = self.model.objects.filter(
-    #         parent_id=self.parent_id
-    #     ).filter(
-    #         Q(child_branch_id=self.child_id_to_detach) | Q(child_leaf_id=self.child_id_to_detach)
-    #     ).get()
-    #     return obj
-    #
-    # @property
-    # def object(self):
-    #     if self._object is None:
-    #         self._object = self.get_object()
-    #     return self._object
-
     def delete(self, request, *args, **kwargs):
-        # obj = self.get_object()
-        # if not self.strategy.is_valid():
-        #     return JsonResponse({"error": True})
-        # self.strategy.post_valid()
-
         message_list = detach_node_service.detach_node(self.path_to_node_to_detach)
         display_business_messages(self.request, message_list.messages)
 
@@ -133,12 +107,6 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
         self._remove_element_from_clipboard_if_stored(self.path_to_node_to_detach)
 
         return super().delete(request, *args, **kwargs)
-
-    # def form_valid(self, form):
-    #     message_list = form.save()
-    #     display_business_messages(self.request, message_list.messages)
-    #     self._remove_element_from_clipboard_if_stored(form.cleaned_data['path'])
-    #     return super().form_valid(form)
 
     # TODO :: [MOVED OK]
     def _remove_element_from_clipboard_if_stored(self, path: str):
@@ -150,7 +118,6 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     # TODO :: [MOVED OK]
     def get_success_url(self):
         # We can just reload the page
-        print()
         return
 
     # TODO :: [MOVED OK]
