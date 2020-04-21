@@ -116,38 +116,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
-  /trainings/{year}/{acronym}/prerequisites:
-    get:
-      description: Return the prerequisites of the learning units of the training (standard version)
-      operationId: trainings_prerequisites
-      parameters:
-        - in: path
-          name: year
-          required: true
-          schema:
-            description: ''
-            type: string
-        - in: path
-          name: acronym
-          required: true
-          schema:
-            description: ''
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ArrayOfEducationGroupPrerequisites'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-      tags:
-        - trainings
   /trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the training
@@ -524,45 +492,6 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    ArrayOfEducationGroupPrerequisites:
-      type: array
-      items:
-        $ref: '#/components/schemas/EducationGroupPrerequisites'
-    EducationGroupPrerequisites:
-      type: object
-      properties:
-        url:
-          type: string
-          format: uri
-        code:
-          type: string
-        title:
-          type: string
-        prerequisites_string:
-          type: string
-          example: (codeA OR codeB) AND (codeC)
-        prerequisites:
-          type: array
-          items:
-            $ref: '#/components/schemas/PrerequisiteItem'
-    PrerequisiteItem:
-      type: object
-      properties:
-        url:
-          type: string
-          format: uri
-        title:
-          type: string
-        absolute_credits:
-          type: number
-        relative_credits:
-          type: number
-        block:
-          type: array
-          items:
-            type: string
-        mandatory:
-          type: boolean
     ArrayOfTraining:
       type: array
       items:

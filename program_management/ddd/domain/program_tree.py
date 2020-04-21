@@ -109,6 +109,21 @@ class ProgramTree:
             None
         )
 
+    def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
+        """
+        Return the corresponding node based on the code and year.
+        :param code: str
+        :param year: int
+        :return: Node
+        """
+        return next(
+            (
+                node for node in self.get_all_nodes()
+                if node.code == code and node.academic_year.year == year
+            ),
+            None
+        )
+
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
         Return a flat set of all nodes present in the tree
@@ -121,6 +136,17 @@ class ProgramTree:
 
     def get_nodes_by_type(self, node_type_value) -> List['Node']:
         return [node for node in self.get_all_nodes() if node.type == node_type_value]
+
+    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+                    if node_obj.has_prerequisite
+                ),
+                key=lambda node_obj: node_obj.code
+            )
+        )
 
     def get_codes_permitted_as_prerequisite(self):
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
