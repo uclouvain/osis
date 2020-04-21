@@ -27,7 +27,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages, constants as MSG
-from django.http import HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseNotFound, HttpResponse, QueryDict
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -36,8 +36,8 @@ from base.ddd.utils.validation_message import BusinessValidationMessageList, Bus
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.utils.cache import ElementCache
-from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
 
@@ -50,17 +50,29 @@ class TestDetachNodeView(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch__academic_year=cls.academic_year)
-        cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = CentralManagerForUEFactory()
         cls.path_to_detach = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
         cls.url = reverse("tree_detach_node", args=[
             cls.education_group_year.id,
-        ]) + "?path=%s" % cls.path_to_detach
+        ]) + "?path=/{}/".format(cls.path_to_detach)
 
     def setUp(self):
+        # self.url = self._format_url()
         self.client.force_login(self.person.user)
         self._mock_perms()
         self._mock_authorized_relationship_validator()
+
+    # def _format_url(self):
+    #     query_dictionary = QueryDict('', mutable=True)
+    #     query_dictionary.update(
+    #         {
+    #             'path': self.path_to_detach
+    #         }
+    #     )
+    #     base_url = reverse("tree_detach_node", args=[
+    #         self.education_group_year.id,
+    #     ])
+    #     return '{base_url}?{querystring}'.format(base_url=base_url, querystring=query_dictionary.urlencode(safe='/'))
 
     def _mock_perms(self):
         self.perm_patcher = mock.patch(
@@ -78,21 +90,13 @@ class TestDetachNodeView(TestCase):
         self.mocked_validator = self.validator_patcher.start()
         self.addCleanup(self.validator_patcher.stop)
 
-    def test_edit_case_user_not_logged(self):
-        self.client.logout()
-
-        response = self.client.post(self.url)
-
-        expected_redirection_url = '/login/?next={}'.format(self.url)
-        self.assertRedirects(response, expected_redirection_url)
-
     def test_allowed_http_method_when_user_is_not_logged(self):
         self.client.logout()
 
         allowed_method = ['get', 'post']
         for method in allowed_method:
             response = getattr(self.client, method)(self.url)
-            self.assertRedirects(response, '/login/?next={}'.format(self.url))
+            self.assertIn("/login/?next=", response.url)
 
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
     def test_get_ensure_path_args_is_set_as_initial_on_form(self, mock):

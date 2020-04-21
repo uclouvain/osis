@@ -510,8 +510,13 @@ class TestGetAllFinalities(SimpleTestCase):
         LinkFactory(parent=self.tree.root_node, child__node_type=GroupType.COMMON_CORE)
         self.assertSetEqual(self.tree.get_all_finalities(), set())
 
-    def test_when_program_is_empty(self):
-        self.assertSetEqual(ProgramTreeFactory().get_all_finalities(), set())
+    def test_when_program_is_empty_but_root_is_finality(self):
+        finality_tree = ProgramTreeFactory(root_node__node_type=TrainingType.MASTER_MD_120)
+        self.assertSetEqual(finality_tree.get_all_finalities(), {finality_tree.root_node})
+
+    def test_when_program_is_empty_and_root_is_not_finality(self):
+        bachelor_tree = ProgramTreeFactory(root_node__node_type=TrainingType.BACHELOR)
+        self.assertSetEqual(bachelor_tree.get_all_finalities(), set())
 
     def test_when_contains_master_ma_120(self):
         link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120))

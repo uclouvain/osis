@@ -39,6 +39,13 @@ class BusinessValidator(ABC):
 
     def __init__(self, *args, **kwargs):
         self._messages = []
+        if self.success_messages is None:
+            self.success_messages = []
+        self.success_messages = [
+            BusinessValidationMessage(msg, MessageLevel.SUCCESS)
+            for msg in self.success_messages
+            if isinstance(msg, str)
+        ]
 
     @property
     def messages(self) -> List[BusinessValidationMessage]:

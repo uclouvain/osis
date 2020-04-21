@@ -105,11 +105,11 @@ class TestBusinessValidator(SimpleTestCase):
 
     def test_reset_messages_does_not_reset_success_message(self):
         validator = ValidatorTest()
-        initial_success_message = validator.success_messages[0]
+        initial_success_messages = list(validator.success_messages)
         validator._reset_messages()
         self.assertListEqual(
             validator.success_messages,
-            [initial_success_message],
+            initial_success_messages,
             "Success message is an attribute of the class ; it is a static value, it can't be removed."
         )
 
