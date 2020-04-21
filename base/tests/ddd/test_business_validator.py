@@ -100,7 +100,7 @@ class TestBusinessValidator(SimpleTestCase):
             BusinessValidationMessage("Error message", MessageLevel.ERROR),
             BusinessValidationMessage('Warning msg', MessageLevel.WARNING),
         ]
-        self.assertNotIn("Success msg", validator.messages, "Should only return warningsand success when is valid")
+        self.assertNotIn("Success msg", validator.messages, "Should only return warnings and success when is valid")
         self.assertEqual(validator.messages, expected_result, "Assert the validator doesn't add messages twice")
 
     def test_reset_messages_does_not_reset_success_message(self):
