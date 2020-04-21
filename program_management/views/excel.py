@@ -38,7 +38,7 @@ from program_management.forms.custom_xls import CustomXlsForm
 
 
 @login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
+@permission_required('base.view_educationgroup', raise_exception=True)
 @set_download_cookie
 def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
@@ -55,7 +55,7 @@ def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
 
 
 @login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
+@permission_required('base.view_educationgroup', raise_exception=True)
 @set_download_cookie
 def get_learning_units_is_prerequisite_for_excel(request, education_group_year_pk):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
@@ -72,7 +72,7 @@ def get_learning_units_is_prerequisite_for_excel(request, education_group_year_p
 
 
 @login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
+@permission_required('base.view_educationgroup', raise_exception=True)
 @set_download_cookie
 def get_learning_units_of_training_for_excel(request, root_id, education_group_year_pk):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
