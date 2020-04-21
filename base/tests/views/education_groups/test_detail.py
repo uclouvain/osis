@@ -437,11 +437,11 @@ class EducationGroupDiplomas(TestCase):
         mini_training_education_group_year = EducationGroupYearFactory()
         mini_training_education_group_year.education_group_type.category = education_group_categories.MINI_TRAINING
         mini_training_education_group_year.education_group_type.save()
-
+        StandardEducationGroupVersionFactory(offer=mini_training_education_group_year)
         url = reverse("education_group_diplomas",
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
-        StandardEducationGroupVersionFactory(offer=mini_training_education_group_year)
+
         expected_url = reverse("education_group_read",
                                args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         self.assertEqual(expected_url, response.url)
@@ -457,13 +457,14 @@ class EducationGroupDiplomas(TestCase):
         group_education_group_year = EducationGroupYearFactory()
         group_education_group_year.education_group_type.category = education_group_categories.GROUP
         group_education_group_year.education_group_type.save()
+        StandardEducationGroupVersionFactory(offer=group_education_group_year)
 
         url = reverse("education_group_diplomas",
                       args=[group_education_group_year.id, group_education_group_year.id]
                       )
 
         response = self.client.get(url)
-        StandardEducationGroupVersionFactory(offer=group_education_group_year)
+
         expected_url = reverse("education_group_read",
                                args=[group_education_group_year.id, group_education_group_year.id])
         self.assertEqual(expected_url, response.url)
