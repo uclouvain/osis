@@ -172,23 +172,20 @@ class Node:
             self,
             keep_reference_of_type: Set[EducationGroupTypesEnum] = None
     ) -> List['Link']:
+        def is_link_to_keep(link: 'Link', keep_reference_of_type: Set[EducationGroupTypesEnum]):
+            in_types_to_keep = keep_reference_of_type and link.child.node_type in keep_reference_of_type
+            return link.link_type != LinkTypes.REFERENCE or in_types_to_keep
+
         links = []
         for link in self.children:
-            in_types_to_keep = keep_reference_of_type and link.child.node_type in keep_reference_of_type
-            if link.link_type != LinkTypes.REFERENCE or in_types_to_keep:
+            if is_link_to_keep(link, keep_reference_of_type):
                 links.append(link)
             else:
                 links += link.child.children
         return links
 
     def get_children_and_only_reference_children_except_minors_reference(self) -> List['Link']:
-        minors = {
-            MiniTrainingType.ACCESS_MINOR,
-            MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR,
-            MiniTrainingType.OPEN_MINOR,
-            MiniTrainingType.SOCIETY_MINOR
-        }
-        return self.children_and_reference_children(keep_reference_of_type=minors)
+        return self.children_and_reference_children(keep_reference_of_type=set(MiniTrainingType.minors_enum()))
 
     def get_children_types(self, include_nodes_used_as_reference=False) -> List[EducationGroupTypesEnum]:
         if not include_nodes_used_as_reference:
