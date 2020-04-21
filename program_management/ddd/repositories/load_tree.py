@@ -177,8 +177,9 @@ def __build_tree(
 ) -> 'ProgramTree':
     structure_by_parent = {}  # For performance
     for s_dict in tree_structure:
-        parent_path = '|'.join(s_dict['path'].split('|')[:-1])
-        structure_by_parent.setdefault(parent_path, []).append(s_dict)
+        if s_dict['path']:  # TODO :: Case child_id or parent_id is null - to remove after DB null constraint set
+            parent_path = '|'.join(s_dict['path'].split('|')[:-1])
+            structure_by_parent.setdefault(parent_path, []).append(s_dict)
     root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
     tree = ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
     return tree
