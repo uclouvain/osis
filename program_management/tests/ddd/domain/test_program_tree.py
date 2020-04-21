@@ -466,7 +466,7 @@ class TestGetLink(SimpleTestCase):
         )
 
 
-class TestGetCodesPermittedAdPrerequisite(SimpleTestCase):
+class TestGetCodesPermittedAsPrerequisite(SimpleTestCase):
 
     def setUp(self):
         self.tree = ProgramTreeFactory()
