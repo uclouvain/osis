@@ -41,13 +41,14 @@ from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
 class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
-
+        StandardEducationGroupVersionFactory(offer=cls.education_group_year)
         cls.achievement_0 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_1 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_2 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
@@ -105,6 +106,7 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         self.assertEqual(messages[0], _("Invalid action"))
 
     def test_update(self):
+        print('update')
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(

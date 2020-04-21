@@ -44,7 +44,7 @@ class EducationGroupAchievementMixin(SingleObjectMixin):
         url = reverse(
             "education_group_skills_achievements",
             args=[
-                self.kwargs['root_id'],
+                self.kwargs['offer_id'],
                 self.kwargs['education_group_year_id'],
             ]
         )

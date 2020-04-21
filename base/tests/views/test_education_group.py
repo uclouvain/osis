@@ -635,7 +635,7 @@ class EducationGroupEditAdministrativeData(TestCase):
         mock_can_user_edit_administrative_data.return_value = True
 
         response = self.client.get(reverse(education_group_edit_administrative_data, kwargs={
-            'root_id': education_group_year.id,
+            'offer_id': education_group_year.id,
             'education_group_year_id': education_group_year.id
         }))
 
@@ -1055,7 +1055,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertLess(admission_condition_line_1.order, admission_condition_line_2.order)
 
         url = reverse('education_group_year_admission_condition_line_order', kwargs={
-            'root_id': self.education_group_parent.id,
+            'offer_id': self.education_group_parent.id,
             'education_group_year_id': self.education_group_child.id,
         })
 
