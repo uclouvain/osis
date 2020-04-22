@@ -289,6 +289,7 @@ class NodeGroupYear(Node):
 class NodeLearningUnitYear(Node):
 
     type = NodeType.LEARNING_UNIT
+    node_type = NodeType.LEARNING_UNIT
 
     def __init__(
             self,
@@ -321,6 +322,7 @@ class NodeLearningUnitYear(Node):
         self.quadrimester = quadrimester
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
+        self.node_type = NodeType.LEARNING_UNIT  # Used for authorized_relationship
 
     @property
     def has_prerequisite(self) -> bool:
