@@ -164,6 +164,21 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
         validator = DetachAuthorizedRelationshipValidator(self.tree, link.child, self.authorized_parent)
         self.assertTrue(validator.is_valid())
 
+    def test_when_relation_is_not_authorized(self):
+        """
+            Business case to fix :
+            MINOR_LIST_CHOICE
+               |--ACCESS_MINOR (link_type=reference)
+                  |--COMMON_CORE
+            # FIXME :: What if we want to detach ACCESS_MINOR in the tree above?
+            # FIXME :: In this case, the relation between child of minor () COMMON_CORE and parent of minor (MINOR_LIST_CHOICE) is not authorized.
+            # FIXME :: While this test pass, it permit to ignore validation if the authorized_relationship does not exist.
+        """
+        unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
+        LinkFactory(parent=self.authorized_parent, child=unauthorized_child)
+        validator = DetachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
+        self.assertTrue(validator.is_valid())
+
     def test_when_parent_has_children_but_minimum_is_not_reached(self):
         another_authorized_child = NodeGroupYearFactory(node_type=GroupType.COMMON_CORE)
         another_authorized_parent = NodeGroupYearFactory(node_type=TrainingType.BACHELOR)

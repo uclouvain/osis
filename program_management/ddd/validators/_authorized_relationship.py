@@ -95,6 +95,9 @@ class DetachAuthorizedRelationshipValidator(BusinessValidator):
         for child_type in children_types_to_check:
             current_count = counter[child_type]
             relation = self.tree.authorized_relationships.get_authorized_relationship(parent_node.node_type, child_type)
+            if not relation:
+                # FIXME :: business cass to fix (cf unit test)
+                continue
             if current_count == relation.min_count_authorized:
                 types_minimum_reached.append(child_type)
 
