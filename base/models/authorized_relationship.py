@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Set, Generator
+from typing import List, Set
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -31,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from program_management.ddd.business_types import *
 
 
 class AuthorizedRelationshipAdmin(OsisModelAdmin):
