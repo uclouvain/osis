@@ -34,7 +34,6 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import link
 
 
 class RecursiveField(serializers.Serializer):
@@ -167,7 +166,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
 
         complete_title = specific_title
         if common_title:
-            complete_title = common_title + ' - ' + specific_title
+            complete_title = common_title + (' - ' + specific_title if specific_title else "")
         return complete_title
 
     def to_representation(self, obj: 'Link'):
