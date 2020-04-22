@@ -362,6 +362,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'functional': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
         'send_mail': {
             'handlers': ['console'],
             'level': 'DEBUG',
@@ -404,6 +409,7 @@ ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMIS
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
 # Selenium Testing
+FUNCTIONAL_LOGGER = "functional"
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
     'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', "geckodriver"),
