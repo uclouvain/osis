@@ -37,9 +37,7 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
-from program_management.models.enums.node_type import NodeType
-from program_management.tests.factories.element import ElementEducationGroupYearFactory, ElementGroupYearFactory, \
-    ElementLearningUnitYearFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.ddd.repositories import load_tree
 from django.utils.translation import gettext_lazy as _

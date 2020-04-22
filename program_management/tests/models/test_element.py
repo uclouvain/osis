@@ -62,14 +62,6 @@ class TestElementSave(TestCase):
                                        learning_class_year=None).exists()
             )
 
-    def test_save_one_education_group_year_fk(self):
-        element = ElementEducationGroupYearFactory(education_group_year=self.egy)
-        element.save()
-
-        self.assertTrue(
-            Element.objects.filter(education_group_year=element.education_group_year).exists()
-        )
-
     def test_save_one_group_year_fk(self):
         element = ElementGroupYearFactory.build(group_year=self.gy)
         element.save()
