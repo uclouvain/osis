@@ -100,4 +100,3 @@ class MiniTrainingPrerequisites(ProgramTreePrerequisites):
             offer__partial_acronym__iexact=partial_acronym,
             offer__academic_year__year=year
         )
-
