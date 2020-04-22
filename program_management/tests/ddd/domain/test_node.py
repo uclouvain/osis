@@ -178,11 +178,11 @@ class TestGetChildrenAndReferenceChildren(SimpleTestCase):
             result
         )
 
-    def test_get_only_children_of_reference_link_except_minors(self):
-        minor = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
-        link_ref = LinkFactory(link_type=LinkTypes.REFERENCE, child=minor)
+    def test_get_only_children_of_reference_link_except_within_minor_list(self):
+        minor_list = NodeGroupYearFactory(node_type=GroupType.MINOR_LIST_CHOICE)
+        link_ref = LinkFactory(link_type=LinkTypes.REFERENCE, parent=minor_list)
         LinkFactory(parent=link_ref.child)
-        result = link_ref.parent.get_children_and_only_reference_children_except_minors_reference()
+        result = link_ref.parent.get_children_and_only_reference_children_except_within_minor_list()
         self.assertListEqual(
             [link_ref],
             result

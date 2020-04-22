@@ -186,10 +186,10 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
         self.assertEqual(len(serializer.data['children']), 1)
         self.assertEqual(serializer.data['children'][0]['code'], luy.acronym)
 
-    def test_ensure_not_getting_direct_child_of_reference_link_except_minor_reference(self):
+    def test_ensure_not_getting_direct_child_of_reference_link_except_within_minor_list(self):
         training = TrainingFactory(
             academic_year=self.academic_year,
-            education_group_type__name=TrainingType.BACHELOR.name
+            education_group_type__name=GroupType.MINOR_LIST_CHOICE.name
         )
         minor = MiniTrainingFactory(
             education_group_type__name=MiniTrainingType.ACCESS_MINOR.name,

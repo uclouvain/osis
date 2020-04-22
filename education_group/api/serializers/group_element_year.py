@@ -73,7 +73,7 @@ class BaseCommonNodeTreeSerializer(serializers.Serializer):
     url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
     title = serializers.SerializerMethodField()
     children = RecursiveField(
-        source='child.get_children_and_only_reference_children_except_minors_reference',
+        source='child.get_children_and_only_reference_children_except_within_minor_list',
         many=True
     )
 
