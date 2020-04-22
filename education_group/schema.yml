@@ -362,10 +362,10 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}/concerned_offers:
+  /mini_trainings/{year}/{partial_acronym}/offer_roots:
     get:
-      description: Return a list of concerned offers for a mini training.
-      operationId: minitrainings_offers_list
+      description: Return the list of offer roots for a mini training.
+      operationId: minitrainings_offer_roots
       parameters:
         - in: path
           name: year

@@ -40,7 +40,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
-from education_group.api.views.mini_training import MiniTrainingList, ConcernedOffers
+from education_group.api.views.mini_training import MiniTrainingList, OfferRoots
 
 
 class MiniTrainingTitleTestCase(APITestCase):
@@ -242,7 +242,7 @@ class GetMiniTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-class ConcernedOffersTestCase(APITestCase):
+class OfferRootsTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
@@ -253,7 +253,7 @@ class ConcernedOffersTestCase(APITestCase):
             offer = TrainingFactory(academic_year=cls.academic_year)
             GroupElementYearFactory(parent=offer, child_branch=cls.minor, child_leaf=None)
         cls.user = UserFactory()
-        cls.url = reverse('education_group_api_v1:' + ConcernedOffers.name, kwargs={
+        cls.url = reverse('education_group_api_v1:' + OfferRoots.name, kwargs={
             'partial_acronym': cls.minor.partial_acronym,
             'year': cls.academic_year.year
         })

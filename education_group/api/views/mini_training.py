@@ -133,11 +133,11 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
         return egy
 
 
-class ConcernedOffers(LanguageContextSerializerMixin, generics.ListAPIView):
+class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     """
-        Return the concerned bachelors of the mini training
+        Return the offer roots of the mini training
     """
-    name = 'concerned_offers'
+    name = 'offer_roots'
     serializer_class = TrainingListSerializer
 
     def get_queryset(self):
