@@ -26,7 +26,6 @@
 
 from typing import List, Dict, Any
 
-from django.db.models import Case, F, When
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -38,11 +37,9 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
-from program_management.models.enums.node_type import NodeType
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
-from django.db.models import IntegerField
 from education_group.models.group_year import GroupYear
 
 
@@ -210,7 +207,7 @@ def __build_children(
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        parent_id = child_structure['parent_element_id']
+        parent_id = child_structure['parent_id']
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node
