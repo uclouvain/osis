@@ -30,6 +30,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
@@ -74,11 +75,13 @@ class DetachNodeValidatorList(BusinessListValidator):
         detach_from = tree.get_node(path_to_parent)
 
         if node_to_detach.is_group():
+            path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
                 MinimumEditableYearValidator(tree),
                 DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
                 IsPrerequisiteValidator(tree, node_to_detach),
                 HasPrerequisiteValidator(tree, node_to_detach),
+                DetachOptionValidator(tree, path_to_node_to_detach, [tree]),
             ]
 
         elif node_to_detach.is_learning_unit():
