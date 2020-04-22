@@ -71,8 +71,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             learning_container_year__academic_year=cls.academic_year,
             credits=10,
             status=False,
-            specific_title=None,
-            learning_container_year__common_title='COMMON'
+            specific_title_english=None,
+            learning_container_year__common_title_english='COMMON'
         )
         cls.luy_gey = GroupElementYearFactory(
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15

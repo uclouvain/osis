@@ -166,7 +166,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
 
         complete_title = specific_title
         if common_title:
-            complete_title = common_title + (' - ' + specific_title) if specific_title else ""
+            complete_title = common_title + (' - ' + specific_title if specific_title else "")
         return complete_title
 
     def to_representation(self, obj: 'Link'):
