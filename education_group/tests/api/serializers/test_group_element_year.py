@@ -39,7 +39,6 @@ from education_group.api.views.group_element_year import TrainingTreeView, Group
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.domain.link import Link
 from program_management.ddd.repositories import load_tree
 
@@ -71,7 +70,9 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
             credits=10,
-            status=False
+            status=False,
+            specific_title=None,
+            learning_container_year__common_title='COMMON'
         )
         cls.luy_gey = GroupElementYearFactory(
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15
@@ -152,6 +153,11 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'proposal_type'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
+
+    def test_learning_unit_children_have_only_common_title_if_no_specific_one(self):
+        luy = self.serializer.data['children'][0]['children'][0]
+        self.assertFalse(luy['status'])
+        self.assertEqual(luy['title'], 'COMMON')
 
     def test_learning_unit_children_status_field_is_false_boolean(self):
         luy = self.serializer.data['children'][0]['children'][0]
