@@ -45,8 +45,8 @@ from education_group.api.serializers.mini_training import MiniTrainingListSerial
 from education_group.api.views.mini_training import MiniTrainingList
 from education_group.api.views.mini_training import OfferRoots
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -205,7 +205,7 @@ class GetMiniTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.mini_training = MiniTrainingFactory(partial_acronym='LGENR100I', academic_year=cls.academic_year)
-        cls.version = EducationGroupVersionFactory(offer=cls.mini_training)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.mini_training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
             'partial_acronym': cls.version.root_group.partial_acronym,
