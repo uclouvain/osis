@@ -473,7 +473,10 @@ class TestBuildTree(TestCase):
         GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
-            child_leaf=LearningUnitYearFactory(acronym=acronym)
+            child_leaf=LearningUnitYearFactory(
+                acronym=acronym,
+                learning_container_year__requirement_entity=None
+            )
         )
 
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
@@ -771,7 +774,7 @@ class TestGetFinalityList(TestCase):
     def test_get_finality_list_case_result_found(self):
         finality_list = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE
+            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
         )
         finality_1 = EducationGroupYearFactory(
             academic_year=self.academic_year,
@@ -850,7 +853,6 @@ class TestPath(TestCase):
         )
 
 
-
 class TestFetchGroupElementsBehindHierarchy(TestCase):
     """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
     @classmethod
@@ -858,25 +860,25 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
         cls.academic_year = AcademicYearFactory()
         cls.root = TrainingFactory(
             acronym='DROI2M',
-            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120,
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120.name,
             academic_year=cls.academic_year
         )
 
         finality_list = GroupFactory(
             acronym='LIST FINALITIES',
-            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
             academic_year=cls.academic_year
         )
 
         formation_master_md = TrainingFactory(
             acronym='DROI2MD',
-            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120,
+            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120.name,
             academic_year=cls.academic_year
         )
 
         common_core = GroupFactory(
             acronym='TC DROI2MD',
-            education_group_type__name=education_group_types.GroupType.COMMON_CORE,
+            education_group_type__name=education_group_types.GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
 
