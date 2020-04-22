@@ -31,27 +31,27 @@ app_name = "program_management"
 
 urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
+        url(r'^transition/prerequisites$', TrainingPrerequisites.as_view(), {'transition': True},
+            name='{}_transition'.format(TrainingPrerequisites.NAME)),
+        url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(TrainingPrerequisites.NAME)),
         url(r'^(?P<version_name>[\w]+)/', include([
             url(r'^transition/prerequisites$', TrainingPrerequisites.as_view(), {'transition': True},
                 name='{}_version_transition'.format(TrainingPrerequisites.NAME)),
             url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
                 name='{}_version'.format(TrainingPrerequisites.NAME)),
         ])),
-        url(r'^transition/prerequisites$', TrainingPrerequisites.as_view(), {'transition': True},
-            name='{}_transition'.format(TrainingPrerequisites.NAME)),
-        url(r'^prerequisites$', TrainingPrerequisites.as_view(), {'transition': False},
-            name='{}_official'.format(TrainingPrerequisites.NAME)),
     ])),
     url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
+        url(r'^transition/prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': True},
+            name='{}_transition'.format(MiniTrainingPrerequisites.NAME)),
+        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
+            name='{}_official'.format(MiniTrainingPrerequisites.NAME)),
         url(r'^(?P<version_name>[\w]+)/', include([
             url(r'^transition/prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': True},
                 name='{}_version_transition'.format(MiniTrainingPrerequisites.NAME)),
             url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
                 name='{}_version'.format(MiniTrainingPrerequisites.NAME)),
         ])),
-        url(r'^transition/prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': True},
-            name='{}_transition'.format(MiniTrainingPrerequisites.NAME)),
-        url(r'^prerequisites$', MiniTrainingPrerequisites.as_view(), {'transition': False},
-            name='{}_official'.format(MiniTrainingPrerequisites.NAME)),
     ])),
 ]
