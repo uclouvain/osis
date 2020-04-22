@@ -48,6 +48,7 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
         return self.tree
 
     def get_queryset(self):
+        self.get_serializer_context()
         return self.get_tree().get_nodes_that_have_prerequisites() if self.get_tree() else None
 
     def get_object(self):
