@@ -65,13 +65,11 @@ class AuthorizedRelationshipObject:
             self,
             parent_type: EducationGroupTypesEnum,
             child_type: EducationGroupTypesEnum,
-            # learning_unit_child_authorized: bool,
             min_constraint: int,
             max_constraint: int,
     ):
         self.parent_type = parent_type
         self.child_type = child_type
-        # self.is_learning_unit_child_authorized = learning_unit_child_authorized
         self.min_count_authorized = min_constraint
         self.max_count_authorized = max_constraint
 

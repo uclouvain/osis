@@ -41,15 +41,10 @@ def load() -> AuthorizedRelationshipList:  # TODO :: add unit tests
     parent_types_with_authorized_learn_unit = set(EducationGroupType.objects.all().values_list('name', flat=True))
     for obj in qs:
         parent_type_name = obj['parent_type__name']
-        # authorized_learning_unit = False
-        # if parent_type_name in parent_types_with_authorized_learn_unit:
-        #     authorized_learning_unit = True
-        #     parent_types_with_authorized_learn_unit.discard(parent_type_name)
         authorized_relationships.append(
             AuthorizedRelationshipObject(
                 convert_node_type_enum(parent_type_name),
                 convert_node_type_enum(obj['child_type__name']),
-                # authorized_learning_unit,
                 obj['min_count_authorized'],
                 obj['max_count_authorized'],
             )
