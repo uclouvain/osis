@@ -38,7 +38,8 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.factories.element import ElementEducationGroupYearFactory, ElementGroupYearFactory
+from program_management.tests.factories.element import ElementEducationGroupYearFactory, ElementGroupYearFactory, \
+    ElementLearningUnitYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.ddd.repositories import load_tree
 from django.utils.translation import gettext_lazy as _
@@ -168,14 +169,14 @@ class TestLoadTreesFromChildren(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2020)
-        cls.root_node = ElementEducationGroupYearFactory(education_group_year__academic_year=cls.academic_year)
+        cls.root_node = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
         cls.link_level_1 = GroupElementYearFactory(
-            parent=cls.root_node.education_group_year,
-            child_branch__academic_year=cls.academic_year
+            parent_element=cls.root_node,
+            child_element__group_year__academic_year=cls.academic_year
         )
         cls.link_level_2 = GroupElementYearFactory(
-            parent=cls.link_level_1.child_branch,
-            child_branch__academic_year=cls.academic_year
+            parent_element=cls.link_level_1.child_element,
+            child_element__group_year__academic_year=cls.academic_year
         )
 
     def test_when_bad_arg(self):
@@ -187,76 +188,69 @@ class TestLoadTreesFromChildren(TestCase):
         self.assertEqual(result, [])
 
     def test_when_child_is_root(self):
-        children_ids = [self.link_level_1.parent.id]
+        children_ids = [self.link_level_1.parent_element_id]
         result = load_tree.load_trees_from_children(children_ids)
         self.assertListEqual(result, [])
 
     def test_when_child_has_only_one_root_id(self):
-        children_ids = [self.link_level_2.child_branch.id]
+        children_ids = [self.link_level_2.child_element_id]
         result = load_tree.load_trees_from_children(children_ids)
-        expected_result = [load_tree.load(self.root_node.education_group_year.id)]
+        expected_result = [load_tree.load(self.root_node.pk)]
         self.assertListEqual(result, expected_result)
 
     def test_when_child_is_learning_unit(self):
-        link_level_3 = GroupElementYearFactory(
-            parent=self.link_level_2.child_branch,
-            child_leaf=LearningUnitYearFactory(academic_year=self.academic_year),
-            child_branch=None,
+        link_level_3 = GroupElementYearChildLeafFactory(
+            parent_element=self.link_level_2.child_element,
+            child_element=ElementLearningUnitYearFactory(learning_unit_year__academic_year=self.academic_year)
         )
-        children_ids = [link_level_3.child_leaf.id]
-        result = load_tree.load_trees_from_children([], child_leaf_ids=children_ids)
-        expected_result = [load_tree.load(self.root_node.education_group_year.id)]
+        children_ids = [link_level_3.child_element_id]
+        result = load_tree.load_trees_from_children(children_ids)
+        expected_result = [load_tree.load(self.root_node.pk)]
         self.assertListEqual(result, expected_result)
 
     def test_when_child_has_many_root_ids(self):
-        root_node_2 = ElementEducationGroupYearFactory(education_group_year__academic_year=self.academic_year)
-        root_node_3 = ElementEducationGroupYearFactory(education_group_year__academic_year=self.academic_year)
-        child = self.link_level_2.child_branch
-        GroupElementYearFactory(
-            parent=root_node_2.education_group_year,
-            child_branch=child
-        )
-        GroupElementYearFactory(
-            parent=root_node_3.education_group_year,
-            child_branch=child
-        )
-        result = load_tree.load_trees_from_children([child.id])
+        root_node_2 = ElementGroupYearFactory(group_year__academic_year=self.academic_year)
+        root_node_3 = ElementGroupYearFactory(group_year__academic_year=self.academic_year)
+        child_element = self.link_level_2.child_element
+
+        GroupElementYearFactory(parent_element=root_node_2, child_element=child_element)
+        GroupElementYearFactory(parent_element=root_node_3, child_element=child_element)
+
+        result = load_tree.load_trees_from_children([child_element.pk])
         expected_result = [
-            load_tree.load(self.root_node.education_group_year.id),
-            load_tree.load(root_node_2.education_group_year.id),
-            load_tree.load(root_node_3.education_group_year.id),
+            load_tree.load(self.root_node.pk),
+            load_tree.load(root_node_2.pk),
+            load_tree.load(root_node_3.pk),
         ]
         self.assertEqual(len(result), len(expected_result))
         for tree in expected_result:
             self.assertIn(tree, result)
 
     def test_when_root_is_2_levels_up(self):
-        child = self.link_level_2.child_branch
+        child = self.link_level_2.child_element
         lvl1 = GroupElementYearFactory(
-            parent__academic_year=child.academic_year,
-            child_branch=child
+            parent_element__group_year__academic_year=child.group_year.academic_year,
+            child_element=child
         )
         lvl2 = GroupElementYearFactory(
-            parent__academic_year=child.academic_year,
-            child_branch=lvl1.parent
+            parent_element__group_year__academic_year=child.group_year.academic_year,
+            child_element=lvl1.parent_element
         )
         result = load_tree.load_trees_from_children([child.id])
-        expected_parent = load_tree.load(lvl2.parent.id)
-        self.assertNotIn(load_tree.load(lvl1.parent.id), result)
+        expected_parent = load_tree.load(lvl2.parent_element.id)
+        self.assertNotIn(load_tree.load(lvl1.parent_element.id), result)
         self.assertIn(expected_parent, result)
 
     def test_when_link_type_is_reference(self):
-        parent_node_type_reference = ElementEducationGroupYearFactory(
-            education_group_year__academic_year=self.academic_year
-        )
-        child = self.link_level_2.child_branch
+        parent_node_type_reference = ElementGroupYearFactory(group_year__academic_year=self.academic_year)
+        child = self.link_level_2.child_element
         GroupElementYearFactory(
-            parent=parent_node_type_reference.education_group_year,
-            child_branch=child,
+            parent_element=parent_node_type_reference,
+            child_element=child,
             link_type=LinkTypes.REFERENCE.name
         )
-        result = load_tree.load_trees_from_children(child_branch_ids=[child.id], link_type=LinkTypes.REFERENCE)
-        expected_result = [load_tree.load(parent_node_type_reference.education_group_year.id)]
+        result = load_tree.load_trees_from_children([child.id], link_type=LinkTypes.REFERENCE)
+        expected_result = [load_tree.load(parent_node_type_reference.pk)]
         self.assertListEqual(result, expected_result)
 
 

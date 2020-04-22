@@ -80,20 +80,16 @@ def load(root_element_id: int) -> 'ProgramTree':
 
 
 def load_trees_from_children(
-        child_branch_ids: list,
-        child_leaf_ids: list = None,
+        child_element_ids: list,
         link_type: LinkTypes = None
 ) -> List['ProgramTree']:
-    if not child_branch_ids and not child_leaf_ids:
+    if child_element_ids:
+        assert isinstance(child_element_ids, list)
+    if not child_element_ids:
         return []
-    if child_branch_ids:
-        assert isinstance(child_branch_ids, list)
-    if child_leaf_ids:
-        assert isinstance(child_leaf_ids, list)
 
     qs = group_element_year.GroupElementYear.objects.get_reverse_adjacency_list(
-        child_branch_ids=child_branch_ids,
-        child_leaf_ids=child_leaf_ids,
+        child_element_ids=child_element_ids,
         link_type=link_type,
     )
     if not qs:
