@@ -24,24 +24,22 @@
 #
 ##############################################################################
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 
-from base.models import person
-from program_management.business.group_element_years import perms as business_perms
+from osis_role.errors import get_permission_error
 
 
-def can_update_group_element_year(user, group_element_year, raise_exception=False):
-    pers = get_object_or_404(person.Person, user=user)
-    is_eligible = business_perms.is_eligible_to_update_group_element_year_content(
-        pers, group_element_year, raise_exception=raise_exception
-    )
-    if not is_eligible:
-        raise PermissionDenied
+def can_update_group_element_year(user, group_element_year):
+    perm = 'base.change_educationgroupcontent'
+    result = user.has_perm(perm)
+    if not result:
+        msg = get_permission_error(user, perm)
+        raise PermissionDenied(_(msg))
     return True
 
 
-def can_detach_group_element_year(user, group_element_year, raise_exception=False):
-    pers = get_object_or_404(person.Person, user=user)
-    if not business_perms.is_eligible_to_detach_group_element_year(pers, group_element_year, raise_exception):
+def can_detach_group_element_year(user, group_element_year):
+    result = user.has_perm('base.detach_educationgroup', group_element_year.parent)
+    if not result:
         raise PermissionDenied
     return True

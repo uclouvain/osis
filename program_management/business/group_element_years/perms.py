@@ -21,27 +21,10 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.perms import can_raise_exception
 from base.models.enums.education_group_types import GroupType
-from osis_role import errors
-
-
-# TODO: Extract permission logic from logic of education group because it's manipulating tree structure
-def is_eligible_to_update_group_element_year(person, group_element_year, raise_exception):
-    return person.user.has_perm('base.change_educationgroup', group_element_year.parent) and \
-           (not group_element_year.child_branch
-            or _can_user_update_education_group_year_child(person, group_element_year.child_branch, raise_exception))
-
-
-# TODO: Extract permission logic from logic of education group because it's manipulating tree structure
-def is_eligible_to_detach_group_element_year(person, group_element_year, raise_exception):
-    result = person.user.has_perm('base.change_educationgroup', group_element_year.parent)
-    if raise_exception and not result:
-        raise PermissionDenied(errors.get_permission_error(person.user, 'base.change_educationgroup'))
-    return result
 
 
 def is_eligible_to_update_group_element_year_content(person, group_element_year, raise_exception):

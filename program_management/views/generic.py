@@ -31,7 +31,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.views.generic import UpdateView, DetailView, FormView
+from django.views.generic import DetailView, FormView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
@@ -44,6 +44,7 @@ from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
+from program_management.views.perms import can_update_group_element_year
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -62,7 +63,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
 
     # RulesRequiredMixin
     raise_exception = True
-    rules = [perms.can_change_education_group]
+    rules = [can_update_group_element_year]
 
     def _call_rule(self, rule):
         """ The permission is computed from the education_group_year """
