@@ -46,8 +46,10 @@ class LanguageFactory(DjangoModelFactory):
 
 
 class FrenchLanguageFactory(LanguageFactory):
-    _language = Language(code='FR', name="Français")
+    code = "FR"
+    name = "Français"
 
 
 class EnglishLanguageFactory(LanguageFactory):
-    _language = Language(code="EN", name="Anglais")
+    code = "EN"
+    name = "Anglais"
