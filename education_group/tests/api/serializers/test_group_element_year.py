@@ -156,7 +156,6 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
 
     def test_learning_unit_children_have_only_common_title_if_no_specific_one(self):
         luy = self.serializer.data['children'][0]['children'][0]
-        self.assertFalse(luy['status'])
         self.assertEqual(luy['title'], 'COMMON')
 
     def test_learning_unit_children_status_field_is_false_boolean(self):
