@@ -43,11 +43,11 @@ class EntityVersionFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.EntityVersion'
 
-    entity = factory.SubFactory(EntityFactory)
+    entity = factory.SubFactory(EntityFactory, version=None)
     title = factory.Faker('company')
     acronym = factory.Iterator(generate_acronyms())
     entity_type = factory.Iterator(entity_type.ENTITY_TYPES, getter=lambda c: c[0])
-    parent = factory.SubFactory(EntityFactory)
+    parent = factory.SubFactory(EntityFactory, version=None)
     start_date = datetime.date(2015, 1, 1).isoformat()
     end_date = None
 

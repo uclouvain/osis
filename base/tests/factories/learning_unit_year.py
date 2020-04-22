@@ -52,6 +52,11 @@ def create_learning_units_year(start_year, end_year, learning_unit):
             for year in range(start_year, end_year+1)}
 
 
+def _is_internship(luy_obj):
+    return luy_obj.learning_container_year \
+           and luy_obj.learning_container_year.container_type == learning_container_year_types.INTERNSHIP
+
+
 class LearningUnitYearFactory(DjangoModelFactory):
     class Meta:
         model = "base.LearningUnitYear"
@@ -70,9 +75,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     specific_title_english = factory.Sequence(lambda n: 'Learning unit year english - %d' % n)
     subtype = factory.Iterator(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES, getter=operator.itemgetter(0))
 
-    is_internship = factory.LazyAttribute(
-        lambda o: o.learning_container_year.container_type == learning_container_year_types.INTERNSHIP
-    )
+    is_internship = factory.LazyAttribute(_is_internship)
     internship_subtype = factory.Maybe(
         'is_internship',
         yes_declaration=factory.Iterator(internship_subtypes.INTERNSHIP_SUBTYPES, getter=operator.itemgetter(0)),
@@ -94,12 +97,14 @@ class LearningUnitYearFactory(DjangoModelFactory):
 class LearningUnitYearWithComponentsFactory(LearningUnitYearFactory):
     lecturing_component = factory.PostGeneration(
         lambda obj, create, extracted, **kwargs: learning_component_year.LecturingLearningComponentYearFactory(
-            learning_unit_year=obj
+            learning_unit_year=obj,
+            **kwargs
         )
     )
     practical_component = factory.PostGeneration(
         lambda obj, create, extracted, **kwargs: learning_component_year.PracticalLearningComponentYearFactory(
-            learning_unit_year=obj
+            learning_unit_year=obj,
+            **kwargs
         )
     )
 
