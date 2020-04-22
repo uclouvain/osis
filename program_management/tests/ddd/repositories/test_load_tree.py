@@ -51,6 +51,7 @@ class TestLoadTree(TestCase):
     @classmethod
     def setUpTestData(cls):
         """
+            (education_group_version)
             root_node
             |-link_level_1
               |-link_level_2
@@ -59,6 +60,9 @@ class TestLoadTree(TestCase):
         cls.root_node = ElementGroupYearFactory()
         cls.link_level_1 = GroupElementYearFactory(parent_element=cls.root_node)
         cls.link_level_2 = GroupElementYearChildLeafFactory(parent_element=cls.link_level_1.child_element)
+        cls.education_group_version = EducationGroupVersionFactory(
+            root_group=cls.root_node.group_year
+        )
 
     def test_case_tree_root_not_exist(self):
         unknown_tree_root_id = -1
@@ -82,60 +86,60 @@ class TestLoadTree(TestCase):
         )
 
     # TODO : move this into test_load_prerequisite
-    # def test_case_load_tree_leaf_have_some_prerequisites(self):
-    #     PrerequisiteFactory(
-    #         education_group_year=self.root_node.education_group_year,
-    #         learning_unit_year=self.link_level_2.child_leaf,
-    #         items__groups=(
-    #             (
-    #                 LearningUnitYearFactory(
-    #                     acronym='LDROI1200', academic_year=self.link_level_2.child_leaf.academic_year
-    #                 ),
-    #             ),
-    #             (
-    #                 LearningUnitYearFactory(
-    #                     acronym='LAGRO1600', academic_year=self.link_level_2.child_leaf.academic_year
-    #                 ),
-    #                 LearningUnitYearFactory(
-    #                     acronym='LBIR2300', academic_year=self.link_level_2.child_leaf.academic_year
-    #                 )
-    #             )
-    #         )
-    #     )
-    #
-    #     education_group_program_tree = load_tree.load(self.root_node.group_year.pk)
-    #     leaf = education_group_program_tree.root_node.children[0].child.children[0].child
-    #
-    #     self.assertIsInstance(leaf, node.NodeLearningUnitYear)
-    #     self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
-    #     expected_str = 'LDROI1200 {AND} (LAGRO1600 {OR} LBIR2300)'.format(
-    #         OR=_(prerequisite_operator.OR),
-    #         AND=_(prerequisite_operator.AND)
-    #     )
-    #     self.assertEquals(str(leaf.prerequisite), expected_str)
-    #     self.assertTrue(leaf.has_prerequisite)
-    #
-    # def test_case_load_tree_leaf_is_prerequisites_of(self):
-    #     new_link = GroupElementYearFactory(
-    #         parent=self.link_level_1.child_branch,
-    #         child_branch=None,
-    #         child_leaf=LearningUnitYearFactory()
-    #     )
-    #     # Add prerequisite between two node
-    #     PrerequisiteFactory(
-    #         education_group_year=self.root_node.education_group_year,
-    #         learning_unit_year=self.link_level_2.child_leaf,
-    #         items__groups=((new_link.child_leaf,),)
-    #     )
-    #
-    #     education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
-    #     leaf = education_group_program_tree.root_node.children[0].child.children[1].child
-    #
-    #     self.assertIsInstance(leaf, node.NodeLearningUnitYear)
-    #     self.assertIsInstance(leaf.is_prerequisite_of, list)
-    #     self.assertEquals(len(leaf.is_prerequisite_of), 1)
-    #     self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
-    #     self.assertTrue(leaf.is_prerequisite)
+    def test_case_load_tree_leaf_have_some_prerequisites(self):
+        PrerequisiteFactory(
+            education_group_version=self.education_group_version,
+            learning_unit_year=self.link_level_2.child_element.learning_unit_year,
+            items__groups=(
+                (
+                    LearningUnitYearFactory(
+                        acronym='LDROI1200',
+                        academic_year=self.link_level_2.child_element.learning_unit_year.academic_year
+                    ),
+                ),
+                (
+                    LearningUnitYearFactory(
+                        acronym='LAGRO1600',
+                        academic_year=self.link_level_2.child_element.learning_unit_year.academic_year
+                    ),
+                    LearningUnitYearFactory(
+                        acronym='LBIR2300',
+                        academic_year=self.link_level_2.child_element.learning_unit_year.academic_year
+                    )
+                )
+            )
+        )
+
+        education_group_program_tree = load_tree.load(self.root_node.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+
+        self.assertIsInstance(leaf, node.NodeLearningUnitYear)
+        self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
+        expected_str = 'LDROI1200 {AND} (LAGRO1600 {OR} LBIR2300)'.format(
+            OR=_(prerequisite_operator.OR),
+            AND=_(prerequisite_operator.AND)
+        )
+        self.assertEquals(str(leaf.prerequisite), expected_str)
+        self.assertTrue(leaf.has_prerequisite)
+
+    def test_case_load_tree_leaf_is_prerequisites_of(self):
+        new_link = GroupElementYearChildLeafFactory(parent_element=self.link_level_1.child_element)
+
+        # Add prerequisite between two node
+        PrerequisiteFactory(
+            education_group_version=self.education_group_version,
+            learning_unit_year=self.link_level_2.child_element.learning_unit_year,
+            items__groups=((new_link.child_element.learning_unit_year,),)
+        )
+
+        education_group_program_tree = load_tree.load(self.root_node.pk)
+        leaf = education_group_program_tree.root_node.children[0].child.children[1].child
+
+        self.assertIsInstance(leaf, node.NodeLearningUnitYear)
+        self.assertIsInstance(leaf.is_prerequisite_of, list)
+        self.assertEquals(len(leaf.is_prerequisite_of), 1)
+        self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_element.pk)
+        self.assertTrue(leaf.is_prerequisite)
 
     def test_case_load_tree_leaf_node_have_a_proposal(self):
         proposal_types = ProposalType.get_names()
