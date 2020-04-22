@@ -58,5 +58,3 @@ class ProgramTreePrerequisitesSerializer(NodeBaseSerializer):
                 node = self.context.get('tree').get_node_by_code_and_year(prerequisite.code, prerequisite.year)
                 list_nodes.append(node)
         return NodeBaseSerializer(list_nodes, many=True, context=self.context).data
-
-
