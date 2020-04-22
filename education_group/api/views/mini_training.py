@@ -135,7 +135,7 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
 
 class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     """
-        Return the offer roots of the mini training
+        Return the list of offer roots for a mini training.
     """
     name = 'offer_roots'
     serializer_class = TrainingListSerializer
