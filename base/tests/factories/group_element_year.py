@@ -57,29 +57,27 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    # FIXME :: DEPRECATED - Use parent_element instead
-    parent = factory.SubFactory(EducationGroupYearFactory)
-    # FIXME :: DEPRECATED - Use child_element instead
-    child_branch = factory.SubFactory(EducationGroupYearFactory,
-                                      academic_year=factory.SelfAttribute("..parent.academic_year"))
+    parent_element = factory.SubFactory(ElementGroupYearFactory)
+    child_element = factory.SubFactory(ElementGroupYearFactory)
     relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
-    # FIXME :: DEPRECATED - Use child_element instead
-    child_leaf = None
     is_mandatory = FuzzyBoolean()
     link_type = None
     order = None
     block = factory.LazyFunction(_generate_block_value)
-    parent_element = factory.SubFactory(ElementGroupYearFactory)
-    child_element = factory.SubFactory(
-        ElementGroupYearFactory,
-        group_year__academic_year=factory.SelfAttribute("..parent_element.academic_year")
+    # FIXME :: DEPRECATED - Use parent_element instead
+    parent = factory.SubFactory(EducationGroupYearFactory)
+    child_branch = factory.SubFactory(
+        EducationGroupYearFactory,
+        academic_year=factory.SelfAttribute("..parent.academic_year")
     )
+    child_leaf = None
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):
-    child_leaf = factory.SubFactory(LearningUnitYearFactory,  # TODO: Remove after refactoring
-                                    academic_year=factory.SelfAttribute("..parent.academic_year"))
-    child_element = factory.SubFactory(
-        ElementLearningUnitYearFactory,
-        learning_unit_year__academic_year=factory.SelfAttribute("..parent_element.academic_year")
+    child_element = factory.SubFactory(ElementLearningUnitYearFactory)
+    # TODO: Remove after refactoring
+    child_leaf = factory.SubFactory(
+        LearningUnitYearFactory,
+        academic_year=factory.SelfAttribute("..parent.academic_year")
     )
+    child_branch = None

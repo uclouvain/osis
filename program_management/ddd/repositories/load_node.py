@@ -25,8 +25,7 @@
 ##############################################################################
 from typing import List
 
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Value, CharField, QuerySet, Q, Case, When
+from django.db.models import F, Value, CharField, QuerySet, Q, Case, When, IntegerField
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum
@@ -38,6 +37,7 @@ from program_management.models import element
 from program_management.models.enums.node_type import NodeType
 
 
+# TODO: Depracated, must be deleted (use load method type are determined in element)
 def load_by_type(type: NodeType, element_id: int) -> node.Node:
     if type == NodeType.GROUP:
         return load_node_group_year(element_id)
@@ -45,6 +45,7 @@ def load_by_type(type: NodeType, element_id: int) -> node.Node:
         return load_node_learning_unit_year(element_id)
 
 
+# TODO: Depracated, must be deleted (use load method type are determined in element)
 def load_node_group_year(node_id: int) -> node.Node:
     try:
         node_data = __load_multiple_node_group_year([node_id])[0]
@@ -53,10 +54,18 @@ def load_node_group_year(node_id: int) -> node.Node:
         raise node.NodeNotFoundException
 
 
+# TODO: Depracated, must be deleted (use load method type are determined in element)
 def load_node_learning_unit_year(node_id: int) -> node.Node:
     try:
         node_data = __load_multiple_node_learning_unit_year([node_id])[0]
         return node.factory.get_node(**__convert_string_to_enum(node_data))
+    except IndexError:
+        raise node.NodeNotFoundException
+
+
+def load(element_id: int) -> node.Node:
+    try:
+        return load_multiple([element_id])[0]
     except IndexError:
         raise node.NodeNotFoundException
 
@@ -70,28 +79,35 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
             When(group_year_id__isnull=False, then=Value(NodeType.GROUP.name)),
             When(learning_unit_year_id__isnull=False, then=Value(NodeType.LEARNING_UNIT.name)),
             When(learning_class_year_id__isnull=False, then=Value(NodeType.LEARNING_CLASS.name)),
-            default=Value(''),
+            default=Value("Unknown"),
             output_field=CharField(),
         ),
-        node_id=Case(
+        fk_id=Case(
             When(group_year_id__isnull=False, then=F('group_year_id')),
             When(learning_unit_year_id__isnull=False, then=F('learning_unit_year_id')),
             When(learning_class_year_id__isnull=False, then=F('learning_class_year_id')),
-            default=Value(''),
-            output_field=CharField(),
+            default=Value(-1),
+            output_field=IntegerField(),
         )
-    ).values('node_type').annotate(node_type=F('node_type'), ids=ArrayAgg('node_id'))
+    ).values('node_type', 'fk_id', 'pk')
+
+    # Create data-structure which all to get in a fast way the corresponding element id of the foreign key id
+    elements_group_by_type = {}
+    for elem in qs:
+        elements_group_by_type.setdefault(elem['node_type'], {})
+        elements_group_by_type[elem['node_type']][elem['fk_id']] = elem['pk']
 
     nodes_objects = []
-    for elem_grouped in qs:
-        if elem_grouped['node_type'] == NodeType.GROUP.name:
-            group_pks = elem_grouped['node_id']
-            nodes_objects += [node.factory.get_node(**__convert_string_to_enum(node_data))
-                              for node_data in __load_multiple_node_group_year(group_pks)]
-        elif elem_grouped['node_type'] == NodeType.LEARNING_UNIT.name:
-            learning_unit_pks = elem_grouped['node_id']
-            nodes_objects += [node.factory.get_node(**__convert_string_to_enum(node_data))
-                              for node_data in __load_multiple_node_learning_unit_year(learning_unit_pks)]
+    for node_type, elem_grouped in elements_group_by_type.items():
+        get_method = {
+            NodeType.GROUP.name: __load_multiple_node_group_year,
+            NodeType.LEARNING_UNIT.name: __load_multiple_node_learning_unit_year
+        }[node_type]
+
+        nodes_objects += [
+            node.factory.get_node(**__convert_string_to_enum(node_data), node_id=elem_grouped[node_data.pop('id')])
+            for node_data in get_method(elem_grouped.keys())
+        ]
     return nodes_objects
 
 
@@ -124,22 +140,19 @@ def __convert_category_enum(category: str):
 
 def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return GroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
-        node_id=F('pk'),
         type=Value(NodeType.GROUP.name, output_field=CharField()),
         node_type=F('education_group_type__name'),
         category=F('education_group_type__category'),
         code=F('partial_acronym'),
         title=F('acronym'),
         year=F('academic_year__year'),
-        remark_fr=F('remark_fr'),
-        remark_en=F('remark_en'),
 
         offer_partial_title_fr=F('educationgroupversion__offer__partial_title'),
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
     ).values(
-        'node_id',
+        'id',
         'type',
         'node_type',
         'code',
@@ -157,7 +170,6 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         'offer_title_fr',
         'offer_title_en',
         'category',
-
     )
 
 
@@ -165,7 +177,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
     nodes = []
     for lu in load_learning_unit_year.load_multiple(node_learning_unit_year_ids):
         node_data = {
-            'node_id': lu.id,
+            'id': lu.id,
             'type': NodeType.LEARNING_UNIT.name,
             'learning_unit_type': lu.type,
             'year': lu.year,

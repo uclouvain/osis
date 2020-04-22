@@ -72,13 +72,13 @@ def load_version(acronym: str, year: int, version_name: str, transition: bool) -
     )
 
 
-def load(tree_root_id: int) -> 'ProgramTree':
-    root_node = load_node.load_node_group_year(tree_root_id)
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
+def load(root_element_id: int) -> 'ProgramTree':
+    root_node = load_node.load(root_element_id)
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([root_element_id])
     nodes = __load_tree_nodes(structure)
-    # TODO: SEE IF  nodes.update({'{}_{}'.format(root_node.pk, NodeType.GROUP.name): root_node})
+    nodes.update({root_node.pk: root_node})
     links = __load_tree_links(structure)
-    prerequisites = __load_tree_prerequisites(tree_root_id, nodes)
+    prerequisites = __load_tree_prerequisites(root_element_id, nodes)
     return __build_tree(root_node, structure, nodes, links, prerequisites)
 
 
@@ -132,9 +132,7 @@ def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
-    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
-        child_id=F('child_element_id')
-    ).values(
+    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).values(
         'pk',
         'relative_credits',
         'min_credits',
@@ -146,15 +144,15 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         'own_comment',
         'quadrimester_derogation',
         'link_type',
-        'parent_id',
-        'child_id',
+        'parent_element_id',
+        'child_element_id',
         'order'
     )
 
     tree_links = {}
     for gey_dict in group_element_year_qs:
-        parent_id = gey_dict.pop('parent_id')
-        child_id = gey_dict.pop('child_id')
+        parent_id = gey_dict.pop('parent_element_id')
+        child_id = gey_dict.pop('child_element_id')
         __convert_link_type_to_enum(gey_dict)
         __convert_quadrimester_to_enum(gey_dict)
 
@@ -212,7 +210,7 @@ def __build_children(
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        parent_id = child_structure['parent_id']
+        parent_id = child_structure['parent_element_id']
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node
