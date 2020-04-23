@@ -62,7 +62,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 def _instanciate_form(academic_year, person=None, post_data=None, learning_unit_instance=None, start_year=None,
@@ -163,7 +163,7 @@ class LearningUnitFullFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing FULL FORM"""
     @classmethod
     def setUpTestData(cls):
-        cls.initial_language = LanguageFactory(code='FR')
+        cls.initial_language = FrenchLanguageFactory()
         cls.initial_campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
         # Creation of a LearningContainerYear and all related models

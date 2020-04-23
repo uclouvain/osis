@@ -403,7 +403,11 @@ def _setup_learning_component_year(learning_unit_year, component_type):
         acronym=DEFAULT_ACRONYM_COMPONENT[component_type],
         learning_unit_year=learning_unit_year,
         type=component_type,
-        planned_classes=1
+        planned_classes=1,
+        hourly_volume_total_annual=30,
+        hourly_volume_partial_q1=30,
+        hourly_volume_partial_q2=0,
+        repartition_volume_requirement_entity=30,
     )
 
 
