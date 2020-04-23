@@ -402,13 +402,13 @@ paths:
           required: true
           schema:
             description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
