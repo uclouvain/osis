@@ -65,7 +65,7 @@ class EntityTagTest(TestCase):
         self.assertEqual(entity_last_version(self.entity_1), self.entity_version_1.acronym)
 
     def test_entity_last_version_when_several_versions(self):
-        an_entity = EntityFactory()
+        an_entity = EntityFactory(version=None)
         newest_acronym = "NEW"
         _create_2_entity_version(an_entity, "OLD", newest_acronym)
         self.assertEqual(entity_last_version(an_entity), newest_acronym)
