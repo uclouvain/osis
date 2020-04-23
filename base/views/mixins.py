@@ -30,6 +30,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
@@ -37,6 +38,7 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin
 from django.views.generic.edit import ProcessFormView
 
 from base.views import common
+from osis_role.errors import get_permission_error
 
 
 class FlagMixin:
@@ -114,6 +116,20 @@ class AjaxTemplateMixin:
             if self.partial_reload:
                 response['partial_reload'] = self.partial_reload
             return JsonResponse(response)
+
+
+class AjaxPermissionRequiredMixin:
+
+    permission_required = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        perm = self.permission_required
+        if request.is_ajax() and perm and not request.user.has_perm(perm, self.get_permission_object()):
+            return render(request, 'education_group/blocks/modal/modal_access_denied.html', {
+                'access_message': get_permission_error(request.user, perm)
+            })
+        return super().dispatch(request, *args, **kwargs)
 
 
 class DeleteViewWithDependencies(FlagMixin, RulesRequiredMixin, AjaxTemplateMixin, DeleteView):

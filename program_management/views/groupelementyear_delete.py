@@ -23,11 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
@@ -36,17 +32,13 @@ from base.utils.cache import ElementCache
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
-from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     template_name = "group_element_year/confirm_detach_inner.html"
 
-    rules = [group_element_year_perms.can_detach_group_element_year]
-
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_object())
+    permission_required = 'base.detach_educationgroup'
 
     @cached_property
     def strategy(self):
@@ -97,20 +89,3 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def get_success_url(self):
         # We can just reload the page
         return
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            try:
-                for rule in self.rules:
-                    perm = rule(self.request.user, self.get_object())
-                    if not perm:
-                        break
-
-            except PermissionDenied as e:
-
-                return render(request,
-                              'education_group/blocks/modal/modal_access_denied.html',
-                              {'access_message': _('You are not eligible to detach this item')})
-
-        return super(DetachGroupElementYearView, self).dispatch(request, *args, **kwargs)

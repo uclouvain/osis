@@ -37,9 +37,9 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.utils.cache import ElementCache
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -50,7 +50,7 @@ class TestDetach(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch__academic_year=cls.academic_year)
-        cls.person = CentralManagerForUEFactory()
+        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
         cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,
@@ -60,12 +60,6 @@ class TestDetach(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "program_management.business.group_element_years.perms.is_eligible_to_detach_group_element_year",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
 
     def test_edit_case_user_not_logged(self):
         self.client.logout()
@@ -80,8 +74,8 @@ class TestDetach(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
 
-    def test_detach_case_user_not_have_access(self):
-        self.mocked_perm.return_value = False
+    @mock.patch('osis_role.contrib.permissions.ObjectPermissionBackend.has_perm', return_value=False)
+    def test_detach_case_user_not_have_access(self, mock_perm):
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -93,10 +87,7 @@ class TestDetach(TestCase):
         self.assertTemplateUsed(response, "group_element_year/confirm_detach_inner.html")
 
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_post_success(self, mock_permission, mock_delete):
-        mock_permission.return_value = True
-
+    def test_detach_case_post_success(self, mock_delete):
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -104,9 +95,7 @@ class TestDetach(TestCase):
         self.assertEqual(list(get_messages(response.wsgi_request))[0].level, MSG.SUCCESS)
         self.assertTrue(mock_delete.called)
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_when_element_is_in_clipboard(self, mock_permission, mock_delete):
+    def test_detach_when_element_is_in_clipboard(self):
         ElementCache(self.person.user).save_element_selected(
             self.group_element_year.child_branch,
             source_link_id=self.group_element_year.id
@@ -115,9 +104,7 @@ class TestDetach(TestCase):
         error_msg = "The clipboard should be cleared if detached element is in clipboard"
         self.assertFalse(ElementCache(self.person.user).cached_data, error_msg)
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_when_clipboard_filled_with_different_detached_element(self, mock_permission, mock_delete):
+    def test_detach_when_clipboard_filled_with_different_detached_element(self):
         element_cached = EducationGroupYearFactory()
         ElementCache(self.person.user).save_element_selected(
             element_cached,
@@ -143,7 +130,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
             child_branch=None,
             child_leaf=cls.luy
         )
-        cls.person = CentralManagerForUEFactory()
+        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
         cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,
@@ -153,12 +140,6 @@ class TestDetachLearningUnitPrerequisite(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "program_management.business.group_element_years.perms.is_eligible_to_detach_group_element_year",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
 
     def test_detach_case_learning_unit_being_prerequisite(self):
         PrerequisiteItemFactory(

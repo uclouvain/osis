@@ -30,10 +30,9 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
@@ -62,7 +61,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
@@ -822,16 +821,7 @@ class TestSelectAttach(TestCase):
         }
 
     def setUp(self):
-        self.client = Client()
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.is_eligible_to_change_education_group",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
-        # Clean cache state
-        self.addCleanup(cache.clear)
 
     def test_copy_case_education_group(self):
         response = self.client.post(
@@ -1013,7 +1003,6 @@ class TestSelectAttach(TestCase):
         self.assertFalse(expected_absent_group_element_year)
 
     def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
-        self.mocked_perm.return_value = False
         AuthorizedRelationshipFactory(
             parent_type=self.new_parent_education_group_year.education_group_type,
             child_type=self.child_education_group_year.education_group_type,
@@ -1034,11 +1023,12 @@ class TestSelectAttach(TestCase):
 
         # Create link :
         response = self.client.get(
-            reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk])
+            reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
 
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_access_denied.html")
 
         expected_absent_group_element_year = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,

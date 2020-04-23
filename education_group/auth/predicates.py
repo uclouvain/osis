@@ -5,6 +5,7 @@ from rules import predicate
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType
 from education_group.auth.scope import Scope
 from osis_role import errors
 from osis_role.errors import predicate_failed_msg
@@ -119,3 +120,17 @@ def _is_maximum_child_not_reached_for_category(self, user, education_group_year,
 def is_user_linked_to_all_scopes(self, user, object):
     user_scopes = {scope for role in self.context['role_qs'] for scope in role.scopes if hasattr(role, 'scopes')}
     return Scope.ALL.value in user_scopes
+
+
+@predicate(bind=True)
+@predicate_failed_msg(
+    message=_("You cannot modify content for %(education_group_types)s") % {
+        "education_group_types": ", ".join(
+            [str(GroupType.MAJOR_LIST_CHOICE.value), str(GroupType.MINOR_LIST_CHOICE.value)])
+        }
+)
+def is_child_education_group_type_not_minor_or_major(self, user, egy=None):
+    if egy:
+        excluded_types = (GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name)
+        return egy.education_group_type.name not in excluded_types and not egy.is_minor
+    return None
