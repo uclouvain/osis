@@ -164,6 +164,31 @@ class TestGetChildrenTypes(SimpleTestCase):
         self.assertNotIn(link0.child.node_type, result, error_msg)
 
 
+class TestGetChildrenAndReferenceChildren(SimpleTestCase):
+    def test_when_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual([], node.children_and_reference_children())
+
+    def test_get_only_children_of_reference_link(self):
+        link = LinkFactory(link_type=LinkTypes.REFERENCE)
+        LinkFactory(parent=link.child)
+        result = link.parent.children_and_reference_children()
+        self.assertListEqual(
+            link.child.children,
+            result
+        )
+
+    def test_get_only_children_of_reference_link_except_within_minor_list(self):
+        minor_list = NodeGroupYearFactory(node_type=GroupType.MINOR_LIST_CHOICE)
+        link_ref = LinkFactory(link_type=LinkTypes.REFERENCE, parent=minor_list)
+        LinkFactory(parent=link_ref.child)
+        result = link_ref.parent.get_children_and_only_reference_children_except_within_minor_list()
+        self.assertListEqual(
+            [link_ref],
+            result
+        )
+
+
 class TestGetAllChildrenAsNode(SimpleTestCase):
 
     def test_when_no_child(self):
