@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import mock
 from django.test import TestCase
 
 from base.models.enums import prerequisite_operator
@@ -37,6 +38,7 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException, ProgramTreeVersion
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.ddd.repositories import load_tree
@@ -252,31 +254,68 @@ class TestLoadTreesFromChildren(TestCase):
         self.assertListEqual(result, expected_result)
 
 
-class TestLoadVersionTree(TestCase):
+class TestLoadVersion(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.education_group = EducationGroupFactory()
-        cls.education_group_year = EducationGroupYearFactory(education_group=cls.education_group,
-                                                             academic_year=cls.academic_year,
-                                                             acronym=EDY_ACRONYM)
-        cls.education_group_year_next = EducationGroupYearFactory(education_group=cls.education_group,
-                                                                  academic_year=cls.next_academic_year,
-                                                                  acronym=EDY_ACRONYM)
-        cls.education_group_version = EducationGroupVersionFactory(version_name=VERSION_NAME,
-                                                                   is_transition=False,
-                                                                   offer=cls.education_group_year)
-        cls.education_group_version_next = EducationGroupVersionFactory(version_name=VERSION_NAME,
-                                                                        is_transition=False,
-                                                                        offer=cls.education_group_year_next)
-
-    def test_find_all_program_tree_versions(self):
-        results = list(load_tree.find_all_program_tree_versions(EDY_ACRONYM, self.academic_year.year, False))
-        self.assertEqual(len(results), 1)
-        self.assertCountEqual(
-            results[0].organized_years,
-            [self.academic_year.year, self.next_academic_year.year]
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_version = EducationGroupVersionFactory(
+            root_group__academic_year=cls.academic_year,
+            offer__academic_year=cls.academic_year
         )
+
+        # Create tree of this version
+        cls.root_link = GroupElementYearFactory(parent_element__group_year=cls.education_group_version.root_group)
+        GroupElementYearFactory(
+            parent_element=cls.root_link.child_element,
+            child_element__group_year__academic_year=cls.academic_year
+        )
+        GroupElementYearChildLeafFactory(
+            parent_element=cls.root_link.child_element,
+            child_element__learning_unit_year__academic_year=cls.academic_year
+        )
+
+    def test_load_version_case_program_tree_version_not_found(self):
+        with self.assertRaises(ProgramTreeVersionNotFoundException):
+            load_tree.load_version('DUMMY', 2018, '', True)
+
+    @mock.patch('program_management.ddd.repositories.load_tree.load')
+    def test_load_version_case_program_tree_version(self, mock_load_tree):
+        program_tree_version = load_tree.load_version(
+            self.education_group_version.offer.acronym,
+            self.academic_year.year,
+            self.education_group_version.version_name,
+            self.education_group_version.is_transition,
+        )
+
+        self.assertIsInstance(program_tree_version, ProgramTreeVersion)
+        mock_load_tree.assert_called_once_with(self.root_link.parent_element_id)
+
+
+# class TestFindAllProgramTreeVersion(TestCase):
+#     @classmethod
+#     def setUpTestData(cls):
+#         cls.academic_year = AcademicYearFactory()
+#         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
+#         cls.education_group = EducationGroupFactory()
+#         cls.education_group_year = EducationGroupYearFactory(education_group=cls.education_group,
+#                                                              academic_year=cls.academic_year,
+#                                                              acronym=EDY_ACRONYM)
+#         cls.education_group_year_next = EducationGroupYearFactory(education_group=cls.education_group,
+#                                                                   academic_year=cls.next_academic_year,
+#                                                                   acronym=EDY_ACRONYM)
+#         cls.education_group_version = EducationGroupVersionFactory(version_name=VERSION_NAME,
+#                                                                    is_transition=False,
+#                                                                    offer=cls.education_group_year)
+#         cls.education_group_version_next = EducationGroupVersionFactory(version_name=VERSION_NAME,
+#                                                                         is_transition=False,
+#                                                                         offer=cls.education_group_year_next)
+#
+#     def test_find_all_program_tree_versions(self):
+#         results = list(load_tree.find_all_program_tree_versions(EDY_ACRONYM, self.academic_year.year, False))
+#         self.assertEqual(len(results), 1)
+#         self.assertCountEqual(
+#             results[0].organized_years,
+#             [self.academic_year.year, self.next_academic_year.year]
+#         )
 
 

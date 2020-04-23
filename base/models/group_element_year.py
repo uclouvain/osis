@@ -134,7 +134,7 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear AS child
                     INNER JOIN adjacency_query AS parent on parent.child_element_id = child.parent_element_id
                 )
-            SELECT distinct starting_node_id, adjacency_query.id, child_element_id, parent_element_id as parent_id,
+            SELECT distinct starting_node_id, adjacency_query.id, parent_element_id as parent_id,
                    child_element_id AS child_id, "order", level, path
             FROM adjacency_query
             JOIN program_management_element elem on elem.id = adjacency_query.child_element_id
@@ -217,6 +217,9 @@ class GroupElementYearManager(models.Manager):
         child_element_ids = child_element_ids or []
         if not isinstance(child_element_ids, list):
             raise Exception('child_element_ids must be an instance of list')
+
+        if not len(child_element_ids) and not academic_year_id:
+            return []
 
         where_statement = self.__build_where_statement(academic_year_id, child_element_ids)
         root_query_template = """

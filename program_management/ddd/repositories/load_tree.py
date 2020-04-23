@@ -50,25 +50,28 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
 def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
-    education_group_version = EducationGroupVersion.objects.select_related('root_group__element').get(
-        offer__acronym=acronym,
-        offer__academic_year__year=year,
-        version_name=version_name,
-        is_transition=transition
-    )
+    try:
+        education_group_version = EducationGroupVersion.objects\
+            .filter(root_group__element__isnull=False)\
+            .select_related('root_group__element').get(
+                offer__acronym=acronym,
+                offer__academic_year__year=year,
+                version_name=version_name,
+                is_transition=transition
+            )
+    except EducationGroupVersion.DoesNotExist:
+        raise ProgramTreeVersionNotFoundException
 
-    if hasattr(education_group_version.root_group, 'element'):
-        tree = load(education_group_version.root_group.element.pk)
-        return ProgramTreeVersion(
-            tree,
-            education_group_version.version_name,
-            education_group_version.is_transition,
-            education_group_version.offer_id,
-            education_group_version.title_fr,
-            education_group_version.title_en,
-            tree.root_node
-        )
-    raise ProgramTreeVersionNotFoundException
+    tree = load(education_group_version.root_group.element.pk)
+    return ProgramTreeVersion(
+        tree,
+        education_group_version.version_name,
+        education_group_version.is_transition,
+        education_group_version.offer_id,
+        education_group_version.title_fr,
+        education_group_version.title_en,
+        tree.root_node
+    )
 
 
 def load(root_element_id: int) -> 'ProgramTree':
@@ -109,7 +112,7 @@ def load_trees_from_children(
 
 
 def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
-    element_ids = [link['child_element_id'] for link in tree_structure]
+    element_ids = [link['child_id'] for link in tree_structure]
     nodes_list = load_node.load_multiple(element_ids)
     return {n.pk: n for n in nodes_list}
 
@@ -192,7 +195,7 @@ def __build_children(
         if structure['path'] == "|".join([root_path, str(structure['child_id'])])
     ]
     for child_structure in childs_structure:
-        child_node = nodes[child_structure['child_element_id']]
+        child_node = nodes[child_structure['child_id']]
         child_node.children = __build_children(
             "|".join([root_path, str(child_node.pk)]),
             tree_structure,
