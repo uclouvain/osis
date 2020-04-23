@@ -2732,6 +2732,9 @@ msgid ""
 "%(value)s and year %(next_year)s - %(next_value)s"
 msgstr ""
 
+msgid "The value of this attribute is inherited from the standard OF"
+msgstr ""
+
 msgid "The volume Q1 or Q2 must have a value but not both"
 msgstr ""
 
