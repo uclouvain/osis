@@ -93,11 +93,6 @@ def _check_integers_orders(value):
 
 
 class GroupElementYearManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
-        )
-
     def get_adjacency_list(self, root_elements_ids):
         if not isinstance(root_elements_ids, list):
             raise Exception('root_elements_ids must be an instance of list')
@@ -219,10 +214,9 @@ class GroupElementYearManager(models.Manager):
             root_category_name=None
     ):
         root_category_name = root_category_name or []
+        child_element_ids = child_element_ids or []
         if not isinstance(child_element_ids, list):
             raise Exception('child_element_ids must be an instance of list')
-        if not child_element_ids:
-            return []
 
         where_statement = self.__build_where_statement(academic_year_id, child_element_ids)
         root_query_template = """
@@ -241,14 +235,14 @@ class GroupElementYearManager(models.Manager):
                     FROM base_groupelementyear gey
                     INNER JOIN program_management_element parent_elem on parent_elem.id = gey.parent_element_id
                     
-                    INNER JOIN base_educationgroupyear AS gpyp on parent_elem.group_year_id = gpyp.id
+                    INNER JOIN education_group_groupyear AS gpyp on parent_elem.group_year_id = gpyp.id
                     INNER JOIN base_educationgrouptype AS egt on gpyp.education_group_type_id = egt.id
                     
                     INNER JOIN program_management_element child_element on child_element.id = gey.child_element_id
                     LEFT JOIN base_learningunityear bl on child_element.learning_unit_year_id = bl.id
                     LEFT JOIN education_group_groupyear AS gpyc on parent_elem.group_year_id = gpyc.id
-                    WHERE {where_statement}
-                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
+                    WHERE {where_statement}  AND
+                          (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
 
                     UNION ALL
 
@@ -272,8 +266,8 @@ class GroupElementYearManager(models.Manager):
 
             SELECT distinct starting_node_id AS child_id, parent_element_id AS root_id
             FROM root_query
-            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s)
-            and (is_root_row is not Null and is_root_row = true)
+            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) AND
+                  (is_root_row is not Null and is_root_row = true)
             ORDER BY starting_node_id;
         """.format(where_statement=where_statement)
 

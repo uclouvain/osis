@@ -85,3 +85,8 @@ class ProgramTreeVersion:
             return 'Transition' if self.is_transition else ''
         else:
             return '{}-Transition'.format(self.version_name) if self.is_transition else self.version_name
+
+
+class ProgramTreeVersionNotFoundException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__("The program version cannot be found")

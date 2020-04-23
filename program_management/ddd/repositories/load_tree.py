@@ -38,7 +38,7 @@ from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from education_group.models.group_year import GroupYear
 
@@ -50,23 +50,25 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
 def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
-    education_group_version = EducationGroupVersion.objects.get(
+    education_group_version = EducationGroupVersion.objects.select_related('root_group__element').get(
         offer__acronym=acronym,
         offer__academic_year__year=year,
         version_name=version_name,
         is_transition=transition
     )
 
-    tree = load(education_group_version.root_group_id)
-    return ProgramTreeVersion(
-        tree,
-        education_group_version.version_name,
-        education_group_version.is_transition,
-        education_group_version.offer_id,
-        education_group_version.title_fr,
-        education_group_version.title_en,
-        tree.root_node
-    )
+    if hasattr(education_group_version.root_group, 'element'):
+        tree = load(education_group_version.root_group.element.pk)
+        return ProgramTreeVersion(
+            tree,
+            education_group_version.version_name,
+            education_group_version.is_transition,
+            education_group_version.offer_id,
+            education_group_version.title_fr,
+            education_group_version.title_en,
+            tree.root_node
+        )
+    raise ProgramTreeVersionNotFoundException
 
 
 def load(root_element_id: int) -> 'ProgramTree':
