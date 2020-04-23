@@ -167,7 +167,8 @@ function get_data_from_tree(data) {
         attach_disabled: obj.a_attr.attach_disabled,
         detach_disabled: obj.a_attr.detach_disabled,
         modification_disabled: obj.a_attr.modification_disabled,
-        search_url: obj.a_attr.search_url
+        search_url: obj.a_attr.search_url,
+        path: obj.a_attr.path
     };
 }
 
@@ -179,11 +180,12 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
         $documentTree.bind("select_node.jstree", function (event, data) {
             document.location.href = data.node.a_attr.href;
         });
-
-        var selected_node_id = $documentTree.jstree().get_selected(true)[0].id;
-        if (selected_node_id != undefined) {
-            var scrollpos = localStorage.getItem('scrollpos');
-            document.getElementById('scrollableDiv').scrollTo(0, scrollpos);
+        var selected_node = $documentTree.jstree().get_selected(true);
+        if(selected_node.length > 0) {
+            if (selected_node[0].id !== undefined) {
+                var scrollpos = localStorage.getItem('scrollpos');
+                document.getElementById('scrollableDiv').scrollTo(0, scrollpos);
+            }
         }
 
         // if the tree has never been loaded, execute close_all by default.
