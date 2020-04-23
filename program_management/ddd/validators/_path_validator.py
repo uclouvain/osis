@@ -23,22 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from base.ddd.utils.business_validator import BusinessValidator
+from program_management.ddd.business_types import *
 
 
-class TestDetachRootForbiddenValidator(SimpleTestCase):
+class PathValidator(BusinessValidator):
 
-    def test_when_node_to_detach_is_the_root(self):
-        node_to_detach = NodeGroupYearFactory()
-        tree = ProgramTreeFactory(root_node=node_to_detach)
-        validator = DetachRootForbiddenValidator(tree, node_to_detach)
-        self.assertFalse(validator.is_valid())
-        expected_result = _("Cannot perform detach action on root.")
-        self.assertEqual(expected_result, validator.error_messages[0])
+    def __init__(self, path: 'Path'):
+        super(PathValidator, self).__init__()
+        self.path = path
 
+    def validate(self):
+        if not self.path:
+            self.add_error_message(_('Invalid tree path'))
+        else:
+            try:
+                root_ids = [int(node_id) for node_id in self.path.split('|')]
+            except Exception as e:
+                self.add_error_message(_('Invalid tree path'))

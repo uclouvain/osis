@@ -27,7 +27,7 @@ from _decimal import Decimal
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
@@ -60,6 +60,8 @@ class Node:
 
     _academic_year = None
 
+    _deleted_children = None
+
     code = None
     year = None
     type = None
@@ -84,6 +86,7 @@ class Node:
         self.title = title
         self.year = year
         self.credits = credits
+        self._deleted_children = set()
 
     def __eq__(self, other):
         return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
@@ -128,6 +131,9 @@ class Node:
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
+    def is_option(self) -> bool:
+        return self.node_type == MiniTrainingType.OPTION
+
     def get_all_children(
             self,
             ignore_children_from: Set[EducationGroupTypesEnum] = None,
@@ -139,6 +145,9 @@ class Node:
                 continue
             children |= link.child.get_all_children(ignore_children_from=ignore_children_from)
         return children
+
+    def get_option_list(self) -> Set['Node']:
+        return {l.child for l in self.get_all_children() if l.child.is_option()}
 
     def get_all_children_as_nodes(
             self,
@@ -205,13 +214,15 @@ class Node:
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def add_child(self, node: 'Node', **kwargs):
-        child = link_factory.get_link(parent=self, child=node, **kwargs)
+    def add_child(self, node: 'Node', **link_attrs):
+        child = link_factory.get_link(parent=self, child=node, **link_attrs)
         self._children.append(child)
         child._has_changed = True
 
-    def detach_child(self, node_id: int):
-        self.children = [link for link in self.children if link.child.pk == node_id]
+    def detach_child(self, node_to_detach: 'Node'):
+        link_to_detach = next(link for link in self.children if link.child == node_to_detach)
+        self._deleted_children.add(link_to_detach)
+        self.children.remove(link_to_detach)
 
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)
@@ -296,6 +307,7 @@ class NodeGroupYear(Node):
 class NodeLearningUnitYear(Node):
 
     type = NodeType.LEARNING_UNIT
+    node_type = NodeType.LEARNING_UNIT
 
     def __init__(
             self,
@@ -328,6 +340,7 @@ class NodeLearningUnitYear(Node):
         self.quadrimester = quadrimester
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
+        self.node_type = NodeType.LEARNING_UNIT  # Used for authorized_relationship
 
     @property
     def has_prerequisite(self) -> bool:
@@ -347,6 +360,9 @@ class NodeLearningUnitYear(Node):
     def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite
         self.prerequisite.has_changed = True
+
+    def remove_all_prerequisite_items(self) -> None:
+        self.prerequisite.remove_all_prerequisite_items()
 
 
 class NodeLearningClassYear(Node):
