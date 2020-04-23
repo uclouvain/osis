@@ -47,8 +47,8 @@ def load_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
     :return:
     """
     prerequisite_item_qs = PrerequisiteItem.objects.filter(
-        prerequisite__education_group_year_id=tree_root_id,
-        prerequisite__learning_unit_year_id__in=node_ids
+        prerequisite__education_group_version__root_group__element__id=tree_root_id,
+        prerequisite__learning_unit_year_id__element__pk__in=node_ids
     ).annotate(
         code=Subquery(
             LearningUnitYear.objects.filter(
@@ -58,12 +58,12 @@ def load_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
         ),
         year=F('prerequisite__learning_unit_year__academic_year__year'),
         main_operator=F('prerequisite__main_operator'),
-        learning_unit_year_id=F('prerequisite__learning_unit_year_id')
-    ).order_by('learning_unit_year_id', 'group_number', 'position')\
-     .values('learning_unit_year_id', 'main_operator', 'group_number', 'position', 'code', 'year')
+        node_id=F('prerequisite__learning_unit_year__element__id')
+    ).order_by('node_id', 'group_number', 'position')\
+     .values('node_id', 'main_operator', 'group_number', 'position', 'code', 'year')
 
     prerequisites_dict = {}
-    for node_id, prequisite_items in itertools.groupby(prerequisite_item_qs, key=lambda p: p['learning_unit_year_id']):
+    for node_id, prequisite_items in itertools.groupby(prerequisite_item_qs, key=lambda p: p['node_id']):
         prequisite_items = list(prequisite_items)
 
         preq = prerequisite.Prerequisite(main_operator=prequisite_items[0]['main_operator'])
@@ -93,12 +93,12 @@ def load_is_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
     :return:
     """
     qs = PrerequisiteItem.objects.filter(
-        prerequisite__education_group_year_id=tree_root_id,
-        learning_unit__learningunityear__pk__in=node_ids
-    ).values('learning_unit__learningunityear__pk')\
+        prerequisite__education_group_version__root_group__element__pk=tree_root_id,
+        learning_unit__learningunityear__element__pk__in=node_ids
+    ).values('learning_unit__learningunityear__element__pk')\
      .annotate(
-        node_id=F('learning_unit__learningunityear__pk'),
-        is_a_prerequisite_of=ArrayAgg('prerequisite__learning_unit_year_id'),
+        node_id=F('learning_unit__learningunityear__element__pk'),
+        is_a_prerequisite_of=ArrayAgg('prerequisite__learning_unit_year__element__pk'),
      )
 
     return {result['node_id']: result['is_a_prerequisite_of'] for result in qs}

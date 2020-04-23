@@ -26,7 +26,6 @@
 
 from typing import List, Dict, Any
 
-from django.db.models import Case, F, When
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -38,11 +37,9 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
-from program_management.models.enums.node_type import NodeType
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
-from django.db.models import IntegerField
 from education_group.models.group_year import GroupYear
 
 
@@ -72,31 +69,27 @@ def load_version(acronym: str, year: int, version_name: str, transition: bool) -
     )
 
 
-def load(tree_root_id: int) -> 'ProgramTree':
-    root_node = load_node.load_node_education_group_year(tree_root_id)
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([tree_root_id])
+def load(root_element_id: int) -> 'ProgramTree':
+    root_node = load_node.load(root_element_id)
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([root_element_id])
     nodes = __load_tree_nodes(structure)
-    nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
+    nodes.update({root_node.pk: root_node})
     links = __load_tree_links(structure)
-    prerequisites = __load_tree_prerequisites(tree_root_id, nodes)
+    prerequisites = __load_tree_prerequisites(root_element_id, nodes)
     return __build_tree(root_node, structure, nodes, links, prerequisites)
 
 
 def load_trees_from_children(
-        child_branch_ids: list,
-        child_leaf_ids: list = None,
+        child_element_ids: list,
         link_type: LinkTypes = None
 ) -> List['ProgramTree']:
-    if not child_branch_ids and not child_leaf_ids:
+    if child_element_ids:
+        assert isinstance(child_element_ids, list)
+    if not child_element_ids:
         return []
-    if child_branch_ids:
-        assert isinstance(child_branch_ids, list)
-    if child_leaf_ids:
-        assert isinstance(child_leaf_ids, list)
 
     qs = group_element_year.GroupElementYear.objects.get_reverse_adjacency_list(
-        child_branch_ids=child_branch_ids,
-        child_leaf_ids=child_leaf_ids,
+        child_element_ids=child_element_ids,
         link_type=link_type,
     )
     if not qs:
@@ -114,9 +107,9 @@ def load_trees_from_children(
 
 
 def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
-    ids = [link['id'] for link in tree_structure]
-    nodes_list = load_node.load_multiple(ids)
-    return {'{}_{}'.format(n.pk, n.type): n for n in nodes_list}
+    element_ids = [link['child_element_id'] for link in tree_structure]
+    nodes_list = load_node.load_multiple(element_ids)
+    return {n.pk: n for n in nodes_list}
 
 
 def __convert_link_type_to_enum(link_data: dict) -> None:
@@ -132,13 +125,7 @@ def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
-    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
-        child_id=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf_id')),
-            default=F('child_branch_id'),
-            output_field=IntegerField()
-        )
-    ).values(
+    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).values(
         'pk',
         'relative_credits',
         'min_credits',
@@ -150,15 +137,15 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         'own_comment',
         'quadrimester_derogation',
         'link_type',
-        'parent_id',
-        'child_id',
+        'parent_element_id',
+        'child_element_id',
         'order'
     )
 
     tree_links = {}
     for gey_dict in group_element_year_qs:
-        parent_id = gey_dict.pop('parent_id')
-        child_id = gey_dict.pop('child_id')
+        parent_id = gey_dict.pop('parent_element_id')
+        child_id = gey_dict.pop('child_element_id')
         __convert_link_type_to_enum(gey_dict)
         __convert_quadrimester_to_enum(gey_dict)
 
@@ -171,7 +158,7 @@ def __load_tree_prerequisites(tree_root_id: int, nodes: dict):
     node_leaf_ids = [n.pk for n in nodes.values() if isinstance(n, node.NodeLearningUnitYear)]
     has_prerequisite_dict = load_prerequisite.load_has_prerequisite(tree_root_id, node_leaf_ids)
     is_prerequisite_dict = {
-        main_node_id: [nodes['{}_{}'.format(id, NodeType.LEARNING_UNIT)] for id in node_ids]
+        main_node_id: [nodes[id] for id in node_ids]
         for main_node_id, node_ids in load_prerequisite.load_is_prerequisite(tree_root_id, node_leaf_ids).items()
     }
     return {'has_prerequisite_dict': has_prerequisite_dict, 'is_prerequisite_dict': is_prerequisite_dict}
@@ -203,9 +190,7 @@ def __build_children(
         if structure['path'] == "|".join([root_path, str(structure['child_id'])])
     ]
     for child_structure in childs_structure:
-        child_id = child_structure['child_id']
-        ntype = NodeType.LEARNING_UNIT if child_structure['child_leaf_id'] else NodeType.EDUCATION_GROUP
-        child_node = nodes['{}_{}'.format(child_id, ntype)]
+        child_node = nodes[child_structure['child_element_id']]
         child_node.children = __build_children(
             "|".join([root_path, str(child_node.pk)]),
             tree_structure,
@@ -219,8 +204,8 @@ def __build_children(
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
         parent_id = child_structure['parent_id']
-        link_node = links['_'.join([str(parent_id), str(child_id)])]
-        link_node.parent = nodes['{}_{}'.format(parent_id, NodeType.EDUCATION_GROUP)]
+        link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
+        link_node.parent = nodes[parent_id]
         link_node.child = child_node
         children.append(link_node)
     return children
