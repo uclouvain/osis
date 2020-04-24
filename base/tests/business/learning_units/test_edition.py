@@ -45,7 +45,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearWithComponentsFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class LearningUnitEditionTestCase(TestCase):
@@ -147,7 +147,7 @@ class LearningUnitEditionTestCase(TestCase):
         # Copy the same learning unit year + change academic year, language
         another_learning_unit_year = _build_copy(self.learning_unit_year)
         another_learning_unit_year.academic_year = self.next_academic_year
-        another_learning_unit_year.language = LanguageFactory(code='FR', name='French')
+        another_learning_unit_year.language = FrenchLanguageFactory()
         another_learning_unit_year.save()
 
         error_list = business_edition._check_postponement_conflict_on_learning_unit_year(
@@ -520,7 +520,7 @@ def _create_learning_unit_year_with_components(l_container, create_lecturing_com
                                                create_pratical_component=True, subtype=None):
     if not subtype:
         subtype = learning_unit_year_subtypes.FULL
-    language = LanguageFactory(code='EN', name='English')
+    language = EnglishLanguageFactory()
     a_learning_unit_year = LearningUnitYearFactory(learning_container_year=l_container,
                                                    acronym=l_container.acronym,
                                                    academic_year=l_container.academic_year,

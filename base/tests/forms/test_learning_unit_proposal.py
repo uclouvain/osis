@@ -54,7 +54,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory, FrenchLanguageFactory
 
 PROPOSAL_TYPE = proposal_type.ProposalType.TRANSFORMATION_AND_MODIFICATION.name
 PROPOSAL_STATE = proposal_state.ProposalState.FACULTY.name
@@ -307,7 +307,7 @@ class TestSave(TestCase):
         self.assertTrue('entity' in form.errors[1])
 
     def test_academic_year_range_creation_proposal_central_manager(self):
-        LanguageFactory(code="FR")
+        FrenchLanguageFactory()
         central_manager = CentralManagerForUEFactory()
         form = learning_unit_create_2.FullForm(
             central_manager,
@@ -324,7 +324,7 @@ class TestSave(TestCase):
         )
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
-        LanguageFactory(code="FR")
+        FrenchLanguageFactory()
         faculty_manager = FacultyManagerForUEFactory()
         form = learning_unit_create_2.FullForm(
             faculty_manager,

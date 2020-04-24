@@ -79,7 +79,7 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
     requirement_entity_version = entities['child_one_entity_version']
     organization = OrganizationFactory(type=organization_type.MAIN)
     campus = CampusFactory(organization=organization)
-    language = LanguageFactory(code='FR')
+    language = FrenchLanguageFactory()
 
     if not learning_unit_year:
         learning_container = LearningContainerFactory()

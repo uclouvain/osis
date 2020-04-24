@@ -51,7 +51,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 NAMEN = 'Namur'
@@ -63,7 +63,7 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
     requesting_entity = entities['child_one_entity_version']
     organization = OrganizationFactory(type=organization_type.MAIN)
     campus = CampusFactory(organization=organization)
-    language = LanguageFactory(code='FR')
+    language = FrenchLanguageFactory()
 
     if not learning_unit_year:
         container_year = LearningContainerYearFactory(academic_year=academic_year)
@@ -125,7 +125,7 @@ class TestExternalLearningUnitForm(TestCase):
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 6)
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
 
     def setUp(self):
         self.person = PersonFactory()
@@ -175,10 +175,10 @@ class TestExternalPartimForm(TestCase):
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 6)
         academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = academic_years[1]
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
         organization = OrganizationFactory(type=organization_type.MAIN)
         cls.campus = CampusFactory(organization=organization)
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
         cls.container_year = LearningContainerYearFactory(academic_year=cls.academic_year, container_type=EXTERNAL)
         cls.learning_unit = LearningUnitFactory(start_year=cls.academic_year)
 
@@ -231,7 +231,7 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
         cls.academic_year = create_current_academic_year()
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
 
     def test_init(self):
         campus = CampusFactory()

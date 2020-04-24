@@ -49,7 +49,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 class LearningUnitsMixin:
@@ -262,7 +262,7 @@ class GenerateContainer:
             entity.refresh_from_db()
 
     def _setup_common_data(self):
-        self.language = LanguageFactory(code='FR', name='French')
+        self.language = FrenchLanguageFactory()
         self.campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
 
     def __iter__(self):
