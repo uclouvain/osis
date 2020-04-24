@@ -99,3 +99,16 @@ class LearningAchievementListTestCase(APITestCase):
             ('achievement', self.achievements[0].text),
         ])
         self.assertDictEqual(response.data[0], expected_response)
+
+    def test_get_only_achievements_with_text(self):
+        LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language__code=FR_CODE_LANGUAGE,
+            order=5,
+            text=''
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIsInstance(response.data, list)
+        self.assertEqual(len(response.data), 5)
