@@ -39,7 +39,7 @@ class HopsListSerializerTestCase(TestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.hops = HopsFactory(education_group_year__academic_year=cls.academic_year)
 
-        url = reverse('education_group_api_v1:' + HopsList.name)
+        url = reverse('education_group_api_v1:' + HopsList.name, kwargs={'year': cls.academic_year.year})
         cls.serializer = HopsListSerializer(cls.hops, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
