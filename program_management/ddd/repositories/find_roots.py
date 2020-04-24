@@ -3,7 +3,6 @@ import itertools
 from typing import List
 
 from base.models import education_group_year, group_element_year
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
 from program_management.models.element import Element
 
@@ -74,10 +73,13 @@ def _flatten_list_of_lists(list_of_lists):
 
 def _convert_parent_ids_to_instances(root_ids_by_object_id):
     flat_root_ids = _flatten_list_of_lists(root_ids_by_object_id.values())
-    map_instance_by_id = {obj.id: obj for obj in education_group_year.search(id=flat_root_ids)}
+    map_instance_by_id = {
+        obj.id: obj for obj in Element.objects.filter(pk__in=flat_root_ids).select_related('group_year')
+    }
+
     result = collections.defaultdict(list)
     result.update({
-        obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.acronym)
+        obj_id: sorted([map_instance_by_id[parent_id] for parent_id in parents], key=lambda obj: obj.group_year.acronym)
         for obj_id, parents in root_ids_by_object_id.items()
     })
     return result
@@ -86,9 +88,9 @@ def _convert_parent_ids_to_instances(root_ids_by_object_id):
 def _assert_same_academic_year(objects: List['Element']):
     cnt = collections.Counter()
     for obj in objects:
-        if hasattr(obj, 'learning_unit_year'):
+        if hasattr(obj, 'learning_unit_year') and obj.learning_unit_year:
             cnt[obj.learning_unit_year.academic_year_id] += 1
-        elif hasattr(obj, 'group_year'):
+        elif hasattr(obj, 'group_year') and obj.group_year:
             cnt[obj.group_year.academic_year_id] += 1
 
     if len(cnt.keys()) > 1:
