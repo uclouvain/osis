@@ -413,10 +413,6 @@ class GroupElementYear(OrderedModel):
         unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
         ordering = ('order',)
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.clean()
-        return super().save(force_insert, force_update, using, update_fields)
-
     # DEPRECATED Move all those validations into forms with ddd validators
     def clean(self):
         if self.child_branch and self.child_leaf:
