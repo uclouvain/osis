@@ -30,8 +30,6 @@ from base.models.enums import prerequisite_operator
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory

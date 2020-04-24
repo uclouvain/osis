@@ -29,19 +29,18 @@ from typing import List, Dict, Any
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from education_group.models.group_year import GroupYear
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import node
+from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import NullPrerequisite
+from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
+from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException
-from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
-from education_group.models.group_year import GroupYear
-
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -74,14 +73,29 @@ def load_version(acronym: str, year: int, version_name: str, transition: bool) -
     )
 
 
-def load(root_element_id: int) -> 'ProgramTree':
-    root_node = load_node.load(root_element_id)
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([root_element_id])
+def load(tree_root_id: int) -> 'ProgramTree':
+    return load_trees([tree_root_id])[0]
+
+
+def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
+    trees = []
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
     nodes = __load_tree_nodes(structure)
-    nodes.update({root_node.pk: root_node})
     links = __load_tree_links(structure)
-    prerequisites = __load_tree_prerequisites(root_element_id, nodes)
-    return __build_tree(root_node, structure, nodes, links, prerequisites)
+    has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
+    is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
+    for tree_root_id in tree_root_ids:
+        root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
+        nodes[root_node.pk] = root_node
+        tree_prerequisites = {
+            'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
+            'is_prerequisite_dict': is_prerequisites.get(tree_root_id) or {},
+        }
+        structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
+        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
+        trees.append(tree)
+        del nodes[root_node.pk]
+    return trees
 
 
 def load_trees_from_children(
@@ -107,8 +121,7 @@ def load_trees_from_children(
         parent_id for parent_id in all_parents
         if not parent_by_child_branch.get(parent_id)
     )
-    # TODO :: performance (get all trees in one single query)
-    return [load(root_id) for root_id in root_ids]
+    return load_trees(list(root_ids))
 
 
 def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
@@ -159,14 +172,14 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     return tree_links
 
 
-def __load_tree_prerequisites(tree_root_id: int, nodes: dict):
-    node_leaf_ids = [n.pk for n in nodes.values() if isinstance(n, node.NodeLearningUnitYear)]
-    has_prerequisite_dict = load_prerequisite.load_has_prerequisite(tree_root_id, node_leaf_ids)
-    is_prerequisite_dict = {
-        main_node_id: [nodes[id] for id in node_ids]
-        for main_node_id, node_ids in load_prerequisite.load_is_prerequisite(tree_root_id, node_leaf_ids).items()
+def __load_tree_prerequisites(
+        tree_root_ids: List[int],
+        nodes: Dict[NodeKey, 'Node']
+) -> Dict[str, Dict[TreeRootId, Dict[NodeId, Prerequisite]]]:
+    return {
+        'has_prerequisite_dict': load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes),
+        'is_prerequisite_dict': load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     }
-    return {'has_prerequisite_dict': has_prerequisite_dict, 'is_prerequisite_dict': is_prerequisite_dict}
 
 
 def __build_tree(
@@ -176,39 +189,41 @@ def __build_tree(
         links: Dict[LinkKey, 'Link'],
         prerequisites
 ) -> 'ProgramTree':
-    root_node.children = __build_children(str(root_node.pk), tree_structure, nodes, links, prerequisites)
+    structure_by_parent = {}  # For performance
+    for s_dict in tree_structure:
+        if s_dict['path']:  # TODO :: Case child_id or parent_id is null - to remove after DB null constraint set
+            parent_path = '|'.join(s_dict['path'].split('|')[:-1])
+            structure_by_parent.setdefault(parent_path, []).append(s_dict)
+    root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
     tree = ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
     return tree
 
 
 def __build_children(
         root_path: 'Path',
-        tree_structure: TreeStructure,
+        map_parent_path_with_tree_structure: Dict['Path', TreeStructure],
         nodes: Dict[NodeKey, 'Node'],
         links: Dict[LinkKey, 'Link'],
         prerequisites
 ) -> List['Link']:
     children = []
+    for child_structure in map_parent_path_with_tree_structure.get(root_path) or []:
+        child_id = child_structure['child_id']
+        parent_id = child_structure['parent_id']
+        child_node = nodes[child_id]
 
-    childs_structure = [
-        structure for structure in tree_structure
-        if structure['path'] == "|".join([root_path, str(structure['child_id'])])
-    ]
-    for child_structure in childs_structure:
-        child_node = nodes[child_structure['child_id']]
         child_node.children = __build_children(
-            "|".join([root_path, str(child_node.pk)]),
-            tree_structure,
+            child_structure['path'],
+            map_parent_path_with_tree_structure,
             nodes,
             links,
             prerequisites
         )
 
-        if isinstance(child_node, node.NodeLearningUnitYear):
+        if child_node.is_learning_unit():
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        parent_id = child_structure['parent_id']
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node

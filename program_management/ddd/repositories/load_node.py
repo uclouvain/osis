@@ -113,7 +113,7 @@ def load_multiple(element_ids: List[int]) -> List[node.Node]:
 
 def __convert_string_to_enum(node_data: dict) -> dict:
     if node_data.get('node_type'):
-        node_data['node_type'] = __convert_node_type_enum(node_data['node_type'])
+        node_data['node_type'] = convert_node_type_enum(node_data['node_type'])
     if node_data.get('category'):
         node_data['category'] = __convert_category_enum(node_data['category'])
     if node_data.get('periodicity'):
@@ -122,7 +122,7 @@ def __convert_string_to_enum(node_data: dict) -> dict:
     return node_data
 
 
-def __convert_node_type_enum(str_node_type: str) -> EducationGroupTypesEnum:
+def convert_node_type_enum(str_node_type: str) -> EducationGroupTypesEnum:
     enum_node_type = None
     for sub_enum in EducationGroupTypesEnum.__subclasses__():
         try:
