@@ -34,7 +34,7 @@ from base.models import entity
 from base.models.entity import find_versions_from_entites
 from base.models.entity_version import EntityVersion
 from base.models.enums import entity_type
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from reference.tests.factories.country import CountryFactory
 
@@ -49,7 +49,7 @@ class EntityTest(TestCase):
         cls.date_in_2017 = factory.fuzzy.FuzzyDate(timezone.make_aware(datetime.datetime(2017, 1, 1)),
                                                    timezone.make_aware(datetime.datetime(2017, 12, 30))).fuzz()
         cls.country = CountryFactory()
-        cls.parent = EntityFactory(
+        cls.parent = EntityWithVersionFactory(
             country=cls.country,
             version__acronym="ROOT_ENTITY",
             version__start_date=cls.start_date,
@@ -61,7 +61,7 @@ class EntityTest(TestCase):
                  cls.types_dict['SCHOOL'],
                  cls.types_dict['FACULTY']]
         cls.children = [
-            EntityFactory(
+            EntityWithVersionFactory(
                 country=cls.country,
                 version__parent=cls.parent,
                 version__acronym="ENTITY_V_" + str(x),
@@ -100,19 +100,19 @@ class EntityTest(TestCase):
         self.assertEqual(len(entities_with_descendants), 1)
 
     def test_find_descendants_with_multiple_parent(self):
-        parent_2 = EntityFactory(
+        parent_2 = EntityWithVersionFactory(
             country=self.country,
             version__acronym="ROOT_ENTITY_2",
             version__start_date=self.start_date,
             version__end_date=self.end_date
         )
-        EntityFactory(
+        EntityWithVersionFactory(
             country=self.country,
             version__acronym="CHILD_OF_ROOT_2",
             version__start_date=self.start_date,
             version__end_date=self.end_date
         )
-        EntityFactory(
+        EntityWithVersionFactory(
             country=self.country,
             version__acronym="CHILD_OF_CHILD",
             version__start_date=self.start_date,

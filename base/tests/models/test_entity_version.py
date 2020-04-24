@@ -38,7 +38,7 @@ from base.models.entity_version import build_current_entity_version_structure_in
 from base.models.enums import organization_type
 from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -55,9 +55,9 @@ class EntityVersionTest(TestCase):
     def setUpTestData(cls):
         cls.country = CountryFactory()
         cls.organization = OrganizationFactory(type=organization_type.MAIN)
-        cls.entities = [EntityFactory(country=cls.country, organization=cls.organization, version=None) for _ in
+        cls.entities = [EntityFactory(country=cls.country, organization=cls.organization) for _ in
                         range(3)]
-        cls.parent = EntityFactory(country=cls.country, organization=cls.organization, version=None)
+        cls.parent = EntityFactory(country=cls.country, organization=cls.organization)
         cls.start_date = datetime.date(2015, 1, 1)
         cls.end_date = datetime.date(2015, 12, 31)
         cls.date_in_2015 = factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
@@ -337,7 +337,7 @@ class EntityVersionTest(TestCase):
 
     def test_find_parent_faculty_version_no_faculty_parent(self):
         ac_yr = AcademicYearFactory(current=True)
-        entity_parent = EntityFactory(version=False)
+        entity_parent = EntityFactory()
         EntityVersionFactory(
             entity__country=self.country,
             entity__organization=self.organization,
@@ -380,7 +380,7 @@ class EntityVersionTest(TestCase):
             entity_type="FACULTY"
         )
 
-        EntityFactory(organization=self.organization, version__entity_type="SECTOR")
+        EntityWithVersionFactory(organization=self.organization, version__entity_type="SECTOR")
 
         entity_version_ilv = EntityVersionFactory(
             entity__organization=self.organization, acronym="ILV"
@@ -609,9 +609,7 @@ class EntityVersionLoadInMemoryTest(TestCase):
 
 class TestFindLastEntityVersionByLearningUnitYearId(TestCase):
     def test_when_entity_version(self):
-        learning_unit_year = LearningUnitYearFactory(
-            learning_container_year__requirement_entity__version=None
-        )
+        learning_unit_year = LearningUnitYearFactory()
 
         actual_entity_version = find_last_requirement_entity_version(
             learning_unit_year_id=learning_unit_year.id,

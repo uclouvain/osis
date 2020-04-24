@@ -71,11 +71,11 @@ class TestSave(TestCase):
         )
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
         today = datetime.date.today()
-        cls.an_entity = EntityFactory(organization=cls.an_organization, version=None)
+        cls.an_entity = EntityFactory(organization=cls.an_organization)
         cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.FACULTY,
                                                   start_date=today.replace(year=1900),
                                                   end_date=None)
-        cls.an_entity_school = EntityFactory(organization=cls.an_organization, version=None)
+        cls.an_entity_school = EntityFactory(organization=cls.an_organization)
         cls.entity_version_school = EntityVersionFactory(entity=cls.an_entity_school, entity_type=entity_type.SCHOOL,
                                                          start_date=today.replace(year=1900),
                                                          end_date=None)
@@ -210,7 +210,6 @@ class TestSave(TestCase):
         today = datetime.date.today()
         entity_1 = EntityFactory(
             organization=OrganizationFactory(type=organization_type.MAIN),
-            version=None
         )
         additional_entity_version_1 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
                                                            start_date=today.replace(year=1900),
@@ -218,7 +217,6 @@ class TestSave(TestCase):
                                                            entity=entity_1)
         entity_2 = EntityFactory(
             organization=OrganizationFactory(type=organization_type.MAIN),
-            version=None
         )
         additional_entity_version_2 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
                                                            start_date=today.replace(year=1900),

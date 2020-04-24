@@ -109,10 +109,9 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.learning_unit = LearningUnitFactory(learning_container=self.learning_container)
         self.learning_container_year = LearningContainerYearFactory(
             learning_container=self.learning_container,
-            requirement_entity__version=None,
             academic_year=self.current_academic_year,
             container_type=learning_container_year_types.COURSE,
-            allocation_entity=EntityFactory(version=None),
+            allocation_entity=EntityFactory(),
             additional_entity_1=EntityFactory(),
             additional_entity_2=EntityFactory(),
         )

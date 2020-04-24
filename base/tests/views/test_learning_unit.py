@@ -251,6 +251,8 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         cls.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,
+            learning_container_year__requirement_entity=None,
+            learning_container_year__allocation_entity=None,
             subtype=learning_unit_year_subtypes.FULL
         )
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
@@ -337,7 +339,7 @@ class LearningUnitViewTestCase(TestCase):
         cls.organization = OrganizationFactory(type=organization_type.MAIN)
         cls.country = CountryFactory()
 
-        cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization, version=None)
+        cls.entities = EntityFactory.create_batch(3, country=cls.country, organization=cls.organization)
 
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)

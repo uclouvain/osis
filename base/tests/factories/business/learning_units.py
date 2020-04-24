@@ -49,7 +49,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class LearningUnitsMixin:
@@ -111,7 +111,9 @@ class LearningUnitsMixin:
         if academic_year and container_type:
             result = LearningContainerYearFactory(
                 academic_year=academic_year,
-                container_type=container_type
+                container_type=container_type,
+                requirement_entity=None,
+                allocation_entity=None
             )
         return result
 

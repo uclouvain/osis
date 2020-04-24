@@ -290,7 +290,7 @@ class LearningUnitEditionTestCase(TestCase):
         )
 
         self.assertIsInstance(error_list, list)
-        self.assertEqual(len(error_list), 3)
+        self.assertEqual(len(error_list), 4)
 
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"

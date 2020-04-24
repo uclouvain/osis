@@ -38,7 +38,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 class EntityContainerYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.entity = EntityFactory(version=None)
+        cls.entity = EntityFactory()
         cls.entity_versions = {}
         cls.academic_years = {}
         for year in [2015, 2016]:

@@ -66,7 +66,11 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
     language = FrenchLanguageFactory()
 
     if not learning_unit_year:
-        container_year = LearningContainerYearFactory(academic_year=academic_year)
+        container_year = LearningContainerYearFactory(
+            academic_year=academic_year,
+            requirement_entity=None,
+            allocation_entity=None
+        )
         learning_unit_year = LearningUnitYearFactory.build(
             acronym='EOSIS1111',
             academic_year=academic_year,
@@ -179,7 +183,12 @@ class TestExternalPartimForm(TestCase):
         organization = OrganizationFactory(type=organization_type.MAIN)
         cls.campus = CampusFactory(organization=organization)
         cls.language = FrenchLanguageFactory()
-        cls.container_year = LearningContainerYearFactory(academic_year=cls.academic_year, container_type=EXTERNAL)
+        cls.container_year = LearningContainerYearFactory(
+            academic_year=cls.academic_year,
+            container_type=EXTERNAL,
+            requirement_entity=None,
+            allocation_entity=None
+        )
         cls.learning_unit = LearningUnitFactory(start_year=cls.academic_year)
 
     def setUp(self):

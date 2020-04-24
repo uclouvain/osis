@@ -44,6 +44,8 @@ class EntityFactory(factory.DjangoModelFactory):
     phone = factory.Faker('phone_number')
     fax = factory.Faker('phone_number')
 
+
+class EntityWithVersionFactory(EntityFactory):
     version = factory.RelatedFactory(
         "base.tests.factories.entity_version.EntityVersionFactory",
         factory_related_name='entity',
