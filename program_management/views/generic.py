@@ -39,8 +39,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.education_groups import perms
 from base.views.education_groups.detail import CatalogGenericDetailView
-from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin, AjaxPermissionRequiredMixin
-from osis_role.contrib.views import PermissionRequiredMixin
+from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
+from osis_role.contrib.views import PermissionRequiredMixin, AjaxPermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view

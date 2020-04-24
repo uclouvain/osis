@@ -1,9 +1,15 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from rules.contrib.views import PermissionRequiredMixin as PermissionRequiredMixinRules, \
     objectgetter as objectgetterrules, \
     permission_required as permission_requiredrules
 
 # Wraps django-rules
+from osis_role.errors import get_permission_error
+
 objectgetter = objectgetterrules
 permission_required = permission_requiredrules
 
@@ -16,3 +22,21 @@ class PermissionRequiredMixin(PermissionRequiredMixinRules):
         if not self.request.user.is_authenticated:
             return redirect_to_login(self.request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
         super().handle_no_permission()
+
+
+class AjaxPermissionRequiredMixin:
+
+    permission_required = None
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        perm = self.permission_required
+        if perm and not request.user.has_perm(perm, self.get_permission_object()):
+            error_msg = get_permission_error(request.user, perm)
+            if request.is_ajax():
+                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {
+                    'access_message': error_msg
+                })
+            else:
+                raise PermissionDenied(error_msg)
+        return super().dispatch(request, *args, **kwargs)
