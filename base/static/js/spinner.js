@@ -66,7 +66,10 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 $(document).ajaxStart(function(){
-    showOverlaySpinner(true);
+    // prevent ajax to trigger spinner when dom is not ready yet
+    if(!spinnerActive['sync']) {
+        showOverlaySpinner(true);
+    }
 }).ajaxStop(function(){
     closeOverlaySpinner(true);
 });
