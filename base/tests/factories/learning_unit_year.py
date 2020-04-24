@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import operator
+import random
 import string
 
 import factory.fuzzy
@@ -57,11 +58,16 @@ def _is_internship(luy_obj):
            and luy_obj.learning_container_year.container_type == learning_container_year_types.INTERNSHIP
 
 
+def _generate_internship_subtype(luy_obj):
+    if _is_internship(luy_obj):
+        return random.choice(internship_subtypes.INTERNSHIP_SUBTYPES)[0]
+    return None
+
+
 class LearningUnitYearFactory(DjangoModelFactory):
     class Meta:
         model = "base.LearningUnitYear"
         django_get_or_create = ('acronym', 'academic_year')
-        exclude = ('is_internship',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     academic_year = factory.SubFactory(AcademicYearFactory)
@@ -75,12 +81,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     specific_title_english = factory.Sequence(lambda n: 'Learning unit year english - %d' % n)
     subtype = factory.Iterator(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES, getter=operator.itemgetter(0))
 
-    is_internship = factory.LazyAttribute(_is_internship)
-    internship_subtype = factory.Maybe(
-        'is_internship',
-        yes_declaration=factory.Iterator(internship_subtypes.INTERNSHIP_SUBTYPES, getter=operator.itemgetter(0)),
-        no_declaration=None
-    )
+    internship_subtype = factory.LazyAttribute(_generate_internship_subtype)
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
     decimal_scores = False
     status = True
