@@ -90,7 +90,7 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
         return super().get_redirect_url(*args, **kwargs)
 
     def get_permission_object(self):
-        return self.education_group_year.parent
+        return self.education_group_year
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
