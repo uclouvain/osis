@@ -115,7 +115,8 @@ class TestBuildTree(TestCase):
             type=organization_type.MAIN
         )
         cls.ADEF = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="ADEF",
             title="ADEF",
             entity_type=entity_version.entity_type.LOGISTICS_ENTITY,
@@ -125,7 +126,8 @@ class TestBuildTree(TestCase):
         )
 
         cls.ILV = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="ILV",
             title="ILV",
             entity_type=entity_version.entity_type.LOGISTICS_ENTITY,
@@ -135,7 +137,8 @@ class TestBuildTree(TestCase):
         )
 
         cls.root = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="SST",
             title="SST",
             entity_type=entity_version.entity_type.SECTOR,
@@ -144,7 +147,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.SC = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="SC",
             title="SC",
             entity_type=entity_version.entity_type.FACULTY,
@@ -153,7 +157,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.MATH = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="MATH",
             title="MATH",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -162,7 +167,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.PHYS = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="PHYS",
             title="PHYS",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -171,7 +177,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.LOCI = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="LOCI",
             title="LOCI",
             entity_type=entity_version.entity_type.FACULTY,
@@ -180,7 +187,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.URBA = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="URBA",
             title="URBA",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -189,7 +197,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.BARC = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="BARC",
             title="BARC",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -198,7 +207,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.EDDY = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="EDDY",
             title="EDDY",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -207,7 +217,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.E2DY = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="E2DY",
             title="E2DY",
             entity_type=entity_version.entity_type.SCHOOL,

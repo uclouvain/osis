@@ -149,7 +149,7 @@ class EducationGroupYearTest(TestCase):
 
         result = search(education_group_type=[self.education_group_type_training,
                                               self.education_group_type_minitraining])
-        self.assertEqual(len(result), 5)
+        self.assertEqual(len(result), 4)
 
         OfferEnrollmentFactory(education_group_year=self.education_group_year_2,
                                enrollment_state=offer_enrollment_state.SUBSCRIBED)
