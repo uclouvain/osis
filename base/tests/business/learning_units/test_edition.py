@@ -58,6 +58,7 @@ class LearningUnitEditionTestCase(TestCase):
 
         cls.learning_unit_year = LearningUnitYearWithComponentsFactory(
             academic_year=cls.academic_year,
+            language=EnglishLanguageFactory(),
             learning_container_year__common_title="common title",
             learning_container_year__requirement_entity=cls.entity_version.entity,
             learning_container_year__additional_entity_1=EntityVersionFactory().entity,

@@ -54,8 +54,8 @@ def generate_title(education_group_year):
 
 
 def generate_partial_acronym():
-    sigle_ele = "".join(random.choices(string.ascii_uppercase, k=5))
-    cnum = "".join(random.choices(string.digits, k=3))
+    sigle_ele = "".join(random.sample(string.ascii_uppercase, k=5))
+    cnum = "".join(random.sample(string.digits, k=3))
     subdivision = random.choice(string.ascii_uppercase)
     return "{sigle_ele}{cnum}{subdivision}".format(
         sigle_ele=sigle_ele,
