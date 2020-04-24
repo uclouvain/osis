@@ -2393,7 +2393,7 @@
                     "messagetemplate"
                 ],
                 [
-                    "change_educationgroupcontent",
+                    "change_link_data",
                     "base",
                     "educationgroup"
                 ]
@@ -2724,7 +2724,7 @@
                     "person"
                 ],
                 [
-                    "change_educationgroupcontent",
+                    "change_link_data",
                     "base",
                     "educationgroup"
                 ]

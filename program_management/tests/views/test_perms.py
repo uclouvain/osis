@@ -50,7 +50,7 @@ class TestCanUpdateGroupElementYear(TestCase):
             ),
         )
         cls.faculty_manager = FacultyManagerFactory(entity=cls.group_element_year.parent.management_entity)
-        cls.permission_required = 'base.change_educationgroupcontent'
+        cls.permission_required = 'base.change_link_data'
 
     def test_return_false_when_user_not_linked_to_entity(self):
         person = PersonFactory()
@@ -87,7 +87,7 @@ class TestCanUpdateGroupElementYear(TestCase):
 
     def test_true_if_person_has_both_roles(self):
         person_with_both_roles = PersonWithPermissionsFactory(
-            'change_educationgroupcontent',
+            'change_link_data',
             groups=(PROGRAM_MANAGER_GROUP,)
         )
         CentralManagerFactory(person=person_with_both_roles, entity=self.group_element_year.parent.management_entity)

@@ -6,8 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from education_group.auth import predicates
 from education_group.auth.roles.utils import EducationGroupTypeScopeRoleMixin
 from education_group.auth.scope import Scope
-from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import admin as osis_role_admin
+from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import predicates as osis_role_predicates
 
 
@@ -96,5 +96,5 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,
-            'base.change_educationgroupcontent': rules.always_allow,
+            'base.change_link_data': rules.always_allow,
         })

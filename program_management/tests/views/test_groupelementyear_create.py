@@ -135,7 +135,7 @@ class TestCreateGroupElementYearView(TestCase):
 
         cls.url = reverse("group_element_year_create", args=[cls.egy.id, cls.egy.id])
 
-        cls.person = PersonWithPermissionsFactory('change_educationgroupcontent')
+        cls.person = PersonWithPermissionsFactory('change_link_data')
 
         cls.attach_strategy_patcher = mock.patch(
             "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
@@ -241,7 +241,7 @@ class TestMoveGroupElementYearView(TestCase):
             args=[cls.root_egy.id, cls.selected_egy.id, cls.group_element_year.id]
         )
 
-        cls.person = PersonWithPermissionsFactory('change_educationgroupcontent')
+        cls.person = PersonWithPermissionsFactory('change_link_data')
 
     def setUp(self):
         self.client.force_login(self.person.user)

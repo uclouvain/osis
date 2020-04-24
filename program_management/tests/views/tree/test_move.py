@@ -38,7 +38,6 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerForUEFactory, PersonWithPermissionsFactory
-from program_management.ddd.domain import link
 
 
 @override_flag('education_group_update', active=True)
@@ -128,7 +127,7 @@ class TestOrderingButtons(TestCase):
         mock_permission.return_value = True
         mock_year_editable.return_value = True
         person_with_both_roles = PersonWithPermissionsFactory(
-            'change_educationgroupcontent',
+            'change_link_data',
             groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP)
         )
         context = {'person': person_with_both_roles, 'group': self.group_element_year, 'root': None}

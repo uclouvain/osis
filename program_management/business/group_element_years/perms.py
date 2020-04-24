@@ -27,7 +27,7 @@ from base.business.education_groups.perms import can_raise_exception
 
 
 def is_eligible_to_update_group_element_year_content(person, group_element_year, raise_exception):
-    result = person.user.has_perm('base.change_educationgroupcontent') and \
+    result = person.user.has_perm('base.change_link_data') and \
                 person.user.has_perm('base.change_educationgroup', group_element_year.parent)
-    can_raise_exception(raise_exception, result, _("The user is not allowed to change education group content."))
+    can_raise_exception(raise_exception, result, _("The user is not allowed to change link data."))
     return result

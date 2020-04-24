@@ -60,7 +60,7 @@ class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, Succe
     # FlagMixin
     flag = "education_group_update"
 
-    permission_required = 'base.change_educationgroupcontent'
+    permission_required = 'base.change_link_data'
 
     @property
     def education_group_year(self):

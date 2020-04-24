@@ -136,7 +136,7 @@ def button_order_with_permission(context, title, id_button, value):
         person = context.get('person')
 
         if person.is_faculty_manager and education_group_year.type in GroupType.minor_major_list_choice():
-            title = _('The user is not allowed to change education group content.')
+            title = _('The user is not allowed to change link data.')
             disabled = "disabled"
 
     if value == "up" and context["forloop"]["first"]:
