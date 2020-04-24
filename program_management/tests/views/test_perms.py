@@ -116,8 +116,6 @@ class TestCanUpdateGroupElementYear(TestCase):
                                                data_year=self.current_acy)
         group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent)
 
-        self.faculty_manager.person.user.has_perm('base.detach_educationgroup', group_element_year.parent)
-
         calendar.delete()
 
         self.assertFalse(

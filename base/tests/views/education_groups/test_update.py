@@ -1023,12 +1023,11 @@ class TestSelectAttach(TestCase):
 
         # Create link :
         response = self.client.get(
-            reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk]),
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+            reverse("group_element_year_create", args=[self.root.pk, self.new_parent_education_group_year.pk])
         )
 
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
 
         expected_absent_group_element_year = GroupElementYear.objects.filter(
             parent=self.new_parent_education_group_year,

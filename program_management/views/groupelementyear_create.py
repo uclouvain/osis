@@ -47,13 +47,10 @@ from program_management.views.generic import GenericGroupElementYearMixin
 
 
 class AttachCheckView(GenericGroupElementYearMixin, View):
+    permission_required = 'base.change_educationgroup'
+
     def get(self, request, *args, **kwargs):
         error_messages = []
-
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            error_messages.append(str(e))
 
         elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
         if not elements_to_attach:

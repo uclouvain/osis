@@ -125,10 +125,14 @@ class AjaxPermissionRequiredMixin:
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
         perm = self.permission_required
-        if request.is_ajax() and perm and not request.user.has_perm(perm, self.get_permission_object()):
-            return render(request, 'education_group/blocks/modal/modal_access_denied.html', {
-                'access_message': get_permission_error(request.user, perm)
-            })
+        if perm and not request.user.has_perm(perm, self.get_permission_object()):
+            error_msg = get_permission_error(request.user, perm)
+            if request.is_ajax():
+                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {
+                    'access_message': error_msg
+                })
+            else:
+                raise PermissionDenied(error_msg)
         return super().dispatch(request, *args, **kwargs)
 
 

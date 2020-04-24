@@ -52,7 +52,7 @@ NO_PREREQUISITES = TrainingType.finality_types() + [
 
 
 @method_decorator(login_required, name='dispatch')
-class GenericGroupElementYearMixin(FlagMixin, SuccessMessageMixin, AjaxPermissionRequiredMixin, AjaxTemplateMixin):
+class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, SuccessMessageMixin, AjaxTemplateMixin):
     model = GroupElementYear
     context_object_name = "group_element_year"
     pk_url_kwarg = "group_element_year_id"
