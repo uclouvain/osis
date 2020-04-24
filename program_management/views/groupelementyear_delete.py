@@ -29,9 +29,10 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
 from base.utils.cache import ElementCache
-from base.views.common import display_error_messages, display_warning_messages
+from base.views.common import display_error_messages, display_warning_messages, display_business_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
+from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.service import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
 from program_management.views.generic import GenericGroupElementYearMixin
@@ -41,7 +42,7 @@ from program_management.views.generic import GenericGroupElementYearMixin
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     template_name = "group_element_year/confirm_detach_inner.html"
 
-    permission_required = 'base.detach_educationgroup'
+    permission_required = 'base.can_detach_node'
     form_class = DetachNodeForm
 
     @cached_property

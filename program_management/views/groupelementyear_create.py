@@ -60,6 +60,9 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
 
         return JsonResponse({"error_messages": error_messages})
 
+    def get_permission_object(self):
+        return self.education_group_year
+
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
 
@@ -147,6 +150,9 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_success_url(self):
         """ We'll reload the page """
         return
+
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class MoveGroupElementYearView(CreateGroupElementYearView):

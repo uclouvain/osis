@@ -67,7 +67,7 @@
         {# Paste link #}
         <li>
             {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
-            {% a_tag_modal_has_perm attach_url _('Paste') 'base.attach_educationgroup' user education_group_year %}
+            {% a_tag_modal_has_perm attach_url _('Paste') 'base.can_attach_node' user education_group_year %}
         </li>
         <li class="divider"></li>
 
@@ -76,7 +76,7 @@
         {% if group_to_parent and group_to_parent != "0" %}    {# We cannot detach root element #}
             <li>
                 {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
-                {% a_tag_modal_has_perm detach_url _('Detach') 'base.detach_educationgroup' user education_group_year %}
+                {% a_tag_modal_has_perm detach_url _('Detach') 'base.can_detach_node' user education_group_year %}
             </li>
              <li class="divider"></li>
         {% endif %}

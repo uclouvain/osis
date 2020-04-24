@@ -70,7 +70,7 @@ class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, Succe
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     def get_permission_object(self):
-        return self.education_group_year
+        return self.get_object().parent
 
 
 @method_decorator(login_required, name='dispatch')

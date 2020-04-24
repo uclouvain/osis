@@ -119,5 +119,5 @@ class TestCanUpdateGroupElementYear(TestCase):
         calendar.delete()
 
         self.assertFalse(
-            self.faculty_manager.person.user.has_perm('base.detach_educationgroup', group_element_year.parent)
+            self.faculty_manager.person.user.has_perm('base.can_detach_node', group_element_year.parent)
         )
