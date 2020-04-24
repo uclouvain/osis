@@ -752,7 +752,6 @@ class TestGetSuccessRedirectUrl(TestCase):
 class TestSelectAttach(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
         cls.academic_year = create_current_academic_year()
         cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year_1 = AcademicYearFactory(year=cls.academic_year.year + 1)
@@ -761,6 +760,7 @@ class TestSelectAttach(TestCase):
             academic_year=cls.academic_year,
             education_group__end_year=cls.next_academic_year_1
         )
+        cls.person = CentralManagerFactory().person
         cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year)
         cls.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.new_parent_education_group_year = EducationGroupYearFactory(
@@ -1003,6 +1003,8 @@ class TestSelectAttach(TestCase):
         self.assertFalse(expected_absent_group_element_year)
 
     def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
+        person = PersonFactory()
+        self.client.force_login(person.user)
         AuthorizedRelationshipFactory(
             parent_type=self.new_parent_education_group_year.education_group_type,
             child_type=self.child_education_group_year.education_group_type,
