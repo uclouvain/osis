@@ -73,14 +73,14 @@ def get_evaluation_text(education_group_year, language_code):
     return translated_text_label, translated_text.text
 
 
-def get_contacts_intro_text(education_group_year, language_code):
+def get_contacts_intro_text(node, language_code):
     introduction = get_object_or_none(
         TranslatedText,
         text_label__entity=OFFER_YEAR,
         text_label__label=CONTACT_INTRO_KEY,
         language=language_code,
         entity=OFFER_YEAR,
-        reference=education_group_year.id
+        reference=node.node_id
     )
     if introduction:
         return introduction.text

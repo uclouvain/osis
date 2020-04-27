@@ -81,19 +81,19 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
                 ContinuingEducationTrainingAdmissionConditionsSerializer,
         }
         serializer = admission_condition_serializers.get(
-            self.get_education_group_year().education_group_type.name,
+            self.get_root_node().node_type.name,
             AdmissionConditionsSerializer,
         )
         return serializer(self.get_admission_condition(), context=self.context).data
 
-    def get_education_group_year(self):
+    def get_root_node(self):
         return self.context['egy']
 
     def get_admission_condition(self):
         try:
-            return self.get_education_group_year().admissioncondition
+            return AdmissionCondition.objects.get(education_group_year_id=self.get_root_node().node_id)
         except AdmissionCondition.DoesNotExist:
-            return AdmissionCondition.objects.create(education_group_year=self.get_education_group_year())
+            return AdmissionCondition.objects.create(education_group_year_id=self.get_root_node().node_id)
 
 
 class ContactsSectionSerializer(serializers.Serializer):

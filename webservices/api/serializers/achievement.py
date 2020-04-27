@@ -110,7 +110,7 @@ class AchievementsSerializer(serializers.ModelSerializer):
                 )
             ).get(
                 entity=OFFER_YEAR,
-                reference=self.instance.id,
+                reference=self.instance.node_id,
                 language=self.context['lang'],
                 text_label__label=cms_type
             )

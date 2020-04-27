@@ -78,7 +78,10 @@ class ContactsSerializer(serializers.ModelSerializer):
         lookup_expr = '__'.join([lookup_field, 'exact'])
         datas = {
             contact_type: ContactSerializer(
-                obj.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
+                EducationGroupPublicationContact.objects.filter(
+                    type=type_name,
+                    education_group_year_id=obj.node_id
+                ).annotate(
                     description_or_none=Case(
                         When(description__exact='', then=None),
                         default=F('description'),
