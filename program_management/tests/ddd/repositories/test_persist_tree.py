@@ -65,14 +65,14 @@ class TestPersistTree(TestCase):
         persist_tree.persist(tree)
 
         link_root_with_common_core = GroupElementYear.objects.filter(
-            parent_id=self.root_node.node_id,
-            child_branch_id=self.common_core_node.node_id,
+            parent_element_id=self.root_node.node_id,
+            child_element_id=self.common_core_node.node_id,
         )
         self.assertTrue(link_root_with_common_core.exists())
 
         link_common_core_with_learn_unit = GroupElementYear.objects.filter(
-            parent_id=self.common_core_node.node_id,
-            child_leaf_id=self.learning_unit_year_node.node_id,
+            parent_element_id=self.common_core_node.node_id,
+            child_element_id=self.learning_unit_year_node.node_id,
         )
         self.assertTrue(link_common_core_with_learn_unit.exists())
 
