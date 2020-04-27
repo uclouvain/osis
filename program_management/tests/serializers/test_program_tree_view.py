@@ -64,7 +64,7 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
     def test_serialize_program_tree_ensure_context_have_root_keys(self, mock):
         program_tree_view_serializer(self.tree)
         context_kwarg = mock.call_args[1]['context']
-        self.assertEquals(context_kwarg['root'], self.tree.root_node)
+        self.assertEqual(context_kwarg['root'], self.tree.root_node)
 
     def test_serialize_program_tree_assert_keys_of_root_element(self):
         serialized_data = program_tree_view_serializer(self.tree)
@@ -84,7 +84,6 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
             serialized_data['children'][0]['path'],
             serialized_data['children'][0]['id']
         )
-
         expected_text = self.common_core.code + " - " + self.common_core.title
         self.assertEqual(serialized_data['children'][0]['text'], expected_text)
         self.assertEqual(serialized_data['children'][0]['icon'], None)
