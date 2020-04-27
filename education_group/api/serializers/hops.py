@@ -25,14 +25,13 @@
 ##############################################################################
 from rest_framework import serializers
 
-from base.models.hops import Hops
 
+class HopsListSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    ares_abilities = serializers.ListField(source='*')
 
-class HopsListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Hops
         fields = (
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'count',
+            'ares_abilities',
         )
