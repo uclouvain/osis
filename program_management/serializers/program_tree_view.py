@@ -29,14 +29,12 @@ from program_management.ddd.business_types import *
 
 
 def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
-    path = str(tree.root_node.pk)
     return {
         'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
-        'id': path,
         'icon': None,
         'children': serialize_children(
             children=tree.root_node.children,
-            path=path,
+            path=str(tree.root_node.pk),
             context={'root': tree.root_node}
         ),
         'a_attr': {
