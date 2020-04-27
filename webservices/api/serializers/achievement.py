@@ -94,7 +94,6 @@ class AchievementsSerializer(serializers.Serializer):
         qs = EducationGroupAchievement.objects.filter(
             education_group_year_id=self.instance.node_id
         )
-        print(qs)
         return AchievementSerializer(qs, many=True).data
 
     def get_intro(self, obj):
