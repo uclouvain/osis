@@ -77,6 +77,12 @@ class Prerequisite(models.Model):
     def __str__(self):
         return "{} / {}".format(self.education_group_year, self.learning_unit_year)
 
+    def save(self, *args, **kwargs):
+        # TODO: Remove when migration is done (Field: education_group_year will be deleted)
+        if self.education_group_version:
+            self.education_group_year = self.education_group_version.offer
+        return super().save(*args, **kwargs)
+
     @property
     def secondary_operator(self):
         return OR if self.main_operator == AND else AND
