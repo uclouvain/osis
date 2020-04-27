@@ -24,12 +24,12 @@
 #
 ##############################################################################
 from django.test import TestCase
+from mock import patch
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.groups import PROGRAM_MANAGER_GROUP
-from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
-    OpenAcademicCalendarFactory
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
@@ -74,9 +74,8 @@ class TestCanUpdateGroupElementYear(TestCase):
             self.faculty_manager.person.user.has_perm(self.permission_required, self.group_element_year.parent)
         )
 
+    @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
     def test_raise_permission_denied_if_person_is_faculty_manager_and_period_closed(self):
-        CloseAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy,
-                                     data_year=self.current_acy)
         self.assertFalse(
             self.faculty_manager.person.user.has_perm(self.permission_required, self.group_element_year.parent)
         )
@@ -94,13 +93,12 @@ class TestCanUpdateGroupElementYear(TestCase):
 
         self.assertTrue(person_with_both_roles.user.has_perm(self.permission_required, self.group_element_year))
 
-    def test_raise_permission_denied_when_minor_or_major_list_choice_and_person_is_faculty_manager(self):
-        OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy)
+    @patch('base.business.event_perms.EventPerm.is_open', return_value=True)
+    def test_raise_permission_denied_when_minor_or_major_list_choice_and_person_is_faculty_manager(self, mock_period):
         egys = [
             GroupFactory(education_group_type__name=GroupType.MINOR_LIST_CHOICE.name, academic_year=self.current_acy),
             GroupFactory(education_group_type__name=GroupType.MAJOR_LIST_CHOICE.name, academic_year=self.current_acy)
         ]
-
         for egy in egys:
             with self.subTest(type=egy.education_group_type):
                 group_element_year = GroupElementYearFactory(
@@ -108,16 +106,5 @@ class TestCanUpdateGroupElementYear(TestCase):
                     child_branch=egy
                 )
                 self.assertFalse(
-                    self.faculty_manager.person.user.has_perm(self.permission_required, group_element_year.parent)
+                    self.faculty_manager.person.user.has_perm(self.permission_required, group_element_year.child_branch)
                 )
-
-    def test_detach(self):
-        calendar = OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy,
-                                               data_year=self.current_acy)
-        group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent)
-
-        calendar.delete()
-
-        self.assertFalse(
-            self.faculty_manager.person.user.has_perm('base.can_detach_node', group_element_year.parent)
-        )
