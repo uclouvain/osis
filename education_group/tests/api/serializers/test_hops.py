@@ -27,6 +27,7 @@ from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
+from base.models.hops import Hops
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.hops import HopsFactory
 from education_group.api.serializers.hops import HopsListSerializer
@@ -38,17 +39,18 @@ class HopsListSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.hops = HopsFactory(education_group_year__academic_year=cls.academic_year)
-
+        ares_ability = Hops.objects.filter(
+            education_group_year__academic_year=cls.academic_year
+        ).values_list('ares_ability', flat=True)
         url = reverse('education_group_api_v1:' + HopsList.name, kwargs={'year': cls.academic_year.year})
-        cls.serializer = HopsListSerializer(cls.hops, context={
+        cls.serializer = HopsListSerializer(ares_ability, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'ares_study',
-            'ares_graca',
-            'ares_ability'
+            'count',
+            'ares_abilities',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

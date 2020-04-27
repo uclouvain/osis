@@ -30,16 +30,16 @@ from base.models.hops import Hops
 from education_group.api.serializers.hops import HopsListSerializer
 
 
-class HopsList(LanguageContextSerializerMixin, generics.ListAPIView):
+class HopsList(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
-        Return the list of habilitation
+        Return the list of used habilitation
     """
     name = 'habilitations_list'
     serializer_class = HopsListSerializer
 
-    def get_queryset(self):
+    def get_object(self):
         year = self.kwargs['year']
         hops = Hops.objects.filter(
             education_group_year__academic_year__year=year
-        ).distinct()
+        ).values_list('ares_ability', flat=True).distinct()
         return hops

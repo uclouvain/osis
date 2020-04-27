@@ -61,6 +61,5 @@ class HopsListTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(response.data['results'][0]['ares_ability'], self.hops.ares_ability)
-        self.assertEqual(response.data['results'][0]['ares_graca'], self.hops.ares_graca)
-        self.assertEqual(response.data['results'][0]['ares_study'], self.hops.ares_study)
+        self.assertEqual(response.data['ares_abilities'][0], self.hops.ares_ability)
+        self.assertEqual(response.data['count'], 1)

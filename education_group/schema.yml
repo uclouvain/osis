@@ -317,7 +317,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfHops'
+                $ref: '#/components/schemas/Hops'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -556,19 +556,15 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    ArrayOfHops:
-      type: array
-      items:
-        $ref: '#/components/schemas/Hops'
     Hops:
       type: object
       properties:
-        ares_ability:
+        count:
           type: integer
-        ares_graca:
-          type: integer
-        ares_study:
-          type: integer
+        ares_abilities:
+          type: array
+          items:
+            type: integer
     ArrayOfTraining:
       type: array
       items:
