@@ -77,8 +77,16 @@ $("a[id^='quick-search']").click(function (event) {
     $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
 });
 
+function saveScrollPosition() {
+    const rootId = $('#panel_file_tree').attr("data-rootId");
+    const scrollPosition = $("#scrollableDiv")[0].scrollTop
+    const storageValue = {}
+    storageValue[rootId] = scrollPosition
+    localStorage.setItem('scrollpos', JSON.stringify(storageValue));
+}
+
 $("#scrollableDiv").on("scroll", function() {
-   localStorage.setItem('scrollpos', $("#scrollableDiv")[0].scrollTop);
+    saveScrollPosition();
 });
 
 $(window).scroll(function() {
@@ -172,6 +180,12 @@ function get_data_from_tree(data) {
     };
 }
 
+function scrollToPositionSaved() {
+    const rootId = $('#panel_file_tree').attr("data-rootId");
+    const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
+    const scrollPosition = rootId in storageValue ? storageValue[rootId] : 0;
+    document.getElementById('scrollableDiv').scrollTo(0, scrollPosition);
+}
 
 function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
     $documentTree.bind("state_ready.jstree", function (event, data) {
@@ -180,13 +194,8 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
         $documentTree.bind("select_node.jstree", function (event, data) {
             document.location.href = data.node.a_attr.href;
         });
-        var selected_node = $documentTree.jstree().get_selected(true);
-        if(selected_node.length > 0) {
-            if (selected_node[0].id !== undefined) {
-                var scrollpos = localStorage.getItem('scrollpos');
-                document.getElementById('scrollableDiv').scrollTo(0, scrollpos);
-            }
-        }
+
+        scrollToPositionSaved();
 
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
