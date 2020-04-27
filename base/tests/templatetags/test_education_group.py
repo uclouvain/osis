@@ -193,7 +193,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         group_type_disabled = [GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name]
         self._get_permisson_order_button(group_type_disabled,
                                          "disabled",
-                                         _('The user is not allowed to change education group content.'))
+                                         _('The user is not allowed to change link data.'))
 
     @mock.patch('base.business.education_groups.perms.check_permission')
     @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')

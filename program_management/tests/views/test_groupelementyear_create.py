@@ -39,8 +39,9 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.utils.cache import cache, ElementCache
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 
 
@@ -55,25 +56,23 @@ class TestAttachCheckView(TestCase):
             academic_year=cls.next_academic_year
         )
 
+        cls.person = CentralManagerFactory(entity=cls.egy.management_entity).person
+
         cls.url = reverse("check_education_group_attach", args=[cls.egy.id, cls.egy.id])
 
-        cls.person = PersonFactory()
-
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                      return_value=True)
-
+        cls.is_open_patcher = mock.patch("base.business.event_perms.EventPerm.is_open")
         cls.attach_strategy_patcher = mock.patch(
             "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
         )
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.mocked_perm = self.perm_patcher.start()
         self.mocked_attach_strategy = self.attach_strategy_patcher.start()
+        self.is_open = self.is_open_patcher.start()
 
     def tearDown(self):
-        self.addCleanup(self.perm_patcher.stop)
         self.addCleanup(self.attach_strategy_patcher.stop)
+        self.addCleanup(self.is_open)
         self.addCleanup(cache.clear)
 
     def test_when_no_element_selected(self):
@@ -136,10 +135,7 @@ class TestCreateGroupElementYearView(TestCase):
 
         cls.url = reverse("group_element_year_create", args=[cls.egy.id, cls.egy.id])
 
-        cls.person = PersonFactory()
-
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                      return_value=True)
+        cls.person = PersonWithPermissionsFactory('change_link_data')
 
         cls.attach_strategy_patcher = mock.patch(
             "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
@@ -147,11 +143,9 @@ class TestCreateGroupElementYearView(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.mocked_perm = self.perm_patcher.start()
         self.mocked_attach_strategy = self.attach_strategy_patcher.start()
 
     def tearDown(self):
-        self.addCleanup(self.perm_patcher.stop)
         self.addCleanup(self.attach_strategy_patcher.stop)
         self.addCleanup(cache.clear)
 
@@ -247,18 +241,10 @@ class TestMoveGroupElementYearView(TestCase):
             args=[cls.root_egy.id, cls.selected_egy.id, cls.group_element_year.id]
         )
 
-        cls.person = PersonFactory()
-
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                      return_value=True)
+        cls.person = PersonWithPermissionsFactory('change_link_data')
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.mocked_perm = self.perm_patcher.start()
-
-    def tearDown(self):
-        self.addCleanup(self.perm_patcher.stop)
-        self.addCleanup(cache.clear)
 
     def test_move(self):
         AuthorizedRelationshipFactory(
@@ -279,5 +265,3 @@ class TestMoveGroupElementYearView(TestCase):
         })
 
         self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id))
-        self.mocked_perm.assert_any_call(self.person, self.selected_egy, raise_exception=True)
-        self.mocked_perm.assert_any_call(self.person, self.group_element_year.parent, raise_exception=True)

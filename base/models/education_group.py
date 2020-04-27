@@ -110,7 +110,7 @@ class EducationGroup(SerializableModel):
             ("add_group", "Can add group"),
             ("change_commonpedagogyinformation", "Can change common pedagogy information"),
             ("change_pedagogyinformation", "Can change pedagogy information"),
-            ("change_educationgroupcontent", "Can change education group content"),
+            ("change_link_data", "Can change link data"),
         )
         verbose_name = _("Education group")
 

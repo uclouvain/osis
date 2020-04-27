@@ -23,12 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.forms import modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
@@ -50,15 +47,10 @@ from program_management.views.generic import GenericGroupElementYearMixin
 
 
 class AttachCheckView(GenericGroupElementYearMixin, View):
-    rules = []
+    permission_required = 'base.change_educationgroup'
 
     def get(self, request, *args, **kwargs):
         error_messages = []
-
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            error_messages.append(str(e))
 
         elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
         if not elements_to_attach:
@@ -68,16 +60,8 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
 
         return JsonResponse({"error_messages": error_messages})
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if self.rules:
-            try:
-                self.rules[0](self.request.user, self.education_group_year)
-
-            except PermissionDenied as e:
-                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(AttachCheckView, self).dispatch(request, *args, **kwargs)
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
@@ -105,16 +89,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
 
         return super().get_redirect_url(*args, **kwargs)
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if self.rules:
-            try:
-                self.rules[0](self.request.user, self.education_group_year)
-
-            except PermissionDenied as e:
-                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(PasteElementFromCacheToSelectedTreeNode, self).dispatch(request, *args, **kwargs)
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
@@ -177,6 +153,9 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_success_url(self):
         """ We'll reload the page """
         return
+
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class MoveGroupElementYearView(CreateGroupElementYearView):

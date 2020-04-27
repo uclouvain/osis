@@ -368,3 +368,40 @@ class TestIsMaximumChildNotReachedForTrainingCategory(TestCase):
         self.assertTrue(
             predicates.is_maximum_child_not_reached_for_training_category(self.user, self.education_group_year)
         )
+
+
+class TestIsUserLinkedToAllScopes(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+
+    def setUp(self):
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_case_is_linked_to_all_scopes(self):
+        person = FacultyManagerFactory().person
+        self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
+        self.assertTrue(
+            predicates.is_user_linked_to_all_scopes(
+                person.user,
+                self.education_group_year
+            )
+        )
+
+    def test_case_is_not_linked_to_all_scopes(self):
+        person = FacultyManagerFactory(scopes=['OTHER']).person
+        self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
+        self.assertFalse(
+            predicates.is_user_linked_to_all_scopes(
+                person.user,
+                self.education_group_year
+            )
+        )

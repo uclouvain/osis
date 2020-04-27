@@ -30,10 +30,9 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
@@ -62,7 +61,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
@@ -753,7 +752,6 @@ class TestGetSuccessRedirectUrl(TestCase):
 class TestSelectAttach(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
         cls.academic_year = create_current_academic_year()
         cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year_1 = AcademicYearFactory(year=cls.academic_year.year + 1)
@@ -762,6 +760,7 @@ class TestSelectAttach(TestCase):
             academic_year=cls.academic_year,
             education_group__end_year=cls.next_academic_year_1
         )
+        cls.person = CentralManagerFactory().person
         cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year)
         cls.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.new_parent_education_group_year = EducationGroupYearFactory(
@@ -822,16 +821,7 @@ class TestSelectAttach(TestCase):
         }
 
     def setUp(self):
-        self.client = Client()
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.is_eligible_to_change_education_group",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
-        # Clean cache state
-        self.addCleanup(cache.clear)
 
     def test_copy_case_education_group(self):
         response = self.client.post(
@@ -1013,7 +1003,8 @@ class TestSelectAttach(TestCase):
         self.assertFalse(expected_absent_group_element_year)
 
     def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
-        self.mocked_perm.return_value = False
+        person = PersonFactory()
+        self.client.force_login(person.user)
         AuthorizedRelationshipFactory(
             parent_type=self.new_parent_education_group_year.education_group_type,
             child_type=self.child_education_group_year.education_group_type,
