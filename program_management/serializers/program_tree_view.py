@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import reverse
 
 from program_management.serializers.node_view import serialize_children
 from program_management.ddd.business_types import *
@@ -40,6 +41,7 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
             context={'root': tree.root_node}
         ),
         'a_attr': {
+            'href': reverse('education_group_read', args=[tree.root_node.pk, tree.root_node.pk]),
             'element_id': tree.root_node.pk,
             'element_type': tree.root_node.type.name,
         }
