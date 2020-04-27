@@ -44,10 +44,12 @@ WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
 class GeneralInformationSerializer(serializers.Serializer):
     language = serializers.CharField(read_only=True)
+    acronym = serializers.CharField(source='title', read_only=True)
     year = serializers.IntegerField(source='academic_year.year', read_only=True)
-    education_group_type = serializers.CharField(source='education_group_type.name', read_only=True)
-    education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    education_group_type = serializers.CharField(source='node_type.name', read_only=True)
+    education_group_type_text = serializers.CharField(source='node_type.value', read_only=True)
     sections = serializers.SerializerMethodField()
+    title = serializers.CharField(source='offer_title_fr', read_only=True)
 
     class Meta:
         fields = (
@@ -66,7 +68,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         acronym = kwargs['context']['acronym'].upper()
         self.instance.language = lang
         if lang != settings.LANGUAGE_CODE_FR[:2]:
-            self.fields['title'] = serializers.CharField(source='title_english', read_only=True)
+            self.fields['title'] = serializers.CharField(source='offer_title_en', read_only=True)
         if self.instance.code == acronym:
             self.fields['acronym'] = serializers.CharField(source='code', read_only=True)
 

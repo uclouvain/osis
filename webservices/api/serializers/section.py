@@ -54,8 +54,8 @@ class AchievementSectionSerializer(serializers.Serializer):
     content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
-        egy = self.context.get('egy')
-        return AchievementsSerializer(egy, context=self.context).data
+        node = self.context.get('egy')
+        return AchievementsSerializer(node, context=self.context).data
 
 
 class AdmissionConditionSectionSerializer(serializers.Serializer):

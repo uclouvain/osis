@@ -32,6 +32,7 @@ from base.tests.factories.education_group_publication_contact import EducationGr
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices.api.serializers.contacts import ContactsSerializer, ContactSerializer
 
 
@@ -43,14 +44,15 @@ class ContactsSerializerTestCase(TestCase):
         entity = EntityFactory()
         EntityVersionFactory(
             entity=entity,
-            start_date=now.replace(year=now.year-1)
+            start_date=now.replace(year=now.year - 1)
         )
         cls.egy = EducationGroupYearFactory(
             academic_year__year=now.year,
             management_entity=entity,
             publication_contact_entity=entity
         )
-        cls.serializer = ContactsSerializer(cls.egy, context={'lang': cls.language})
+        cls.node = NodeEducationGroupYearFactory(node_id=cls.egy.id)
+        cls.serializer = ContactsSerializer(cls.node, context={'lang': cls.language})
 
     def test_contains_expected_fields(self):
         expected_fields = [

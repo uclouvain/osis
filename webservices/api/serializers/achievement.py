@@ -29,7 +29,6 @@ from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
-from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -79,18 +78,24 @@ class AchievementSerializer(serializers.ModelSerializer):
         return _get_appropriate_code_name(obj)
 
 
-class AchievementsSerializer(serializers.ModelSerializer):
+class AchievementsSerializer(serializers.Serializer):
     intro = serializers.SerializerMethodField()
-    blocs = AchievementSerializer(source='educationgroupachievement_set', many=True, read_only=True)
+    blocs = serializers.SerializerMethodField()
     extra = serializers.SerializerMethodField()
 
     class Meta:
-        model = EducationGroupYear
         fields = (
             'intro',
             'blocs',
             'extra'
         )
+
+    def get_blocs(self, obj):
+        qs = EducationGroupAchievement.objects.filter(
+            education_group_year_id=self.instance.node_id
+        )
+        print(qs)
+        return AchievementSerializer(qs, many=True).data
 
     def get_intro(self, obj):
         return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_INTRO)

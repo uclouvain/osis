@@ -38,6 +38,8 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from program_management.ddd.repositories import load_tree
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
@@ -46,6 +48,10 @@ class GeneralInformationSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.node = NodeEducationGroupYearFactory(
+            node_id=cls.egy.id,
+            node_type=cls.egy.education_group_type,
+        )
         cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
@@ -81,8 +87,9 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
+        cls.tree = load_tree.load(cls.egy.id)
         cls.serializer = GeneralInformationSerializer(
-            cls.egy, context={
+            cls.tree.root_node, context={
                 'language': cls.language,
                 'acronym': cls.egy.acronym
             }
@@ -100,11 +107,11 @@ class GeneralInformationSerializerTestCase(TestCase):
         expected_fields = [
             'language',
             'acronym',
-            'title',
             'year',
             'education_group_type',
             'education_group_type_text',
-            'sections'
+            'sections',
+            'title'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -136,8 +143,9 @@ class GeneralInformationSerializerTestCase(TestCase):
                 language=self.language,
                 text_label__label=WELCOME_INTRODUCTION
             )
+
             welcome_introduction_section = GeneralInformationSerializer(
-                self.egy, context={
+                self.node, context={
                     'language': self.language,
                     'acronym': self.egy.acronym
                 }
@@ -158,6 +166,10 @@ class IntroOffersSectionTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.node = NodeEducationGroupYearFactory(
+            node_id=cls.egy.id,
+            node_type=cls.egy.education_group_type,
+        )
         EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
 
@@ -175,7 +187,7 @@ class IntroOffersSectionTestCase(TestCase):
             child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
             child_branch__partial_acronym="TESTTC"
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testtc')
 
@@ -189,7 +201,7 @@ class IntroOffersSectionTestCase(TestCase):
             child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
             child_branch__partial_acronym="TESTOPTION"
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey_option, self.egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey_option)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testoption')
 
@@ -203,11 +215,11 @@ class IntroOffersSectionTestCase(TestCase):
             child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
             child_branch__partial_acronym="TESTFINA",
         )
-        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testfina')
 
-    def _get_pertinent_intro_section(self, gey, egy):
+    def _get_pertinent_intro_section(self, gey):
         TranslatedTextLabelFactory(
             text_label__label=INTRODUCTION,
             language=self.language,
@@ -219,8 +231,8 @@ class IntroOffersSectionTestCase(TestCase):
             reference=gey.child_branch.id
         )
         return GeneralInformationSerializer(
-            egy, context={
+            self.node, context={
                 'language': self.language,
-                'acronym': egy.acronym
+                'acronym': self.node.title
             }
         ).data['sections'][0]

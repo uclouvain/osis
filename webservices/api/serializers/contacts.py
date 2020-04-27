@@ -28,7 +28,7 @@ from django.db.models import Case, When, F, CharField
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
-from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import EntityVersion
 from base.models.enums.publication_contact_type import PublicationContactType
 from webservices.business import get_contacts_intro_text
 
@@ -47,15 +47,13 @@ class ContactSerializer(serializers.ModelSerializer):
         )
 
 
-class ContactsSerializer(serializers.ModelSerializer):
+class ContactsSerializer(serializers.Serializer):
     contacts = serializers.SerializerMethodField()
     text = serializers.SerializerMethodField()
-    entity = serializers.CharField(source='publication_contact_entity_version.acronym', read_only=True)
-    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    entity = serializers.SerializerMethodField()
+    management_entity = serializers.SerializerMethodField()
 
     class Meta:
-        model = EducationGroupYear
-
         fields = (
             'contacts',
             'text',
@@ -63,9 +61,19 @@ class ContactsSerializer(serializers.ModelSerializer):
             'management_entity'
         )
 
+    def get_entity(self, obj):
+        return EntityVersion.objects.get(
+            entity__educationgroupyear__id=obj.node_id
+        ).acronym
+
+    def get_management_entity(self, obj):
+        return EntityVersion.objects.get(
+            entity__management_entity__id=obj.node_id
+        ).acronym
+
     def get_text(self, obj):
         text = get_contacts_intro_text(obj, self.context.get('lang'))
-        return text if text else None
+        return text or None
 
     def get_contacts(self, obj):
         contact_types = [
