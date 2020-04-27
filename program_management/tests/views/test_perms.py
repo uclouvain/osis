@@ -75,7 +75,7 @@ class TestCanUpdateGroupElementYear(TestCase):
         )
 
     @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
-    def test_raise_permission_denied_if_person_is_faculty_manager_and_period_closed(self):
+    def test_raise_permission_denied_if_person_is_faculty_manager_and_period_closed(self, mock_period_open):
         self.assertFalse(
             self.faculty_manager.person.user.has_perm(self.permission_required, self.group_element_year.parent)
         )

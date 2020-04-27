@@ -38,6 +38,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
 
@@ -158,8 +159,9 @@ class TestDetachNodeView(TestCase):
         self.assertEqual(ElementCache(self.person.user).cached_data['id'], element_cached.id, error_msg)
 
     @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=False)
-    def test_detach_not_permitted_period_closed(self, mock_period_open):
+    def test_detach_not_permitted_for_faculty_manager_if_period_closed(self, mock_period_open):
+        faculty_manager = FacultyManagerFactory(entity=self.education_group_year.management_entity)
         group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent)
         self.assertFalse(
-            self.faculty_manager.person.user.has_perm('base.can_detach_node', group_element_year.parent)
+            faculty_manager.person.user.has_perm('base.can_detach_node', group_element_year.parent)
         )
