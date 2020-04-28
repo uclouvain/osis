@@ -88,7 +88,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
             if serializer:
-                serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
+                serializer = serializer({'id': specific_section}, context={'root_node': obj, 'lang': language})
                 datas.append(serializer.data)
             elif specific_section not in WS_SECTIONS_TO_SKIP:
                 sections.append(self._get_section_cms(obj, specific_section, language))

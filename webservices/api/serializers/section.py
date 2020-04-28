@@ -54,7 +54,7 @@ class AchievementSectionSerializer(serializers.Serializer):
     content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
-        node = self.context.get('egy')
+        node = self.context.get('root_node')
         return AchievementsSerializer(node, context=self.context).data
 
 
@@ -87,7 +87,7 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
         return serializer(self.get_admission_condition(), context=self.context).data
 
     def get_root_node(self):
-        return self.context['egy']
+        return self.context['root_node']
 
     def get_admission_condition(self):
         try:
@@ -102,5 +102,5 @@ class ContactsSectionSerializer(serializers.Serializer):
     content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
-        egy = self.context.get('egy')
-        return ContactsSerializer(egy, context=self.context).data
+        root_node = self.context.get('root_node')
+        return ContactsSerializer(root_node, context=self.context).data

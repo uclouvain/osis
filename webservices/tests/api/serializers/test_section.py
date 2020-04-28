@@ -128,7 +128,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         AdmissionConditionFactory(education_group_year=common_egy)
         AdmissionConditionFactory(education_group_year=cls.egy)
         cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
-            'egy': cls.node,
+            'root_node': cls.node,
             'lang': cls.language
         })
 
@@ -151,7 +151,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             node_type=training_wihtout_admission_condition.education_group_type,
         )
         serializer = AdmissionConditionSectionSerializer({}, context={
-            'egy': node,
+            'root_node': node,
             'lang': self.language
         })
 
