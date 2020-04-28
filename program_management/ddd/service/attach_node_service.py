@@ -29,7 +29,7 @@ from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import factory
-from program_management.ddd.repositories import load_tree, persist_tree
+from program_management.ddd.repositories import load_tree, persist_tree, load_node
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
@@ -45,7 +45,7 @@ def attach_node(
         **link_attributes
 ) -> List[BusinessValidationMessage]:
     tree = load_tree.load(root_id)
-    node_to_attach = factory.get_node(type_node_to_attach, node_id=node_id_to_attach)
+    node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
     error_messages = __validate_trees_using_node_as_reference_link(tree, node_to_attach, path)
     if type_node_to_attach != NodeType.LEARNING_UNIT:
         error_messages += _validate_end_date_and_option_finality(node_to_attach)
