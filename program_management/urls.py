@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^copy_element/$', program_management.views.tree.move.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
+            #  TODO Remove attach urls
             url(u'^attach/', program_management.views.tree.attach.PasteElementFromCacheToSelectedTreeNode.as_view(),
                 name='education_group_attach'),
             url(r'^check_attach/', program_management.views.tree.attach.AttachCheckView.as_view(),

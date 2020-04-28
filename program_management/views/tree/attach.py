@@ -66,8 +66,7 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
 
     @cached_property
     def root_id(self):
-        _root_id, *_ = self.request.GET['to_path'].split('|', 1)
-        return _root_id
+        return self.kwargs["root_id"]
 
     @cached_property
     def elements_to_attach(self):
@@ -85,9 +84,9 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
         for idx, element in enumerate(self.elements_to_attach):
             formset_kwargs.append({
                 'node_id': element.pk,
-                'node_type': NodeType.EDUCATION_GROUP.name if isinstance(element, EducationGroupYear) else
-                NodeType.LEARNING_UNIT.name,
-                'to_path': self.request.GET['to_path']
+                'node_type': NodeType.EDUCATION_GROUP if isinstance(element, EducationGroupYear) else
+                NodeType.LEARNING_UNIT,
+                'to_path': self.request.GET['path']
             })
         return formset_kwargs
 

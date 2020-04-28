@@ -105,8 +105,8 @@ class TestAttachNodeView(TestCase):
             self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
     def test_get_method_when_no_data_selected_on_cache(self):
-        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
-        response = self.client.get(self.url + "?to_path=" + to_path)
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
+        response = self.client.get(self.url + "?path=" + path)
         self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
@@ -122,8 +122,8 @@ class TestAttachNodeView(TestCase):
         mock_cache_elems.return_value = [subgroup_to_attach]
 
         # To path :  BIR1BA ---> COMMON_CORE
-        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
-        response = self.client.get(self.url + "?to_path=" + to_path)
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
+        response = self.client.get(self.url + "?path=" + path)
         self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
@@ -145,8 +145,8 @@ class TestAttachNodeView(TestCase):
         mock_cache_elems.return_value = [subgroup_to_attach, subgroup_to_attach_2]
 
         # To path :  BIR1BA ---> LBIR101G
-        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.get(self.url + "?to_path=" + to_path)
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.get(self.url + "?path=" + path)
         self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
@@ -165,8 +165,8 @@ class TestAttachNodeView(TestCase):
         mock_formset_is_valid.return_value = False
 
         # To path :  BIR1BA ---> LBIR101G
-        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.post(self.url + "?to_path=" + to_path)
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.post(self.url + "?path=" + path)
 
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
@@ -184,8 +184,8 @@ class TestAttachNodeView(TestCase):
         mock_cache_elems.return_value = [subgroup_to_attach]
 
         # To path :  BIR1BA ---> LBIR101G
-        to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.post(self.url + "?to_path=" + to_path)
+        path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
+        response = self.client.post(self.url + "?path=" + path)
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, ['Success'])
