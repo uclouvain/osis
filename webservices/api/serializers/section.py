@@ -40,13 +40,6 @@ class SectionSerializer(serializers.Serializer):
     label = serializers.CharField(source='translated_label', read_only=True)
     content = serializers.CharField(source='text', read_only=True, allow_null=True)
 
-    class Meta:
-        fields = (
-            'id',
-            'label',
-            'content',
-        )
-
 
 class AchievementSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)

@@ -51,17 +51,6 @@ class GeneralInformationSerializer(serializers.Serializer):
     sections = serializers.SerializerMethodField()
     title = serializers.CharField(source='offer_title_fr', read_only=True)
 
-    class Meta:
-        fields = (
-            'language',
-            'acronym',
-            'title',
-            'year',
-            'education_group_type',
-            'education_group_type_text',
-            'sections',
-        )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         lang = kwargs['context']['language']

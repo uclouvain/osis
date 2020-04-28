@@ -53,20 +53,14 @@ class ContactsSerializer(serializers.Serializer):
     entity = serializers.SerializerMethodField()
     management_entity = serializers.SerializerMethodField()
 
-    class Meta:
-        fields = (
-            'contacts',
-            'text',
-            'entity',
-            'management_entity'
-        )
-
-    def get_entity(self, obj):
+    @staticmethod
+    def get_entity(obj):
         return EntityVersion.objects.get(
             entity__educationgroupyear__id=obj.node_id
         ).acronym
 
-    def get_management_entity(self, obj):
+    @staticmethod
+    def get_management_entity(obj):
         return EntityVersion.objects.get(
             entity__management_entity__id=obj.node_id
         ).acronym

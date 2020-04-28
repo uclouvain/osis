@@ -49,7 +49,8 @@ class DetailedAchievementSerializer(serializers.ModelSerializer):
     def get_text(self, obj):
         return _get_appropriate_text(obj, self.context)
 
-    def get_code_name(self, obj):
+    @staticmethod
+    def get_code_name(obj):
         return _get_appropriate_code_name(obj)
 
 
@@ -74,7 +75,8 @@ class AchievementSerializer(serializers.ModelSerializer):
     def get_teaser(self, obj):
         return _get_appropriate_text(obj, self.context)
 
-    def get_code_name(self, obj):
+    @staticmethod
+    def get_code_name(obj):
         return _get_appropriate_code_name(obj)
 
 
@@ -82,13 +84,6 @@ class AchievementsSerializer(serializers.Serializer):
     intro = serializers.SerializerMethodField()
     blocs = serializers.SerializerMethodField()
     extra = serializers.SerializerMethodField()
-
-    class Meta:
-        fields = (
-            'intro',
-            'blocs',
-            'extra'
-        )
 
     def get_blocs(self, obj):
         qs = EducationGroupAchievement.objects.filter(
