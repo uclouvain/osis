@@ -34,11 +34,11 @@ paths:
             description: ''
             type: string
         - in: path
-            name: version_name
-            required: true
-            schema:
-              description: ''
-              type: string
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -72,11 +72,11 @@ paths:
             description: ''
             type: string
         - in: path
-            name: version_name
-            required: true
-            schema:
-              description: ''
-              type: string
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -174,11 +174,11 @@ paths:
             description: ''
             type: string
         - in: path
-            name: version_name
-            required: true
-            schema:
-              description: ''
-              type: string
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -212,11 +212,11 @@ paths:
             description: ''
             type: string
         - in: path
-            name: version_name
-            required: true
-            schema:
-              description: ''
-              type: string
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
