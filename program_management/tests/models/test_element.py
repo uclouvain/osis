@@ -33,7 +33,7 @@ from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from program_management.models.element import Element
-from program_management.tests.factories.element import ElementFactory, ElementEducationGroupYearFactory, \
+from program_management.tests.factories.element import ElementFactory, \
     ElementLearningUnitYearFactory, ElementLearningClassYearFactory, ElementGroupYearFactory
 
 

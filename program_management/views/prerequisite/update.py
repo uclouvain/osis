@@ -23,22 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
 
 from base.ddd.utils.validation_message import MessageLevel
+from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.repositories import persist_tree
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
-from program_management.models.enums.node_type import NodeType
-from program_management.views.generic import LearningUnitGenericUpdateView
+from program_management.views.generic import LearningUnitGeneric
 
 
-class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
+class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, LearningUnitGeneric, FormView):
     template_name = "learning_unit/tab_prerequisite_update.html"
     form_class = PrerequisiteForm
+
+    permission_required = 'base.change_educationgroup'
+    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         self.check_can_update_prerequisite()
@@ -46,28 +50,22 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs["learning_unit_year_id"]),
-            NodeType.LEARNING_UNIT
-        )
+
         form_kwargs["program_tree"] = self.program_tree
-        form_kwargs["node"] = node
+        form_kwargs["node"] = self.node
         form_kwargs["initial"] = {
-            "prerequisite_string": str(node.prerequisite)
+            "prerequisite_string": str(self.node.prerequisite)
         }
         return form_kwargs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context["show_prerequisites"] = True
-        return context
+        return {
+            **super().get_context_data(),
+            "show_prerequisites": True
+        }
 
     def form_valid(self, form):
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs["learning_unit_year_id"]),
-            NodeType.LEARNING_UNIT
-        )
-        messages = self.program_tree.set_prerequisite(form.cleaned_data["prerequisite_string"], node)
+        messages = self.program_tree.set_prerequisite(form.cleaned_data["prerequisite_string"], self.node)
         error_messages = [msg for msg in messages if msg.level == MessageLevel.ERROR]
         if error_messages:
             raise PermissionDenied([msg.message for msg in error_messages])
@@ -84,5 +82,10 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         return _("Prerequisites saved.")
 
     def get_success_url(self):
-        return reverse("learning_unit_prerequisite", args=[self.kwargs["root_id"],
-                                                           self.kwargs["learning_unit_year_id"]])
+        return reverse(
+            "learning_unit_prerequisite",
+            kwargs={
+                'root_element_id': self.kwargs["root_element_id"],
+                'child_element_id': self.kwargs["child_element_id"]
+            }
+        )

@@ -23,12 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.repositories.find_roots import find_roots
-from program_management.views.generic import LearningUnitGenericDetailView
+from program_management.views.generic import LearningUnitGeneric
 
 
-class LearningUnitUtilization(LearningUnitGenericDetailView):
+class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_utilization.html"
+
+    permission_required = 'base.view_educationgroup'
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

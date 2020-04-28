@@ -64,7 +64,8 @@ urlpatterns = [
                 name="quick_search_education_group"),
         ])),
     ])),
-    url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
+    # TODO: #  Url should have a slugify on path <version_id>
+    url(r'^(?P<root_element_id>[0-9]+)/(?P<child_element_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
             element_utilization.LearningUnitUtilization.as_view(),
             name='learning_unit_utilization'),

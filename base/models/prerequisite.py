@@ -59,6 +59,7 @@ class Prerequisite(models.Model):
         "LearningUnitYear", on_delete=models.CASCADE
 
     )
+    # TODO : Remove this field after migration
     education_group_year = models.ForeignKey(
         "EducationGroupYear", on_delete=models.CASCADE
     )
