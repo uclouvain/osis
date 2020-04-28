@@ -35,7 +35,6 @@ from base.tests.factories.group_element_year import GroupElementYearChildLeafFac
 from base.tests.factories.person import PersonFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 

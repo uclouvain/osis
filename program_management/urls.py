@@ -29,8 +29,7 @@ from django.urls import include, path
 import program_management.views.tree.move
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, element_utilization, groupelementyear_postpone, \
-    excel, search, tree
-from program_management.views.prerequisite import read, update
+    excel, search, tree, prerequisite_read, prerequisite_update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
@@ -70,10 +69,10 @@ urlpatterns = [
             element_utilization.LearningUnitUtilization.as_view(),
             name='learning_unit_utilization'),
         url(r'^prerequisite/$',
-            read.LearningUnitPrerequisite.as_view(),
+            prerequisite_read.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite'),
         url(r'^prerequisite/update/$',
-            update.LearningUnitPrerequisite.as_view(),
+            prerequisite_update.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite_update'),
     ])),
     url(
