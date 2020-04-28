@@ -174,8 +174,10 @@ class TestAttachNodeView(TestCase):
 
     @mock.patch('program_management.ddd.service.attach_node_service.attach_node')
     @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
+    @mock.patch.object(AttachNodeForm, 'is_valid')
     @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
-    def test_post_method_case_formset_valid(self, mock_cache_elems, mock_service):
+    def test_post_method_case_formset_valid(self, mock_cache_elems, mock_form_valid, mock_service):
+        mock_form_valid.return_value = True
         mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
         subgroup_to_attach = GroupFactory(
             academic_year__year=self.tree.root_node.year,
@@ -188,13 +190,13 @@ class TestAttachNodeView(TestCase):
         response = self.client.post(self.url + "?path=" + path)
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
-        self.assertEqual(msgs, ['Success'])
 
         self.assertTrue(
             mock_service.called,
             msg="View must call attach node service (and not another layer) "
                 "because the 'attach node' action uses multiple domain objects"
         )
+        self.assertEqual(msgs, ['Success'])
 
 
 @override_flag('education_group_update', active=True)

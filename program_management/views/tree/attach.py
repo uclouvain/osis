@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
@@ -54,13 +52,13 @@ from program_management.business.group_element_years.attach import AttachEducati
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
-from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
+#  TODO Inherit FormView
 class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):
     template_name = "tree/attach_inner.html"
 
@@ -107,26 +105,13 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
         else:
             return self.form_invalid(formset)
 
-    def form_valid(self, formset):
-        messages = self.__execute_attach_node(formset)
+    def form_valid(self, formset: AttachNodeFormSet):
+        messages = formset.save()
         self.__clear_cache(messages)
         display_business_messages(self.request, messages)
         return redirect(
             reverse('education_group_read', args=[self.root_id, self.root_id])
         )
-
-    @transaction.atomic
-    def __execute_attach_node(self, formset) -> List['BusinessValidationMessage']:
-        messages = []
-        for form in formset:
-            messages += attach_node_service.attach_node(
-                self.root_id,
-                form.node_id,
-                form.node_type,
-                form.to_path,
-                **form.cleaned_data
-            )
-        return messages
 
     def __clear_cache(self, messages):
         if not BusinessValidationMessage.contains_errors(messages):

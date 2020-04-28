@@ -23,16 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
+from typing import List
+
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
+from base.ddd.utils import validation_message
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
+from program_management.ddd.service import attach_node_service
 
 
 class AttachNodeFormSet(BaseFormSet):
@@ -41,6 +47,12 @@ class AttachNodeFormSet(BaseFormSet):
         if self.form_kwargs:
             return self.form_kwargs[index]
         return {}
+
+    @transaction.atomic
+    def save(self) -> List[validation_message.BusinessValidationMessage]:
+        return list(itertools.chain.from_iterable(
+            [form.save() for form in self.forms]
+        ))
 
 
 class AttachNodeForm(forms.Form):
@@ -58,6 +70,19 @@ class AttachNodeForm(forms.Form):
         self.node_id = node_id
         self.node_type = node_type
         super().__init__(**kwargs)
+
+    def save(self) -> List[validation_message.BusinessValidationMessage]:
+        result = []
+        if self.is_valid():
+            root_id = int(self.to_path.split("|")[0])
+            result = attach_node_service.attach_node(
+                root_id,
+                self.node_id,
+                self.node_type,
+                self.to_path,
+                commit=True
+            )
+        return result
 
 
 class GroupElementYearForm(forms.ModelForm):

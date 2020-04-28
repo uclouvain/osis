@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import skip
+from unittest import skip, mock
 
 from django.test import SimpleTestCase, TestCase
 from django.utils.translation import gettext as _
@@ -36,7 +36,6 @@ from base.tests.factories.education_group_year import TrainingFactory, MiniTrain
     GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeForm, GroupElementYearForm
 from program_management.models.enums.node_type import NodeType
@@ -70,6 +69,14 @@ class TestAttachNodeForm(SimpleTestCase):
         form_instance = self._get_attach_node_form_instance({'link_type': 'invalid_link_type'})
         self.assertFalse(form_instance.is_valid())
         self.assertTrue(form_instance.errors['link_type'])
+
+    @mock.patch("program_management.ddd.service.attach_node_service.attach_node")
+    def test_save_should_call_attach_service(self, mock_service_attach_node):
+        form_instance = self._get_attach_node_form_instance(link_attributes={})
+        form_instance.is_valid()
+        form_instance.save()
+
+        self.assertTrue(mock_service_attach_node.called)
 
 
 class TestGroupElementYearForm(TestCase):
