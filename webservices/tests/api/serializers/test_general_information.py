@@ -166,10 +166,6 @@ class IntroOffersSectionTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
-        cls.node = NodeEducationGroupYearFactory(
-            node_id=cls.egy.id,
-            node_type=cls.egy.education_group_type,
-        )
         EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
 
@@ -211,7 +207,7 @@ class IntroOffersSectionTestCase(TestCase):
             child_branch__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
         )
         gey = GroupElementYearFactory(
-            parent=g.parent,
+            parent=g.child_branch,
             child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
             child_branch__partial_acronym="TESTFINA",
         )
@@ -230,9 +226,11 @@ class IntroOffersSectionTestCase(TestCase):
             entity=OFFER_YEAR,
             reference=gey.child_branch.id
         )
+        tree = load_tree.load(self.egy.id)
+        node = tree.root_node
         return GeneralInformationSerializer(
-            self.node, context={
+            node, context={
                 'language': self.language,
-                'acronym': self.node.title
+                'acronym': node.title
             }
         ).data['sections'][0]

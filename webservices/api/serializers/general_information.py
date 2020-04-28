@@ -85,7 +85,6 @@ class GeneralInformationSerializer(serializers.Serializer):
             CONTACTS: ContactsSectionSerializer,
         }
         extra_intro_offers = self._get_intro_offers(obj)
-
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
             if serializer:

@@ -33,6 +33,7 @@ from base.tests.factories.education_group_publication_contact import EducationGr
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonMasterFactory, \
     TrainingFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -167,13 +168,18 @@ class ContactsSectionSerializerTestCase(TestCase):
             'dummy': 'DUMMY'
         }
         cls.language = 'en'
-        cls.egy = EducationGroupYearFactory()
+        management_entity = EntityFactory()
+        publication_contact_entity = EntityFactory()
+        cls.egy = EducationGroupYearFactory(
+            management_entity=management_entity,
+            publication_contact_entity=publication_contact_entity
+        )
         cls.node = NodeEducationGroupYearFactory(
             node_id=cls.egy.id,
             node_type=cls.egy.education_group_type,
         )
-        EntityVersionFactory(entity=cls.egy.management_entity)
-        EntityVersionFactory(entity=cls.egy.publication_contact_entity)
+        EntityVersionFactory(entity=management_entity)
+        EntityVersionFactory(entity=publication_contact_entity)
         EducationGroupPublicationContactFactory(education_group_year=cls.egy)
         cls.serializer = ContactsSectionSerializer(cls.data_to_serialize, context={
             'egy': cls.node,
