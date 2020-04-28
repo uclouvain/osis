@@ -22,16 +22,19 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from typing import Optional
+
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
+from base.models.enums import education_group_types
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain.node import Node
 from program_management.models.enums.node_type import NodeType
 
 
 class AuthorizedLinkTypeValidator(BusinessValidator):
-    def __init__(self, node_to_add: Node, link_type: Optional[LinkTypes]):
+    def __init__(self, parent_node: Node, node_to_add: Node, link_type: Optional[LinkTypes]):
+        self.parent_node = parent_node
         self.node_to_add = node_to_add
         self.link_type = link_type
 
@@ -41,4 +44,11 @@ class AuthorizedLinkTypeValidator(BusinessValidator):
         if self.node_to_add.node_type == NodeType.LEARNING_UNIT and self.link_type == LinkTypes.REFERENCE:
             self.add_error_message(
                 _("You are not allowed to create a reference with a learning unit")
+            )
+
+        if self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and\
+                self.node_to_add.node_type in education_group_types.MiniTrainingType \
+                and self.link_type != LinkTypes.REFERENCE:
+            self.add_error_message(
+                _("Link type should be reference")
             )

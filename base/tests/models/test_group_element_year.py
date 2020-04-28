@@ -132,32 +132,6 @@ class TestValidationOnEducationGroupYearBlockField(TestCase):
             self.group_element_year.full_clean()
 
 
-class TestLinkTypeGroupElementYear(TestCase):
-    def test_when_link_minor_to_minor_list_choice(self):
-        minor_list_choice = GroupFactory(education_group_type__name=GroupType.MINOR_LIST_CHOICE.name)
-        minor = MiniTrainingFactory(education_group_type__name=random.choice(MiniTrainingType.minors()))
-
-        link = GroupElementYear(parent=minor_list_choice, child_branch=minor, link_type=None)
-        link._clean_link_type()
-        self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
-
-    def test_when_link_deepening_to_minor_list_choice(self):
-        minor_list_choice = GroupFactory(education_group_type__name=GroupType.MINOR_LIST_CHOICE.name)
-        deepening = MiniTrainingFactory(education_group_type__name=MiniTrainingType.DEEPENING.name)
-
-        link = GroupElementYear(parent=minor_list_choice, child_branch=deepening, link_type=None)
-        link._clean_link_type()
-        self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
-
-    def test_when_link_major_to_major_list_choice(self):
-        major_list_choice = GroupFactory(education_group_type__name=GroupType.MAJOR_LIST_CHOICE.name)
-        major = MiniTrainingFactory(education_group_type__name=MiniTrainingType.FSA_SPECIALITY.name)
-
-        link = GroupElementYear(parent=major_list_choice, child_branch=major, link_type=None)
-        link._clean_link_type()
-        self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
-
-
 class TestManagerGetAdjacencyList(TestCase):
     @classmethod
     def setUpTestData(cls):

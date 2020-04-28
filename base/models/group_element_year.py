@@ -444,24 +444,9 @@ class GroupElementYear(OrderedModel):
         self.clean()
         return super().save(force_insert, force_update, using, update_fields)
 
-    # DEPRECATED Move all those validations into forms with ddd validators
     def clean(self):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
-
-        if self.child_leaf and self.link_type == LinkTypes.REFERENCE.name:
-            raise ValidationError(
-                {'link_type': _("You are not allowed to create a reference with a learning unit")}
-            )
-        self._clean_link_type()
-
-    #  TODO move to form
-    def _clean_link_type(self):
-        if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
-                                                  GroupType.MAJOR_LIST_CHOICE.name] and \
-                isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
-                [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
-            self.link_type = LinkTypes.REFERENCE.name
 
     @cached_property
     def child(self):

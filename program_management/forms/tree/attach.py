@@ -59,7 +59,7 @@ class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
     block = forms.CharField(required=False)
-    link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)
+    link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)  # TODO default value of reference depending on parent and children
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
 
