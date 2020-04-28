@@ -61,6 +61,7 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
+#  TODO move to validator and use it in form
 def validate_block_value(value):
     max_authorized_value = 6
     _error_msg = _(
@@ -448,26 +449,13 @@ class GroupElementYear(OrderedModel):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
 
-        if self.child_branch == self.parent:
-            raise ValidationError(_("It is forbidden to add an element to itself."))
-
-        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise ValidationError(_("It is forbidden to add an element to one of its included elements."))
-
         if self.child_leaf and self.link_type == LinkTypes.REFERENCE.name:
             raise ValidationError(
                 {'link_type': _("You are not allowed to create a reference with a learning unit")}
             )
-        self._check_same_academic_year_parent_child_branch()
-
-    def _check_same_academic_year_parent_child_branch(self):
-        if (self.parent and self.child_branch) and \
-                (self.parent.academic_year.year != self.child_branch.academic_year.year):
-            raise ValidationError(_("It is prohibited to attach a group, mini-training or training to an element of "
-                                    "another academic year."))
-
         self._clean_link_type()
 
+    #  TODO move to form
     def _clean_link_type(self):
         if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
                                                   GroupType.MAJOR_LIST_CHOICE.name] and \

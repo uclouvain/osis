@@ -81,34 +81,6 @@ class TestSaveGroupElementYear(TestCase):
             child_branch=egy2,
         )
 
-    def test_loop_save_on_itself_ko(self):
-        egy = EducationGroupYearFactory()
-        with self.assertRaises(ValidationError):
-            GroupElementYearFactory(
-                parent=egy,
-                child_branch=egy,
-            )
-
-    def test_loop_save_ko(self):
-        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy2 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy3 = EducationGroupYearFactory(academic_year=self.academic_year)
-
-        GroupElementYearFactory(
-            parent=egy2,
-            child_branch=egy1,
-        )
-        GroupElementYearFactory(
-            parent=egy3,
-            child_branch=egy2,
-        )
-
-        with self.assertRaises(ValidationError):
-            GroupElementYearFactory(
-                parent=egy1,
-                child_branch=egy3,
-            )
-
     def test_save_with_child_branch_and_child_leaf_ko(self):
         egy = EducationGroupYearFactory(academic_year=self.academic_year)
         luy = LearningUnitYearFactory()
@@ -158,16 +130,6 @@ class TestValidationOnEducationGroupYearBlockField(TestCase):
         self.group_element_year.block = -124
         with self.assertRaises(ValidationError):
             self.group_element_year.full_clean()
-
-    def test_when_academic_year_diff_of_2_education_group(self):
-        egy1 = EducationGroupYearFactory(academic_year=self.academic_year)
-        egy2 = EducationGroupYearFactory(academic_year__year=self.academic_year.year + 1)
-        with self.assertRaises(ValidationError):
-            GroupElementYearFactory(
-                parent=egy1,
-                child_branch=egy2,
-                child_leaf=None,
-            )
 
 
 class TestLinkTypeGroupElementYear(TestCase):
