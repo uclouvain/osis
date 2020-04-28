@@ -55,8 +55,8 @@ from program_management.business.group_element_years.detach import DetachEducati
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
 from program_management.ddd.service import attach_node_service
-from program_management.forms.group_element_year import GroupElementYearForm, BaseGroupElementYearFormset
-from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet
+from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet, GroupElementYearForm, \
+    BaseGroupElementYearFormset
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
