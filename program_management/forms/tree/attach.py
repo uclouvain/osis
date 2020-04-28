@@ -80,7 +80,8 @@ class AttachNodeForm(forms.Form):
                 self.node_id,
                 self.node_type,
                 self.to_path,
-                commit=True
+                commit=True,
+                **self.cleaned_data
             )
         return result
 

@@ -25,10 +25,11 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Optional
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
@@ -206,13 +207,19 @@ class ProgramTree:
         """
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
-        is_valid, messages = self.clean_attach_node(node_to_attach, path)
+        link_type = link_attributes.get("link_type", None)
+        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type)
         if is_valid:
             parent.add_child(node_to_attach, **link_attributes)
         return messages
 
-    def clean_attach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = AttachNodeValidatorList(self, node_to_attach, path)
+    def clean_attach_node(
+            self,
+            node_to_attach: 'Node',
+            path: Path,
+            link_type: Optional[LinkTypes]
+    ) -> Tuple[bool, List['BusinessValidationMessage']]:
+        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type)
         return validator.is_valid(), validator.messages
 
     def set_prerequisite(

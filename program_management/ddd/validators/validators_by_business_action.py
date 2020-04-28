@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
+
 from django.utils.translation import gettext as _
 
 from base.ddd.utils.business_validator import BusinessListValidator
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
@@ -47,10 +50,10 @@ class AttachNodeValidatorList(BusinessListValidator):
         _('Success message')
     ]
 
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
+    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path', link_type: Optional[LinkTypes]):
         if node_to_add.is_group():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_add),
+                CreateLinkValidatorList(tree.get_node(path), node_to_add, link_type),
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
@@ -58,7 +61,7 @@ class AttachNodeValidatorList(BusinessListValidator):
 
         elif node_to_add.is_learning_unit():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_add),
+                CreateLinkValidatorList(tree.get_node(path), node_to_add, link_type),
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
