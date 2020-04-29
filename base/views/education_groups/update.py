@@ -27,7 +27,6 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -222,7 +221,8 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         'group_element_years': groupelementyear_formset,
-        'show_minor_major_option_table': education_group_year.is_minor_major_option_list_choice
+        'show_minor_major_option_table': education_group_year.is_minor_major_option_list_choice,
+        "show_content_tab": request.user.has_perm('base.change_link_data', education_group_year),
     })
 
 
@@ -257,6 +257,7 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": has_coorganization(education_group_year),
         "show_diploma_tab": form_education_group_year.show_diploma_tab(),
+        "show_content_tab": request.user.has_perm('base.change_link_data', education_group_year),
         'can_change_coorganization':
             request.user.has_perm('base.change_educationgrouporganization', education_group_year),
         'group_element_years': groupelementyear_formset,
@@ -303,5 +304,6 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
         "form_education_group_year": form.forms[forms.ModelForm],
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm],
-        'group_element_years': groupelementyear_formset
+        'group_element_years': groupelementyear_formset,
+        "show_content_tab": request.user.has_perm('base.change_link_data', education_group_year),
     })

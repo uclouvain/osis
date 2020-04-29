@@ -185,21 +185,21 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         self.assertEqual(result["class_li"], "disabled")
         self.assertEqual(result["text"], _("Modify"))
 
-    @mock.patch('base.business.education_groups.perms.check_permission')
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
-    def test_button_order_with_permission_for_major_minor_list_choice_disabled(self, mock_permission, mock_eligibility):
-        mock_permission.return_value = True
-        mock_eligibility.return_value = True
+    def test_button_order_with_permission_for_major_minor_list_choice_disabled(self):
         group_type_disabled = [GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name]
-        self._get_permisson_order_button(group_type_disabled,
-                                         "disabled",
-                                         _('The user is not allowed to change link data.'))
+        self._get_permisson_order_button(
+            group_type_disabled,
+            "disabled",
+            _("You cannot modify content for %(education_group_types)s") % {
+                "education_group_types": ", ".join(
+                    [str(GroupType.MAJOR_LIST_CHOICE.value), str(GroupType.MINOR_LIST_CHOICE.value)]
+                )
+            }
+        )
 
-    @mock.patch('base.business.education_groups.perms.check_permission')
-    @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
-    def test_button_order_with_permission_for_major_minor_list_choice_enabled(self, mock_permission, mock_eligibility):
+    @mock.patch('osis_role.contrib.permissions.ObjectPermissionBackend.has_perm')
+    def test_button_order_with_permission_for_major_minor_list_choice_enabled(self, mock_permission):
         mock_permission.return_value = True
-        mock_eligibility.return_value = True
         group_type_disabled = [GroupType.OPTION_LIST_CHOICE.name]
         self._get_permisson_order_button(group_type_disabled, "", "")
 
