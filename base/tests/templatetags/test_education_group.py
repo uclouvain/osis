@@ -206,7 +206,9 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
     def _get_permisson_order_button(self, group_type_disabled, disabled_status, message):
         for group_type in group_type_disabled:
             egt = EducationGroupTypeFactory(name=group_type, category=education_group_categories.TRAINING)
-            self.context['education_group_year'] = TrainingFactory(education_group_type=egt)
+            self.context['education_group_year'] = TrainingFactory(
+                education_group_type=egt, management_entity=self.education_group_year.management_entity
+            )
             result = button_order_with_permission(self.context, message, "id", "edit")
             self.assertEqual(result, {"title": message,
                                       "id": "id", "value": "edit", 'disabled': disabled_status,

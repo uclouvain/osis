@@ -390,7 +390,7 @@ class TestIsUserLinkedToAllScopes(TestCase):
         person = FacultyManagerFactory().person
         self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
         self.assertTrue(
-            predicates.is_user_linked_to_all_scopes(
+            predicates.is_user_linked_to_all_scopes_of_management_entity(
                 person.user,
                 self.education_group_year
             )
@@ -400,7 +400,7 @@ class TestIsUserLinkedToAllScopes(TestCase):
         person = FacultyManagerFactory(scopes=['OTHER']).person
         self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
         self.assertFalse(
-            predicates.is_user_linked_to_all_scopes(
+            predicates.is_user_linked_to_all_scopes_of_management_entity(
                 person.user,
                 self.education_group_year
             )
