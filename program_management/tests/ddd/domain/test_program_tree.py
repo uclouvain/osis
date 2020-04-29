@@ -25,27 +25,23 @@
 ##############################################################################
 import inspect
 from unittest.mock import patch
-from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.ddd.utils.validation_message import MessageLevel
-from base.models.enums import prerequisite_operator
-from base.models.enums.education_group_types import TrainingType, GroupType
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import node, prerequisite
 from program_management.ddd.domain import node
+from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
-from program_management.ddd.domain.program_tree import ProgramTree, build_path
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    DetachNodeValidatorList
-from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.link import LinkFactory
