@@ -27,7 +27,6 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -257,6 +256,7 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         "form_hops": form_education_group_year.hops_form,
         "show_coorganization": has_coorganization(education_group_year),
         "show_diploma_tab": form_education_group_year.show_diploma_tab(),
+        "show_content_tab": request.user.has_perm('base.change_link_data', education_group_year),
         'can_change_coorganization':
             request.user.has_perm('base.change_educationgrouporganization', education_group_year),
         'group_element_years': groupelementyear_formset,
