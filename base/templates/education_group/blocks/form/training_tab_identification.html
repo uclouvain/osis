@@ -44,6 +44,7 @@
         </li>
     {% endif %}
 
+
     {% if show_content_tab and education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
         <li role="presentation"
             {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
