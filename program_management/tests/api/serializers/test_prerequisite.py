@@ -113,6 +113,21 @@ class TestLearningUnitBaseSerializer(SimpleTestCase):
             'language': 'fr',
         })
 
+    def test_title_with_only_common_title_if_no_specific(self):
+        node_lu = NodeLearningUnitYearFactory(node_id=7,
+                                              code="LDROI1302",
+                                              common_title_fr="Introduction droit",
+                                              year=2018)
+
+        url = reverse('program_management_api_v1:training-prerequisites_official',
+                      kwargs={'year': 2018, 'acronym': 'LDROI1302'})
+        request = RequestFactory().get(url)
+        serializer = NodeBaseSerializer(node_lu, context={
+            'request': request,
+            'language': 'fr',
+        })
+        self.assertEqual(serializer.data['title'], node_lu.common_title_fr)
+
     def test_contains_expected_fields(self):
         expected_fields = [
             'title',
