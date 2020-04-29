@@ -30,6 +30,7 @@ import program_management.views.tree.move
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, element_utilization, groupelementyear_postpone, \
     excel, search, tree, prerequisite_read, prerequisite_update
+from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
@@ -63,18 +64,6 @@ urlpatterns = [
                 name="quick_search_education_group"),
         ])),
     ])),
-    # TODO: #  Url should have a slugify on path <version_id>
-    url(r'^(?P<root_element_id>[0-9]+)/(?P<child_element_id>[0-9]+)/learning_unit/', include([
-        url(r'^utilization/$',
-            element_utilization.LearningUnitUtilization.as_view(),
-            name='learning_unit_utilization'),
-        url(r'^prerequisite/$',
-            prerequisite_read.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite'),
-        url(r'^prerequisite/update/$',
-            prerequisite_update.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite_update'),
-    ])),
     url(
         r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
         excel.get_learning_unit_prerequisites_excel,
@@ -102,6 +91,19 @@ urlpatterns = [
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
         ]))
-
+    ])),
+    path('<int:root_element_id>/', include([
+        path('identification/', IdentificationRedirectView.as_view(), name='element_identification'),
+        path('<int:child_element_id>/learning_unit/', include([
+            path('utilization/',
+                 element_utilization.LearningUnitUtilization.as_view(),
+                 name='learning_unit_utilization'),
+            path('prerequisite/',
+                 prerequisite_read.LearningUnitPrerequisite.as_view(),
+                 name='learning_unit_prerequisite'),
+            path('prerequisite/update/',
+                 prerequisite_update.LearningUnitPrerequisite.as_view(),
+                 name='learning_unit_prerequisite_update'),
+        ]))
     ])),
 ]

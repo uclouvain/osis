@@ -44,38 +44,6 @@ class TestVersionTemplateTags(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
 
-    def test_compute_url_with_standard(self):
-        a_version = ProgramTreeVersionFactory(version_name='',
-                                              is_transition=False,
-                                              offer=self.education_group_year)
-        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
-        expected_url = "/educationgroups/{}/identification/".format(self.education_group_year.id)
-        self.assertEqual(an_url, expected_url)
-
-    def test_compute_url_with_standard_transition(self):
-        a_version = ProgramTreeVersionFactory(version_name='',
-                                              is_transition=True,
-                                              offer=self.education_group_year)
-        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
-        expected_url = "/educationgroups/{}/transition/identification/".format(self.education_group_year.id)
-        self.assertEqual(an_url, expected_url)
-
-    def test_compute_url_with_particular(self):
-        a_version = ProgramTreeVersionFactory(version_name='ICHEC',
-                                              is_transition=False,
-                                              offer=self.education_group_year)
-        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
-        expected_url = "/educationgroups/{}/{}/identification/".format(self.education_group_year.id, 'ICHEC')
-        self.assertEqual(an_url, expected_url)
-
-    def test_compute_url_with_particular_transition(self):
-        a_version = ProgramTreeVersionFactory(version_name='ICHEC',
-                                              is_transition=True,
-                                              offer=self.education_group_year)
-        an_url = compute_url(IDENTIFICATION_URL_NAME, a_version)
-        expected_url = "/educationgroups/{}/transition/{}/identification/".format(self.education_group_year.id, 'ICHEC')
-        self.assertEqual(an_url, expected_url)
-
     def test_ordered_list(self):
         ichec_version = ProgramTreeVersionFactory(version_name='ICHEC',
                                                   is_transition=True,

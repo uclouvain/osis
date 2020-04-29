@@ -29,10 +29,10 @@
 {% endblock %}
 
 {% block details %}
-    {% build_url_identification_tab current_version as url_identification %}
+    {% url 'education_group_read' root_group.year root_group.partial_acronym as url_identification %}
     <a href="{{url_identification}}"
        id="lnk_offer_{education_group_year.id}}">{{ education_group_year.verbose }}</a>
     {% trans 'is using in' %} :
     <br><br>
-    {% include "education_group/blocks/table_utilizations.html" %}
+    {% include "blocks/table_element_utilizations.html" %}
 {% endblock %}

@@ -29,6 +29,8 @@ from django import template
 from django.shortcuts import reverse
 from django.utils.translation import gettext_lazy as _
 
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+
 register = template.Library()
 
 IDENTIFICATION_URL_NAME = 'education_group_read'
@@ -36,86 +38,53 @@ CONTENT_URL_NAME = 'education_group_content'
 UTILIZATION_URL_NAME = 'education_group_utilization'
 
 
-@register.simple_tag()
-def build_url_identification_tab(a_version):
-    return compute_url(IDENTIFICATION_URL_NAME, a_version)
-
-
-@register.simple_tag()
-def build_url_content_tab(a_version):
-    return compute_url(CONTENT_URL_NAME, a_version)
-
-
-@register.simple_tag()
-def build_url_utilization_tab(a_version):
-    return compute_url(UTILIZATION_URL_NAME, a_version)
-
-
-def compute_url(basic_url, a_version=None):
-    kwargs = {'education_group_year_id': a_version.offer.id}
-    url_name = basic_url
-    if a_version:
-        if a_version.is_transition:
-            url_name = '{}_transition'.format(basic_url)
-
-        if a_version.version_name:
-            kwargs.update({'version_name': a_version.version_name})
-
-    return reverse(url_name, kwargs=kwargs)
-
-
 @register.inclusion_tag('education_group/blocks/dropdown/versions.html')
-def dropdown_versions(all_versions_available, current_version, tab_to_show):
-    lst = []
+def dropdown_versions(all_versions_available, current_tree_version: ProgramTreeVersion, tab_to_show: str):
+    options = []
     ordered_versions_available = _ordered_version_list(all_versions_available)
 
     for a_version in ordered_versions_available:
-        lst.append({
+        url_computed = _get_version_url_with_tab_to_show(
+            a_version.root_group.academic_year.year,
+            a_version.root_group.partial_acronym,
+            tab_to_show,
+        )
+        is_current = a_version.version_name == current_tree_version.version_name and \
+            a_version.is_transition == current_tree_version.is_transition
+
+        options.append({
             'text': version_label(a_version),
-            'selected':
-                a_version.version_name == current_version.version_name and
-                a_version.is_transition == current_version.is_transition,
-            'value': _get_version_url_with_tab_to_show(a_version.version_name,
-                                                       tab_to_show,
-                                                       a_version.offer.id,
-                                                       a_version.is_transition)
+            'selected': is_current,
+            'value': url_computed
         })
-    return {'options': lst}
+    return {'options': options}
 
 
 @register.inclusion_tag('education_group/blocks/dropdown/versions.html')
-def dropdown_academic_years(offer_id, current_version, academic_years, tab_to_show):
-    lst = []
+def dropdown_academic_years(current_tree_version: ProgramTreeVersion, academic_years, tab_to_show: str):
+    options = []
     for version_by_year in academic_years:
-        lst.append(
-            {'text': version_by_year.academic_year.year,
-             'selected': version_by_year.education_group_id.id == offer_id,
-             'value': _get_version_url_with_tab_to_show(current_version.version_name,
-                                                        tab_to_show,
-                                                        version_by_year.education_group_id.id,
-                                                        current_version.is_transition)
-             }
+        url_computed = _get_version_url_with_tab_to_show(
+            version_by_year.academic_year.year,
+            version_by_year.root_group.partial_acronym,
+            tab_to_show,
         )
-    return {'options': lst}
+        options.append({
+            'text': version_by_year.academic_year.year,
+            'selected': current_tree_version.root_group == version_by_year.root_group,
+            'value': url_computed
+        })
+    return {'options': options}
 
 
-def _get_version_url_with_tab_to_show(version_name, tab_to_show, offer_id, is_transition):
+def _get_version_url_with_tab_to_show(year, code, tab_to_show):
     if tab_to_show == "show_content":
         basic_url = CONTENT_URL_NAME
     elif tab_to_show == 'show_utilization':
         basic_url = UTILIZATION_URL_NAME
     else:
         basic_url = IDENTIFICATION_URL_NAME
-
-    kwargs = {'education_group_year_id': offer_id}
-    url_name = basic_url
-    if is_transition:
-        url_name = '{}_transition'.format(basic_url)
-
-    if version_name:
-        kwargs.update({'version_name': version_name})
-
-    return reverse(url_name, kwargs=kwargs)
+    return reverse(basic_url, kwargs={'year': year, 'code': code})
 
 
 @register.filter

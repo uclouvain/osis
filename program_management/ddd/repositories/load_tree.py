@@ -256,7 +256,7 @@ def find_all_versions_academic_year(acronym: str,
     qs = GroupYear.objects.filter(educationgroupversion__offer__acronym=acronym,
                                   educationgroupversion__version_name=version_name,
                                   educationgroupversion__is_transition=is_transition) \
-        .distinct('educationgroupversion__offer__academic_year')
+        .distinct('educationgroupversion__root_group__academic_year')
     results = []
     for elem in qs:
         results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))

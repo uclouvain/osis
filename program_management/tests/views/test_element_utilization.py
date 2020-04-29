@@ -98,5 +98,4 @@ class TestLearningUnitUtilization(TestCase):
     def test_assert_key_context(self):
         response = self.client.get(self.url)
 
-        self.assertIn('group_element_years', response.context)
-        self.assertIn('formations', response.context)
+        self.assertIn('utilization_rows', response.context)

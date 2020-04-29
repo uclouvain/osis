@@ -49,8 +49,8 @@
                     <span class="fa fa-bars" aria-hidden="true"></span>
                 </a>
 
-                {% if offer == education_group_year %}
-                    {% dropdown_academic_years offer.id current_version academic_years request.GET.tab_to_show %}
+                {% if offer and education_group_year and offer == education_group_year %}
+                    {% dropdown_academic_years current_version academic_years request.GET.tab_to_show %}
                     {% if all_versions_available %}
                         {% dropdown_versions all_versions_available current_version request.GET.tab_to_show %}
                     {% endif %}

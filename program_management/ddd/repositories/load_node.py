@@ -151,6 +151,8 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
+        group_title_fr=F('title_fr'),
+        group_title_en=F('title_en')
     ).values(
         'id',
         'type',
@@ -169,6 +171,8 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         'offer_partial_title_en',
         'offer_title_fr',
         'offer_title_en',
+        'group_title_fr',
+        'group_title_en',
         'category',
     )
 

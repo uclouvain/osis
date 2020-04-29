@@ -286,6 +286,8 @@ class NodeGroupYear(Node):
         remark_en: str = None,
         offer_title_fr: str = None,
         offer_title_en: str = None,
+        group_title_fr: str = None,
+        group_title_en: str = None,
         offer_partial_title_fr: str = None,
         offer_partial_title_en: str = None,
         category: Categories = None,
@@ -299,6 +301,8 @@ class NodeGroupYear(Node):
         self.remark_en = remark_en
         self.offer_title_fr = offer_title_fr
         self.offer_title_en = offer_title_en
+        self.group_title_fr = group_title_fr
+        self.group_title_en = group_title_en
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
         self.category = category

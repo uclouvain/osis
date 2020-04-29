@@ -39,7 +39,7 @@ from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from django.views.generic import DetailView
+from django.views.generic import DetailView, TemplateView
 from reversion.models import Version
 
 from base import models as mdl
@@ -72,6 +72,7 @@ from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from education_group.models.group_year import GroupYear
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.find_roots import find_roots
 from program_management.forms.custom_xls import CustomXlsForm
@@ -81,7 +82,6 @@ from program_management.ddd.repositories.load_tree import find_all_program_tree_
     find_all_versions_academic_year
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
-from education_group.templatetags.version import build_url_identification_tab
 
 
 SECTIONS_WITH_TEXT = (
@@ -120,12 +120,7 @@ class CatalogGenericDetailView:
 
 
 @method_decorator(login_required, name='dispatch')
-class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
-    # DetailView
-    model = EducationGroupYear
-    context_object_name = "education_group_year"
-    pk_url_kwarg = 'education_group_year_id'
-
+class EducationGroupGenericDetailView(PermissionRequiredMixin, CatalogGenericDetailView, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -133,15 +128,21 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
     # FIXME: resolve dependency in other ways
     with_tree = 'program_management' in settings.INSTALLED_APPS
 
-    def get_queryset(self):
-        return super().get_queryset().select_related(
-            'education_group_type', 'enrollment_campus__organization', 'main_teaching_campus__organization'
-        ).prefetch_related(
-            Prefetch(
-                'education_group__educationgroupyear_set',
-                queryset=EducationGroupYear.objects.select_related('management_entity', 'academic_year'),
+    def get_object(self):
+        # TODO: Use DDD instead DDD
+        return get_object_or_404(
+            GroupYear.objects.select_related(
+                'educationgroupversion__offer',
+                'management_entity',
+                'academic_year',
             ),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
         )
+
+    @cached_property
+    def object(self):
+        return self.get_object()
 
     @cached_property
     def person(self):
@@ -149,16 +150,15 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     @cached_property
     def offer(self):
-        return EducationGroupYear.objects.select_related('academic_year')\
-            .get(pk=self.kwargs.get("education_group_year_id"))
+        return self.get_object().educationgroupversion.offer
 
     @cached_property
     def version_name(self):
-        return self.kwargs.get('version_name', '')
+        return self.get_object().educationgroupversion.version_name
 
     @cached_property
     def transition(self):
-        return self.kwargs.get('transition', False)
+        return self.get_object().educationgroupversion.is_transition
 
     @cached_property
     def all_versions_available(self):
@@ -183,14 +183,17 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         if self.current_version:
             context['root_group'] = self.current_version.root_group
         context['all_versions_available'] = self.all_versions_available
-        context['academic_years'] = find_all_versions_academic_year(self.offer.acronym,
-                                                                    self.version_name,
-                                                                    self.transition)
+        context['academic_years'] = find_all_versions_academic_year(
+            self.offer.acronym,
+            self.version_name,
+            self.transition,
+        )
+
         # FIXME same param
         context['offer'] = self.offer
         context['offer_id'] = self.offer.pk
         context['parent'] = self.offer
-        context['parent_training'] = self.object.parent_by_training()
+        context['parent_training'] = self.offer.parent_by_training()
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
         context["show_general_information"] = self.show_general_information()
@@ -215,11 +218,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = self.request.user.has_perm(
             'base.change_educationgroup',
-            context['object']
+            self.object
         )
         context['can_change_coorganization'] = self.request.user.has_perm(
             'base.change_educationgrouporganization',
-            context['object']
+            self.object
         )
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
@@ -228,11 +231,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return context
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.current_version and self.offer.pk and self.get_object().pk:
-            default_url = build_url_identification_tab(self.current_version)
-        else:
-            default_url = reverse('education_group_read', args=[self.offer.pk, self.get_object().pk])
+        default_url = reverse('education_group_read', kwargs={
+            'year': self.object.academic_year.year,
+            'code': self.object.partial_acronym
+        })
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if not self.can_show_view():
@@ -246,39 +248,39 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return True
 
     def show_diploma(self):
-        return self.object.education_group_type.category == TRAINING and not self.object.is_common \
+        return self.offer.education_group_type.category == TRAINING and not self.offer.is_common \
                and self.current_version.is_standard
 
     def show_general_information(self):
-        return not self.object.acronym.startswith('common-') and \
+        return not self.offer.acronym.startswith('common-') and \
                self.is_general_info_and_condition_admission_in_display_range() and \
-               self.object.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys() and \
+               self.offer.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys() and \
                self.current_version.is_standard
 
     def show_administrative(self):
-        return self.object.education_group_type.category == "TRAINING" and \
-               self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                             TrainingType.PGRM_MASTER_180_240.name] and \
-               not self.object.is_common \
+        return self.offer.education_group_type.category == "TRAINING" and \
+               self.offer.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                            TrainingType.PGRM_MASTER_180_240.name] and \
+               not self.offer.is_common \
                and self.current_version.is_standard
 
     def show_content(self):
-        return not self.object.is_common
+        return not self.offer.is_common
 
     def show_utilization(self):
-        return not self.object.is_common
+        return not self.offer.is_common
 
     def show_admission_conditions(self):
-        return not self.object.is_main_common and \
-               self.object.education_group_type.name in itertools.chain(TrainingType.with_admission_condition(),
-                                                                        MiniTrainingType.with_admission_condition()) \
+        return not self.offer.is_main_common and \
+               self.offer.education_group_type.name in itertools.chain(TrainingType.with_admission_condition(),
+                                                                       MiniTrainingType.with_admission_condition()) \
                and self.is_general_info_and_condition_admission_in_display_range()\
                and self.current_version.is_standard
 
     def show_skills_and_achievements(self):
-        return not self.object.is_common and \
-               self.object.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
-                                                                        MiniTrainingType.with_admission_condition()) \
+        return not self.offer.is_common and \
+               self.offer.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
+                                                                       MiniTrainingType.with_admission_condition()) \
                and self.is_general_info_and_condition_admission_in_display_range() \
                and self.current_version.is_standard
 
@@ -300,11 +302,12 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
+        context["education_group_languages"] = self.offer.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
-        context["show_coorganization"] = education_group_business.has_coorganization(self.object)
-        context["is_finality_types"] = context["education_group_year"].is_finality
+        context["show_coorganization"] = education_group_business.has_coorganization(self.offer)
+        context["is_finality_types"] = self.offer.is_finality
+        context["education_group_year"] = self.offer
         return context
 
     def get_template_names(self):
@@ -330,14 +333,6 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
-
-    def get_queryset(self):
-        """ Optimization """
-        return super().get_queryset().select_related(
-            'enrollment_campus', 'education_group_type', 'primary_language',
-            'main_teaching_campus', 'administration_entity', 'management_entity',
-            'academic_year'
-        )
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):

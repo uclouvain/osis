@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
+from django.urls import path
 
 from base.views import education_group
 from base.views.education_groups.clear_clipboard import clear_clipboard
@@ -88,37 +89,12 @@ urlpatterns = [
         create.SelectEducationGroupTypeView.as_view(),
         name='select_education_group_type'
     ),
-    url(r'^(?P<education_group_year_id>[0-9]+)/', include([
-        url(r'^identification/$', detail.EducationGroupRead.as_view(),
-            {'transition': False}, name='education_group_read'),
-        url(r'^transition/identification/$', detail.EducationGroupRead.as_view(),
-            {'transition': True}, name='education_group_read_transition'),
-        url(r'^(?P<version_name>[A-Za-z-]+)/identification/$',
-            detail.EducationGroupRead.as_view(), {'transition': False}, name='education_group_read'),
-        url(r'^transition/(?P<version_name>[A-Za-z-]+)/identification/$',
-            detail.EducationGroupRead.as_view(), {'transition': True}, name='education_group_read_transition'),
-
-        url(r'^content/$', detail.EducationGroupContent.as_view(),
-            {'transition': False}, name='education_group_content'),
-        url(r'^transition/content/$', detail.EducationGroupContent.as_view(),
-            {'transition': True}, name='education_group_content_transition'),
-        url(r'^(?P<version_name>[A-Za-z-]+)/content/$',
-            detail.EducationGroupContent.as_view(), {'transition': False}, name='education_group_content'),
-        url(r'^transition/(?P<version_name>[A-Za-z-]+)/content/$',
-            detail.EducationGroupContent.as_view(), {'transition': True}, name='education_group_content_transition'),
-
-        url(r'^utilization/$', detail.EducationGroupUsing.as_view(),
-            {'transition': False}, name='education_group_utilization'),
-        url(r'^transition/utilization/$', detail.EducationGroupUsing.as_view(),
-            {'transition': True}, name='education_group_utilization_transition'),
-        url(r'^(?P<version_name>[A-Za-z-]+)/utilization/$',
-            detail.EducationGroupUsing.as_view(), {'transition': False}, name='education_group_utilization'),
-        url(r'^transition/(?P<version_name>[A-Za-z-]+)/utilization/$',
-            detail.EducationGroupUsing.as_view(), {'transition': True}, name='education_group_utilization_transition'),
+    path('<int:year>/<str:code>/', include([
+        url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
+        url(r'^content/$', detail.EducationGroupContent.as_view(), name='education_group_content'),
+        url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
     ])),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
-
-        url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
             name='education_group_diplomas'),
@@ -134,11 +110,6 @@ urlpatterns = [
                 name='education_group_edit_administrative')
         ])),
         url(r'^select/$', copy_education_group_to_cache, name='copy_education_group_to_cache'),
-        url(r'^content/', include([
-            url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
-        ])),
-        url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
-
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
 
         url(r'^admission_conditions/$',
@@ -178,5 +149,5 @@ urlpatterns = [
                 EducationGroupPublicationContactDeleteView.as_view(),
                 name="publication_contact_delete"),
         ])),
-    ])),
+    ]))
 ]

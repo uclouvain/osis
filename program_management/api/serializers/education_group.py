@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import reverse
 from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
-from education_group.templatetags.version import build_url_identification_tab
 
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -34,7 +34,10 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         super().__init__(view_name='education_group_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        return build_url_identification_tab(obj.educationgroupversion)
+        return reverse('education_group_read', kwargs={
+            'year': obj.academic_year.year,
+            'code': obj.partial_acronym
+        })
 
 
 class EducationGroupSerializer(serializers.Serializer):

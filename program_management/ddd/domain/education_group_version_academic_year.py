@@ -28,5 +28,5 @@
 class EducationGroupVersionAcademicYear:
 
     def __init__(self, educationgroupversion):
-        self.academic_year = educationgroupversion.offer.academic_year
-        self.education_group_id = educationgroupversion.offer
+        self.academic_year = educationgroupversion.root_group.academic_year
+        self.root_group = educationgroupversion.root_group
