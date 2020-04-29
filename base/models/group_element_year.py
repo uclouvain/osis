@@ -332,7 +332,7 @@ class GroupElementYear(OrderedModel):
     parent_element = models.ForeignKey(
         Element,
         related_name='parent_elements',
-        null=True,  # TODO: To remove after data migration
+        null=True,  # TODO: To remove after data migration,
         on_delete=models.PROTECT,
     )
 
@@ -427,30 +427,28 @@ class GroupElementYear(OrderedModel):
 
     objects = GroupElementYearManager()
 
+    class Meta:
+        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
+        ordering = ('order',)
+        constraints = [
+            models.CheckConstraint(
+                check=~models.Q(child_branch__isnull=False, child_leaf__isnull=False),
+                name="child_branch_xor_child_leaf"
+            )
+        ]
+
     def __str__(self):
         return "{} - {}".format(self.parent, self.child)
+
+    @cached_property
+    def child(self):
+        return self.child_branch or self.child_leaf
 
     @property
     def verbose_comment(self):
         if self.comment_english and translation.get_language() == LANGUAGE_CODE_EN:
             return self.comment_english
         return self.comment
-
-    class Meta:
-        unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
-        ordering = ('order',)
-
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.clean()
-        return super().save(force_insert, force_update, using, update_fields)
-
-    def clean(self):
-        if self.child_branch and self.child_leaf:
-            raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
-
-    @cached_property
-    def child(self):
-        return self.child_branch or self.child_leaf
 
 
 def fetch_row_sql(root_ids):

@@ -26,6 +26,7 @@
 import random
 
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.test import TestCase
 
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
@@ -84,7 +85,7 @@ class TestSaveGroupElementYear(TestCase):
     def test_save_with_child_branch_and_child_leaf_ko(self):
         egy = EducationGroupYearFactory(academic_year=self.academic_year)
         luy = LearningUnitYearFactory()
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             GroupElementYearFactory(
                 parent=egy,
                 child_branch=egy,
