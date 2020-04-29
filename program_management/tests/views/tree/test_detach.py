@@ -25,9 +25,8 @@
 ##############################################################################
 from unittest import mock
 
-from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages, constants as MSG
-from django.http import HttpResponseNotFound, HttpResponse, QueryDict
+from django.http import HttpResponseNotFound, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -40,6 +39,7 @@ from base.tests.factories.person import CentralManagerForUEFactory
 from base.utils.cache import ElementCache
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -47,13 +47,16 @@ class TestDetachNodeView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch__academic_year=cls.academic_year)
+        element = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(parent_element=element,
+                                                         child_element__group_year__academic_year=cls.academic_year)
         cls.person = CentralManagerForUEFactory()
-        cls.path_to_detach = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
+        cls.path_to_detach = '|'.join([
+            str(cls.group_element_year.parent_element_id),
+            str(cls.group_element_year.child_element_id)
+        ])
         cls.url = reverse("tree_detach_node", args=[
-            cls.education_group_year.id,
+            element.id,
         ]) + "?path={}".format(cls.path_to_detach)
 
     def setUp(self):
