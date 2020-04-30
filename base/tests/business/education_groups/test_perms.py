@@ -36,7 +36,7 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
     EducationGroupYearMasterFactory
-from base.tests.factories.entity import EntityWithVersionFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
@@ -100,7 +100,7 @@ class TestFacultyManagerRolePerms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.entity = EntityWithVersionFactory()
+        cls.entity = EntityFactory()
         cls.faculty_manager = FacultyManagerFactory(entity=cls.entity)
         cls.other_education_group_year = EducationGroupYearMasterFactory(
             academic_year=cls.current_academic_year, management_entity=cls.entity
@@ -168,7 +168,7 @@ class TestFacultyIUFCManagerRolePerms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.entity = EntityWithVersionFactory()
+        cls.entity = EntityFactory()
         cls.faculty_manager_iufc = FacultyManagerFactory(scopes=[Scope.IUFC.name], entity=cls.entity)
         cls.other_education_group_year = EducationGroupYearMasterFactory(
             academic_year=cls.current_academic_year, management_entity=cls.entity

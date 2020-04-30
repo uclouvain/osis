@@ -26,7 +26,7 @@
 import factory
 from django.contrib.auth.models import Permission
 
-from base.tests.factories.entity import EntityWithVersionFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -54,5 +54,5 @@ class EntityModelFactory(RoleModelFactory):
         abstract = True
         django_get_or_create = ('person', 'entity',)
 
-    entity = factory.SubFactory(EntityWithVersionFactory)
+    entity = factory.SubFactory(EntityFactory)
     with_child = False
