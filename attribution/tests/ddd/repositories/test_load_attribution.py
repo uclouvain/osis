@@ -26,7 +26,7 @@
 from django.test import TestCase
 
 from attribution.ddd.domain.attribution import Attribution
-from attribution.ddd.repositories.load_attribution import load_learning_unit_year_attributions
+from attribution.ddd.repositories.load_attribution import load_attributions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -55,27 +55,28 @@ class TestLoadAttribution(TestCase):
         )
 
     def test_load_learning_unit_year_attributions_number_of_attributions(self):
-        results = load_learning_unit_year_attributions(self.l_unit_1.id)
+        results = load_attributions(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
         self.assertEqual(len(results), 2)
 
     def test_load_learning_unit_year_attributions_no_results(self):
-        results = load_learning_unit_year_attributions(self.l_unit_no_attribution.id)
+        results = load_attributions(self.l_unit_no_attribution.acronym, self.l_unit_no_attribution.academic_year.year)
         self.assertEqual(len(results), 0)
 
     def test_load_learning_unit_year_attributions_content_and_order(self):
-        results = load_learning_unit_year_attributions(self.l_unit_1.id)
+        results = load_attributions(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
         for obj in results:
             self.assertTrue(isinstance(obj, Attribution))
+        teacher_attribution = results[0].teacher
+        self.assertEqual(teacher_attribution.last_name, "Marchal")
+        self.assertEqual(teacher_attribution.first_name, "Cali")
+        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.email, "cali@gmail.com")
 
-        self.assertEqual(results[0].teacher_last_name, "Marchal")
-        self.assertEqual(results[0].teacher_first_name, "Cali")
-        self.assertIsNone(results[0].teacher_middle_name)
-        self.assertEqual(results[0].teacher_email, "cali@gmail.com")
-
-        self.assertEqual(results[1].teacher_last_name, "Marchal")
-        self.assertEqual(results[1].teacher_first_name, "Tilia")
-        self.assertIsNone(results[1].teacher_middle_name)
-        self.assertEqual(results[1].teacher_email, "tilia@gmail.com")
+        teacher_attribution = results[1].teacher
+        self.assertEqual(teacher_attribution.last_name, "Marchal")
+        self.assertEqual(teacher_attribution.first_name, "Tilia")
+        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.email, "tilia@gmail.com")
 
 
 def _build_attributions(component):

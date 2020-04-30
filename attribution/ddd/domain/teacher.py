@@ -24,13 +24,25 @@
 #
 ##############################################################################
 
-from attribution.ddd.domain.teacher import Teacher
 
-
-class Attribution:
+class Teacher:
 
     def __init__(
             self,
-            teacher: Teacher = None,
+            last_name: str = None,
+            first_name: str = None,
+            middle_name: str = None,
+            email: str = None,
     ):
-        self.teacher = teacher
+        self.last_name = last_name
+        self.first_name = first_name
+        self.middle_name = middle_name
+        self.email = email
+
+    @property
+    def full_name(self):
+        return "".join([
+            (self.last_name or "").upper(),
+            self.first_name or "",
+            self.middle_name or ""
+        ]).strip()

@@ -24,13 +24,23 @@
 #
 ##############################################################################
 
-from attribution.ddd.domain.teacher import Teacher
+import factory.fuzzy
+
+from attribution.ddd.domain.attribution import Teacher
 
 
-class Attribution:
+def generate_person_email(person):
+    return '{0.first_name}.{0.last_name}@{1}'\
+        .format(person, factory.Faker('domain_name').generate({})).lower()
 
-    def __init__(
-            self,
-            teacher: Teacher = None,
-    ):
-        self.teacher = teacher
+
+class TeacherFactory(factory.Factory):
+
+    class Meta:
+        model = Teacher
+        abstract = False
+
+    last_name = factory.fuzzy.FuzzyText(length=50)
+    first_name = factory.fuzzy.FuzzyText(length=50)
+    middle_name = None
+    email = factory.LazyAttribute(generate_person_email)

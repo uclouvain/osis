@@ -25,22 +25,22 @@
 ##############################################################################
 from django.test import SimpleTestCase
 
-from attribution.tests.ddd.factories.attribution import AttributionFactory
+from attribution.tests.ddd.factories.teacher import TeacherFactory
 
 
-class TestInitAttribution(SimpleTestCase):
+class TestInitTeacher(SimpleTestCase):
 
     def test_full_name_with_spaces(self):
-        obj = AttributionFactory(
-            teacher_last_name=" Truc",
-            teacher_first_name=" Machin",
-            teacher_middle_name=" Chose "
+        obj = TeacherFactory(
+            last_name=" Truc",
+            first_name=" Machin",
+            middle_name=" Chose "
         )
-        self.assertEqual(obj.teacher_full_name, 'TRUC Machin Chose')
+        self.assertEqual(obj.full_name, 'TRUC Machin Chose')
 
     def test_full_name_without_middle_name(self):
-        obj = AttributionFactory(
-            teacher_last_name=" Truc",
-            teacher_first_name=" Machin",
+        obj = TeacherFactory(
+            last_name=" Truc",
+            first_name=" Machin",
         )
-        self.assertEqual(obj.teacher_full_name, 'TRUC Machin')
+        self.assertEqual(obj.full_name, 'TRUC Machin')

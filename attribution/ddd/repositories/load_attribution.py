@@ -27,14 +27,25 @@ from typing import List
 
 from django.db.models import F
 
-from attribution.ddd.domain.attribution import Attribution
+from attribution.ddd.domain.attribution import Attribution, Teacher
 from attribution.models import attribution_charge_new
 
 
-def load_learning_unit_year_attributions(learning_unit_year_id: int) -> List['Attribution']:
+def __instanciate_teacher_object(attribution_data: dict) -> dict:
+    attribution_data['teacher'] = Teacher(last_name=attribution_data.pop('teacher_last_name'),
+                                          first_name=attribution_data.pop('teacher_first_name'),
+                                          middle_name=attribution_data.pop('teacher_middle_name'),
+                                          email=attribution_data.pop('teacher_email'),
+                                          )
+
+    return attribution_data
+
+
+def load_attributions(acronym: str, year: int) -> List['Attribution']:
 
     qs = attribution_charge_new.AttributionChargeNew.objects \
-        .filter(learning_component_year__learning_unit_year__id=learning_unit_year_id) \
+        .filter(learning_component_year__learning_unit_year__acronym=acronym,
+                learning_component_year__learning_unit_year__academic_year__year=year) \
         .select_related('learning_component_year', 'attribution__tutor__person')\
         .order_by('attribution__tutor__person__last_name',
                   'attribution__tutor__person__first_name',
@@ -48,6 +59,6 @@ def load_learning_unit_year_attributions(learning_unit_year_id: int) -> List['At
                 'teacher_middle_name', 'teacher_email')
 
     return [
-        Attribution(**attribution_data)
+        Attribution(**__instanciate_teacher_object(attribution_data))
         for attribution_data in qs
     ]

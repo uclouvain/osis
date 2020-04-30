@@ -27,10 +27,7 @@
 import factory.fuzzy
 
 from attribution.ddd.domain.attribution import Attribution
-
-
-def generate_person_email(person):
-    return '{0.teacher_first_name}.{0.teacher_last_name}@{1}'.format(person, factory.Faker('domain_name').generate({})).lower()
+from attribution.ddd.domain.attribution import Teacher
 
 
 class AttributionFactory(factory.Factory):
@@ -39,7 +36,4 @@ class AttributionFactory(factory.Factory):
         model = Attribution
         abstract = False
 
-    teacher_last_name = factory.fuzzy.FuzzyText(length=50)
-    teacher_first_name = factory.fuzzy.FuzzyText(length=50)
-    teacher_middle_name = None
-    teacher_email = factory.LazyAttribute(generate_person_email)
+    teacher = factory.SubFactory(Teacher)
