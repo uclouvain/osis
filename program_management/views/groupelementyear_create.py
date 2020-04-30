@@ -37,6 +37,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
+from osis_role.errors import get_permission_error
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
@@ -72,10 +73,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
     def get_redirect_url(self, *args, **kwargs):
         self.pattern_name = 'group_element_year_create'
 
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            display_warning_messages(self.request, str(e))
+        if not self.request.user.has_perm(self.permission_required, obj=self.education_group_year):
+            display_warning_messages(self.request, get_permission_error(self.request.user, self.permission_required))
 
         cached_data = ElementCache(self.request.user).cached_data
 

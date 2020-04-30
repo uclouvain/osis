@@ -117,9 +117,13 @@ def _is_maximum_child_not_reached_for_category(self, user, education_group_year,
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The scope of the user is limited and prevents this action to be performed"))
-def is_user_linked_to_all_scopes(self, user, object):
-    user_scopes = {scope for role in self.context['role_qs'] for scope in role.scopes if hasattr(role, 'scopes')}
-    return Scope.ALL.value in user_scopes
+def is_user_linked_to_all_scopes_of_management_entity(self, user, education_group_year):
+    if education_group_year:
+        user_scopes = {
+            role.entity: scope for role in self.context['role_qs'] for scope in role.scopes if hasattr(role, 'scopes')
+        }
+        return user_scopes.get(education_group_year.management_entity) == Scope.ALL.value
+    return None
 
 
 @predicate(bind=True)
