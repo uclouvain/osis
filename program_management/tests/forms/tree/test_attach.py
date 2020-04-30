@@ -25,10 +25,11 @@
 ##############################################################################
 from unittest import skip, mock
 
+import factory.fuzzy
 from django.test import SimpleTestCase, TestCase
 from django.utils.translation import gettext as _
 
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -37,9 +38,88 @@ from base.tests.factories.education_group_year import TrainingFactory, MiniTrain
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.forms.tree import attach
 from program_management.forms.tree.attach import AttachNodeForm, GroupElementYearForm
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
+    AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory, \
+    NodeEducationGroupYearFactory
+
+
+class TestAttachNodeFormFactory(SimpleTestCase):
+    def test_form_returned_when_child_node_is_a_learning_unit(self):
+        parent_node = NodeEducationGroupYearFactory()
+        child_node = NodeLearningUnitYearFactory()
+        path = ""
+        relationships = AuthorizedRelationshipListFactory()
+
+        form = attach.attach_form_factory(None, parent_node, child_node, path, relationships)
+        self.assertIsInstance(form, attach.AttachLearningUnitForm)
+
+    def test_form_returned_when_relationship_is_not_authorized(self):
+        parent_node = NodeEducationGroupYearFactory()
+        child_node = NodeEducationGroupYearFactory(
+            node_type=MiniTrainingType.FSA_SPECIALITY
+        )
+        path = ""
+        relationships = AuthorizedRelationshipListFactory(
+            authorized_relationships=[AuthorizedRelationshipObjectFactory(child_type=MiniTrainingType.SOCIETY_MINOR)]
+        )
+
+        form = attach.attach_form_factory(None, parent_node, child_node, path, relationships)
+        self.assertIsInstance(form, attach.AttachNotAuthorizedChildren)
+
+    def test_form_returned_when_parent_is_minor_major_list_choice_and_child_is_other_type(self):
+        parent_node = NodeEducationGroupYearFactory(
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
+        )
+        child_node = NodeEducationGroupYearFactory(
+            node_type=MiniTrainingType.ACCESS_MINOR
+        )
+        path = ""
+        relationship_object = AuthorizedRelationshipObjectFactory(
+            parent_type=parent_node.node_type,
+            child_type=child_node.node_type
+        )
+        relationships = AuthorizedRelationshipListFactory(
+            authorized_relationships=[relationship_object]
+        )
+
+        form = attach.attach_form_factory(None, parent_node, child_node, path, relationships)
+        self.assertIsInstance(form, attach.AttachToMinorMajorListChoiceForm)
+
+    def test_form_returned_when_parent_is_training_and_child_is_minor_major_list_choice(self):
+        parent_node = NodeEducationGroupYearFactory()
+        child_node = NodeEducationGroupYearFactory(
+            node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
+        )
+        path = ""
+        relationship_object = AuthorizedRelationshipObjectFactory(
+            parent_type=parent_node.node_type,
+            child_type=child_node.node_type
+        )
+        relationships = AuthorizedRelationshipListFactory(
+            authorized_relationships=[relationship_object]
+        )
+
+        form = attach.attach_form_factory(None, parent_node, child_node, path, relationships)
+        self.assertIsInstance(form, attach.AttachMinorMajorListChoiceToTrainingForm)
+
+    def test_return_base_form_when_no_special_condition_met(self):
+        parent_node = NodeEducationGroupYearFactory()
+        child_node = NodeEducationGroupYearFactory()
+        path = ""
+        relationship_object = AuthorizedRelationshipObjectFactory(
+            parent_type=parent_node.node_type,
+            child_type=child_node.node_type
+        )
+        relationships = AuthorizedRelationshipListFactory(
+            authorized_relationships=[relationship_object]
+        )
+
+        form = attach.attach_form_factory(None, parent_node, child_node, path, relationships)
+        self.assertEqual(type(form), attach.AttachNodeForm)
 
 
 class TestAttachNodeForm(SimpleTestCase):
@@ -55,15 +135,9 @@ class TestAttachNodeForm(SimpleTestCase):
 
         return AttachNodeForm(
             to_path,
-            node_to_attach.node_id,
-            NodeType.GROUP.name,
+            node_to_attach,
             data=link_attributes
         )
-
-    def test_ensure_form_contains_fields(self):
-        form_instance = self._get_attach_node_form_instance()
-        expected_fields = {'access_condition', 'is_mandatory', 'block', 'link_type', 'comment', 'comment_english'}
-        self.assertFalse(set(form_instance.fields.keys()) - expected_fields, msg="Form must contains fields")
 
     def test_ensure_link_type_choice(self):
         form_instance = self._get_attach_node_form_instance({'link_type': 'invalid_link_type'})
@@ -77,6 +151,50 @@ class TestAttachNodeForm(SimpleTestCase):
         form_instance.save()
 
         self.assertTrue(mock_service_attach_node.called)
+
+
+class TestAttachNodeFormFields(SimpleTestCase):
+    def test_attach_node_form_base_fields(self):
+        form = attach.AttachNodeForm("", NodeEducationGroupYearFactory())
+        actual_fields = form.fields
+        expected_fields = [
+            'relative_credits',
+            'access_condition',
+            'is_mandatory',
+            'block',
+            'link_type',
+            'comment',
+            'comment_english'
+        ]
+        self.assertCountEqual(expected_fields, actual_fields)
+
+    def test_attach_learning_unit_form_should_remove_access_condition_and_link_type_field(self):
+        form = attach.AttachLearningUnitForm("", NodeLearningUnitYearFactory())
+        actual_fields = form.fields
+
+        self.assertNotIn("access_condition", actual_fields)
+        self.assertNotIn("link_type", actual_fields)
+
+    def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
+        form = attach.AttachToMinorMajorListChoiceForm("", NodeEducationGroupYearFactory())
+        actual_fields = form.fields
+        expected_fields = ["access_condition"]
+
+        self.assertCountEqual(actual_fields, expected_fields)
+
+    def test_attach_minor_major_list_choice_to_training_form_should_disable_all_fields_but_block(self):
+        form = attach.AttachMinorMajorListChoiceToTrainingForm("", NodeEducationGroupYearFactory())
+
+        expected_fields_disabled = ["block"]
+        actual_fields_disabled = [name for name, field in form.fields.items() if not field.disabled]
+        self.assertCountEqual(expected_fields_disabled, actual_fields_disabled)
+
+    def test_attach_not_authorized_children_should_remove_relative_credits_and_access_condition(self):
+        form = attach.AttachNotAuthorizedChildren("", NodeEducationGroupYearFactory())
+        actual_fields = form.fields
+
+        self.assertNotIn("access_condition", actual_fields)
+        self.assertNotIn("relative_credits", actual_fields)
 
 
 class TestGroupElementYearForm(TestCase):

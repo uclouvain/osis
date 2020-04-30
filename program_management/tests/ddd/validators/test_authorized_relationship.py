@@ -34,7 +34,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -54,7 +54,7 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             year=self.academic_year.year,
         )
         self.authorized_relationships = AuthorizedRelationshipList([
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_parent.node_type,
                 child_type=self.authorized_child.node_type,
                 max_constraint=1,
@@ -137,17 +137,17 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
             year=self.academic_year.year,
         )
         self.authorized_relationships = AuthorizedRelationshipList([
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_parent.node_type,
                 child_type=self.authorized_child.node_type,
                 min_constraint=1,
             ),
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=GroupType.SUB_GROUP,
                 min_constraint=1,
             ),
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=NodeType.LEARNING_UNIT,
                 min_constraint=1,

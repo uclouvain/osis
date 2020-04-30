@@ -43,7 +43,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -375,7 +375,7 @@ class TestGetGreaterBlockValue(SimpleTestCase):
 class TestCopyAndPrune(SimpleTestCase):
 
     def setUp(self):
-        self.auth_relations = [AuthorizedRelationshipFactory()]
+        self.auth_relations = [AuthorizedRelationshipObjectFactory()]
 
         self.original_root = NodeEducationGroupYearFactory()
 

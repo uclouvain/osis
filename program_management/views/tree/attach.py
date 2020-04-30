@@ -52,8 +52,9 @@ from program_management.business.group_element_years.attach import AttachEducati
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
-from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet, GroupElementYearForm, \
-    BaseGroupElementYearFormset
+from program_management.ddd.repositories import load_authorized_relationship, load_node
+from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
+    BaseGroupElementYearFormset, attach_form_factory, AttachNodeForm
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -72,19 +73,25 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
 
     def get_formset_class(self):
         return formset_factory(
-            form=AttachNodeForm,
+            form=attach_form_factory,
             formset=AttachNodeFormSet,
             extra=len(self.elements_to_attach)
         )
 
     def get_formset_kwargs(self):
         formset_kwargs = []
+        authorized_relationships = load_authorized_relationship.load()
+        parent_node = load_node.load_by_type(NodeType.EDUCATION_GROUP, self.root_id)
         for idx, element in enumerate(self.elements_to_attach):
+            child_node = load_node.load_by_type(
+                NodeType.EDUCATION_GROUP if isinstance(element, EducationGroupYear) else NodeType.LEARNING_UNIT,
+                element.pk
+            )
             formset_kwargs.append({
-                'node_id': element.pk,
-                'node_type': NodeType.EDUCATION_GROUP if isinstance(element, EducationGroupYear) else
-                NodeType.LEARNING_UNIT,
-                'to_path': self.request.GET['path']
+                'parent_node': parent_node,
+                'child_node': child_node,
+                'to_path': self.request.GET['path'],
+                'authorized_relationship': authorized_relationships
             })
         return formset_kwargs
 

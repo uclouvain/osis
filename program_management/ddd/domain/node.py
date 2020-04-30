@@ -134,6 +134,12 @@ class Node:
     def is_option(self) -> bool:
         return self.node_type == MiniTrainingType.OPTION
 
+    def is_training(self) -> bool:
+        return self.node_type in TrainingType.all()
+
+    def is_minor_major_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_list_choice_enums()
+
     def get_all_children(
             self,
             ignore_children_from: Set[EducationGroupTypesEnum] = None,

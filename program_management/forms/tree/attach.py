@@ -32,13 +32,16 @@ from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
 from base.ddd.utils import validation_message
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
+from program_management.ddd.domain.node import Node
 from program_management.ddd.service import attach_node_service
+from program_management.models.enums.node_type import NodeType
 
 
 class AttachNodeFormSet(BaseFormSet):
@@ -55,6 +58,25 @@ class AttachNodeFormSet(BaseFormSet):
         ))
 
 
+def attach_form_factory(
+        self,
+        parent_node: Node,
+        child_node: Node,
+        to_path: str,
+        authorized_relationship: AuthorizedRelationshipList = None,
+        **kwargs
+) -> 'AttachNodeForm':
+    if child_node.node_type == NodeType.LEARNING_UNIT:
+        return AttachLearningUnitForm(to_path, child_node, **kwargs)
+    elif not authorized_relationship.is_authorized(parent_node.node_type, child_node.node_type):
+        return AttachNotAuthorizedChildren(to_path, child_node, **kwargs)
+    elif parent_node.is_minor_major_list_choice() and not child_node.is_minor_major_list_choice():
+        return AttachToMinorMajorListChoiceForm(to_path, child_node, **kwargs)
+    elif parent_node.is_training() and child_node.is_minor_major_list_choice():
+        return AttachMinorMajorListChoiceToTrainingForm(to_path, child_node, **kwargs)
+    return AttachNodeForm(to_path, child_node, **kwargs)
+
+
 class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
@@ -62,13 +84,11 @@ class AttachNodeForm(forms.Form):
     link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)  # TODO default value of reference depending on parent and children
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
+    relative_credits = forms.CharField(widget=forms.widgets.TextInput, required=False)
 
-    def __init__(self, to_path: str, node_id: int, node_type: str, **kwargs):
-        # TODO :: validation on to_path (should be required=True)
-        # TODO :: transform 'to_path', 'node_id' and 'node_type' to forms.InputHidden ??
+    def __init__(self, to_path: str, node: Node, **kwargs):
         self.to_path = to_path
-        self.node_id = node_id
-        self.node_type = node_type
+        self.node = node
         super().__init__(**kwargs)
 
     def save(self) -> List[validation_message.BusinessValidationMessage]:
@@ -77,13 +97,44 @@ class AttachNodeForm(forms.Form):
             root_id = int(self.to_path.split("|")[0])
             result = attach_node_service.attach_node(
                 root_id,
-                self.node_id,
-                self.node_type,
+                self.node.node_id,
+                self.node.node_type,
                 self.to_path,
                 commit=True,
                 **self.cleaned_data
             )
         return result
+
+
+class AttachLearningUnitForm(AttachNodeForm):
+    access_condition = None
+    link_type = None
+
+
+class AttachMinorMajorListChoiceToTrainingForm(AttachNodeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._disable_all_but_block_fields()
+
+    def _disable_all_but_block_fields(self):
+        for field_name, field in self.fields.items():
+            if field_name != "block":
+                field.disabled = True
+
+
+class AttachToMinorMajorListChoiceForm(AttachNodeForm):
+    is_mandatory = None
+    block = None
+    link_type = None
+    comment = None
+    comment_english = None
+    relative_credits = None
+
+
+class AttachNotAuthorizedChildren(AttachNodeForm):
+    access_condition = None
+    relative_credits = None
 
 
 class GroupElementYearForm(forms.ModelForm):
