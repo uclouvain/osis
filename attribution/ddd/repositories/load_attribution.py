@@ -32,13 +32,11 @@ from attribution.models import attribution_charge_new
 
 
 def __instanciate_teacher_object(attribution_data: dict) -> dict:
-    attribution_data['teacher'] = Teacher(last_name=attribution_data.pop('teacher_last_name'),
-                                          first_name=attribution_data.pop('teacher_first_name'),
-                                          middle_name=attribution_data.pop('teacher_middle_name'),
-                                          email=attribution_data.pop('teacher_email'),
-                                          )
-
-    return attribution_data
+    return Teacher(last_name=attribution_data.pop('teacher_last_name'),
+                   first_name=attribution_data.pop('teacher_first_name'),
+                   middle_name=attribution_data.pop('teacher_middle_name'),
+                   email=attribution_data.pop('teacher_email'),
+                   )
 
 
 def load_attributions(acronym: str, year: int) -> List['Attribution']:
@@ -59,6 +57,6 @@ def load_attributions(acronym: str, year: int) -> List['Attribution']:
                 'teacher_middle_name', 'teacher_email')
 
     return [
-        Attribution(**__instanciate_teacher_object(attribution_data))
+        Attribution(teacher=__instanciate_teacher_object(attribution_data))
         for attribution_data in qs
     ]
