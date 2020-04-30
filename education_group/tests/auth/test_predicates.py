@@ -4,6 +4,7 @@ from django.test import TestCase, override_settings
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -139,7 +140,9 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         education_group_type_managed = EducationGroupYearFactory(
             education_group_type__name=TrainingType.CERTIFICATE_OF_SUCCESS.name
         )
-        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.name],)
+        FacultyManagerFactory(
+            person=self.person, entity=education_group_type_managed.management_entity, scopes=[Scope.IUFC.name]
+        )
 
         self.assertTrue(
             predicates.is_education_group_type_authorized_according_to_user_scope(
@@ -159,6 +162,34 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
                 self.person.user,
                 education_group_type_managed
             )
+        )
+
+    def test_case_user_has_multiple_roles_with_multiple_scopes_in_various_entities(self):
+        main_entity = EntityFactory()
+        other_entity = EntityFactory()
+
+        main_egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name, management_entity=main_entity
+        )
+        other_egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.BACHELOR.name, management_entity=other_entity
+        )
+        other_iufc_egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.CERTIFICATE_OF_SUCCESS.name, management_entity=other_entity
+        )
+
+        FacultyManagerFactory(person=self.person, entity=main_entity, scopes=[Scope.ALL.name])
+        FacultyManagerFactory(person=self.person, entity=other_entity, scopes=[Scope.IUFC.name])
+
+        # user should have perm for all scopes in one entity but only IUFC in the other entity
+        self.assertTrue(
+            predicates.is_education_group_type_authorized_according_to_user_scope(self.person.user, main_egy)
+        )
+        self.assertTrue(
+            predicates.is_education_group_type_authorized_according_to_user_scope(self.person.user, other_iufc_egy)
+        )
+        self.assertFalse(
+            predicates.is_education_group_type_authorized_according_to_user_scope(self.person.user, other_egy)
         )
 
 
