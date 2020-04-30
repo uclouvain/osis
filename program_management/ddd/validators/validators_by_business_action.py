@@ -54,7 +54,7 @@ class AttachNodeValidatorList(BusinessListValidator):
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path', link_type: Optional[LinkTypes]):
         if node_to_add.is_group():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_add, link_type),
+                CreateLinkValidatorList(tree.get_node(path), node_to_add),
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
@@ -63,7 +63,7 @@ class AttachNodeValidatorList(BusinessListValidator):
 
         elif node_to_add.is_learning_unit():
             self.validators = [
-                CreateLinkValidatorList(tree.get_node(path), node_to_add, link_type),
+                CreateLinkValidatorList(tree.get_node(path), node_to_add),
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),

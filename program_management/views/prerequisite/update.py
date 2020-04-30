@@ -76,7 +76,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
 
     #  FIXME refactor permission with new permission module
     def check_can_update_prerequisite(self):
-        validator = AuthorizedRootTypeForPrerequisite(self.program_tree.parent_node)
+        validator = AuthorizedRootTypeForPrerequisite(self.program_tree.root_node)
         if not validator.is_valid():
             raise PermissionDenied([msg.message for msg in validator.error_messages])
 

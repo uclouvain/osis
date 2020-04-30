@@ -60,6 +60,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_persist_tree()
         self._patch_load_tree()
         self._patch_load_trees_from_children()
+        self._patch_load_child_node_to_attach()
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
@@ -71,6 +72,12 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.addCleanup(patcher_load.stop)
         self.mock_load = patcher_load.start()
         self.mock_load.return_value = self.tree
+
+    def _patch_load_child_node_to_attach(self):
+        patcher_load = patch("program_management.ddd.repositories.load_node.load_by_type")
+        self.addCleanup(patcher_load.stop)
+        self.mock_load = patcher_load.start()
+        self.mock_load.return_value = self.node_to_attach
 
     def _patch_load_trees_from_children(self):
         patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")

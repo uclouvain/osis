@@ -388,7 +388,7 @@ class TestCopyAndPrune(SimpleTestCase):
 
     def test_should_copy_nodes(self):
         copied_tree = self.original_tree.prune()
-        copied_root = copied_tree.parent_node
+        copied_root = copied_tree.root_node
         self.assertEqual(copied_root.node_id, self.original_root.node_id)
         self.assertEqual(copied_root.title, self.original_root.title)
         original_title = self.original_root.title
@@ -398,14 +398,14 @@ class TestCopyAndPrune(SimpleTestCase):
 
     def test_should_copy_tree(self):
         copied_tree = self.original_tree.prune()
-        self.assertEqual(copied_tree.parent_node, self.original_tree.root_node)
+        self.assertEqual(copied_tree.root_node, self.original_tree.root_node)
         self.assertEqual(copied_tree.authorized_relationships, self.original_tree.authorized_relationships)
         self.assertNotEqual(id(self.original_tree), id(copied_tree))
 
     def test_should_copy_links(self):
         original_link = self.original_tree.root_node.children[0]
         copied_tree = self.original_tree.prune()
-        copied_link = copied_tree.parent_node.children[0]
+        copied_link = copied_tree.root_node.children[0]
         self.assertEqual(copied_link.child, original_link.child)
         self.assertEqual(copied_link.parent, original_link.parent)
         self.assertEqual(copied_link.block, original_link.block)
@@ -426,7 +426,7 @@ class TestCopyAndPrune(SimpleTestCase):
     def test_pruning_with_param_ignore_children_from(self):
         link = LinkFactory(parent=self.original_root)
         copied_tree = self.original_tree.prune(ignore_children_from={link.parent.node_type})
-        self.assertListEqual([], copied_tree.parent_node.children)
+        self.assertListEqual([], copied_tree.root_node.children)
 
     def test_pruning_multiple_levels_with_param_ignore_children_from(self):
         link_1 = LinkFactory(
@@ -439,7 +439,7 @@ class TestCopyAndPrune(SimpleTestCase):
         original_tree = ProgramTreeFactory(root_node=link_1.parent)
         copied_tree = original_tree.prune(ignore_children_from={GroupType.SUB_GROUP})
         result = copied_tree.get_all_links()
-        copied_link_1_1_1 = copied_tree.parent_node.children[0].child.children[0].child
+        copied_link_1_1_1 = copied_tree.root_node.children[0].child.children[0].child
         self.assertListEqual([], copied_link_1_1_1.children)
         self.assertNotIn(link1_1_1, result)
         self.assertNotIn(link1_1_1_1, result)

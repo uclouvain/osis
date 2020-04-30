@@ -49,6 +49,7 @@ from program_management.business.group_element_years.management import EDUCATION
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.views.tree.attach import AttachMultipleNodesView
 
 
 def form_valid_effect(formset: AttachNodeFormSet):
@@ -78,6 +79,14 @@ class TestAttachNodeView(TestCase):
         )
         self.fetch_from_cache_patcher.start()
         self.addCleanup(self.fetch_from_cache_patcher.stop)
+
+        self.parent_patcher = mock.patch.object(
+            AttachMultipleNodesView,
+            'parent_node',
+            return_value=NodeEducationGroupYearFactory()
+        )
+        self.parent_patcher.start()
+        self.addCleanup(self.parent_patcher.stop)
 
     def setUpTreeData(self):
         """
@@ -217,18 +226,17 @@ class TestAttachCheckView(TestCase):
         cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
                                       return_value=True)
 
-        cls.attach_strategy_patcher = mock.patch(
-            "program_management.views.tree.attach.AttachEducationGroupYearStrategy"
+        cls.check_attach_service_patcher = mock.patch(
+            "program_management.ddd.service.attach_node_service.check_attach"
         )
 
     def setUp(self):
         self.client.force_login(self.person.user)
         self.mocked_perm = self.perm_patcher.start()
-        self.mocked_attach_strategy = self.attach_strategy_patcher.start()
+        self.mock_check_attach_service = self.check_attach_service_patcher.start()
 
-    def tearDown(self):
         self.addCleanup(self.perm_patcher.stop)
-        self.addCleanup(self.attach_strategy_patcher.stop)
+        self.addCleanup(self.check_attach_service_patcher.stop)
         self.addCleanup(cache.clear)
 
     def test_when_no_element_selected(self):
@@ -245,20 +253,6 @@ class TestAttachCheckView(TestCase):
             {"error_messages": [_("Please select an item before adding it")]}
         )
 
-    def test_when_element_selected_and_no_error(self):
-        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": EDUCATION_GROUP_YEAR})
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {"error_messages": []}
-        )
-
-        self.assertEqual(
-            self.mocked_attach_strategy.call_args_list,
-            [
-                ({"parent": self.egy, "child": self.egy},)
-            ]
-        )
-
     def test_when_multiple_element_selected(self):
         other_egy = EducationGroupYearFactory()
         response = self.client.get(self.url, data={
@@ -269,13 +263,7 @@ class TestAttachCheckView(TestCase):
             str(response.content, encoding='utf8'),
             {"error_messages": []}
         )
-        self.assertEqual(
-            self.mocked_attach_strategy.call_args_list,
-            [
-                ({"parent": self.egy, "child": self.egy},),
-                ({"parent": self.egy, "child": other_egy},)
-            ]
-        )
+        self.assertTrue(self.mock_check_attach_service.called)
 
 
 @override_flag('education_group_update', active=True)
@@ -297,7 +285,8 @@ class TestCreateGroupElementYearView(TestCase):
                                       return_value=True)
 
         cls.attach_strategy_patcher = mock.patch(
-            "program_management.views.tree.attach.AttachEducationGroupYearStrategy"
+            "program_management.ddd.service.attach_node_service.check_attach",
+            return_value=[]
         )
 
     def setUp(self):

@@ -26,7 +26,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
@@ -46,8 +46,6 @@ from base.views.common import display_warning_messages, display_business_message
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
-from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
-    AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
@@ -60,7 +58,7 @@ from program_management.views.generic import GenericGroupElementYearMixin
 
 
 class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
-    template_name = "tree/attach/attach_inner.html"
+    template_name = "tree/attach_inner.html"
 
     @cached_property
     def root_id(self):
