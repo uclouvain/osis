@@ -4,7 +4,7 @@ from django.test import TestCase, override_settings
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
-from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -165,8 +165,8 @@ class TestEducationGroupTypeAuthorizedAccordingToScope(TestCase):
         )
 
     def test_case_user_has_multiple_roles_with_multiple_scopes_in_various_entities(self):
-        main_entity = EntityFactory()
-        other_entity = EntityFactory()
+        main_entity = EntityWithVersionFactory()
+        other_entity = EntityWithVersionFactory()
 
         main_egy = EducationGroupYearFactory(
             education_group_type__name=TrainingType.BACHELOR.name, management_entity=main_entity
