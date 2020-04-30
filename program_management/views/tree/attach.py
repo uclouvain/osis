@@ -35,8 +35,7 @@ from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import RedirectView, CreateView
-from django.views.generic.base import TemplateView
+from django.views.generic import RedirectView, CreateView, FormView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.education_group_year import EducationGroupYear
@@ -54,63 +53,62 @@ from program_management.business.group_element_years.detach import DetachEducati
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
 from program_management.ddd.repositories import load_authorized_relationship, load_node
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
-    BaseGroupElementYearFormset, attach_form_factory, AttachNodeForm
+    BaseGroupElementYearFormset, attach_form_factory
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-#  TODO Inherit FormView
-class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):
-    template_name = "tree/attach_inner.html"
+class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
+    template_name = "tree/attach/attach_inner.html"
 
     @cached_property
     def root_id(self):
         return self.kwargs["root_id"]
 
     @cached_property
+    def parent_node(self):
+        parent_node_id = int(self.request.GET["path"].split("|")[-1])
+        return load_node.load_by_type(NodeType.EDUCATION_GROUP, parent_node_id)
+
+    @cached_property
     def elements_to_attach(self):
         return management.fetch_elements_selected(self.request.GET, self.request.user)
 
-    def get_formset_class(self):
+    def get_form_class(self):
         return formset_factory(
             form=attach_form_factory,
             formset=AttachNodeFormSet,
             extra=len(self.elements_to_attach)
         )
 
-    def get_formset_kwargs(self):
+    def get_form_kwargs(self):
         formset_kwargs = []
         authorized_relationships = load_authorized_relationship.load()
-        parent_node = load_node.load_by_type(NodeType.EDUCATION_GROUP, self.root_id)
+        if not self.elements_to_attach:
+            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         for idx, element in enumerate(self.elements_to_attach):
             child_node = load_node.load_by_type(
                 NodeType.EDUCATION_GROUP if isinstance(element, EducationGroupYear) else NodeType.LEARNING_UNIT,
                 element.pk
             )
             formset_kwargs.append({
-                'parent_node': parent_node,
+                'parent_node': self.parent_node,
                 'child_node': child_node,
                 'to_path': self.request.GET['path'],
                 'authorized_relationship': authorized_relationships
             })
         return formset_kwargs
 
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(form_kwargs=self.get_form_kwargs())
+
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        if self.elements_to_attach:
-            context_data['formset'] = kwargs.pop('formset', None) or self.get_formset_class()(
-                form_kwargs=self.get_formset_kwargs()
-            )
-        else:
-            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
+        context_data["formset"] = context_data["form"]
+        context_data["is_parent_a_minor_major_list_choice"] = self.parent_node.is_minor_major_list_choice()
         return context_data
-
-    def post(self, request, *args, **kwargs):
-        formset = self.get_formset_class()(self.request.POST or None, form_kwargs=self.get_formset_kwargs())
-        if formset.is_valid():
-            return self.form_valid(formset)
-        else:
-            return self.form_invalid(formset)
 
     def form_valid(self, formset: AttachNodeFormSet):
         messages = formset.save()
@@ -120,12 +118,12 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateVie
             reverse('education_group_read', args=[self.root_id, self.root_id])
         )
 
+    def form_invalid(self, formset: AttachNodeFormSet):
+        return self.render_to_response(self.get_context_data(formset=formset))
+
     def __clear_cache(self, messages):
         if not BusinessValidationMessage.contains_errors(messages):
             ElementCache(self.request.user).clear()
-
-    def form_invalid(self, formset):
-        return self.render_to_response(self.get_context_data(formset=formset))
 
 
 class AttachCheckView(GenericGroupElementYearMixin, View):

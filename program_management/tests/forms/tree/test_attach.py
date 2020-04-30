@@ -40,7 +40,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree import attach
 from program_management.forms.tree.attach import AttachNodeForm, GroupElementYearForm
-from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory, \
@@ -70,13 +69,11 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         form = attach.attach_form_factory(None, parent_node, child_node, path, relationships)
         self.assertIsInstance(form, attach.AttachNotAuthorizedChildren)
 
-    def test_form_returned_when_parent_is_minor_major_list_choice_and_child_is_other_type(self):
+    def test_form_returned_when_parent_is_minor_major_list_choice(self):
         parent_node = NodeEducationGroupYearFactory(
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
-        child_node = NodeEducationGroupYearFactory(
-            node_type=MiniTrainingType.ACCESS_MINOR
-        )
+        child_node = NodeEducationGroupYearFactory()
         path = ""
         relationship_object = AuthorizedRelationshipObjectFactory(
             parent_type=parent_node.node_type,

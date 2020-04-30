@@ -66,14 +66,18 @@ def attach_form_factory(
         authorized_relationship: AuthorizedRelationshipList = None,
         **kwargs
 ) -> 'AttachNodeForm':
-    if child_node.node_type == NodeType.LEARNING_UNIT:
-        return AttachLearningUnitForm(to_path, child_node, **kwargs)
-    elif not authorized_relationship.is_authorized(parent_node.node_type, child_node.node_type):
-        return AttachNotAuthorizedChildren(to_path, child_node, **kwargs)
-    elif parent_node.is_minor_major_list_choice() and not child_node.is_minor_major_list_choice():
+    if parent_node.is_minor_major_list_choice():
         return AttachToMinorMajorListChoiceForm(to_path, child_node, **kwargs)
+
+    elif child_node.node_type == NodeType.LEARNING_UNIT:
+        return AttachLearningUnitForm(to_path, child_node, **kwargs)
+
     elif parent_node.is_training() and child_node.is_minor_major_list_choice():
         return AttachMinorMajorListChoiceToTrainingForm(to_path, child_node, **kwargs)
+
+    elif not authorized_relationship.is_authorized(parent_node.node_type, child_node.node_type):
+        return AttachNotAuthorizedChildren(to_path, child_node, **kwargs)
+
     return AttachNodeForm(to_path, child_node, **kwargs)
 
 
