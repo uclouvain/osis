@@ -60,7 +60,7 @@ class ProgramTree:
         self.authorized_relationships = authorized_relationships
 
     def __eq__(self, other):
-        return self.root_node == other.root_node
+        return self.root_node == other.parent_node
 
     def is_master_2m(self):
         return self.root_node.is_master_2m()

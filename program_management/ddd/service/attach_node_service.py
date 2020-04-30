@@ -32,6 +32,7 @@ from program_management.ddd.repositories import load_tree, persist_tree, load_no
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators import link as link_validator
 from program_management.models.enums.node_type import NodeType
 
 
@@ -54,6 +55,28 @@ def attach_node(
     if commit:
         persist_tree.persist(tree)
     return success_messages
+
+
+#  TODO group message by node
+def check_attach(
+        parent_node_id: int,
+        children_nodes_ids: List[int],
+        children_type: NodeType
+) -> List[BusinessValidationMessage]:
+    result = []
+
+    parent_node = load_tree.load_node.load_by_type(NodeType.EDUCATION_GROUP, parent_node_id)
+    children_nodes = [load_node.load_by_type(children_type, node_id) for node_id in children_nodes_ids]
+
+    for child_node in children_nodes:
+        if children_type != NodeType.LEARNING_UNIT:
+            result.extend(_validate_end_date_and_option_finality(child_node))
+
+        validator = link_validator.CreateLinkValidatorList(parent_node, child_node)
+        if not validator.is_valid():
+            result.extend(validator.messages)
+
+    return result
 
 
 def __validate_trees_using_node_as_reference_link(

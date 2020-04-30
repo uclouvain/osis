@@ -52,6 +52,7 @@ from program_management.business.group_element_years.detach import DetachEducati
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
 from program_management.ddd.repositories import load_authorized_relationship, load_node
+from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory
 from program_management.models.enums.node_type import NodeType
@@ -141,9 +142,10 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
         if not elements_to_attach:
             error_messages.append(_("Please select an item before adding it"))
 
+        #  TODO create service to check attach
         error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
 
-        return JsonResponse({"error_messages": error_messages})
+        return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -287,16 +289,9 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
 
 
 def _check_attach(parent: EducationGroupYear, elements_to_attach):
-    error_messages = []
-    for element in elements_to_attach:
-        try:
-            strategy = AttachEducationGroupYearStrategy if isinstance(element, EducationGroupYear) else \
-                AttachLearningUnitYearStrategy
-            strategy(parent=parent, child=element).is_valid()
-        except ValidationError as e:
-            for msg in e.messages:
-                msg_prefix = _("Element selected %(element)s") % {
-                    "element": "{} - {}".format(element.academic_year, element.acronym)
-                }
-                error_messages.append("{}: {}".format(msg_prefix, msg))
-    return error_messages
+    children_types = NodeType.LEARNING_UNIT if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
+    return attach_node_service.check_attach(
+        parent.pk,
+        [element.pk for element in elements_to_attach],
+        children_types
+    )

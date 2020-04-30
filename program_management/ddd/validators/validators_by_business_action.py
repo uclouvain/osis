@@ -30,6 +30,7 @@ from django.utils.translation import gettext as _
 from base.ddd.utils.business_validator import BusinessListValidator
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
+from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
     DetachAuthorizedRelationshipValidator
@@ -57,6 +58,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
+                AuthorizedLinkTypeValidator(tree.root_node, node_to_add, link_type)
             ]
 
         elif node_to_add.is_learning_unit():
@@ -65,6 +67,7 @@ class AttachNodeValidatorList(BusinessListValidator):
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
+                AuthorizedLinkTypeValidator(tree.root_node, node_to_add, link_type)
             ]
 
         else:

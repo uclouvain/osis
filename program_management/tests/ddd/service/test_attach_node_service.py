@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
@@ -36,6 +37,7 @@ from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators.link import CreateLinkValidatorList
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -237,3 +239,60 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error attach option message"
         self.assertIn(validator_msg, result)
+
+
+class TestCheckAttach(SimpleTestCase):
+    def setUp(self) -> None:
+        self.parent_node = NodeEducationGroupYearFactory()
+        self.node_to_attach_1 = NodeEducationGroupYearFactory()
+        self.node_to_attach_2 = NodeEducationGroupYearFactory()
+
+        patcher_load_node = mock.patch("program_management.ddd.repositories.load_node.load_by_type")
+        self.mock_load_node_by_type = patcher_load_node.start()
+        self.mock_load_node_by_type.side_effect = (self.parent_node, self.node_to_attach_1, self.node_to_attach_2)
+        self.addCleanup(patcher_load_node.stop)
+
+        patcher_validate_end_date_and_option_finality = mock.patch(
+            "program_management.ddd.service.attach_node_service._validate_end_date_and_option_finality"
+        )
+        self.mock_validate_end_date_and_option_finality = patcher_validate_end_date_and_option_finality.start()
+        self.mock_validate_end_date_and_option_finality.return_value = []
+        self.addCleanup(patcher_validate_end_date_and_option_finality.stop)
+
+        patcher_create_link_validator_list = mock.patch.object(
+            CreateLinkValidatorList, "is_valid"
+        )
+        self.mock_create_link_validtor = patcher_create_link_validator_list.start()
+        self.mock_create_link_validtor.return_value = True
+        self.addCleanup(patcher_create_link_validator_list.stop)
+
+    def test_should_call_validate_end_date_and_option_finality(self):
+        attach_node_service.check_attach(
+            self.parent_node.node_id,
+            [self.node_to_attach_1.node_id, self.node_to_attach_2.node_id],
+            NodeType.EDUCATION_GROUP
+        )
+
+        self.assertEqual(self.mock_validate_end_date_and_option_finality.call_count, 2)
+
+    def test_should_call_create_link_validator_list(self):
+        attach_node_service.check_attach(
+            self.parent_node.node_id,
+            [self.node_to_attach_1.node_id, self.node_to_attach_2.node_id],
+            NodeType.EDUCATION_GROUP
+        )
+
+        self.assertEqual(self.mock_create_link_validtor.call_count, 2)
+
+    def test_should_return_validation_messages_if_any(self):
+        self.mock_validate_end_date_and_option_finality.return_value = ["Validation error"]
+        result = attach_node_service.check_attach(
+            self.parent_node.node_id,
+            [self.node_to_attach_1.node_id, self.node_to_attach_2.node_id],
+            NodeType.EDUCATION_GROUP
+        )
+
+        self.assertEqual(
+            result,
+            ["Validation error", "Validation error"]
+        )
