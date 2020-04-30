@@ -36,7 +36,7 @@
             {% dl_with_parent_without_context 'category' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" is_standard=current_version.is_standard%}
             {% dl_with_parent_without_context 'name' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" is_standard=current_version.is_standard%}
 
-            {% if education_group_year.education_group_type.category != 'GROUP' %}
+            {% if group_year.education_group_type.category != 'GROUP' %}
                 {% dl_with_parent 'active' class_dl="col-md-6" versioned_field=True %}
                 {% dl_with_parent 'schedule_type' class_dl="col-md-6" %}
             {% endif %}
@@ -48,7 +48,7 @@
         </div>
 
         <div>
-            {% dl_with_parent 'title' dl_title=_('Title in French')  default_value='-' %}
+            {% dl_with_parent 'title_fr' dl_title=_('Title in French')  default_value='-' versioned_field=True %}
         </div>
         {% if is_finality_types %}
             <br>
@@ -60,7 +60,7 @@
         {% endif %}
         <br>
         <div>
-            {% dl_with_parent 'title_english' dl_title=_('Title in English')  default_value='' %}
+            {% dl_with_parent 'title_en' dl_title=_('Title in English')  default_value='' versioned_field=True %}
         </div>
         {% if is_finality_types %}
             <br>

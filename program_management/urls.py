@@ -57,12 +57,6 @@ urlpatterns = [
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
         url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
             name="postpone_education_group"),
-        url(r'^quick_search/', include([
-            url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
-                name="quick_search_learning_unit"),
-            url(r'^education_group/$', QuickSearchEducationGroupYearView.as_view(),
-                name="quick_search_education_group"),
-        ])),
     ])),
     url(
         r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
@@ -94,16 +88,24 @@ urlpatterns = [
     ])),
     path('<int:root_element_id>/', include([
         path('identification/', IdentificationRedirectView.as_view(), name='element_identification'),
-        path('<int:child_element_id>/learning_unit/', include([
-            path('utilization/',
-                 element_utilization.LearningUnitUtilization.as_view(),
-                 name='learning_unit_utilization'),
-            path('prerequisite/',
-                 prerequisite_read.LearningUnitPrerequisite.as_view(),
-                 name='learning_unit_prerequisite'),
-            path('prerequisite/update/',
-                 prerequisite_update.LearningUnitPrerequisite.as_view(),
-                 name='learning_unit_prerequisite_update'),
+        path('<int:child_element_id>/', include([
+            path('quick_search/', include([
+                path('learning_unit/', QuickSearchLearningUnitYearView.as_view(),
+                     name="quick_search_learning_unit"),
+                path('education_group/', QuickSearchEducationGroupYearView.as_view(),
+                     name="quick_search_education_group"),
+            ])),
+            path('learning_unit/', include([
+                path('utilization/',
+                     element_utilization.LearningUnitUtilization.as_view(),
+                     name='learning_unit_utilization'),
+                path('prerequisite/',
+                     prerequisite_read.LearningUnitPrerequisite.as_view(),
+                     name='learning_unit_prerequisite'),
+                path('prerequisite/update/',
+                     prerequisite_update.LearningUnitPrerequisite.as_view(),
+                     name='learning_unit_prerequisite_update'),
+            ]))
         ]))
     ])),
 ]

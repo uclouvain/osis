@@ -29,9 +29,9 @@
 {% endblock %}
 
 {% block details %}
-    {% url 'education_group_read' root_group.year root_group.partial_acronym as url_identification %}
+    {% url 'education_group_read' node.year node.partial_acronym as url_identification %}
     <a href="{{url_identification}}"
-       id="lnk_offer_{education_group_year.id}}">{{ education_group_year.verbose }}</a>
+       id="lnk_offer_{education_group_year.id}}">{{ node.code }}</a>
     {% trans 'is using in' %} :
     <br><br>
     {% include "blocks/table_element_utilizations.html" %}

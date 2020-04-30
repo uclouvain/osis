@@ -36,6 +36,7 @@ from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.mixins import AjaxTemplateMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
+from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 from program_management.business.group_element_years import attach
 
@@ -58,18 +59,20 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        egy = get_object_or_404(EducationGroupYear, id=self.kwargs['education_group_year_id'])
-        kwargs["initial"] = {'academic_year': egy.academic_year_id}
+        gy = get_object_or_404(GroupYear, element__pk=self.kwargs['child_element_id'])
+        kwargs["initial"] = {'academic_year': gy.academic_year_id}
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_id'] = self.kwargs['root_id']
-        context['education_group_year_id'] = self.kwargs['education_group_year_id']
-        context['display_quick_search_luy_link'] = attach.can_attach_learning_units(
-            EducationGroupYear.objects.get(id=self.kwargs['education_group_year_id'])
-        )
+        context['root_element_id'] = self.kwargs['root_element_id']
+        context['child_element_id'] = self.kwargs['child_element_id']
+        # TODO: Find a cleaner way use DDD
+        context['display_quick_search_luy_link'] = GroupYear.objects.filter(
+            element__pk=self.kwargs['child_element_id'],
+            education_group_type__category=education_group_categories.Categories.GROUP.name
+        ).exists()
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -97,15 +100,15 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        egy = get_object_or_404(EducationGroupYear, id=self.kwargs['education_group_year_id'])
-        kwargs["initial"] = {'academic_year': egy.academic_year_id}
+        gy = get_object_or_404(GroupYear, element__pk=self.kwargs['child_element_id'])
+        kwargs["initial"] = {'academic_year': gy.academic_year_id}
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_id'] = self.kwargs['root_id']
-        context['education_group_year_id'] = self.kwargs['education_group_year_id']
+        context['root_element_id'] = self.kwargs['root_element_id']
+        context['child_element_id'] = self.kwargs['child_element_id']
         return context
 
     def render_to_response(self, context, **response_kwargs):

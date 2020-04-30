@@ -8,7 +8,7 @@
         <li role="presentation" class="active"><a href="#">{% trans 'Trainings' %}</a></li>
         {% if display_quick_search_luy_link %}
         <li role="presentation">
-            <a href="#" class="trigger_modal" data-url="{% url "quick_search_learning_unit" root_id education_group_year_id %}">{% trans 'Learning units' %}</a>
+            <a href="#" class="trigger_modal" data-url="{% url "quick_search_learning_unit" root_element_id child_element_id %}">{% trans 'Learning units' %}</a>
         </li>
         {% endif %}
     </ul>

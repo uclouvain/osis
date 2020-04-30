@@ -56,19 +56,17 @@ def have_only_access_to_certificate_aims(user, education_group_year):
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
-    offer = context['offer']
-    education_group_year = context['education_group_year']
-    url = reverse('postpone_education_group', args=[offer.pk, education_group_year.pk])
+    group_year = context['group_year']
+    url = reverse('postpone_education_group', args=[group_year.pk, group_year.pk])
 
     try:
-        last_academic_year = education_group_year.academic_year.past()
+        last_academic_year = group_year.academic_year.past()
     except AcademicYear.DoesNotExist:
         last_academic_year = "last year"
 
     message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
         'previous_anac': str(last_academic_year),
-        'current_anac': str(education_group_year.academic_year)
-
+        'current_anac': str(group_year.academic_year)
     }
     return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
 
@@ -193,19 +191,21 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
     (strong, blue).
     """
     if versioned_field:
-        obj = context["root_group"]
+        obj = context["group_year"]
     else:
         obj = context["education_group_year"]
 
     parent = context["parent"]
 
     return dl_with_parent_without_context(
-        key, obj, parent, dl_title=dl_title,
+        key, obj, parent,
+        dl_title=dl_title,
         class_dl=class_dl,
-        default_value=default_value, is_standard=context["current_version"].is_standard,
+        default_value=default_value,
+        is_standard=context["current_version"].is_standard if context.get('current_version') else None,
         versioned_field=versioned_field,
         version_label="{}".format(context["current_version"].version_label)
-        if key == "acronym" and context["current_version"].version_label else None
+        if key == "acronym" and context.get("current_version") and context["current_version"].version_label else None
     )
 
 

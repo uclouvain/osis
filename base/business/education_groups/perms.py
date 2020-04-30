@@ -66,14 +66,6 @@ def is_eligible_to_postpone_education_group(person, education_group, raise_excep
     result = person.user.has_perm('base.change_educationgroup', education_group)
     if not result:
         raise PermissionDenied()
-
-    try:
-        # Check if the education group is valid
-        postponement.PostponeContent(education_group.previous_year(), person)
-    except postponement.NotPostponeError as e:
-        result = False
-        if raise_exception:
-            raise PermissionDenied(str(e))
     return result
 
 

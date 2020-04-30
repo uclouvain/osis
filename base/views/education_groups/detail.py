@@ -73,8 +73,9 @@ from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from education_group.models.group_year import GroupYear
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories import load_tree, load_node
 from program_management.ddd.repositories.find_roots import find_roots
+from program_management.ddd.service import tree_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.enums import node_type
 from webservices.business import CONTACT_INTRO_KEY
@@ -144,9 +145,30 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, CatalogGenericDet
     def object(self):
         return self.get_object()
 
+    def get_tree(self):
+        if self.with_tree:
+            # TODO : Create Path class
+            element_id = self.get_node_path().split("|")[0]
+            return load_tree.load(int(element_id))
+        return None
+
+    def get_node_path(self):
+        return self.request.GET.get('path') or str(self.get_object().element.pk)
+
+    @cached_property
+    def node(self):
+        """
+        Return the current node based on path encoded in path? querystring
+        """
+        path = self.get_node_path()
+        return self.get_tree().get_node(path)
+
     @cached_property
     def person(self):
         return self.request.user.person
+
+    def has_version_related(self):
+        return hasattr(self.object, 'educationgroupversion') and self.object.educationgroupversion
 
     @cached_property
     def offer(self):
@@ -174,61 +196,57 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, CatalogGenericDet
         return starting_academic_year()
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # This objects are mandatory for all education group views
-        context['person'] = self.person
-
-        context['current_version'] = self.current_version
-        if self.current_version:
-            context['root_group'] = self.current_version.root_group
-        context['all_versions_available'] = self.all_versions_available
-        context['academic_years'] = find_all_versions_academic_year(
-            self.offer.acronym,
-            self.version_name,
-            self.transition,
-        )
-
-        # FIXME same param
-        context['offer'] = self.offer
-        context['offer_id'] = self.offer.pk
-        context['parent'] = self.offer
-        context['parent_training'] = self.offer.parent_by_training()
-        context["show_identification"] = self.show_identification()
-        context["show_diploma"] = self.show_diploma()
-        context["show_general_information"] = self.show_general_information()
-        context["show_skills_and_achievements"] = self.show_skills_and_achievements()
-        context["show_administrative"] = self.show_administrative()
-        context["show_content"] = self.show_content()
-        context["show_utilization"] = self.show_utilization()
-        context["show_admission_conditions"] = self.show_admission_conditions()
-        if self.with_tree:
-            program_tree_version = load_tree.load_version(
-                self.offer.acronym,
-                self.offer.academic_year.year,
-                self.version_name,
-                self.transition
-            )
-            serialized_data = program_tree_view_serializer(program_tree_version.tree)
-            context['tree'] = json.dumps(serialized_data)
-            context["current_node"] = program_tree_version.tree.get_node_by_id_and_type(
-                self.object.id,
-                node_type.NodeType.EDUCATION_GROUP
-            )
-        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['can_change_education_group'] = self.request.user.has_perm(
+        can_change_education_group = self.request.user.has_perm(
             'base.change_educationgroup',
             self.object
         )
-        context['can_change_coorganization'] = self.request.user.has_perm(
-            'base.change_educationgrouporganization',
-            self.object
-        )
-        context['enums'] = mdl.enums.education_group_categories
-        context['current_academic_year'] = self.starting_academic_year
-        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
-        context['form_xls_custom'] = CustomXlsForm()
+        context = {
+            **super().get_context_data(**kwargs),
+            "person": self.person,
+            "node": self.node,
+            "group_year": self.object,
+            "group_to_parent": self.request.GET.get("group_to_parent") or '0',
+            "enums": mdl.enums.education_group_categories,
+            "current_academic_year": self.starting_academic_year,
+            "selected_element_clipboard": self.get_selected_element_for_clipboard(),
+            "form_xls_custom": CustomXlsForm(),
+            "can_change_education_group": can_change_education_group,
+        }
+
+        if self.has_version_related():
+            context.update(self.get_offer_context_data())
+        else:
+            context.update(self.get_group_context_data())
+
+        program_tree = self.get_tree()
+        if program_tree:
+            serialized_data = program_tree_view_serializer(program_tree)
+            context['tree'] = json.dumps(serialized_data)
         return context
+
+    def get_offer_context_data(self):
+        can_change_coorganization = self.request.user.has_perm('base.change_educationgrouporganization', self.offer)
+        return {
+            "current_version": self.current_version,
+            "offer": self.offer,
+            "offer_id": self.offer.pk,
+            "parent_training": self.offer.parent_by_training(),
+            "all_versions_available": self.all_versions_available,
+            "academic_years":  find_all_versions_academic_year(self.offer.acronym, self.version_name, self.transition),
+            "can_change_coorganization": can_change_coorganization
+        }
+
+    def get_group_context_data(self):
+        return {
+            "show_identification": True,
+            "show_utilization": True,
+            "show_content": True,
+            "show_general_information": False,
+            "show_skills_and_achievements": False,
+            "show_administrative": False,
+            "show_diploma": False,
+            "show_admission_conditions": False,
+        }
 
     def get(self, request, *args, **kwargs):
         default_url = reverse('education_group_read', kwargs={
@@ -248,37 +266,37 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, CatalogGenericDet
         return True
 
     def show_diploma(self):
-        return self.offer.education_group_type.category == TRAINING and not self.offer.is_common \
+        return self.object.education_group_type.category == TRAINING and not self.offer.is_common \
                and self.current_version.is_standard
 
     def show_general_information(self):
-        return not self.offer.acronym.startswith('common-') and \
+        return not self.object.acronym.startswith('common-') and \
                self.is_general_info_and_condition_admission_in_display_range() and \
-               self.offer.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys() and \
+               self.object.education_group_type.name in SECTIONS_PER_OFFER_TYPE.keys() and \
                self.current_version.is_standard
 
     def show_administrative(self):
-        return self.offer.education_group_type.category == "TRAINING" and \
-               self.offer.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
-                                                            TrainingType.PGRM_MASTER_180_240.name] and \
+        return self.object.education_group_type.category == TRAINING and \
+               self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                             TrainingType.PGRM_MASTER_180_240.name] and \
                not self.offer.is_common \
                and self.current_version.is_standard
 
     def show_content(self):
-        return not self.offer.is_common
+        return not(self.has_version_related() and self.offer.is_common)
 
     def show_utilization(self):
-        return not self.offer.is_common
+        return not(self.has_version_related() and self.offer.is_common)
 
     def show_admission_conditions(self):
-        return not self.offer.is_main_common and \
+        return self.has_version_related() and not self.offer.is_main_common and \
                self.offer.education_group_type.name in itertools.chain(TrainingType.with_admission_condition(),
                                                                        MiniTrainingType.with_admission_condition()) \
                and self.is_general_info_and_condition_admission_in_display_range()\
                and self.current_version.is_standard
 
     def show_skills_and_achievements(self):
-        return not self.offer.is_common and \
+        return self.has_version_related() and not self.offer.is_common and \
                self.offer.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
                                                                        MiniTrainingType.with_admission_condition()) \
                and self.is_general_info_and_condition_admission_in_display_range() \
@@ -299,16 +317,17 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def can_show_view(self):
         return self.show_identification()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["education_group_languages"] = self.offer.educationgrouplanguage_set.order_by('order').values_list(
+    def get_offer_context_data(self):
+        education_group_languages = self.offer.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
-        context["versions"] = self.get_related_versions()
-        context["show_coorganization"] = education_group_business.has_coorganization(self.offer)
-        context["is_finality_types"] = self.offer.is_finality
-        context["education_group_year"] = self.offer
-        return context
+        return {
+            **super().get_offer_context_data(),
+            "education_group_languages": education_group_languages,
+            "versions": self.get_related_versions(),
+            "show_coorganization": education_group_business.has_coorganization(self.offer),
+            "is_finality_types": self.offer.is_finality,
+            "education_group_year": self.offer
+        }
 
     def get_template_names(self):
         return self.templates.get(self.object.education_group_type.category)
@@ -341,19 +360,12 @@ class EducationGroupDiplomas(EducationGroupGenericDetailView):
     def can_show_view(self):
         return self.show_diploma()
 
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related('certificate_aims')
-
 
 class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
 
     def can_show_view(self):
         return self.show_general_information()
-
-    def get_queryset(self):
-        """ Optimization """
-        return super().get_queryset().prefetch_related('educationgrouppublicationcontact_set')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -587,11 +599,15 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["group_element_years"] = self.object.child_branch.select_related("parent")
-        context["formations"] = find_roots(
-            list(grp.parent for grp in self.object.child_branch.select_related("parent")),
-            as_instances=True
-        )
+        trees = tree_service.search_trees_using_node(self.node)
+
+        context['utilization_rows'] = []
+        for tree in trees:
+            context['utilization_rows'] += [
+                {'link': link, 'root_nodes': [tree.root_node]}
+                for link in tree.get_links_using_node(self.node)
+            ]
+        context['utilization_rows'] = sorted(context['utilization_rows'], key=lambda row: row['link'].parent.code)
         return context
 
 

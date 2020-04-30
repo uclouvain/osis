@@ -6,7 +6,8 @@
 {% block navbar %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation">
-            <a class="trigger_modal" data-url="{% url "quick_search_education_group" root_id education_group_year_id%}">{% trans 'Trainings' %}</a>
+            {#  TODO: Correct url quick_search_education_group #}
+            <a class="trigger_modal" data-url="{% url "quick_search_education_group" root_element_id child_element_id %}">{% trans 'Trainings' %}</a>
         </li>
         <li role="presentation" class="active">
             <a href=#">{% trans 'Learning units' %}</a>
