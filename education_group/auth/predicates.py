@@ -46,7 +46,7 @@ def is_education_group_type_authorized_according_to_user_scope(self, user, educa
     if education_group_year:
         return any(
             education_group_year.education_group_type.name in role_row.get_allowed_education_group_types()
-            for role_row in self.context['role_qs']
+            for role_row in self.context['role_qs'] if role_row.entity == education_group_year.management_entity
         )
     return None
 
