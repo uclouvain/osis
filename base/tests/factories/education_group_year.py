@@ -39,7 +39,7 @@ from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
+from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.language import LanguageFactory
 
 
@@ -78,7 +78,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     partial_title = ""
     partial_title_english = ""
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
-    management_entity = factory.SubFactory(EntityWithVersionFactory)
+    management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
     main_teaching_campus = factory.SubFactory(CampusFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
