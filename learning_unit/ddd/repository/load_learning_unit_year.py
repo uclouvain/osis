@@ -34,6 +34,8 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+from learning_unit.ddd.repository.load_achievement import load_achievements
+from django.conf import settings
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -91,14 +93,14 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'pp_vol_tot',
     )
 
-    return [
-        LearningUnitYear(
-            **__instanciate_volume_domain_object(
-                __convert_string_to_enum(learnin_unit_data)
-            )
-        )
-        for learnin_unit_data in qs
-    ]
+    results = []
+    # TODO pas trop sûre de ceci?
+    for learnin_unit_data in qs:
+        luy = LearningUnitYear(**__instanciate_volume_domain_object(__convert_string_to_enum(learnin_unit_data)))
+        luy.achievements_fr = load_achievements(luy.acronym, luy.year, settings.LANGUAGE_CODE_FR[:2].upper())
+        luy.achievements_en = load_achievements(luy.acronym, luy.year, settings.LANGUAGE_CODE_FR[:2].upper())
+        results.append(luy)
+    return results
 
 
 def __convert_string_to_enum(learn_unit_data: dict) -> dict:

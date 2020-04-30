@@ -88,6 +88,8 @@ class LearningUnitYear:
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
+        self.achievements_fr = None
+        self.achievements_en = None
 
     @property
     def full_title_fr(self):
