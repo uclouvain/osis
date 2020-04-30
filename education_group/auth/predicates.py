@@ -2,7 +2,6 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
-from base.business.entity import get_entities_ids
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.education_group_type import EducationGroupType
 from base.models.enums.education_group_categories import Categories
@@ -46,10 +45,8 @@ def is_education_group_year_older_or_equals_than_limit_settings_year(self, user,
 def is_education_group_type_authorized_according_to_user_scope(self, user, education_group_year=None):
     if education_group_year:
         return any(
-            education_group_year.education_group_type.name in role.get_allowed_education_group_types()
-            for role in self.context['role_qs'] if education_group_year.management_entity_id in get_entities_ids(
-                role.entity.most_recent_acronym, True
-            )
+            education_group_year.education_group_type.name in role_row.get_allowed_education_group_types()
+            for role_row in self.context['role_qs'] if role_row.entity == education_group_year.management_entity
         )
     return None
 
