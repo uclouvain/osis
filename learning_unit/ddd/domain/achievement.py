@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 
 
 class Achievement:
@@ -31,9 +32,9 @@ class Achievement:
         self,
         code_name: str = None,
         text: str = None,
-        language_code: str = None  # TODO : est-ce nécessaire?
-                                   # TODO : faut-il ajouter la notion d'ordre? Notion ici ou ailleurs
+        language__code: str = None,
     ):
+        #TODO est-ce qu'un achiement avec un même code_name à un text en fr et un uen en automatiquement?
         self.code_name = code_name
-        self.text = text
-        self.language_code = language_code
+        self.text_fr = text if language__code.upper() == settings.LANGUAGE_CODE_FR[:2].upper() else None
+        self.text_en = text if language__code.upper() == settings.LANGUAGE_CODE_EN[:2].upper() else None

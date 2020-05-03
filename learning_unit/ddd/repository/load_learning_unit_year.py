@@ -94,11 +94,11 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     )
 
     results = []
-    # TODO pas trop sûre de ceci?
+
     for learnin_unit_data in qs:
-        luy = LearningUnitYear(**__instanciate_volume_domain_object(__convert_string_to_enum(learnin_unit_data)))
-        luy.achievements_fr = load_achievements(luy.acronym, luy.year, settings.LANGUAGE_CODE_FR[:2].upper())
-        luy.achievements_en = load_achievements(luy.acronym, luy.year, settings.LANGUAGE_CODE_FR[:2].upper())
+        # TODO juste avec achievements ici?
+        luy = LearningUnitYear(**__instanciate_volume_domain_object(__convert_string_to_enum(learnin_unit_data)),
+                               achievements=load_achievements(learnin_unit_data['acronym'], learnin_unit_data['year']))
         results.append(luy)
     return results
 

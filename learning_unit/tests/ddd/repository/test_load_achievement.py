@@ -29,7 +29,7 @@ from django.test import TestCase
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from learning_unit.ddd.repository.load_achievement import load_achievements
-from reference.tests.factories.language import EnglishLanguageFactory
+from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
 
 
 class TestLoadAchievement(TestCase):
@@ -39,15 +39,20 @@ class TestLoadAchievement(TestCase):
 
         cls.l_unit_1 = LearningUnitYearFactory()
         cls.en_language = EnglishLanguageFactory()
-        cls.achievements = [LearningAchievementFactory(language=cls.en_language,
-                                                       code_name="A_{}".format(idx),
-                                                       learning_unit_year=cls.l_unit_1) for idx in range(5)]
+        cls.fr_language = FrenchLanguageFactory()
+        cls.achievements_en = [LearningAchievementFactory(language=cls.en_language,
+                                                          text="English text {}".format(idx),
+                                                          learning_unit_year=cls.l_unit_1) for idx in range(1)]
+        cls.achievements_fr = [LearningAchievementFactory(language=cls.fr_language,
+                                                          text="French text {}".format(idx),
+                                                          learning_unit_year=cls.l_unit_1) for idx in range(1)]
 
     def test_load_achievements(self):
-        results = load_achievements(self.l_unit_1.acronym, self.l_unit_1.academic_year.year, self.en_language.code)
+        results = load_achievements(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
         self.assertEqual(len(results), 5)
 
     def test_load_achievements_check_order(self):
-        results = load_achievements(self.l_unit_1.acronym, self.l_unit_1.academic_year.year, self.en_language.code)
+        results = load_achievements(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
         for idx in range(5):
-            self.assertEqual(results[idx].code_name, "A_{}".format(idx))
+            self.assertEqual(results[idx].text_fr, "French text {}".format(idx))
+            self.assertEqual(results[idx].text_en, "English text {}".format(idx))

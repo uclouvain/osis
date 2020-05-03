@@ -30,13 +30,15 @@ from base.models.learning_achievement import LearningAchievement
 from learning_unit.ddd.domain.achievement import Achievement
 
 
-def load_achievements(acronym: str, year: int, language: str) -> List['Achievement']:
+def load_achievements(acronym: str, year: int) -> List['Achievement']:
     qs = LearningAchievement.objects.filter(
         learning_unit_year__acronym=acronym,
-        learning_unit_year__academic_year__year=year,
-        language__code=language)\
-        .values('code_name', 'text')\
-        .order_by('order')
+        learning_unit_year__academic_year__year=year)\
+        .values('code_name', 'text', 'language__code')\
+        .order_by('order', 'language__code')
+   #TODO : ici je vois pas trop comment faire pour retourner la liste des achievements
+   # avec pour chaque record une text_fr et un text_en ???
+
     return [
             Achievement(**data)
             for data in qs

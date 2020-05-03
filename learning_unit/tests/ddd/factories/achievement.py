@@ -36,5 +36,5 @@ class AchievementFactory(factory.Factory):
         abstract = False
 
     code_name = factory.fuzzy.FuzzyText(length=100)
-    text = factory.fuzzy.FuzzyText(length=240)
-    language_code = 'EN'
+    text_fr = factory.fuzzy.FuzzyText(length=240)
+    text_en = factory.fuzzy.FuzzyText(length=240)
