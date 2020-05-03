@@ -35,16 +35,28 @@ class LecturingVolume:
     def __init__(
         self,
         total_annual: Decimal = None,
+        vol_q1: Decimal = None,
+        vol_q2: Decimal = None,
+        classes: Decimal = None,
     ):
         self.total_annual = total_annual
+        self.vol_q1 = vol_q1
+        self.vol_q2 = vol_q2
+        self.classes = classes
 
 
 class PracticalVolume:
     def __init__(
             self,
             total_annual: Decimal = None,
+            vol_q1: Decimal = None,
+            vol_q2: Decimal = None,
+            classes: Decimal = None,
     ):
         self.total_annual = total_annual
+        self.vol_q1 = vol_q1
+        self.vol_q2 = vol_q2
+        self.classes = classes
 
 
 class LearningUnitYear:
