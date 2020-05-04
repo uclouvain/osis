@@ -61,4 +61,4 @@ class LearningUnitYearFactory(factory.Factory):
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
     status = True
     periodicity = factory.Iterator(PeriodicityEnum.choices(), getter=operator.itemgetter(0))
-    achievements = None
+    achievements = []

@@ -29,13 +29,16 @@ from typing import List
 from base.models.learning_achievement import LearningAchievement
 from learning_unit.ddd.domain.achievement import Achievement
 
+from django.db.models import F
+
 
 def load_achievements(acronym: str, year: int) -> List['Achievement']:
     qs = LearningAchievement.objects.filter(
         learning_unit_year__acronym=acronym,
         learning_unit_year__academic_year__year=year)\
-        .values('code_name', 'text', 'language__code')\
-        .order_by('order', 'language__code')
+        .annotate(language_code=F('language__code'))\
+        .values('code_name', 'text', 'language_code')\
+        .order_by('order', 'language_code')
    #TODO : ici je vois pas trop comment faire pour retourner la liste des achievements
    # avec pour chaque record une text_fr et un text_en ???
 
