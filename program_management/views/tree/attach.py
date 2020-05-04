@@ -101,7 +101,7 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
     def get_form(self, form_class=None):
         if form_class is None:
             form_class = self.get_form_class()
-        return form_class(form_kwargs=self.get_form_kwargs())
+        return form_class(form_kwargs=self.get_form_kwargs(), data=self.request.POST or None)
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -113,12 +113,10 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
         messages = formset.save()
         self.__clear_cache(messages)
         display_business_messages(self.request, messages)
-        return redirect(
-            reverse('education_group_read', args=[self.root_id, self.root_id])
-        )
+        return super().form_valid(formset)
 
-    def form_invalid(self, formset: AttachNodeFormSet):
-        return self.render_to_response(self.get_context_data(formset=formset))
+    def get_success_url(self):
+        return reverse('education_group_read', args=[self.root_id, self.root_id])
 
     def __clear_cache(self, messages):
         if not BusinessValidationMessage.contains_errors(messages):

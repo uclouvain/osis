@@ -66,7 +66,7 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None
         'detach_msg': None,
         'modification_disabled': False,
         'modification_msg': None,
-        'search_url': reverse('quick_search_education_group', args=[context['root'].pk, link.child.pk]),
+        'search_url': reverse('quick_search_education_group', args=[context['root'].pk, path]),
     }
 
 

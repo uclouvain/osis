@@ -87,7 +87,7 @@
             {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
         let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
+        let attachUrl = "{% url 'tree_attach_node' root_id %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
@@ -108,6 +108,7 @@
                 const parameters = extract_ids_and_content_type_parameters(elementsUrl);
                 const paramString = new URLSearchParams();
                 paramString.append("content_type", parameters["content_type"]);
+                paramString.append("path", "{{ node_path }}");
                 for (let index in parameters["id"]){
                     paramString.append("id", parameters["id"][index]);
                 }

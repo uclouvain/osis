@@ -59,12 +59,6 @@ urlpatterns = [
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
         url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
             name="postpone_education_group"),
-        url(r'^quick_search/', include([
-            url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
-                name="quick_search_learning_unit"),
-            url(r'^education_group/$', QuickSearchEducationGroupYearView.as_view(),
-                name="quick_search_education_group"),
-        ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
@@ -103,7 +97,11 @@ urlpatterns = [
         path('<int:link_id>/', include([
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
-        ]))
+        ])),
+        path('<str:node_path>/quick_search/', include([
+            path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
+            path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),
+        ])),
 
     ])),
 ]
