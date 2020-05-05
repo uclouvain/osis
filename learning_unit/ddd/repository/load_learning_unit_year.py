@@ -34,7 +34,13 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
+
+
+def __instanciate_specific_objects(learn_unit_data: dict) -> dict:
+    __instanciate_volume_domain_object(learn_unit_data)
+    __instanciate_entities_object(learn_unit_data)
+    return learn_unit_data
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -111,7 +117,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
 
     return [
         LearningUnitYear(
-            **__instanciate_volume_domain_object(
+            **__instanciate_specific_objects(
                 __convert_string_to_enum(learnin_unit_data)
             )
         )
@@ -124,4 +130,11 @@ def __convert_string_to_enum(learn_unit_data: dict) -> dict:
     learn_unit_data['type'] = LearningContainerYearType[subtype_str]
     if learn_unit_data.get('quadrimester'):
         learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
+    return learn_unit_data
+
+
+def __instanciate_entities_object(learn_unit_data: dict) -> dict:
+    learn_unit_data['entities'] = Entities(requirement_entity_acronym=learn_unit_data.pop('requirement_entity_acronym'),
+                                           allocation_entity_acronym=learn_unit_data.pop('allocation_entity_acronym'))
+
     return learn_unit_data

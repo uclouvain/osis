@@ -80,8 +80,7 @@ class LearningUnitYear:
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
 
-            requirement_entity_acronym=None,
-            allocation_entity_acronym=None,
+            entities: Entities = None,
     ):
         self.id = id
         self.year = year
@@ -101,8 +100,7 @@ class LearningUnitYear:
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
-        self.entities = Entities(requirement_entity_acronym=requirement_entity_acronym,
-                                 allocation_entity_acronym=allocation_entity_acronym)
+        self.entities = entities
 
     @property
     def full_title_fr(self):
