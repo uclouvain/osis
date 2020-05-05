@@ -48,15 +48,12 @@ def load_achievements(acronym: str, year: int) -> List['Achievement']:
 def _build_achievements(qs):
     ue_achievements = sorted(qs, key=lambda el: el['code_name'])
     achievements = []
-    for k, elements in itertools.groupby(ue_achievements, key=lambda el: el['code_name']):
-        text_fr = None
-        text_en = None
+    for code_name, elements in itertools.groupby(ue_achievements, key=lambda el: el['code_name']):
+        achievement_parameters = {'code_name': code_name}
         for achievement in elements:
             if achievement['language_code'] == settings.LANGUAGE_CODE_EN[:2].upper():
-                text_en = achievement['text']
+                achievement_parameters['text_en'] = achievement['text']
             if achievement['language_code'] == settings.LANGUAGE_CODE_FR[:2].upper():
-                text_fr = achievement['text']
-        achievements.append(Achievement(code_name=k,
-                                        text_en=text_en,
-                                        text_fr=text_fr))
+                achievement_parameters['text_fr'] = achievement['text']
+        achievements.append(Achievement(**achievement_parameters))
     return achievements
