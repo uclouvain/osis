@@ -29,7 +29,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
@@ -42,7 +42,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_business_messages, display_error_messages
+from base.views.common import display_warning_messages, display_error_messages, display_business_messages
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
@@ -57,6 +57,7 @@ from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
+#  TODO should call check attach node before accessing this view
 class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/attach_inner.html"
 
@@ -111,16 +112,18 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
 
     def form_valid(self, formset: AttachNodeFormSet):
         messages = formset.save()
-        self.__clear_cache(messages)
+        if BusinessValidationMessage.contains_errors(messages):
+            return self.form_invalid(formset)
         display_business_messages(self.request, messages)
+        self.__clear_cache(messages)
+
         return super().form_valid(formset)
 
     def get_success_url(self):
         return reverse('education_group_read', args=[self.root_id, self.root_id])
 
     def __clear_cache(self, messages):
-        if not BusinessValidationMessage.contains_errors(messages):
-            ElementCache(self.request.user).clear()
+        ElementCache(self.request.user).clear()
 
 
 class AttachCheckView(GenericGroupElementYearMixin, View):

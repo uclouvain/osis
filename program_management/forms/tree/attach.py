@@ -81,6 +81,7 @@ def attach_form_factory(
     return AttachNodeForm(to_path, child_node, **kwargs)
 
 
+#  TODO should define clean_link_type and when saving should verify errors
 class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
@@ -95,6 +96,10 @@ class AttachNodeForm(forms.Form):
         self.node = node
         super().__init__(**kwargs)
 
+    def clean_link_type(self):
+        cleaned_link_type = self.cleaned_data.get('link_type')
+        return cleaned_link_type
+
     def save(self) -> List[validation_message.BusinessValidationMessage]:
         result = []
         if self.is_valid():
@@ -107,6 +112,8 @@ class AttachNodeForm(forms.Form):
                 commit=True,
                 **self.cleaned_data
             )
+            if result:
+                self.add_error(None, result)
         return result
 
 

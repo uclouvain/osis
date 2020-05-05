@@ -57,7 +57,7 @@ def attach_node(
     return success_messages
 
 
-#  TODO group message by node
+#  TODO redefine messages to explicit node to attach
 def check_attach(
         parent_node_id: int,
         children_nodes_ids: List[int],
