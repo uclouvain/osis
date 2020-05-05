@@ -267,6 +267,68 @@ class TestAttachCheckView(TestCase):
 
 
 @override_flag('education_group_update', active=True)
+class TestAttachCheckViewBis(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = EducationGroupYearFactory()
+        cls.next_academic_year = AcademicYearFactory(current=True)
+        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
+        cls.selected_egy = EducationGroupYearFactory(
+            academic_year=cls.next_academic_year
+        )
+        cls.path = "|".join([str(cls.egy.id)])
+        cls.url = reverse("check_education_group_attach_bis", args=[cls.egy.id])
+
+        cls.person = PersonFactory()
+
+        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                      return_value=True)
+
+        cls.check_attach_service_patcher = mock.patch(
+            "program_management.ddd.service.attach_node_service.check_attach"
+        )
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+        self.mocked_perm = self.perm_patcher.start()
+        self.mock_check_attach_service = self.check_attach_service_patcher.start()
+
+        self.addCleanup(self.perm_patcher.stop)
+        self.addCleanup(self.check_attach_service_patcher.stop)
+        self.addCleanup(cache.clear)
+
+    def test_when_no_element_selected(self):
+        response = self.client.get(self.url, data={"path": self.path})
+        self.assertTemplateUsed("tree/check_attach_inner.html")
+        msgs = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertCountEqual(
+            msgs,
+            [_("Please select an item before adding it")]
+        )
+
+    def test_when_multiple_element_selected_and_no_errors_then_should_redirect_to_view_attach_nodes(self):
+        self.mock_check_attach_service.return_value = []
+        other_egy = EducationGroupYearFactory()
+        response = self.client.get(self.url, data={
+            "id": [self.egy.id, other_egy.id],
+            "content_type": EDUCATION_GROUP_YEAR,
+            "path": self.path
+        })
+        qd = QueryDict(mutable=True)
+        qd.update({
+            "content_type": EDUCATION_GROUP_YEAR,
+            "path": self.path
+        })
+        qd.setlist("id", [self.egy.id, other_egy.id])
+        expected_url = reverse("tree_attach_node", args=[self.egy.id]) + "?{}".format(qd.urlencode())
+        self.assertRedirects(
+            response,
+            expected_url
+        )
+        self.assertTrue(self.mock_check_attach_service.called)
+
+
+@override_flag('education_group_update', active=True)
 class TestCreateGroupElementYearView(TestCase):
     @classmethod
     def setUpTestData(cls):

@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import List
 
-from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, persist_tree, load_node
@@ -43,7 +42,7 @@ def attach_node(
         path: 'Path' = None,
         commit=True,
         **link_attributes
-) -> List[BusinessValidationMessage]:
+) -> List['BusinessValidationMessage']:
     tree = load_tree.load(root_id)
     node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
     error_messages = __validate_trees_using_node_as_reference_link(tree, node_to_attach, path)
@@ -57,12 +56,11 @@ def attach_node(
     return success_messages
 
 
-#  TODO redefine messages to explicit node to attach
 def check_attach(
         parent_node_id: int,
         children_nodes_ids: List[int],
         children_type: NodeType
-) -> List[BusinessValidationMessage]:
+) -> List['BusinessValidationMessage']:
     result = []
 
     parent_node = load_tree.load_node.load_by_type(NodeType.EDUCATION_GROUP, parent_node_id)
@@ -83,7 +81,7 @@ def __validate_trees_using_node_as_reference_link(
         tree: 'ProgramTree',
         node_to_attach: 'Node',
         path: 'Path'
-) -> List[BusinessValidationMessage]:
+) -> List['BusinessValidationMessage']:
 
     error_messages = []
     child_node = tree.get_node(path)
@@ -96,7 +94,7 @@ def __validate_trees_using_node_as_reference_link(
     return error_messages
 
 
-def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List[BusinessValidationMessage]:
+def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List['BusinessValidationMessage']:
     error_messages = []
     tree_from_node_to_attach = load_tree.load(node_to_attach.node_id)
     finality_ids = [n.node_id for n in tree_from_node_to_attach.get_all_finalities()]

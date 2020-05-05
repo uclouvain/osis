@@ -46,7 +46,6 @@ from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
 class AttachNodeValidatorList(BusinessListValidator):
-
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path', link_type: Optional[LinkTypes]):
         if node_to_add.is_group():
             self.validators = [

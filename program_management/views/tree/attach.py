@@ -30,20 +30,20 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import RedirectView, CreateView, FormView
+from django.views.generic import RedirectView, CreateView, FormView, TemplateView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_error_messages, display_business_messages
+from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
@@ -58,7 +58,6 @@ from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-#  TODO should call check attach node before accessing this view
 class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
 
@@ -144,7 +143,6 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
         if not elements_to_attach:
             error_messages.append(_("Please select an item before adding it"))
 
-        #  TODO create service to check attach
         error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
 
         return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
@@ -159,6 +157,29 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
                 return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
 
         return super(AttachCheckView, self).dispatch(request, *args, **kwargs)
+
+
+class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
+    template_name = "tree/check_attach_inner.html"
+
+    def get(self, request, *args, **kwargs):
+        error_messages = []
+        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
+        if not elements_to_attach:
+            error_messages.append(_("Please select an item before adding it"))
+
+        error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
+        display_error_messages(self.request, error_messages)
+
+        if not error_messages:
+            return redirect(
+                reverse("tree_attach_node", args=[self.kwargs["root_id"]]) + "?{}".format(self.request.GET.urlencode())
+            )
+        return super().get(request, *args, **kwargs)
+
+    @property
+    def education_group_year(self):
+        return EducationGroupYear.objects.get(id=int(self.request.GET["path"].split("|")[-1]))
 
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
