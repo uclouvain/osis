@@ -75,7 +75,7 @@ class TestAttachNodeView(TestCase):
         self.addCleanup(fetch_tree_patcher.stop)
 
         self.fetch_from_cache_patcher = mock.patch(
-            'program_management.business.group_element_years.management.fetch_elements_selected',
+            'program_management.business.group_element_years.management.fetch_nodes_selected',
             return_value=[]
         )
         self.fetch_from_cache_patcher.start()
@@ -236,21 +236,7 @@ class TestAttachCheckView(TestCase):
         self.addCleanup(self.check_attach_service_patcher.stop)
         self.addCleanup(cache.clear)
 
-    def test_when_no_element_selected(self):
-        response = self.client.get(self.url)
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {"error_messages": [_("Please select an item before adding it")]}
-        )
-
-    def test_when_all_parameters_not_set(self):
-        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": ""})
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {"error_messages": [_("Please select an item before adding it")]}
-        )
-
-    def test_when_multiple_element_selected(self):
+    def test_check_attach_called(self):
         other_egy = EducationGroupYearFactory()
         response = self.client.get(self.url, data={
             "id": [self.egy.id, other_egy.id],
@@ -293,15 +279,6 @@ class TestAttachCheckViewBis(TestCase):
         self.addCleanup(self.perm_patcher.stop)
         self.addCleanup(self.check_attach_service_patcher.stop)
         self.addCleanup(cache.clear)
-
-    def test_when_no_element_selected(self):
-        response = self.client.get(self.url, data={"path": self.path})
-        self.assertTemplateUsed("tree/check_attach_inner.html")
-        msgs = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertCountEqual(
-            msgs,
-            [_("Please select an item before adding it")]
-        )
 
     def test_when_multiple_element_selected_and_no_errors_then_should_redirect_to_view_attach_nodes(self):
         self.mock_check_attach_service.return_value = []

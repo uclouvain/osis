@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union, List
+from typing import List
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -132,11 +132,8 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
         except PermissionDenied as e:
             error_messages.append(str(e))
 
-        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
-        if not elements_to_attach:
-            error_messages.append(_("Please select an item before adding it"))
-
-        error_messages.extend(_check_attach(self.node, elements_to_attach))
+        nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
+        error_messages = attach_node_service.check_attach(self.node, nodes_to_attach)
 
         return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
 
@@ -160,23 +157,17 @@ class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMi
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
-        error_messages = []
-        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
-        if not elements_to_attach:
-            error_messages.append(_("Please select an item before adding it"))
-
-        error_messages.extend(_check_attach(self.node_to_attach_from, elements_to_attach))
-        display_error_messages(self.request, error_messages)
+        node_to_attach_from = load_node.load_by_type(NodeType.EDUCATION_GROUP, int(self.request.GET["path"].split("|")[-1]))
+        nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
+        error_messages = attach_node_service.check_attach(node_to_attach_from, nodes_to_attach)
 
         if not error_messages:
             return redirect(
                 reverse("tree_attach_node", args=[self.kwargs["root_id"]]) + "?{}".format(self.request.GET.urlencode())
             )
-        return super().get(request, *args, **kwargs)
 
-    @property
-    def node_to_attach_from(self):
-        return load_node.load_by_type(NodeType.EDUCATION_GROUP, int(self.request.GET["path"].split("|")[-1]))
+        display_error_messages(self.request, error_messages)
+        return super().get(request, *args, **kwargs)
 
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
@@ -242,7 +233,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 
         children = fetch_elements_selected(self.request.GET, self.request.user)
 
-        messages = _check_attach_bis(self.education_group_year, children)
+        messages = _check_attach(self.education_group_year, children)
         if messages:
             display_error_messages(self.request, messages)
 
@@ -308,18 +299,10 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
         return super().form_valid(form)
 
 
-def _check_attach(parent: Node, elements_to_attach):
-    children_types = NodeType.LEARNING_UNIT if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
-    return attach_node_service.check_attach(
-        parent.node_id,
-        [element.pk for element in elements_to_attach],
-        children_types
-    )
-
-
-def _check_attach_bis(parent: EducationGroupYear, elements_to_attach):
-    children_types = NodeType.LEARNING_UNIT if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
-    return attach_node_service.check_attach(
+def _check_attach(parent: EducationGroupYear, elements_to_attach):
+    children_types = NodeType.LEARNING_UNIT \
+        if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
+    return attach_node_service.check_attach_bis(
         parent.pk,
         [element.pk for element in elements_to_attach],
         children_types

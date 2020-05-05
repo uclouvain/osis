@@ -24,8 +24,9 @@
 #
 ##############################################################################
 from typing import List
-
+from django.utils.translation import gettext_lazy as _
 from base.models.enums.link_type import LinkTypes
+from program_management.business.group_element_years import management
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, persist_tree, load_node
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
@@ -56,7 +57,7 @@ def attach_node(
     return success_messages
 
 
-def check_attach(
+def check_attach_bis(
         parent_node_id: int,
         children_nodes_ids: List[int],
         children_type: NodeType
@@ -68,6 +69,28 @@ def check_attach(
 
     for child_node in children_nodes:
         if children_type != NodeType.LEARNING_UNIT:
+            result.extend(_validate_end_date_and_option_finality(child_node))
+
+        validator = link_validator.CreateLinkValidatorList(parent_node, child_node)
+        if not validator.is_valid():
+            result.extend(validator.messages)
+
+    return result
+
+
+def check_attach(
+    parent_node: 'Node',
+    children_nodes: List['Node']
+) -> List['BusinessValidationMessage']:
+    result = []
+
+    if not children_nodes:
+        result.append(
+            _("Please select an item before adding it")
+        )
+
+    for child_node in children_nodes:
+        if child_node.node_type != NodeType.LEARNING_UNIT:
             result.extend(_validate_end_date_and_option_finality(child_node))
 
         validator = link_validator.CreateLinkValidatorList(parent_node, child_node)

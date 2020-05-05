@@ -254,11 +254,6 @@ class TestCheckAttach(SimpleTestCase):
         self.node_to_attach_1 = NodeEducationGroupYearFactory()
         self.node_to_attach_2 = NodeEducationGroupYearFactory()
 
-        patcher_load_node = mock.patch("program_management.ddd.repositories.load_node.load_by_type")
-        self.mock_load_node_by_type = patcher_load_node.start()
-        self.mock_load_node_by_type.side_effect = (self.parent_node, self.node_to_attach_1, self.node_to_attach_2)
-        self.addCleanup(patcher_load_node.stop)
-
         patcher_validate_end_date_and_option_finality = mock.patch(
             "program_management.ddd.service.attach_node_service._validate_end_date_and_option_finality"
         )
@@ -273,20 +268,25 @@ class TestCheckAttach(SimpleTestCase):
         self.mock_create_link_validtor.return_value = True
         self.addCleanup(patcher_create_link_validator_list.stop)
 
+    def test_should_call_return_error_if_no_nodes_to_attach(self):
+        result = attach_node_service.check_attach(
+            self.parent_node,
+            [],
+        )
+        self.assertIn(_("Please select an item before adding it"), result)
+
     def test_should_call_validate_end_date_and_option_finality(self):
         attach_node_service.check_attach(
-            self.parent_node.node_id,
-            [self.node_to_attach_1.node_id, self.node_to_attach_2.node_id],
-            NodeType.EDUCATION_GROUP
+            self.parent_node,
+            [self.node_to_attach_1, self.node_to_attach_2],
         )
 
         self.assertEqual(self.mock_validate_end_date_and_option_finality.call_count, 2)
 
     def test_should_call_create_link_validator_list(self):
         attach_node_service.check_attach(
-            self.parent_node.node_id,
-            [self.node_to_attach_1.node_id, self.node_to_attach_2.node_id],
-            NodeType.EDUCATION_GROUP
+            self.parent_node,
+            [self.node_to_attach_1, self.node_to_attach_2]
         )
 
         self.assertEqual(self.mock_create_link_validtor.call_count, 2)
@@ -294,9 +294,8 @@ class TestCheckAttach(SimpleTestCase):
     def test_should_return_validation_messages_if_any(self):
         self.mock_validate_end_date_and_option_finality.return_value = ["Validation error"]
         result = attach_node_service.check_attach(
-            self.parent_node.node_id,
-            [self.node_to_attach_1.node_id, self.node_to_attach_2.node_id],
-            NodeType.EDUCATION_GROUP
+            self.parent_node,
+            [self.node_to_attach_1, self.node_to_attach_2],
         )
 
         self.assertEqual(
