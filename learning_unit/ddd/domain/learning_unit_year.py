@@ -30,6 +30,8 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 
+from typing import List
+
 
 class LecturingVolume:
     def __init__(
@@ -81,6 +83,7 @@ class LearningUnitYear:
 
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
+            achievements: List['Achievement'] = None,
     ):
         self.id = id
         self.year = year
@@ -100,6 +103,7 @@ class LearningUnitYear:
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
+        self.achievements = achievements
 
     @property
     def full_title_fr(self):

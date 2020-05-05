@@ -23,42 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
-import random
 
 import factory.fuzzy
 
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.enums.proposal_type import ProposalType
-from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
+from learning_unit.ddd.domain.achievement import Achievement
 
 
-def generate_end_year(node):
-    return node.year + 10
-
-
-def generate_start_year(node):
-    return node.year + 10
-
-
-class LearningUnitYearFactory(factory.Factory):
+class AchievementFactory(factory.Factory):
 
     class Meta:
-        model = LearningUnitYear
+        model = Achievement
         abstract = False
 
-    id = factory.Sequence(lambda n: n+1)
-    acronym = factory.Sequence(lambda n: 'Code-%02d' % n)
-    common_title_fr = factory.fuzzy.FuzzyText(length=240)
-    specific_title_fr = factory.fuzzy.FuzzyText(length=240)
-    common_title_en = factory.fuzzy.FuzzyText(length=240)
-    specific_title_en = factory.fuzzy.FuzzyText(length=240)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-    start_year = factory.LazyAttribute(generate_start_year)
-    end_year = factory.LazyAttribute(generate_end_year)
-    proposal_type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
-    credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
-    status = True
-    periodicity = factory.Iterator(PeriodicityEnum.choices(), getter=operator.itemgetter(0))
-    achievements = []
+    code_name = factory.fuzzy.FuzzyText(length=100)
+    text_fr = factory.fuzzy.FuzzyText(length=240)
+    text_en = factory.fuzzy.FuzzyText(length=240)
