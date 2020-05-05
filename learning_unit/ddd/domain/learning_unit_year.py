@@ -47,6 +47,16 @@ class PracticalVolume:
         self.total_annual = total_annual
 
 
+class Entities:
+    def __init__(
+            self,
+            requirement_entity_acronym: str = None,
+            allocation_entity_acronym: str = None,
+    ):
+        self.requirement_entity_acronym = requirement_entity_acronym
+        self.allocation_entity_acronym = allocation_entity_acronym
+
+
 class LearningUnitYear:
     def __init__(
             self,
@@ -69,6 +79,9 @@ class LearningUnitYear:
 
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
+
+            requirement_entity_acronym=None,
+            allocation_entity_acronym=None,
     ):
         self.id = id
         self.year = year
@@ -88,6 +101,8 @@ class LearningUnitYear:
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
+        self.entities = Entities(requirement_entity_acronym=requirement_entity_acronym,
+                                 allocation_entity_acronym=allocation_entity_acronym)
 
     @property
     def full_title_fr(self):

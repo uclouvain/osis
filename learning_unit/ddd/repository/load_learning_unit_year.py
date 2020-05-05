@@ -28,6 +28,7 @@ from typing import List
 
 from django.db.models import F, Subquery, OuterRef
 
+from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -52,6 +53,17 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     subquery_component_pp = subquery_component.filter(
         type=PRACTICAL_EXERCISES
     )
+    subquery_entity_requirement = EntityVersion.objects.filter(
+        entity=OuterRef('learning_container_year__requirement_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
+
+    subquery_allocation_requirement = EntityVersion.objects.filter(
+        entity=OuterRef('learning_container_year__allocation_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
 
     qs = LearningUnitYearModel.objects.filter(pk__in=learning_unit_year_ids).annotate(
         specific_title_en=F('specific_title_english'),
@@ -68,6 +80,9 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         # components (volumes) data
         pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
         pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+
+        requirement_entity_acronym=Subquery(subquery_entity_requirement),
+        allocation_entity_acronym=Subquery(subquery_allocation_requirement),
 
     ).values(
         'id',
@@ -89,6 +104,9 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
 
         'pm_vol_tot',
         'pp_vol_tot',
+
+        'requirement_entity_acronym',
+        'allocation_entity_acronym',
     )
 
     return [
