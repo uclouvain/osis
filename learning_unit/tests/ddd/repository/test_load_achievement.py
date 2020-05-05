@@ -42,10 +42,10 @@ class TestLoadAchievement(TestCase):
         cls.fr_language = FrenchLanguageFactory()
         cls.achievements_en = [LearningAchievementFactory(language=cls.en_language,
                                                           text="English text {}".format(idx),
-                                                          learning_unit_year=cls.l_unit_1) for idx in range(1)]
+                                                          learning_unit_year=cls.l_unit_1) for idx in range(5)]
         cls.achievements_fr = [LearningAchievementFactory(language=cls.fr_language,
                                                           text="French text {}".format(idx),
-                                                          learning_unit_year=cls.l_unit_1) for idx in range(1)]
+                                                          learning_unit_year=cls.l_unit_1) for idx in range(5)]
 
     def test_load_achievements(self):
         results = load_achievements(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)

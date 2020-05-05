@@ -25,7 +25,6 @@
 ##############################################################################
 from django.test import SimpleTestCase
 
-from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 
 
@@ -43,11 +42,3 @@ class TestInit(SimpleTestCase):
         self.assertEqual(obj.specific_title_fr, '')
         self.assertEqual(obj.specific_title_en, '')
 
-    def test_achievements(self):
-        obj = LearningUnitYear(achievements=[Achievement(language__code='FR', text='Text1 fr'),
-                                             Achievement(language__code='EN', text='Text1 en'),
-                                             Achievement(language__code='FR', text='Text2 fr'),
-                                             Achievement(language__code='EN', text='Text2 en'),
-                                             ])
-        print('res')
-        print(obj.achievements)

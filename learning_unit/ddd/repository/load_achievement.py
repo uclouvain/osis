@@ -37,12 +37,30 @@ def load_achievements(acronym: str, year: int) -> List['Achievement']:
         learning_unit_year__acronym=acronym,
         learning_unit_year__academic_year__year=year)\
         .annotate(language_code=F('language__code'))\
-        .values('code_name', 'text', 'language_code')\
+        .values('code_name', 'text', 'language_code', 'order')\
         .order_by('order', 'language_code')
-   #TODO : ici je vois pas trop comment faire pour retourner la liste des achievements
-   # avec pour chaque record une text_fr et un text_en ???
 
-    return [
-            Achievement(**data)
-            for data in qs
-        ]
+    return _build_achievements(qs)
+
+
+def _build_achievements(qs):
+    # TODO : Je n'arrive pas à faire autrement que comme ceci
+    current_order = None
+    achievements = []
+    code_name = None
+    text_fr = None
+    text_en = None
+    for achievement_rec in qs:
+        if current_order is None:
+            current_order = achievement_rec['order']
+        if achievement_rec['order'] != current_order:
+            achievements.append(Achievement(code_name=code_name, text_fr=text_fr, text_en=text_en))
+            current_order = achievement_rec['order']
+
+        code_name = achievement_rec['code_name']
+        if achievement_rec['language_code'] == 'EN':
+            text_en = achievement_rec['text']
+        if achievement_rec['language_code'] == 'FR':
+            text_fr = achievement_rec['text']
+    achievements.append(Achievement(code_name=code_name, text_fr=text_fr, text_en=text_en))
+    return achievements

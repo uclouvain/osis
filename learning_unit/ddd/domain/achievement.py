@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
 
 
 class Achievement:
@@ -31,9 +30,10 @@ class Achievement:
     def __init__(
         self,
         code_name: str = None,
-        text: str = None,
-        language_code: str = None,
+        text_fr: str = None,
+        text_en: str = None,
     ):
+
         self.code_name = code_name
-        self.text_fr = text if language_code.upper() == settings.LANGUAGE_CODE_FR[:2].upper() else None
-        self.text_en = text if language_code.upper() == settings.LANGUAGE_CODE_EN[:2].upper() else None
+        self.text_fr = text_fr
+        self.text_en = text_en
