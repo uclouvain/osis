@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 
+from django.conf import settings
 from typing import List
 
 from base.models.learning_achievement import LearningAchievement
@@ -44,23 +46,17 @@ def load_achievements(acronym: str, year: int) -> List['Achievement']:
 
 
 def _build_achievements(qs):
-    # TODO : Je n'arrive pas à faire autrement que comme ceci
-    current_order = None
+    ue_achievements = sorted(qs, key=lambda el: el['code_name'])
     achievements = []
-    code_name = None
-    text_fr = None
-    text_en = None
-    for achievement_rec in qs:
-        if current_order is None:
-            current_order = achievement_rec['order']
-        if achievement_rec['order'] != current_order:
-            achievements.append(Achievement(code_name=code_name, text_fr=text_fr, text_en=text_en))
-            current_order = achievement_rec['order']
-
-        code_name = achievement_rec['code_name']
-        if achievement_rec['language_code'] == 'EN':
-            text_en = achievement_rec['text']
-        if achievement_rec['language_code'] == 'FR':
-            text_fr = achievement_rec['text']
-    achievements.append(Achievement(code_name=code_name, text_fr=text_fr, text_en=text_en))
+    for k, elements in itertools.groupby(ue_achievements, key=lambda el: el['code_name']):
+        text_fr = None
+        text_en = None
+        for achievement in elements:
+            if achievement['language_code'] == settings.LANGUAGE_CODE_EN[:2].upper():
+                text_en = achievement['text']
+            if achievement['language_code'] == settings.LANGUAGE_CODE_FR[:2].upper():
+                text_fr = achievement['text']
+        achievements.append(Achievement(code_name=k,
+                                        text_en=text_en,
+                                        text_fr=text_fr))
     return achievements
