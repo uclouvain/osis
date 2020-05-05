@@ -121,9 +121,11 @@ def _is_maximum_child_not_reached_for_category(self, user, education_group_year,
 def is_user_linked_to_all_scopes_of_management_entity(self, user, education_group_year):
     if education_group_year:
         user_scopes = {
-            role.entity: scope for role in self.context['role_qs'] for scope in role.scopes if hasattr(role, 'scopes')
+            entity_id: scope for role in self.context['role_qs']
+            for scope in role.scopes if hasattr(role, 'scopes')
+            for entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids()
         }
-        return user_scopes.get(education_group_year.management_entity) == Scope.ALL.value
+        return user_scopes.get(education_group_year.management_entity_id) == Scope.ALL.value
     return None
 
 

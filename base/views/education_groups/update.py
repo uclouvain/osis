@@ -206,7 +206,7 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
     has_content = len(groupelementyear_formset.queryset) > 0
-    can_change_content = request.user.has_perm('base.change_educationgrouporganization', education_group_year)
+    can_change_content = request.user.has_perm('base.change_link_data', education_group_year)
     if request.method == 'POST':
         if form_education_group_year.is_valid() and \
                 (not (has_content and can_change_content) or groupelementyear_formset.is_valid()):
@@ -234,7 +234,7 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
     coorganization_formset = None
     has_content = len(groupelementyear_formset.queryset) > 0
-    can_change_content = request.user.has_perm('base.change_educationgrouporganization', education_group_year)
+    can_change_content = request.user.has_perm('base.change_link_data', education_group_year)
     forms_valid = all(
         [form_education_group_year.is_valid(),
          not (has_content and can_change_content) or groupelementyear_formset.is_valid()]
@@ -300,7 +300,7 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to upodate form to filter on list of parents, not only on the first direct parent
     form = MiniTrainingForm(request.POST or None, instance=education_group_year, user=request.user)
-    can_change_content = request.user.has_perm('base.change_educationgrouporganization', education_group_year)
+    can_change_content = request.user.has_perm('base.change_link_data', education_group_year)
     if request.method == 'POST':
         has_content = len(groupelementyear_formset.queryset) > 0
         forms_valid = all(
