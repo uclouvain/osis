@@ -205,7 +205,6 @@ class TestAttachNodeView(TestCase):
             msg="View must call attach node service (and not another layer) "
                 "because the 'attach node' action uses multiple domain objects"
         )
-        self.assertEqual(msgs, ['Success'])
 
 
 @override_flag('education_group_update', active=True)

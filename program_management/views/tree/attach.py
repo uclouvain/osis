@@ -50,6 +50,7 @@ from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
+from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_authorized_relationship, load_node
 from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
@@ -143,9 +144,13 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
         if not elements_to_attach:
             error_messages.append(_("Please select an item before adding it"))
 
-        error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
+        error_messages.extend(_check_attach(self.node, elements_to_attach))
 
         return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
+
+    @property
+    def node(self):
+        return load_node.load_by_type(NodeType.EDUCATION_GROUP, self.kwargs.get("education_group_year_id"))
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -168,7 +173,7 @@ class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMi
         if not elements_to_attach:
             error_messages.append(_("Please select an item before adding it"))
 
-        error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
+        error_messages.extend(_check_attach(self.node_to_attach_from, elements_to_attach))
         display_error_messages(self.request, error_messages)
 
         if not error_messages:
@@ -178,8 +183,8 @@ class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMi
         return super().get(request, *args, **kwargs)
 
     @property
-    def education_group_year(self):
-        return EducationGroupYear.objects.get(id=int(self.request.GET["path"].split("|")[-1]))
+    def node_to_attach_from(self):
+        return load_node.load_by_type(NodeType.EDUCATION_GROUP, int(self.request.GET["path"].split("|")[-1]))
 
 
 class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
@@ -245,7 +250,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 
         children = fetch_elements_selected(self.request.GET, self.request.user)
 
-        messages = _check_attach(self.education_group_year, children)
+        messages = _check_attach_bis(self.education_group_year, children)
         if messages:
             display_error_messages(self.request, messages)
 
@@ -311,7 +316,16 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
         return super().form_valid(form)
 
 
-def _check_attach(parent: EducationGroupYear, elements_to_attach):
+def _check_attach(parent: Node, elements_to_attach):
+    children_types = NodeType.LEARNING_UNIT if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
+    return attach_node_service.check_attach(
+        parent.node_id,
+        [element.pk for element in elements_to_attach],
+        children_types
+    )
+
+
+def _check_attach_bis(parent: EducationGroupYear, elements_to_attach):
     children_types = NodeType.LEARNING_UNIT if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
     return attach_node_service.check_attach(
         parent.pk,
