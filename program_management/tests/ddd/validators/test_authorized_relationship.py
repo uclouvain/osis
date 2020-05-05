@@ -32,11 +32,11 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator, \
-    DetachAuthorizedRelationshipValidator
+    DetachAuthorizedRelationshipValidator, AuthorizedRelationshipLearningUnitValidator
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -121,6 +121,45 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
                         }
         self.assertIn(max_error_msg, validator.error_messages)
         self.assertEqual(len(validator.error_messages), 1)
+
+
+class TestAuthorizedRelationshipLearningUnitValidator(SimpleTestCase):
+    def test_when_parent_node_do_not_allow_learning_unit_as_children_should_be_not_valid(self):
+        root_node = NodeGroupYearFactory()
+        authorized_relationships = AuthorizedRelationshipList([
+            AuthorizedRelationshipObjectFactory(
+                parent_type=root_node.node_type,
+                child_type=root_node.node_type,
+            )
+        ])
+        tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
+        node_to_add = NodeLearningUnitYearFactory()
+        validator = AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.root_node)
+
+        self.assertFalse(validator.is_valid())
+
+        error_msg_expected = _(
+            "You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s."
+        ) % {
+            "node": node_to_add,
+            "parent": tree.root_node,
+            "type": tree.root_node.node_type
+        }
+        self.assertIn(error_msg_expected, validator.error_messages)
+
+    def test_when_parent_node_allows_learning_unit_as_children_then_should_be_valid(self):
+        root_node = NodeGroupYearFactory()
+        authorized_relationships = AuthorizedRelationshipList([
+            AuthorizedRelationshipObjectFactory(
+                parent_type=root_node.node_type,
+                child_type=NodeType.LEARNING_UNIT,
+            )
+        ])
+        tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
+        node_to_add = NodeLearningUnitYearFactory()
+        validator = AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.root_node)
+
+        self.assertTrue(validator.is_valid())
 
 
 class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):

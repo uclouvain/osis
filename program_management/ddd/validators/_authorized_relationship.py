@@ -69,10 +69,25 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
         return current_count == relation.max_count_authorized
 
 
-# Implemented from CheckAuthorizedRelationship (management.py)
 class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', node_to_attach: 'Node', position_to_attach_from: 'Node'):
+        super().__init__()
+        self.tree = tree
+        self.node_to_attach = node_to_attach
+        self.position_to_attach_from = position_to_attach_from
+
     def validate(self):
-        pass  # cf. AttachLearningUnitYearStrategy.id_valid  # TODO :: to implement !
+        if not self.tree.authorized_relationships.is_authorized(
+                self.position_to_attach_from.node_type,
+                self.node_to_attach.node_type
+        ):
+            self.add_error_message(
+                _("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
+                    "node": self.node_to_attach,
+                    "parent": self.position_to_attach_from,
+                    "type": self.position_to_attach_from.node_type
+                }
+            )
 
 
 class DetachAuthorizedRelationshipValidator(BusinessValidator):
