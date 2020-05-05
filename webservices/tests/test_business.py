@@ -76,7 +76,8 @@ class GetContactsIntroTextTestCase(TestCase):
     def setUp(self):
         self.education_group_year = EducationGroupYearFactory()
         self.node = NodeEducationGroupYearFactory(
-            node_id=self.education_group_year.id,
+            code=self.education_group_year.partial_acronym,
+            year=self.education_group_year.academic_year.year,
             node_type=self.education_group_year.education_group_type,
         )
         self.cms_label_name = business.CONTACT_INTRO_KEY
@@ -98,8 +99,9 @@ class GetContactsIntroTextTestCase(TestCase):
     def test_get_contacts_intro_text_case_no_value(self):
         education_group_year = EducationGroupYearFactory()
         node = NodeEducationGroupYearFactory(
-            node_id=education_group_year.id,
             node_type=education_group_year.education_group_type,
+            code=education_group_year.partial_acronym,
+            year=education_group_year.academic_year.year
         )
         self.assertIsNone(business.get_contacts_intro_text(node, settings.LANGUAGE_CODE_FR))
 

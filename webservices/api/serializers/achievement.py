@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, CharField, F
+from django.db.models import Case, When, CharField, F, Subquery
 from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -87,7 +88,12 @@ class AchievementsSerializer(serializers.Serializer):
 
     def get_blocs(self, obj):
         qs = EducationGroupAchievement.objects.filter(
-            education_group_year_id=self.instance.node_id
+            education_group_year_id=Subquery(
+                EducationGroupYear.objects.filter(
+                    academic_year__year=self.instance.year,
+                    partial_acronym=self.instance.code
+                ).values('id')[:1]
+            )
         )
         return AchievementSerializer(qs, many=True).data
 
@@ -109,9 +115,14 @@ class AchievementsSerializer(serializers.Serializer):
                 )
             ).get(
                 entity=OFFER_YEAR,
-                reference=self.instance.node_id,
                 language=self.context['lang'],
-                text_label__label=cms_type
+                text_label__label=cms_type,
+                reference=Subquery(
+                    EducationGroupYear.objects.filter(
+                        academic_year__year=self.instance.year,
+                        partial_acronym=self.instance.code
+                    ).values('id')[:1]
+                )
             )
             return data.text_or_none
         except TranslatedText.DoesNotExist:

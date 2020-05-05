@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Subquery
 
+from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.utils.models import get_object_or_none
@@ -80,7 +81,12 @@ def get_contacts_intro_text(node, language_code):
         text_label__label=CONTACT_INTRO_KEY,
         language=language_code,
         entity=OFFER_YEAR,
-        reference=node.node_id
+        reference=Subquery(
+            EducationGroupYear.objects.filter(
+                academic_year__year=node.year,
+                partial_acronym=node.code
+            ).values('id')[:1]
+        )
     )
     if introduction:
         return introduction.text

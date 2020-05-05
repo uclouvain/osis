@@ -51,7 +51,7 @@ class ContactsSerializerTestCase(TestCase):
             management_entity=entity,
             publication_contact_entity=entity
         )
-        cls.node = NodeEducationGroupYearFactory(node_id=cls.egy.id)
+        cls.node = NodeEducationGroupYearFactory(code=cls.egy.partial_acronym, year=now.year)
         cls.serializer = ContactsSerializer(cls.node, context={'lang': cls.language})
 
     def test_contains_expected_fields(self):

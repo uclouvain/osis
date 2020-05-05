@@ -24,10 +24,11 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, F, CharField
+from django.db.models import Case, When, F, CharField, Subquery
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
+from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion
 from base.models.enums.publication_contact_type import PublicationContactType
 from webservices.business import get_contacts_intro_text
@@ -56,13 +57,23 @@ class ContactsSerializer(serializers.Serializer):
     @staticmethod
     def get_entity(obj):
         return EntityVersion.objects.get(
-            entity__educationgroupyear__id=obj.node_id
+            entity__educationgroupyear__id=Subquery(
+                EducationGroupYear.objects.filter(
+                    academic_year__year=obj.year,
+                    partial_acronym=obj.code
+                ).values('id')[:1]
+            )
         ).acronym
 
     @staticmethod
     def get_management_entity(obj):
         return EntityVersion.objects.get(
-            entity__management_entity__id=obj.node_id
+            entity__management_entity__id=Subquery(
+                EducationGroupYear.objects.filter(
+                    academic_year__year=obj.year,
+                    partial_acronym=obj.code
+                ).values('id')[:1]
+            )
         ).acronym
 
     def get_text(self, obj):
@@ -82,7 +93,12 @@ class ContactsSerializer(serializers.Serializer):
             contact_type: ContactSerializer(
                 EducationGroupPublicationContact.objects.filter(
                     type=type_name,
-                    education_group_year_id=obj.node_id
+                    education_group_year_id=Subquery(
+                        EducationGroupYear.objects.filter(
+                            academic_year__year=self.instance.year,
+                            partial_acronym=self.instance.code
+                        ).values('id')[:1]
+                    )
                 ).annotate(
                     description_or_none=Case(
                         When(description__exact='', then=None),

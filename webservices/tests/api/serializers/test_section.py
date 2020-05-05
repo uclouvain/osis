@@ -121,8 +121,9 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
         cls.node = NodeEducationGroupYearFactory(
-            node_id=cls.egy.id,
             node_type=cls.egy.education_group_type,
+            code=cls.egy.partial_acronym,
+            year=cls.egy.academic_year.year
         )
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=cls.egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
@@ -147,7 +148,8 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
     def test_ensure_admission_condition_is_created_if_not_exists(self):
         training_wihtout_admission_condition = TrainingFactory(education_group_type__name=TrainingType.BACHELOR.name)
         node = NodeEducationGroupYearFactory(
-            node_id=training_wihtout_admission_condition.id,
+            code=training_wihtout_admission_condition.partial_acronym,
+            year=training_wihtout_admission_condition.academic_year.year,
             node_type=training_wihtout_admission_condition.education_group_type,
         )
         serializer = AdmissionConditionSectionSerializer({}, context={

@@ -26,12 +26,13 @@
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Value, CharField
+from django.db.models import Value, CharField, Subquery
 from rest_framework import serializers
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -94,7 +95,12 @@ class GeneralInformationSerializer(serializers.Serializer):
             text_label__label=section,
             language=language,
             entity=OFFER_YEAR,
-            reference=node.node_id
+            reference=Subquery(
+                EducationGroupYear.objects.filter(
+                    academic_year__year=node.year,
+                    partial_acronym=node.code
+                ).values('id')[:1]
+            )
         ).annotate(
             label=Value(self._get_correct_label_name(node, section), output_field=CharField()),
             translated_label=Value(translated_text_label.label, output_field=CharField())
