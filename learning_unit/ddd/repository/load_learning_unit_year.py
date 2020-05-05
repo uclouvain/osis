@@ -34,6 +34,14 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.specifications import Specifications
+from django.conf import settings
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from cms.models.translated_text import TranslatedText
+from django.db.models import QuerySet
+from base.models.learning_achievement import LearningAchievement
 from learning_unit.ddd.repository.load_achievement import load_achievements
 from django.conf import settings
 
@@ -90,15 +98,24 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'quadrimester',
 
         'pm_vol_tot',
-        'pp_vol_tot',
+        'pp_vol_tot'
+
     )
+    # TODO il y a qq ch ici qui coince.
+    # on peut le constater quand on exécute le test python manage.py test learning_unit.tests.ddd.repository.test_load_learning_unit_year.TestLoadLearningUnitDescriptionFiche.test_load_resume -k
+    # malheureusement je vois pas trop ce qui coince....je sais pas si c'est le test ou le query ici
+    # Pourrais-tu m'aider?
+    # Je suis partie de ce qu'il y avait dans la génération de la liste xls des ue d'une of
+    qs = _annotate_with_description_fiche_specifications(qs)
 
     results = []
 
     for learnin_unit_data in qs:
-        # TODO juste avec achievements ici?
-        luy = LearningUnitYear(**__instanciate_volume_domain_object(__convert_string_to_enum(learnin_unit_data)),
+        print('yyyyyyyyy')
+        print(learnin_unit_data)
+        luy = LearningUnitYear(**__instanciate_specific_objects(__convert_string_to_enum(learnin_unit_data)),
                                achievements=load_achievements(learnin_unit_data['acronym'], learnin_unit_data['year']))
+
         results.append(luy)
     return results
 
@@ -108,4 +125,81 @@ def __convert_string_to_enum(learn_unit_data: dict) -> dict:
     learn_unit_data['type'] = LearningContainerYearType[subtype_str]
     if learn_unit_data.get('quadrimester'):
         learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
+    print('jjj')
+    return learn_unit_data
+
+
+def _annotate_with_description_fiche_specifications(original_qs1):
+    original_qs = original_qs1
+    sq = TranslatedText.objects.filter(
+        reference=OuterRef('pk'),
+        entity=LEARNING_UNIT_YEAR)
+
+    annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
+    original_qs = original_qs.annotate(**annotations)
+
+    # annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
+    # original_qs = original_qs.annotate(**annotations)
+
+    return original_qs
+
+
+def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
+    annotations = {
+        "cms_{}".format(lbl): Subquery(
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
+        for lbl in fr_labels
+    }
+    annotations.update({
+        "cms_{}_en".format(lbl): Subquery(
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
+        for lbl in en_labels}
+    )
+    return annotations
+
+
+def _build_subquery_text_label(qs, cms_text_label, lang):
+
+    return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
+        'text')[:1]
+
+
+def __instanciate_specific_objects(learn_unit_data: dict) -> dict:
+    __instanciate_volume_domain_object(learn_unit_data)
+    __instanciate_description_fiche(learn_unit_data)
+    __instanciate_specifications(learn_unit_data)
+    return learn_unit_data
+
+
+def __instanciate_description_fiche(learn_unit_data: dict) -> dict:
+    print('__instanciate_description_fiche')
+    learn_unit_data['description_fiche'] = None
+    # print(learn_unit_data.get('cms_resume'))
+    # print(learn_unit_data.get('cms_resume_en'))
+    learn_unit_data['description_fiche'] = DescriptionFiche(
+        resume=learn_unit_data.get('cms_resume', None),
+        resume_en=learn_unit_data.get('cms_resume_en', None),
+        teaching_methods=learn_unit_data.pop('cms_teaching_methods') if learn_unit_data.get('cms_teaching_methods') else None,
+        teaching_methods_en=learn_unit_data.pop('cms_teaching_methods_en') if learn_unit_data.get('cms_teaching_methods_en') else None,
+        evaluation_methods=learn_unit_data.pop('cms_evaluation_methods') if learn_unit_data.get('cms_evaluation_methods') else None,
+        evaluation_methods_en=learn_unit_data.pop('cms_evaluation_methods_en') if learn_unit_data.get('cms_cms_evaluation_methods_enresume_en') else None,
+        other_informations=learn_unit_data.pop('cms_other_informations') if learn_unit_data.get('cms_other_informations') else None,
+        other_informations_en=learn_unit_data.pop('cms_other_informations_en') if learn_unit_data.get('cms_other_informations_en') else None,
+        online_resources=learn_unit_data.pop('cms_online_resources') if learn_unit_data.get('cms_online_resources') else None,
+        online_resources_en=learn_unit_data.pop('cms_online_resources_en') if learn_unit_data.get('cms_online_resources_en') else None,
+        bibliography=learn_unit_data.pop('cms_bibliography') if learn_unit_data.get('cms_bibliography') else None,
+        mobility=learn_unit_data.pop('cms_mobility') if learn_unit_data.get('cms_mobility') else None,
+    )
+    return learn_unit_data
+
+
+def __instanciate_specifications(learn_unit_data: dict) -> dict:
+    print('__instanciate_specifications')
+    learn_unit_data['specifications'] = None
+    learn_unit_data['specifications'] = Specifications(
+        themes_discussed=learn_unit_data.pop('cms_themes_discussed') if learn_unit_data.get('cms_themes_discussed') else None,
+        themes_discussed_en=learn_unit_data.pop('cms_themes_discussed_en') if learn_unit_data.get('cms_themes_discussed_en') else None,
+        prerequisite=learn_unit_data.pop('cms_prerequisite') if learn_unit_data.get('cms_prerequisite') else None,
+        prerequisite_en=learn_unit_data.pop('cms_prerequisite_en') if learn_unit_data.get('cms_prerequisite_en') else None,
+    )
     return learn_unit_data

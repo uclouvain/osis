@@ -31,6 +31,8 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 
 from typing import List
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.specifications import Specifications
 
 
 class LecturingVolume:
@@ -72,7 +74,10 @@ class LearningUnitYear:
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
             achievements: List['Achievement'] = None,
+            description_fiche: DescriptionFiche = None,
+            specifications: Specifications = None
     ):
+        print('ini')
         self.id = id
         self.year = year
         self.acronym = acronym
@@ -92,6 +97,8 @@ class LearningUnitYear:
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
         self.achievements = achievements
+        self.description_fiche = description_fiche
+        self.specifications = specifications
 
     @property
     def full_title_fr(self):

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,33 +23,57 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.test.utils import override_settings
 from django.test import TestCase
 
-from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from learning_unit.ddd.repository.load_achievement import load_achievements
+from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
+from cms.models.translated_text_label import TranslatedTextLabel
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
-from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from unittest import mock
 
 
-class TestLoadLearningUnitAchievements(TestCase):
+class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
-        cls.l_unit_1 = LearningUnitYearFactory()
         cls.en_language = EnglishLanguageFactory()
         cls.fr_language = FrenchLanguageFactory()
-        cls.achievements_en = [LearningAchievementFactory(language=cls.en_language,
-                                                          code_name="A_{}".format(idx),
-                                                          text="English text {}".format(idx),
-                                                          learning_unit_year=cls.l_unit_1) for idx in range(2)]
-        cls.achievements_fr = [LearningAchievementFactory(language=cls.fr_language,
-                                                          code_name="A_{}".format(idx),
-                                                          text="French text {}".format(idx),
-                                                          learning_unit_year=cls.l_unit_1) for idx in range(2)]
 
-    def test_load_learning_unit_year_init_achievements(self):
+        cls.l_unit_1 = LearningUnitYearFactory()
+        print('ID {}'.format(cls.l_unit_1.id))
 
+        text_label_lu_3 = TextLabelFactory(order=1, label='resume', entity=entity_name.LEARNING_UNIT_YEAR)
+
+        TranslatedTextFactory(text_label=text_label_lu_3,
+                              entity=entity_name.LEARNING_UNIT_YEAR,
+                              reference=cls.l_unit_1.id,
+                              language=cls.fr_language.code,
+                              text="Text fr")
+        TranslatedTextFactory(text_label=text_label_lu_3,
+                              entity=entity_name.LEARNING_UNIT_YEAR,
+                              reference=cls.l_unit_1.id,
+                              language=cls.en_language.code,
+                              text="Text en")
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
+    @mock.patch("learning_unit.ddd.repository.load_achievement.load_achievements")
+    def test_load_resume(self, mock=True):
+        print('test_load_resume')
+        print(self.l_unit_1.id)
+        for r in TranslatedTextLabel.objects.all():
+            print('for1')
+            print(r.label)
+        for r in TranslatedText.objects.all():
+            print('for2')
+            print("{} {} . referrence{}".format(r.text_label.label, r.text, r.reference))
         results = load_multiple([self.l_unit_1.id])
+        print('*********************************')
+        ##TODO resume est tj nul???
+        print(results[0].description_fiche.__dict__)
+        print('*************')
