@@ -74,8 +74,8 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         other_remark=F('learning_unit__other_remark'),
 
         # components (volumes) data
-        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
-        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
+        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
         pm_vol_q1=Subquery(subquery_component_pm.values('hourly_volume_partial_q1')),
         pp_vol_q1=Subquery(subquery_component_pp.values('hourly_volume_partial_q1')),
         pm_vol_q2=Subquery(subquery_component_pm.values('hourly_volume_partial_q2')),
