@@ -443,7 +443,7 @@ class TestIsUserLinkedToAllScopes(TestCase):
         parent_entity = EntityFactory()
         child_entity = EntityVersionFactory(parent=parent_entity).entity
         mock_get_tree.return_value = [{'entity_id': parent_entity.pk}, {'entity_id': child_entity.pk}]
-        self.education_group_year.management_entity = child_entity
+        self.education_group_year.management_entity_id = child_entity.pk
         person = FacultyManagerFactory(entity=parent_entity, with_child=True).person
         self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
         self.assertTrue(
