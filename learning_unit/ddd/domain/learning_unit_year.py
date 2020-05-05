@@ -29,6 +29,9 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from learning_unit.ddd.domain.achievement import Achievement
+
+from typing import List
 
 
 class LecturingVolume:
@@ -79,6 +82,7 @@ class LearningUnitYear:
 
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
+            achievements: List['Achievement'] = None,
 
             entities: Entities = None,
     ):
@@ -100,6 +104,7 @@ class LearningUnitYear:
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
+        self.achievements = achievements
         self.entities = entities
 
     @property

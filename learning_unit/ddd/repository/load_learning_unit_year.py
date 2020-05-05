@@ -34,6 +34,9 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+from learning_unit.ddd.repository.load_achievement import load_achievements
+from django.conf import settings
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
 
 
@@ -115,14 +118,13 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'allocation_entity_acronym',
     )
 
-    return [
-        LearningUnitYear(
-            **__instanciate_specific_objects(
-                __convert_string_to_enum(learnin_unit_data)
-            )
-        )
-        for learnin_unit_data in qs
-    ]
+    results = []
+
+    for learnin_unit_data in qs:
+        luy = LearningUnitYear(**__instanciate_specific_objects(__convert_string_to_enum(learnin_unit_data)),
+                               achievements=load_achievements(learnin_unit_data['acronym'], learnin_unit_data['year']))
+        results.append(luy)
+    return results
 
 
 def __convert_string_to_enum(learn_unit_data: dict) -> dict:

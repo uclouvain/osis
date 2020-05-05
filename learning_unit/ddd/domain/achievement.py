@@ -23,22 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
-
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
 
 
-class TestInit(SimpleTestCase):
+class Achievement:
 
-    def test_when_titles_are_none(self):
-        obj = LearningUnitYear(
-            common_title_fr=None,
-            common_title_en=None,
-            specific_title_fr=None,
-            specific_title_en=None,
-        )
-        self.assertEqual(obj.common_title_fr, '')
-        self.assertEqual(obj.common_title_en, '')
-        self.assertEqual(obj.specific_title_fr, '')
-        self.assertEqual(obj.specific_title_en, '')
+    def __init__(
+        self,
+        code_name: str = None,
+        text_fr: str = None,
+        text_en: str = None,
+    ):
 
+        self.code_name = code_name
+        self.text_fr = text_fr
+        self.text_en = text_en
