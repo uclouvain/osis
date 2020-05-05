@@ -26,6 +26,7 @@
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
@@ -58,7 +59,7 @@ from program_management.views.generic import GenericGroupElementYearMixin
 
 
 #  TODO should call check attach node before accessing this view
-class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
+class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
 
     @cached_property
@@ -114,10 +115,12 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, FormView):
         messages = formset.save()
         if BusinessValidationMessage.contains_errors(messages):
             return self.form_invalid(formset)
-        display_business_messages(self.request, messages)
         self.__clear_cache(messages)
 
         return super().form_valid(formset)
+
+    def get_success_message(self, cleaned_data):
+        return _("The content of %(acronym)s has been updated.") % {"acronym": self.parent_node}
 
     def get_success_url(self):
         return reverse('education_group_read', args=[self.root_id, self.root_id])

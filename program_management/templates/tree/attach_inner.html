@@ -34,6 +34,9 @@
                 {% csrf_token %}
                 {{ formset.management_form }}
                 {{ formset.media }}
+                {% for form in formset.forms %}
+                    {% bootstrap_form_errors form %}
+                {% endfor %}
                 {% if is_parent_a_minor_major_list_choice %}
                     <table class="table">
                         <thead>
@@ -52,7 +55,6 @@
                                 {{ form.id }}
                                 <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not form.node.is_learning_unit %}{{ form.node.title }}{% else %}-{% endif %}</td>
                                 <td>{{ form.node.code }}</td>
-
                                 <td>{% bootstrap_field form.access_condition %}</td>
                             </tr>
                         {% endfor %}
@@ -77,11 +79,6 @@
                                 {% if forloop.first %}
                                     {{ form.media }}
                                 {% endif %}
-                                <tr>
-                                    <td colspan="8">
-                                        {% bootstrap_form_errors form %}
-                                    </td>
-                                </tr>
                                 <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                                     {{ form.id }}
                                     <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not form.node.is_learning_unit %}{{ form.node.title }}{% else %}-{% endif %}</td>

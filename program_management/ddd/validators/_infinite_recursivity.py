@@ -54,4 +54,6 @@ class InfiniteRecursivityLinkValidator(BusinessValidator):
 
     def validate(self):
         if self.node_to_add == self.parent_node:
-            self.add_error_message(_('Cannot attach a node to himself.'))
+            self.add_error_message(
+                _('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_add}
+            )
