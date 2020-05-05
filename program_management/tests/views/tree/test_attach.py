@@ -48,7 +48,8 @@ from base.utils.cache import ElementCache
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
+    NodeGroupYearFactory
 from program_management.views.tree.attach import AttachMultipleNodesView
 
 
@@ -80,13 +81,13 @@ class TestAttachNodeView(TestCase):
         self.fetch_from_cache_patcher.start()
         self.addCleanup(self.fetch_from_cache_patcher.stop)
 
-        self.parent_patcher = mock.patch.object(
+        self.node_to_attach_from_patcher = mock.patch.object(
             AttachMultipleNodesView,
-            'parent_node',
+            'node_to_attach_from',
             return_value=NodeEducationGroupYearFactory()
         )
-        self.parent_patcher.start()
-        self.addCleanup(self.parent_patcher.stop)
+        self.node_to_attach_from_patcher.start()
+        self.addCleanup(self.node_to_attach_from_patcher.stop)
 
     def setUpTreeData(self):
         """
@@ -122,7 +123,7 @@ class TestAttachNodeView(TestCase):
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
     def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
         subgroup_to_attach = GroupFactory(
             academic_year__year=self.tree.root_node.year,
@@ -141,7 +142,7 @@ class TestAttachNodeView(TestCase):
         self.assertEquals(len(response.context['formset'].forms), 1)
         self.assertIsInstance(response.context['formset'].forms[0], AttachNodeForm)
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
     def test_get_method_when_multiple_education_group_year_element_are_selected(self, mock_cache_elems):
         subgroup_to_attach = GroupFactory(
             academic_year__year=self.tree.root_node.year,
@@ -163,7 +164,7 @@ class TestAttachNodeView(TestCase):
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
         self.assertEquals(len(response.context['formset'].forms), 2)
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
     @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid')
     def test_post_method_case_formset_invalid(self, mock_formset_is_valid, mock_cache_elems):
         subgroup_to_attach = GroupFactory(
@@ -184,14 +185,11 @@ class TestAttachNodeView(TestCase):
     @mock.patch('program_management.ddd.service.attach_node_service.attach_node')
     @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
     @mock.patch.object(AttachNodeForm, 'is_valid')
-    @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
     def test_post_method_case_formset_valid(self, mock_cache_elems, mock_form_valid, mock_service):
         mock_form_valid.return_value = True
         mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
-        subgroup_to_attach = GroupFactory(
-            academic_year__year=self.tree.root_node.year,
-            education_group_type__name=GroupType.SUB_GROUP.name,
-        )
+        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
         mock_cache_elems.return_value = [subgroup_to_attach]
 
         # To path :  BIR1BA ---> LBIR101G

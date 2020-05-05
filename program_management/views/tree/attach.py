@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union, List
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -39,6 +40,7 @@ from django.views import View
 from django.views.generic import RedirectView, CreateView, FormView, TemplateView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
+from base.models import authorized_relationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -63,42 +65,32 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
     template_name = "tree/attach_inner.html"
 
     @cached_property
-    def root_id(self):
-        return self.kwargs["root_id"]
+    def node_to_attach_from(self):
+        node_id = int(self.request.GET["path"].split("|")[-1])
+        return load_node.load_by_type(NodeType.EDUCATION_GROUP, node_id)
 
     @cached_property
-    def parent_node(self):
-        parent_node_id = int(self.request.GET["path"].split("|")[-1])
-        return load_node.load_by_type(NodeType.EDUCATION_GROUP, parent_node_id)
-
-    @cached_property
-    def elements_to_attach(self):
-        return management.fetch_elements_selected(self.request.GET, self.request.user)
+    def nodes_to_attach(self) -> List[Node]:
+        return management.fetch_nodes_selected(self.request.GET, self.request.user)
 
     def get_form_class(self):
-        return formset_factory(
-            form=attach_form_factory,
-            formset=AttachNodeFormSet,
-            extra=len(self.elements_to_attach)
-        )
+        return formset_factory(form=attach_form_factory, formset=AttachNodeFormSet, extra=len(self.nodes_to_attach))
 
-    def get_form_kwargs(self):
-        formset_kwargs = []
+    def get_form_kwargs(self) -> List[dict]:
         authorized_relationships = load_authorized_relationship.load()
-        if not self.elements_to_attach:
-            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
-        for idx, element in enumerate(self.elements_to_attach):
-            child_node = load_node.load_by_type(
-                NodeType.EDUCATION_GROUP if isinstance(element, EducationGroupYear) else NodeType.LEARNING_UNIT,
-                element.pk
-            )
-            formset_kwargs.append({
-                'parent_node': self.parent_node,
-                'child_node': child_node,
-                'to_path': self.request.GET['path'],
-                'authorized_relationship': authorized_relationships
-            })
-        return formset_kwargs
+        return [self._get_form_kwargs(authorized_relationships, node_obj) for node_obj in self.nodes_to_attach]
+
+    def _get_form_kwargs(
+            self,
+            authorized_relationships: authorized_relationship.AuthorizedRelationshipList,
+            node_to_attach: Node
+    ) -> dict:
+        return {
+            'parent_node': self.node_to_attach_from,
+            'child_node': node_to_attach,
+            'to_path': self.request.GET['path'],
+            'authorized_relationship': authorized_relationships
+        }
 
     def get_form(self, form_class=None):
         if form_class is None:
@@ -108,25 +100,25 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data["formset"] = context_data["form"]
-        context_data["is_parent_a_minor_major_list_choice"] = self.parent_node.is_minor_major_list_choice()
+        context_data["is_parent_a_minor_major_list_choice"] = self.node_to_attach_from.is_minor_major_list_choice()
+        if not self.nodes_to_attach:
+            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data
 
     def form_valid(self, formset: AttachNodeFormSet):
         messages = formset.save()
         if BusinessValidationMessage.contains_errors(messages):
             return self.form_invalid(formset)
-        self.__clear_cache(messages)
+        ElementCache(self.request.user).clear()
 
         return super().form_valid(formset)
 
     def get_success_message(self, cleaned_data):
-        return _("The content of %(acronym)s has been updated.") % {"acronym": self.parent_node}
+        return _("The content of %(acronym)s has been updated.") % {"acronym": self.node_to_attach_from}
 
     def get_success_url(self):
-        return reverse('education_group_read', args=[self.root_id, self.root_id])
-
-    def __clear_cache(self, messages):
-        ElementCache(self.request.user).clear()
+        root_id = self.kwargs["root_id"]
+        return reverse('education_group_read', args=[root_id, root_id])
 
 
 class AttachCheckView(GenericGroupElementYearMixin, View):

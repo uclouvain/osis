@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import Counter
+from typing import List, Union
 
 from django.db.models import Count, Q
 from django.utils.functional import cached_property
@@ -36,6 +37,8 @@ from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
+from program_management.ddd.domain import node
+from program_management.ddd.repositories import load_node
 
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
@@ -50,6 +53,19 @@ def fetch_source_link(request_parameters, user):
             source_link = GroupElementYear.objects.select_related('parent').get(pk=selected_element['source_link_id'])
 
     return source_link
+
+
+def fetch_nodes_selected(request_parameters, user) -> List[node.Node]:
+    selected_data = _get_elements_selected(request_parameters, user)
+
+    nodes_selected = []
+    for selected_element in selected_data:
+        if selected_element['modelname'] == LEARNING_UNIT_YEAR:
+            nodes_selected.append(load_node.load_node_learning_unit_year(selected_element["id"]))
+        elif selected_element['modelname'] == EDUCATION_GROUP_YEAR:
+            nodes_selected.append(load_node.load_node_education_group_year(selected_element['id']))
+
+    return nodes_selected
 
 
 # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
