@@ -1,5 +1,6 @@
 import mock
 from django.test import TestCase, override_settings
+from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -431,6 +432,21 @@ class TestIsUserLinkedToAllScopes(TestCase):
         person = FacultyManagerFactory(entity=self.education_group_year.management_entity, scopes=['OTHER']).person
         self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
         self.assertFalse(
+            predicates.is_user_linked_to_all_scopes_of_management_entity(
+                person.user,
+                self.education_group_year
+            )
+        )
+
+    @patch('base.models.entity_version.EntityVersionQuerySet.get_tree')
+    def test_case_is_linked_to_all_scopes_of_child_entities(self, mock_get_tree):
+        parent_entity = EntityFactory()
+        child_entity = EntityVersionFactory(parent=parent_entity).entity
+        mock_get_tree.return_value = [{'entity_id': parent_entity.pk}, {'entity_id': child_entity.pk}]
+        self.education_group_year.management_entity = child_entity
+        person = FacultyManagerFactory(entity=parent_entity, with_child=True).person
+        self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
+        self.assertTrue(
             predicates.is_user_linked_to_all_scopes_of_management_entity(
                 person.user,
                 self.education_group_year
