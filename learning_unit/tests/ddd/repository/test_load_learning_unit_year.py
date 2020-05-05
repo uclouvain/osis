@@ -53,26 +53,3 @@ class TestLoadLearningUnitEntities(TestCase):
         results = load_multiple([self.l_unit_1.id])
         self.assertEqual(results[0].entities.requirement_entity_acronym, self.requirement_entity_version.acronym)
         self.assertEqual(results[0].entities.allocation_entity_acronym, self.allocation_entity_version.acronym)
-
-
-class TestLoadLearningUnitEntities(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
-
-        cls.requirement_entity_version = EntityVersionFactory(acronym='DRT',
-                                                              start_date=cls.academic_year.start_date)
-        cls.allocation_entity_version = EntityVersionFactory(acronym='FIAL',
-                                                             start_date=cls.academic_year.start_date)
-        cls.l_unit_1 = LearningUnitYearFactory(
-            academic_year=cls.academic_year,
-            learning_container_year__academic_year=cls.academic_year,
-            learning_container_year__requirement_entity=cls.requirement_entity_version.entity,
-            learning_container_year__allocation_entity=cls.allocation_entity_version.entity,
-        )
-
-    def test_load_learning_unit_year_init_entities(self):
-        results = load_multiple([self.l_unit_1.id])
-        self.assertEqual(results[0].entities.requirement_entity_acronym, self.requirement_entity_version.acronym)
-        self.assertEqual(results[0].entities.allocation_entity_acronym, self.allocation_entity_version.acronym)
