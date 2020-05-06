@@ -32,6 +32,11 @@ msgstr ""
 msgid "Start academic year"
 msgstr ""
 
+#, python-format
+msgctxt "female"
+msgid "The user does not have permission to delete a %(category)s."
+msgstr ""
+
 msgid "The user is not allowed to create/modify this type of education group"
 msgstr ""
 
