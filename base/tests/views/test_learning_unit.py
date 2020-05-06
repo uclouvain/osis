@@ -291,6 +291,9 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "learning_unit/simple/creation_partim.html")
         self.assertEqual(response.status_code, HttpResponse.status_code)
+        context = response.context
+        self.assertEqual(context['learning_unit_year'], self.learning_unit_year_full)
+        self.assertTrue(context['partim_creation'])
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
                 side_effect=lambda *args: True)
