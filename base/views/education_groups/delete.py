@@ -52,11 +52,11 @@ class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependenci
     education_group_years = []
 
     def get_permission_required(self):
-        return {
+        return ({
             education_group_categories.TRAINING: 'base.delete_all_training',
             education_group_categories.MINI_TRAINING: 'base.delete_all_minitraining',
             education_group_categories.GROUP: 'base.delete_all_group',
-        }[self.get_object().education_group_type.category]
+        }[self.get_object().education_group_type.category],)
 
     def get_protected_messages(self):
         """This function will return all protected message ordered by year"""
