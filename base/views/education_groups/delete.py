@@ -26,17 +26,17 @@
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.business.education_groups import delete
-from base.models.education_group import EducationGroup
+from base.models.education_group_year import EducationGroupYear
 from base.views import common
 from base.views.mixins import DeleteViewWithDependencies
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependencies):
     # DeleteView
-    model = EducationGroup
+    model = EducationGroupYear
     success_url = reverse_lazy('education_groups')
     pk_url_kwarg = "education_group_year_id"
     template_name = "education_group/delete.html"
@@ -53,7 +53,8 @@ class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependenci
 
     def get_protected_messages(self):
         """This function will return all protected message ordered by year"""
-        self.education_group_years = delete.get_education_group_years_to_delete(self.get_object())
+        education_group = self.get_object().education_group
+        self.education_group_years = delete.get_education_group_years_to_delete(education_group)
         protected_messages = []
         for education_group_year in self.education_group_years:
             protected_message = delete.get_protected_messages_by_education_group_year(education_group_year)
@@ -65,7 +66,8 @@ class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependenci
         return protected_messages
 
     def delete(self, request, *args, **kwargs):
-        for education_group_year in delete.get_education_group_years_to_delete(self.get_object()):
+        education_group = self.get_object().education_group
+        for education_group_year in delete.get_education_group_years_to_delete(education_group):
             delete.start(education_group_year)
         common.display_success_messages(request, self.success_message)
         return JsonResponse({'success': True, 'success_url': self.success_url})
