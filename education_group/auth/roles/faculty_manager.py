@@ -43,18 +43,40 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_not_orphan_group &
                 predicates.is_program_edition_period_open &
                 predicates.is_maximum_child_not_reached_for_group_category,
+            # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,
+            'base.delete_all_training':
+                predicates.are_all_trainings_removable,
+            'base.delete_all_minitraining':
+                predicates.are_all_minitrainings_removable &
+                predicates.is_program_edition_period_open,
+            'base.delete_all_group':
+                predicates.are_all_groups_removable &
+                predicates.is_program_edition_period_open,
             'base.delete_all_educationgroup':
                 predicates.are_all_education_group_years_removable &
                 predicates.is_program_edition_period_open,
+            'base.delete_training':
+                osis_role_predicates.always_deny(
+                    message=pgettext("female", "The user does not have permission to delete a %(category)s.") % {
+                        "category": Categories.TRAINING.value
+                    }
+                ),
+            'base.delete_minitraining':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_user_attached_to_management_entity,
+            'base.delete_group':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_user_attached_to_management_entity,
             'base.delete_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_attached_to_management_entity &
-                predicates.is_education_group_category_mini_training_or_group,
+                predicates.is_user_attached_to_management_entity,
             'base.can_attach_node':
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &

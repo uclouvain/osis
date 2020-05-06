@@ -14,10 +14,32 @@ from osis_role.errors import predicate_failed_msg, set_permission_error, get_per
 @predicate(bind=True)
 def are_all_education_group_years_removable(self, user, education_group_year):
     education_group_years = education_group_year.education_group.educationgroupyear_set.all()
-    perm = "base.delete_educationgroup"
+    return _are_all_removable(self, user, education_group_years, 'delete_educationgroup')
+
+
+@predicate(bind=True)
+def are_all_trainings_removable(self, user, education_group_year):
+    trainings = education_group_year.education_group.educationgroupyear_set.all()
+    return _are_all_removable(self, user, trainings, 'base.delete_training')
+
+
+@predicate(bind=True)
+def are_all_minitrainings_removable(self, user, education_group_year):
+    print('minitraining')
+    minitrainings = education_group_year.education_group.educationgroupyear_set.all()
+    return _are_all_removable(self, user, minitrainings, 'base.delete_minitraining')
+
+
+@predicate(bind=True)
+def are_all_groups_removable(self, user, education_group_year):
+    groups = education_group_year.education_group.educationgroupyear_set.all()
+    return _are_all_removable(self, user, groups, 'base.delete_group')
+
+
+def _are_all_removable(self, user, objects, perm):
     result = all(
-        user.has_perm(perm, education_group_year)
-        for education_group_year in education_group_years
+        user.has_perm(perm, object)
+        for object in objects
     )
     # transfers last perm error message
     message = get_permission_error(user, perm)
@@ -145,14 +167,4 @@ def is_child_education_group_type_not_minor_or_major(self, user, egy=None):
     if egy:
         excluded_types = (GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name)
         return egy.education_group_type.name not in excluded_types and not egy.is_minor
-    return None
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_("Education group must be mini-training or group"))
-def is_education_group_category_mini_training_or_group(self, user, education_group_year=None):
-    if education_group_year:
-        return education_group_year.education_group_type.category in [
-            Categories.MINI_TRAINING.name, Categories.GROUP.name
-        ]
     return None

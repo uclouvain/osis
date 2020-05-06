@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import delete
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.views import common
 from base.views.mixins import DeleteViewWithDependencies
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -41,7 +42,6 @@ class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependenci
     pk_url_kwarg = "education_group_year_id"
     template_name = "education_group/delete.html"
     context_object_name = "education_group"
-    permission_required = 'base.delete_all_educationgroup'
 
     # DeleteViewWithDependencies
     success_message = _("The education group has been deleted.")
@@ -50,6 +50,13 @@ class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependenci
     # FlagMixin
     flag = 'education_group_delete'
     education_group_years = []
+
+    def get_permission_required(self):
+        return {
+            education_group_categories.TRAINING: 'base.delete_all_training',
+            education_group_categories.MINI_TRAINING: 'base.delete_all_minitraining',
+            education_group_categories.GROUP: 'base.delete_all_group',
+        }[self.get_object().education_group_type.category]
 
     def get_protected_messages(self):
         """This function will return all protected message ordered by year"""
