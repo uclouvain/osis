@@ -56,9 +56,6 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.delete_all_group':
                 predicates.are_all_groups_removable &
                 predicates.is_program_edition_period_open,
-            'base.delete_all_educationgroup':
-                predicates.are_all_education_group_years_removable &
-                predicates.is_program_edition_period_open,
             'base.delete_training':
                 osis_role_predicates.always_deny(
                     message=pgettext("female", "The user does not have permission to delete a %(category)s.") % {
@@ -70,10 +67,6 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,
             'base.delete_group':
-                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_education_group_type_authorized_according_to_user_scope &
-                predicates.is_user_attached_to_management_entity,
-            'base.delete_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,

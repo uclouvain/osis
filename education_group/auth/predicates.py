@@ -12,12 +12,6 @@ from osis_role.errors import predicate_failed_msg, set_permission_error, get_per
 
 
 @predicate(bind=True)
-def are_all_education_group_years_removable(self, user, education_group_year):
-    education_group_years = education_group_year.education_group.educationgroupyear_set.all()
-    return _are_all_removable(self, user, education_group_years, 'delete_educationgroup')
-
-
-@predicate(bind=True)
 def are_all_trainings_removable(self, user, education_group_year):
     trainings = education_group_year.education_group.educationgroupyear_set.all()
     return _are_all_removable(self, user, trainings, 'base.delete_training')
@@ -25,7 +19,6 @@ def are_all_trainings_removable(self, user, education_group_year):
 
 @predicate(bind=True)
 def are_all_minitrainings_removable(self, user, education_group_year):
-    print('minitraining')
     minitrainings = education_group_year.education_group.educationgroupyear_set.all()
     return _are_all_removable(self, user, minitrainings, 'base.delete_minitraining')
 

@@ -38,13 +38,26 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_group':
                 predicates.is_not_orphan_group &
                 predicates.is_maximum_child_not_reached_for_group_category,
+            # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,
-            'base.delete_all_educationgroup':
-                predicates.are_all_education_group_years_removable,
-            'base.delete_educationgroup':
+            'base.delete_all_training':
+                predicates.are_all_trainings_removable,
+            'base.delete_all_minitraining':
+                predicates.are_all_minitrainings_removable,
+            'base.delete_all_group':
+                predicates.are_all_groups_removable,
+            'base.delete_training':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_user_attached_to_management_entity,
+            'base.delete_minitraining':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
+                predicates.is_user_attached_to_management_entity,
+            'base.delete_group':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_user_attached_to_management_entity,
