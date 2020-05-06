@@ -2,6 +2,7 @@ import mock
 from django.test import TestCase, override_settings
 from mock import patch
 
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
@@ -452,3 +453,38 @@ class TestIsUserLinkedToAllScopes(TestCase):
                 self.education_group_year
             )
         )
+
+
+class TestIsEducationGroupCategoryMiniTrainingOrGroup(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+
+    def setUp(self):
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def _test_is_education_group_category(self, category, expected):
+        person = FacultyManagerFactory(entity=self.education_group_year.management_entity).person
+        self.education_group_year.education_group_type.category = category
+        self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
+        self.assertEqual(
+            predicates.is_education_group_category_mini_training_or_group(
+                person.user,
+                self.education_group_year
+            ), expected
+        )
+
+    def test_case_is_mini_training_or_group(self):
+        self._test_is_education_group_category(Categories.MINI_TRAINING.name, True)
+        self._test_is_education_group_category(Categories.GROUP.name, True)
+
+    def test_case_is_not_mini_training_or_group(self):
+        self._test_is_education_group_category(Categories.TRAINING.name, False)
