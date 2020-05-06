@@ -39,8 +39,16 @@ from django.conf import settings
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
-    learn_unit_data['lecturing_volume'] = LecturingVolume(total_annual=learn_unit_data.pop('pm_vol_tot'))
-    learn_unit_data['practical_volume'] = PracticalVolume(total_annual=learn_unit_data.pop('pp_vol_tot'))
+    learn_unit_data['lecturing_volume'] = LecturingVolume(total_annual=learn_unit_data.pop('pm_vol_tot'),
+                                                          first_quadrimester=learn_unit_data.pop('pm_vol_q1'),
+                                                          second_quadrimester=learn_unit_data.pop('pm_vol_q2'),
+                                                          classes_count=learn_unit_data.pop('pm_classes'),
+                                                          )
+    learn_unit_data['practical_volume'] = PracticalVolume(total_annual=learn_unit_data.pop('pp_vol_tot'),
+                                                          first_quadrimester=learn_unit_data.pop('pp_vol_q1'),
+                                                          second_quadrimester=learn_unit_data.pop('pp_vol_q2'),
+                                                          classes_count=learn_unit_data.pop('pp_classes'),
+                                                          )
     return learn_unit_data
 
 
@@ -68,8 +76,14 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         other_remark=F('learning_unit__other_remark'),
 
         # components (volumes) data
-        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
-        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
+        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
+        pm_vol_q1=Subquery(subquery_component_pm.values('hourly_volume_partial_q1')),
+        pp_vol_q1=Subquery(subquery_component_pp.values('hourly_volume_partial_q1')),
+        pm_vol_q2=Subquery(subquery_component_pm.values('hourly_volume_partial_q2')),
+        pp_vol_q2=Subquery(subquery_component_pp.values('hourly_volume_partial_q2')),
+        pm_classes=Subquery(subquery_component_pm.values('planned_classes')),
+        pp_classes=Subquery(subquery_component_pp.values('planned_classes')),
 
     ).values(
         'id',
@@ -91,6 +105,12 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
 
         'pm_vol_tot',
         'pp_vol_tot',
+        'pm_vol_q1',
+        'pp_vol_q1',
+        'pm_vol_q2',
+        'pp_vol_q2',
+        'pm_classes',
+        'pp_classes',
     )
 
     results = []

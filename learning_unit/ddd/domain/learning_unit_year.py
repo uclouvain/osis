@@ -37,16 +37,28 @@ class LecturingVolume:
     def __init__(
         self,
         total_annual: Decimal = None,
+        first_quadrimester: Decimal = None,
+        second_quadrimester: Decimal = None,
+        classes_count: int = None,
     ):
         self.total_annual = total_annual
+        self.first_quadrimester = first_quadrimester
+        self.second_quadrimester = second_quadrimester
+        self.classes_count = classes_count
 
 
 class PracticalVolume:
     def __init__(
             self,
             total_annual: Decimal = None,
+            first_quadrimester: Decimal = None,
+            second_quadrimester: Decimal = None,
+            classes_count: int = None,
     ):
         self.total_annual = total_annual
+        self.first_quadrimester = first_quadrimester
+        self.second_quadrimester = second_quadrimester
+        self.classes_count = classes_count
 
 
 class LearningUnitYear:
