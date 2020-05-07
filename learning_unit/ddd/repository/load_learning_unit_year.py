@@ -45,6 +45,20 @@ from django.db.models import QuerySet
 from learning_unit.ddd.repository.load_achievement import load_achievements
 
 
+def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
+    learn_unit_data['lecturing_volume'] = LecturingVolume(total_annual=learn_unit_data.pop('pm_vol_tot'),
+                                                          first_quadrimester=learn_unit_data.pop('pm_vol_q1'),
+                                                          second_quadrimester=learn_unit_data.pop('pm_vol_q2'),
+                                                          classes_count=learn_unit_data.pop('pm_classes'),
+                                                          )
+    learn_unit_data['practical_volume'] = PracticalVolume(total_annual=learn_unit_data.pop('pp_vol_tot'),
+                                                          first_quadrimester=learn_unit_data.pop('pp_vol_q1'),
+                                                          second_quadrimester=learn_unit_data.pop('pp_vol_q2'),
+                                                          classes_count=learn_unit_data.pop('pp_classes'),
+                                                          )
+    return learn_unit_data
+
+
 def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']:
     subquery_component = LearningComponentYear.objects.filter(
         learning_unit_year_id=OuterRef('pk')
@@ -128,39 +142,31 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     results = []
 
     for learning_unit_data in qs:
-        learning_unit_data = __convert_string_to_enum(learning_unit_data)
         luy = LearningUnitYear(
-            lecturing_volume=LecturingVolume(total_annual=learning_unit_data.pop('pm_vol_tot'),
-                                             first_quadrimester=learning_unit_data.pop('pm_vol_q1'),
-                                             second_quadrimester=learning_unit_data.pop('pm_vol_q2'),
-                                             classes_count=learning_unit_data.pop('pm_classes')),
-            practical_volume=PracticalVolume(total_annual=learning_unit_data.pop('pp_vol_tot'),
-                                             first_quadrimester=learning_unit_data.pop('pp_vol_q1'),
-                                             second_quadrimester=learning_unit_data.pop('pp_vol_q2'),
-                                             classes_count=learning_unit_data.pop('pp_classes')),
+            **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
-                    resume=learning_unit_data.get('cms_resume'),
-                    resume_en=learning_unit_data.get('cms_resume_en'),
-                    teaching_methods=learning_unit_data.get('cms_teaching_methods'),
-                    teaching_methods_en=learning_unit_data.get('cms_teaching_methods_en'),
-                    evaluation_methods=learning_unit_data.get('cms_evaluation_methods'),
-                    evaluation_methods_en=learning_unit_data.get('cms_evaluation_methods_en'),
-                    other_informations=learning_unit_data.get('cms_other_informations'),
-                    other_informations_en=learning_unit_data.get('cms_other_informations_en'),
-                    online_resources=learning_unit_data.get('cms_online_resources'),
-                    online_resources_en=learning_unit_data.get('cms_online_resources_en'),
-                    bibliography=learning_unit_data.get('cms_bibliography'),
-                    mobility=learning_unit_data.get('cms_mobility')
+                    resume=learning_unit_data.pop('cms_resume'),
+                    resume_en=learning_unit_data.pop('cms_resume_en'),
+                    teaching_methods=learning_unit_data.pop('cms_teaching_methods'),
+                    teaching_methods_en=learning_unit_data.pop('cms_teaching_methods_en'),
+                    evaluation_methods=learning_unit_data.pop('cms_evaluation_methods'),
+                    evaluation_methods_en=learning_unit_data.pop('cms_evaluation_methods_en'),
+                    other_informations=learning_unit_data.pop('cms_other_informations'),
+                    other_informations_en=learning_unit_data.pop('cms_other_informations_en'),
+                    online_resources=learning_unit_data.pop('cms_online_resources'),
+                    online_resources_en=learning_unit_data.pop('cms_online_resources_en'),
+                    bibliography=learning_unit_data.pop('cms_bibliography'),
+                    mobility=learning_unit_data.pop('cms_mobility')
                 ),
             specifications=Specifications(
-                themes_discussed=learning_unit_data.get('cms_themes_discussed'),
-                themes_discussed_en=learning_unit_data.get('cms_themes_discussed_en'),
-                prerequisite=learning_unit_data.get('cms_prerequisite'),
-                prerequisite_en=learning_unit_data.get('cms_prerequisite_en')
-            )
+                themes_discussed=learning_unit_data.pop('cms_themes_discussed'),
+                themes_discussed_en=learning_unit_data.pop('cms_themes_discussed_en'),
+                prerequisite=learning_unit_data.pop('cms_prerequisite'),
+                prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
+                ),
             )
 
         results.append(luy)
