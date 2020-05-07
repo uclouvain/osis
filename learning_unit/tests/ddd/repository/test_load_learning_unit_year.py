@@ -28,8 +28,42 @@ from django.test import TestCase
 
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
+    PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
+
+
+class TestLoadLearningUnitVolumes(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+
+        cls.l_unit_1 = LearningUnitYearFactory()
+        cls.practical_volume = PracticalLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
+                                                                     hourly_volume_total_annual=20,
+                                                                     hourly_volume_partial_q1=15,
+                                                                     hourly_volume_partial_q2=5,
+                                                                     planned_classes=1
+                                                                     )
+        cls.lecturing_volume = LecturingLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
+                                                                     hourly_volume_total_annual=40,
+                                                                     hourly_volume_partial_q1=20,
+                                                                     hourly_volume_partial_q2=20,
+                                                                     planned_classes=2
+                                                                     )
+
+    def test_load_learning_unit_year_init_volumes(self):
+        results = load_multiple([self.l_unit_1.id])
+
+        self._assert_volume(results[0].practical_volume, self.practical_volume)
+        self._assert_volume(results[0].lecturing_volume, self.lecturing_volume)
+
+    def _assert_volume(self, volumes, expected):
+        self.assertEqual(volumes.total_annual, expected.hourly_volume_total_annual)
+        self.assertEqual(volumes.first_quadrimester, expected.hourly_volume_partial_q1)
+        self.assertEqual(volumes.second_quadrimester, expected.hourly_volume_partial_q2)
+        self.assertEqual(volumes.classes_count, expected.planned_classes)
 
 
 class TestLoadLearningUnitEntities(TestCase):
