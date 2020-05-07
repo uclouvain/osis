@@ -48,9 +48,9 @@ class DescriptionFiche:
         self.teaching_methods_en = teaching_methods_en
         self.evaluation_methods = evaluation_methods
         self.evaluation_methods_en = evaluation_methods_en
-        self.other_informations= other_informations
+        self.other_informations = other_informations
         self.other_informations_en = other_informations_en
         self.online_resources = online_resources
         self.online_resources_en = online_resources_en
-        self.bibliography: str = bibliography
-        self.mobility: str = mobility
+        self.bibliography = bibliography
+        self.mobility = mobility
