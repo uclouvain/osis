@@ -23,18 +23,77 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
+    PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
 
 LANGUAGE_EN = "en"
 LANGUAGE_FR = "fr-be"
+
+
+class TestLoadLearningUnitVolumes(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+
+        cls.l_unit_1 = LearningUnitYearFactory()
+        cls.practical_volume = PracticalLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
+                                                                     hourly_volume_total_annual=20,
+                                                                     hourly_volume_partial_q1=15,
+                                                                     hourly_volume_partial_q2=5,
+                                                                     planned_classes=1
+                                                                     )
+        cls.lecturing_volume = LecturingLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
+                                                                     hourly_volume_total_annual=40,
+                                                                     hourly_volume_partial_q1=20,
+                                                                     hourly_volume_partial_q2=20,
+                                                                     planned_classes=2
+                                                                     )
+
+    def test_load_learning_unit_year_init_volumes(self):
+        results = load_multiple([self.l_unit_1.id])
+        self._assert_volume(results[0].practical_volume, self.practical_volume)
+        self._assert_volume(results[0].lecturing_volume, self.lecturing_volume)
+
+    def _assert_volume(self, volumes, expected):
+        self.assertEqual(volumes.total_annual, expected.hourly_volume_total_annual)
+        self.assertEqual(volumes.first_quadrimester, expected.hourly_volume_partial_q1)
+        self.assertEqual(volumes.second_quadrimester, expected.hourly_volume_partial_q2)
+        self.assertEqual(volumes.classes_count, expected.planned_classes)
+
+
+class TestLoadLearningUnitEntities(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+
+        cls.requirement_entity_version = EntityVersionFactory(acronym='DRT',
+                                                              start_date=cls.academic_year.start_date)
+        cls.allocation_entity_version = EntityVersionFactory(acronym='FIAL',
+                                                             start_date=cls.academic_year.start_date)
+        cls.l_unit_1 = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year,
+            learning_container_year__requirement_entity=cls.requirement_entity_version.entity,
+            learning_container_year__allocation_entity=cls.allocation_entity_version.entity,
+        )
+
+    def test_load_learning_unit_year_init_entities(self):
+        results = load_multiple([self.l_unit_1.id])
+        self.assertEqual(results[0].entities.requirement_entity_acronym, self.requirement_entity_version.acronym)
+        self.assertEqual(results[0].entities.allocation_entity_acronym, self.allocation_entity_version.acronym)
 
 
 class TestLoadLearningUnitDescriptionFiche(TestCase):

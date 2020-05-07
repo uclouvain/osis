@@ -26,14 +26,16 @@
 
 from typing import List
 
+from django.conf import settings
 from django.db.models import F, Subquery, OuterRef
 
+from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.specifications import Specifications
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
@@ -41,13 +43,6 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from django.db.models import QuerySet
 from learning_unit.ddd.repository.load_achievement import load_achievements
-from django.conf import settings
-
-
-def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
-    learn_unit_data['lecturing_volume'] = LecturingVolume(total_annual=learn_unit_data.pop('pm_vol_tot'))
-    learn_unit_data['practical_volume'] = PracticalVolume(total_annual=learn_unit_data.pop('pp_vol_tot'))
-    return learn_unit_data
 
 
 def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']:
@@ -60,6 +55,17 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     subquery_component_pp = subquery_component.filter(
         type=PRACTICAL_EXERCISES
     )
+    subquery_entity_requirement = EntityVersion.objects.filter(
+        entity=OuterRef('learning_container_year__requirement_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
+
+    subquery_allocation_requirement = EntityVersion.objects.filter(
+        entity=OuterRef('learning_container_year__allocation_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
 
     qs = LearningUnitYearModel.objects.filter(pk__in=learning_unit_year_ids).annotate(
         specific_title_en=F('specific_title_english'),
@@ -74,8 +80,17 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         other_remark=F('learning_unit__other_remark'),
 
         # components (volumes) data
-        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')[:1]),
-        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')[:1]),
+        pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
+        pp_vol_tot=Subquery(subquery_component_pp.values('hourly_volume_total_annual')),
+        pm_vol_q1=Subquery(subquery_component_pm.values('hourly_volume_partial_q1')),
+        pp_vol_q1=Subquery(subquery_component_pp.values('hourly_volume_partial_q1')),
+        pm_vol_q2=Subquery(subquery_component_pm.values('hourly_volume_partial_q2')),
+        pp_vol_q2=Subquery(subquery_component_pp.values('hourly_volume_partial_q2')),
+        pm_classes=Subquery(subquery_component_pm.values('planned_classes')),
+        pp_classes=Subquery(subquery_component_pp.values('planned_classes')),
+
+        requirement_entity_acronym=Subquery(subquery_entity_requirement),
+        allocation_entity_acronym=Subquery(subquery_allocation_requirement),
 
     ).values(
         'id',
@@ -96,8 +111,16 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'quadrimester',
 
         'pm_vol_tot',
-        'pp_vol_tot'
+        'pp_vol_tot',
+        'pm_vol_q1',
+        'pp_vol_q1',
+        'pm_vol_q2',
+        'pp_vol_q2',
+        'pm_classes',
+        'pp_classes',
 
+        'requirement_entity_acronym',
+        'allocation_entity_acronym',
     )
 
     qs = _annotate_with_description_fiche_specifications(qs)
@@ -105,30 +128,40 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     results = []
 
     for learning_unit_data in qs:
+        learning_unit_data = __convert_string_to_enum(learning_unit_data)
         luy = LearningUnitYear(
-            __instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
+            lecturing_volume=LecturingVolume(total_annual=learning_unit_data.pop('pm_vol_tot'),
+                                             first_quadrimester=learning_unit_data.pop('pm_vol_q1'),
+                                             second_quadrimester=learning_unit_data.pop('pm_vol_q2'),
+                                             classes_count=learning_unit_data.pop('pm_classes')),
+            practical_volume=PracticalVolume(total_annual=learning_unit_data.pop('pp_vol_tot'),
+                                             first_quadrimester=learning_unit_data.pop('pp_vol_q1'),
+                                             second_quadrimester=learning_unit_data.pop('pp_vol_q2'),
+                                             classes_count=learning_unit_data.pop('pp_classes')),
             achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
+            entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
+                              allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
-                resume=learning_unit_data.get('cms_resume'),
-                resume_en=learning_unit_data.get('cms_resume_en'),
-                teaching_methods=learning_unit_data.get('cms_teaching_methods'),
-                teaching_methods_en=learning_unit_data.get('cms_teaching_methods_en'),
-                evaluation_methods=learning_unit_data.get('cms_evaluation_methods'),
-                evaluation_methods_en=learning_unit_data.get('cms_evaluation_methods_en'),
-                other_informations=learning_unit_data.get('cms_other_informations'),
-                other_informations_en=learning_unit_data.get('cms_other_informations_en'),
-                online_resources=learning_unit_data.get('cms_online_resources'),
-                online_resources_en=learning_unit_data.get('cms_online_resources_en'),
-                bibliography=learning_unit_data.get('cms_bibliography'),
-                mobility=learning_unit_data.get('cms_mobility')
-            ),
+                    resume=learning_unit_data.get('cms_resume'),
+                    resume_en=learning_unit_data.get('cms_resume_en'),
+                    teaching_methods=learning_unit_data.get('cms_teaching_methods'),
+                    teaching_methods_en=learning_unit_data.get('cms_teaching_methods_en'),
+                    evaluation_methods=learning_unit_data.get('cms_evaluation_methods'),
+                    evaluation_methods_en=learning_unit_data.get('cms_evaluation_methods_en'),
+                    other_informations=learning_unit_data.get('cms_other_informations'),
+                    other_informations_en=learning_unit_data.get('cms_other_informations_en'),
+                    online_resources=learning_unit_data.get('cms_online_resources'),
+                    online_resources_en=learning_unit_data.get('cms_online_resources_en'),
+                    bibliography=learning_unit_data.get('cms_bibliography'),
+                    mobility=learning_unit_data.get('cms_mobility')
+                ),
             specifications=Specifications(
                 themes_discussed=learning_unit_data.get('cms_themes_discussed'),
                 themes_discussed_en=learning_unit_data.get('cms_themes_discussed_en'),
                 prerequisite=learning_unit_data.get('cms_prerequisite'),
                 prerequisite_en=learning_unit_data.get('cms_prerequisite_en')
             )
-        )
+            )
 
         results.append(luy)
     return results

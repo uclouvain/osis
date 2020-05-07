@@ -29,6 +29,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from learning_unit.ddd.domain.achievement import Achievement
 
 from typing import List
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
@@ -39,16 +40,38 @@ class LecturingVolume:
     def __init__(
         self,
         total_annual: Decimal = None,
+        first_quadrimester: Decimal = None,
+        second_quadrimester: Decimal = None,
+        classes_count: int = None,
     ):
         self.total_annual = total_annual
+        self.first_quadrimester = first_quadrimester
+        self.second_quadrimester = second_quadrimester
+        self.classes_count = classes_count
 
 
 class PracticalVolume:
     def __init__(
             self,
             total_annual: Decimal = None,
+            first_quadrimester: Decimal = None,
+            second_quadrimester: Decimal = None,
+            classes_count: int = None,
     ):
         self.total_annual = total_annual
+        self.first_quadrimester = first_quadrimester
+        self.second_quadrimester = second_quadrimester
+        self.classes_count = classes_count
+
+
+class Entities:
+    def __init__(
+            self,
+            requirement_entity_acronym: str = None,
+            allocation_entity_acronym: str = None,
+    ):
+        self.requirement_entity_acronym = requirement_entity_acronym
+        self.allocation_entity_acronym = allocation_entity_acronym
 
 
 class LearningUnitYear:
@@ -74,6 +97,9 @@ class LearningUnitYear:
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
             achievements: List['Achievement'] = None,
+
+            entities: Entities = None,
+
             description_fiche: DescriptionFiche = None,
             specifications: Specifications = None
     ):
@@ -96,6 +122,7 @@ class LearningUnitYear:
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
         self.achievements = achievements
+        self.entities = entities
         self.description_fiche = description_fiche
         self.specifications = specifications
 
