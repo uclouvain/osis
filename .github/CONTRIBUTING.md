@@ -228,3 +228,72 @@ Idéalement lorsqu'on teste une view, on doit vérifier :
 - Les redirections en cas de succès/erreurs
 - Le contenu du contexte utilisé dans le render du template
 - Les éventuels ordres de listes attendus
+
+
+
+### Domain driven design :
+
+```
+django_app
+ ├─ ddd
+ |   ├─ command.py
+ |   ├─ domain
+ |   ├─ repository
+ |   ├─ service
+ |   |   ├─ read
+ |   |   ├─ write
+ |   ├─ validators
+ |
+ ├── models
+ |
+ ├── views (gestion des httpRequests)
+ |
+ ├── API (gestion des httpRequests)
+ |   ├─ views
+```
+
+- Couche "views" : gestion des HttpRequest
+- Dans un premier temps, utilisation des objets du DDD pour la consultation et écriture
+- les urls : utiliser des urls identifiés par des clés naturelles et pas des ids de la DB. 
+Dans de rares cas plus complexes (exemple: identification d'une personne : UUID).
+Attention aux données privées
+
+
+- Les Application services se trouvent dans "service".
+- Les services doivent être des fonctions
+- Les fontions de service doivent recevoir des objets CommandRequest
+- Le fichier "command" regourpe les objets qui pvent petre transmis à un service
+- Les fichiers dans service suivent la convention suivante :
+    - <action_metier>_service
+- Chaque fonction service s'appelle toujours <action_metier>. Exemple : attach_node()
+- Les services renvoient toujours un EntityId ; c'est al resposabilité des views de gérer les messages de succès ;
+- Des exceptions sont raisées en cas d'invariant métier non respecté. Chaque Exception doit être comme suit : 
+BusinessException(message: str)
+
+
+TODO : workshop inversion de dépendance
+TODO : workshop services application et domain service
+TODO :: mettre les dossier au singulier
+
+- Chaque objet du domaine doit obligatoirement hériter de ValueObject, Entity ou RootEntity
+- Validateurs : on les garde, pas d'héritage, pas de gestion de messages d'erreurs : juste raise exception quand invariant non respecté
+- Business exception gèrera les traductions à la place des validateurs
+
+
+Couche repo : 
+- Utilisation d'une interface commune AbstractRepository
+- Les objets du repository doivent impélmenter AbstractRepository et se nommer NomDomaineRepository. 
+Exemple : ProgramTReeRepository
+- Attention à spérarer les write et read dans les services !
+
+
+Conventions générales :
+- Tous les apramètres d'entrée et de sortie doivent être typés.
+- Les fonctions qui renvoient une objet, int, str doivent être nommés "get_<sth>".
+- Les fonctions qui renvoient un booléen doivent être nommés "is_<sth>", "has_<sth>", "contains_<sth>"
+- Les fonctions qui renvoient une list, set, dict :
+    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". Exemple: get_all_nodes, get_all_links, get_parents, etc
+- Les fonctions de recherche : 
+    - search_<nom_pluriel>() -> search_nodes, etc. 
+- Priate : __function -> visibilité privée (uniquement scope de la classe ou du fichier)
+- Protected : _function -> Visibilité package
