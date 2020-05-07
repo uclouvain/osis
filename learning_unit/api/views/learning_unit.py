@@ -47,7 +47,7 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the learning unit with optional filtering.
     """
     name = 'learningunits_list'
-    queryset = LearningUnitYear.objects.all().select_related(
+    queryset = LearningUnitYear.objects_with_container.all().select_related(
         'academic_year',
         'learning_container_year'
     ).prefetch_related(
@@ -72,7 +72,7 @@ class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIV
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        queryset = LearningUnitYear.objects_with_container.all().select_related(
+        queryset = LearningUnitYear.objects.all().select_related(
             'language',
             'campus',
             'academic_year',
