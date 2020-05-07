@@ -42,9 +42,7 @@ class DescriptionFiche:
             bibliography: str = None,
             mobility: str = None,
     ):
-        print('init inti DescriptionFiche')
         self.resume = resume
-        print('init inti DescriptionFiche2')
         self.resume_en = resume_en
         self.teaching_methods = teaching_methods
         self.teaching_methods_en = teaching_methods_en

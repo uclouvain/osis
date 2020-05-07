@@ -77,7 +77,6 @@ class LearningUnitYear:
             description_fiche: DescriptionFiche = None,
             specifications: Specifications = None
     ):
-        print('ini')
         self.id = id
         self.year = year
         self.acronym = acronym
