@@ -242,6 +242,7 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
     return _descendents
 
 
+# TODO: Remove this class because unused when migration is done
 class NodeEducationGroupYear(Node):
 
     type = NodeType.EDUCATION_GROUP
@@ -291,6 +292,8 @@ class NodeGroupYear(Node):
         offer_partial_title_fr: str = None,
         offer_partial_title_en: str = None,
         category: Categories = None,
+        management_entity_acronym: str = None,
+        teaching_campus: str = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -306,6 +309,8 @@ class NodeGroupYear(Node):
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
         self.category = category
+        self.management_entity_acronym = management_entity_acronym
+        self.teaching_campus = teaching_campus
 
 
 class NodeLearningUnitYear(Node):

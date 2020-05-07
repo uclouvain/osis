@@ -1,5 +1,5 @@
 {% extends "education_group/tab_identification.html" %}
-{% load i18n %}
+{% load i18n bootstrap3 %}
 {% load format %}
 {% load static education_group %}
 {% comment "License" %}
@@ -26,10 +26,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block details %}
-    {% with  parent=parent_training %}
-        {% if not current_version.is_standard  %}
-            {% include  "education_group/blocks/panel/panel_version_information.html" %}
-        {% endif %}
+    {% with parent=parent_training %}
         <div class="row">
             <div class="col-md-7" style="margin-top: 10px">
                 {% include 'education_group/blocks/informations.html' %}
@@ -37,15 +34,42 @@
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") is_standard=current_version.is_standard %}
-                        {% dl_with_parent "main_teaching_campus" versioned_field=True%}
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% bootstrap_label _("Management entity") label_class='d-block'%}
+                                <p>{{ node.management_entity_acronym }}</p>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% bootstrap_label _("Learning location") label_class='d-block'%}
+                                <p>{{ node.teaching_campus }} </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {% include "blocks/panel/reversion.html" %}
-
-
             </div>
         </div>
-        {% include 'education_group/blocks/remarks.html' %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        {% bootstrap_label _("Remark") label_class='d-block' %}
+                        <p>{{ node.remark_fr }} </p>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-12">
+                        {% with label=_("remark in english") %}
+                            {% bootstrap_label label|capfirst label_class='d-block' %}
+                        {% endwith %}
+                        <p>{{ node.remark_fr }} </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endwith %}
 {% endblock %}

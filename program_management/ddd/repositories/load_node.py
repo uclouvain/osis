@@ -25,8 +25,10 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F, Value, CharField, QuerySet, Q, Case, When, IntegerField
+from django.db.models import F, Value, CharField, QuerySet, Q, Case, When, IntegerField, OuterRef, Subquery
+from django.db.models.functions import Concat
 
+from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -139,6 +141,12 @@ def __convert_category_enum(category: str):
 
 
 def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
+    subquery_management_entity = EntityVersion.objects.filter(
+        entity=OuterRef('management_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
+
     return GroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         type=Value(NodeType.GROUP.name, output_field=CharField()),
         node_type=F('education_group_type__name'),
@@ -146,7 +154,10 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         code=F('partial_acronym'),
         title=F('acronym'),
         year=F('academic_year__year'),
-
+        management_entity_acronym=Subquery(subquery_management_entity),
+        teaching_campus=Concat(
+            F('main_teaching_campus__name'), Value(' - '), F('main_teaching_campus__organization__name')
+        ),
         offer_partial_title_fr=F('educationgroupversion__offer__partial_title'),
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
@@ -174,6 +185,8 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         'group_title_fr',
         'group_title_en',
         'category',
+        'management_entity_acronym',
+        'teaching_campus'
     )
 
 
