@@ -2,10 +2,11 @@ import mock
 from django.test import TestCase, override_settings
 from mock import patch
 
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory
+from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, ContinuingEducationTrainingFactory, \
+    TrainingFactory, MiniTrainingFactory, GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -455,10 +456,10 @@ class TestIsUserLinkedToAllScopes(TestCase):
         )
 
 
-class TestIsEducationGroupCategoryMiniTrainingOrGroup(TestCase):
+class TestAreAllEducationGroupRemovable(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.education_group = EducationGroupFactory()
 
     def setUp(self):
         self.predicate_context_mock = mock.patch(
@@ -471,20 +472,34 @@ class TestIsEducationGroupCategoryMiniTrainingOrGroup(TestCase):
         self.predicate_context_mock.start()
         self.addCleanup(self.predicate_context_mock.stop)
 
-    def _test_is_education_group_category(self, category, expected):
-        person = FacultyManagerFactory(entity=self.education_group_year.management_entity).person
-        self.education_group_year.education_group_type.category = category
-        self.predicate_context_mock.target.context['role_qs'] = FacultyManager.objects.filter(person=person)
-        self.assertEqual(
-            predicates.is_education_group_category_mini_training_or_group(
+    def test_case_all_trainings_are_not_removable(self):
+        trainings = [TrainingFactory(education_group=self.education_group)]
+        person = FacultyManagerFactory(entity=trainings[0].management_entity).person
+        self.assertFalse(
+            predicates.are_all_trainings_removable(
                 person.user,
-                self.education_group_year
-            ), expected
+                trainings[0]
+            )
         )
 
-    def test_case_is_mini_training_or_group(self):
-        self._test_is_education_group_category(Categories.MINI_TRAINING.name, True)
-        self._test_is_education_group_category(Categories.GROUP.name, True)
+    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    def test_case_all_minitrainings_are_removable(self, mock_open):
+        minitrainings = [MiniTrainingFactory(education_group=self.education_group)]
+        person = FacultyManagerFactory(entity=minitrainings[0].management_entity).person
+        self.assertTrue(
+            predicates.are_all_minitrainings_removable(
+                person.user,
+                minitrainings[0]
+            )
+        )
 
-    def test_case_is_not_mini_training_or_group(self):
-        self._test_is_education_group_category(Categories.TRAINING.name, False)
+    @mock.patch('base.business.event_perms.EventPermEducationGroupEdition.is_open', return_value=True)
+    def test_case_all_groups_are_not_removable(self, mock_open):
+        groups = [GroupFactory(education_group=self.education_group)]
+        person = FacultyManagerFactory(entity=groups[0].management_entity).person
+        self.assertTrue(
+            predicates.are_all_groups_removable(
+                person.user,
+                groups[0]
+            )
+        )
