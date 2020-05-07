@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,57 +23,77 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test.utils import override_settings
 from django.test import TestCase
+from django.test.utils import override_settings
 
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from cms.enums import entity_name
-from cms.models.translated_text import TranslatedText
-from cms.models.translated_text_label import TranslatedTextLabel
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
-from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
-from unittest import mock
+
+LANGUAGE_EN = "en"
+LANGUAGE_FR = "fr-be"
 
 
 class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.en_language = EnglishLanguageFactory()
-        cls.fr_language = FrenchLanguageFactory()
 
         cls.l_unit_1 = LearningUnitYearFactory()
-        print('ID {}'.format(cls.l_unit_1.id))
+        dict_labels = {}
+        for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
+            dict_labels.update(
+                {cms_label: TextLabelFactory(order=1, label=cms_label, entity=entity_name.LEARNING_UNIT_YEAR)}
+            )
 
-        text_label_lu_3 = TextLabelFactory(order=1, label='resume', entity=entity_name.LEARNING_UNIT_YEAR)
-
-        TranslatedTextFactory(text_label=text_label_lu_3,
-                              entity=entity_name.LEARNING_UNIT_YEAR,
-                              reference=cls.l_unit_1.id,
-                              language=cls.fr_language.code,
-                              text="Text fr")
-        TranslatedTextFactory(text_label=text_label_lu_3,
-                              entity=entity_name.LEARNING_UNIT_YEAR,
-                              reference=cls.l_unit_1.id,
-                              language=cls.en_language.code,
-                              text="Text en")
+        cls.fr_cms_label = _build_cms_translated_text(cls.l_unit_1.id, dict_labels, LANGUAGE_FR,
+                                                      CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS)
+        cls.en_cms_label = _build_cms_translated_text(cls.l_unit_1.id, dict_labels, LANGUAGE_EN,
+                                                      CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS)
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
-    @mock.patch("learning_unit.ddd.repository.load_achievement.load_achievements")
-    def test_load_resume(self, mock=True):
-        print('test_load_resume')
-        print(self.l_unit_1.id)
-        for r in TranslatedTextLabel.objects.all():
-            print('for1')
-            print(r.label)
-        for r in TranslatedText.objects.all():
-            print('for2')
-            print("{} {} . referrence{}".format(r.text_label.label, r.text, r.reference))
+    def test_load_description_fiche(self):
         results = load_multiple([self.l_unit_1.id])
-        print('*********************************')
-        ##TODO resume est tj nul???
-        print(results[0].description_fiche.__dict__)
-        print('*************')
+        description_fiche = results[0].description_fiche
+
+        self.assertEqual(description_fiche.resume, self.fr_cms_label.get('resume').text)
+        self.assertEqual(description_fiche.teaching_methods, self.fr_cms_label.get('teaching_methods').text)
+        self.assertEqual(description_fiche.evaluation_methods, self.fr_cms_label.get('evaluation_methods').text)
+        self.assertEqual(description_fiche.other_informations, self.fr_cms_label.get('other_informations').text)
+        self.assertEqual(description_fiche.online_resources, self.fr_cms_label.get('online_resources').text)
+        self.assertEqual(description_fiche.bibliography, self.fr_cms_label.get('bibliography').text)
+        self.assertEqual(description_fiche.mobility, self.fr_cms_label.get('mobility').text)
+
+        self.assertEqual(description_fiche.resume_en, self.en_cms_label.get('resume').text)
+        self.assertEqual(description_fiche.teaching_methods_en, self.en_cms_label.get('teaching_methods').text)
+        self.assertEqual(description_fiche.evaluation_methods_en, self.en_cms_label.get('evaluation_methods').text)
+        self.assertEqual(description_fiche.other_informations_en, self.en_cms_label.get('other_informations').text)
+        self.assertEqual(description_fiche.online_resources_en, self.en_cms_label.get('online_resources').text)
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
+    def test_load_specifications(self):
+        results = load_multiple([self.l_unit_1.id])
+        description_fiche = results[0].specifications
+
+        self.assertEqual(description_fiche.themes_discussed, self.fr_cms_label.get('themes_discussed').text)
+        self.assertEqual(description_fiche.prerequisite, self.fr_cms_label.get('prerequisite').text)
+
+        self.assertEqual(description_fiche.themes_discussed_en, self.en_cms_label.get('themes_discussed').text)
+        self.assertEqual(description_fiche.prerequisite_en, self.en_cms_label.get('prerequisite').text)
+
+
+def _build_cms_translated_text(l_unit_id, dict_labels, language, cms_labels):
+    translated_text_by_language = {}
+    for cms_label in cms_labels:
+        cms_text_label = dict_labels.get(cms_label)
+        translated_text_by_language.update({
+            cms_label: TranslatedTextFactory(text_label=cms_text_label,
+                                             entity=entity_name.LEARNING_UNIT_YEAR,
+                                             reference=l_unit_id,
+                                             language=language,
+                                             text="Text {} {}".format(language, cms_label))
+        })
+    return translated_text_by_language
