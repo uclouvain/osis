@@ -28,14 +28,14 @@ from typing import List
 
 from django.db.models import F, Subquery, OuterRef
 
+from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
 from learning_unit.ddd.repository.load_achievement import load_achievements
-from django.conf import settings
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -62,6 +62,17 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     subquery_component_pp = subquery_component.filter(
         type=PRACTICAL_EXERCISES
     )
+    subquery_entity_requirement = EntityVersion.objects.filter(
+        entity=OuterRef('learning_container_year__requirement_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
+
+    subquery_allocation_requirement = EntityVersion.objects.filter(
+        entity=OuterRef('learning_container_year__allocation_entity'),
+    ).current(
+        OuterRef('academic_year__start_date')
+    ).values('acronym')[:1]
 
     qs = LearningUnitYearModel.objects.filter(pk__in=learning_unit_year_ids).annotate(
         specific_title_en=F('specific_title_english'),
@@ -84,6 +95,9 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         pp_vol_q2=Subquery(subquery_component_pp.values('hourly_volume_partial_q2')),
         pm_classes=Subquery(subquery_component_pm.values('planned_classes')),
         pp_classes=Subquery(subquery_component_pp.values('planned_classes')),
+
+        requirement_entity_acronym=Subquery(subquery_entity_requirement),
+        allocation_entity_acronym=Subquery(subquery_allocation_requirement),
 
     ).values(
         'id',
@@ -111,14 +125,20 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'pp_vol_q2',
         'pm_classes',
         'pp_classes',
+
+        'requirement_entity_acronym',
+        'allocation_entity_acronym',
     )
 
     results = []
 
-    for learnin_unit_data in qs:
-        # TODO juste avec achievements ici?
-        luy = LearningUnitYear(**__instanciate_volume_domain_object(__convert_string_to_enum(learnin_unit_data)),
-                               achievements=load_achievements(learnin_unit_data['acronym'], learnin_unit_data['year']))
+    for learning_unit_data in qs:
+        luy = LearningUnitYear(
+            **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
+            achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
+            entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
+                              allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym'))
+        )
         results.append(luy)
     return results
 
