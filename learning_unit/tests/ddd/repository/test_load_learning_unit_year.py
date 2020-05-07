@@ -31,6 +31,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
 
 
@@ -87,3 +88,18 @@ class TestLoadLearningUnitEntities(TestCase):
         results = load_multiple([self.l_unit_1.id])
         self.assertEqual(results[0].entities.requirement_entity_acronym, self.requirement_entity_version.acronym)
         self.assertEqual(results[0].entities.allocation_entity_acronym, self.allocation_entity_version.acronym)
+
+
+class TestLoadLearningUnitProposal(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+
+        cls.l_unit_1 = LearningUnitYearFactory()
+        cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.l_unit_1)
+
+    def test_load_learning_unit_year_init_entities(self):
+        results = load_multiple([self.l_unit_1.id])
+        self.assertEqual(results[0].proposal.type, self.proposal.type)
+        self.assertEqual(results[0].proposal.state, self.proposal.state)

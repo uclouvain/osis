@@ -35,7 +35,10 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
+from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.repository.load_achievement import load_achievements
+from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -81,10 +84,12 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         common_title_en=F('learning_container_year__common_title_english'),
         year=F('academic_year__year'),
         proposal_type=F('proposallearningunit__type'),
+        proposal_state=F('proposallearningunit__state'),
         start_year=F('learning_unit__start_year'),
         end_year=F('learning_unit__end_year'),
         type=F('learning_container_year__container_type'),
         other_remark=F('learning_unit__other_remark'),
+        main_language=F('language__name'),
 
         # components (volumes) data
         pm_vol_tot=Subquery(subquery_component_pm.values('hourly_volume_total_annual')),
@@ -111,6 +116,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'start_year',
         'end_year',
         'proposal_type',
+        'proposal_state',
         'credits',
         'status',
         'periodicity',
@@ -128,6 +134,9 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
 
         'requirement_entity_acronym',
         'allocation_entity_acronym',
+        'subtype',
+        'session',
+        'main_language',
     )
 
     results = []
@@ -135,9 +144,12 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     for learning_unit_data in qs:
         luy = LearningUnitYear(
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
+            proposal=Proposal(learning_unit_data.pop('proposal_type'),
+                              learning_unit_data.pop('proposal_state')),
             achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
-                              allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym'))
+                              allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
+            teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year'])
         )
         results.append(luy)
     return results
@@ -148,4 +160,5 @@ def __convert_string_to_enum(learn_unit_data: dict) -> dict:
     learn_unit_data['type'] = LearningContainerYearType[subtype_str]
     if learn_unit_data.get('quadrimester'):
         learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
+    learn_unit_data['subtype'] = dict(LEARNING_UNIT_YEAR_SUBTYPES)[learn_unit_data['subtype']]
     return learn_unit_data
