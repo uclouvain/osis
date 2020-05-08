@@ -33,5 +33,5 @@ class TeachingMaterial:
     ):
 
         self.title = title
-        self.mandatory = mandatory
+        self.is_mandatory = mandatory
 
