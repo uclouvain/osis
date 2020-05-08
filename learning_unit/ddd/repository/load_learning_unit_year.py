@@ -183,14 +183,15 @@ def __convert_string_to_enum(learn_unit_data: dict) -> dict:
 
 def _annotate_with_description_fiche_specifications(original_qs1):
     original_qs = original_qs1
-    sq = TranslatedText.objects.filter(
+    qs = TranslatedText.objects.filter(
         reference=OuterRef('pk'),
         entity=LEARNING_UNIT_YEAR)
 
-    annotations = build_annotations(sq, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN)
-    original_qs = original_qs.annotate(**annotations)
-
-    annotations = build_annotations(sq, CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SPECIFICATIONS)
+    annotations = build_annotations(
+        qs,
+        CMS_LABEL_PEDAGOGY+CMS_LABEL_SPECIFICATIONS,
+        CMS_LABEL_PEDAGOGY_FR_AND_EN+CMS_LABEL_SPECIFICATIONS
+    )
     original_qs = original_qs.annotate(**annotations)
 
     return original_qs
