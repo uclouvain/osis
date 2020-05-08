@@ -72,7 +72,9 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
             credits=10,
-            status=False
+            status=False,
+            specific_title_english=None,
+            learning_container_year__common_title_english='COMMON'
         )
         cls.luy_gey = GroupElementYearFactory(
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15
@@ -153,6 +155,10 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'proposal_type'
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
+
+    def test_learning_unit_children_have_only_common_title_if_no_specific_one(self):
+        luy = self.serializer.data['children'][0]['children'][0]
+        self.assertEqual(luy['title'], 'COMMON')
 
     def test_learning_unit_children_status_field_is_false_boolean(self):
         luy = self.serializer.data['children'][0]['children'][0]
