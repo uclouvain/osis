@@ -33,7 +33,6 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
-from learning_unit.ddd.repository import load_learning_unit_year
 
 
 class TestLoadLearningUnitVolumes(TestCase):
@@ -104,10 +103,3 @@ class TestLoadLearningUnitProposal(TestCase):
         results = load_multiple([self.l_unit_1.id])
         self.assertEqual(results[0].proposal.type, self.proposal.type)
         self.assertEqual(results[0].proposal.state, self.proposal.state)
-
-
-class TestConvertStringToEnum(TestCase):
-
-    def test_convert_quadrimester(self):
-        self.assertIsNone(load_learning_unit_year.__convert_string_to_enum({'quadrimester': None}))
-        self.assertIsNone(load_learning_unit_year.__convert_string_to_enum({}))
