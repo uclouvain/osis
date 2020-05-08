@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import List, Type
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -40,6 +40,7 @@ from program_management.business.group_element_years.attach import AttachEducati
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 from program_management.ddd.domain.node import Node
+from program_management.ddd.repositories import load_node, load_authorized_relationship
 from program_management.ddd.service import attach_node_service
 from program_management.models.enums.node_type import NodeType
 
@@ -60,25 +61,34 @@ class AttachNodeFormSet(BaseFormSet):
 
 def attach_form_factory(
         self,
-        parent_node: Node,
-        child_node: Node,
-        to_path: str,
-        authorized_relationship: AuthorizedRelationshipList = None,
+        path_of_node_to_attach_from: str,
+        node_to_attach_id: int,
+        node_to_attach_type: NodeType,
         **kwargs
 ) -> 'AttachNodeForm':
-    if parent_node.is_minor_major_list_choice():
-        return AttachToMinorMajorListChoiceForm(to_path, child_node, **kwargs)
+    form_class = _get_form_class(path_of_node_to_attach_from, node_to_attach_id, node_to_attach_type)
+    return form_class(path_of_node_to_attach_from, node_to_attach_id, node_to_attach_type, **kwargs)
 
-    elif child_node.node_type == NodeType.LEARNING_UNIT:
-        return AttachLearningUnitForm(to_path, child_node, **kwargs)
 
-    elif parent_node.is_training() and child_node.is_minor_major_list_choice():
-        return AttachMinorMajorListChoiceToTrainingForm(to_path, child_node, **kwargs)
+def _get_form_class(
+        path_of_node_to_attach_from: str,
+        node_to_attach_id: int,
+        node_to_attach_type: NodeType
+) -> Type['AttachNodeForm']:
+    node_to_attach_from_id = int(path_of_node_to_attach_from.split("|")[-1])
+    node_to_attach_from = load_node.load_by_type(NodeType.EDUCATION_GROUP, node_to_attach_from_id)
+    node_to_attach = load_node.load_by_type(node_to_attach_type, node_to_attach_id)
+    authorized_relationship = load_authorized_relationship.load()
 
-    elif not authorized_relationship.is_authorized(parent_node.node_type, child_node.node_type):
-        return AttachNotAuthorizedChildren(to_path, child_node, **kwargs)
-
-    return AttachNodeForm(to_path, child_node, **kwargs)
+    if node_to_attach_from.is_minor_major_list_choice():
+        return AttachToMinorMajorListChoiceForm
+    elif node_to_attach.node_type == NodeType.LEARNING_UNIT:
+        return AttachLearningUnitForm
+    elif node_to_attach_from.is_training() and node_to_attach.is_minor_major_list_choice():
+        return AttachMinorMajorListChoiceToTrainingForm
+    elif not authorized_relationship.is_authorized(node_to_attach_from.node_type, node_to_attach.node_type):
+        return AttachNotAuthorizedChildren
+    return AttachNodeForm
 
 
 #  TODO should define clean_link_type and when saving should verify errors
@@ -91,9 +101,10 @@ class AttachNodeForm(forms.Form):
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.CharField(widget=forms.widgets.TextInput, required=False)
 
-    def __init__(self, to_path: str, node: Node, **kwargs):
+    def __init__(self, to_path: str, node_to_attach_id: int, node_to_attach_type: NodeType, **kwargs):
         self.to_path = to_path
-        self.node = node
+        self.node_id = node_to_attach_id
+        self.node_type = node_to_attach_type
         super().__init__(**kwargs)
 
     def clean_link_type(self):
@@ -106,8 +117,8 @@ class AttachNodeForm(forms.Form):
             root_id = int(self.to_path.split("|")[0])
             result = attach_node_service.attach_node(
                 root_id,
-                self.node.node_id,
-                self.node.node_type,
+                self.node_id,
+                self.node_type,
                 self.to_path,
                 commit=True,
                 **self.cleaned_data

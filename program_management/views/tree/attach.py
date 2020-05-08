@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Tuple
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -40,7 +40,6 @@ from django.views import View
 from django.views.generic import RedirectView, CreateView, FormView, TemplateView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
-from base.models import authorized_relationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -52,11 +51,10 @@ from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
-from program_management.ddd.domain.node import Node
-from program_management.ddd.repositories import load_authorized_relationship, load_node
+from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
-    BaseGroupElementYearFormset, attach_form_factory
+    BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -65,31 +63,24 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
     template_name = "tree/attach_inner.html"
 
     @cached_property
-    def node_to_attach_from(self):
-        node_id = int(self.request.GET["path"].split("|")[-1])
-        return load_node.load_by_type(NodeType.EDUCATION_GROUP, node_id)
-
-    @cached_property
-    def nodes_to_attach(self) -> List[Node]:
-        return management.fetch_nodes_selected(self.request.GET, self.request.user)
+    def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
+        return management.fetch_nodes_selected_bis(self.request.GET, self.request.user)
 
     def get_form_class(self):
         return formset_factory(form=attach_form_factory, formset=AttachNodeFormSet, extra=len(self.nodes_to_attach))
 
     def get_form_kwargs(self) -> List[dict]:
-        authorized_relationships = load_authorized_relationship.load()
-        return [self._get_form_kwargs(authorized_relationships, node_obj) for node_obj in self.nodes_to_attach]
+        return [self._get_form_kwargs(node_id, node_type) for node_id, node_type in self.nodes_to_attach]
 
     def _get_form_kwargs(
             self,
-            authorized_relationships: authorized_relationship.AuthorizedRelationshipList,
-            node_to_attach: Node
+            node_id: int,
+            node_type: NodeType
     ) -> dict:
         return {
-            'parent_node': self.node_to_attach_from,
-            'child_node': node_to_attach,
-            'to_path': self.request.GET['path'],
-            'authorized_relationship': authorized_relationships
+            'node_to_attach_type': node_type,
+            'node_to_attach_id': node_id,
+            'path_of_node_to_attach_from': self.request.GET['path'],
         }
 
     def get_form(self, form_class=None):
@@ -100,7 +91,9 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         context_data["formset"] = context_data["form"]
-        context_data["is_parent_a_minor_major_list_choice"] = self.node_to_attach_from.is_minor_major_list_choice()
+        context_data["is_parent_a_minor_major_list_choice"] = self._is_parent_a_minor_major_list_choice(
+            context_data["formset"]
+        )
         if not self.nodes_to_attach:
             display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data
@@ -113,8 +106,11 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
 
         return super().form_valid(formset)
 
+    def _is_parent_a_minor_major_list_choice(self, formset):
+        return any(isinstance(form, AttachToMinorMajorListChoiceForm) for form in formset)
+
     def get_success_message(self, cleaned_data):
-        return _("The content of %(acronym)s has been updated.") % {"acronym": self.node_to_attach_from}
+        return _("The content has been updated.")
 
     def get_success_url(self):
         root_id = self.kwargs["root_id"]
@@ -157,7 +153,10 @@ class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMi
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
-        node_to_attach_from = load_node.load_by_type(NodeType.EDUCATION_GROUP, int(self.request.GET["path"].split("|")[-1]))
+        node_to_attach_from = load_node.load_by_type(
+            NodeType.EDUCATION_GROUP,
+            int(self.request.GET["path"].split("|")[-1])
+        )
         nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
         error_messages = attach_node_service.check_attach(node_to_attach_from, nodes_to_attach)
 

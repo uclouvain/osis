@@ -50,7 +50,6 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
-from program_management.views.tree.attach import AttachMultipleNodesView
 
 
 def form_valid_effect(formset: AttachNodeFormSet):
@@ -75,19 +74,18 @@ class TestAttachNodeView(TestCase):
         self.addCleanup(fetch_tree_patcher.stop)
 
         self.fetch_from_cache_patcher = mock.patch(
-            'program_management.business.group_element_years.management.fetch_nodes_selected',
+            'program_management.business.group_element_years.management.fetch_nodes_selected_bis',
             return_value=[]
         )
         self.fetch_from_cache_patcher.start()
         self.addCleanup(self.fetch_from_cache_patcher.stop)
 
-        self.node_to_attach_from_patcher = mock.patch.object(
-            AttachMultipleNodesView,
-            'node_to_attach_from',
-            return_value=NodeEducationGroupYearFactory()
+        self.get_form_class_patcher = mock.patch(
+            'program_management.forms.tree.attach._get_form_class',
+            return_value=AttachNodeForm
         )
-        self.node_to_attach_from_patcher.start()
-        self.addCleanup(self.node_to_attach_from_patcher.stop)
+        self.get_form_class_patcher.start()
+        self.addCleanup(self.get_form_class_patcher.stop)
 
     def setUpTreeData(self):
         """
@@ -123,13 +121,10 @@ class TestAttachNodeView(TestCase):
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected_bis')
     def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
-        subgroup_to_attach = GroupFactory(
-            academic_year__year=self.tree.root_node.year,
-            education_group_type__name=GroupType.SUB_GROUP.name,
-        )
-        mock_cache_elems.return_value = [subgroup_to_attach]
+        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
 
         # To path :  BIR1BA ---> COMMON_CORE
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
@@ -142,27 +137,24 @@ class TestAttachNodeView(TestCase):
         self.assertEquals(len(response.context['formset'].forms), 1)
         self.assertIsInstance(response.context['formset'].forms[0], AttachNodeForm)
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected_bis')
     def test_get_method_when_multiple_education_group_year_element_are_selected(self, mock_cache_elems):
-        subgroup_to_attach = GroupFactory(
-            academic_year__year=self.tree.root_node.year,
-            education_group_type__name=GroupType.SUB_GROUP.name,
-        )
-        subgroup_to_attach_2 = GroupFactory(
-            academic_year__year=self.tree.root_node.year,
-            education_group_type__name=GroupType.SUB_GROUP.name,
-        )
-        mock_cache_elems.return_value = [subgroup_to_attach, subgroup_to_attach_2]
+        subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
+        subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
+        mock_cache_elems.return_value = [
+            (subgroup_to_attach.node_id, subgroup_to_attach.node_type),
+            (subgroup_to_attach_2.node_id, subgroup_to_attach_2.node_type)
+        ]
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
         response = self.client.get(self.url + "?path=" + path)
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
-        self.assertEquals(len(response.context['formset'].forms), 2)
+        self.assertEqual(len(response.context['formset'].forms), 2)
 
     @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
     @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid')
@@ -185,12 +177,12 @@ class TestAttachNodeView(TestCase):
     @mock.patch('program_management.ddd.service.attach_node_service.attach_node')
     @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
     @mock.patch.object(AttachNodeForm, 'is_valid')
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
+    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected_bis')
     def test_post_method_case_formset_valid(self, mock_cache_elems, mock_form_valid, mock_service):
         mock_form_valid.return_value = True
         mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
-        mock_cache_elems.return_value = [subgroup_to_attach]
+        mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])

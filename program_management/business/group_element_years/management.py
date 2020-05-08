@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import Counter
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from django.db.models import Count, Q
 from django.utils.functional import cached_property
@@ -39,6 +39,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from program_management.ddd.domain import node
 from program_management.ddd.repositories import load_node
+from program_management.models.enums.node_type import NodeType
 
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
@@ -66,6 +67,16 @@ def fetch_nodes_selected(request_parameters, user) -> List[node.Node]:
             nodes_selected.append(load_node.load_node_education_group_year(selected_element['id']))
 
     return nodes_selected
+
+
+def fetch_nodes_selected_bis(request_parameters, user) -> List[Tuple[int, NodeType]]:
+    def _convert_element_to_node_id_and_node_type(element) -> Tuple[int, NodeType]:
+        if element['modelname'] == LEARNING_UNIT_YEAR:
+            return element["id"], NodeType.LEARNING_UNIT
+        return element["id"], NodeType.EDUCATION_GROUP
+
+    selected_data = _get_elements_selected(request_parameters, user)
+    return [_convert_element_to_node_id_and_node_type(element) for element in selected_data]
 
 
 # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
