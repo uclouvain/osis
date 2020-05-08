@@ -26,19 +26,26 @@
 
 from typing import List
 
+from django.conf import settings
 from django.db.models import F, Subquery, OuterRef
+from django.db.models import QuerySet
 
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearModel
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from cms.models.translated_text import TranslatedText
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
 from learning_unit.ddd.domain.proposal import Proposal
+from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.repository.load_achievement import load_achievements
 from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
-from base.models.enums.learning_unit_year_subtypes import LEARNING_UNIT_YEAR_SUBTYPES
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -139,6 +146,8 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'main_language',
     )
 
+    qs = _annotate_with_description_fiche_specifications(qs)
+
     results = []
 
     for learning_unit_data in qs:
@@ -149,8 +158,29 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
             achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
+            description_fiche=DescriptionFiche(
+                    resume=learning_unit_data.pop('cms_resume'),
+                    resume_en=learning_unit_data.pop('cms_resume_en'),
+                    teaching_methods=learning_unit_data.pop('cms_teaching_methods'),
+                    teaching_methods_en=learning_unit_data.pop('cms_teaching_methods_en'),
+                    evaluation_methods=learning_unit_data.pop('cms_evaluation_methods'),
+                    evaluation_methods_en=learning_unit_data.pop('cms_evaluation_methods_en'),
+                    other_informations=learning_unit_data.pop('cms_other_informations'),
+                    other_informations_en=learning_unit_data.pop('cms_other_informations_en'),
+                    online_resources=learning_unit_data.pop('cms_online_resources'),
+                    online_resources_en=learning_unit_data.pop('cms_online_resources_en'),
+                    bibliography=learning_unit_data.pop('cms_bibliography'),
+                    mobility=learning_unit_data.pop('cms_mobility')
+                ),
+            specifications=Specifications(
+                themes_discussed=learning_unit_data.pop('cms_themes_discussed'),
+                themes_discussed_en=learning_unit_data.pop('cms_themes_discussed_en'),
+                prerequisite=learning_unit_data.pop('cms_prerequisite'),
+                prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
+                ),
             teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year'])
-        )
+            )
+
         results.append(luy)
     return results
 
@@ -162,3 +192,40 @@ def __convert_string_to_enum(learn_unit_data: dict) -> dict:
         learn_unit_data['quadrimester'] = DerogationQuadrimester[learn_unit_data['quadrimester']]
     learn_unit_data['subtype'] = dict(LEARNING_UNIT_YEAR_SUBTYPES)[learn_unit_data['subtype']]
     return learn_unit_data
+
+
+def _annotate_with_description_fiche_specifications(original_qs1):
+    original_qs = original_qs1
+    qs = TranslatedText.objects.filter(
+        reference=OuterRef('pk'),
+        entity=LEARNING_UNIT_YEAR)
+
+    annotations = build_annotations(
+        qs,
+        CMS_LABEL_PEDAGOGY+CMS_LABEL_SPECIFICATIONS,
+        CMS_LABEL_PEDAGOGY_FR_AND_EN+CMS_LABEL_SPECIFICATIONS
+    )
+    original_qs = original_qs.annotate(**annotations)
+
+    return original_qs
+
+
+def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
+    annotations = {
+        "cms_{}".format(lbl): Subquery(
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
+        for lbl in fr_labels
+    }
+
+    annotations.update({
+        "cms_{}_en".format(lbl): Subquery(
+            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
+        for lbl in en_labels}
+    )
+    return annotations
+
+
+def _build_subquery_text_label(qs, cms_text_label, lang):
+
+    return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
+        'text')[:1]

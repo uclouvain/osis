@@ -24,15 +24,16 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from typing import List
 
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from learning_unit.ddd.domain.achievement import Achievement
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.proposal import Proposal
+from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
-
-from typing import List
 
 
 class LecturingVolume:
@@ -98,6 +99,10 @@ class LearningUnitYear:
             achievements: List['Achievement'] = None,
 
             entities: Entities = None,
+
+            description_fiche: DescriptionFiche = None,
+            specifications: Specifications = None,
+
             teaching_materials: TeachingMaterial = None,
             subtype: str = None,
             session: str = None,
@@ -125,6 +130,8 @@ class LearningUnitYear:
         self.practical_volume = practical_volume
         self.achievements = achievements
         self.entities = entities
+        self.description_fiche = description_fiche
+        self.specifications = specifications
         self.teaching_materials = teaching_materials
         self.subtype = subtype
         self.session = session

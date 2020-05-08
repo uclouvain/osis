@@ -24,17 +24,17 @@
 #
 ##############################################################################
 import itertools
+from typing import List
 
 from django.conf import settings
-from typing import List
+from django.db.models import F
 
 from base.models.learning_achievement import LearningAchievement
 from learning_unit.ddd.domain.achievement import Achievement
 
-from django.db.models import F
-
 
 def load_achievements(acronym: str, year: int) -> List['Achievement']:
+
     qs = LearningAchievement.objects.filter(
         learning_unit_year__acronym=acronym,
         learning_unit_year__academic_year__year=year)\
@@ -56,4 +56,5 @@ def _build_achievements(qs):
             if achievement['language_code'] == settings.LANGUAGE_CODE_FR[:2].upper():
                 achievement_parameters['text_fr'] = achievement['text']
         achievements.append(Achievement(**achievement_parameters))
+
     return achievements
