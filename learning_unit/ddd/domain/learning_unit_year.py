@@ -32,6 +32,8 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from learning_unit.ddd.domain.achievement import Achievement
 
 from typing import List
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.specifications import Specifications
 
 
 class LecturingVolume:
@@ -97,6 +99,9 @@ class LearningUnitYear:
             achievements: List['Achievement'] = None,
 
             entities: Entities = None,
+
+            description_fiche: DescriptionFiche = None,
+            specifications: Specifications = None
     ):
         self.id = id
         self.year = year
@@ -118,6 +123,8 @@ class LearningUnitYear:
         self.practical_volume = practical_volume
         self.achievements = achievements
         self.entities = entities
+        self.description_fiche = description_fiche
+        self.specifications = specifications
 
     @property
     def full_title_fr(self):
