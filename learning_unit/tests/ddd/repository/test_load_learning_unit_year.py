@@ -27,16 +27,17 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
 
 LANGUAGE_EN = "en"
 LANGUAGE_FR = "fr-be"
@@ -156,3 +157,18 @@ def _build_cms_translated_text(l_unit_id, dict_labels, language, cms_labels):
                                              text="Text {} {}".format(language, cms_label))
         })
     return translated_text_by_language
+
+
+class TestLoadLearningUnitProposal(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+
+        cls.l_unit_1 = LearningUnitYearFactory()
+        cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.l_unit_1)
+
+    def test_load_learning_unit_year_init_entities(self):
+        results = load_multiple([self.l_unit_1.id])
+        self.assertEqual(results[0].proposal.type, self.proposal.type)
+        self.assertEqual(results[0].proposal.state, self.proposal.state)

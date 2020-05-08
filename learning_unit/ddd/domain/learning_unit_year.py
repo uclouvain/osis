@@ -24,16 +24,16 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from typing import List
 
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from learning_unit.ddd.domain.achievement import Achievement
-
-from typing import List
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
+from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
+from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 
 
 class LecturingVolume:
@@ -87,7 +87,7 @@ class LearningUnitYear:
             specific_title_en: str = '',
             start_year: int = None,
             end_year: int = None,
-            proposal_type: ProposalType = None,
+            proposal: Proposal = None,
             credits: Decimal = None,
             status: bool = None,
             periodicity: PeriodicityEnum = None,
@@ -101,7 +101,14 @@ class LearningUnitYear:
             entities: Entities = None,
 
             description_fiche: DescriptionFiche = None,
-            specifications: Specifications = None
+            specifications: Specifications = None,
+
+            teaching_materials: TeachingMaterial = None,
+            subtype: str = None,
+            session: str = None,
+            main_language: str = None
+
+
     ):
         self.id = id
         self.year = year
@@ -113,7 +120,7 @@ class LearningUnitYear:
         self.specific_title_en = specific_title_en or ''
         self.start_date = start_year
         self.end_date = end_year
-        self.proposal_type = proposal_type
+        self.proposal = proposal
         self.credits = credits
         self.status = status
         self.periodicity = periodicity
@@ -125,6 +132,10 @@ class LearningUnitYear:
         self.entities = entities
         self.description_fiche = description_fiche
         self.specifications = specifications
+        self.teaching_materials = teaching_materials
+        self.subtype = subtype
+        self.session = session
+        self.main_language = main_language
 
     @property
     def full_title_fr(self):
