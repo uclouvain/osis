@@ -78,10 +78,12 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         validator = AttachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
         self.assertFalse(validator.is_valid())
-        error_msg = _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+        error_msg = _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
+                      "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
+            'child': unauthorized_child,
             'child_types': unauthorized_child.node_type.value,
             'parent': self.authorized_parent,
-            'parent_type': self.authorized_parent.node_type.value,
+            'parent_type': self.authorized_parent.node_type.value
         }
 
         self.assertIn(error_msg, validator.error_messages)
@@ -114,11 +116,14 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
 
         self.assertFalse(validator.is_valid())
 
-        max_error_msg = _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-                          "has already reached the limit.") % {
-                            'child_types': another_authorized_child.node_type.value,
-                            'parent': self.authorized_parent
-                        }
+        max_error_msg = _(
+            "Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
+            "for \"%(parent)s\" has already reached the limit.") % {
+            'child': another_authorized_child,
+            'child_types': another_authorized_child.node_type.value,
+            'parent': self.authorized_parent
+        }
+
         self.assertIn(max_error_msg, validator.error_messages)
         self.assertEqual(len(validator.error_messages), 1)
 
@@ -138,9 +143,8 @@ class TestAuthorizedRelationshipLearningUnitValidator(SimpleTestCase):
 
         self.assertFalse(validator.is_valid())
 
-        error_msg_expected = _(
-            "You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s."
-        ) % {
+        error_msg_expected = _("You can not attach a learning unit like %(node)s "
+                               "to element %(parent)s of type %(type)s.") % {
             "node": node_to_add,
             "parent": tree.root_node,
             "type": tree.root_node.node_type

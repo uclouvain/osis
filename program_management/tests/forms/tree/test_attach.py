@@ -40,6 +40,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree import attach
 from program_management.forms.tree.attach import AttachNodeForm, GroupElementYearForm
+from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory, \
@@ -158,7 +159,8 @@ class TestAttachNodeForm(SimpleTestCase):
 
         return AttachNodeForm(
             to_path,
-            node_to_attach,
+            node_to_attach.node_id,
+            node_to_attach.node_type,
             data=link_attributes
         )
 
@@ -178,7 +180,8 @@ class TestAttachNodeForm(SimpleTestCase):
 
 class TestAttachNodeFormFields(SimpleTestCase):
     def test_attach_node_form_base_fields(self):
-        form = attach.AttachNodeForm("", NodeEducationGroupYearFactory())
+        node_to_attach = NodeEducationGroupYearFactory()
+        form = attach.AttachNodeForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
         expected_fields = [
             'relative_credits',
@@ -192,28 +195,32 @@ class TestAttachNodeFormFields(SimpleTestCase):
         self.assertCountEqual(expected_fields, actual_fields)
 
     def test_attach_learning_unit_form_should_remove_access_condition_and_link_type_field(self):
-        form = attach.AttachLearningUnitForm("", NodeLearningUnitYearFactory())
+        node_to_attach = NodeLearningUnitYearFactory()
+        form = attach.AttachLearningUnitForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
 
         self.assertNotIn("access_condition", actual_fields)
         self.assertNotIn("link_type", actual_fields)
 
     def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
-        form = attach.AttachToMinorMajorListChoiceForm("", NodeEducationGroupYearFactory())
+        node_to_attach = NodeEducationGroupYearFactory()
+        form = attach.AttachToMinorMajorListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
-        expected_fields = ["access_condition"]
+        expected_fields = ["access_condition", "link_type"]
 
         self.assertCountEqual(actual_fields, expected_fields)
 
     def test_attach_minor_major_list_choice_to_training_form_should_disable_all_fields_but_block(self):
-        form = attach.AttachMinorMajorListChoiceToTrainingForm("", NodeEducationGroupYearFactory())
+        node_to_attach = NodeEducationGroupYearFactory()
+        form = attach.AttachMinorMajorListChoiceToTrainingForm("", node_to_attach.node_id, node_to_attach.node_type)
 
         expected_fields_disabled = ["block"]
         actual_fields_disabled = [name for name, field in form.fields.items() if not field.disabled]
         self.assertCountEqual(expected_fields_disabled, actual_fields_disabled)
 
     def test_attach_not_authorized_children_should_remove_relative_credits_and_access_condition(self):
-        form = attach.AttachNotAuthorizedChildren("", NodeEducationGroupYearFactory())
+        node_to_attach = NodeEducationGroupYearFactory()
+        form = attach.AttachNotAuthorizedChildren("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
 
         self.assertNotIn("access_condition", actual_fields)

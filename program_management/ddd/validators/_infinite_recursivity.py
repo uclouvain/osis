@@ -39,7 +39,7 @@ class InfiniteRecursivityTreeValidator(BusinessValidator):
 
     def validate(self):
         if self.node_to_add in self.tree.get_parents(self.path):
-            error_msg = 'The child %(child)s you want to attach is a parent of the node you want to attach.' % {
+            error_msg = _('The child %(child)s you want to attach is a parent of the node you want to attach.') % {
                 'child': self.node_to_add
             }
             self.add_error_message(_(error_msg))
