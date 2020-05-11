@@ -23,26 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
 from typing import List, Tuple
+
 from django.utils.translation import gettext_lazy as _
+
 from base.models.enums.link_type import LinkTypes
-from program_management.business.group_element_years import management
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, persist_tree, load_node
+from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
-from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
 from program_management.models.enums.node_type import NodeType
+
+AttachRequest = collections.namedtuple(
+    "AttachRequest",
+    "access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
+)
 
 
 def attach_node(
         root_id: int,
         node_id_to_attach: int,
         type_node_to_attach,
-        path: 'Path' = None,
+        path: 'Path',
+        attach_request: AttachRequest,
         commit=True,
-        **link_attributes
 ) -> List['BusinessValidationMessage']:
     tree = load_tree.load(root_id)
     node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
@@ -51,7 +58,7 @@ def attach_node(
         error_messages += _validate_end_date_and_option_finality(node_to_attach)
     if error_messages:
         return error_messages
-    success_messages = tree.attach_node(node_to_attach, path, **link_attributes)
+    success_messages = tree.attach_node(node_to_attach, path, **attach_request._asdict())
     if commit:
         persist_tree.persist(tree)
     return success_messages

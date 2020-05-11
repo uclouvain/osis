@@ -65,6 +65,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_load_tree()
         self._patch_load_trees_from_children()
         self._patch_load_child_node_to_attach()
+        self.attach_request = attach_node_service.AttachRequest(None, None, None, None, None, None, None)
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
@@ -96,7 +97,8 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.tree.root_node.node_id,
             self.node_to_attach.node_id,
             self.node_to_attach_type,
-            self.root_path
+            self.root_path,
+            self.attach_request
         )
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
@@ -109,7 +111,8 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.tree.root_node.node_id,
             self.node_to_attach.node_id,
             self.node_to_attach_type,
-            self.root_path
+            self.root_path,
+            self.attach_request
         )
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
@@ -130,7 +133,8 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.tree.root_node,
             self.node_to_attach.node_id,
             self.node_to_attach_type,
-            self.root_path
+            self.root_path,
+            self.attach_request
         )
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].message, 'error link reference')
@@ -152,7 +156,8 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.tree.root_node,
             self.node_to_attach.node_id,
             self.node_to_attach_type,
-            self.root_path
+            self.root_path,
+            self.attach_request
         )
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].message, _('Success message'))
@@ -165,6 +170,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.node_to_attach.node_id,
             self.node_to_attach_type,
             self.root_path,
+            self.attach_request,
             commit=True
         )
         self.assertTrue(self.mock_load_tress_from_children.called)
@@ -177,6 +183,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             self.node_to_attach.node_id,
             self.node_to_attach_type,
             self.root_path,
+            self.attach_request,
             commit=False
         )
         self.assertFalse(self.mock_persist.called)

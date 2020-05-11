@@ -120,12 +120,23 @@ class AttachNodeForm(forms.Form):
                 self.node_id,
                 self.node_type,
                 self.to_path,
+                self._get_attach_request(),
                 commit=True,
-                **self.cleaned_data
             )
             if result:
                 self.add_error(None, result)
         return result
+
+    def _get_attach_request(self) -> attach_node_service.AttachRequest:
+        return attach_node_service.AttachRequest(
+            access_condition=self.cleaned_data.get("access_condition"),
+            is_mandatory=self.cleaned_data.get("is_mandatory"),
+            block=self.cleaned_data.get("block"),
+            link_type=self.cleaned_data.get("link_type"),
+            comment=self.cleaned_data.get("comment"),
+            comment_english=self.cleaned_data.get("comment_english"),
+            relative_credits=self.cleaned_data.get("relative_credits")
+        )
 
 
 class AttachLearningUnitForm(AttachNodeForm):
