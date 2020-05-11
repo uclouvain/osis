@@ -96,7 +96,7 @@ class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
     block = forms.CharField(required=False)
-    link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)  # TODO default value of reference depending on parent and children
+    link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.CharField(widget=forms.widgets.TextInput, required=False)
@@ -148,7 +148,12 @@ class AttachMinorMajorListChoiceToTrainingForm(AttachNodeForm):
 class AttachToMinorMajorListChoiceForm(AttachNodeForm):
     is_mandatory = None
     block = None
-    link_type = None
+    link_type = forms.ChoiceField(
+        choices=LinkTypes.choices(),
+        initial=LinkTypes.REFERENCE.name,
+        required=False,
+        disabled=True
+    )
     comment = None
     comment_english = None
     relative_credits = None
