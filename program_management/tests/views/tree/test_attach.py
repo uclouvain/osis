@@ -48,8 +48,10 @@ from base.utils.cache import ElementCache
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
+from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 def form_valid_effect(formset: AttachNodeFormSet):
@@ -198,98 +200,80 @@ class TestAttachNodeView(TestCase):
 class TestAttachCheckView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.egy = EducationGroupYearFactory()
-        cls.next_academic_year = AcademicYearFactory(current=True)
-        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
-        cls.selected_egy = EducationGroupYearFactory(
-            academic_year=cls.next_academic_year
-        )
-
-        cls.url = reverse("check_education_group_attach", args=[cls.egy.id, cls.egy.id])
-
         cls.person = PersonFactory()
 
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                      return_value=True)
-
-        cls.check_attach_service_patcher = mock.patch(
-            "program_management.ddd.service.attach_node_service.check_attach"
-        )
+        cls.url = reverse("check_education_group_attach", args=["12"])
+        cls.path = "12|25|98"
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.mocked_perm = self.perm_patcher.start()
-        self.mock_check_attach_service = self.check_attach_service_patcher.start()
 
-        self.addCleanup(self.perm_patcher.stop)
-        self.addCleanup(self.check_attach_service_patcher.stop)
-        self.addCleanup(cache.clear)
+        patcher_fetch_nodes_selected = mock.patch("program_management.business.group_element_years.management.fetch_nodes_selected")
+        mock_fetch_nodes_selected = patcher_fetch_nodes_selected.start()
+        mock_fetch_nodes_selected.return_value = [(36, NodeType.EDUCATION_GROUP), (89, NodeType.EDUCATION_GROUP)]
+        self.addCleanup(patcher_fetch_nodes_selected.stop)
 
-    def test_check_attach_called(self):
-        other_egy = EducationGroupYearFactory()
+        patcher_check_attach = mock.patch("program_management.ddd.service.attach_node_service.check_attach")
+        self.mock_check_attach = patcher_check_attach.start()
+        self.mock_check_attach.return_value = []
+        self.addCleanup(patcher_check_attach.stop)
+
+    def test_when_check_errors_then_should_display_those_errors(self):
+        self.mock_check_attach.return_value = ["Not valid"]
         response = self.client.get(self.url, data={
-            "id": [self.egy.id, other_egy.id],
-            "content_type": EDUCATION_GROUP_YEAR,
-            "path": str(self.egy.id)
-        })
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {"error_messages": []}
-        )
-        self.assertTrue(self.mock_check_attach_service.called)
-
-
-@override_flag('education_group_update', active=True)
-class TestAttachCheckViewBis(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.egy = EducationGroupYearFactory()
-        cls.next_academic_year = AcademicYearFactory(current=True)
-        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
-        cls.selected_egy = EducationGroupYearFactory(
-            academic_year=cls.next_academic_year
-        )
-        cls.path = "|".join([str(cls.egy.id)])
-        cls.url = reverse("check_education_group_attach_bis", args=[cls.egy.id])
-
-        cls.person = PersonFactory()
-
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                      return_value=True)
-
-        cls.check_attach_service_patcher = mock.patch(
-            "program_management.ddd.service.attach_node_service.check_attach"
-        )
-
-    def setUp(self):
-        self.client.force_login(self.person.user)
-        self.mocked_perm = self.perm_patcher.start()
-        self.mock_check_attach_service = self.check_attach_service_patcher.start()
-
-        self.addCleanup(self.perm_patcher.stop)
-        self.addCleanup(self.check_attach_service_patcher.stop)
-        self.addCleanup(cache.clear)
-
-    def test_when_multiple_element_selected_and_no_errors_then_should_redirect_to_view_attach_nodes(self):
-        self.mock_check_attach_service.return_value = []
-        other_egy = EducationGroupYearFactory()
-        response = self.client.get(self.url, data={
-            "id": [self.egy.id, other_egy.id],
+            "id": [36, 89],
             "content_type": EDUCATION_GROUP_YEAR,
             "path": self.path
         })
+        self.assertTemplateUsed(response, "tree/check_attach_inner.html")
+
+        msgs = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertIn("Not valid", msgs)
+
+    def test_when_check_errors_and_accept_json_header_then_should_return_those_errors_as_json(self):
+        self.mock_check_attach.return_value = ["Not valid"]
+        response = self.client.get(self.url, data={
+            "id": [36, 89],
+            "content_type": EDUCATION_GROUP_YEAR,
+            "path": self.path
+        }, HTTP_ACCEPT="application/json")
+
+        self.assertEqual(
+            response.json(),
+            {"error_messages": ["Not valid"]}
+        )
+
+    def test_when_no_check_errors_and_accept_json_header_then_should_json_response_with_empty_errors_messages(self):
+        response = self.client.get(self.url, data={
+            "id": [36, 89],
+            "content_type": EDUCATION_GROUP_YEAR,
+            "path": self.path
+        }, HTTP_ACCEPT="application/json")
+
+        self.assertEqual(
+            response.json(),
+            {"error_messages": []}
+        )
+
+    def test_when_no_check_errors_then_should_redirect_to_view_attach_nodes(self):
+        response = self.client.get(self.url, data={
+            "id": [36, 89],
+            "content_type": EDUCATION_GROUP_YEAR,
+            "path": self.path
+        })
+
         qd = QueryDict(mutable=True)
         qd.update({
             "content_type": EDUCATION_GROUP_YEAR,
             "path": self.path
         })
-        qd.setlist("id", [self.egy.id, other_egy.id])
-        expected_url = reverse("tree_attach_node", args=[self.egy.id]) + "?{}".format(qd.urlencode())
+        qd.setlist("id", [36, 89])
+        expected_url = reverse("tree_attach_node", args=[12]) + "?{}".format(qd.urlencode())
         self.assertRedirects(
             response,
-            expected_url
+            expected_url,
+            fetch_redirect_response=False
         )
-        self.assertTrue(self.mock_check_attach_service.called)
 
 
 @override_flag('education_group_update', active=True)

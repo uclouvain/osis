@@ -39,11 +39,8 @@ urlpatterns = [
     url(r'^copy_element/$', program_management.views.tree.move.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
-            #  TODO Remove attach urls
             url(u'^attach/', program_management.views.tree.attach.PasteElementFromCacheToSelectedTreeNode.as_view(),
                 name='education_group_attach'),
-            url(r'^check_attach/', program_management.views.tree.attach.AttachCheckView.as_view(),
-                name="check_education_group_attach"),
             url(u'^create/$', program_management.views.tree.attach.CreateGroupElementYearView.as_view(),
                 name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
@@ -98,8 +95,8 @@ urlpatterns = [
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
         ])),
-        path('check_attach_bis/', program_management.views.tree.attach.AttachCheckViewBis.as_view(),
-             name="check_education_group_attach_bis"),
+        path('check_attach/', program_management.views.tree.attach.AttachCheckView.as_view(),
+             name="check_education_group_attach"),
         path('<str:node_path>/quick_search/', include([
             path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
             path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),

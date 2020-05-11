@@ -46,7 +46,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
-from base.views.mixins import AjaxTemplateMixin
+from base.views.mixins import AjaxTemplateMixin, FlagMixin, RulesRequiredMixin
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
@@ -116,49 +116,19 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
         return reverse('education_group_read', args=[root_id, root_id])
 
 
-class AttachCheckView(GenericGroupElementYearMixin, View):
-    rules = []
-
-    def get(self, request, *args, **kwargs):
-        error_messages = []
-
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            error_messages.append(str(e))
-
-        nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
-        error_messages = attach_node_service.check_attach(
-            int(self.kwargs["root_id"]),
-            self.request.GET["path"],
-            nodes_to_attach
-        )
-
-        return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if self.rules:
-            try:
-                self.rules[0](self.request.user, self.education_group_year)
-
-            except PermissionDenied as e:
-                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(AttachCheckView, self).dispatch(request, *args, **kwargs)
-
-
-class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
+class AttachCheckView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
-        node_to_attach_from_id = int(self.request.GET["path"].split("|")[-1])
         nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
         error_messages = attach_node_service.check_attach(
             self.kwargs["root_id"],
             self.request.GET["path"],
             nodes_to_attach
         )
+
+        if "application/json" in self.request.headers.get("Accept", ""):
+            return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
 
         if not error_messages:
             return redirect(
