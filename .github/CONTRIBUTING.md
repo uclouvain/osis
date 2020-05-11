@@ -406,7 +406,7 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 
 - Regroupe les invariants métier (règles business)
 - Se charge de raise des BusinessException en cas d'invariant métier non respecté
-- Les exceptions sont "raisées" en anglais ; il n'y a pas de traduction des messages (c'est BusinessException qui s'en charge)
+- Les messages doivent être traduits (si BusinessException s'en charge, le makemessages ne reprendra pas messages à traduire car ils seront stockés dans des variables...)
 - Doit hériter de BusinessValidator
 - 1 fichier par invariant métier
 - Nommage des fichiers : <invariant_metier>.py
@@ -416,8 +416,9 @@ Exemple :
 ```python
 # detach_root.py
 from osis_common.ddd import interface
+from django.utils.translation import gettext as _
 
-class DetachRootValidator(BusinessValidator):
+class DetachRootValidator(interface.BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', path_to_detach: 'Path'):
         super(DetachRootValidator, self).__init__()
@@ -426,7 +427,7 @@ class DetachRootValidator(BusinessValidator):
 
     def validate(self):
         if self.tree.is_root(self.tree.get_node(self.path_to_detach)):
-            raise interface.BusinessException("Cannot perform detach action on root.")
+            raise interface.BusinessException(_("Cannot perform detach action on root."))
 
 ```
 
