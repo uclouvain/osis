@@ -36,7 +36,6 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views import View
 from django.views.generic import RedirectView, CreateView, FormView, TemplateView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
@@ -46,7 +45,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
-from base.views.mixins import AjaxTemplateMixin, FlagMixin, RulesRequiredMixin
+from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
@@ -146,6 +145,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
 
     def get_redirect_url(self, *args, **kwargs):
         self.pattern_name = 'group_element_year_create'
+        redirect_url = reverse("check_education_group_attach", args=[self.kwargs["root_id"]])
+        redirect_url = "{}?{}".format(redirect_url, self.request.GET.urlencode())
 
         try:
             perms.can_change_education_group(self.request.user, self.education_group_year)
@@ -161,7 +162,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
             if action_from_cache == ElementCache.ElementCacheAction.CUT.value:
                 kwargs['group_element_year_id'] = fetch_source_link(self.request.GET, self.request.user).id
                 self.pattern_name = 'group_element_year_move'
-
+            else:
+                return redirect_url
         return super().get_redirect_url(*args, **kwargs)
 
     @method_decorator(login_required)
