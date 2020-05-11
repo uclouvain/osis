@@ -294,6 +294,7 @@ django_app
 #### ddd/command.py
 - Regroupe les **objets** qui sont transmis en paramètre d'un service (ddd/service)
 - Représente une simple "dataclass" possédant des attributs primitifs
+- Doit obligatoirement hériter de l'objet CommandRequest
 - Nommage des classes de commande : <ActionMetier>Command
 
 Exemple : 
