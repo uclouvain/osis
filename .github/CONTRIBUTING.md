@@ -257,8 +257,10 @@ Dans de rares cas plus complexes (exemple: identification d'une personne : UUID)
     Exemple: ```def _my_protected_function(param: str) -> None```
 
 
-> :information_source: Info : Toutes les interfaces et classes abstraites réutilisables pour le DDD
-> (ValueObject, EntityObject...) sont définies [dans osis_common](https://github.com/uclouvain/osis-common/tree/master/ddd)
+
+> :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour le DDD
+> (ValueObject, EntityObject...) sont définies [dans osis_common](https://github.com/uclouvain/osis-common/tree/master/ddd)**
+
 
 
 #### Arborescence des packages
