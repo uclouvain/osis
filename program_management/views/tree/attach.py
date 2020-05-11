@@ -129,7 +129,7 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
 
         nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
         error_messages = attach_node_service.check_attach(
-            self.kwargs["root_id"],
+            int(self.kwargs["root_id"]),
             self.request.GET["path"],
             nodes_to_attach
         )
