@@ -429,7 +429,7 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
-            'form-0-country': OrganizationAddressFactory(organization=organization, is_main=True).country.pk,
+            'form-0-country': OrganizationAddressFactory(organization=organization, is_main=True).country,
             'form-0-organization': organization.pk,
             'form-0-diploma': diploma_choice,
             'group_element_year_formset-TOTAL_FORMS': 0,
