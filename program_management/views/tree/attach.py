@@ -273,7 +273,7 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
 def _check_attach(parent: EducationGroupYear, elements_to_attach):
     children_types = NodeType.LEARNING_UNIT \
         if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
-    return attach_node_service.check_attach_bis(
+    return attach_node_service.check_attach_via_parent(
         parent.pk,
         [element.pk for element in elements_to_attach],
         children_types

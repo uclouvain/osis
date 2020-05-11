@@ -32,6 +32,7 @@ from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
 from base.ddd.utils import validation_message
+from base.models import group_element_year
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
@@ -95,11 +96,15 @@ def _get_form_class(
 class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
-    block = forms.CharField(required=False)
+    block = forms.IntegerField(
+        required=False,
+        validators=[group_element_year.validate_block_value],
+        widget=forms.widgets.TextInput
+    )
     link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
-    relative_credits = forms.CharField(widget=forms.widgets.TextInput, required=False)
+    relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
 
     def __init__(self, to_path: str, node_to_attach_id: int, node_to_attach_type: NodeType, **kwargs):
         self.to_path = to_path
@@ -129,12 +134,12 @@ class AttachNodeForm(forms.Form):
 
     def _get_attach_request(self) -> attach_node_service.AttachRequest:
         return attach_node_service.AttachRequest(
-            access_condition=self.cleaned_data.get("access_condition"),
-            is_mandatory=self.cleaned_data.get("is_mandatory"),
+            access_condition=self.cleaned_data.get("access_condition", False),
+            is_mandatory=self.cleaned_data.get("is_mandatory", True),
             block=self.cleaned_data.get("block"),
             link_type=self.cleaned_data.get("link_type"),
-            comment=self.cleaned_data.get("comment"),
-            comment_english=self.cleaned_data.get("comment_english"),
+            comment=self.cleaned_data.get("comment", ""),
+            comment_english=self.cleaned_data.get("comment_english", ""),
             relative_credits=self.cleaned_data.get("relative_credits")
         )
 

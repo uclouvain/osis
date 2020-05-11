@@ -29,6 +29,7 @@ from typing import List, Tuple
 from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.link_type import LinkTypes
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, persist_tree, load_node
 from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
@@ -64,7 +65,8 @@ def attach_node(
     return success_messages
 
 
-def check_attach_bis(
+@deprecated
+def check_attach_via_parent(
         parent_node_id: int,
         children_nodes_ids: List[int],
         children_type: NodeType

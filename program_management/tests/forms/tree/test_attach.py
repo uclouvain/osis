@@ -169,6 +169,13 @@ class TestAttachNodeForm(SimpleTestCase):
         self.assertFalse(form_instance.is_valid())
         self.assertTrue(form_instance.errors['link_type'])
 
+    def test_block_field_should_only_accept_sequence_of_increasing_digits_of_1_to_6(self):
+        form_instance = self._get_attach_node_form_instance({'block': "012758"})
+        self.assertTrue(form_instance.errors['block'])
+
+        form_instance = self._get_attach_node_form_instance({'block': "125"})
+        self.assertTrue(form_instance.is_valid())
+
     @mock.patch("program_management.ddd.service.attach_node_service.attach_node")
     def test_save_should_call_attach_service(self, mock_service_attach_node):
         form_instance = self._get_attach_node_form_instance(link_attributes={})
