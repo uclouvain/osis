@@ -144,7 +144,7 @@ class PermissionFieldEducationGroupYearMixin(PermissionFieldEducationGroupMixin)
         return EventPermEducationGroupEdition(obj=education_group_year, raise_exception=False).is_open()
 
 
-class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
+class PermissionFieldTrainingMixin(PermissionFieldEducationGroupYearMixin):
     """
     Permission Field for Hops(year) and for Coorganization
 
