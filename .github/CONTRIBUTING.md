@@ -398,9 +398,7 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
     # Appel à l'action métier sur l'objet du domaine
     
     # Then
-    
-    # Event
-    # Envoyer notifications, envoyer un mail, ...
+    pass
  
 ```
 
