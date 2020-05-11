@@ -144,7 +144,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     for learning_unit_data in qs:
         luy = LearningUnitYear(
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
-            achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
+            # achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
