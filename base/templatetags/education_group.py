@@ -183,7 +183,7 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, versioned_field=False):
+def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, html_id=None, versioned_field=False):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
@@ -194,7 +194,6 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
         obj = context["group_year"]
     else:
         obj = context["education_group_year"]
-
     parent = context["parent"]
 
     return dl_with_parent_without_context(
@@ -210,12 +209,11 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, v
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
-def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, version_label=None,
+def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, html_id=None, version_label=None,
                                    is_standard=False, versioned_field=False):
 
     value = None
     parent_value = None
-
     if obj:
         value = get_verbose_field_value(obj, key)
 
@@ -238,6 +236,7 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
         'parent_value': _bool_to_string(parent_value),
         'class_dl': class_dl,
         'default_value': default_value,
+        'html_id': html_id,
     }
     if not is_standard and not versioned_field:
         dl_dict.update({'title_dl': _('The value of this attribute is inherited from the standard OF')})
