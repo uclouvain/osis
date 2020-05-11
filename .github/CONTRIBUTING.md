@@ -315,6 +315,8 @@ class AttachNodeCommand(interface.CommandRequest):
 
 #### ddd/domain
 - Regroupe les **objets** du domaine métier qui doivent obligatoirement hériter de ValueObject, Entity ou RootEntity
+- Déclare les EntityIdentity (dans le même fichier que la classe du domaine qui utilise cet EntityIdentity)
+- Les ValueObject doivent obligatoirement redéfinir les méthodes `__hash__()` et `__eq__()`
 - 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
 - Nommage des objets : ObjetMetier.
 
@@ -322,6 +324,21 @@ Exemple :
 ```python
 # ddd/domain/program_tree.py  -> Aggregate root du domaine "program_management"
 from osis_common.ddd import interface
+
+
+class ProgramTreeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        """Doit être implémenté obligatoirement pour les ValueObjects uniquement !"""
+        return hash(self.code + str(self.year))
+    
+    def __eq__(self, other):
+        """Doit être implémenté obligatoirement pour les ValueObjects uniquement !"""
+        return other.code == self.code and other.year == self.year 
+
 
 class ProgramTree(interface.RootEntity):
     pass
