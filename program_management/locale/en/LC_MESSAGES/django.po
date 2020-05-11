@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-05 08:45+0200\n"
+"POT-Creation-Date: 2020-05-11 08:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -551,6 +551,9 @@ msgstr ""
 msgid "The content has already been postponed."
 msgstr ""
 
+msgid "The content has been updated."
+msgstr ""
+
 #, python-format
 msgid "The content of %(acronym)s has been updated."
 msgstr ""
@@ -677,6 +680,7 @@ msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
+#, python-format
 msgid ""
 "You are not allowed to create a reference with a learning unit %(child_node)s"
 msgstr ""
@@ -702,6 +706,12 @@ msgid "You can not add the same child %(child_node)s several times."
 msgstr ""
 
 msgid "You can not add the same child several times."
+msgstr ""
+
+#, python-format
+msgid ""
+"You can not attach a learning unit like %(node)s to element %(parent)s of "
+"type %(type)s."
 msgstr ""
 
 #, python-format

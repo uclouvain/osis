@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Tuple
 from django.utils.translation import gettext_lazy as _
 from base.models.enums.link_type import LinkTypes
 from program_management.business.group_element_years import management
@@ -32,7 +32,7 @@ from program_management.ddd.repositories import load_tree, persist_tree, load_no
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
-from program_management.ddd.validators import link as link_validator
+from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
 from program_management.models.enums.node_type import NodeType
 
 
@@ -79,21 +79,38 @@ def check_attach_bis(
 
 
 def check_attach(
-    parent_node: 'Node',
-    children_nodes: List['Node']
+        tree_root_id: int,
+        path_of_node_to_attach_from: 'Path',
+        nodes_to_attach: List[Tuple[int, NodeType]]
 ) -> List['BusinessValidationMessage']:
     result = []
+    tree = load_tree.load(tree_root_id)
+    node_to_attach_from = tree.get_node(path_of_node_to_attach_from)
 
-    if not children_nodes:
+    _nodes_to_attach = [load_node.load_by_type(node_type, node_id) for node_id, node_type in nodes_to_attach]
+
+    if not _nodes_to_attach:
         result.append(
             _("Please select an item before adding it")
         )
 
-    for child_node in children_nodes:
-        if child_node.node_type != NodeType.LEARNING_UNIT:
-            result.extend(_validate_end_date_and_option_finality(child_node))
+    for node_to_attach in _nodes_to_attach:
+        if not node_to_attach.is_learning_unit():
+            result.extend(_validate_end_date_and_option_finality(node_to_attach))
 
-        validator = link_validator.CreateLinkValidatorList(parent_node, child_node)
+        validator = link_validator.CreateLinkValidatorList(node_to_attach_from, node_to_attach)
+        if not validator.is_valid():
+            result.extend(validator.messages)
+
+        validator = _minimum_editable_year.MinimumEditableYearValidator(tree)
+        if not validator.is_valid():
+            result.extend(validator.messages)
+
+        validator = _infinite_recursivity.InfiniteRecursivityTreeValidator(
+            tree,
+            node_to_attach,
+            path_of_node_to_attach_from
+        )
         if not validator.is_valid():
             result.extend(validator.messages)
 

@@ -51,7 +51,6 @@ from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
-from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
@@ -64,7 +63,7 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
 
     @cached_property
     def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
-        return management.fetch_nodes_selected_bis(self.request.GET, self.request.user)
+        return management.fetch_nodes_selected(self.request.GET, self.request.user)
 
     def get_form_class(self):
         return formset_factory(form=attach_form_factory, formset=AttachNodeFormSet, extra=len(self.nodes_to_attach))
@@ -129,13 +128,13 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
             error_messages.append(str(e))
 
         nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
-        error_messages = attach_node_service.check_attach(self.node, nodes_to_attach)
+        error_messages = attach_node_service.check_attach(
+            self.kwargs["root_id"],
+            self.request.GET["path"],
+            nodes_to_attach
+        )
 
         return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
-
-    @property
-    def node(self):
-        return load_node.load_by_type(NodeType.EDUCATION_GROUP, self.kwargs.get("education_group_year_id"))
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -153,12 +152,13 @@ class AttachCheckViewBis(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMi
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
-        node_to_attach_from = load_node.load_by_type(
-            NodeType.EDUCATION_GROUP,
-            int(self.request.GET["path"].split("|")[-1])
-        )
+        node_to_attach_from_id = int(self.request.GET["path"].split("|")[-1])
         nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
-        error_messages = attach_node_service.check_attach(node_to_attach_from, nodes_to_attach)
+        error_messages = attach_node_service.check_attach(
+            self.kwargs["root_id"],
+            self.request.GET["path"],
+            nodes_to_attach
+        )
 
         if not error_messages:
             return redirect(

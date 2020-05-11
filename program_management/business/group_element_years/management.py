@@ -56,20 +56,7 @@ def fetch_source_link(request_parameters, user):
     return source_link
 
 
-def fetch_nodes_selected(request_parameters, user) -> List[node.Node]:
-    selected_data = _get_elements_selected(request_parameters, user)
-
-    nodes_selected = []
-    for selected_element in selected_data:
-        if selected_element['modelname'] == LEARNING_UNIT_YEAR:
-            nodes_selected.append(load_node.load_node_learning_unit_year(selected_element["id"]))
-        elif selected_element['modelname'] == EDUCATION_GROUP_YEAR:
-            nodes_selected.append(load_node.load_node_education_group_year(selected_element['id']))
-
-    return nodes_selected
-
-
-def fetch_nodes_selected_bis(request_parameters, user) -> List[Tuple[int, NodeType]]:
+def fetch_nodes_selected(request_parameters, user) -> List[Tuple[int, NodeType]]:
     def _convert_element_to_node_id_and_node_type(element) -> Tuple[int, NodeType]:
         if element['modelname'] == LEARNING_UNIT_YEAR:
             return element["id"], NodeType.LEARNING_UNIT

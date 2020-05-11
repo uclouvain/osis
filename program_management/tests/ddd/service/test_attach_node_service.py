@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Type
 from unittest import mock
 from unittest.mock import patch
 
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
@@ -37,6 +39,8 @@ from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
+from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
+from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
 from program_management.models.enums.node_type import NodeType
@@ -250,7 +254,11 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
 
 class TestCheckAttach(SimpleTestCase):
     def setUp(self) -> None:
-        self.parent_node = NodeEducationGroupYearFactory()
+        self.tree = ProgramTreeFactory()
+        self.node_to_attach_from = NodeEducationGroupYearFactory()
+        LinkFactory(parent=self.tree.root_node, child=self.node_to_attach_from)
+        self.path = "|".join([str(self.tree.root_node.node_id), str(self.node_to_attach_from.node_id)])
+
         self.node_to_attach_1 = NodeEducationGroupYearFactory()
         self.node_to_attach_2 = NodeEducationGroupYearFactory()
 
@@ -261,41 +269,76 @@ class TestCheckAttach(SimpleTestCase):
         self.mock_validate_end_date_and_option_finality.return_value = []
         self.addCleanup(patcher_validate_end_date_and_option_finality.stop)
 
-        patcher_create_link_validator_list = mock.patch.object(
-            CreateLinkValidatorList, "is_valid"
+        patcher_load_tree = mock.patch(
+            "program_management.ddd.repositories.load_tree.load"
         )
-        self.mock_create_link_validtor = patcher_create_link_validator_list.start()
-        self.mock_create_link_validtor.return_value = True
-        self.addCleanup(patcher_create_link_validator_list.stop)
+        self.mock_load_tree = patcher_load_tree.start()
+        self.mock_load_tree.return_value = self.tree
+        self.addCleanup(patcher_load_tree.stop)
+
+        patcher_load_nodes = mock.patch(
+            "program_management.ddd.repositories.load_node.load_by_type"
+        )
+        self.mock_load_node = patcher_load_nodes.start()
+        self.mock_load_node.side_effect = [self.node_to_attach_1, self.node_to_attach_2]
+        self.addCleanup(patcher_load_nodes.stop)
+
+        self.mock_create_link_validator = self._patch_validator_is_valid(CreateLinkValidatorList)
+        self.mock_minimum_year_editable = self._patch_validator_is_valid(MinimumEditableYearValidator)
+        self.mock_infinite_recursivity_tree = self._patch_validator_is_valid(InfiniteRecursivityTreeValidator)
+
+    def _patch_validator_is_valid(self, validator_class: Type[business_validator.BusinessValidator]):
+        patch_validator = mock.patch.object(
+            validator_class, "is_valid"
+        )
+        mock_validator = patch_validator.start()
+        mock_validator.return_value = True
+        self.addCleanup(patch_validator.stop)
+        return mock_validator
 
     def test_should_call_return_error_if_no_nodes_to_attach(self):
         result = attach_node_service.check_attach(
-            self.parent_node,
+            self.tree.root_node.node_id,
+            self.path,
             [],
         )
         self.assertIn(_("Please select an item before adding it"), result)
 
     def test_should_call_validate_end_date_and_option_finality(self):
         attach_node_service.check_attach(
-            self.parent_node,
-            [self.node_to_attach_1, self.node_to_attach_2],
+            self.tree.root_node.node_id,
+            self.path,
+            [
+                (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
+                (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
+            ],
         )
 
         self.assertEqual(self.mock_validate_end_date_and_option_finality.call_count, 2)
 
-    def test_should_call_create_link_validator_list(self):
+    def test_should_call_specific_validators(self):
         attach_node_service.check_attach(
-            self.parent_node,
-            [self.node_to_attach_1, self.node_to_attach_2]
+            self.tree.root_node.node_id,
+            self.path,
+            [
+                (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
+                (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
+            ]
         )
 
-        self.assertEqual(self.mock_create_link_validtor.call_count, 2)
+        self.assertEqual(self.mock_create_link_validator.call_count, 2)
+        self.assertEqual(self.mock_minimum_year_editable.call_count, 2)
+        self.assertEqual(self.mock_infinite_recursivity_tree.call_count, 2)
 
     def test_should_return_validation_messages_if_any(self):
         self.mock_validate_end_date_and_option_finality.return_value = ["Validation error"]
         result = attach_node_service.check_attach(
-            self.parent_node,
-            [self.node_to_attach_1, self.node_to_attach_2],
+            self.tree.root_node.node_id,
+            self.path,
+            [
+                (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
+                (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
+            ]
         )
 
         self.assertEqual(
