@@ -291,7 +291,7 @@ class NodeGroupYear(Node):
         group_title_en: str = None,
         offer_partial_title_fr: str = None,
         offer_partial_title_en: str = None,
-        category: Categories = None,
+        category: GroupType = None,
         management_entity_acronym: str = None,
         teaching_campus: str = None,
         **kwargs

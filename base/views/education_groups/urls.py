@@ -34,6 +34,7 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.select import copy_education_group_to_cache, copy_learning_unit_to_cache
 from base.views.education_groups.update import CertificateAimAutocomplete
+from education_group import urls as education_group_urls
 from . import search, create, detail, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
@@ -89,11 +90,6 @@ urlpatterns = [
         create.SelectEducationGroupTypeView.as_view(),
         name='select_education_group_type'
     ),
-    path('<int:year>/<str:code>/', include([
-        url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
-        url(r'^content/$', detail.EducationGroupContent.as_view(), name='education_group_content'),
-        url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
-    ])),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
@@ -150,4 +146,4 @@ urlpatterns = [
                 name="publication_contact_delete"),
         ])),
     ]))
-]
+] + education_group_urls.urlpatterns

@@ -30,7 +30,7 @@ from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from education_group.models.group_year import GroupYear
 from learning_unit.ddd.repository import load_learning_unit_year
@@ -137,7 +137,8 @@ def convert_node_type_enum(str_node_type: str) -> EducationGroupTypesEnum:
 
 
 def __convert_category_enum(category: str):
-    return Categories[category]
+    return getattr(GroupType, category, None) or getattr(TrainingType, category, None) or \
+           getattr(MiniTrainingType, category, None)
 
 
 def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
@@ -150,7 +151,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return GroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         type=Value(NodeType.GROUP.name, output_field=CharField()),
         node_type=F('education_group_type__name'),
-        category=F('education_group_type__category'),
+        category=F('education_group_type__name'),
         code=F('partial_acronym'),
         title=F('acronym'),
         year=F('academic_year__year'),

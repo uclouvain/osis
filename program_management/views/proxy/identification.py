@@ -11,7 +11,7 @@ class IdentificationRedirectView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         tree = load_tree.load(self.kwargs['root_element_id'])
         self.url = reverse(
-            'education_group_read',
+            'group_identification',
             kwargs={'year': tree.root_node.year, 'code': tree.root_node.code}
         )
         return super().get_redirect_url(*args, **kwargs)
