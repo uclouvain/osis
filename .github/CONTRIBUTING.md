@@ -417,8 +417,9 @@ Exemple :
 # detach_root.py
 from osis_common.ddd import interface
 from django.utils.translation import gettext as _
+from base.ddd.utils import business_validator
 
-class DetachRootValidator(interface.BusinessValidator):
+class DetachRootValidator(business_validator.BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', path_to_detach: 'Path'):
         super(DetachRootValidator, self).__init__()
