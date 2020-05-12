@@ -114,6 +114,7 @@ class AttachNodeForm(forms.Form):
         validator = _block_validator.BlockValidator(cleaned_block_type)
         if not validator.is_valid():
             raise ValidationError(validator.error_messages)
+        return cleaned_block_type
 
     def clean_link_type(self):
         cleaned_link_type = self.cleaned_data.get('link_type')
