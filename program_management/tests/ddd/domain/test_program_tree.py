@@ -136,9 +136,14 @@ class TestGetNodePath(SimpleTestCase):
 
     def test_when_node_is_present_multiple_times_in_tree_should_return_a_path(self):
         path = self.tree.get_node_path(self.link_1_1_1.child)
-        self.assertEqual(
+
+        paths_possible = [
+            program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child, self.link_1_1_1.child),
+            program_tree.build_path(self.tree.root_node, self.link_2.child, self.link_2_1.child),
+        ]
+        self.assertIn(
             path,
-            program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child, self.link_1_1_1.child)
+            paths_possible
         )
 
 
