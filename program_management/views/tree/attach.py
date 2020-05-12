@@ -114,8 +114,7 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
         return _("The content has been updated.")
 
     def get_success_url(self):
-        root_id = self.kwargs["root_id"]
-        return reverse('education_group_read', args=[root_id, root_id])
+        return
 
 
 class AttachCheckView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
