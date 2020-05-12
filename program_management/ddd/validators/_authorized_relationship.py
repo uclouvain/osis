@@ -85,7 +85,7 @@ class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
                 _("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
                     "node": self.node_to_attach,
                     "parent": self.position_to_attach_from,
-                    "type": self.position_to_attach_from.node_type
+                    "type": self.position_to_attach_from.node_type.value
                 }
             )
 
