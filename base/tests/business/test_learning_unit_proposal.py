@@ -273,11 +273,10 @@ class TestConsolidateProposals(TestCase):
     @mock.patch("base.business.learning_units.perms._is_attached_to_initial_or_current_requirement_entity",
                 return_value=True)
     def test_apply_action_on_proposals_with_tutor_application(self, mock_entity, mock_state, mock_right):
-        self.proposals[0].type = ProposalType.SUPPRESSION.name
-        self.proposals[0].save()
-        TutorApplicationFactory(learning_container_year=self.proposals[0].learning_unit_year.learning_container_year)
+        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name)
+        TutorApplicationFactory(learning_container_year=proposal.learning_unit_year.learning_container_year)
         proposals_with_results = _apply_action_on_proposals(
-            self.proposals,
+            [proposal],
             consolidate_proposal,
             self.author,
             is_eligible_to_consolidate_proposal
@@ -286,7 +285,7 @@ class TestConsolidateProposals(TestCase):
         self.assertEqual(
             proposals_with_results[0],
             (
-                self.proposals[0],
+                proposal,
                 {ERROR: _("This learning unit has application.")}
             )
         )
