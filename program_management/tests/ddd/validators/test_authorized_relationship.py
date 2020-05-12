@@ -147,7 +147,7 @@ class TestAuthorizedRelationshipLearningUnitValidator(SimpleTestCase):
                                "to element %(parent)s of type %(type)s.") % {
             "node": node_to_add,
             "parent": tree.root_node,
-            "type": tree.root_node.node_type
+            "type": tree.root_node.node_type.value
         }
         self.assertIn(error_msg_expected, validator.error_messages)
 

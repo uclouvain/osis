@@ -213,7 +213,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
         node_to_attach = NodeEducationGroupYearFactory()
         form = attach.AttachToMinorMajorListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
-        expected_fields = ["access_condition", "link_type"]
+        expected_fields = ["access_condition"]
 
         self.assertCountEqual(actual_fields, expected_fields)
 
