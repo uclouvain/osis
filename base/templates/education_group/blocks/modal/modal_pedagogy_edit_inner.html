@@ -52,16 +52,6 @@
 </form>
 
 <script>
-    {# FIXME Need this so as to display ckeditor properly   #}
-    $(function () {
-        var richText = $('#id_text_french');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_french', config);
-
-        var richText = $('#id_text_english');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_english', config);
-    });
     $('#modification_tabs a').click(function (e) {
         e.preventDefault();
         $(this).tab('show');
