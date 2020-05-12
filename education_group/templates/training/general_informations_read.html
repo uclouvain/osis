@@ -1,5 +1,5 @@
-{% extends "group/layout_read.html" %}
-{% load i18n bootstrap3 format static education_group %}
+{% extends "training/layout_read.html" %}
+{% load i18n bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -24,16 +24,10 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            {% url 'education_group_read' node.year node.code as url_identification %}
-             <a href="{{url_identification}}"
-               id="lnk_node_{node.pk}}">{{ node.code }} - {{ node.title }}</a>
-            {% trans 'is using in' %} :
-            <br><br>
-            {% include "blocks/table_element_utilizations.html" %}
+            TEST GENERAL INFORMATION READ
         </div>
     </div>
 {% endblock details %}

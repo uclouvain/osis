@@ -31,13 +31,10 @@ from base.models.education_group_type import EducationGroupType
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
     def __init__(self, *args, **kwargs):
-        super().__init__(view_name='education_group_read', **kwargs)
+        super().__init__(view_name='element_identification', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
-        return reverse('education_group_read', kwargs={
-            'year': obj.academic_year.year,
-            'code': obj.partial_acronym
-        })
+        return reverse('element_identification', args=[obj.element.pk])
 
 
 class EducationGroupSerializer(serializers.Serializer):
