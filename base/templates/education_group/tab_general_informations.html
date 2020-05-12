@@ -57,23 +57,10 @@
         {% endif %}
     </div>
 
-    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
 
 {% block script %}
     <script>
-        {% if can_edit_information %}
-            $('div#panel-data').on('click', 'a.pedagogy-edit-btn', function (evt) {
-                evt.preventDefault();
-                var url = $(this).data("form");
-                var pedagogy_edit_modal = $("#pedagogy_edit");
-                pedagogy_edit_modal.load(url, function () {
-                    $(this).modal('show');
-                });
-                return false;
-            });
-        {% endif %}
-
         {% if  request.GET.anchor  %}
             $(document).ready(function () {
                 var elt_to_focus = "#lbl_contacts_header";
