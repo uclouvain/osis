@@ -33,7 +33,7 @@ from django.utils.translation import gettext_lazy as _
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import node
+from program_management.ddd.domain import node, program_tree
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree, build_path
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
@@ -103,6 +103,41 @@ class TestGetNodeByIdAndTypeProgramTree(SimpleTestCase):
         self.assertEqual(
             result,
             self.subgroup_node
+        )
+
+
+class TestGetNodePath(SimpleTestCase):
+    def setUp(self) -> None:
+        self.tree = ProgramTreeFactory()
+        self.link_1 = LinkFactory(parent=self.tree.root_node)
+        self.link_1_1 = LinkFactory(parent=self.link_1.child)
+        self.link_1_1_1 = LinkFactory(parent=self.link_1_1.child)
+        self.link_2 = LinkFactory(parent=self.tree.root_node)
+        self.link_2_1 = LinkFactory(parent=self.link_2.child, child=self.link_1_1_1.child)
+
+    def test_when_node_not_present_in_tree_should_return_none(self):
+        path = self.tree.get_node_path(NodeLearningUnitYearFactory())
+        self.assertIsNone(path)
+
+    def test_when_node_is_root_then_should_return_path_of_root(self):
+        path = self.tree.get_node_path(self.tree.root_node)
+        self.assertEqual(
+            path,
+            program_tree.build_path(self.tree.root_node)
+        )
+
+    def test_when_node_is_uniquely_present_in_tree_should_return_path(self):
+        path = self.tree.get_node_path(self.link_1_1.child)
+        self.assertEqual(
+            path,
+            program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child)
+        )
+
+    def test_when_node_is_present_multiple_times_in_tree_should_return_a_path(self):
+        path = self.tree.get_node_path(self.link_1_1_1.child)
+        self.assertEqual(
+            path,
+            program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child, self.link_1_1_1.child)
         )
 
 

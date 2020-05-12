@@ -132,6 +132,16 @@ class ProgramTree:
             None
         )
 
+    def get_node_path(self, node: 'Node') -> Optional[Path]:
+        if node == self.root_node:
+            return build_path(self.root_node)
+
+        nodes_by_path = self.root_node.descendents
+        return next(
+            (path for path, node_obj in nodes_by_path.items() if node_obj == node),
+            None
+        )
+
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
         Return a flat set of all nodes present in the tree

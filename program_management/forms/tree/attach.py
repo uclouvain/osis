@@ -93,7 +93,6 @@ def _get_form_class(
     return AttachNodeForm
 
 
-#  TODO should define clean_link_type and when saving should verify errors
 class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)

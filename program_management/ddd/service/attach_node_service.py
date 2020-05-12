@@ -65,6 +65,7 @@ def attach_node(
     return success_messages
 
 
+#  FIXME suppress when view MoveGroupElementYear will use ddd services
 @deprecated
 def check_attach_via_parent(
         parent_node_id: int,
