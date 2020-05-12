@@ -116,10 +116,6 @@ class AttachNodeForm(forms.Form):
             raise ValidationError(validator.error_messages)
         return cleaned_block_type
 
-    def clean_link_type(self):
-        cleaned_link_type = self.cleaned_data.get('link_type')
-        return cleaned_link_type
-
     def save(self) -> List[validation_message.BusinessValidationMessage]:
         result = []
         if self.is_valid():
@@ -168,15 +164,14 @@ class AttachMinorMajorListChoiceToTrainingForm(AttachNodeForm):
 class AttachToMinorMajorListChoiceForm(AttachNodeForm):
     is_mandatory = None
     block = None
-    link_type = forms.ChoiceField(
-        choices=LinkTypes.choices(),
-        initial=LinkTypes.REFERENCE.name,
-        required=False,
-        disabled=True
-    )
+    link_type = None
     comment = None
     comment_english = None
     relative_credits = None
+
+    def _get_attach_request(self) -> attach_node_service.AttachRequest:
+        attach_request = super()._get_attach_request()
+        return attach_request._replace(link_type=LinkTypes.REFERENCE.name)
 
 
 class AttachNotAuthorizedChildren(AttachNodeForm):
