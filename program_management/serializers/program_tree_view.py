@@ -30,15 +30,18 @@ from program_management.ddd.business_types import *
 
 
 def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
+    path = str(tree.root_node.pk)
     return {
         'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
+        'id': path,
         'icon': None,
         'children': serialize_children(
             children=tree.root_node.children,
-            path=str(tree.root_node.pk),
+            path=path,
             context={'root': tree.root_node}
         ),
         'a_attr': {
+            'href': reverse('education_group_read', args=[tree.root_node.pk, tree.root_node.pk]),
             'element_id': tree.root_node.pk,
             'element_type': tree.root_node.type.name,
             'attach_url': reverse(

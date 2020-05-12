@@ -109,6 +109,7 @@ def __get_title(obj: 'Link') -> str:
 
 def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
     return {
+        'id': path,
         'path': path,
         'icon': _get_group_node_icon(link),
         'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
@@ -129,6 +130,7 @@ def _get_group_node_icon(obj: 'Link'):
 
 def _leaf_view_serializer(link: 'Link', path: str, context=None) -> dict:
     return {
+        'id': path,
         'path': path,
         'icon': __get_learning_unit_node_icon(link),
         'text': __get_learning_unit_node_text(link, context=context),

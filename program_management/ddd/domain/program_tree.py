@@ -27,23 +27,19 @@ import copy
 from collections import Counter
 from typing import List, Set, Tuple, Optional
 
+from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from program_management.ddd.domain import prerequisite
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    DetachNodeValidatorList
-from program_management.ddd.domain import prerequisite
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
-
-from django.utils.translation import gettext_lazy as _
-
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
@@ -142,6 +138,21 @@ class ProgramTree:
             None
         )
 
+    def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
+        """
+        Return the corresponding node based on the code and year.
+        :param code: str
+        :param year: int
+        :return: Node
+        """
+        return next(
+            (
+                node for node in self.get_all_nodes()
+                if node.code == code and node.academic_year.year == year
+            ),
+            None
+        )
+
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
         Return a flat set of all nodes present in the tree
@@ -154,6 +165,17 @@ class ProgramTree:
 
     def get_nodes_by_type(self, node_type_value) -> Set['Node']:
         return {node for node in self.get_all_nodes() if node.type == node_type_value}
+
+    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+                    if node_obj.has_prerequisite
+                ),
+                key=lambda node_obj: node_obj.code
+            )
+        )
 
     def get_codes_permitted_as_prerequisite(self) -> List[str]:
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
@@ -170,17 +192,6 @@ class ProgramTree:
             )
         )
 
-    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
-        return list(
-            sorted(
-                (
-                    node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and node_obj.has_prerequisite
-                ),
-                key=lambda node_obj: node_obj.code
-            )
-        )
-
     def count_usage(self, node: 'Node') -> int:
         return Counter(_nodes_from_root(self.root_node))[node]
 
@@ -192,7 +203,7 @@ class ProgramTree:
         all_links = self.get_all_links()
         if not all_links:
             return 0
-        return max(l.block_max_value for l in all_links)
+        return max(link_obj.block_max_value for link_obj in all_links)
 
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)

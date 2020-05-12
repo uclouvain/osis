@@ -25,23 +25,24 @@
 ##############################################################################
 import inspect
 from unittest.mock import patch
-from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import node, program_tree
+from program_management.ddd.domain import node
+from program_management.ddd.domain import prerequisite
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
-from program_management.ddd.domain.program_tree import ProgramTree, build_path
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    DetachNodeValidatorList
-from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -480,6 +481,75 @@ class TestCopyAndPrune(SimpleTestCase):
         self.assertNotIn(link1_1_1_1, result)
 
 
+class TestGetNodeByCodeAndYearProgramTree(SimpleTestCase):
+    def setUp(self):
+        self.year = 2020
+        link = LinkFactory(child=NodeGroupYearFactory(node_id=1, code='AAAA', year=self.year))
+        self.root_node = link.parent
+        self.subgroup_node = link.child
+
+        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=1,
+                                                                                                       code='BBBB',
+                                                                                                       year=self.year))
+        self.learning_unit_node = link_with_learning_unit.child
+
+        self.tree = ProgramTreeFactory(root_node=self.root_node)
+
+    def test_should_return_None_when_no_node_present_with_corresponding_code_and_year(self):
+        result = self.tree.get_node_by_code_and_year('bla', 2019)
+        with self.subTest('Wrong code and year'):
+            self.assertIsNone(result)
+
+        result = self.tree.get_node_by_code_and_year('BBBB', 2019)
+        with self.subTest('Wrong year, good code'):
+            self.assertIsNone(result)
+
+        result = self.tree.get_node_by_code_and_year('bla', 2020)
+        with self.subTest('Wrong code, good year'):
+            self.assertIsNone(result)
+
+    def test_should_return_node_matching_specific_code_and_year(self):
+        result = self.tree.get_node_by_code_and_year('BBBB', self.year)
+        with self.subTest('Test for NodeLearningUnitYear'):
+            self.assertEqual(
+                result,
+                self.learning_unit_node
+            )
+
+        result = self.tree.get_node_by_code_and_year('AAAA', self.year)
+        with self.subTest('Test for NodeGroupYear'):
+            self.assertEqual(
+                result,
+                self.subgroup_node
+            )
+
+
+class TestGetNodesThatHavePrerequisites(SimpleTestCase):
+
+    def setUp(self) -> None:
+        self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')
+        self.link_with_child = LinkFactory(
+            parent=self.link_with_root.child,
+            child=NodeLearningUnitYearFactory(common_title_fr="child__child__ROOT",
+                                              year=self.link_with_root.parent.year),
+        )
+        self.tree = ProgramTreeFactory(root_node=self.link_with_root.parent)
+
+    def test_when_tree_has_not_node_that_have_prerequisites(self):
+        self.assertEqual(self.tree.get_nodes_that_have_prerequisites(), [])
+
+    def test_when_tree_has_node_that_have_prerequisites(self):
+        p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.AND)
+        p_group.add_prerequisite_item('BLA', self.link_with_child.child.year)
+
+        p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
+        p_req.add_prerequisite_item_group(p_group)
+        self.link_with_child.child.set_prerequisite(p_req)
+
+        result = self.tree.get_nodes_that_have_prerequisites()
+        self.assertEqual(result, [self.link_with_child.child])
+
+
 class TestGetLink(SimpleTestCase):
     def setUp(self):
         self.tree = ProgramTreeFactory()
@@ -554,51 +624,78 @@ class TestGetAllFinalities(SimpleTestCase):
         self.assertSetEqual(bachelor_tree.get_all_finalities(), set())
 
     def test_when_contains_master_ma_120(self):
-        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120))
+        link = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
+        )
         expected_result = {
             link.child
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
 
     def test_when_contains_master_md_120(self):
-        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120))
+        link = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120)
+        )
         expected_result = {
             link.child
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
 
     def test_when_contains_master_ms_120(self):
-        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120))
+        link = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120)
+        )
         expected_result = {
             link.child
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
 
     def test_when_contains_master_ma_180_240(self):
-        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_180_240))
+        link = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_180_240)
+        )
         expected_result = {
             link.child
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
 
     def test_when_contains_master_md_180_240(self):
-        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_180_240))
+        link = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_180_240)
+        )
         expected_result = {
             link.child
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
 
     def test_when_contains_master_ms_180_240(self):
-        link = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_180_240))
+        link = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_180_240)
+        )
         expected_result = {
             link.child
         }
         self.assertSetEqual(self.tree.get_all_finalities(), expected_result)
 
     def test_when_contains_multiple_finalities(self):
-        link1 = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120))
-        link2 = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120))
-        link3 = LinkFactory(parent=self.finalities_group, child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120))
+        link1 = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
+        )
+        link2 = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MD_120)
+        )
+        link3 = LinkFactory(
+            parent=self.finalities_group,
+            child=NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120)
+        )
         expected_result = {
             link1.child,
             link2.child,
@@ -662,7 +759,10 @@ class TestDetachNode(SimpleTestCase):
         node_that_is_prerequisite = NodeLearningUnitYearFactory(is_prerequisite_of=[node_that_has_prerequisite])
         node_that_has_prerequisite.set_prerequisite(cast_to_prerequisite(node_that_is_prerequisite))
         initial_items = node_that_has_prerequisite.prerequisite.get_all_prerequisite_items()
-        self.assertListEqual(initial_items, [PrerequisiteItem(node_that_is_prerequisite.code, node_that_is_prerequisite.year)])
+        self.assertListEqual(
+            initial_items,
+            [PrerequisiteItem(node_that_is_prerequisite.code, node_that_is_prerequisite.year)]
+        )
 
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node, child=node_that_is_prerequisite)
