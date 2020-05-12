@@ -62,7 +62,7 @@ paths:
                       results:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Training'
+                          $ref: '#/components/schemas/LearningUnit'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
