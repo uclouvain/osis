@@ -50,6 +50,7 @@ from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
+from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
@@ -92,6 +93,8 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
         context_data["is_parent_a_minor_major_list_choice"] = self._is_parent_a_minor_major_list_choice(
             context_data["formset"]
         )
+        context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
+                                       for node_id, node_type in self.nodes_to_attach}
         if not self.nodes_to_attach:
             display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data

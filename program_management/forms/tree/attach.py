@@ -32,6 +32,7 @@ from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
 from base.ddd.utils import validation_message
+from base.forms.utils import choice_field
 from base.models import group_element_year
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import education_group_categories
@@ -96,8 +97,8 @@ def _get_form_class(
 class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
-    block = forms.IntegerField(required=False,widget=forms.widgets.TextInput)
-    link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)
+    block = forms.IntegerField(required=False, widget=forms.widgets.TextInput)
+    link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
