@@ -70,6 +70,7 @@ from education_group.tests.factories.auth.central_manager import CentralManagerF
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from program_management.models.enums import node_type
+from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -191,6 +192,8 @@ class TestUpdate(TestCase):
             entity=cls.mini_training_education_group_year.management_entity,
             start_date=cls.education_group_year.academic_year.start_date
         )
+        cls.country_be = CountryFactory(iso_code='BE', name='Belgium')
+        cls.organization_address = OrganizationAddressFactory(country=cls.country_be)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -429,7 +432,7 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
-            'form-0-country': OrganizationAddressFactory(organization=organization, is_main=True).country,
+            'form-0-country': OrganizationAddressFactory(organization=organization, is_main=True).country.pk,
             'form-0-organization': organization.pk,
             'form-0-diploma': diploma_choice,
             'group_element_year_formset-TOTAL_FORMS': 0,
@@ -472,7 +475,7 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
-            'form-0-country': address.country.pk,
+            'form-0-country': address.country,
             'form-0-organization': organization.pk,
             'form-0-diploma': diploma_choice,
             'group_element_year_formset-TOTAL_FORMS': 0,
