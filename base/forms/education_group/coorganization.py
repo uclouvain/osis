@@ -40,6 +40,7 @@ class CoorganizationEditForm(PermissionFieldTrainingMixin, forms.ModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
         label=_("Country"),
+        to_field_name='name'
     )
 
     organization = ModelChoiceField(

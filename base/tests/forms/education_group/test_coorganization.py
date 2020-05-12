@@ -57,7 +57,7 @@ class TestCoorganizationForm(TestCase):
         )
 
         cls.root_id = cls.education_group_yr.id
-        cls.country_be = CountryFactory()
+        cls.country_be = CountryFactory(iso_code='BE', name='Belgium')
 
         cls.organization_address = OrganizationAddressFactory(country=cls.country_be)
         cls.organization = cls.organization_address.organization
@@ -76,7 +76,7 @@ class TestCoorganizationForm(TestCase):
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
             'form-0-diploma': random.choice(DiplomaCoorganizationTypes.get_names()),
-            'form-0-country': self.address.country.pk,
+            'form-0-country': self.address.country,
             'form-0-organization': self.organization_bis.pk
         }
 
@@ -94,7 +94,7 @@ class TestCoorganizationForm(TestCase):
         actual_fields = list(form.fields.keys())
 
         self.assertListEqual(expected_fields, actual_fields)
-        self.assertEqual(form['country'].value(), self.organization_address.country.pk)
+        self.assertEqual(form['country'].value(), self.organization_address.country.name)
         self.assertEqual(form['organization'].value(), self.education_group_organization.organization.pk)
         self.assertEqual(form['diploma'].value(), diploma_coorganization.UNIQUE)
         self.assertTrue(form['all_students'].value())
