@@ -43,6 +43,7 @@ from program_management.business.group_element_years.management import CheckAuth
 from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_node, load_authorized_relationship
 from program_management.ddd.service import attach_node_service
+from program_management.ddd.validators import _block_validator
 from program_management.models.enums.node_type import NodeType
 
 
@@ -96,11 +97,7 @@ def _get_form_class(
 class AttachNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
-    block = forms.IntegerField(
-        required=False,
-        validators=[group_element_year.validate_block_value],
-        widget=forms.widgets.TextInput
-    )
+    block = forms.IntegerField(required=False,widget=forms.widgets.TextInput)
     link_type = forms.ChoiceField(choices=LinkTypes.choices(), required=False)
     comment = forms.CharField(widget=forms.widgets.Textarea, required=False)
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
@@ -111,6 +108,12 @@ class AttachNodeForm(forms.Form):
         self.node_id = node_to_attach_id
         self.node_type = node_to_attach_type
         super().__init__(**kwargs)
+
+    def clean_block(self):
+        cleaned_block_type = self.cleaned_data.get('block', None)
+        validator = _block_validator.BlockValidator(cleaned_block_type)
+        if not validator.is_valid():
+            raise ValidationError(validator.error_messages)
 
     def clean_link_type(self):
         cleaned_link_type = self.cleaned_data.get('link_type')

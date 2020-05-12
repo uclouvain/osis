@@ -24,10 +24,8 @@
 #
 ##############################################################################
 import re
-from collections import Counter
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models, connection
 from django.db.models import Q
 from django.utils import translation
@@ -39,7 +37,7 @@ from reversion.admin import VersionAdmin
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.utils.db import dict_fetchall
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -62,6 +60,8 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
+#  FIXME Kept around as a migration reference this function.
+#        To be removed when migrations are squashed.
 def validate_block_value(value: int):
     max_authorized_value = 6
     block_regex = r"1?2?3?4?5?6?"
@@ -315,7 +315,7 @@ class GroupElementYear(OrderedModel):
     parent_element = models.ForeignKey(
         Element,
         related_name='parent_elements',
-        null=True,  # TODO: To remove after data migration,
+        null=True,  # TODO: To remove after data migration
         on_delete=models.PROTECT,
     )
 
@@ -373,7 +373,6 @@ class GroupElementYear(OrderedModel):
         blank=True,
         null=True,
         verbose_name=_("Block"),
-        validators=[validate_block_value]
     )
 
     access_condition = models.BooleanField(

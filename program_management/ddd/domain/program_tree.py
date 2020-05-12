@@ -207,8 +207,9 @@ class ProgramTree:
         """
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
-        link_type = link_attributes.get("link_type", None)
-        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type)
+        link_type = link_attributes.get("link_type")
+        block = link_attributes.get("block")
+        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
         if is_valid:
             parent.add_child(node_to_attach, **link_attributes)
         return messages
@@ -217,9 +218,10 @@ class ProgramTree:
             self,
             node_to_attach: 'Node',
             path: Path,
-            link_type: Optional[LinkTypes]
+            link_type: Optional[LinkTypes],
+            block: Optional[int]
     ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type)
+        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type, block)
         return validator.is_valid(), validator.messages
 
     def set_prerequisite(
