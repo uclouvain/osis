@@ -76,6 +76,7 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -
         'path': path,
         'icon': None,
         'href': reverse('learning_unit_utilization', args=[context['root'].pk, link.child.pk]),
+        'attach_url': None,
         'has_prerequisite': link.child.has_prerequisite,
         'is_prerequisite': link.child.is_prerequisite,
         'css_class': __get_css_class(link),
