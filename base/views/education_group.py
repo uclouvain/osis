@@ -33,6 +33,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from rules.contrib.views import permission_required
 from waffle.decorators import waffle_flag
 
 from base import models as mdl
@@ -158,7 +159,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
         label=label_name,
         language=get_user_interface_language(request.user)
     )
-    return render(request, 'education_group/pedagogy_edit.html', context)
+    return render(request, 'education_group/blocks/modal/modal_pedagogy_edit_inner.html', context)
 
 
 @login_required
