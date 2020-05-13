@@ -63,10 +63,13 @@
     <script>
         {% if  request.GET.anchor  %}
             $(document).ready(function () {
+                keepFocusOnContactAfterAdd()
+            });
+            function keepFocusOnContactAfterAdd(){
                 var elt_to_focus = "#lbl_contacts_header";
                 $(elt_to_focus).attr("tabindex",-1).focus();
                 $(window).scrollTop($(elt_to_focus).position().top);
-            });
+            }
         {% endif %}
 
     </script>
