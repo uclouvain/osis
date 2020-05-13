@@ -40,6 +40,7 @@ class OrderLinkCommand(interface.CommandRequest):
     # To implement
     pass
 
-class CreateProgramTreeVersionCommand(interface.CommandRequest)
+
+class CreateProgramTreeVersionCommand(interface.CommandRequest):
     # To implement
     pass
