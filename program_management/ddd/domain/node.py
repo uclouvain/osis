@@ -116,10 +116,6 @@ class Node(interface.Entity):
         return str(self)
 
     @property
-    def entity_id(self) -> 'NodeIdentity':  # FIXME :: pass entity_id into the constructor
-        return NodeIdentity(self.code, self.year)
-
-    @property
     def pk(self):
         return self.node_id
 
