@@ -28,8 +28,7 @@ from django.urls import include, path
 
 import program_management.views.tree.move
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
-    groupelementyear_read, element_utilization, groupelementyear_postpone, \
-    excel, search, tree
+    groupelementyear_read, element_utilization, excel, search, tree
 from program_management.views.prerequisite import read, update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 

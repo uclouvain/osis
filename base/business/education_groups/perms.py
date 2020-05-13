@@ -29,7 +29,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.education_group_year import EducationGroupYear
-from program_management.business.group_element_years import postponement
 
 ERRORS_MSG = {
     "base.add_educationgroup": _("The user does not have permission to create education groups."),
