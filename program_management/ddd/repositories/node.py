@@ -28,6 +28,7 @@ from typing import Optional, List
 from django.db.models import Q
 
 from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, Entity
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_node
 from program_management.models.element import Element
@@ -36,25 +37,37 @@ from program_management.models.element import Element
 class NodeRepository(interface.AbstractRepository):
 
     @classmethod
+    def create(cls, entity: 'Node') -> EntityIdentity:
+        raise NotImplementedError
+
+    @classmethod
+    def update(cls, entity: 'Node') -> EntityIdentity:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: 'NodeIdentity') -> None:
+        raise NotImplementedError
+
+    @classmethod
     def get(cls, entity_id: 'NodeIdentity') -> 'Node':
         search_result = cls.search(entity_ids=[entity_id])
         if search_result:
             return search_result[0]
 
     @classmethod
-    def search(cls, entity_ids: Optional[List[NodeIdentity]] = None, **kwargs) -> List['Node']:
+    def search(cls, entity_ids: Optional[List['NodeIdentity']] = None, **kwargs) -> List['Node']:
         if entity_ids:
-            return cls.__search_by_entity_ids(entity_ids)
+            return _search_by_entity_ids(entity_ids)
         return []
 
-    @classmethod
-    def __search_by_entity_ids(cls, entity_ids: Optional[List[NodeIdentity]]) -> List['Node']:
-        qs = Element.objects.all()
-        filter_search_from = _build_where_clause(entity_ids[0])
-        for identity in entity_ids[1:]:
-            filter_search_from |= _build_where_clause(identity)
-        qs = qs.filter(filter_search_from)
-        return load_node.load_multiple(qs.values_list('pk', flat=True))
+
+def _search_by_entity_ids(entity_ids: Optional[List['NodeIdentity']]) -> List['Node']:
+    qs = Element.objects.all()
+    filter_search_from = _build_where_clause(entity_ids[0])
+    for identity in entity_ids[1:]:
+        filter_search_from |= _build_where_clause(identity)
+    qs = qs.filter(filter_search_from)
+    return load_node.load_multiple(qs.values_list('pk', flat=True))
 
 
 def _build_where_clause(node_identity: 'NodeIdentity') -> Q:

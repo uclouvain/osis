@@ -23,14 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional, List
 
 from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, Entity
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import persist_tree, load_tree
 from program_management.models.element import Element
 
 
 class ProgramTreeRepository(interface.AbstractRepository):
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List['ProgramTreeIdentity']] = None, **kwargs) -> List[Entity]:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
+        raise NotImplementedError
 
     @classmethod
     def create(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
