@@ -44,19 +44,8 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6" id="content_fr_{{ label.label_id }}">
-                    {% if label.label_name_fr is not None %}
-                        <span>{{ label.text_fr|truncatewords_html:40|safe }}</span>
-                    {% else %}
-                        <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
-                    {% endif %}
-                </div>
-                <div class="col-md-6" id="content_en_{{ label.label_id }}">
-                    {% if label.label_name_en is not None %}
-                        <span>{{ label.text_en|truncatewords_html:40|safe }}</span>
-                    {% else %}
-                        <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
-                    {% endif %}
+                <div class="col-md-12">
+                    {% include "blocks/row_translation_side_by_side.html" %}
                 </div>
             </div>
             {% if not forloop.last %}
