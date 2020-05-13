@@ -66,7 +66,20 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_load_tree()
         self._patch_load_trees_from_children()
         self._patch_load_child_node_to_attach()
-        self.attach_request = command.AttachNodeCommand(None, None, None, None, None, None, None)
+        self.attach_request = command.AttachNodeCommand(
+            root_id=self.tree.root_node.node_id,
+            node_id_to_attach=self.node_to_attach.node_id,
+            type_of_node_to_attach=self.node_to_attach_type,
+            path_where_to_attach=self.root_path,
+            commit=False,
+            access_condition=None,
+            is_mandatory=None,
+            block=None,
+            link_type=None,
+            comment=None,
+            comment_english=None,
+            relative_credits=None
+        )
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
@@ -94,13 +107,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_attach_node_action_is_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
         mock_attach_node.return_value = [validator_message]
-        result = attach_node_service.attach_node(
-            self.tree.root_node.node_id,
-            self.node_to_attach.node_id,
-            self.node_to_attach_type,
-            self.root_path,
-            self.attach_request
-        )
+        result = attach_node_service.attach_node(self.attach_request)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
@@ -108,13 +115,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_attach_node_action_is_not_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
         mock_attach_node.return_value = [validator_message]
-        result = attach_node_service.attach_node(
-            self.tree.root_node.node_id,
-            self.node_to_attach.node_id,
-            self.node_to_attach_type,
-            self.root_path,
-            self.attach_request
-        )
+        result = attach_node_service.attach_node(self.attach_request)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
@@ -130,13 +131,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, [])
         self.mock_validator(AttachAuthorizedRelationshipValidator, ['error link reference'])
 
-        result = attach_node_service.attach_node(
-            self.tree.root_node,
-            self.node_to_attach.node_id,
-            self.node_to_attach_type,
-            self.root_path,
-            self.attach_request
-        )
+        result = attach_node_service.attach_node(self.attach_request)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].message, 'error link reference')
         self.assertEqual(result[0].level, MessageLevel.ERROR)
@@ -153,40 +148,21 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         self.mock_validator(AttachAuthorizedRelationshipValidator, [])
 
-        result = attach_node_service.attach_node(
-            self.tree.root_node,
-            self.node_to_attach.node_id,
-            self.node_to_attach_type,
-            self.root_path,
-            self.attach_request
-        )
+        result = attach_node_service.attach_node(self.attach_request)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].message, _('Success message'))
         self.assertEqual(result[0].level, MessageLevel.SUCCESS)
 
-    def test_when_commit_is_true(self):
+    def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_node_service.attach_node(
-            self.tree.root_node,
-            self.node_to_attach.node_id,
-            self.node_to_attach_type,
-            self.root_path,
-            self.attach_request,
-            commit=True
-        )
+        attach_request_with_commit_set_to_true = self.attach_request._replace(commit=True)
+        attach_node_service.attach_node(attach_request_with_commit_set_to_true)
         self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)
 
-    def test_when_commit_is_false(self):
+    def test_when_commit_is_false_then_sould_not_persist_modification(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_node_service.attach_node(
-            self.tree.root_node,
-            self.node_to_attach.node_id,
-            self.node_to_attach_type,
-            self.root_path,
-            self.attach_request,
-            commit=False
-        )
+        attach_node_service.attach_node(self.attach_request)
         self.assertFalse(self.mock_persist.called)
 
 

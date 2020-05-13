@@ -120,21 +120,19 @@ class AttachNodeForm(forms.Form):
     def save(self) -> List[validation_message.BusinessValidationMessage]:
         result = []
         if self.is_valid():
-            root_id = int(self.to_path.split("|")[0])
-            result = attach_node_service.attach_node(
-                root_id,
-                self.node_id,
-                self.node_type,
-                self.to_path,
-                self._get_attach_request(),
-                commit=True,
-            )
+            result = attach_node_service.attach_node(self._get_attach_request())
             if result:
                 self.add_error(None, result)
         return result
 
     def _get_attach_request(self) -> command.AttachNodeCommand:
+        root_id = int(self.to_path.split("|")[0])
         return command.AttachNodeCommand(
+            root_id=root_id,
+            node_id_to_attach=self.node_id,
+            type_of_node_to_attach=self.node_type,
+            path_where_to_attach=self.to_path,
+            commit=True,
             access_condition=self.cleaned_data.get("access_condition", False),
             is_mandatory=self.cleaned_data.get("is_mandatory", True),
             block=self.cleaned_data.get("block"),

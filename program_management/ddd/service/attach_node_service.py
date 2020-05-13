@@ -39,22 +39,22 @@ from program_management.ddd.validators._authorized_relationship import AttachAut
 from program_management.models.enums.node_type import NodeType
 
 
-def attach_node(
-        root_id: int,
-        node_id_to_attach: int,
-        type_node_to_attach,
-        path: 'Path',
-        attach_request: command.AttachNodeCommand,
-        commit=True,
-) -> List['BusinessValidationMessage']:
+def attach_node(request: command.AttachNodeCommand) -> List['BusinessValidationMessage']:
+    root_id = request.root_id
+    type_node_to_attach = request.type_of_node_to_attach
+    node_id_to_attach = request.node_id_to_attach
+    path = request.path_where_to_attach
+    commit = request.commit
+
     tree = load_tree.load(root_id)
     node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
+
     error_messages = __validate_trees_using_node_as_reference_link(tree, node_to_attach, path)
     if type_node_to_attach != NodeType.LEARNING_UNIT:
         error_messages += _validate_end_date_and_option_finality(node_to_attach)
     if error_messages:
         return error_messages
-    success_messages = tree.attach_node(node_to_attach, path, **attach_request._asdict())
+    success_messages = tree.attach_node(node_to_attach, path, request)
     if commit:
         persist_tree.persist(tree)
     return success_messages

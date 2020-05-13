@@ -34,6 +34,7 @@ from base.models.enums.link_type import LinkTypes
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
+from program_management.ddd.service import command
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
@@ -227,21 +228,31 @@ class ProgramTree:
     def attach_node(
             self,
             node_to_attach: 'Node',
-            path: Path = None,
-            **link_attributes
+            path: Optional[Path],
+            attach_request: command.AttachNodeCommand
     ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
         :param node_to_attach: Node to add on the tree
-        :param path: [Optional] The position where the node must be added
+        :param path: [Optional]The position where the node must be added
+        :param attach_request: an attach node command
         """
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
-        link_type = link_attributes.get("link_type")
-        block = link_attributes.get("block")
+        link_type = attach_request.link_type
+        block = attach_request.block
         is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
         if is_valid:
-            parent.add_child(node_to_attach, **link_attributes)
+            parent.add_child(
+                node_to_attach,
+                access_condition=attach_request.access_condition,
+                is_mandatory=attach_request.is_mandatory,
+                block=attach_request.block,
+                link_type=attach_request.link_type,
+                comment=attach_request.comment,
+                comment_english=attach_request.comment_english,
+                relative_credits=attach_request.relative_credits
+            )
         return messages
 
     def clean_attach_node(

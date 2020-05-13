@@ -25,5 +25,6 @@ import collections
 
 AttachNodeCommand = collections.namedtuple(
     "AttachNodeCommand",
-    "access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
+    "root_id, node_id_to_attach, type_of_node_to_attach, path_where_to_attach, commit,"
+    " access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
 )
