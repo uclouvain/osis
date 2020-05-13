@@ -31,6 +31,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
+import program_management.ddd.service.command
 from base.ddd.utils import validation_message
 from base.forms.utils import choice_field
 from base.models import group_element_year
@@ -43,7 +44,7 @@ from program_management.business.group_element_years.attach import AttachEducati
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_node, load_authorized_relationship
-from program_management.ddd.service import attach_node_service
+from program_management.ddd.service import attach_node_service, command
 from program_management.ddd.validators import _block_validator
 from program_management.models.enums.node_type import NodeType
 
@@ -132,8 +133,8 @@ class AttachNodeForm(forms.Form):
                 self.add_error(None, result)
         return result
 
-    def _get_attach_request(self) -> attach_node_service.AttachRequest:
-        return attach_node_service.AttachRequest(
+    def _get_attach_request(self) -> command.AttachNodeCommand:
+        return command.AttachNodeCommand(
             access_condition=self.cleaned_data.get("access_condition", False),
             is_mandatory=self.cleaned_data.get("is_mandatory", True),
             block=self.cleaned_data.get("block"),
@@ -169,7 +170,7 @@ class AttachToMinorMajorListChoiceForm(AttachNodeForm):
     comment_english = None
     relative_credits = None
 
-    def _get_attach_request(self) -> attach_node_service.AttachRequest:
+    def _get_attach_request(self) -> command.AttachNodeCommand:
         attach_request = super()._get_attach_request()
         return attach_request._replace(link_type=LinkTypes.REFERENCE.name)
 

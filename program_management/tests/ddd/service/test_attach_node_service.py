@@ -30,12 +30,13 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+import program_management.ddd.service.command
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import program_tree
-from program_management.ddd.service import attach_node_service
+from program_management.ddd.service import attach_node_service, command
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
@@ -65,7 +66,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_load_tree()
         self._patch_load_trees_from_children()
         self._patch_load_child_node_to_attach()
-        self.attach_request = attach_node_service.AttachRequest(None, None, None, None, None, None, None)
+        self.attach_request = command.AttachNodeCommand(None, None, None, None, None, None, None)
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
