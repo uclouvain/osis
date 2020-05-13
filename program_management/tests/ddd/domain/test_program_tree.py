@@ -117,33 +117,36 @@ class TestGetNodePath(SimpleTestCase):
         self.link_2_1 = LinkFactory(parent=self.link_2.child, child=self.link_1_1_1.child)
 
     def test_when_node_not_present_in_tree_should_return_none(self):
-        path = self.tree.get_node_path(NodeLearningUnitYearFactory())
+        path = self.tree.get_node_smallest_ordered_path(NodeLearningUnitYearFactory())
         self.assertIsNone(path)
 
     def test_when_node_is_root_then_should_return_path_of_root(self):
-        path = self.tree.get_node_path(self.tree.root_node)
+        path = self.tree.get_node_smallest_ordered_path(self.tree.root_node)
         self.assertEqual(
             path,
             program_tree.build_path(self.tree.root_node)
         )
 
     def test_when_node_is_uniquely_present_in_tree_should_return_path(self):
-        path = self.tree.get_node_path(self.link_1_1.child)
+        path = self.tree.get_node_smallest_ordered_path(self.link_1_1.child)
         self.assertEqual(
             path,
             program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child)
         )
 
-    def test_when_node_is_present_multiple_times_in_tree_should_return_a_path(self):
-        path = self.tree.get_node_path(self.link_1_1_1.child)
+    def test_when_node_is_present_multiple_times_in_tree_should_return_smallest_ordered_path(self):
+        path = self.tree.get_node_smallest_ordered_path(self.link_1_1_1.child)
 
-        paths_possible = [
-            program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child, self.link_1_1_1.child),
-            program_tree.build_path(self.tree.root_node, self.link_2.child, self.link_2_1.child),
-        ]
-        self.assertIn(
+        path_expected = program_tree.build_path(
+            self.tree.root_node,
+            self.link_1.child,
+            self.link_1_1.child,
+            self.link_1_1_1.child
+        )
+
+        self.assertEqual(
             path,
-            paths_possible
+            path_expected
         )
 
 

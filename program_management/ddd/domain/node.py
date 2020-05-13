@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from collections import OrderedDict
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_categories import Categories
@@ -235,7 +236,7 @@ class Node:
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
-    _descendents = {}
+    _descendents = OrderedDict()
     if current_path is None:
         current_path = str(root_node.pk)
 
