@@ -426,12 +426,6 @@ class GroupElementYear(OrderedModel):
     def child(self):
         return self.child_branch or self.child_leaf
 
-    @property
-    def verbose_comment(self):
-        if self.comment_english and translation.get_language() == LANGUAGE_CODE_EN:
-            return self.comment_english
-        return self.comment
-
 
 def fetch_row_sql(root_ids):
     return GroupElementYear.objects.get_adjacency_list(root_ids)
