@@ -4,10 +4,16 @@ from collections import OrderedDict
 from enum import Enum
 
 from django.urls import reverse
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.business.education_groups import general_information_sections
+from base.business.education_groups.general_information_sections import \
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
+from base.models import academic_year
+from base.models.enums.education_group_types import MiniTrainingType
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
@@ -40,6 +46,10 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
             )
             path = str(root_element.pk)
         return path
+
+    @functools.lru_cache()
+    def get_current_academic_year(self):
+        return academic_year.starting_academic_year()
 
     def get_education_group_version(self):
         root_element_id = self.get_path().split("|")[0]
@@ -97,22 +107,41 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
             Tab.GENERAL_INFO: {
                 'text': _('General informations'),
                 'active': Tab.GENERAL_INFO == self.active_tab,
-                'display': True,
+                'display': self._have_general_information_tab(),
                 'url': reverse('mini_training_general_information', args=[node.year, node.code]) +
                 "?path={}".format(self.get_path()),
             },
             Tab.SKILLS_ACHIEVEMENTS: {
-                'text': _('skills and achievements'),
+                'text': capfirst(_('skills and achievements')),
                 'active': Tab.SKILLS_ACHIEVEMENTS == self.active_tab,
-                'display': True,
+                'display': self._have_skills_and_achievements_tab(),
                 'url': reverse('mini_training_skills_achievements', args=[node.year, node.code]) +
                 "?path={}".format(self.get_path()),
             },
             Tab.ADMISSION_CONDITION: {
                 'text': _('Conditions'),
                 'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': True,
+                'display': self._have_admission_condition_tab(),
                 'url': reverse('mini_training_admission_condition', args=[node.year, node.code]) +
                 "?path={}".format(self.get_path()),
             },
         })
+
+    def _have_general_information_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _have_skills_and_achievements_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in MiniTrainingType.with_skills_achievements() and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _have_admission_condition_tab(self):
+        node_category = self.get_object().category
+        return node_category.name in MiniTrainingType.with_admission_condition() and \
+            self._is_general_info_and_condition_admission_in_display_range
+
+    def _is_general_info_and_condition_admission_in_display_range(self):
+        return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
+               self.get_current_academic_year().year + 2

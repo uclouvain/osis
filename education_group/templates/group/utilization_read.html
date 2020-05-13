@@ -30,7 +30,7 @@
         <div class="col-md-12">
             {% url 'education_group_read' node.year node.code as url_identification %}
              <a href="{{url_identification}}"
-               id="lnk_node_{node.pk}}">{{ node.code }} - {{ node.title }}</a>
+               id="lnk_node_{{node.pk}}">{{ node.code }} - {{ node.title }}</a>
             {% trans 'is using in' %} :
             <br><br>
             {% include "blocks/table_element_utilizations.html" %}

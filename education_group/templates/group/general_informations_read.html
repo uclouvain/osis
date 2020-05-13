@@ -41,45 +41,9 @@
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
-                <div class="panel-heading text-center section">
-                    <h3> {% trans 'Welcome' %}</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="container-fluid">
-                        {% for label in labels %}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <label id="label_{{ label.label_id }}"><b>{{ label.label_translated }}</b></label>
-                                    {% if can_edit_information %}
-                                        <a class="pedagogy-edit-btn" href="#">
-                                           {# TODO: Fix URL update for pedagocical information #}
-                                           <!-- data-form="{{ post_url }}?label={{ label.label_id }}"
-                                           title="{% trans 'Edit' %}">-->
-                                            <span class="glyphicon glyphicon-edit"
-                                                  aria-hidden="true"></span>
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6" id="content_fr_{{ label.label_id }}">
-                                    {% if label.label_name_fr is not None %}
-                                        <span>{{ label.text_fr|truncatewords_html:40|safe }}</span>
-                                    {% else %}
-                                        <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6" id="content_en_{{ label.label_id }}">
-                                    {% if label.label_name_en is not None %}
-                                        <span>{{ label.text_en|truncatewords_html:40|safe }}</span>
-                                    {% else %}
-                                        <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
+                {% for section_name, labels in sections.items %}
+                    {% include "blocks/general_information_section_panel.html" %}
+                {% endfor %}
             </div>
         </div>
     </div>

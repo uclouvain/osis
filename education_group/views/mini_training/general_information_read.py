@@ -17,12 +17,30 @@ class MiniTrainingReadGeneralInformation(MiniTrainingRead):
         node = self.get_object()
         return {
             **super().get_context_data(**kwargs),
-            "labels": self.get_translated_labels(),
+            "sections": self.get_sections(),
             "publish_url": reverse('publish_general_information', args=[node.year, node.code]) +
             "?path={}".format(self.get_path()),
             "can_edit_information":
                 self.request.user.has_perm("base.change_pedagogyinformation", self.get_education_group_version().offer)
         }
+
+    def get_sections(self):
+        translated_labels = self.get_translated_labels()
+        labels = self.get_labels()
+
+        sections = {}
+        for section in general_information_sections.SECTION_LIST:
+            for label in filter(lambda l: l in labels, section.labels):
+                translated_label = next(
+                    translated_label for translated_label in translated_labels if
+                    translated_label['label_id'] == label
+                )
+                sections.setdefault(section.title, []).append(translated_label)
+        return sections
+
+    def get_labels(self):
+        node_category = self.get_object().category
+        return general_information_sections.SECTIONS_PER_OFFER_TYPE[node_category.name]['specific']
 
     def get_translated_labels(self):
         subqstranslated_fr = TranslatedText.objects.filter(reference=self.get_object().pk, text_label=OuterRef('pk'),
@@ -35,7 +53,7 @@ class MiniTrainingReadGeneralInformation(MiniTrainingRead):
         ).values('label')[:1]
 
         qs = TextLabel.objects.filter(
-            label=general_information_sections.INTRODUCTION,
+            label__in=self.get_labels(),
         ).annotate(
             label_id=F('label'),
             label_translated=Subquery(subqslabel, output_field=fields.CharField()),

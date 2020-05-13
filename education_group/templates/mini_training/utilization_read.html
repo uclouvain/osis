@@ -27,7 +27,12 @@
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            TEST UTILIZATION READ
+            {% url 'mini_training_identification' node.year node.code as url_identification %}
+             <a href="{{url_identification}}"
+               id="lnk_node_{{node.pk}}">{{ node.code }} - {{ node.title }}</a>
+            {% trans 'is using in' %} :
+            <br><br>
+            {% include "blocks/table_element_utilizations.html" %}
         </div>
     </div>
 {% endblock details %}

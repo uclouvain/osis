@@ -1,5 +1,4 @@
 {% extends "mini_training/layout_read.html" %}
-{% load i18n bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -27,7 +26,11 @@
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            TEST GENERAL INFORMATION READ
+            <div class="panel panel-default">
+                {% for section_name, labels in sections.items %}
+                    {% include "blocks/general_information_section_panel.html" %}
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock details %}
