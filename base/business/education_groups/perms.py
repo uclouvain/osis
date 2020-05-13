@@ -62,21 +62,6 @@ def _is_year_editable(education_group, raise_exception):
     return result
 
 
-def is_eligible_to_postpone_education_group(person, education_group, raise_exception=False):
-    result = person.user.has_perm('base.change_educationgroup', education_group)
-    if not result:
-        raise PermissionDenied()
-
-    try:
-        # Check if the education group is valid
-        postponement.PostponeContent(education_group.previous_year(), person)
-    except postponement.NotPostponeError as e:
-        result = False
-        if raise_exception:
-            raise PermissionDenied(str(e))
-    return result
-
-
 def _is_eligible_education_group(person, education_group, raise_exception):
     return (
         check_link_to_management_entity(education_group, person, raise_exception) and

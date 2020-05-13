@@ -55,8 +55,6 @@ urlpatterns = [
         ])),
         url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
-        url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
-            name="postpone_education_group"),
         url(r'^quick_search/', include([
             url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
                 name="quick_search_learning_unit"),
