@@ -75,7 +75,7 @@ def _build_where_clause(node_identity: 'NodeIdentity') -> Q:
         Q(
             group_year__partial_acronym=node_identity.code,
             group_year__academic_year__year=node_identity.year
-        ) & Q(
+        ) | Q(
             learning_unit_year__acronym=node_identity.code,
             learning_unit_year__academic_year__year=node_identity.year
         )
