@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db.models import OuterRef, Subquery, fields, F
 
 from base.business.education_groups import general_information_sections
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -45,3 +46,24 @@ def __get_translated_labels(node: NodeGroupYear, language_code: str):
 
 def __get_labels(node: NodeGroupYear):
     return general_information_sections.SECTIONS_PER_OFFER_TYPE[node.category.name]['specific']
+
+
+def get_contacts(node: NodeGroupYear):
+    qs = EducationGroupPublicationContact.objects.filter(
+        education_group_year__educationgroupversion__root_group__element__pk=node.pk
+    )
+    contacts_by_type = {}
+    for publication_contact in qs:
+        contact_formated = __get_contact_formated(publication_contact)
+        contacts_by_type.setdefault(publication_contact.type, []).append(contact_formated)
+    return contacts_by_type
+
+
+def __get_contact_formated(publication_contact):
+    return {
+        "pk": publication_contact.pk,
+        "email": publication_contact.email,
+        "description": publication_contact.description,
+        "role_fr": publication_contact.role_fr,
+        "role_en": publication_contact.role_en,
+    }

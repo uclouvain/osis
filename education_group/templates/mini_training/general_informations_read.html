@@ -30,6 +30,10 @@
                 {% for section_name, labels in sections.items %}
                     {% include "blocks/general_information_section_panel.html" %}
                 {% endfor %}
+
+                {% if show_contacts %}
+                    {% include "blocks/general_information_section_contact_panel.html" %}
+                {% endif %}
             </div>
         </div>
     </div>

@@ -70,9 +70,10 @@
 
                         <div class="col-md-2">
                             {% if can_edit_information %}
-                                {% url "education_group_achievements_actions" parent.pk education_group_year.pk achievement.pk as action_url %}
-                                {% url 'update_education_group_achievement' root.pk education_group_year.pk achievement.pk as update_url %}
-                                {% url 'delete_education_group_achievement' root.pk education_group_year.pk achievement.pk as delete_url %}
+                                {# TODO: Fix URL for education group achievement  #}
+                                {% url "education_group_achievements_actions" node.pk node.pk achievement.pk as action_url %}
+                                {% url 'update_education_group_achievement' node.pk node.pk achievement.pk as update_url %}
+                                {% url 'delete_education_group_achievement' node.pk node.pk achievement.pk as delete_url %}
                                 {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
                             {% endif %}
                         </div>
@@ -97,9 +98,10 @@
 
                                     <div class="col-md-2">
                                         {% if can_edit_information %}
-                                            {% url "education_group_detailed_achievements_actions" parent.pk education_group_year.pk  achievement.pk detail_achievement.pk as action_url %}
-                                            {% url 'update_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as update_url %}
-                                            {% url 'delete_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk detail_achievement.pk as delete_url %}
+                                            {# TODO: Fix URL for detailed education group achievement  #}
+                                            {% url "education_group_detailed_achievements_actions" node.pk node.pk  achievement.pk detail_achievement.pk as action_url %}
+                                            {% url 'update_education_group_detailed_achievement' node.pk node.pk achievement.pk detail_achievement.pk as update_url %}
+                                            {% url 'delete_education_group_detailed_achievement' node.pk node.pk achievement.pk detail_achievement.pk as delete_url %}
                                             {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
                                         {% endif %}
                                     </div>
@@ -107,8 +109,9 @@
                              </div>
                         {% endfor %}
                         {% if can_edit_information %}
+                            {# TODO: Fix URL for create detailed education group achievement  #}
                             <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
-                                    data-url="{% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk %}">
+                                    data-url="{% url 'create_education_group_detailed_achievement' node.pk node.pk achievement.pk %}">
                                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                             </button>
                         {% endif %}
@@ -117,8 +120,9 @@
             </div>
         {% endfor %}
          {% if can_edit_information %}
+             {# TODO: Fix URL for create education group achievement  #}
             <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal"
-                    data-url="{% url 'create_education_group_achievement' root.pk education_group_year.pk %}">
+                    data-url="{% url 'create_education_group_achievement' node.pk node.pk %}">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </button>
         {% endif %}
