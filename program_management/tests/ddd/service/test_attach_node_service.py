@@ -246,20 +246,14 @@ class TestCheckAttach(SimpleTestCase):
         self.node_to_attach_1 = NodeEducationGroupYearFactory()
         self.node_to_attach_2 = NodeEducationGroupYearFactory()
 
-        patcher_validate_end_date_and_option_finality = mock.patch(
-            "program_management.ddd.service.attach_node_service._validate_end_date_and_option_finality"
-        )
-        self.mock_validate_end_date_and_option_finality = patcher_validate_end_date_and_option_finality.start()
-        self.mock_validate_end_date_and_option_finality.return_value = []
-        self.addCleanup(patcher_validate_end_date_and_option_finality.stop)
+        self._patch_validate_end_date_and_option_finality()
+        self._patch_load_tree()
+        self._patch_load_node()
+        self.mock_create_link_validator = self._patch_validator_is_valid(CreateLinkValidatorList)
+        self.mock_minimum_year_editable = self._patch_validator_is_valid(MinimumEditableYearValidator)
+        self.mock_infinite_recursivity_tree = self._patch_validator_is_valid(InfiniteRecursivityTreeValidator)
 
-        patcher_load_tree = mock.patch(
-            "program_management.ddd.repositories.load_tree.load"
-        )
-        self.mock_load_tree = patcher_load_tree.start()
-        self.mock_load_tree.return_value = self.tree
-        self.addCleanup(patcher_load_tree.stop)
-
+    def _patch_load_node(self):
         patcher_load_nodes = mock.patch(
             "program_management.ddd.repositories.load_node.load_by_type"
         )
@@ -267,9 +261,21 @@ class TestCheckAttach(SimpleTestCase):
         self.mock_load_node.side_effect = [self.node_to_attach_1, self.node_to_attach_2]
         self.addCleanup(patcher_load_nodes.stop)
 
-        self.mock_create_link_validator = self._patch_validator_is_valid(CreateLinkValidatorList)
-        self.mock_minimum_year_editable = self._patch_validator_is_valid(MinimumEditableYearValidator)
-        self.mock_infinite_recursivity_tree = self._patch_validator_is_valid(InfiniteRecursivityTreeValidator)
+    def _patch_load_tree(self):
+        patcher_load_tree = mock.patch(
+            "program_management.ddd.repositories.load_tree.load"
+        )
+        self.mock_load_tree = patcher_load_tree.start()
+        self.mock_load_tree.return_value = self.tree
+        self.addCleanup(patcher_load_tree.stop)
+
+    def _patch_validate_end_date_and_option_finality(self):
+        patcher_validate_end_date_and_option_finality = mock.patch(
+            "program_management.ddd.service.attach_node_service._validate_end_date_and_option_finality"
+        )
+        self.mock_validate_end_date_and_option_finality = patcher_validate_end_date_and_option_finality.start()
+        self.mock_validate_end_date_and_option_finality.return_value = []
+        self.addCleanup(patcher_validate_end_date_and_option_finality.stop)
 
     def _patch_validator_is_valid(self, validator_class: Type[business_validator.BusinessValidator]):
         patch_validator = mock.patch.object(
