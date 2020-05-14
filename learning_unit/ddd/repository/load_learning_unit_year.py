@@ -46,6 +46,7 @@ from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.repository.load_achievement import load_achievements
 from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
+from attribution.ddd.repositories.load_attribution import load_attributions
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -178,7 +179,8 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
                 prerequisite=learning_unit_data.pop('cms_prerequisite'),
                 prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
                 ),
-            teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year'])
+            teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year']),
+            attributions=load_attributions(learning_unit_data['acronym'], learning_unit_data['year'])
             )
 
         results.append(luy)
