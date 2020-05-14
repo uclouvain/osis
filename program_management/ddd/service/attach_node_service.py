@@ -84,11 +84,10 @@ def check_attach_via_parent(
     return result
 
 
-def check_attach(
-        tree_root_id: int,
-        path_of_node_to_attach_from: 'Path',
-        nodes_to_attach: List[Tuple[int, NodeType]]
-) -> List['BusinessValidationMessage']:
+def check_attach(check_command: command.CheckAttachNodeCommand) -> List['BusinessValidationMessage']:
+    tree_root_id = check_command.root_id
+    path_of_node_to_attach_from = check_command.path_where_to_attach
+    nodes_to_attach = check_command.nodes_to_attach
     result = []
     tree = load_tree.load(tree_root_id)
     node_to_attach_from = tree.get_node(path_of_node_to_attach_from)

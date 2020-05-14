@@ -287,49 +287,53 @@ class TestCheckAttach(SimpleTestCase):
         return mock_validator
 
     def test_should_call_return_error_if_no_nodes_to_attach(self):
-        result = attach_node_service.check_attach(
-            self.tree.root_node.node_id,
-            self.path,
-            [],
+        check_command = command.CheckAttachNodeCommand(
+            root_id=self.tree.root_node.node_id,
+            nodes_to_attach=[],
+            path_where_to_attach=self.path
         )
+        result = attach_node_service.check_attach(check_command)
         self.assertIn(_("Please select an item before adding it"), result)
 
     def test_should_call_validate_end_date_and_option_finality(self):
-        attach_node_service.check_attach(
-            self.tree.root_node.node_id,
-            self.path,
-            [
+        check_command = command.CheckAttachNodeCommand(
+            root_id=self.tree.root_node.node_id,
+            nodes_to_attach=[
                 (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
                 (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
             ],
+            path_where_to_attach=self.path
         )
+        attach_node_service.check_attach(check_command)
 
         self.assertEqual(self.mock_validate_end_date_and_option_finality.call_count, 2)
 
     def test_should_call_specific_validators(self):
-        attach_node_service.check_attach(
-            self.tree.root_node.node_id,
-            self.path,
-            [
+        check_command = command.CheckAttachNodeCommand(
+            root_id=self.tree.root_node.node_id,
+            nodes_to_attach=[
                 (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
                 (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
-            ]
+            ],
+            path_where_to_attach=self.path
         )
+        attach_node_service.check_attach(check_command)
 
         self.assertEqual(self.mock_create_link_validator.call_count, 2)
         self.assertEqual(self.mock_minimum_year_editable.call_count, 2)
         self.assertEqual(self.mock_infinite_recursivity_tree.call_count, 2)
 
     def test_should_return_validation_messages_if_any(self):
-        self.mock_validate_end_date_and_option_finality.return_value = ["Validation error"]
-        result = attach_node_service.check_attach(
-            self.tree.root_node.node_id,
-            self.path,
-            [
+        check_command = command.CheckAttachNodeCommand(
+            root_id=self.tree.root_node.node_id,
+            nodes_to_attach=[
                 (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
                 (self.node_to_attach_2.node_id, self.node_to_attach_2.node_type)
-            ]
+            ],
+            path_where_to_attach=self.path
         )
+        self.mock_validate_end_date_and_option_finality.return_value = ["Validation error"]
+        result = attach_node_service.check_attach(check_command)
 
         self.assertEqual(
             result,

@@ -28,3 +28,8 @@ AttachNodeCommand = collections.namedtuple(
     "root_id, node_id_to_attach, type_of_node_to_attach, path_where_to_attach, commit,"
     " access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
 )
+
+CheckAttachNodeCommand = collections.namedtuple(
+    "CheckAttachNodeCommand",
+    "root_id, nodes_to_attach, path_where_to_attach"
+)

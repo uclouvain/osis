@@ -51,7 +51,7 @@ from program_management.business.group_element_years.detach import DetachEducati
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
 from program_management.ddd.repositories import load_node
-from program_management.ddd.service import attach_node_service
+from program_management.ddd.service import attach_node_service, command
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
@@ -122,11 +122,12 @@ class AttachCheckView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin
 
     def get(self, request, *args, **kwargs):
         nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
-        error_messages = attach_node_service.check_attach(
-            self.kwargs["root_id"],
-            self.request.GET["path"],
-            nodes_to_attach
+        check_command = command.CheckAttachNodeCommand(
+            root_id=self.kwargs["root_id"],
+            path_where_to_attach=self.request.GET["path"],
+            nodes_to_attach=nodes_to_attach
         )
+        error_messages = attach_node_service.check_attach(check_command)
 
         if "application/json" in self.request.headers.get("Accept", ""):
             return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
