@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-21 15:47+0200\n"
+"POT-Creation-Date: 2020-05-06 10:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,9 @@ msgstr ""
 msgid "Academic year"
 msgstr "Année académique"
 
+msgid "Education group must be mini-training or group"
+msgstr "L'offre doit être une mini-formation ou un groupement"
+
 msgid "End academic year"
 msgstr "Année académique de fin"
 
@@ -27,6 +30,11 @@ msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
 
 msgid "Start academic year"
 msgstr "Année académique de début"
+
+#, python-format
+msgctxt "female"
+msgid "The user does not have permission to delete a %(category)s."
+msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
 
 msgid "The user is not allowed to create/modify this type of education group"
 msgstr "L'utilisateur n'est pas autorisé à créer/modifer ce type de formation"

@@ -8,16 +8,36 @@ from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType
 from education_group.auth.scope import Scope
 from osis_role import errors
-from osis_role.errors import predicate_failed_msg
+from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
 
 
 @predicate(bind=True)
-def are_all_education_group_years_removable(self, user, education_group):
-    education_group_years = education_group.educationgroupyear_set.all()
-    return all(
-        user.has_perm('base.delete_educationgroup', education_group_year)
-        for education_group_year in education_group_years
+def are_all_trainings_removable(self, user, education_group_year):
+    trainings = education_group_year.education_group.educationgroupyear_set.all()
+    return _are_all_removable(self, user, trainings, 'base.delete_training')
+
+
+@predicate(bind=True)
+def are_all_minitrainings_removable(self, user, education_group_year):
+    minitrainings = education_group_year.education_group.educationgroupyear_set.all()
+    return _are_all_removable(self, user, minitrainings, 'base.delete_minitraining')
+
+
+@predicate(bind=True)
+def are_all_groups_removable(self, user, education_group_year):
+    groups = education_group_year.education_group.educationgroupyear_set.all()
+    return _are_all_removable(self, user, groups, 'base.delete_group')
+
+
+def _are_all_removable(self, user, objects, perm):
+    result = all(
+        user.has_perm(perm, object)
+        for object in objects
     )
+    # transfers last perm error message
+    message = get_permission_error(user, perm)
+    set_permission_error(user, self.context['perm_name'], message)
+    return result
 
 
 @predicate(bind=True)

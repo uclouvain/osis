@@ -113,25 +113,38 @@ class ValidationRuleEducationGroupTypeMixin(ValidationRuleMixin):
 
 class PermissionFieldEducationGroupMixin(PermissionFieldMixin):
     """
-    Permission Field for educationgroup(year)
+    Permission Field for educationgroup
 
-    This mixin will get allowed field on reference_field model according to perm's
+    This mixin will get allowed field on reference_field model according to perms
     """
+
+    def is_edition_period_opened(self):
+        return EventPermEducationGroupEdition().is_open()
+
     def get_context(self):
-        is_edition_period_egy_opened = EventPermEducationGroupEdition().is_open()
+        is_open = self.is_edition_period_opened()
         if self.category == education_group_categories.TRAINING:
-            return TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
-                TRAINING_DAILY_MANAGEMENT
+            return TRAINING_PGRM_ENCODING_PERIOD if is_open else TRAINING_DAILY_MANAGEMENT
         elif self.category == education_group_categories.MINI_TRAINING:
-            return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
-                MINI_TRAINING_DAILY_MANAGEMENT
+            return MINI_TRAINING_PGRM_ENCODING_PERIOD if is_open else MINI_TRAINING_DAILY_MANAGEMENT
         elif self.category == education_group_categories.GROUP:
-            return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_egy_opened else \
-                GROUP_DAILY_MANAGEMENT
+            return GROUP_PGRM_ENCODING_PERIOD if is_open else GROUP_DAILY_MANAGEMENT
         return super().get_context()
 
 
-class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
+class PermissionFieldEducationGroupYearMixin(PermissionFieldEducationGroupMixin):
+    """
+    Permission Field for educationgroupyear
+
+    This mixin will get allowed field on reference_field model according to perms and egy related period
+    """
+
+    def is_edition_period_opened(self):
+        education_group_year = self.instance if hasattr(self.instance, 'academic_year') else None
+        return EventPermEducationGroupEdition(obj=education_group_year, raise_exception=False).is_open()
+
+
+class PermissionFieldTrainingMixin(PermissionFieldEducationGroupYearMixin):
     """
     Permission Field for Hops(year) and for Coorganization
 
@@ -143,7 +156,7 @@ class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
         super().__init__(*args, **kwargs)
 
 
-class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupMixin,
+class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupYearMixin,
                                   forms.ModelForm):
     category = None
 

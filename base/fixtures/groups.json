@@ -2684,11 +2684,6 @@
                     "educationgroup"
                 ],
                 [
-                    "delete_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
                     "is_entity_manager",
                     "base",
                     "entitymanager"
