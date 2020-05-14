@@ -38,6 +38,7 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 from program_management.business.group_element_years import attach
+from program_management.ddd.repositories import load_node
 
 CACHE_TIMEOUT = 60
 
@@ -62,8 +63,8 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        egy = get_object_or_404(EducationGroupYear, id=self.node_id)
-        kwargs["initial"] = {'academic_year': egy.academic_year_id}
+        node = load_node.load_node_education_group_year(self.node_id)
+        kwargs["initial"] = {'academic_year': node.year}
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -106,8 +107,8 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        egy = get_object_or_404(EducationGroupYear, id=self.node_id)
-        kwargs["initial"] = {'academic_year': egy.academic_year_id}
+        node = load_node.load_node_education_group_year(self.node_id)
+        kwargs["initial"] = {'academic_year': node.year}
         return kwargs
 
     def get_context_data(self, **kwargs):
