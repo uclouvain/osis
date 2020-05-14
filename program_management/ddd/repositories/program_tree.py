@@ -55,7 +55,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
     @classmethod
     def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
         tree_root_id = Element.objects.get(
-            group_year__code=entity_id.code,
+            group_year__partial_acronym=entity_id.code,
             group_year__academic_year__year=entity_id.year
         ).pk
         return load_tree.load(tree_root_id)
