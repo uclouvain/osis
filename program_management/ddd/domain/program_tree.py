@@ -229,29 +229,29 @@ class ProgramTree:
             self,
             node_to_attach: 'Node',
             path: Optional[Path],
-            attach_request: command.AttachNodeCommand
+            attach_command: command.AttachNodeCommand
     ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
         :param node_to_attach: Node to add on the tree
         :param path: [Optional]The position where the node must be added
-        :param attach_request: an attach node command
+        :param attach_command: an attach node command
         """
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
-        link_type = attach_request.link_type
-        block = attach_request.block
+        link_type = attach_command.link_type
+        block = attach_command.block
         is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
         if is_valid:
             parent.add_child(
                 node_to_attach,
-                access_condition=attach_request.access_condition,
-                is_mandatory=attach_request.is_mandatory,
-                block=attach_request.block,
-                link_type=attach_request.link_type,
-                comment=attach_request.comment,
-                comment_english=attach_request.comment_english,
-                relative_credits=attach_request.relative_credits
+                access_condition=attach_command.access_condition,
+                is_mandatory=attach_command.is_mandatory,
+                block=attach_command.block,
+                link_type=attach_command.link_type,
+                comment=attach_command.comment,
+                comment_english=attach_command.comment_english,
+                relative_credits=attach_command.relative_credits
             )
         return messages
 

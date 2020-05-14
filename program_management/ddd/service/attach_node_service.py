@@ -40,12 +40,12 @@ from program_management.models.enums.node_type import NodeType
 
 
 # FIXME Pass repository to method attach_node and move validations inside AttachNodeValidatorList
-def attach_node(request: command.AttachNodeCommand) -> List['BusinessValidationMessage']:
-    root_id = request.root_id
-    type_node_to_attach = request.type_of_node_to_attach
-    node_id_to_attach = request.node_id_to_attach
-    path = request.path_where_to_attach
-    commit = request.commit
+def attach_node(attach_command: command.AttachNodeCommand) -> List['BusinessValidationMessage']:
+    root_id = attach_command.root_id
+    type_node_to_attach = attach_command.type_of_node_to_attach
+    node_id_to_attach = attach_command.node_id_to_attach
+    path = attach_command.path_where_to_attach
+    commit = attach_command.commit
 
     tree = load_tree.load(root_id)
     node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
@@ -55,7 +55,7 @@ def attach_node(request: command.AttachNodeCommand) -> List['BusinessValidationM
         error_messages += _validate_end_date_and_option_finality(node_to_attach)
     if error_messages:
         return error_messages
-    success_messages = tree.attach_node(node_to_attach, path, request)
+    success_messages = tree.attach_node(node_to_attach, path, attach_command)
     if commit:
         persist_tree.persist(tree)
     return success_messages
