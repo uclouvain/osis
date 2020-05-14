@@ -34,6 +34,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import utils
+from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
