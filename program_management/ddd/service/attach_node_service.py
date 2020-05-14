@@ -39,6 +39,7 @@ from program_management.ddd.validators._authorized_relationship import AttachAut
 from program_management.models.enums.node_type import NodeType
 
 
+# FIXME Pass repository to method attach_node and move validations inside AttachNodeValidatorList
 def attach_node(request: command.AttachNodeCommand) -> List['BusinessValidationMessage']:
     root_id = request.root_id
     type_node_to_attach = request.type_of_node_to_attach
