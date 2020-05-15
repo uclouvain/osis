@@ -24,6 +24,20 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block bottom_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+
 {% block details %}
     <div class="row">
         <div class="col-md-12">
