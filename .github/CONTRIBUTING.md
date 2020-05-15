@@ -301,6 +301,7 @@ django_app
 #### ddd/command.py
 - Regroupe les **objets** qui sont transmis en paramètre d'un service (ddd/service)
 - Représente une simple "dataclass" possédant des attributs primitifs
+- Ces classes sont publiques : elles sont utilisées par les views
 - Doit obligatoirement hériter de l'objet CommandRequest
 - Nommage des classes de commande : <ActionMetier>Command
 
@@ -325,6 +326,7 @@ class AttachNodeCommand(interface.CommandRequest):
 - Regroupe les **objets** du domaine métier qui doivent obligatoirement hériter de ValueObject, Entity ou RootEntity
 - Déclare les EntityIdentity (dans le même fichier que la classe du domaine qui utilise cet EntityIdentity)
 - Les ValueObject doivent obligatoirement redéfinir les méthodes `__hash__()` et `__eq__()`
+- Seuls les AggregateRoot (interface.RootEntity) sont publiques ; les `Entity` utilisées par l'aggregat root sont `protected`
 - 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
 - Nommage des objets : ObjetMetier.
 
@@ -389,6 +391,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
 - Les fonctions de service reçoivent en paramètres uniquement des objets CommandRequest ([ddd/command.py](#ddd/command.py))
 - Les services renvoient toujours un EntityIdentity ; c'est la responsabilité des views de gérer les messages de succès ;
 - Attention à séparer les services write et read !
+- Les fonctions de service sont toujours publiques
 - Nommage des fichiers : <action_metier>_service.py
 - Nommage des fonctions : <action_metier>
 
@@ -415,13 +418,14 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 - Se charge de raise des BusinessException en cas d'invariant métier non respecté
 - Les messages doivent être traduits (si BusinessException s'en charge, le makemessages ne reprendra pas messages à traduire car ils seront stockés dans des variables...)
 - Doit hériter de BusinessValidator
+- Sont toujours `protected` (accessibles uniquement par le Domain)
 - 1 fichier par invariant métier
 - Nommage des fichiers : <invariant_metier>.py
 - Nommage des objets : <InvariantMetier>Validator
 
 Exemple : 
 ```python
-# detach_root.py
+# ddd/validator/_detach_root.py  # protected
 from osis_common.ddd import interface
 from django.utils.translation import gettext as _
 from base.ddd.utils import business_validator
