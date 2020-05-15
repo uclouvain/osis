@@ -32,8 +32,8 @@ class Proposal:
     def __init__(
         self,
         proposal_type: ProposalType = None,
-        proposal_state: ProposalState = False,
+        proposal_state: ProposalState = None
     ):
 
-        self.type = proposal_type
-        self.state = proposal_state
+        self.proposal_type = proposal_type
+        self.proposal_state = proposal_state

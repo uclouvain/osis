@@ -170,5 +170,5 @@ class TestLoadLearningUnitProposal(TestCase):
 
     def test_load_learning_unit_year_init_entities(self):
         results = load_multiple([self.l_unit_1.id])
-        self.assertEqual(results[0].proposal.type, self.proposal.type)
-        self.assertEqual(results[0].proposal.state, self.proposal.state)
+        self.assertEqual(results[0].proposal.proposal_type, self.proposal.type)
+        self.assertEqual(results[0].proposal.proposal_state, self.proposal.state)
