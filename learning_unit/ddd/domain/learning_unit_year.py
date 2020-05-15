@@ -146,3 +146,23 @@ class LearningUnitYear:
     @property
     def full_title_en(self):
         return self.common_title_en + self.specific_title_en
+
+
+class LearningUnitYearIdentity:
+
+    def __init__(
+            self,
+            code: str = None,
+            year: int = None
+    ):
+        self.code = code
+        self.year = year
+
+    def __str__(self) -> str:
+        return "{} - {}".format(self.code, self.year)
+
+    def __eq__(self, other):
+        return (self.code, self.year) == (other.code, other.year)
+
+    def __hash__(self):
+        return hash((self.code, self.year))
