@@ -61,7 +61,7 @@ class NodeRepository(interface.AbstractRepository):
         return []
 
 
-def _search_by_entity_ids(entity_ids: Optional[List['NodeIdentity']]) -> List['Node']:
+def _search_by_entity_ids(entity_ids: List['NodeIdentity']) -> List['Node']:
     qs = Element.objects.all()
     filter_search_from = _build_where_clause(entity_ids[0])
     for identity in entity_ids[1:]:
