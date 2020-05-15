@@ -238,7 +238,8 @@ Idéalement lorsqu'on teste une view, on doit vérifier :
 Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
 - Tous les paramètres d'entrée et de sortie doivent être typés
 - Les fonctions qui renvoient une objet, int, str doivent être nommés "get_<sth>"
-- Les fonctions qui renvoient un booléen doivent être nommés "is_<sth>", "has_<sth>", "contains_<sth>"
+- Les fonctions qui renvoient un booléen doivent être nommés de sorte à poser une question fermée 
+(où la réponse ne peut être que "Oui" ou "Non"). Exemples : `is_<sth>`, `has_<sth>`, `contains_<sth>`...
 - Les fonctions qui renvoient une list, set, dict :
     - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
     
