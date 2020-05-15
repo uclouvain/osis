@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Dict
 
 from django.db.models import F
 
-from attribution.ddd.domain.attribution import Attribution, Teacher
+from attribution.ddd.domain.attribution import Teacher, Attribution
+from attribution.ddd.domain.teacher import Teacher
 from attribution.models import attribution_charge_new
+from django.db.models import QuerySet
 
 
 def __instanciate_teacher_object(attribution_data: dict) -> dict:
@@ -39,24 +41,29 @@ def __instanciate_teacher_object(attribution_data: dict) -> dict:
                    )
 
 
-def load_attributions(acronym: str, year: int) -> List['Attribution']:
-
-    qs = attribution_charge_new.AttributionChargeNew.objects \
-        .filter(learning_component_year__learning_unit_year__acronym=acronym,
-                learning_component_year__learning_unit_year__academic_year__year=year) \
-        .select_related('learning_component_year', 'attribution__tutor__person')\
+def load_attributions(learning_unit_year_ids: List[int]) -> QuerySet:
+    return attribution_charge_new.AttributionChargeNew.objects \
+        .filter(learning_component_year__learning_unit_year__id__in=learning_unit_year_ids) \
+        .select_related('learning_component_year', 'attribution__tutor__person') \
         .order_by('attribution__tutor__person__last_name',
                   'attribution__tutor__person__first_name',
-                  'attribution__tutor__person__middle_name')\
+                  'attribution__tutor__person__middle_name') \
         .annotate(teacher_last_name=F('attribution__tutor__person__last_name'),
                   teacher_first_name=F('attribution__tutor__person__first_name'),
                   teacher_middle_name=F('attribution__tutor__person__middle_name'),
                   teacher_email=F('attribution__tutor__person__email'),
-                  )\
+                  ue_id=F('learning_component_year__learning_unit_year__id')
+                  ) \
         .values('teacher_last_name', 'teacher_first_name',
-                'teacher_middle_name', 'teacher_email')
+                'teacher_middle_name', 'teacher_email', 'ue_id')
 
-    return [
-        Attribution(teacher=__instanciate_teacher_object(attribution_data))
-        for attribution_data in qs
-    ]
+
+def set_attributions(attributions_dict: Dict = None) -> List['Attribution']:
+    attributions = []
+    for teacher_data in attributions_dict:
+        attributions.append(
+            Attribution(
+                teacher=__instanciate_teacher_object(teacher_data)
+                )
+            )
+    return attributions

@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from typing import List
+import itertools
+from typing import List, Dict
 
 from django.conf import settings
 from django.db.models import F, Subquery, OuterRef
@@ -46,7 +46,8 @@ from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.repository.load_achievement import load_achievements
 from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
-from attribution.ddd.repositories.load_attribution import load_attributions
+from attribution.ddd.repositories.load_attribution import load_attributions, set_attributions
+from operator import itemgetter
 
 
 def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
@@ -84,7 +85,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
     ).current(
         OuterRef('academic_year__start_date')
     ).values('acronym')[:1]
-
+    qs_attributions = load_attributions(learning_unit_year_ids)
     qs = LearningUnitYearModel.objects.filter(pk__in=learning_unit_year_ids).annotate(
         specific_title_en=F('specific_title_english'),
         specific_title_fr=F('specific_title'),
@@ -144,12 +145,14 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
         'allocation_entity_acronym',
         'subtype',
         'session',
-        'main_language',
+        'main_language'
     )
 
     qs = _annotate_with_description_fiche_specifications(qs)
 
     results = []
+
+    attributions_by_ue = _build_sorted_attributions_grouped_by_ue(qs_attributions)
 
     for learning_unit_data in qs:
         luy = LearningUnitYear(
@@ -180,9 +183,8 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
                 prerequisite_en=learning_unit_data.pop('cms_prerequisite_en')
                 ),
             teaching_materials=load_teaching_materials(learning_unit_data['acronym'], learning_unit_data['year']),
-            attributions=load_attributions(learning_unit_data['acronym'], learning_unit_data['year'])
+            attributions=set_attributions(attributions_by_ue.get(learning_unit_data.get('id')))
             )
-
         results.append(luy)
     return results
 
@@ -231,3 +233,20 @@ def _build_subquery_text_label(qs, cms_text_label, lang):
 
     return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
         'text')[:1]
+
+
+def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[int, List]:
+    sorted_attributions = sorted(qs_attributions,
+                                 key=lambda attribution: (attribution['ue_id'],
+                                                          attribution['teacher_last_name'],
+                                                          attribution['teacher_first_name'],
+                                                          attribution['teacher_middle_name']
+                                                          )
+                                 )
+    sorted_attributions_grouped_by_ue = {}
+
+    for learning_unit_year_id, attributions in itertools.groupby(sorted_attributions, key=itemgetter('ue_id')):
+        sorted_attributions_grouped_by_ue.update(
+            {learning_unit_year_id: [attribution for attribution in attributions]}
+        )
+    return sorted_attributions_grouped_by_ue
