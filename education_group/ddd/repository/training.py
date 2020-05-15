@@ -1,0 +1,239 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from typing import Optional, List
+
+from django.db.models import Subquery, OuterRef, Prefetch
+
+from base.models.education_group_organization import EducationGroupOrganization
+from base.models.education_group_year import EducationGroupYear
+from base.models.entity import Entity
+from base.models.entity_version import EntityVersion
+from base.models.enums.activity_presence import ActivityPresence
+from base.models.enums.education_group_types import TrainingType
+from base.models.enums.funding_codes import FundingCodes
+from base.models.enums.internship_presence import InternshipPresence
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from base.models.organization_address import OrganizationAddress
+from education_group.ddd.business_types import *
+from education_group.ddd.domain import training
+from education_group.ddd.domain._academic_partner import AcademicPartner
+from education_group.ddd.domain._address import Address
+from education_group.ddd.domain._campus import Campus
+from education_group.ddd.domain._co_graduation import CoGraduation
+from education_group.ddd.domain._co_organization import CoOrganization
+from education_group.ddd.domain._entity import Entity as EntityValueObject
+from education_group.ddd.domain._funding import Funding
+from education_group.ddd.domain._hops import HOPS
+from education_group.ddd.domain._isced_domain import IscedDomain
+from education_group.ddd.domain._language import Language
+from education_group.ddd.domain._study_domain import StudyDomain
+from education_group.ddd.domain._titles import Titles
+from osis_common.ddd import interface
+
+
+class TrainingRepository(interface.AbstractRepository):
+    @classmethod
+    def create(cls, entity: 'Training') -> 'TrainingIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def update(cls, entity: 'Training') -> 'TrainingIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
+        qs = EducationGroupYear.objects.filter(
+            acronym='DROI1BA',
+            academic_year__year=2020
+        ).select_related(
+            'education_group_type',
+            'hops',
+            'management_entity',
+            'administration_entity',
+            'administration_entity',
+            'enrollment_campus__organization',
+            'main_teaching_campus__organization',
+            'isced_domain',
+            'education_group__start_year',
+            'education_group__end_year',
+            'primary_language',
+            'main_domain__decree',
+        ).prefetch_related(
+            'secondary_domains',
+            Prefetch(
+                'educationgrouporganization_set',
+                EducationGroupOrganization.objects.all().prefetch_related(
+                    Prefetch(
+                        'organization__organizationaddress_set',
+                        OrganizationAddress.objects.all().select_related('country')
+                    )
+                ).order_by('all_students')
+            ),
+            Prefetch(
+                'administration_entity',
+                Entity.objects.all().annotate(
+                    most_recent_acronym=Subquery(
+                        EntityVersion.objects.filter(
+                            entity__id=OuterRef('pk')
+                        ).order_by('-start_date').values('acronym')[:1]
+                    )
+                )
+            ),
+            Prefetch(
+                'management_entity',
+                Entity.objects.all().annotate(
+                    most_recent_acronym=Subquery(
+                        EntityVersion.objects.filter(
+                            entity__id=OuterRef('pk')
+                        ).order_by('-start_date').values('acronym')[:1]
+                    )
+                )
+            ),
+        )
+
+        obj = qs.get()
+
+        secondary_domains = []
+        for domain in obj.secondary_domains.all():
+            secondary_domains.append(
+                StudyDomain(
+                    decree_name=domain.decree.name,
+                    code=domain.code,
+                    name=domain.name,
+                )
+            )
+
+        coorganizations = []
+        for coorg in obj.educationgrouporganization_set.all():
+            first_address = coorg.organization.organizationaddress_set.all()[0]
+            coorganizations.append(
+                CoOrganization(
+                    partner=AcademicPartner(
+                        name=coorg.organization.name,
+                        address=Address(
+                            country_name=first_address.country.name,
+                            city=first_address.country.city,
+                        ),
+                        logo_url=coorg.organization.logo_url,
+                    ),
+                    is_for_all_students=coorg.all_students,
+                    is_reference_institution=coorg.enrollment_place,
+                    certificate_type=coorg.certificate_type,
+                    is_producing_certificate=coorg.is_producing_certificate,
+                    is_producing_certificate_annexes=coorg.is_producing_annexe,
+                )
+            )
+
+        return training.Training(
+            entity_identity=entity_id,
+            type=TrainingType[obj.education_group_type.name],
+            credits=obj.credits,
+            schedule_type=ScheduleTypeEnum[obj.schedule_type],
+            duration=obj.duration,
+            start_year=obj.education_group.start_year.year,
+            titles=Titles(
+                title_fr=obj.title,
+                partial_title_fr=obj.partial_title,
+                title_en=obj.title_english,
+                partial_title_en=obj.partial_title_english,
+            ),
+            keywords=obj.keywords,
+            internship=InternshipPresence[obj.internship],
+            is_enrollment_enabled=obj.enrollment_enabled,
+            has_online_re_registration=obj.web_re_registration,
+            has_partial_deliberation=obj.partial_deliberation,
+            has_admission_exam=obj.admission_exam,
+            has_dissertation=obj.dissertation,
+            produce_university_certificate=obj.university_certificate,
+            decree_category=obj.decree_category,
+            rate_code=obj.rate_code,
+            main_language=Language(
+                name=obj.primary_language.name,
+            ),
+            english_activities=ActivityPresence[obj.english_activities],
+            other_language_activities=ActivityPresence[obj.other_language_activities],
+            internal_comment=obj.internal_comment,
+            main_domain=StudyDomain(
+                decree_name=obj.main_domain.decree.name,
+                code=obj.main_domain.code,
+                name=obj.main_domain.name,
+            ),
+            secondary_domains=secondary_domains,
+            isced_domain=IscedDomain(
+                code=obj.isced_domain.code,
+                title_fr=obj.isced_domain.title_fr,
+                title_en=obj.isced_domain.title_en,
+            ),
+            management_entity=EntityValueObject(
+                acronym=obj.management_entity.most_recent_acronym,
+            ),
+            administration_entity=EntityValueObject(
+                acronym=obj.administration_entity.most_recent_acronym,
+            ),
+            end_year=obj.education_group.end_year.year if obj.education_group.end_year else None,
+            teaching_campus=Campus(
+                name=obj.main_teaching_campus.name,
+                university_name=obj.main_teaching_campus.organization.name,
+            ),
+            enrollment_campus=Campus(
+                name=obj.enrollment_campus.name,
+                university_name=obj.enrollment_campus.organization.name,
+            ),
+            other_campus_activities=obj.other_campus_activities,
+            funding=Funding(
+                can_be_funded=obj.funding,
+                funding_orientation=FundingCodes[obj.funding_direction],
+                can_be_international_funded=obj.funding_cud,
+                international_funding_orientation=FundingCodes[obj.funding_direction_cud],
+            ),
+            hops=HOPS(
+                ares_code=obj.hops.ares_study,
+                ares_graca=obj.hops.ares_graca,
+                ares_authorization=obj.hops.ares_ability,
+            ),
+            co_graduation=CoGraduation(
+                code_inter_cfb=obj.co_graduation,
+                coefficient=obj.co_graduation_coefficient,
+            ),
+            co_organizations=coorganizations,
+        )
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List['TrainingIdentity']] = None, **kwargs) -> List['Training']:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: 'TrainingIdentity') -> None:
+        raise NotImplementedError
+
+
+def test():
+    # from education_group.ddd.repository import training as t
+    # training.test()
+    from education_group.ddd.domain.training import TrainingIdentity
+    identity = TrainingIdentity(acronym='DROI2MS/KI', year=2020)
+    obj = TrainingRepository().get(identity)
+    return obj
