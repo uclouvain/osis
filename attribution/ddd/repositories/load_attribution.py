@@ -28,7 +28,8 @@ from typing import List, Dict
 
 from django.db.models import F, Q
 
-from attribution.ddd.domain.attribution import Attribution, instanciate_attribution
+from attribution.ddd.domain.attribution import Attribution
+from attribution.ddd.domain.teacher import Teacher
 from attribution.models import attribution_charge_new
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYearIdentity
 
@@ -86,3 +87,15 @@ def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[LearningUn
             attributions_data.append(instanciate_attribution(attribution))
         sorted_attributions_grouped_by_ue.update({learning_unit_identity: attributions_data})
     return sorted_attributions_grouped_by_ue
+
+
+def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
+    return Attribution(teacher=instanciate_teacher_object(attributions_dict))
+
+
+def instanciate_teacher_object(attribution_data: dict) -> Teacher:
+    return Teacher(last_name=attribution_data.get('teacher_last_name'),
+                   first_name=attribution_data.get('teacher_first_name'),
+                   middle_name=attribution_data.get('teacher_middle_name'),
+                   email=attribution_data.get('teacher_email'),
+                   )

@@ -24,9 +24,7 @@
 #
 ##############################################################################
 
-from typing import Dict
-
-from attribution.ddd.domain.teacher import Teacher, instanciate_teacher_object
+from attribution.ddd.domain.teacher import Teacher
 from osis_common.ddd import interface
 
 
@@ -48,7 +46,3 @@ class Attribution(interface.RootEntity):
             teacher: Teacher = None,
     ):
         self.teacher = teacher
-
-
-def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
-    return Attribution(teacher=instanciate_teacher_object(attributions_dict))
