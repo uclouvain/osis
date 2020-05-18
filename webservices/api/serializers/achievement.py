@@ -24,12 +24,11 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, CharField, F, Subquery
+from django.db.models import Case, When, CharField, F
 from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
-from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -98,6 +97,7 @@ class AchievementsSerializer(serializers.Serializer):
         return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_EXTRA)
 
     def _get_cms_achievement_data(self, cms_type):
+        offer = self.context.get('offer')
         try:
             data = TranslatedText.objects.select_related(
                 'text_label'
@@ -111,12 +111,7 @@ class AchievementsSerializer(serializers.Serializer):
                 entity=OFFER_YEAR,
                 language=self.context['language'],
                 text_label__label=cms_type,
-                reference=Subquery(
-                    EducationGroupYear.objects.filter(
-                        academic_year__year=self.instance.year,
-                        partial_acronym=self.instance.code
-                    ).values('id')[:1]
-                )
+                reference=offer.id
             )
             return data.text_or_none
         except TranslatedText.DoesNotExist:
