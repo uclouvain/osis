@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List, Tuple
 
+from django import shortcuts
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -47,6 +48,7 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
+from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
@@ -60,9 +62,13 @@ from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-# TODO check for permission
-class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class AttachMultipleNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
+    permission_required = "base.attach_educationgroup"
+
+    def get_permission_object(self) -> EducationGroupYear:
+        node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
+        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
 
     @cached_property
     def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:

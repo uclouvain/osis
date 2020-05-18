@@ -25,33 +25,31 @@
 ##############################################################################
 from unittest import mock
 
-import mock
 from django.contrib import messages
 from django.contrib.messages import get_messages
-from django.core.cache import cache
-from django.http import HttpResponse, QueryDict, HttpResponseRedirect
+from django.http import HttpResponse, QueryDict
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearFactory, TrainingFactory
+from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 def form_valid_effect(formset: AttachNodeFormSet):
@@ -89,6 +87,11 @@ class TestAttachNodeView(TestCase):
         self.get_form_class_patcher.start()
         self.addCleanup(self.get_form_class_patcher.stop)
 
+        permission_patcher = mock.patch.object(PermissionRequiredMixin, "has_permission")
+        self.permission_mock = permission_patcher.start()
+        self.permission_mock.return_value = True
+        self.addCleanup(permission_patcher.stop)
+
     def setUpTreeData(self):
         """
            |BIR1BA
@@ -106,14 +109,6 @@ class TestAttachNodeView(TestCase):
         root_node.add_child(subgroup)
         return ProgramTree(root_node)
 
-    def test_allowed_http_method_when_user_is_not_logged(self):
-        self.client.logout()
-
-        allowed_method = ['get', 'post']
-        for method in allowed_method:
-            response = getattr(self.client, method)(self.url)
-            self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
     def test_get_method_when_no_data_selected_on_cache(self):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url, data={"path": path})
@@ -122,6 +117,7 @@ class TestAttachNodeView(TestCase):
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
         self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])
+        self.assertTrue(self.permission_mock.called)
 
     @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
     def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
@@ -185,9 +181,7 @@ class TestAttachNodeView(TestCase):
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.post(self.url + "?path=" + path)
-
-        msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
+        self.client.post(self.url + "?path=" + path)
 
         self.assertTrue(
             mock_service.called,
@@ -208,7 +202,9 @@ class TestAttachCheckView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-        patcher_fetch_nodes_selected = mock.patch("program_management.business.group_element_years.management.fetch_nodes_selected")
+        patcher_fetch_nodes_selected = mock.patch(
+            "program_management.business.group_element_years.management.fetch_nodes_selected"
+        )
         mock_fetch_nodes_selected = patcher_fetch_nodes_selected.start()
         mock_fetch_nodes_selected.return_value = [(36, NodeType.EDUCATION_GROUP), (89, NodeType.EDUCATION_GROUP)]
         self.addCleanup(patcher_fetch_nodes_selected.stop)
@@ -300,6 +296,11 @@ class TestMoveGroupElementYearView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
+        permission_patcher = mock.patch.object(PermissionRequiredMixin, "has_permission")
+        self.permission_mock = permission_patcher.start()
+        self.permission_mock.return_value = True
+        self.addCleanup(permission_patcher.stop)
+
     def test_move(self):
         AuthorizedRelationshipFactory(
             parent_type=self.selected_egy.education_group_type,
@@ -312,7 +313,7 @@ class TestMoveGroupElementYearView(TestCase):
             source_link_id=self.group_element_year.id
         )
 
-        response = self.client.post(self.url, data={
+        self.client.post(self.url, data={
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1',
@@ -320,4 +321,6 @@ class TestMoveGroupElementYearView(TestCase):
         })
 
         self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id))
-        self.assertTrue(GroupElementYear.objects.filter(parent=self.selected_egy, child_branch=self.group_element_year.child_branch))
+        self.assertTrue(
+            GroupElementYear.objects.filter(parent=self.selected_egy, child_branch=self.group_element_year.child_branch)
+        )
