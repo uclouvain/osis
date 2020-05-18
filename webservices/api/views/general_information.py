@@ -28,7 +28,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from base.business.education_groups import general_information_sections
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 
@@ -56,7 +57,8 @@ class GeneralInformation(generics.RetrieveAPIView):
             offer__academic_year__year=self.kwargs['year'],
             offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys()
         )
-        tree = load_tree.load(egv.offer.id)
+        identity = ProgramTreeIdentity(code=egv.root_group.partial_acronym, year=egv.root_group.academic_year.year)
+        tree = ProgramTreeRepository.get(entity_id=identity)
         return tree.root_node
 
     def get_serializer_context(self):
