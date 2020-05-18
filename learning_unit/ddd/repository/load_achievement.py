@@ -46,7 +46,7 @@ def load_achievements(acronym: str, year: int) -> List['Achievement']:
 def _build_achievements(qs):
     ue_achievements = sorted(qs, key=lambda el: el['order'])
     achievements = []
-    for code_name, elements in itertools.groupby(ue_achievements, key=lambda el: el['code_name']):
+    for code_name, elements in itertools.groupby(ue_achievements, key=lambda el: el['order']):
         achievement_parameters = {'code_name': code_name}
         for achievement in elements:
             if achievement['language_code'] == settings.LANGUAGE_CODE_EN[:2].upper():
