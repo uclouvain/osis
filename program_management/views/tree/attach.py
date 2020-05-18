@@ -29,6 +29,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse, request
 from django.shortcuts import render, redirect
@@ -194,7 +195,7 @@ class MoveGroupElementYearView(AttachMultipleNodesView):
             display_error_messages(self.request, message_list)
         return kwargs
 
-    # TODO should be atomic
+    @transaction.atomic
     def form_valid(self, form):
         detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=True)
         return super().form_valid(form)
