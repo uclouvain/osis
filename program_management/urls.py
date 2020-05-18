@@ -29,8 +29,7 @@ from django.urls import include, path
 import program_management.views.tree.attach
 import program_management.views.tree.move
 from program_management.views import groupelementyear_delete, groupelementyear_update, \
-    groupelementyear_read, element_utilization, groupelementyear_postpone, \
-    excel, search, tree
+    groupelementyear_read, element_utilization, excel, search, tree
 from program_management.views.prerequisite import read, update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
@@ -54,8 +53,6 @@ urlpatterns = [
         ])),
         url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
-        url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
-            name="postpone_education_group"),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
