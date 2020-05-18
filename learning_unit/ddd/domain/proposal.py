@@ -31,9 +31,9 @@ from base.models.enums.proposal_state import ProposalState
 class Proposal:
     def __init__(
         self,
-        proposal_type: ProposalType = None,
-        proposal_state: ProposalState = False,
+        type: ProposalType = None,
+        state: ProposalState = None
     ):
 
-        self.type = proposal_type
-        self.state = proposal_state
+        self.type = type
+        self.state = state
