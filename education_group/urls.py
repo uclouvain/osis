@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from education_group.views import group, training, mini_training
+from education_group.views import group, training, mini_training, general_information
 
 urlpatterns = [
     path('groups/<int:year>/<str:code>/', include([
@@ -53,6 +53,29 @@ urlpatterns = [
             'admission_conditions/',
             training.TrainingReadAdmissionCondition.as_view(),
             name='training_admission_condition'
+        ),
+    ])),
+    path('general_information/', include([
+        path('common/', general_information.CommonGeneralInformation, name="common_general_information"),
+        path(
+            'common-bachelor/',
+            general_information.CommonBachelorAdmissionCondition,
+            name="common_bachelor_admission_condition"
+        ),
+        path(
+            'common-aggregate',
+            general_information.CommonAggregateAdmissionCondition,
+            name="common_aggregate_admission_condition"
+        ),
+        path(
+            'common-master',
+            general_information.CommonMasterAdmissionCondition,
+            name="common_master_admission_condition"
+        ),
+        path(
+            'common-master-specialized',
+            general_information.CommonMasterSpecializedAdmissionCondition,
+            name="common_master_specialized_admission_condition"
         ),
     ])),
     path('<int:year>/<str:code>/publish',

@@ -23,6 +23,19 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block bottom_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+
 {% block details %}
     <div class="row">
         <div class="col-md-12">
@@ -30,6 +43,10 @@
                 {% for section_name, labels in sections.items %}
                     {% include "blocks/general_information_section_panel.html" %}
                 {% endfor %}
+
+                {% if show_contacts %}
+                    {% include "blocks/general_information_section_contact_panel.html" %}
+                {% endif %}
             </div>
         </div>
     </div>

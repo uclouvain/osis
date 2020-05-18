@@ -24,14 +24,13 @@
 #
 ##############################################################################
 import itertools
+from typing import List
 
 from django.conf import settings
-from typing import List
+from django.db.models import F
 
 from base.models.learning_achievement import LearningAchievement
 from learning_unit.ddd.domain.achievement import Achievement
-
-from django.db.models import F
 
 
 def load_achievements(acronym: str, year: int) -> List['Achievement']:

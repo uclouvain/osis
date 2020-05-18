@@ -29,10 +29,10 @@
 <div class="panel-body">
     <div class="container-fluid">
         {% for label in labels %}
-            <div class="row">
+            <div class="row {% if label.common_label %} education_group_year-common italic {% endif %}">
                 <div class="col-md-12">
                     <label id="label_{{ label.label_id }}"><b>{{ label.label_translated }}</b></label>
-                    {% if can_edit_information %}
+                    {% if can_edit_information and not label.common_label %}
                         <a class="pedagogy-edit-btn" href="#">
                            {# TODO: Fix URL update for pedagocical information #}
                            <!-- data-form="{{ post_url }}?label={{ label.label_id }}"
@@ -43,7 +43,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="row">
+            <div class="row {% if label.common_label %} education_group_year-common italic {% endif %}">
                 <div class="col-md-12">
                     {% include "blocks/row_translation_side_by_side.html" %}
                 </div>
