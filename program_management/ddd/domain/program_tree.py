@@ -27,10 +27,10 @@ import copy
 from collections import Counter
 from typing import List, Set, Tuple, Optional
 
-from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
@@ -47,7 +47,19 @@ PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
-class ProgramTree:
+class ProgramTreeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
+
+
+class ProgramTree(interface.RootEntity):
 
     root_node = None
     authorized_relationships = None
@@ -55,6 +67,8 @@ class ProgramTree:
     def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
         self.root_node = root_node
         self.authorized_relationships = authorized_relationships
+        # FIXME :: pass entity_id into the __init__ param !
+        super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
 
     def __eq__(self, other: 'ProgramTree'):
         return self.root_node == other.root_node
