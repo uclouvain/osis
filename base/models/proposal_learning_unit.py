@@ -129,3 +129,10 @@ def is_in_proposal_of_transformation(luy):
         learning_unit_year=luy,
         type__in=[ProposalType.TRANSFORMATION.name, ProposalType.TRANSFORMATION_AND_MODIFICATION.name]
     ).exists()
+
+
+def is_proposal_of_creation(lu):
+    return ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=lu,
+        type__in=[ProposalType.CREATION.name]
+    ).exists()
