@@ -108,7 +108,7 @@ class LearningUnitYear:
             subtype: str = None,
             session: str = None,
             main_language: str = None,
-            attributions: List['Attribution'] = [],
+            attributions: List['Attribution'] = None,
 
     ):
         self.id = id
@@ -137,7 +137,7 @@ class LearningUnitYear:
         self.subtype = subtype
         self.session = session
         self.main_language = main_language
-        self.attributions = attributions
+        self.attributions = attributions or []
 
     @property
     def full_title_fr(self):

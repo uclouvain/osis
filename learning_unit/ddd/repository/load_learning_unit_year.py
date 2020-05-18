@@ -29,7 +29,7 @@ from typing import List, Dict
 from django.conf import settings
 from django.db.models import F, Subquery, OuterRef, QuerySet, Q
 
-from attribution.ddd.repositories.load_attribution import load_attributions, __set_attributions
+from attribution.ddd.repositories.load_attribution import load_attributions, instanciate_attributions
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -337,7 +337,7 @@ def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitY
     for learning_unit_data in qs:
         learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_data['acronym'],
                                                           year=learning_unit_data['year'])
-        attributions = __set_attributions(attributions_by_ue.get(learning_unit_identity))
+        attributions = instanciate_attributions(attributions_by_ue.get(learning_unit_identity))
         luy = LearningUnitYear(
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             proposal=Proposal(learning_unit_data.pop('proposal_type'),
@@ -381,7 +381,7 @@ def _build_where_clause(node_identity: 'LearningUnitYearIdentity') -> Q:
     )
 
 
-def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[LearningUnitYearIdentity, List]:
+def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[LearningUnitYearIdentity, List['Attribution']]:
     sorted_attributions = sorted(qs_attributions,
                                  key=lambda attribution: (attribution['acronym_ue'],
                                                           attribution['year_ue'],

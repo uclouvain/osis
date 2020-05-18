@@ -64,7 +64,7 @@ def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) 
     return qs
 
 
-def __set_attributions(attributions_dict: Dict = None) -> List['Attribution']:
+def instanciate_attributions(attributions_dict: Dict = None) -> List['Attribution']:
     attributions = []
     if attributions_dict:
         for teacher_data in attributions_dict:
