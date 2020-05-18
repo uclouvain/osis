@@ -50,8 +50,9 @@ from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
+from program_management.ddd.domain import program_tree
 from program_management.ddd.repositories import load_node
-from program_management.ddd.service import attach_node_service, command
+from program_management.ddd.service import attach_node_service, command, detach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
@@ -246,11 +247,10 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
 class MoveGroupElementYearView(CreateGroupElementYearView):
     template_name = "group_element_year/group_element_year_comment_inner.html"
 
-    @cached_property
-    def detach_strategy(self):
-        obj = self.get_object()
-        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
-        return strategy_class(obj)
+    def path_to_detach_from(self) -> program_tree.Path:
+        obj = self.get_object()  # type:GroupElementYear
+        path = "{}|{}".format(obj.parent.pk, obj.child.pk)
+        return path
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -261,15 +261,14 @@ class MoveGroupElementYearView(CreateGroupElementYearView):
             msg = "{}: {}".format(str(self.get_object().parent), str(e))
             display_warning_messages(self.request, msg)
 
-        if not self.detach_strategy.is_valid():
-            display_error_messages(self.request, self.detach_strategy.errors)
+        message_list = detach_node_service.detach_node(self.path_to_detach_from(), commit=False)
+        if message_list.contains_errors():
+            display_error_messages(self.request, message_list)
 
         return kwargs
 
     def form_valid(self, form):
-        self.detach_strategy.post_valid()
-        obj = self.get_object()
-        obj.delete()
+        detach_node_service.detach_node(self.path_to_detach_from(), commit=True)
         return super().form_valid(form)
 
 
