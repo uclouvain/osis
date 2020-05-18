@@ -149,7 +149,6 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
     query_string = True
 
     def get_redirect_url(self, *args, **kwargs):
-        self.pattern_name = 'group_element_year_create'
         redirect_url = reverse("check_education_group_attach", args=[self.kwargs["root_id"]])
         redirect_url = "{}?{}".format(redirect_url, self.request.GET.urlencode())
 
@@ -185,68 +184,6 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
                 return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
 
         return super(PasteElementFromCacheToSelectedTreeNode, self).dispatch(request, *args, **kwargs)
-
-
-class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
-    template_name = "group_element_year/group_element_year_comment_inner.html"
-
-    def get_form_class(self):
-        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
-        if not elements_to_attach:
-            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
-
-        return modelformset_factory(
-            model=GroupElementYear,
-            form=GroupElementYearForm,
-            formset=BaseGroupElementYearFormset,
-            extra=len(elements_to_attach),
-        )
-
-    def get_form_kwargs(self):
-        """ For the creation, the group_element_year needs a parent and a child """
-        kwargs = super().get_form_kwargs()
-
-        # Formset don't use instance parameter
-        if "instance" in kwargs:
-            del kwargs["instance"]
-        kwargs_form_kwargs = []
-
-        children = fetch_elements_selected(self.request.GET, self.request.user)
-
-        messages = _check_attach(self.education_group_year, children)
-        if messages:
-            display_error_messages(self.request, messages)
-
-        for child in children:
-            kwargs_form_kwargs.append({
-                'parent': self.education_group_year,
-                'child_branch': child if isinstance(child, EducationGroupYear) else None,
-                'child_leaf': child if isinstance(child, LearningUnitYear) else None,
-                'empty_permitted': False
-            })
-
-        kwargs["form_kwargs"] = kwargs_form_kwargs
-        kwargs["queryset"] = GroupElementYear.objects.none()
-        return kwargs
-
-    def form_valid(self, form):
-        ElementCache(self.request.user).clear()
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['formset'] = context["form"]
-        if len(context["formset"]) > 0:
-            context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
-        context["education_group_year"] = self.education_group_year
-        return context
-
-    def get_success_message(self, cleaned_data):
-        return _("The content of %(acronym)s has been updated.") % {"acronym": self.education_group_year.verbose}
-
-    def get_success_url(self):
-        """ We'll reload the page """
-        return
 
 
 class MoveGroupElementYearView(AttachMultipleNodesView):

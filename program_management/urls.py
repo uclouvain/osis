@@ -40,8 +40,6 @@ urlpatterns = [
         url(r'^content/', include([
             url(u'^attach/', program_management.views.tree.attach.PasteElementFromCacheToSelectedTreeNode.as_view(),
                 name='education_group_attach'),
-            url(u'^create/$', program_management.views.tree.attach.CreateGroupElementYearView.as_view(),
-                name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
