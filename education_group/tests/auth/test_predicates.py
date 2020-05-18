@@ -1,5 +1,7 @@
 import mock
+from django.http import HttpResponseForbidden
 from django.test import TestCase, override_settings
+from django.urls import reverse
 from mock import patch
 
 from base.models.enums.education_group_types import TrainingType
@@ -83,31 +85,33 @@ class TestUserAttachedToManagementEntity(TestCase):
 
         self.assertFalse(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
-    # def _test_user_cannot_create_egy_in_other_entity(self, egy):
-    #     faculty_manager = FacultyManagerFactory(
-    #         person=self.person,
-    #         entity=self.root_entity_version.entity,
-    #         with_child=True
-    #     )
-    #     self.client.force_login(faculty_manager.person.user)
-    #     url = reverse('new_education_group', args=[
-    #         egy.category, egy.education_group_type.pk, egy.pk, egy.pk
-    #     ])
-    #     response = self.client.get(url)
-    #     self.assertTemplateUsed(response, "access_denied.html")
-    #     self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-    #
-    # def test_user_cannot_create_training_in_other_entity(self):
-    #     training = TrainingFactory()
-    #     self._test_user_cannot_create_egy_in_other_entity(training)
-    #
-    # def test_user_cannot_create_mini_training_in_other_entity(self):
-    #     minitraining = MiniTrainingFactory()
-    #     self._test_user_cannot_create_egy_in_other_entity(minitraining)
-    #
-    # def test_user_cannot_create_Group_in_other_entity(self):
-    #     group = GroupFactory()
-    #     self._test_user_cannot_create_egy_in_other_entity(group)
+    def test_user_cannot_create_training_in_other_entity(self):
+        training = TrainingFactory()
+        self._test_user_cannot_create_egy_in_other_entity(training)
+
+    def test_user_cannot_create_mini_training_in_other_entity(self):
+        minitraining = MiniTrainingFactory()
+        self._test_user_cannot_create_egy_in_other_entity(minitraining)
+
+    def test_user_cannot_create_Group_in_other_entity(self):
+        group = GroupFactory()
+        self._test_user_cannot_create_egy_in_other_entity(group)
+
+    def _test_user_cannot_create_egy_in_other_entity(self, egy):
+        faculty_manager = FacultyManagerFactory(
+            person=self.person,
+            entity=self.root_entity_version.entity,
+            with_child=True
+        )
+        self.client.force_login(faculty_manager.person.user)
+        url = reverse('new_education_group', args=[
+            egy.category, egy.education_group_type.pk, egy.pk, egy.pk
+        ])
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        # invalidate egy after test
+        egy.delete()
 
 
 class TestEducationGroupYearOlderOrEqualsThanLimitSettings(TestCase):
