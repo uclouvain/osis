@@ -26,6 +26,7 @@
 from _decimal import Decimal
 from typing import List
 
+from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.education_group_types import TrainingType
@@ -95,7 +96,8 @@ class Training(interface.RootEntity):
             funding: Funding = None,
             hops: HOPS = None,
             co_graduation: CoGraduation = None,
-            co_organizations: List[CoOrganization] = None
+            co_organizations: List[CoOrganization] = None,
+            academic_type: AcademicTypes = None
     ):
         super(Training, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
@@ -132,6 +134,7 @@ class Training(interface.RootEntity):
         self.hops = hops
         self.co_graduation = co_graduation
         self.co_organizations = co_organizations
+        self.academic_type = academic_type
 
     @property
     def acronym(self) -> str:

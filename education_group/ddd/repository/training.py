@@ -31,10 +31,13 @@ from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
+from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
+from base.models.enums.decree_category import DecreeCategories
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
+from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.organization_address import OrganizationAddress
 from education_group.ddd.business_types import *
@@ -161,15 +164,15 @@ class TrainingRepository(interface.AbstractRepository):
                 partial_title_en=obj.partial_title_english,
             ),
             keywords=obj.keywords,
-            internship=InternshipPresence[obj.internship],
+            internship=InternshipPresence[obj.internship] if obj.internship else None,
             is_enrollment_enabled=obj.enrollment_enabled,
             has_online_re_registration=obj.web_re_registration,
             has_partial_deliberation=obj.partial_deliberation,
             has_admission_exam=obj.admission_exam,
             has_dissertation=obj.dissertation,
             produce_university_certificate=obj.university_certificate,
-            decree_category=obj.decree_category,
-            rate_code=obj.rate_code,
+            decree_category=DecreeCategories[obj.decree_category] if obj.decree_category else None,
+            rate_code=RateCode[obj.rate_code] if obj.rate_code else None,
             main_language=Language(
                 name=obj.primary_language.name,
             ),
@@ -202,7 +205,8 @@ class TrainingRepository(interface.AbstractRepository):
                 name=obj.enrollment_campus.name,
                 university_name=obj.enrollment_campus.organization.name,
             ),
-            other_campus_activities=obj.other_campus_activities,
+            other_campus_activities=ActivityPresence[
+                obj.other_campus_activities] if obj.other_campus_activities else None,
             funding=Funding(
                 can_be_funded=obj.funding,
                 funding_orientation=FundingCodes[obj.funding_direction],
@@ -219,6 +223,7 @@ class TrainingRepository(interface.AbstractRepository):
                 coefficient=obj.co_graduation_coefficient,
             ),
             co_organizations=coorganizations,
+            academic_type=AcademicTypes[obj.academic_type] if obj.academic_type else None,
         )
 
     @classmethod

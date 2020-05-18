@@ -1,4 +1,3 @@
-{% extends "training/layout_read.html" %}
 {% load i18n bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -23,19 +22,36 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Funding") label_class='d-block'%}
+                <p>{{ education_group_year.funding.can_be_funded | yesno | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Funding direction") label_class='d-block'%}
+                <p>{{ education_group_year.funding.funding_orientation.value | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Funding international cooperation CCD/CUD") label_class='d-block'%}
+                <p>{{ education_group_year.funding.can_be_international_funded | yesno | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Funding international cooperation CCD/CUD direction") label_class='d-block'%}
+                <p>{{ education_group_year.funding.international_funding_orientation.value | title }}</p>
+            </div>
+        </div>
+        <br>
 
-{% block details %}
-    {% if not current_version.is_standard %}
-        {% include  "education_group/blocks/panel/panel_version_information.html" %}
-    {% endif %}
-    <div class="row">
-        <div class="col-md-7">
-            {% include  "training/identification/panel_informations.html" %}
-            {% include  "training/identification/panel_academic_informations.html" %}
-        </div>
-        <div class="col-md-5">
-            {% include  "training/identification/panel_entities.html" %}
-            {% include  "training/identification/panel_funding.html" %}
-        </div>
     </div>
-{% endblock details %}
+</div>

@@ -23,20 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd import interface
+from django.db.models import F
+
+from education_group.models.group_year import GroupYear
+from osis_common.ddd.interface import BusinessException
+from program_management.ddd.business_types import *
+from education_group.ddd.business_types import *
+
+DomainService = object  # TODO :: move into osis_commin/ddd/interfaces
 
 
-class StudyDomain(interface.ValueObject):
-    def __init__(self, decree_name: str, code: str, name: str):
-        self.decree_name = decree_name
-        self.code = code
-        self.name = name
-
-    def __str__(self):
-        return "{obj.decree_name} {obj.code} {obj.name}".format(obj=self)
-
-    def __eq__(self, other):
-        return self.decree_name == other.decree_name and self.code == other.code and self.name == other.name
-
-    def __hash__(self):
-        return hash(self.decree_name + self.code + self.name)
+class TrainingIdentitySearch(DomainService):
+    def get_from_node_identity(self, node_identity: 'NodeIdentity') -> 'TrainingIdentity':
+        values = GroupYear.objects.filter(
+            partial_acronym=node_identity.code,
+            academic_year__year=node_identity.year
+        ).annotate(
+            offer_acronym=F('education_group_version__education_group_year__acronym'),
+            year=F('education_group_version__education_group_year__academic_year__year'),
+        ).values('offer_acronym', 'year')
+        if values:
+            return TrainingIdentity(acronym=values[0]['offer_acronym'], year=values[0]['year'])
+        raise BusinessException(
+            "TrainingIdentity not found from NodeIdentity = {n_id.code} - {n_id.year}".format(n_id=node_identity)
+        )
