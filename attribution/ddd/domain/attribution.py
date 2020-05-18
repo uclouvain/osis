@@ -24,13 +24,31 @@
 #
 ##############################################################################
 
-from attribution.ddd.domain.teacher import Teacher
+from typing import Dict
+
+from attribution.ddd.domain.teacher import Teacher, instanciate_teacher_object
+from osis_common.ddd import interface
 
 
-class Attribution:
+class AttributionIdentity(interface.EntityIdentity):
+    def __init__(self, id: int):
+        self.id = id
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return other.id == self.id
+
+
+class Attribution(interface.RootEntity):
 
     def __init__(
             self,
             teacher: Teacher = None,
     ):
         self.teacher = teacher
+
+
+def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
+    return Attribution(teacher=instanciate_teacher_object(attributions_dict))

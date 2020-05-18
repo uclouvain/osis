@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
-from typing import List, Dict
+from typing import List
 
 from django.conf import settings
 from django.db.models import F, Subquery, OuterRef, QuerySet, Q
 
-from attribution.ddd.repositories.load_attribution import load_attributions, instanciate_attributions
+from attribution.ddd.repositories.load_attribution import load_attributions
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -264,7 +263,7 @@ def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitY
     qs = LearningUnitYearModel.objects.all()
     qs = qs.filter(filter_by_identity)
 
-    qs_attributions = load_attributions(learning_unit_year_identities)
+    attributions_by_ue = load_attributions(learning_unit_year_identities)
 
     qs = qs.annotate(
         specific_title_en=F('specific_title_english'),
@@ -332,12 +331,10 @@ def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitY
 
     results = []
 
-    attributions_by_ue = _build_sorted_attributions_grouped_by_ue(qs_attributions)
-
     for learning_unit_data in qs:
         learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_data['acronym'],
                                                           year=learning_unit_data['year'])
-        attributions = instanciate_attributions(attributions_by_ue.get(learning_unit_identity))
+        attributions = attributions_by_ue.get(learning_unit_identity)
         luy = LearningUnitYear(
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             proposal=Proposal(learning_unit_data.pop('proposal_type'),
@@ -379,30 +376,3 @@ def _build_where_clause(node_identity: 'LearningUnitYearIdentity') -> Q:
         acronym=node_identity.code,
         academic_year__year=node_identity.year
     )
-
-
-def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[LearningUnitYearIdentity, List['Attribution']]:
-    sorted_attributions = sorted(qs_attributions,
-                                 key=lambda attribution: (attribution['acronym_ue'],
-                                                          attribution['year_ue'],
-                                                          attribution['teacher_last_name'],
-                                                          attribution['teacher_first_name'],
-                                                          attribution['teacher_middle_name']
-                                                          )
-                                 )
-    sorted_attributions_grouped_by_ue = {}
-
-    for learning_unit_year_id, attributions in itertools.groupby(sorted_attributions,
-                                                                 key=lambda attribution: (attribution['acronym_ue'],
-                                                                                          attribution['year_ue'])
-                                                                 ):
-        learnin_unit_identity = LearningUnitYearIdentity(code=learning_unit_year_id[0], year=learning_unit_year_id[1])
-        attributions_data = []
-        for attribution in attributions:
-            # Todo est-ce nécssaire de faire pop pour se débarasser de ces 2 valeurs inutiles après coup
-            attribution.pop('acronym_ue')
-            attribution.pop('year_ue')
-            attributions_data.append(attribution)
-        sorted_attributions_grouped_by_ue.update({learnin_unit_identity: attributions_data})
-
-    return sorted_attributions_grouped_by_ue

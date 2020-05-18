@@ -46,3 +46,11 @@ class Teacher:
             self.first_name or "",
             self.middle_name or ""
         ]).strip()
+
+
+def instanciate_teacher_object(attribution_data: dict) -> Teacher:
+    return Teacher(last_name=attribution_data.get('teacher_last_name'),
+                   first_name=attribution_data.get('teacher_first_name'),
+                   middle_name=attribution_data.get('teacher_middle_name'),
+                   email=attribution_data.get('teacher_email'),
+                   )
