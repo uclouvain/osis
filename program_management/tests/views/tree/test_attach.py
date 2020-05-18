@@ -116,7 +116,7 @@ class TestAttachNodeView(TestCase):
 
     def test_get_method_when_no_data_selected_on_cache(self):
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
-        response = self.client.get(self.url + "?path=" + path)
+        response = self.client.get(self.url, data={"path": path})
         self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
@@ -130,7 +130,7 @@ class TestAttachNodeView(TestCase):
 
         # To path :  BIR1BA ---> COMMON_CORE
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
-        response = self.client.get(self.url + "?path=" + path)
+        response = self.client.get(self.url, data={"path": path})
         self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
@@ -150,7 +150,7 @@ class TestAttachNodeView(TestCase):
 
         # To path :  BIR1BA ---> LBIR101G
         path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
-        response = self.client.get(self.url + "?path=" + path)
+        response = self.client.get(self.url, data={"path": path})
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
@@ -395,24 +395,19 @@ class TestMoveGroupElementYearView(TestCase):
         cls.selected_egy = GroupFactory(
             academic_year=cls.next_academic_year
         )
+        GroupElementYearFactory(parent=cls.root_egy, child_branch=cls.selected_egy)
 
-        cls.url = reverse(
-            "group_element_year_move",
-            args=[cls.root_egy.id, cls.selected_egy.id, cls.group_element_year.id]
+        path_to_detach = "|".join([str(cls.group_element_year.parent.pk), str(cls.group_element_year.child.pk)])
+        path_to_attach = "|".join([str(cls.root_egy.pk), str(cls.selected_egy.pk)])
+        cls.url = reverse("group_element_year_move", args=[cls.root_egy.id])
+        cls.url = "{}?path={}&path_to_detach={}".format(
+            cls.url, path_to_attach, path_to_detach
         )
 
         cls.person = PersonFactory()
 
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                      return_value=True)
-
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.mocked_perm = self.perm_patcher.start()
-
-    def tearDown(self):
-        self.addCleanup(self.perm_patcher.stop)
-        self.addCleanup(cache.clear)
 
     def test_move(self):
         AuthorizedRelationshipFactory(
@@ -425,7 +420,8 @@ class TestMoveGroupElementYearView(TestCase):
             self.group_element_year.child_branch,
             source_link_id=self.group_element_year.id
         )
-        self.client.post(self.url, data={
+
+        response = self.client.post(self.url, data={
             'form-TOTAL_FORMS': '1',
             'form-INITIAL_FORMS': '0',
             'form-MAX_NUM_FORMS': '1',
@@ -433,5 +429,4 @@ class TestMoveGroupElementYearView(TestCase):
         })
 
         self.assertFalse(GroupElementYear.objects.filter(id=self.group_element_year.id))
-        self.mocked_perm.assert_any_call(self.person, self.selected_egy, raise_exception=True)
-        self.mocked_perm.assert_any_call(self.person, self.group_element_year.parent, raise_exception=True)
+        self.assertTrue(GroupElementYear.objects.filter(parent=self.selected_egy, child_branch=self.group_element_year.child_branch))

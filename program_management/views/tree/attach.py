@@ -30,7 +30,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
-from django.http import JsonResponse
+from django.http import JsonResponse, request
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -59,6 +59,7 @@ from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
+# TODO check for permission
 class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
 
@@ -164,8 +165,12 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
             action_from_cache = cached_data.get('action')
 
             if action_from_cache == ElementCache.ElementCacheAction.CUT.value:
-                kwargs['group_element_year_id'] = fetch_source_link(self.request.GET, self.request.user).id
-                self.pattern_name = 'group_element_year_move'
+                link_to_detach = fetch_source_link(self.request.GET, self.request.user)  # type: GroupElementYear
+                path_to_detach = "|".join([str(link_to_detach.parent.pk), str(link_to_detach.child.pk)])
+                get_copy = self.request.GET.copy()  # type: request.QueryDict
+                get_copy["path_to_detach"] = path_to_detach
+                redirect_url = reverse("group_element_year_move", args=[self.kwargs["root_id"]])
+                return "{}?{}".format(redirect_url, get_copy.urlencode())
             else:
                 return redirect_url
         return super().get_redirect_url(*args, **kwargs)
@@ -244,31 +249,17 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         return
 
 
-class MoveGroupElementYearView(CreateGroupElementYearView):
-    template_name = "group_element_year/group_element_year_comment_inner.html"
-
-    def path_to_detach_from(self) -> program_tree.Path:
-        obj = self.get_object()  # type:GroupElementYear
-        path = "{}|{}".format(obj.parent.pk, obj.child.pk)
-        return path
-
+class MoveGroupElementYearView(AttachMultipleNodesView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-
-        try:
-            perms.can_change_education_group(self.request.user, self.get_object().parent)
-        except PermissionDenied as e:
-            msg = "{}: {}".format(str(self.get_object().parent), str(e))
-            display_warning_messages(self.request, msg)
-
-        message_list = detach_node_service.detach_node(self.path_to_detach_from(), commit=False)
+        message_list = detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=False)
         if message_list.contains_errors():
             display_error_messages(self.request, message_list)
-
         return kwargs
 
+    # TODO should be atomic
     def form_valid(self, form):
-        detach_node_service.detach_node(self.path_to_detach_from(), commit=True)
+        detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=True)
         return super().form_valid(form)
 
 

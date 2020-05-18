@@ -45,8 +45,6 @@ urlpatterns = [
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
-                url(r'^move/$', program_management.views.tree.attach.MoveGroupElementYearView.as_view(),
-                    name='group_element_year_move'),
                 url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
                     name="group_element_year_update"),
             ]))
@@ -88,6 +86,7 @@ urlpatterns = [
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('attach/', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
+        path('move/', tree.attach.MoveGroupElementYearView.as_view(), name='group_element_year_move'),
         path('<int:link_id>/', include([
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
