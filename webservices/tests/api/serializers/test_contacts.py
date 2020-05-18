@@ -52,7 +52,7 @@ class ContactsSerializerTestCase(TestCase):
             publication_contact_entity=entity
         )
         cls.node = NodeEducationGroupYearFactory(code=cls.egy.partial_acronym, year=now.year)
-        cls.serializer = ContactsSerializer(cls.node, context={'language': cls.language})
+        cls.serializer = ContactsSerializer(cls.node, context={'language': cls.language, 'offer': cls.egy})
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -82,7 +82,7 @@ class ContactSerializerTestCase(TestCase):
                 output_field=CharField()
             ),
         ).first()
-        cls.serializer = ContactSerializer(cls.annoted_contact, context={'language': cls.language})
+        cls.serializer = ContactSerializer(cls.annoted_contact, context={'language': cls.language, 'offer': cls.egy})
 
     def test_contains_expected_fields(self):
         expected_fields = [

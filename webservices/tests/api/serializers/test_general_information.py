@@ -91,7 +91,8 @@ class GeneralInformationSerializerTestCase(TestCase):
         cls.serializer = GeneralInformationSerializer(
             cls.tree.root_node, context={
                 'language': cls.language,
-                'acronym': cls.egy.acronym
+                'acronym': cls.egy.acronym,
+                'offer': cls.egy
             }
         )
 

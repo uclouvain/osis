@@ -130,7 +130,8 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         AdmissionConditionFactory(education_group_year=cls.egy)
         cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
             'root_node': cls.node,
-            'language': cls.language
+            'language': cls.language,
+            'offer': cls.egy
         })
 
     def test_contains_expected_fields(self):
@@ -142,8 +143,8 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_get_education_group_year(self):
-        self.assertIsInstance(self.serializer.get_root_node(), NodeEducationGroupYear)
-        self.assertEqual(self.serializer.get_root_node(), self.node)
+        self.assertIsInstance(self.serializer.context.get('root_node'), NodeEducationGroupYear)
+        self.assertEqual(self.serializer.context.get('root_node'), self.node)
 
     def test_ensure_admission_condition_is_created_if_not_exists(self):
         training_wihtout_admission_condition = TrainingFactory(education_group_type__name=TrainingType.BACHELOR.name)
@@ -154,7 +155,8 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         )
         serializer = AdmissionConditionSectionSerializer({}, context={
             'root_node': node,
-            'language': self.language
+            'language': self.language,
+            'offer': training_wihtout_admission_condition
         })
 
         new_instance = serializer.get_admission_condition()
