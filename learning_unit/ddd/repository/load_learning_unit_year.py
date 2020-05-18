@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import itertools
+
+from typing import List, Dict
 
 from django.conf import settings
 from django.db.models import F, Subquery, OuterRef, QuerySet, Q
 
-from attribution.ddd.repositories.load_attribution import load_attributions
+from attribution.ddd.repositories.attribution_repository import AttributionRepository
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.models.entity_version import EntityVersion
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -263,7 +265,8 @@ def load_multiple_by_identity(learning_unit_year_identities: List['LearningUnitY
     qs = LearningUnitYearModel.objects.all()
     qs = qs.filter(filter_by_identity)
 
-    attributions_by_ue = load_attributions(learning_unit_year_identities)
+    attributions = AttributionRepository.search(learning_unit_year_ids=learning_unit_year_identities)
+    attributions_by_ue = __build_sorted_attributions_grouped_by_ue(attributions)
 
     qs = qs.annotate(
         specific_title_en=F('specific_title_english'),
@@ -376,3 +379,17 @@ def _build_where_clause(node_identity: 'LearningUnitYearIdentity') -> Q:
         acronym=node_identity.code,
         academic_year__year=node_identity.year
     )
+
+
+def __build_sorted_attributions_grouped_by_ue(qs_attributions: List['Attribution']) \
+        -> Dict[LearningUnitYearIdentity, List['Attribution']]:
+    attributions_grouped_by_ue = {}
+    for learning_unit_year_id, attributions in itertools.groupby(qs_attributions,
+                                                                 key=lambda attribution: (attribution.acronym,
+                                                                                          attribution.year)
+                                                                 ):
+        learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_year_id[0], year=learning_unit_year_id[1])
+        attributions_data = [attribution for attribution in attributions]
+
+        attributions_grouped_by_ue.update({learning_unit_identity: attributions_data})
+    return attributions_grouped_by_ue

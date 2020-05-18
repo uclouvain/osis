@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
 from typing import List, Dict
 
 from django.db.models import F, Q
@@ -35,7 +34,7 @@ from learning_unit.ddd.domain.learning_unit_year import LearningUnitYearIdentity
 
 
 def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) \
-        -> Dict[LearningUnitYearIdentity, List['Attribution']]:
+        -> List['Attribution']:
     qs = attribution_charge_new.AttributionChargeNew.objects.all()
     filter_search_from = __build_where_clause(learning_unit_year_ids[0])
     for identity in learning_unit_year_ids[1:]:
@@ -56,7 +55,7 @@ def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) 
         .values('teacher_last_name', 'teacher_first_name',
                 'teacher_middle_name', 'teacher_email', 'acronym_ue', 'year_ue')
 
-    return _build_sorted_attributions_grouped_by_ue(qs)
+    return _build_sorted_attributions(qs)
 
 
 def __build_where_clause(learning_unit_identity: 'LearningUnitYearIdentity') -> Q:
@@ -66,7 +65,7 @@ def __build_where_clause(learning_unit_identity: 'LearningUnitYearIdentity') -> 
         )
 
 
-def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[LearningUnitYearIdentity, List['Attribution']]:
+def _build_sorted_attributions(qs_attributions) -> List['Attribution']:
     sorted_attributions = sorted(qs_attributions,
                                  key=lambda attribution: (attribution['acronym_ue'],
                                                           attribution['year_ue'],
@@ -75,22 +74,14 @@ def _build_sorted_attributions_grouped_by_ue(qs_attributions) -> Dict[LearningUn
                                                           attribution['teacher_middle_name']
                                                           )
                                  )
-    sorted_attributions_grouped_by_ue = {}
 
-    for learning_unit_year_id, attributions in itertools.groupby(sorted_attributions,
-                                                                 key=lambda attribution: (attribution['acronym_ue'],
-                                                                                          attribution['year_ue'])
-                                                                 ):
-        learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_year_id[0], year=learning_unit_year_id[1])
-        attributions_data = []
-        for attribution in attributions:
-            attributions_data.append(instanciate_attribution(attribution))
-        sorted_attributions_grouped_by_ue.update({learning_unit_identity: attributions_data})
-    return sorted_attributions_grouped_by_ue
+    return [instanciate_attribution(attribution) for attribution in sorted_attributions]
 
 
 def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
-    return Attribution(teacher=instanciate_teacher_object(attributions_dict))
+    return Attribution(acronym=attributions_dict['acronym_ue'],
+                       year=attributions_dict['year_ue'],
+                       teacher=instanciate_teacher_object(attributions_dict))
 
 
 def instanciate_teacher_object(attribution_data: dict) -> Teacher:

@@ -43,6 +43,10 @@ class Attribution(interface.RootEntity):
 
     def __init__(
             self,
+            year: int = None,
+            acronym: str = None,
             teacher: Teacher = None,
     ):
+        self.year = year
+        self.acronym = acronym
         self.teacher = teacher
