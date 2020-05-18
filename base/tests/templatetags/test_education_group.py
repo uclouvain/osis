@@ -33,15 +33,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
-from base.models.enums import education_group_categories
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
-from base.models.enums.education_group_types import GroupType
 from base.templatetags.education_group import button_order_with_permission, \
     link_pdf_content_education_group, button_edit_administrative_data, dl_with_parent, \
     have_only_access_to_certificate_aims
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
@@ -184,35 +181,6 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
 
         self.assertEqual(result["class_li"], "disabled")
         self.assertEqual(result["text"], _("Modify"))
-
-    def test_button_order_with_permission_for_major_minor_list_choice_disabled(self):
-        group_type_disabled = [GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name]
-        self._get_permisson_order_button(
-            group_type_disabled,
-            "disabled",
-            _("You cannot modify content for %(education_group_types)s") % {
-                "education_group_types": ", ".join(
-                    [str(GroupType.MAJOR_LIST_CHOICE.value), str(GroupType.MINOR_LIST_CHOICE.value)]
-                )
-            }
-        )
-
-    @mock.patch('osis_role.contrib.permissions.ObjectPermissionBackend.has_perm')
-    def test_button_order_with_permission_for_major_minor_list_choice_enabled(self, mock_permission):
-        mock_permission.return_value = True
-        group_type_disabled = [GroupType.OPTION_LIST_CHOICE.name]
-        self._get_permisson_order_button(group_type_disabled, "", "")
-
-    def _get_permisson_order_button(self, group_type_disabled, disabled_status, message):
-        for group_type in group_type_disabled:
-            egt = EducationGroupTypeFactory(name=group_type, category=education_group_categories.TRAINING)
-            self.context['education_group_year'] = TrainingFactory(
-                education_group_type=egt, management_entity=self.education_group_year.management_entity
-            )
-            result = button_order_with_permission(self.context, message, "id", "edit")
-            self.assertEqual(result, {"title": message,
-                                      "id": "id", "value": "edit", 'disabled': disabled_status,
-                                      'icon': "glyphicon glyphicon-edit"})
 
 
 class TestEducationGroupDlWithParent(TestCase):
