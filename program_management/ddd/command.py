@@ -23,21 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.business_types import *
+from osis_common.ddd import interface
 
 
-class NodeDuplicationValidator(BusinessValidator):
+class AttachNodeCommand(interface.CommandRequest):
+    # To implement
+    pass
 
-    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
-        super(NodeDuplicationValidator, self).__init__()
-        self.node_to_add = node_to_add
-        self.parent_node = parent_node
 
-    def validate(self):
-        if self.node_to_add in self.parent_node.children_as_nodes:
-            self.add_error_message(
-                _("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}
-            )
+class DetachNodeCommand(interface.CommandRequest):
+    # To implement
+    pass
+
+
+class OrderLinkCommand(interface.CommandRequest):
+    # To implement
+    pass
+
+
+class CreateProgramTreeVersionCommand(interface.CommandRequest):
+    # To implement
+    pass
