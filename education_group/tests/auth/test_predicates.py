@@ -25,6 +25,9 @@ class TestUserAttachedToManagementEntity(TestCase):
         cls.root_entity_version = EntityVersionFactory(parent=None)
         cls.entity_version_level_1 = EntityVersionFactory(parent=cls.root_entity_version.entity)
         cls.entity_version_level_2 = EntityVersionFactory(parent=cls.entity_version_level_1.entity)
+        cls.training = TrainingFactory()
+        cls.minitraining = MiniTrainingFactory()
+        cls.group = GroupFactory()
 
         cls.academic_year = AcademicYearFactory(current=True)
         cls.education_group_year = EducationGroupYearFactory(
@@ -86,16 +89,13 @@ class TestUserAttachedToManagementEntity(TestCase):
         self.assertFalse(predicates.is_user_attached_to_management_entity(self.person.user, self.education_group_year))
 
     def test_user_cannot_create_training_in_other_entity(self):
-        training = TrainingFactory()
-        self._test_user_cannot_create_egy_in_other_entity(training)
+        self._test_user_cannot_create_egy_in_other_entity(self.training)
 
     def test_user_cannot_create_mini_training_in_other_entity(self):
-        minitraining = MiniTrainingFactory()
-        self._test_user_cannot_create_egy_in_other_entity(minitraining)
+        self._test_user_cannot_create_egy_in_other_entity(self.minitraining)
 
     def test_user_cannot_create_Group_in_other_entity(self):
-        group = GroupFactory()
-        self._test_user_cannot_create_egy_in_other_entity(group)
+        self._test_user_cannot_create_egy_in_other_entity(self.group)
 
     def _test_user_cannot_create_egy_in_other_entity(self, egy):
         faculty_manager = FacultyManagerFactory(
@@ -110,8 +110,6 @@ class TestUserAttachedToManagementEntity(TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        # invalidate egy after test
-        egy.delete()
 
 
 class TestEducationGroupYearOlderOrEqualsThanLimitSettings(TestCase):
