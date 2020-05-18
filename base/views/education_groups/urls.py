@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
-from django.urls import path
 
 from base.views import education_group
 from base.views.education_groups.clear_clipboard import clear_clipboard
@@ -34,6 +33,7 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.select import copy_education_group_to_cache, copy_learning_unit_to_cache
 from base.views.education_groups.update import CertificateAimAutocomplete
+from education_group import urls as education_group_urls
 from . import search, create, detail, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
@@ -89,23 +89,21 @@ urlpatterns = [
         create.SelectEducationGroupTypeView.as_view(),
         name='select_education_group_type'
     ),
-    path('<int:year>/<str:code>/', include([
-        url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
-        url(r'^content/$', detail.EducationGroupContent.as_view(), name='education_group_content'),
-        url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
-    ])),
     url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^update/$', update.update_education_group, name="update_education_group"),
-        url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
-            name='education_group_diplomas'),
-        url(r'^informations/$', detail.EducationGroupGeneralInformation.as_view(),
-            name='education_group_general_informations'),
+        # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
+        # url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
+        #     name='education_group_diplomas'),
+        # url(r'^informations/$', detail.EducationGroupGeneralInformation.as_view(),
+        #     name='education_group_general_informations'),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
-        url(r'^informations/publish/$', detail.publish,
-            name="education_group_publish"),
+        # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
+        # url(r'^informations/publish/$', detail.publish,
+        #     name="education_group_publish"),
         url(r'^administrative/', include([
-            url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
+            # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
+            # url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
             url(u'^edit/$', education_group.education_group_edit_administrative_data,
                 name='education_group_edit_administrative')
         ])),
@@ -150,4 +148,4 @@ urlpatterns = [
                 name="publication_contact_delete"),
         ])),
     ]))
-]
+] + education_group_urls.urlpatterns

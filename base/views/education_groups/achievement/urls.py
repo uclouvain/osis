@@ -35,9 +35,10 @@ from base.views.education_groups.achievement.update import EducationGroupAchieve
     EducationGroupAchievementProgramAim, EducationGroupAchievementAdditionalInformation
 
 urlpatterns = [
-    url(r'^$',
-        EducationGroupSkillsAchievements.as_view(),
-        name='education_group_skills_achievements'),
+    # TODO : URL TO REMOVE because splited by group/mini_training/training (rewriting path)
+    # url(r'^$',
+    #     EducationGroupSkillsAchievements.as_view(),
+    #     name='education_group_skills_achievements'),
 
     url(r'^create',
         CreateEducationGroupAchievement.as_view(),

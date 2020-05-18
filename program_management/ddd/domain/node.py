@@ -26,6 +26,7 @@
 from _decimal import Decimal
 from typing import List, Set, Dict
 
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -33,6 +34,7 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.academic_year import AcademicYear
@@ -285,15 +287,20 @@ class NodeGroupYear(Node):
         max_constraint: int = None,
         remark_fr: str = None,
         remark_en: str = None,
+        start_year: int = None,
+        end_year: int = None,
         offer_title_fr: str = None,
         offer_title_en: str = None,
         group_title_fr: str = None,
         group_title_en: str = None,
         offer_partial_title_fr: str = None,
         offer_partial_title_en: str = None,
-        category: Categories = None,
+        category: GroupType = None,
         management_entity_acronym: str = None,
         teaching_campus: str = None,
+        schedule_type: ScheduleTypeEnum = None,
+        offer_status: ActiveStatusEnum = None,
+        keywords: str = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -302,12 +309,17 @@ class NodeGroupYear(Node):
         self.max_constraint = max_constraint
         self.remark_fr = remark_fr
         self.remark_en = remark_en
+        self.start_year = start_year
+        self.end_date = end_year
         self.offer_title_fr = offer_title_fr
         self.offer_title_en = offer_title_en
         self.group_title_fr = group_title_fr
         self.group_title_en = group_title_en
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
+        self.offer_status = offer_status
+        self.schedule_type = schedule_type
+        self.keywords = keywords
         self.category = category
         self.management_entity_acronym = management_entity_acronym
         self.teaching_campus = teaching_campus

@@ -29,9 +29,11 @@ from django.db.models import F, Value, CharField, QuerySet, Q, Case, When, Integ
 from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import EducationGroupTypesEnum
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.group_year import GroupYear
 from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
@@ -120,6 +122,10 @@ def __convert_string_to_enum(node_data: dict) -> dict:
         node_data['category'] = __convert_category_enum(node_data['category'])
     if node_data.get('periodicity'):
         node_data['periodicity'] = PeriodicityEnum[node_data['periodicity']]
+    if node_data.get('schedule_type'):
+        node_data['schedule_type'] = ScheduleTypeEnum[node_data['schedule_type']]
+    if node_data.get('offer_status'):
+        node_data['offer_status'] = ActiveStatusEnum[node_data['offer_status']]
     node_data['type'] = NodeType[node_data['type']]
     return node_data
 
@@ -137,7 +143,8 @@ def convert_node_type_enum(str_node_type: str) -> EducationGroupTypesEnum:
 
 
 def __convert_category_enum(category: str):
-    return Categories[category]
+    return getattr(GroupType, category, None) or getattr(TrainingType, category, None) or \
+           getattr(MiniTrainingType, category, None)
 
 
 def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
@@ -150,10 +157,12 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
     return GroupYear.objects.filter(pk__in=node_group_year_ids).annotate(
         type=Value(NodeType.GROUP.name, output_field=CharField()),
         node_type=F('education_group_type__name'),
-        category=F('education_group_type__category'),
+        category=F('education_group_type__name'),
         code=F('partial_acronym'),
         title=F('acronym'),
         year=F('academic_year__year'),
+        start_year=F('group__start_year__year'),
+        end_year=F('group__end_year__year'),
         management_entity_acronym=Subquery(subquery_management_entity),
         teaching_campus=Concat(
             F('main_teaching_campus__name'), Value(' - '), F('main_teaching_campus__organization__name')
@@ -162,6 +171,9 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
+        offer_status=F('educationgroupversion__offer__active'),
+        schedule_type=F('educationgroupversion__offer__schedule_type'),
+        keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),
         group_title_en=F('title_en')
     ).values(
@@ -171,6 +183,8 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         'code',
         'title',
         'year',
+        'start_year',
+        'end_year',
         'constraint_type',
         'min_constraint',
         'max_constraint',
@@ -184,6 +198,9 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         'offer_title_en',
         'group_title_fr',
         'group_title_en',
+        'schedule_type',
+        'offer_status',
+        'keywords',
         'category',
         'management_entity_acronym',
         'teaching_campus'
