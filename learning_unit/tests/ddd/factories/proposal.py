@@ -39,5 +39,5 @@ class ProposalFactory(factory.Factory):
         model = Proposal
         abstract = False
 
-    proposal_type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
-    proposal_state = factory.Iterator(ProposalState.choices(), getter=operator.itemgetter(0))
+    type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
+    state = factory.Iterator(ProposalState.choices(), getter=operator.itemgetter(0))

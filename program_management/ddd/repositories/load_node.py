@@ -191,7 +191,7 @@ def __load_multiple_node_learning_unit_year(node_learning_unit_year_ids: List[in
             'type': NodeType.LEARNING_UNIT.name,
             'learning_unit_type': lu.type,
             'year': lu.year,
-            'proposal_type': lu.proposal.proposal_type,
+            'proposal_type': lu.proposal.type,
             'code': lu.acronym,
             'title': lu.full_title_fr,
             'credits': lu.credits,
