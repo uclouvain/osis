@@ -26,6 +26,7 @@
 from unittest import mock
 
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from django.http import HttpResponse, QueryDict
 from django.test import TestCase
@@ -296,10 +297,21 @@ class TestMoveGroupElementYearView(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-        permission_patcher = mock.patch.object(PermissionRequiredMixin, "has_permission")
+        permission_patcher = mock.patch.object(User, "has_perms")
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
         self.addCleanup(permission_patcher.stop)
+
+    def test_should_check_attach_and_detach_permission(self):
+        self.client.get(self.url)
+        self.permission_mock.assert_has_calls(
+            [
+                mock.call(("base.detach_educationgroup",), self.group_element_year.parent),
+                mock.call(("base.attach_educationgroup",), self.selected_egy)
+            ]
+
+        )
+        self.assertTrue(self.permission_mock.called)
 
     def test_move(self):
         AuthorizedRelationshipFactory(

@@ -206,6 +206,12 @@ class MoveGroupElementYearView(AttachMultipleNodesView):
         detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=True)
         return super().form_valid(form)
 
+    def has_permission(self):
+        obj_to_detach_id = int(self.request.GET["path_to_detach"].split("|")[-2])
+        obj_to_detach = shortcuts.get_object_or_404(EducationGroupYear, pk=obj_to_detach_id)
+        has_permission_to_detach = self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
+        return has_permission_to_detach & super().has_permission()
+
 
 def _check_attach(parent: EducationGroupYear, elements_to_attach):
     children_types = NodeType.LEARNING_UNIT \
