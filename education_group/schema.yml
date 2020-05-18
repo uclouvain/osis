@@ -125,7 +125,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+        - trainings
   /trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the training

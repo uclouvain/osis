@@ -29,6 +29,7 @@ from typing import List, Set, Tuple
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
@@ -49,7 +50,19 @@ PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
-class ProgramTree:
+class ProgramTreeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
+
+
+class ProgramTree(interface.RootEntity):
 
     root_node = None
     authorized_relationships = None
@@ -57,6 +70,8 @@ class ProgramTree:
     def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
         self.root_node = root_node
         self.authorized_relationships = authorized_relationships
+        # FIXME :: pass entity_id into the __init__ param !
+        super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
 
     def __eq__(self, other):
         return self.root_node == other.root_node
@@ -131,6 +146,21 @@ class ProgramTree:
             None
         )
 
+    def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
+        """
+        Return the corresponding node based on the code and year.
+        :param code: str
+        :param year: int
+        :return: Node
+        """
+        return next(
+            (
+                node for node in self.get_all_nodes()
+                if node.code == code and node.academic_year.year == year
+            ),
+            None
+        )
+
     def get_all_nodes(self, types: Set[EducationGroupTypesEnum] = None) -> Set['Node']:
         """
         Return a flat set of all nodes present in the tree
@@ -144,6 +174,17 @@ class ProgramTree:
     def get_nodes_by_type(self, node_type_value) -> Set['Node']:
         return {node for node in self.get_all_nodes() if node.type == node_type_value}
 
+    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
+                    if node_obj.has_prerequisite
+                ),
+                key=lambda node_obj: node_obj.code
+            )
+        )
+
     def get_codes_permitted_as_prerequisite(self) -> List[str]:
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
         return list(sorted(node_obj.code for node_obj in learning_unit_nodes_contained_in_program))
@@ -154,17 +195,6 @@ class ProgramTree:
                 (
                     node_obj for node_obj in self.get_all_nodes()
                     if node_obj.is_learning_unit() and node_obj.is_prerequisite
-                ),
-                key=lambda node_obj: node_obj.code
-            )
-        )
-
-    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
-        return list(
-            sorted(
-                (
-                    node_obj for node_obj in self.get_all_nodes()
-                    if node_obj.is_learning_unit() and node_obj.has_prerequisite
                 ),
                 key=lambda node_obj: node_obj.code
             )
