@@ -26,7 +26,6 @@
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from webservices.api.serializers.achievement import AchievementsSerializer
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
@@ -74,25 +73,19 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name:
                 ContinuingEducationTrainingAdmissionConditionsSerializer,
         }
+        root_node = self.context.get('root_node')
         serializer = admission_condition_serializers.get(
-            self.get_root_node().node_type.name,
+            root_node.node_type.name,
             AdmissionConditionsSerializer,
         )
         return serializer(self.get_admission_condition(), context=self.context).data
 
-    def get_root_node(self):
-        return self.context['root_node']
-
     def get_admission_condition(self):
-        root_node = self.get_root_node()
-        egy = EducationGroupYear.objects.get(
-            academic_year__year=root_node.year,
-            partial_acronym=root_node.code
-        )
+        offer = self.context.get('offer')
         try:
-            return AdmissionCondition.objects.get(education_group_year_id=egy.id)
+            return AdmissionCondition.objects.get(education_group_year_id=offer.id)
         except AdmissionCondition.DoesNotExist:
-            return AdmissionCondition.objects.create(education_group_year_id=egy.id)
+            return AdmissionCondition.objects.create(education_group_year_id=offer.id)
 
 
 class ContactsSectionSerializer(serializers.Serializer):

@@ -50,7 +50,7 @@ class AchievementsSerializerTestCase(TestCase):
                 language=cls.language
             )
         cls.node = NodeEducationGroupYearFactory(node_id=cls.egy.id)
-        cls.serializer = AchievementsSerializer(cls.node, context={'lang': cls.language})
+        cls.serializer = AchievementsSerializer(cls.node, context={'language': cls.language})
 
     def test_contains_expected_fields(self):
         expected_fields = [

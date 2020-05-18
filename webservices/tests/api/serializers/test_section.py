@@ -96,7 +96,7 @@ class AchievementSectionSerializerTestCase(TestCase):
             )
         cls.serializer = AchievementSectionSerializer(cls.data_to_serialize, context={
             'egy': cls.node,
-            'lang': cls.language
+            'language': cls.language
         })
 
     def test_contains_expected_fields(self):
@@ -130,7 +130,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         AdmissionConditionFactory(education_group_year=cls.egy)
         cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
             'root_node': cls.node,
-            'lang': cls.language
+            'language': cls.language
         })
 
     def test_contains_expected_fields(self):
@@ -154,7 +154,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         )
         serializer = AdmissionConditionSectionSerializer({}, context={
             'root_node': node,
-            'lang': self.language
+            'language': self.language
         })
 
         new_instance = serializer.get_admission_condition()
@@ -185,7 +185,7 @@ class ContactsSectionSerializerTestCase(TestCase):
         EducationGroupPublicationContactFactory(education_group_year=cls.egy)
         cls.serializer = ContactsSectionSerializer(cls.data_to_serialize, context={
             'egy': cls.node,
-            'lang': cls.language
+            'language': cls.language
         })
 
     def test_contains_expected_fields(self):

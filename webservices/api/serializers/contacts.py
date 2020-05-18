@@ -24,12 +24,10 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import Case, When, F, CharField, Subquery
+from django.db.models import Case, When, F, CharField
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
-from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import EntityVersion
 from base.models.enums.publication_contact_type import PublicationContactType
 from webservices.business import get_contacts_intro_text
 
@@ -54,30 +52,16 @@ class ContactsSerializer(serializers.Serializer):
     entity = serializers.SerializerMethodField()
     management_entity = serializers.SerializerMethodField()
 
-    @staticmethod
-    def get_entity(obj):
-        return EntityVersion.objects.get(
-            entity__educationgroupyear__id=Subquery(
-                EducationGroupYear.objects.filter(
-                    academic_year__year=obj.year,
-                    partial_acronym=obj.code
-                ).values('id')[:1]
-            )
-        ).acronym
+    def get_entity(self, obj):
+        offer = self.context.get('offer')
+        return offer.publication_contact_entity_version.acronym
 
-    @staticmethod
-    def get_management_entity(obj):
-        return EntityVersion.objects.get(
-            entity__management_entity__id=Subquery(
-                EducationGroupYear.objects.filter(
-                    academic_year__year=obj.year,
-                    partial_acronym=obj.code
-                ).values('id')[:1]
-            )
-        ).acronym
+    def get_management_entity(self, obj):
+        offer = self.context.get('offer')
+        return offer.management_entity_version.acronym
 
     def get_text(self, obj):
-        text = get_contacts_intro_text(obj, self.context.get('lang'))
+        text = get_contacts_intro_text(obj, self.context.get('language'))
         return text or None
 
     def get_contacts(self, obj):
@@ -87,19 +71,13 @@ class ContactsSerializer(serializers.Serializer):
             (PublicationContactType.JURY_MEMBER.name, 'jury_members'),
             (PublicationContactType.OTHER_CONTACT.name, 'other_contacts')
         ]
-        lookup_field = 'role_fr' if self.context.get('lang') == settings.LANGUAGE_CODE_FR else 'role_en'
+        lookup_field = 'role_fr' if self.context.get('language') == settings.LANGUAGE_CODE_FR else 'role_en'
         lookup_expr = '__'.join([lookup_field, 'exact'])
+
+        offer = self.context.get('offer')
         datas = {
             contact_type: ContactSerializer(
-                EducationGroupPublicationContact.objects.filter(
-                    type=type_name,
-                    education_group_year_id=Subquery(
-                        EducationGroupYear.objects.filter(
-                            academic_year__year=self.instance.year,
-                            partial_acronym=self.instance.code
-                        ).values('id')[:1]
-                    )
-                ).annotate(
+                offer.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
                     description_or_none=Case(
                         When(description__exact='', then=None),
                         default=F('description'),

@@ -87,14 +87,8 @@ class AchievementsSerializer(serializers.Serializer):
     extra = serializers.SerializerMethodField()
 
     def get_blocs(self, obj):
-        qs = EducationGroupAchievement.objects.filter(
-            education_group_year_id=Subquery(
-                EducationGroupYear.objects.filter(
-                    academic_year__year=self.instance.year,
-                    partial_acronym=self.instance.code
-                ).values('id')[:1]
-            )
-        )
+        offer = self.context.get('offer')
+        qs = offer.educationgroupachievement_set.all()
         return AchievementSerializer(qs, many=True).data
 
     def get_intro(self, obj):
@@ -115,7 +109,7 @@ class AchievementsSerializer(serializers.Serializer):
                 )
             ).get(
                 entity=OFFER_YEAR,
-                language=self.context['lang'],
+                language=self.context['language'],
                 text_label__label=cms_type,
                 reference=Subquery(
                     EducationGroupYear.objects.filter(
@@ -130,7 +124,7 @@ class AchievementsSerializer(serializers.Serializer):
 
 
 def _get_appropriate_text(eg_achievement, context):
-    if context.get('lang') == settings.LANGUAGE_CODE_EN:
+    if context.get('language') == settings.LANGUAGE_CODE_EN:
         return eg_achievement.english_text
     return eg_achievement.french_text
 

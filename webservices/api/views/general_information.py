@@ -42,7 +42,7 @@ class GeneralInformation(generics.RetrieveAPIView):
     serializer_class = GeneralInformationSerializer
 
     def get_object(self):
-        egv = get_object_or_404(
+        self.egv = get_object_or_404(
             EducationGroupVersion.objects.select_related(
                 'offer__academic_year',
                 'offer__admissioncondition',
@@ -50,14 +50,19 @@ class GeneralInformation(generics.RetrieveAPIView):
                 'root_group__academic_year'
             ).prefetch_related(
                 'offer__educationgrouppublicationcontact_set',
-                'offer__educationgroupachievement_set'
+                'offer__educationgroupachievement_set',
+                'offer__management_entity__entityversion_set',
+                'offer__publication_contact_entity__entityversion_set'
             ),
             Q(offer__acronym__iexact=self.kwargs['acronym']) |
             Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
             offer__academic_year__year=self.kwargs['year'],
             offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys()
         )
-        identity = ProgramTreeIdentity(code=egv.root_group.partial_acronym, year=egv.root_group.academic_year.year)
+        identity = ProgramTreeIdentity(
+            code=self.egv.root_group.partial_acronym,
+            year=self.egv.root_group.academic_year.year
+        )
         tree = ProgramTreeRepository.get(entity_id=identity)
         return tree.root_node
 
@@ -65,4 +70,5 @@ class GeneralInformation(generics.RetrieveAPIView):
         serializer_context = super().get_serializer_context()
         serializer_context['language'] = self.kwargs['language']
         serializer_context['acronym'] = self.kwargs['acronym']
+        serializer_context['offer'] = self.egv.offer
         return serializer_context
