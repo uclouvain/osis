@@ -122,9 +122,9 @@ class CatalogGenericDetailView:
         model_name = cached_data.get('modelname')
         cached_obj_id = cached_data.get('id')
         obj = None
-        if model_name == LEARNING_UNIT_YEAR:
+        if model_name == node_type.NodeType.LEARNING_UNIT.name:
             obj = LearningUnitYear.objects.get(id=cached_obj_id)
-        elif model_name == EDUCATION_GROUP_YEAR:
+        elif model_name == node_type.NodeType.EDUCATION_GROUP.name:
             obj = EducationGroupYear.objects.get(id=cached_obj_id)
         return obj
 

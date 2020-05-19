@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth import models
+
 from osis_common.ddd import interface
 
 
@@ -44,3 +46,18 @@ class OrderLinkCommand(interface.CommandRequest):
 class CreateProgramTreeVersionCommand(interface.CommandRequest):
     # To implement
     pass
+
+
+class CopyElementCommand(interface.CommandRequest):
+    def __init__(self, user: models.User, element_id: int, element_type: str):
+        self.user = user
+        self.element_id = element_id
+        self.element_type = element_type
+
+
+class CutElementCommand(interface.CommandRequest):
+    def __init__(self, user: models.User, element_id: int, element_type: str, link_id: int):
+        self.user = user
+        self.element_id = element_id
+        self.element_type = element_type
+        self.link_id = link_id

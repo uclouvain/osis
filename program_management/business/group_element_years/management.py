@@ -60,7 +60,7 @@ def fetch_source_link(request_parameters, user):
 # FIXME Migrate this method into ddd/service
 def fetch_nodes_selected(request_parameters, user) -> List[Tuple[int, NodeType]]:
     def _convert_element_to_node_id_and_node_type(element) -> Tuple[int, NodeType]:
-        if element['modelname'] == LEARNING_UNIT_YEAR:
+        if element['modelname'] == NodeType.LEARNING_UNIT.name:
             return element["id"], NodeType.LEARNING_UNIT
         return element["id"], NodeType.EDUCATION_GROUP
 

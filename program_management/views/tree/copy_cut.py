@@ -21,9 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Optional
 
-from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -31,7 +29,8 @@ from django.views.decorators.http import require_http_methods
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import ElementCache
+from program_management.ddd import command
+from program_management.ddd.service.write import copy_element_service, cut_element_service
 from program_management.models.enums.node_type import NodeType
 
 
@@ -41,15 +40,19 @@ from program_management.models.enums.node_type import NodeType
 def copy_to_cache(request):
     element_id = request.POST['element_id']
     element_type = request.POST['element_type']
+    copy_command = command.CopyElementCommand(request.user, element_id, element_type)
+
+    copy_element_service.copy_element_service(copy_command)
 
     element = _get_concerned_object(element_id, element_type)
 
-    return _cache_object(
-        request.user,
-        None,
-        object_to_cache=element,
-        action=ElementCache.ElementCacheAction.COPY
+    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
+    success_msg = msg_template.format(
+        clipboard_title=_("Copied element"),
+        object_str=str(element),
     )
+
+    return build_success_json_response(success_msg)
 
 
 @require_http_methods(['POST'])
@@ -57,15 +60,19 @@ def cut_to_cache(request):
     link_id = request.POST['group_element_year_id']
     element_id = request.POST['element_id']
     element_type = request.POST['element_type']
+    cut_command = command.CutElementCommand(request.user, element_id, element_type, link_id)
+
+    cut_element_service.cut_element_service(cut_command)
 
     element = _get_concerned_object(element_id, element_type)
 
-    return _cache_object(
-        request.user,
-        link_id,
-        object_to_cache=element,
-        action=ElementCache.ElementCacheAction.CUT
+    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
+    success_msg = msg_template.format(
+        clipboard_title=_("Cut element"),
+        object_str=str(element),
     )
+
+    return build_success_json_response(success_msg)
 
 
 def _get_concerned_object(element_id: int, element_type: str):
@@ -75,34 +82,6 @@ def _get_concerned_object(element_id: int, element_type: str):
         object_class = EducationGroupYear
 
     return get_object_or_404(object_class, pk=element_id)
-
-
-def _cache_object(
-        user: User,
-        link_id: Optional[int],
-        object_to_cache,
-        action: ElementCache.ElementCacheAction
-):
-    ElementCache(user).save_element_selected(object_to_cache, source_link_id=link_id, action=action.value)
-    success_msg = get_clipboard_content_display(object_to_cache, action.value)
-    return build_success_json_response(success_msg)
-
-
-def get_clipboard_content_display(obj, action):
-    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
-    return msg_template.format(
-        clipboard_title=_get_clipboard_title(action),
-        object_str=str(obj),
-    )
-
-
-def _get_clipboard_title(action):
-    if action == ElementCache.ElementCacheAction.CUT.value:
-        return _("Cut element")
-    elif action == ElementCache.ElementCacheAction.COPY.value:
-        return _("Copied element")
-    else:
-        return ""
 
 
 def build_success_json_response(success_message):
