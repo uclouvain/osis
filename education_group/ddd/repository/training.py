@@ -190,7 +190,7 @@ class TrainingRepository(interface.AbstractRepository):
                 code=obj.isced_domain.code,
                 title_fr=obj.isced_domain.title_fr,
                 title_en=obj.isced_domain.title_en,
-            ),
+            ) if obj.isced_domain else None,
             management_entity=EntityValueObject(
                 acronym=obj.management_entity.most_recent_acronym,
             ),
@@ -218,7 +218,7 @@ class TrainingRepository(interface.AbstractRepository):
                 ares_code=obj.hops.ares_study,
                 ares_graca=obj.hops.ares_graca,
                 ares_authorization=obj.hops.ares_ability,
-            ),
+            ) if hasattr(obj, 'hops') else None,
             co_graduation=CoGraduation(
                 code_inter_cfb=obj.co_graduation,
                 coefficient=obj.co_graduation_coefficient,

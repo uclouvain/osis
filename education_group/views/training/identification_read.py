@@ -21,13 +21,11 @@ class TrainingReadIdentification(TrainingRead):
     active_tab = Tab.IDENTIFICATION
 
     def get_context_data(self, **kwargs):
-        training = self.get_training()
-        print()
         return {
             **super().get_context_data(**kwargs),
             "all_versions_available": self.all_versions_available,
             "current_version": self.current_version,  # Template : panel_version_information.html
-            "education_group_year": training,
+            "education_group_year": self.get_training(),
             "history": self.get_related_history(),
         }
 
