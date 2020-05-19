@@ -177,8 +177,9 @@ class TrainingRepository(interface.AbstractRepository):
             main_language=Language(
                 name=obj.primary_language.name,
             ),
-            english_activities=ActivityPresence[obj.english_activities],
-            other_language_activities=ActivityPresence[obj.other_language_activities],
+            english_activities=ActivityPresence[obj.english_activities] if obj.english_activities else None,
+            other_language_activities=ActivityPresence[
+                obj.other_language_activities] if obj.other_language_activities else None,
             internal_comment=obj.internal_comment,
             main_domain=StudyDomain(
                 decree_name=obj.main_domain.decree.name,

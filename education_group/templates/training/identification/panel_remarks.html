@@ -28,17 +28,16 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-12">
-                {% bootstrap_label _("remark in english") label_class='d-block'%}
-                <p>{{ current_version.remark_fr }}</p>
+                {% bootstrap_label _("Remark") label_class='d-block'%}
+                <p>{{ node.remark_fr }}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div class="col-md-12">
-                {% bootstrap_label _("Remark") label_class='d-block'%}
-                <p>{{ current_version.remark }}</p>
+                {% bootstrap_label _("remark in english") label_class='d-block'%}
+                <p>{{ node.remark_en }}</p>
             </div>
         </div>
-        <br>
     </div>
 </div>

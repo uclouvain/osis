@@ -36,7 +36,7 @@ class TrainingReadIdentification(TrainingRead):
         )
 
     @cached_property
-    def current_version(self):
+    def current_version(self) -> 'ProgramTreeVersion':
         current_version_name = self.education_group_version.version_name
         is_transition = self.education_group_version.is_transition
         return next(

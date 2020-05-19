@@ -47,7 +47,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
 
     @cached_property
     def education_group_version(self):
-        root_element_id = self.get_path().split("|")[0]
+        root_element_id = self.get_path().split("|")[-1]
         return EducationGroupVersion.objects.select_related(
             'offer__academic_year', 'root_group'
         ).get(root_group__element__pk=root_element_id)

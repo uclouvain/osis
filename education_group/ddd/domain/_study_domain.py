@@ -33,7 +33,7 @@ class StudyDomain(interface.ValueObject):
         self.name = name
 
     def __str__(self):
-        return "{obj.decree_name} {obj.code} {obj.name}".format(obj=self)
+        return "{obj.decree_name} : {obj.code} {obj.name}".format(obj=self)
 
     def __eq__(self, other):
         return self.decree_name == other.decree_name and self.code == other.code and self.name == other.name
