@@ -61,29 +61,6 @@ def attach_node(attach_command: command.AttachNodeCommand) -> List['BusinessVali
     return success_messages
 
 
-#  FIXME suppress when view MoveGroupElementYear will use ddd services
-@deprecated
-def check_attach_via_parent(
-        parent_node_id: int,
-        children_nodes_ids: List[int],
-        children_type: NodeType
-) -> List['BusinessValidationMessage']:
-    result = []
-
-    parent_node = load_tree.load_node.load_by_type(NodeType.EDUCATION_GROUP, parent_node_id)
-    children_nodes = [load_node.load_by_type(children_type, node_id) for node_id in children_nodes_ids]
-
-    for child_node in children_nodes:
-        if children_type != NodeType.LEARNING_UNIT:
-            result.extend(_validate_end_date_and_option_finality(child_node))
-
-        validator = link_validator.CreateLinkValidatorList(parent_node, child_node)
-        if not validator.is_valid():
-            result.extend(validator.messages)
-
-    return result
-
-
 def check_attach(check_command: command.CheckAttachNodeCommand) -> List['BusinessValidationMessage']:
     tree_root_id = check_command.root_id
     path_of_node_to_attach_from = check_command.path_where_to_attach
