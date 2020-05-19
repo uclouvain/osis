@@ -29,6 +29,7 @@ from typing import List
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
+from base.models.enums.duration_unit import DurationUnitsEnum
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
@@ -97,7 +98,8 @@ class Training(interface.RootEntity):
             hops: HOPS = None,
             co_graduation: CoGraduation = None,
             co_organizations: List[CoOrganization] = None,
-            academic_type: AcademicTypes = None
+            academic_type: AcademicTypes = None,
+            duration_unit: DurationUnitsEnum = None,
     ):
         super(Training, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
@@ -105,6 +107,7 @@ class Training(interface.RootEntity):
         self.credits = credits
         self.schedule_type = schedule_type
         self.duration = duration
+        self.duration_unit = duration_unit or DurationUnitsEnum.QUADRIMESTER
         self.start_year = start_year
         self.titles = titles
         self.keywords = keywords
