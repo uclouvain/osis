@@ -69,19 +69,6 @@ def fetch_nodes_selected(request_parameters, user) -> List[Tuple[int, NodeType]]
 
 
 # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
-def fetch_elements_selected(request_parameters, user):
-    selected_data = _get_elements_selected(request_parameters, user)
-
-    children = []
-    for selected_element in selected_data:
-        if selected_element['modelname'] == LEARNING_UNIT_YEAR:
-            children.append(LearningUnitYear.objects.get(pk=selected_element['id']))
-        elif selected_element['modelname'] == EDUCATION_GROUP_YEAR:
-            children.append(EducationGroupYear.objects.get(pk=selected_element['id']))
-
-    return children
-
-
 def _get_elements_selected(request_parameters, user):
     object_ids = request_parameters.getlist("id", [])
     content_type = request_parameters.get("content_type")

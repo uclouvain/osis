@@ -31,33 +31,29 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.forms import formset_factory, modelformset_factory
+from django.forms import formset_factory
 from django.http import JsonResponse, request
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import RedirectView, CreateView, FormView, TemplateView
+from django.views.generic import RedirectView, FormView, TemplateView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
-from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.business.group_element_years import management
-from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
-    DetachLearningUnitYearStrategy
-from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
-from program_management.ddd.domain import program_tree
+from program_management.business.group_element_years.management import fetch_source_link
 from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service, command, detach_node_service
-from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
-    BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
+from program_management.forms.tree.attach import AttachNodeFormSet, attach_form_factory, \
+    AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
@@ -212,12 +208,3 @@ class MoveGroupElementYearView(AttachMultipleNodesView):
         has_permission_to_detach = self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
         return has_permission_to_detach & super().has_permission()
 
-
-def _check_attach(parent: EducationGroupYear, elements_to_attach):
-    children_types = NodeType.LEARNING_UNIT \
-        if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
-    return attach_node_service.check_attach_via_parent(
-        parent.pk,
-        [element.pk for element in elements_to_attach],
-        children_types
-    )
