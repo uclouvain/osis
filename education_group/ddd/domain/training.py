@@ -146,3 +146,6 @@ class Training(interface.RootEntity):
     @property
     def year(self) -> int:
         return self.entity_id.year
+
+    def is_finality(self) -> bool:
+        return self.type in set(TrainingType.finality_types_enum())
