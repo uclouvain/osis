@@ -24,15 +24,18 @@
 from typing import Optional
 
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
-from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
 from program_management.models.enums.node_type import NodeType
 
+
+#  FIXME Add tests for those views
 
 @require_http_methods(['POST'])
 def copy_to_cache(request):
@@ -83,3 +86,25 @@ def _cache_object(
     ElementCache(user).save_element_selected(object_to_cache, source_link_id=link_id, action=action.value)
     success_msg = get_clipboard_content_display(object_to_cache, action.value)
     return build_success_json_response(success_msg)
+
+
+def get_clipboard_content_display(obj, action):
+    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
+    return msg_template.format(
+        clipboard_title=_get_clipboard_title(action),
+        object_str=str(obj),
+    )
+
+
+def _get_clipboard_title(action):
+    if action == ElementCache.ElementCacheAction.CUT.value:
+        return _("Cut element")
+    elif action == ElementCache.ElementCacheAction.COPY.value:
+        return _("Copied element")
+    else:
+        return ""
+
+
+def build_success_json_response(success_message):
+    data = {'success_message': success_message}
+    return JsonResponse(data)

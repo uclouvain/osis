@@ -45,7 +45,7 @@ from reversion.models import Version
 
 from base import models as mdl
 from base.business import education_group as education_group_business
-from base.business.education_groups import perms, general_information
+from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
@@ -69,7 +69,6 @@ from base.models.program_manager import ProgramManager
 from base.utils.cache import cache, ElementCache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
-from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -100,8 +99,23 @@ class CatalogGenericDetailView:
         cached_data = ElementCache(self.request.user).cached_data
         if cached_data:
             obj = self._get_instance_object_from_cache(cached_data)
-            return get_clipboard_content_display(obj, cached_data['action'])
+            return self.get_clipboard_content_display(obj, cached_data['action'])
         return None
+
+    def get_clipboard_content_display(self, obj, action):
+        msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
+        return msg_template.format(
+            clipboard_title=self._get_clipboard_title(action),
+            object_str=str(obj),
+        )
+
+    def _get_clipboard_title(self, action):
+        if action == ElementCache.ElementCacheAction.CUT.value:
+            return _("Cut element")
+        elif action == ElementCache.ElementCacheAction.COPY.value:
+            return _("Copied element")
+        else:
+            return ""
 
     @staticmethod
     def _get_instance_object_from_cache(cached_data):
