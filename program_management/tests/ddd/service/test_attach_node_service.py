@@ -30,13 +30,14 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-import program_management.ddd.service.command
+import program_management.ddd.command
+import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import business_validator
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import program_tree
-from program_management.ddd.service import attach_node_service, command
+from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
@@ -66,7 +67,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_load_tree()
         self._patch_load_trees_from_children()
         self._patch_load_child_node_to_attach()
-        self.attach_request = command.AttachNodeCommand(
+        self.attach_request = program_management.ddd.command.AttachNodeCommand(
             root_id=self.tree.root_node.node_id,
             node_id_to_attach=self.node_to_attach.node_id,
             type_of_node_to_attach=self.node_to_attach_type,
@@ -107,7 +108,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_attach_node_action_is_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
         mock_attach_node.return_value = [validator_message]
-        result = attach_node_service.attach_node(self.attach_request)
+        result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.attach_request)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
@@ -115,7 +116,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_attach_node_action_is_not_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
         mock_attach_node.return_value = [validator_message]
-        result = attach_node_service.attach_node(self.attach_request)
+        result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.attach_request)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
@@ -131,7 +132,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, [])
         self.mock_validator(AttachAuthorizedRelationshipValidator, ['error link reference'])
 
-        result = attach_node_service.attach_node(self.attach_request)
+        result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.attach_request)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0].message, 'error link reference')
         self.assertEqual(result[0].level, MessageLevel.ERROR)
@@ -148,7 +149,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         self.mock_validator(AttachAuthorizedRelationshipValidator, [])
 
-        result = attach_node_service.attach_node(self.attach_request)
+        result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.attach_request)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0].message, _('Success message'))
         self.assertEqual(result[0].level, MessageLevel.SUCCESS)
@@ -156,13 +157,13 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         attach_request_with_commit_set_to_true = self.attach_request._replace(commit=True)
-        attach_node_service.attach_node(attach_request_with_commit_set_to_true)
+        program_management.ddd.service.write.paste_element_service.paste_element_service(attach_request_with_commit_set_to_true)
         self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)
 
     def test_when_commit_is_false_then_sould_not_persist_modification(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_node_service.attach_node(self.attach_request)
+        program_management.ddd.service.write.paste_element_service.paste_element_service(self.attach_request)
         self.assertFalse(self.mock_persist.called)
 
 
@@ -187,7 +188,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         """Unit test only for performance"""
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
 
-        attach_node_service._validate_end_date_and_option_finality(self.node_to_attach_not_finality)
+        program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(self.node_to_attach_not_finality)
         self.assertFalse(mock_load_2m_trees.called)
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
@@ -197,7 +198,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
-        result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
+        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
@@ -210,7 +211,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
 
-        result = attach_node_service._validate_end_date_and_option_finality(not_finality)
+        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(not_finality)
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
@@ -221,7 +222,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
 
-        result = attach_node_service._validate_end_date_and_option_finality(finality)
+        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(finality)
         self.assertEqual([], result)
 
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
@@ -231,7 +232,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
 
-        result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
+        result = program_management.ddd.service.write.paste_element_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error attach option message"
         self.assertIn(validator_msg, result)
 
@@ -287,7 +288,7 @@ class TestCheckAttach(SimpleTestCase):
         return mock_validator
 
     def test_should_call_return_error_if_no_nodes_to_attach(self):
-        check_command = command.CheckAttachNodeCommand(
+        check_command = program_management.ddd.command.CheckAttachNodeCommand(
             root_id=self.tree.root_node.node_id,
             nodes_to_attach=[],
             path_where_to_attach=self.path
@@ -296,7 +297,7 @@ class TestCheckAttach(SimpleTestCase):
         self.assertIn(_("Please select an item before adding it"), result)
 
     def test_should_call_validate_end_date_and_option_finality(self):
-        check_command = command.CheckAttachNodeCommand(
+        check_command = program_management.ddd.command.CheckAttachNodeCommand(
             root_id=self.tree.root_node.node_id,
             nodes_to_attach=[
                 (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
@@ -309,7 +310,7 @@ class TestCheckAttach(SimpleTestCase):
         self.assertEqual(self.mock_validate_end_date_and_option_finality.call_count, 2)
 
     def test_should_call_specific_validators(self):
-        check_command = command.CheckAttachNodeCommand(
+        check_command = program_management.ddd.command.CheckAttachNodeCommand(
             root_id=self.tree.root_node.node_id,
             nodes_to_attach=[
                 (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),
@@ -324,7 +325,7 @@ class TestCheckAttach(SimpleTestCase):
         self.assertEqual(self.mock_infinite_recursivity_tree.call_count, 2)
 
     def test_should_return_validation_messages_if_any(self):
-        check_command = command.CheckAttachNodeCommand(
+        check_command = program_management.ddd.command.CheckAttachNodeCommand(
             root_id=self.tree.root_node.node_id,
             nodes_to_attach=[
                 (self.node_to_attach_1.node_id, self.node_to_attach_1.node_type),

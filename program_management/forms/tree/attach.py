@@ -31,20 +31,17 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
-import program_management.ddd.service.command
+import program_management.ddd.command
+import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import validation_message
 from base.forms.utils import choice_field
-from base.models import group_element_year
-from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
-from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_node, load_authorized_relationship
-from program_management.ddd.service import attach_node_service, command
 from program_management.ddd.validators import _block_validator
 from program_management.models.enums.node_type import NodeType
 
@@ -120,14 +117,14 @@ class AttachNodeForm(forms.Form):
     def save(self) -> List[validation_message.BusinessValidationMessage]:
         result = []
         if self.is_valid():
-            result = attach_node_service.attach_node(self._get_attach_request())
+            result = program_management.ddd.service.write.paste_element_service.paste_element_service(self._get_attach_request())
             if result:
                 self.add_error(None, result)
         return result
 
-    def _get_attach_request(self) -> command.AttachNodeCommand:
+    def _get_attach_request(self) -> program_management.ddd.command.AttachNodeCommand:
         root_id = int(self.to_path.split("|")[0])
-        return command.AttachNodeCommand(
+        return program_management.ddd.command.AttachNodeCommand(
             root_id=root_id,
             node_id_to_attach=self.node_id,
             type_of_node_to_attach=self.node_type,
@@ -168,7 +165,7 @@ class AttachToMinorMajorListChoiceForm(AttachNodeForm):
     comment_english = None
     relative_credits = None
 
-    def _get_attach_request(self) -> command.AttachNodeCommand:
+    def _get_attach_request(self) -> program_management.ddd.command.AttachNodeCommand:
         attach_request = super()._get_attach_request()
         return attach_request._replace(link_type=LinkTypes.REFERENCE.name)
 

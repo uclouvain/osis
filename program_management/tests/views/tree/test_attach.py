@@ -170,7 +170,7 @@ class TestAttachNodeView(TestCase):
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
 
-    @mock.patch('program_management.ddd.service.attach_node_service.attach_node')
+    @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element_service')
     @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
     @mock.patch.object(AttachNodeForm, 'is_valid')
     @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')

@@ -23,14 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
+
 from django.contrib.auth import models
 
 from osis_common.ddd import interface
-
-
-class AttachNodeCommand(interface.CommandRequest):
-    # To implement
-    pass
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -61,3 +58,15 @@ class CutElementCommand(interface.CommandRequest):
         self.element_id = element_id
         self.element_type = element_type
         self.link_id = link_id
+
+
+AttachNodeCommand = collections.namedtuple(
+    "AttachNodeCommand",
+    "root_id, node_id_to_attach, type_of_node_to_attach, path_where_to_attach, commit,"
+    " access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
+)
+
+CheckAttachNodeCommand = collections.namedtuple(
+    "CheckAttachNodeCommand",
+    "root_id, nodes_to_attach, path_where_to_attach"
+)

@@ -29,6 +29,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
+import program_management.ddd.command
 from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums import prerequisite_operator
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
@@ -39,7 +40,6 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.prerequisite import PrerequisiteItem
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.service import command
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
@@ -197,7 +197,7 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTreeFactory(root_node=root_node)
-        self.request = command.AttachNodeCommand(
+        self.request = program_management.ddd.command.AttachNodeCommand(
             None, None, None, None, None, None, None, None, None, None, None, None,
         )
 
