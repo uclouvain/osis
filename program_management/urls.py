@@ -27,6 +27,7 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.attach
+import program_management.views.tree.copy_cut
 import program_management.views.tree.move
 from program_management.views import groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, element_utilization, excel, search, tree
@@ -34,8 +35,8 @@ from program_management.views.prerequisite import read, update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
-    url(r'^cut_element/$', program_management.views.tree.move.cut_to_cache, name='cut_element'),
-    url(r'^copy_element/$', program_management.views.tree.move.copy_to_cache, name='copy_element'),
+    url(r'^cut_element/$', program_management.views.tree.copy_cut.cut_to_cache, name='cut_element'),
+    url(r'^copy_element/$', program_management.views.tree.copy_cut.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
             url(u'^attach/', program_management.views.tree.attach.PasteElementFromCacheToSelectedTreeNode.as_view(),
