@@ -52,6 +52,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             'offer__academic_year', 'root_group'
         ).get(root_group__element__pk=root_element_id)
 
+    @functools.lru_cache()
     def get_tree(self):
         root_element_id = self.get_path().split("|")[0]
         return load_tree.load(int(root_element_id))
