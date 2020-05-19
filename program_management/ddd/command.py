@@ -24,10 +24,14 @@
 #
 ##############################################################################
 import collections
+from typing import Optional
 
 from django.contrib.auth import models
 
+from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
+from program_management.ddd.business_types import *
+from program_management.models.enums import node_type
 
 
 class DetachNodeCommand(interface.CommandRequest):
@@ -60,11 +64,38 @@ class CutElementCommand(interface.CommandRequest):
         self.link_id = link_id
 
 
-AttachNodeCommand = collections.namedtuple(
-    "AttachNodeCommand",
-    "root_id, node_id_to_attach, type_of_node_to_attach, path_where_to_attach, commit,"
-    " access_condition, is_mandatory, block, link_type, comment, comment_english, relative_credits"
-)
+#  TODO extract link attributes into named tuple
+class PasteElementCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            root_id: int,
+            node_id_to_attach: int,
+            type_of_node_to_attach: node_type.NodeType,
+            path_where_to_attach: 'Path',
+            commit: bool,
+            access_condition: Optional[bool],
+            is_mandatory: Optional[bool],
+            block: Optional[int],
+            link_type: Optional[LinkTypes],
+            comment: str,
+            comment_english: str,
+            relative_credits: Optional[int],
+            path_where_to_detach: Optional['Path']
+    ) -> None:
+        self.root_id = root_id
+        self.node_id_to_attach = node_id_to_attach
+        self.type_of_node_to_attach = type_of_node_to_attach
+        self.path_where_to_attach = path_where_to_attach
+        self.commit = commit
+        self.access_condition = access_condition
+        self.is_mandatory = is_mandatory
+        self.block = block
+        self.link_type = link_type
+        self.comment = comment
+        self.comment_english = comment_english
+        self.relative_credits = relative_credits
+        self.path_where_to_detach = path_where_to_detach
+
 
 CheckAttachNodeCommand = collections.namedtuple(
     "CheckAttachNodeCommand",

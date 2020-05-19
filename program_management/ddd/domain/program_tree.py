@@ -243,7 +243,7 @@ class ProgramTree(interface.RootEntity):
             self,
             node_to_attach: 'Node',
             path: Optional[Path],
-            attach_command: program_management.ddd.command.AttachNodeCommand
+            attach_command: program_management.ddd.command.PasteElementCommand
     ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree

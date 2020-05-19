@@ -197,8 +197,8 @@ class TestAttachNodeProgramTree(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self):
         root_node = NodeGroupYearFactory(node_id=0)
         self.tree = ProgramTreeFactory(root_node=root_node)
-        self.request = program_management.ddd.command.AttachNodeCommand(
-            None, None, None, None, None, None, None, None, None, None, None, None,
+        self.request = program_management.ddd.command.PasteElementCommand(
+            None, None, None, None, None, None, None, None, None, None, None, None, None
         )
 
     def test_attach_node_case_no_path_specified(self):

@@ -67,7 +67,7 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self._patch_load_tree()
         self._patch_load_trees_from_children()
         self._patch_load_child_node_to_attach()
-        self.attach_request = program_management.ddd.command.AttachNodeCommand(
+        self.attach_request = program_management.ddd.command.PasteElementCommand(
             root_id=self.tree.root_node.node_id,
             node_id_to_attach=self.node_to_attach.node_id,
             type_of_node_to_attach=self.node_to_attach_type,
@@ -79,7 +79,8 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
             link_type=None,
             comment=None,
             comment_english=None,
-            relative_credits=None
+            relative_credits=None,
+            path_where_to_detach=None
         )
 
     def _patch_persist_tree(self):
@@ -156,7 +157,21 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
 
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        attach_request_with_commit_set_to_true = self.attach_request._replace(commit=True)
+        attach_request_with_commit_set_to_true = program_management.ddd.command.PasteElementCommand(
+            root_id=self.tree.root_node.node_id,
+            node_id_to_attach=self.node_to_attach.node_id,
+            type_of_node_to_attach=self.node_to_attach_type,
+            path_where_to_attach=self.root_path,
+            commit=True,
+            access_condition=None,
+            is_mandatory=None,
+            block=None,
+            link_type=None,
+            comment="",
+            comment_english="",
+            relative_credits=None,
+            path_where_to_detach=None
+        )
         program_management.ddd.service.write.paste_element_service.paste_element_service(attach_request_with_commit_set_to_true)
         self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)

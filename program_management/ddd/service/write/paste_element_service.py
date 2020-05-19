@@ -32,7 +32,7 @@ from program_management.ddd.validators._authorized_relationship import AttachAut
 from program_management.models.enums.node_type import NodeType
 
 
-def paste_element_service(attach_command: program_management.ddd.command.AttachNodeCommand) -> List['BusinessValidationMessage']:
+def paste_element_service(attach_command: program_management.ddd.command.PasteElementCommand) -> List['BusinessValidationMessage']:
     root_id = attach_command.root_id
     type_node_to_attach = attach_command.type_of_node_to_attach
     node_id_to_attach = attach_command.node_id_to_attach

@@ -122,9 +122,9 @@ class AttachNodeForm(forms.Form):
                 self.add_error(None, result)
         return result
 
-    def _get_attach_request(self) -> program_management.ddd.command.AttachNodeCommand:
+    def _get_attach_request(self) -> program_management.ddd.command.PasteElementCommand:
         root_id = int(self.to_path.split("|")[0])
-        return program_management.ddd.command.AttachNodeCommand(
+        return program_management.ddd.command.PasteElementCommand(
             root_id=root_id,
             node_id_to_attach=self.node_id,
             type_of_node_to_attach=self.node_type,
@@ -136,7 +136,8 @@ class AttachNodeForm(forms.Form):
             link_type=self.cleaned_data.get("link_type"),
             comment=self.cleaned_data.get("comment", ""),
             comment_english=self.cleaned_data.get("comment_english", ""),
-            relative_credits=self.cleaned_data.get("relative_credits")
+            relative_credits=self.cleaned_data.get("relative_credits"),
+            path_where_to_detach=None
         )
 
 
@@ -165,9 +166,23 @@ class AttachToMinorMajorListChoiceForm(AttachNodeForm):
     comment_english = None
     relative_credits = None
 
-    def _get_attach_request(self) -> program_management.ddd.command.AttachNodeCommand:
-        attach_request = super()._get_attach_request()
-        return attach_request._replace(link_type=LinkTypes.REFERENCE.name)
+    def _get_attach_request(self) -> program_management.ddd.command.PasteElementCommand:
+        root_id = int(self.to_path.split("|")[0])
+        return program_management.ddd.command.PasteElementCommand(
+            root_id=root_id,
+            node_id_to_attach=self.node_id,
+            type_of_node_to_attach=self.node_type,
+            path_where_to_attach=self.to_path,
+            commit=True,
+            access_condition=self.cleaned_data.get("access_condition", False),
+            is_mandatory=self.cleaned_data.get("is_mandatory", True),
+            block=self.cleaned_data.get("block"),
+            link_type=LinkTypes.REFERENCE,
+            comment=self.cleaned_data.get("comment", ""),
+            comment_english=self.cleaned_data.get("comment_english", ""),
+            relative_credits=self.cleaned_data.get("relative_credits"),
+            path_where_to_detach=None
+        )
 
 
 class AttachNotAuthorizedChildren(AttachNodeForm):
