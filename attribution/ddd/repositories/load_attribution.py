@@ -30,7 +30,7 @@ from django.db.models import F, Q
 from attribution.ddd.domain.attribution import Attribution
 from attribution.ddd.domain.teacher import Teacher
 from attribution.models import attribution_charge_new
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYearIdentity
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 
 def load_attributions(learning_unit_year_ids: List['LearningUnitYearIdentity']) \
@@ -79,9 +79,11 @@ def _build_sorted_attributions(qs_attributions) -> List['Attribution']:
 
 
 def instanciate_attribution(attributions_dict: Dict = None) -> 'Attribution':
-    return Attribution(acronym=attributions_dict['acronym_ue'],
-                       year=attributions_dict['year_ue'],
-                       teacher=instanciate_teacher_object(attributions_dict))
+    return Attribution(
+        learning_unit_year=LearningUnitYearIdentity(code=attributions_dict['acronym_ue'],
+                                                    year=attributions_dict['year_ue']),
+        teacher=instanciate_teacher_object(attributions_dict)
+    )
 
 
 def instanciate_teacher_object(attribution_data: dict) -> Teacher:

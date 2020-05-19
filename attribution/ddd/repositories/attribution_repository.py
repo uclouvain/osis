@@ -28,13 +28,12 @@ from typing import Optional, List
 from attribution.ddd.domain.attribution import AttributionIdentity, Attribution
 from attribution.ddd.repositories.load_attribution import load_attributions
 from osis_common.ddd import interface
-from osis_common.ddd.interface import Entity
 
 
 class AttributionRepository(interface.AbstractRepository):
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['AttributionIdentity']] = None, **kwargs) -> List[Entity]:
+    def search(cls, entity_ids: Optional[List['AttributionIdentity']] = None, **kwargs) -> List[Attribution]:
         return load_attributions(learning_unit_year_ids=kwargs.pop('learning_unit_year_ids'))
 
     @classmethod

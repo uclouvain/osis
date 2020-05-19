@@ -42,8 +42,8 @@ from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearM
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
-from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities, \
-    LearningUnitYearIdentity
+from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, LecturingVolume, PracticalVolume, Entities
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.repository.load_achievement import load_achievements
@@ -384,10 +384,10 @@ def _build_where_clause(node_identity: 'LearningUnitYearIdentity') -> Q:
 def __build_sorted_attributions_grouped_by_ue(qs_attributions: List['Attribution']) \
         -> Dict[LearningUnitYearIdentity, List['Attribution']]:
     attributions_grouped_by_ue = {}
-    for learning_unit_year_id, attributions in itertools.groupby(qs_attributions,
-                                                                 key=lambda attribution: (attribution.acronym,
-                                                                                          attribution.year)
-                                                                 ):
+    for learning_unit_year_id, attributions in itertools.groupby(
+            qs_attributions,
+            key=lambda attribution: (attribution.learning_unit_year.code, attribution.learning_unit_year.year)
+    ):
         learning_unit_identity = LearningUnitYearIdentity(code=learning_unit_year_id[0], year=learning_unit_year_id[1])
         attributions_data = [attribution for attribution in attributions]
 

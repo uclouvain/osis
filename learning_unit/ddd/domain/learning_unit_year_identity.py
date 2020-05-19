@@ -24,24 +24,22 @@
 #
 ##############################################################################
 
-import factory.fuzzy
 
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+class LearningUnitYearIdentity:
 
+    def __init__(
+            self,
+            code: str = None,
+            year: int = None
+    ):
+        self.code = code
+        self.year = year
 
-def generate_end_year(node):
-    return node.year + 10
+    def __str__(self) -> str:
+        return "{} - {}".format(self.code, self.year)
 
+    def __eq__(self, other):
+        return (self.code, self.year) == (other.code, other.year)
 
-def generate_start_year(node):
-    return node.year + 10
-
-
-class LearningUnitYearIdentityFactory(factory.Factory):
-
-    class Meta:
-        model = LearningUnitYearIdentity
-        abstract = False
-
-    code = factory.Sequence(lambda n: 'Code-%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+    def __hash__(self):
+        return hash((self.code, self.year))

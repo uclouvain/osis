@@ -25,6 +25,7 @@
 ##############################################################################
 
 from attribution.ddd.domain.teacher import Teacher
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.ddd import interface
 
 
@@ -43,10 +44,8 @@ class Attribution(interface.RootEntity):
 
     def __init__(
             self,
-            year: int = None,
-            acronym: str = None,
+            learning_unit_year: LearningUnitYearIdentity = None,
             teacher: Teacher = None,
     ):
-        self.year = year
-        self.acronym = acronym
+        self.learning_unit_year = learning_unit_year
         self.teacher = teacher
