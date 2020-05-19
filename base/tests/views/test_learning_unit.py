@@ -62,6 +62,7 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
+from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
@@ -331,6 +332,30 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         response = self.client.post(self.url, data={})
         url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': a_partim_learning_unit_year.id})
         self.assertRedirects(response, url_to_redirect)
+
+    @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
+                side_effect=lambda *args: True)
+    def test_create_partim_with_proposal_of_creation(self, mock_is_pers_linked_to_entity_charge):
+        learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
+        learning_unit_year = LearningUnitYearFactory(
+            academic_year=self.current_academic_year,
+            learning_container_year=learning_container_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
+        data = {
+            'acronym_2': ['B'],
+            'credits': learning_unit_year.credits,
+            'periodicity': ANNUAL,
+            'language': learning_unit_year.language.id,
+            'quadrimester': learning_unit_year.quadrimester,
+            'session': learning_unit_year.session,
+            'campus': learning_unit_year.campus.id,
+            'component-TOTAL_FORMS': '2',
+            'component-INITIAL_FORMS': '2',
+            'component-MAX_NUM_FORMS': '2',
+        }
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
 # TODO Split this test based on functionality
