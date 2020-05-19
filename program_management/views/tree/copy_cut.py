@@ -28,11 +28,9 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
 from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
-from osis_common.utils.models import get_object_or_none
 from program_management.models.enums.node_type import NodeType
 
 
@@ -53,16 +51,15 @@ def copy_to_cache(request):
 
 @require_http_methods(['POST'])
 def cut_to_cache(request):
-    group_element_year_id = request.POST['group_element_year_id']
+    link_id = request.POST['group_element_year_id']
     element_id = request.POST['element_id']
     element_type = request.POST['element_type']
 
-    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
     element = _get_concerned_object(element_id, element_type)
 
     return _cache_object(
         request.user,
-        group_element_year,
+        link_id,
         object_to_cache=element,
         action=ElementCache.ElementCacheAction.CUT
     )
@@ -79,11 +76,10 @@ def _get_concerned_object(element_id: int, element_type: str):
 
 def _cache_object(
         user: User,
-        group_element_year: Optional[GroupElementYear],
+        link_id: Optional[int],
         object_to_cache,
         action: ElementCache.ElementCacheAction
 ):
-    group_element_year_pk = group_element_year.pk if group_element_year else None
-    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action.value)
+    ElementCache(user).save_element_selected(object_to_cache, source_link_id=link_id, action=action.value)
     success_msg = get_clipboard_content_display(object_to_cache, action.value)
     return build_success_json_response(success_msg)
