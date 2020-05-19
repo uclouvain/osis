@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,17 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
 
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
-from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.repositories import find_roots
