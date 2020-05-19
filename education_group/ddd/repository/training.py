@@ -34,6 +34,7 @@ from base.models.entity_version import EntityVersion
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.internship_presence import InternshipPresence
@@ -69,8 +70,8 @@ class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
         qs = EducationGroupYear.objects.filter(
-            acronym='DROI1BA',
-            academic_year__year=2020
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year
         ).select_related(
             'education_group_type',
             'hops',
@@ -138,14 +139,14 @@ class TrainingRepository(interface.AbstractRepository):
                         name=coorg.organization.name,
                         address=Address(
                             country_name=first_address.country.name,
-                            city=first_address.country.city,
+                            city=first_address.city,
                         ),
-                        logo_url=coorg.organization.logo_url,
+                        logo_url=coorg.organization.logo.url if coorg.organization.logo else None,
                     ),
                     is_for_all_students=coorg.all_students,
                     is_reference_institution=coorg.enrollment_place,
-                    certificate_type=coorg.certificate_type,
-                    is_producing_certificate=coorg.is_producing_certificate,
+                    certificate_type=DiplomaCoorganizationTypes[coorg.diploma] if coorg.diploma else None,
+                    is_producing_certificate=coorg.is_producing_cerfificate,
                     is_producing_certificate_annexes=coorg.is_producing_annexe,
                 )
             )

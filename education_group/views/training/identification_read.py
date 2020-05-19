@@ -3,6 +3,11 @@ from typing import List
 from django.utils.functional import cached_property
 from reversion.models import Version
 
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_organization import EducationGroupOrganization
+from base.models.education_group_year_domain import EducationGroupYearDomain
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.views.training.common_read import TrainingRead, Tab
@@ -16,12 +21,14 @@ class TrainingReadIdentification(TrainingRead):
     active_tab = Tab.IDENTIFICATION
 
     def get_context_data(self, **kwargs):
+        training = self.get_training()
+        print()
         return {
             **super().get_context_data(**kwargs),
             "all_versions_available": self.all_versions_available,
             "current_version": self.current_version,  # Template : panel_version_information.html
-            "education_group_year": self.get_training(),
-            # "history": self.get_related_versions(),
+            "education_group_year": training,
+            "history": self.get_related_history(),
         }
 
     @cached_property
@@ -43,7 +50,28 @@ class TrainingReadIdentification(TrainingRead):
         )
 
     def get_related_history(self):
-        return Version.objects.none()
+        education_group_year = self.education_group_version.offer
+        versions = Version.objects.get_for_object(
+            education_group_year
+        ).select_related('revision__user__person')
+
+        related_models = [
+            EducationGroupOrganization,
+            EducationGroupAchievement,
+            EducationGroupDetailedAchievement,
+            EducationGroupYearDomain,
+            EducationGroupCertificateAim
+        ]
+
+        subversion = Version.objects.none()
+        for model in related_models:
+            subversion |= Version.objects.get_for_model(model).select_related('revision__user__person')
+
+        versions |= subversion.filter(
+            serialized_data__contains="\"education_group_year\": {}".format(education_group_year.pk)
+        )
+
+        return versions.order_by('-revision__date_created').distinct('revision__date_created')
 
     def get_training(self):
         offer = self.education_group_version.offer

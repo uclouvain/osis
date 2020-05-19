@@ -1,5 +1,5 @@
-{% extends "training/layout_read.html" %}
-{% load i18n bootstrap3 %}
+{% load i18n %}
+
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -24,27 +24,32 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block details %}
-    {% if not current_version.is_standard %}
-        {% include  "education_group/blocks/panel/panel_version_information.html" %}
-    {% endif %}
-    <div class="row">
-        <div class="col-md-7">
-            {% include  "training/identification/panel_informations.html" %}
-            {% include  "training/identification/panel_academic_informations.html" %}
+{% if history %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4>{% trans "Last modifications" %}</h4>
         </div>
-        <div class="col-md-5">
-            {% include  "training/identification/panel_entities.html" %}
-            {% include  "training/identification/panel_funding.html" %}
-            {% include  "training/identification/panel_history.html" %}
+        <div class="panel-body" style="max-height: 200px; overflow-y: auto">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>{% trans "Datetime" %}</th>
+                    <th>{% trans "User" %}</th>
+                </tr>
+                <thead>
+                <tbody>
+                {% for version in history %}
+                    <tr>
+                        <td>
+                            {{ version.revision.date_created }}
+                        </td>
+                        <td>
+                            {{ version.revision.user.person| default_if_none:"-" }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            {% include  "training/identification/panel_remarks.html" %}
-            {% include  "training/identification/panel_hops.html" %}
-            {% include  "training/identification/panel_coorganizations.html" %}
-        </div>
-    </div>
-
-{% endblock details %}
+{% endif %}

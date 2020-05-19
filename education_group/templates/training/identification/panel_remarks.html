@@ -1,4 +1,4 @@
-{% extends "training/layout_read.html" %}
+{% load static %}
 {% load i18n bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -24,27 +24,21 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block details %}
-    {% if not current_version.is_standard %}
-        {% include  "education_group/blocks/panel/panel_version_information.html" %}
-    {% endif %}
-    <div class="row">
-        <div class="col-md-7">
-            {% include  "training/identification/panel_informations.html" %}
-            {% include  "training/identification/panel_academic_informations.html" %}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("remark in english") label_class='d-block'%}
+                <p>{{ current_version.remark_fr }}</p>
+            </div>
         </div>
-        <div class="col-md-5">
-            {% include  "training/identification/panel_entities.html" %}
-            {% include  "training/identification/panel_funding.html" %}
-            {% include  "training/identification/panel_history.html" %}
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Remark") label_class='d-block'%}
+                <p>{{ current_version.remark }}</p>
+            </div>
         </div>
+        <br>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            {% include  "training/identification/panel_remarks.html" %}
-            {% include  "training/identification/panel_hops.html" %}
-            {% include  "training/identification/panel_coorganizations.html" %}
-        </div>
-    </div>
-
-{% endblock details %}
+</div>
