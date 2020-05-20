@@ -54,7 +54,7 @@ from program_management.forms.tree.attach import AttachNodeFormSet, attach_form_
 from program_management.models.enums.node_type import NodeType
 
 
-class AttachMultipleNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
     permission_required = "base.attach_educationgroup"
 
@@ -142,7 +142,7 @@ class AttachMultipleNodesView(PermissionRequiredMixin, AjaxTemplateMixin, Succes
         return
 
 
-class AttachCheckView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
+class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
