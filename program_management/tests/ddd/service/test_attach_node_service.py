@@ -176,6 +176,27 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)
 
+    @mock.patch("program_management.ddd.service.detach_node_service.detach_node", return_value=[])
+    def test_when_path_to_detach_is_set_then_should_call_detach_service(self, mock_detach):
+        self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
+        past_request_with_detach_set = program_management.ddd.command.PasteElementCommand(
+            root_id=self.tree.root_node.node_id,
+            node_id_to_attach=self.node_to_attach.node_id,
+            type_of_node_to_attach=self.node_to_attach_type,
+            path_where_to_attach=self.root_path,
+            commit=False,
+            access_condition=None,
+            is_mandatory=None,
+            block=None,
+            link_type=None,
+            comment="",
+            comment_english="",
+            relative_credits=None,
+            path_where_to_detach="a|b"
+        )
+        program_management.ddd.service.write.paste_element_service.paste_element_service(past_request_with_detach_set)
+        self.assertTrue(mock_detach.called)
+
     def test_when_commit_is_false_then_sould_not_persist_modification(self):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         program_management.ddd.service.write.paste_element_service.paste_element_service(self.attach_request)

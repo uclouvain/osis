@@ -86,6 +86,7 @@ class AttachMultipleNodesView(PermissionRequiredMixin, AjaxTemplateMixin, Succes
             'node_to_attach_type': node_type,
             'node_to_attach_id': node_id,
             'path_of_node_to_attach_from': self.request.GET['path'],
+            'path_to_detach': self.request.GET.get('path_to_detach'),
         }
 
     def get_form(self, form_class=None):
@@ -191,17 +192,12 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
 
 
 class MoveGroupElementYearView(AttachMultipleNodesView):
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
         message_list = detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=False)
         if message_list.contains_errors():
             display_error_messages(self.request, message_list)
-        return kwargs
-
-    @transaction.atomic
-    def form_valid(self, form):
-        detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=True)
-        return super().form_valid(form)
+        return context_data
 
     def has_permission(self):
         obj_to_detach_id = int(self.request.GET["path_to_detach"].split("|")[-2])

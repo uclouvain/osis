@@ -101,10 +101,11 @@ class AttachNodeForm(forms.Form):
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
 
-    def __init__(self, to_path: str, node_to_attach_id: int, node_to_attach_type: NodeType, **kwargs):
+    def __init__(self, to_path: str, node_to_attach_id: int, node_to_attach_type: NodeType, path_to_detach: str = None, **kwargs):
         self.to_path = to_path
         self.node_id = node_to_attach_id
         self.node_type = node_to_attach_type
+        self.path_to_detach = path_to_detach
         super().__init__(**kwargs)
 
     def clean_block(self):
@@ -137,7 +138,7 @@ class AttachNodeForm(forms.Form):
             comment=self.cleaned_data.get("comment", ""),
             comment_english=self.cleaned_data.get("comment_english", ""),
             relative_credits=self.cleaned_data.get("relative_credits"),
-            path_where_to_detach=None
+            path_where_to_detach=self.path_to_detach
         )
 
 
@@ -181,7 +182,7 @@ class AttachToMinorMajorListChoiceForm(AttachNodeForm):
             comment=self.cleaned_data.get("comment", ""),
             comment_english=self.cleaned_data.get("comment_english", ""),
             relative_credits=self.cleaned_data.get("relative_credits"),
-            path_where_to_detach=None
+            path_where_to_detach=self.path_to_detach
         )
 
 

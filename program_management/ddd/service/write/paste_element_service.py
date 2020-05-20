@@ -26,18 +26,20 @@ from typing import List
 import program_management.ddd.command
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.repositories import load_tree, load_node, persist_tree
+from program_management.ddd.service import detach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
 from program_management.ddd.validators._attach_option import AttachOptionsValidator
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator
 from program_management.models.enums.node_type import NodeType
 
 
-def paste_element_service(attach_command: program_management.ddd.command.PasteElementCommand) -> List['BusinessValidationMessage']:
-    root_id = attach_command.root_id
-    type_node_to_attach = attach_command.type_of_node_to_attach
-    node_id_to_attach = attach_command.node_id_to_attach
-    path = attach_command.path_where_to_attach
-    commit = attach_command.commit
+def paste_element_service(paste_command: program_management.ddd.command.PasteElementCommand) -> List['BusinessValidationMessage']:
+    root_id = paste_command.root_id
+    type_node_to_attach = paste_command.type_of_node_to_attach
+    node_id_to_attach = paste_command.node_id_to_attach
+    path = paste_command.path_where_to_attach
+    path_to_detach = paste_command.path_where_to_detach
+    commit = paste_command.commit
 
     tree = load_tree.load(root_id)
     node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
@@ -47,10 +49,15 @@ def paste_element_service(attach_command: program_management.ddd.command.PasteEl
         error_messages += _validate_end_date_and_option_finality(node_to_attach)
     if error_messages:
         return error_messages
-    success_messages = tree.attach_node(node_to_attach, path, attach_command)
+
+    action_messages = []
+    if path_to_detach:
+        action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
+
+    action_messages.extend(tree.attach_node(node_to_attach, path, paste_command))
     if commit:
         persist_tree.persist(tree)
-    return success_messages
+    return action_messages
 
 
 def __validate_trees_using_node_as_reference_link(
