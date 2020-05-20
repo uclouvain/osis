@@ -66,7 +66,7 @@
 
         {# Paste link #}
         <li>
-            {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
+            {% url 'tree_attach_node' parent.id education_group_year.id as attach_url %}
             {% a_tag_modal_has_perm attach_url|add:"?path="|add:node_path _('Paste') 'base.attach_educationgroup' user education_group_year %}
         </li>
         <li class="divider"></li>

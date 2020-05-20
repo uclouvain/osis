@@ -359,7 +359,7 @@ class TestBuildTree(TestCase):
         ])
         self.assertEqual(json['children'][0]['a_attr']['modify_url'], expected_modify_url)
 
-        expected_attach_url = reverse('education_group_attach', args=[self.parent.pk, child.pk])
+        expected_attach_url = reverse('tree_attach_node', args=[self.parent.pk])
         self.assertEqual(json['children'][0]['a_attr']['attach_url'], expected_attach_url)
 
         expected_detach_url = reverse('group_element_year_delete', args=[

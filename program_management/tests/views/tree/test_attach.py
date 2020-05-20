@@ -285,11 +285,10 @@ class TestMoveGroupElementYearView(TestCase):
         )
         GroupElementYearFactory(parent=cls.root_egy, child_branch=cls.selected_egy)
 
-        path_to_detach = "|".join([str(cls.group_element_year.parent.pk), str(cls.group_element_year.child.pk)])
         path_to_attach = "|".join([str(cls.root_egy.pk), str(cls.selected_egy.pk)])
         cls.url = reverse("group_element_year_move", args=[cls.root_egy.id])
-        cls.url = "{}?path={}&path_to_detach={}".format(
-            cls.url, path_to_attach, path_to_detach
+        cls.url = "{}?path={}".format(
+            cls.url, path_to_attach
         )
 
         cls.person = PersonFactory()
@@ -301,8 +300,13 @@ class TestMoveGroupElementYearView(TestCase):
         self.permission_mock = permission_patcher.start()
         self.permission_mock.return_value = True
         self.addCleanup(permission_patcher.stop)
+        self.addCleanup(ElementCache(self.person.user).clear)
 
     def test_should_check_attach_and_detach_permission(self):
+        ElementCache(self.person.user).save_element_selected(
+            self.group_element_year.child_branch,
+            source_link_id=self.group_element_year.id
+        )
         self.client.get(self.url)
         self.permission_mock.assert_has_calls(
             [

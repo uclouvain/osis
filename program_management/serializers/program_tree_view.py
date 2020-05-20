@@ -45,8 +45,8 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
             'element_id': tree.root_node.pk,
             'element_type': tree.root_node.type.name,
             'attach_url': reverse(
-                'education_group_attach',
-                args=[tree.root_node.pk, tree.root_node.pk]
+                'tree_attach_node',
+                args=[tree.root_node.pk]
             ) + "?path=%s" % str(tree.root_node.pk),
         }
     }
