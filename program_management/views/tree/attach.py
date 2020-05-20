@@ -23,17 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
-from django.contrib.auth.decorators import login_required
+from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView, CreateView, FormView, TemplateView
@@ -46,20 +45,44 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from osis_role.errors import get_permission_error
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
+from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.repositories import load_node
-from program_management.ddd.service import attach_node_service, command
+from program_management.ddd.service import attach_node_service, command, detach_node_service
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class AttachMultipleNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
+    permission_required = "base.can_attach_node"
+
+    def has_permission(self):
+        return self._has_permission_to_detach() & super().has_permission()
+
+    def _has_permission_to_detach(self) -> bool:
+        if not self.get_path_to_detach():
+            return True
+        obj_to_detach_id = int(self.get_path_to_detach().split("|")[-2])
+        obj_to_detach = shortcuts.get_object_or_404(EducationGroupYear, pk=obj_to_detach_id)
+        return self.request.user.has_perms(("base.can_detach_node",), obj_to_detach)
+
+    def get_permission_object(self) -> EducationGroupYear:
+        node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
+        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
+
+    def get_path_to_detach(self) -> Optional[Path]:
+        link_to_detach = fetch_source_link(self.request.GET, self.request.user)  # type: GroupElementYear
+        if not link_to_detach:
+            return None
+        return "|".join([str(link_to_detach.parent.pk), str(link_to_detach.child.pk)])
 
     @cached_property
     def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
@@ -80,6 +103,7 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
             'node_to_attach_type': node_type,
             'node_to_attach_id': node_id,
             'path_of_node_to_attach_from': self.request.GET['path'],
+            'path_to_detach': self.get_path_to_detach(),
         }
 
     def get_form(self, form_class=None):
@@ -95,9 +119,16 @@ class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMess
         )
         context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
                                        for node_id, node_type in self.nodes_to_attach}
+        if self.get_path_to_detach():
+            self.check_detach_errors()
         if not self.nodes_to_attach:
             display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data
+
+    def check_detach_errors(self):
+        message_list = detach_node_service.detach_node(self.get_path_to_detach(), commit=False)
+        if message_list.contains_errors():
+            display_error_messages(self.request, message_list)
 
     def form_valid(self, formset: AttachNodeFormSet):
         messages = formset.save()
@@ -151,10 +182,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
         redirect_url = reverse("check_education_group_attach", args=[self.kwargs["root_id"]])
         redirect_url = "{}?{}".format(redirect_url, self.request.GET.urlencode())
 
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            display_warning_messages(self.request, str(e))
+        if not self.request.user.has_perm(self.permission_required, obj=self.education_group_year):
+            display_warning_messages(self.request, get_permission_error(self.request.user, self.permission_required))
 
         cached_data = ElementCache(self.request.user).cached_data
 
@@ -169,16 +198,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
                 return redirect_url
         return super().get_redirect_url(*args, **kwargs)
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if self.rules:
-            try:
-                self.rules[0](self.request.user, self.education_group_year)
-
-            except PermissionDenied as e:
-                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(PasteElementFromCacheToSelectedTreeNode, self).dispatch(request, *args, **kwargs)
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
@@ -241,6 +262,9 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_success_url(self):
         """ We'll reload the page """
         return
+
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class MoveGroupElementYearView(CreateGroupElementYearView):
