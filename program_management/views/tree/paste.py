@@ -44,11 +44,11 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.mixins import AjaxTemplateMixin
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.business.group_element_years import management
 from program_management.business.group_element_years.management import fetch_source_link
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service, detach_node_service
+from program_management.ddd.service.read import element_selected_service
 from program_management.forms.tree.attach import AttachNodeFormSet, attach_form_factory, \
     AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
@@ -80,7 +80,11 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
 
     @cached_property
     def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
-        return management.fetch_nodes_selected(self.request.GET, self.request.user)
+        return element_selected_service.retrieve_element_selected(
+            self.request.user,
+            self.request.GET.get("id", []),
+            self.request.GET.get("content_type")
+        )
 
     def get_form_class(self):
         return formset_factory(form=attach_form_factory, formset=AttachNodeFormSet, extra=len(self.nodes_to_attach))
@@ -146,7 +150,11 @@ class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin,
     template_name = "tree/check_attach_inner.html"
 
     def get(self, request, *args, **kwargs):
-        nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
+        nodes_to_attach = element_selected_service.retrieve_element_selected(
+            self.request.user,
+            self.request.GET.get("id", []),
+            self.request.GET.get("content_type")
+        )
         check_command = program_management.ddd.command.CheckAttachNodeCommand(
             root_id=self.kwargs["root_id"],
             path_where_to_attach=self.request.GET["path"],

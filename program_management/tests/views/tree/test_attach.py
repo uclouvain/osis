@@ -120,7 +120,7 @@ class TestAttachNodeView(TestCase):
         self.assertEqual(msgs, [_("Please cut or copy an item before attach it")])
         self.assertTrue(self.permission_mock.called)
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
+    @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     def test_get_method_when_education_group_year_element_is_selected(self, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
@@ -136,7 +136,7 @@ class TestAttachNodeView(TestCase):
         self.assertEqual(len(response.context['formset'].forms), 1)
         self.assertIsInstance(response.context['formset'].forms[0], AttachNodeForm)
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
+    @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     def test_get_method_when_multiple_education_group_year_element_are_selected(self, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         subgroup_to_attach_2 = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP,)
@@ -173,7 +173,7 @@ class TestAttachNodeView(TestCase):
     @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element_service')
     @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
     @mock.patch.object(AttachNodeForm, 'is_valid')
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
+    @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     def test_post_method_case_formset_valid(self, mock_cache_elems, mock_form_valid, mock_service):
         mock_form_valid.return_value = True
         mock_service.return_value = [BusinessValidationMessage('Success', MessageLevel.SUCCESS)]
