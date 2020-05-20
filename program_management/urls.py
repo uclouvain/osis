@@ -26,7 +26,7 @@
 from django.conf.urls import url
 from django.urls import include, path
 
-import program_management.views.tree.attach
+import program_management.views.tree.paste
 import program_management.views.tree.copy_cut
 import program_management.views.tree.move
 from program_management.views import groupelementyear_delete, groupelementyear_update, \
@@ -81,14 +81,14 @@ urlpatterns = [
     path('<int:root_id>/', include([
         path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        path('attach/', tree.attach.PasteNodesView.as_view(), name='tree_attach_node'),
+        path('attach/', tree.paste.PasteNodesView.as_view(), name='tree_attach_node'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
-        path('move/', tree.attach.PasteNodesView.as_view(), name='group_element_year_move'),
+        path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
         path('<int:link_id>/', include([
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
         ])),
-        path('check_attach/', program_management.views.tree.attach.CheckPasteView.as_view(),
+        path('check_attach/', program_management.views.tree.paste.CheckPasteView.as_view(),
              name="check_education_group_attach"),
         path('<str:node_path>/quick_search/', include([
             path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
