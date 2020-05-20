@@ -52,6 +52,7 @@ def paste_element_service(paste_command: program_management.ddd.command.PasteEle
 
     action_messages = []
     if path_to_detach:
+
         action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
 
     action_messages.extend(tree.attach_node(node_to_attach, path, paste_command))

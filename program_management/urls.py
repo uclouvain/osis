@@ -85,7 +85,7 @@ urlpatterns = [
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
         path('attach/', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
-        path('move/', tree.attach.MoveGroupElementYearView.as_view(), name='group_element_year_move'),
+        path('move/', tree.attach.AttachMultipleNodesView.as_view(), name='group_element_year_move'),
         path('<int:link_id>/', include([
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")

@@ -33,7 +33,7 @@ from django.utils.translation import gettext as _
 import program_management.ddd.command
 import program_management.ddd.service.write.paste_element_service
 from base.ddd.utils import business_validator
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import program_tree
@@ -176,8 +176,9 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)
 
-    @mock.patch("program_management.ddd.service.detach_node_service.detach_node", return_value=[])
+    @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
     def test_when_path_to_detach_is_set_then_should_call_detach_service(self, mock_detach):
+        mock_detach.return_value = BusinessValidationMessageList([])
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         past_request_with_detach_set = program_management.ddd.command.PasteElementCommand(
             root_id=self.tree.root_node.node_id,

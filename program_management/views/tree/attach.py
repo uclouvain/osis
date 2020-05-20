@@ -63,6 +63,16 @@ class AttachMultipleNodesView(PermissionRequiredMixin, AjaxTemplateMixin, Succes
     template_name = "tree/attach_inner.html"
     permission_required = "base.attach_educationgroup"
 
+    def has_permission(self):
+        return self._has_permission_to_detach() & super().has_permission()
+
+    def _has_permission_to_detach(self) -> bool:
+        if "path_to_detach" not in self.request.GET:
+            return True
+        obj_to_detach_id = int(self.request.GET["path_to_detach"].split("|")[-2])
+        obj_to_detach = shortcuts.get_object_or_404(EducationGroupYear, pk=obj_to_detach_id)
+        return self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
+
     def get_permission_object(self) -> EducationGroupYear:
         node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
         return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
@@ -102,9 +112,16 @@ class AttachMultipleNodesView(PermissionRequiredMixin, AjaxTemplateMixin, Succes
         )
         context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
                                        for node_id, node_type in self.nodes_to_attach}
+        if "path_to_detach" in self.request.GET:
+            self.check_detach_errors()
         if not self.nodes_to_attach:
             display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data
+
+    def check_detach_errors(self):
+        message_list = detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=False)
+        if message_list.contains_errors():
+            display_error_messages(self.request, message_list)
 
     def form_valid(self, formset: AttachNodeFormSet):
         messages = formset.save()
@@ -189,19 +206,3 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
                 return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
 
         return super(PasteElementFromCacheToSelectedTreeNode, self).dispatch(request, *args, **kwargs)
-
-
-class MoveGroupElementYearView(AttachMultipleNodesView):
-    def get_context_data(self, **kwargs):
-        context_data = super().get_context_data(**kwargs)
-        message_list = detach_node_service.detach_node(self.request.GET["path_to_detach"], commit=False)
-        if message_list.contains_errors():
-            display_error_messages(self.request, message_list)
-        return context_data
-
-    def has_permission(self):
-        obj_to_detach_id = int(self.request.GET["path_to_detach"].split("|")[-2])
-        obj_to_detach = shortcuts.get_object_or_404(EducationGroupYear, pk=obj_to_detach_id)
-        has_permission_to_detach = self.request.user.has_perms(("base.detach_educationgroup",), obj_to_detach)
-        return has_permission_to_detach & super().has_permission()
-
