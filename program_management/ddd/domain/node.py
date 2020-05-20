@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from collections import OrderedDict
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_categories import Categories
@@ -34,6 +35,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.enums.constraint_type import ConstraintTypes
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
@@ -56,7 +58,19 @@ class NodeFactory:
 factory = NodeFactory()
 
 
-class Node:
+class NodeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
+
+
+class Node(interface.Entity):
 
     _academic_year = None
 
@@ -87,6 +101,8 @@ class Node:
         self.year = year
         self.credits = credits
         self._deleted_children = set()
+        # FIXME :: pass entity_id into the __init__ param !
+        super(Node, self).__init__(entity_id=NodeIdentity(self.code, self.year))
 
     def __eq__(self, other):
         return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
@@ -133,6 +149,12 @@ class Node:
 
     def is_option(self) -> bool:
         return self.node_type == MiniTrainingType.OPTION
+
+    def is_training(self) -> bool:
+        return self.node_type in TrainingType.all()
+
+    def is_minor_major_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_list_choice_enums()
 
     def get_all_children(
             self,
@@ -229,7 +251,7 @@ class Node:
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
-    _descendents = {}
+    _descendents = OrderedDict()
     if current_path is None:
         current_path = str(root_node.pk)
 

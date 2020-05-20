@@ -51,17 +51,17 @@ class TestEntityRoleChoiceField(TestCase):
 
     def test_case_user_are_linked_with_child_on_role(self):
         CentralManagerFactory(person=self.person, entity=self.root_entity_version.entity, with_child=True)
-        self.assertEquals(self.field_instance.get_queryset().count(), 3)
+        self.assertEqual(self.field_instance.get_queryset().count(), 3)
 
     def test_case_user_are_linked_without_child_on_role(self):
         CentralManagerFactory(person=self.person, entity=self.root_entity_version.entity, with_child=False)
-        self.assertEquals(self.field_instance.get_queryset().count(), 1)
+        self.assertEqual(self.field_instance.get_queryset().count(), 1)
 
     def test_case_user_are_linked_on_multiple_role_connected_to_fields(self):
         CentralManagerFactory(person=self.person, entity=self.root_entity_version.entity, with_child=False)
         FacultyManagerFactory(person=self.person, entity=self.entity_version_level_2.entity, with_child=True)
 
-        self.assertEquals(self.field_instance.get_queryset().count(), 2)
+        self.assertEqual(self.field_instance.get_queryset().count(), 2)
 
     def test_case_user_has_scope_all_on_entity(self):
         FacultyManagerFactory(person=self.person, entity=self.entity_version_level_2.entity, with_child=True)
