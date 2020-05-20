@@ -39,8 +39,6 @@ urlpatterns = [
     url(r'^copy_element/$', program_management.views.tree.copy_cut.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
-            url(u'^attach/', program_management.views.tree.attach.PasteElementFromCacheToSelectedTreeNode.as_view(),
-                name='education_group_attach'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
