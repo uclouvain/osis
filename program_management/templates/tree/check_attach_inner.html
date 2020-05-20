@@ -1,5 +1,4 @@
-{% load static %}
-{% load i18n %}
+{% load bootstrap3 i18n static %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -24,4 +23,11 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% include "education_group/blocks/modal/modal_pedagogy_edit.html" %}
+<div class="modal-content" id="form-modal-content">
+    <div class="modal-body">
+        {% include 'template_messages.html' %}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+    </div>
+</div>

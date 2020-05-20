@@ -29,6 +29,7 @@ from typing import List, Dict, Any
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from osis_common.decorators.deprecated import deprecated
 from education_group.models.group_year import GroupYear
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
@@ -48,6 +49,7 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
+@deprecated  # use ProgramTreeVersionRepository.get() instead
 def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
     try:
         education_group_version = EducationGroupVersion.objects\
@@ -73,10 +75,12 @@ def load_version(acronym: str, year: int, version_name: str, transition: bool) -
     )
 
 
+@deprecated  # use ProgramTreeRepository.get() instead
 def load(tree_root_id: int) -> 'ProgramTree':
     return load_trees([tree_root_id])[0]
 
 
+@deprecated  # use ProgramTreeRepository.search() instead
 def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     trees = []
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
@@ -98,6 +102,7 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     return trees
 
 
+# FIXME :: to move into ProgramTreeRepository.search()
 def load_trees_from_children(
         child_element_ids: list,
         link_type: LinkTypes = None

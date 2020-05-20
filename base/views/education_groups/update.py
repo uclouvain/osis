@@ -49,7 +49,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
-from program_management.forms.group_element_year import GroupElementYearFormset
+from program_management.forms.tree.attach import GroupElementYearFormset
 
 
 def get_education_group_year_by_pk(request, root_id, education_group_year_id):
