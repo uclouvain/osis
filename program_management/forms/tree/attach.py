@@ -100,12 +100,10 @@ class AttachNodeForm(forms.Form):
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
 
-    def __init__(self, to_path: str, node_to_attach_id: int,
-                 node_to_attach_type: NodeType, path_to_detach: str, **kwargs):
+    def __init__(self, to_path: str, node_to_attach_id: int, node_to_attach_type: NodeType, **kwargs):
         self.to_path = to_path
         self.node_id = node_to_attach_id
         self.node_type = node_to_attach_type
-        self.path_to_detach = path_to_detach
         super().__init__(**kwargs)
 
     def clean_block(self):

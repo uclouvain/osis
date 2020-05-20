@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 
 from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -51,9 +51,8 @@ from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
-from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.repositories import load_node
-from program_management.ddd.service import attach_node_service, command, detach_node_service
+from program_management.ddd.service import attach_node_service, command
 from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
     BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
@@ -64,25 +63,9 @@ class AttachMultipleNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Su
     template_name = "tree/attach_inner.html"
     permission_required = "base.can_attach_node"
 
-    def has_permission(self):
-        return self._has_permission_to_detach() & super().has_permission()
-
-    def _has_permission_to_detach(self) -> bool:
-        if not self.get_path_to_detach():
-            return True
-        obj_to_detach_id = int(self.get_path_to_detach().split("|")[-2])
-        obj_to_detach = shortcuts.get_object_or_404(EducationGroupYear, pk=obj_to_detach_id)
-        return self.request.user.has_perms(("base.can_detach_node",), obj_to_detach)
-
     def get_permission_object(self) -> EducationGroupYear:
         node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
         return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
-
-    def get_path_to_detach(self) -> Optional[Path]:
-        link_to_detach = fetch_source_link(self.request.GET, self.request.user)  # type: GroupElementYear
-        if not link_to_detach:
-            return None
-        return "|".join([str(link_to_detach.parent.pk), str(link_to_detach.child.pk)])
 
     @cached_property
     def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
@@ -103,7 +86,6 @@ class AttachMultipleNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Su
             'node_to_attach_type': node_type,
             'node_to_attach_id': node_id,
             'path_of_node_to_attach_from': self.request.GET['path'],
-            'path_to_detach': self.get_path_to_detach(),
         }
 
     def get_form(self, form_class=None):
@@ -119,16 +101,9 @@ class AttachMultipleNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Su
         )
         context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
                                        for node_id, node_type in self.nodes_to_attach}
-        if self.get_path_to_detach():
-            self.check_detach_errors()
         if not self.nodes_to_attach:
             display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data
-
-    def check_detach_errors(self):
-        message_list = detach_node_service.detach_node(self.get_path_to_detach(), commit=False)
-        if message_list.contains_errors():
-            display_error_messages(self.request, message_list)
 
     def form_valid(self, formset: AttachNodeFormSet):
         messages = formset.save()
