@@ -30,11 +30,11 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
-from base.business.education_groups.perms import is_eligible_to_change_education_group_content
 from base.models import program_manager
 from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
+from osis_role.errors import get_permission_error
 
 register = template.Library()
 
