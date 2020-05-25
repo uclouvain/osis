@@ -17,6 +17,7 @@ class MiniTrainingReadGeneralInformation(MiniTrainingRead):
         return {
             **super().get_context_data(**kwargs),
             "sections": self.get_sections(),
+            "update_label_url": self.get_update_label_url(),
             "publish_url": reverse('publish_general_information', args=[node.year, node.code]) +
             "?path={}".format(self.get_path()),
             "can_edit_information":
@@ -28,6 +29,10 @@ class MiniTrainingReadGeneralInformation(MiniTrainingRead):
             "jury_members": self.get_jury_members(),
             "other_contacts": self.get_other_contacts()
         }
+
+    def get_update_label_url(self):
+        offer_id = self.get_education_group_version().offer_id
+        return reverse('education_group_pedagogy_edit', args=[offer_id, offer_id])
 
     def get_sections(self):
         return serializers.general_information.get_sections(self.get_object(), self.request.LANGUAGE_CODE)

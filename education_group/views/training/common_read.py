@@ -14,6 +14,7 @@ from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
+from program_management.forms.custom_xls import CustomXlsForm
 
 from program_management.ddd.business_types import *
 
@@ -71,6 +72,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             "education_group_version": self.education_group_version,
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.education_group_version.root_group
+            "form_xls_custom": CustomXlsForm(path=self.get_path()),
         }
 
     def get_permission_object(self):

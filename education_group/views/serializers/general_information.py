@@ -6,10 +6,25 @@ from django.db.models import OuterRef, Subquery, fields, F
 from base.business.education_groups import general_information_sections
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeGroupYear
+
+
+def get_sections_of_common(year: int, language_code: str):
+    reference_pk = EducationGroupYear.objects.get_common(academic_year__year=year).pk
+    labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
+
+    translated_labels = __get_translated_labels(reference_pk, labels, language_code)
+    sections = {}
+    for section in general_information_sections.SECTION_LIST:
+        for label in filter(lambda l: l in labels, section.labels):
+            translated_label = translated_labels.get(label)
+            sections.setdefault(section.title, []).append(translated_label)
+    return sections
 
 
 def get_sections(node: NodeGroupYear, language_code: str):
@@ -33,9 +48,16 @@ def get_sections(node: NodeGroupYear, language_code: str):
 
 def __get_specific_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_specific_labels(node)
-    reference_pk = node.pk
+    reference_pk = __get_reference_pk(node)
 
     return __get_translated_labels(reference_pk, labels, language_code)
+
+
+def __get_reference_pk(node: NodeGroupYear):
+    if node.category.name in GroupType.get_names():
+        return GroupYear.objects.get(element__pk=node.pk).pk
+    else:
+        return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
 
 
 def __get_specific_labels(node: NodeGroupYear) -> List[str]:

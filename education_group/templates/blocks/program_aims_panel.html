@@ -56,7 +56,13 @@
                     {% include "blocks/row_translation_side_by_side.html" %}
                 {% endwith %}
             </div>
-            <div class="col-md-1"></div>
+            <div class="col-md-1">
+                {% if can_edit_information %}
+                    <a class="trigger_modal pull-right" data-url="{{ program_aims_update_url }}" data-modal_class="modal-lg" title={% trans 'Edit' %}>
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
