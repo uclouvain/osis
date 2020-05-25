@@ -165,9 +165,9 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
 @login_required
 @require_http_methods(['GET', 'POST'])
 @can_change_general_information
-def education_group_year_pedagogy_edit(request, root_id, education_group_year_id):
+def education_group_year_pedagogy_edit(request, offer_id, education_group_year_id):
     if request.method == 'POST':
-        return education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id)
+        return education_group_year_pedagogy_edit_post(request, education_group_year_id, offer_id)
     return education_group_year_pedagogy_edit_get(request, education_group_year_id)
 
 
