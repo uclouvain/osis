@@ -72,5 +72,4 @@ class TrainingReadIdentification(TrainingRead):
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
 
     def get_training(self):
-        offer = self.education_group_version.offer
-        return TrainingRepository.get(TrainingIdentity(acronym=offer.acronym, year=offer.academic_year.year))
+        return TrainingRepository.get(TrainingIdentity(acronym=self.get_object().title, year=self.get_object().year))
