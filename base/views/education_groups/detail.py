@@ -178,6 +178,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
                 self.object.id,
                 node_type.NodeType.EDUCATION_GROUP
             )
+            context["node_path"] = program_tree.get_node_smallest_ordered_path(context["current_node"])
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = self.request.user.has_perm(
             'base.change_educationgroup',

@@ -39,7 +39,7 @@ from base.models.campus import Campus
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import find_authorized_types, EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import find_pedagogical_entities_version, get_last_version
+from base.models.entity_version import find_pedagogical_entities_version, get_last_version, EntityVersion
 from base.models.enums import education_group_categories, groups
 from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
@@ -72,8 +72,9 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
 
 
 class ManagementEntitiesVersionChoiceField(EntityRoleChoiceField):
-    def __init__(self, person, **kwargs):
+    def __init__(self, person, initial, **kwargs):
         group_names = (groups.FACULTY_MANAGER_GROUP, groups.CENTRAL_MANAGER_GROUP, )
+        self.initial = initial
         super().__init__(
             person=person,
             group_names=group_names,
@@ -82,7 +83,10 @@ class ManagementEntitiesVersionChoiceField(EntityRoleChoiceField):
         )
 
     def get_queryset(self):
-        return super().get_queryset().pedagogical_entities().order_by('acronym')
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+        if self.initial:
+            qs |= EntityVersion.objects.filter(pk=self.initial)
+        return qs
 
 
 class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
@@ -226,9 +230,12 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             self.initial['management_entity'] = get_last_version(self.instance.management_entity).pk
 
     def _filter_management_entity_according_to_person(self):
+        entity = self.instance.management_entity
         if 'management_entity' in self.fields:
             self.fields['management_entity'] = ManagementEntitiesVersionChoiceField(
-                person=self.user.person, disabled=self.fields['management_entity'].disabled
+                person=self.user.person,
+                disabled=self.fields['management_entity'].disabled,
+                initial=get_last_version(entity).pk if entity else None
             )
 
     def _disable_field(self, key, initial_value=None):

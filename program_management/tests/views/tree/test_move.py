@@ -77,21 +77,21 @@ class TestUp(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
     def test_up_case_user_not_have_access(self, mock_permission):
         mock_permission.return_value = False
         response = self.client.post(self.url, self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
     def test_up_case_method_not_allowed(self, mock_permission):
         mock_permission.return_value = True
         response = self.client.get(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
     @mock.patch("program_management.ddd.service.order_link_service.up_link")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
     def test_up_case_success(self, mock_permission, mock_up):
         mock_permission.return_value = True
         http_referer = reverse(
@@ -171,21 +171,21 @@ class TestDown(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
     def test_down_case_user_not_have_access(self, mock_permission):
         mock_permission.return_value = False
         response = self.client.post(self.url, self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
     def test_down_case_method_not_allowed(self, mock_permission):
         mock_permission.return_value = True
         response = self.client.get(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
     @mock.patch("program_management.ddd.service.order_link_service.down_link")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("osis_role.contrib.permissions.ObjectPermissionBackend.has_perm")
     def test_down_case_success(self, mock_permission, mock_down):
         mock_permission.return_value = True
         http_referer = reverse(
