@@ -33,12 +33,10 @@
                 <div class="col-md-12">
                     <label id="label_{{ label.label_id }}"><b>{{ label.label_translated }}</b></label>
                     {% if can_edit_information and not label.common_label %}
-                        <a class="pedagogy-edit-btn" href="#">
-                           {# TODO: Fix URL update for pedagocical information #}
-                           <!-- data-form="{{ post_url }}?label={{ label.label_id }}"
-                           title="{% trans 'Edit' %}">-->
-                            <span class="glyphicon glyphicon-edit"
-                                  aria-hidden="true"></span>
+                        <a class="pedagogy-edit-btn trigger_modal" data-modal_class="modal-lg"
+                           data-url="{{update_label_url}}?label={{ label.label_id }}"
+                           title="{% trans 'Edit' %}">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                         </a>
                     {% endif %}
                 </div>

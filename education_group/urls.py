@@ -55,26 +55,26 @@ urlpatterns = [
             name='training_admission_condition'
         ),
     ])),
-    path('general_information/', include([
-        path('common/', general_information.CommonGeneralInformation, name="common_general_information"),
+    path('general_information/<int:year>/', include([
+        path('common/', general_information.CommonGeneralInformation.as_view(), name="common_general_information"),
         path(
             'common-bachelor/',
-            general_information.CommonBachelorAdmissionCondition,
+            general_information.CommonBachelorAdmissionCondition.as_view(),
             name="common_bachelor_admission_condition"
         ),
         path(
             'common-aggregate',
-            general_information.CommonAggregateAdmissionCondition,
+            general_information.CommonAggregateAdmissionCondition.as_view(),
             name="common_aggregate_admission_condition"
         ),
         path(
             'common-master',
-            general_information.CommonMasterAdmissionCondition,
+            general_information.CommonMasterAdmissionCondition.as_view(),
             name="common_master_admission_condition"
         ),
         path(
             'common-master-specialized',
-            general_information.CommonMasterSpecializedAdmissionCondition,
+            general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
             name="common_master_specialized_admission_condition"
         ),
     ])),
