@@ -31,7 +31,6 @@ from django.utils.translation import gettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
 from base.models import program_manager
-from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
 from osis_role.errors import get_permission_error
@@ -123,10 +122,6 @@ def button_order_with_permission(context, title, id_button, value):
     else:
         education_group_year = context.get('education_group_year')
         person = context.get('person')
-
-        if person.is_faculty_manager and education_group_year.type in GroupType.minor_major_list_choice():
-            title = _('The user is not allowed to change link data.')
-            disabled = "disabled"
 
     if value == "up" and context["forloop"]["first"]:
         disabled = "disabled"
