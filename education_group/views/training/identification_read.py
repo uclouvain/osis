@@ -24,7 +24,7 @@ class TrainingReadIdentification(TrainingRead):
         return {
             **super().get_context_data(**kwargs),
             "all_versions_available": self.all_versions_available,
-            "current_version": self.current_version,  # Template : panel_version_information.html
+            "current_version": self.current_version,
             "education_group_year": self.get_training(),
             "history": self.get_related_history(),
         }
