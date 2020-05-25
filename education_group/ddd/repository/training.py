@@ -48,7 +48,7 @@ from education_group.ddd.domain._academic_partner import AcademicPartner
 from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
-from education_group.ddd.domain._co_organization import CoOrganization
+from education_group.ddd.domain._co_organization import Coorganization
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -135,7 +135,7 @@ class TrainingRepository(interface.AbstractRepository):
         for coorg in obj.educationgrouporganization_set.all():
             first_address = coorg.organization.organizationaddress_set.all()[0]
             coorganizations.append(
-                CoOrganization(
+                Coorganization(
                     partner=AcademicPartner(
                         name=coorg.organization.name,
                         address=Address(

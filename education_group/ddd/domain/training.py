@@ -36,7 +36,7 @@ from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
-from education_group.ddd.domain._co_organization import CoOrganization
+from education_group.ddd.domain._co_organization import Coorganization
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -97,7 +97,7 @@ class Training(interface.RootEntity):
             funding: Funding = None,
             hops: HOPS = None,
             co_graduation: CoGraduation = None,
-            co_organizations: List[CoOrganization] = None,
+            co_organizations: List[Coorganization] = None,
             academic_type: AcademicTypes = None,
             duration_unit: DurationUnitsEnum = None,
     ):
