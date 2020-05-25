@@ -26,7 +26,7 @@
 import json
 
 import mock
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
@@ -69,13 +69,12 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    def test_permission_denied_when_learning_unit_not_contained_in_training(self):
+    def test_not_found_when_learning_unit_not_contained_in_training(self):
         other_education_group_year = TrainingFactory(academic_year=self.academic_year)
         url = reverse("learning_unit_prerequisite_update",
                       args=[other_education_group_year.id, self.learning_unit_year_child.id])
-
         response = self.client.get(url)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_permission_denied_when_context_not_a_formation(self):
         group_parent = GroupFactory(academic_year=self.academic_year)
