@@ -39,6 +39,7 @@ from education_group.api.serializers.education_group import EducationGroupSerial
 from education_group.models.group_year import GroupYear
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 from program_management.business.group_element_years import attach
+from program_management.ddd.repositories import load_node
 
 CACHE_TIMEOUT = 60
 
@@ -57,22 +58,25 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
 
     serializer_class = EducationGroupSerializer
 
+    @property
+    def node_id(self) -> int:
+        return int(self.kwargs["node_path"].split("|")[-1])
+
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        gy = get_object_or_404(GroupYear, element__pk=self.kwargs['child_element_id'])
-        kwargs["initial"] = {'academic_year': gy.academic_year_id}
+        node = load_node.load_node_education_group_year(self.node_id)
+        kwargs["initial"] = {'academic_year': node.year}
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_element_id'] = self.kwargs['root_element_id']
-        context['child_element_id'] = self.kwargs['child_element_id']
-        # TODO: Find a cleaner way use DDD
-        context['display_quick_search_luy_link'] = GroupYear.objects.filter(
-            element__pk=self.kwargs['child_element_id'],
-            education_group_type__category=education_group_categories.Categories.GROUP.name
-        ).exists()
+        context['root_id'] = self.kwargs['root_id']
+        context['education_group_year_id'] = self.node_id
+        context['display_quick_search_luy_link'] = attach.can_attach_learning_units(
+            EducationGroupYear.objects.get(id=self.node_id)
+        )
+        context['node_path'] = self.kwargs["node_path"]
         return context
 
     def render_to_response(self, context, **response_kwargs):
@@ -98,17 +102,22 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
 
     serializer_class = LearningUnitSerializer
 
+    @property
+    def node_id(self) -> int:
+        return int(self.kwargs["node_path"].split("|")[-1])
+
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)
-        gy = get_object_or_404(GroupYear, element__pk=self.kwargs['child_element_id'])
-        kwargs["initial"] = {'academic_year': gy.academic_year_id}
+        node = load_node.load_node_education_group_year(self.node_id)
+        kwargs["initial"] = {'academic_year': node.year}
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = context["filter"].form
-        context['root_element_id'] = self.kwargs['root_element_id']
-        context['child_element_id'] = self.kwargs['child_element_id']
+        context['root_id'] = self.kwargs['root_id']
+        context['education_group_year_id'] = self.node_id
+        context['node_path'] = self.kwargs["node_path"]
         return context
 
     def render_to_response(self, context, **response_kwargs):
