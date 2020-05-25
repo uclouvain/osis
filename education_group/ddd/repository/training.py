@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from django.db.models import Subquery, OuterRef, Prefetch
 
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity import Entity
@@ -49,6 +50,7 @@ from education_group.ddd.domain._address import Address
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import CoOrganization
+from education_group.ddd.domain._diploma import Diploma, DiplomaAim
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -117,6 +119,10 @@ class TrainingRepository(interface.AbstractRepository):
                     )
                 )
             ),
+            Prefetch(
+                'educationgroupcertificateaim_set',
+                EducationGroupCertificateAim.objects.all().select_related('certificate_aim')
+            ),
         )
 
         obj = qs.get()
@@ -149,6 +155,16 @@ class TrainingRepository(interface.AbstractRepository):
                     certificate_type=DiplomaCoorganizationTypes[coorg.diploma] if coorg.diploma else None,
                     is_producing_certificate=coorg.is_producing_cerfificate,
                     is_producing_certificate_annexes=coorg.is_producing_annexe,
+                )
+            )
+
+        certificate_aims = []
+        for aim in obj.educationgroupcertificateaim_set.all():
+            certificate_aims.append(
+                DiplomaAim(
+                    section=aim.certificate_aim.section,
+                    code=aim.certificate_aim.code,
+                    description=aim.certificate_aim.description,
                 )
             )
 
@@ -228,6 +244,12 @@ class TrainingRepository(interface.AbstractRepository):
             co_organizations=coorganizations,
             academic_type=AcademicTypes[obj.academic_type] if obj.academic_type else None,
             duration_unit=DurationUnitsEnum[obj.duration_unit] if obj.duration_unit else None,
+            diploma=Diploma(
+                leads_to_diploma=obj.joint_diploma,
+                printing_title=obj.diploma_printing_title,
+                professional_title=obj.professional_title,
+                aims=certificate_aims
+            )
         )
 
     @classmethod
