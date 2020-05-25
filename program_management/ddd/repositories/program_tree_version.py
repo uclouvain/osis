@@ -25,34 +25,42 @@
 ##############################################################################
 from typing import Optional, List
 
-from django.db.models import Q, F
+from django.db.models import F
 
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.models.education_group_version import EducationGroupVersion
-from program_management.models.element import Element
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
 
-    # @classmethod
-    # def get(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
-    #     search_result = cls.search(entity_ids=[entity_id])
-    #     if search_result:
-    #         return search_result[0]
+    @classmethod
+    def create(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
+        raise NotImplementedError
 
-    # @classmethod
-    # def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List['ProgramTreeVersion']:
-    #     if entity_ids:
-    #         return _search_by_entity_ids(entity_ids)
-    #     return []
+    @classmethod
+    def update(cls, entity: 'ProgramTreeVersion') -> 'ProgramTreeVersionIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def get(cls, entity_id: ProgramTreeVersionIdentity) -> 'ProgramTreeVersion':
+        raise NotImplementedError
+
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
+            **kwargs
+    ) -> List[ProgramTreeVersion]:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: 'ProgramTreeVersionIdentity') -> None:
+        raise NotImplementedError
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
@@ -87,27 +95,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
                         record_dict['is_transition'],
                     ),
                     program_tree_identity=ProgramTreeIdentity(root_node_identity.code, root_node_identity.year),
-                    program_tree_repository=ProgramTreeRepository,
+                    program_tree_repository=ProgramTreeRepository(),
                     title_fr=record_dict['version_title_fr'],
                     title_en=record_dict['version_title_en'],
                 )
             )
         return results
-
-
-# def _search_by_entity_ids(entity_ids) -> List['ProgramTreeVersion']:
-#     qs = Element.objects.all()
-#     filter_search_from = _build_where_clause(entity_ids[0])
-#     for identity in entity_ids[1:]:
-#         filter_search_from |= _build_where_clause(identity)
-#     qs = qs.filter(filter_search_from)
-#     # FIXME :: implement load_version into this function ProgramTreeVersionRepository.get()
-#     return load_tree.load_version(qs.values_list('pk', flat=True))
-#
-#
-# def _build_where_clause(program_version_identity: 'ProgramTreeVersionIdentity') -> Q:
-#     return Q(
-#         group_year__education_group_version__version_name=program_version_identity.version_name,
-#         group_year__education_group_version__education_group_year_id=program_version_identity.offer_id,
-#         group_year__education_group_version__is_transition=program_version_identity.is_transition,
-#     )
