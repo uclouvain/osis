@@ -55,22 +55,34 @@ class ProgramTreeVersionBuilder:
         raise NotImplementedError()
 
 
+# FIXME :: should be in a separate DDD domain
 class ProgramTreeVersion(interface.RootEntity):
 
     def __init__(
             self,
             entity_identity: 'ProgramTreeVersionIdentity',
+            program_tree_identity: 'ProgramTreeIdentity',
+            program_tree_repository: 'ProgramTreeRepository',
             offer: int = None,
             title_fr: str = None,
             title_en: str = None,
-            root_group = None
+            root_group = None,
+            tree: 'ProgramTree' = None
     ):
         super(ProgramTreeVersion, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
-        self.offer = offer
+        self.program_tree_identity = program_tree_identity
+        self.program_tree_repository = program_tree_repository
+        self.offer = offer  # FIXME :: to remove
         self.title_fr = title_fr
         self.title_en = title_en
         self.root_group = root_group
+        self.tree = tree
+
+    def get_tree(self) -> 'ProgramTree':
+        if not self.tree:
+            self.tree = self.program_tree_repository.get(self.program_tree_identity)
+        return self.tree
 
     @property
     def is_standard(self):

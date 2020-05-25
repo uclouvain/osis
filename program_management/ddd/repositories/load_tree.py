@@ -31,6 +31,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from osis_common.decorators.deprecated import deprecated
 from education_group.models.group_year import GroupYear
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
@@ -236,6 +237,7 @@ def __build_children(
     return children
 
 
+@deprecated  # use ProgramTreeVersionRepository.search_all_versions_from_root_node instead
 def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
     qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
         .select_related('offer').order_by('version_name')
