@@ -71,7 +71,7 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "education_group_version": self.education_group_version,
             # TODO: Remove when finished reoganized tempalate
-            "group_year": self.education_group_version.root_group
+            "group_year": self.education_group_version.root_group,
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
         }
 
