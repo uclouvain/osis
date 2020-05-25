@@ -237,12 +237,3 @@ class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity') -> None:
         raise NotImplementedError
-
-
-def test():
-    # from education_group.ddd.repository import training as t
-    # training.test()
-    from education_group.ddd.domain.training import TrainingIdentity
-    identity = TrainingIdentity(acronym='DROI2MS/KI', year=2020)
-    obj = TrainingRepository().get(identity)
-    return obj
