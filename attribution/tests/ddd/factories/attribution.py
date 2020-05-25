@@ -36,4 +36,6 @@ class AttributionFactory(factory.Factory):
         model = Attribution
         abstract = False
 
+    acronym = factory.Sequence(lambda n: 'Code-%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     teacher = factory.SubFactory(Teacher)

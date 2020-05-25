@@ -222,6 +222,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, CatalogGenericDet
         if program_tree:
             serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
+            context["current_node"] = program_tree.get_node_by_id_and_type(
+                self.object.id,
+                node_type.NodeType.EDUCATION_GROUP
+            )
+            context["node_path"] = program_tree.get_node_smallest_ordered_path(context["current_node"])
         return context
 
     def get_offer_context_data(self):
