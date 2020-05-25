@@ -1,7 +1,7 @@
 from typing import List
 
 from django.conf import settings
-from django.db.models import OuterRef, Subquery, fields, F, Value
+from django.db.models import OuterRef, Subquery, fields, F
 
 from base.business.education_groups import general_information_sections
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
@@ -12,6 +12,19 @@ from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeGroupYear
+
+
+def get_sections_of_common(year: int, language_code: str):
+    reference_pk = EducationGroupYear.objects.get_common(academic_year__year=year).pk
+    labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
+
+    translated_labels = __get_translated_labels(reference_pk, labels, language_code)
+    sections = {}
+    for section in general_information_sections.SECTION_LIST:
+        for label in filter(lambda l: l in labels, section.labels):
+            translated_label = translated_labels.get(label)
+            sections.setdefault(section.title, []).append(translated_label)
+    return sections
 
 
 def get_sections(node: NodeGroupYear, language_code: str):
