@@ -10,10 +10,12 @@ from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
+from education_group.models.group_year import GroupYear
 from education_group.views.training.common_read import TrainingRead, Tab
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class TrainingReadIdentification(TrainingRead):
@@ -58,7 +60,9 @@ class TrainingReadIdentification(TrainingRead):
             EducationGroupAchievement,
             EducationGroupDetailedAchievement,
             EducationGroupYearDomain,
-            EducationGroupCertificateAim
+            EducationGroupCertificateAim,
+            EducationGroupVersion,
+            GroupYear,
         ]
 
         subversion = Version.objects.none()
