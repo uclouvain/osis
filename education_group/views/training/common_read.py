@@ -13,6 +13,7 @@ from program_management.ddd.repositories import load_tree
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
+from program_management.forms.custom_xls import CustomXlsForm
 
 
 class Tab(Enum):
@@ -65,7 +66,8 @@ class TrainingRead(PermissionRequiredMixin, TemplateView):
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "education_group_version": self.get_education_group_version(),
             # TODO: Remove when finished reoganized tempalate
-            "group_year": self.get_education_group_version().root_group
+            "group_year": self.get_education_group_version().root_group,
+            "form_xls_custom": CustomXlsForm(path=self.get_path()),
         }
 
     def get_permission_object(self):
