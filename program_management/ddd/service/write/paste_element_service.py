@@ -23,44 +23,27 @@
 # ############################################################################
 from typing import List
 
-from program_management.ddd.business_types import *
 from program_management.ddd import command
+from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, load_node, persist_tree
 from program_management.ddd.service import detach_node_service
-from program_management.ddd.validators._authorized_relationship_for_all_trees import \
-    ValidateAuthorizedRelationshipForAllTrees
-from program_management.ddd.validators._validate_end_date_and_option_finality import \
-    ValidateEndDateAndOptionFinality
-from program_management.models.enums.node_type import NodeType
 
 
 def paste_element_service(paste_command: command.PasteElementCommand) -> List['BusinessValidationMessage']:
-    root_id = paste_command.root_id
-    type_node_to_attach = paste_command.node_to_paste_type
-    node_id_to_attach = paste_command.node_to_paste_id
-    path = paste_command.path_where_to_paste
-    path_to_detach = paste_command.path_where_to_detach
     commit = paste_command.commit
-
-    tree = load_tree.load(root_id)
-    node_to_attach = load_node.load_by_type(type_node_to_attach, element_id=node_id_to_attach)
-
-    validator = ValidateAuthorizedRelationshipForAllTrees(tree, node_to_attach, path)
-    validator.is_valid()
-    error_messages = validator.error_messages
-    if type_node_to_attach != NodeType.LEARNING_UNIT:
-        other_validator = ValidateEndDateAndOptionFinality(node_to_attach)
-        other_validator.is_valid()
-        error_messages += other_validator.error_messages
-    if error_messages:
-        return error_messages
+    path_to_detach = paste_command.path_where_to_detach
+    tree = load_tree.load(paste_command.root_id)
+    node_to_attach = load_node.load_by_type(
+        paste_command.node_to_paste_type,
+        element_id=paste_command.node_to_paste_id
+    )
 
     action_messages = []
     if path_to_detach:
-
         action_messages.extend(detach_node_service.detach_node(path_to_detach, commit=commit).errors)
 
     action_messages.extend(tree.paste_node(node_to_attach, paste_command))
+
     if commit:
         persist_tree.persist(tree)
     return action_messages

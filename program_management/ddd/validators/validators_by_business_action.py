@@ -40,6 +40,9 @@ from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequi
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
+from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateEndDateAndOptionFinality
+from program_management.ddd.validators._authorized_relationship_for_all_trees import \
+    ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
@@ -64,6 +67,8 @@ class PasteNodeValidatorList(BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
+                ValidateEndDateAndOptionFinality(node_to_paste),
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path)
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -74,6 +79,7 @@ class PasteNodeValidatorList(BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path),
                 AuthorizedLinkTypeValidator(tree.root_node, node_to_paste, link_type),
                 BlockValidator(block),
+                ValidateAuthorizedRelationshipForAllTrees(tree, node_to_paste, path)
             ]
 
         else:

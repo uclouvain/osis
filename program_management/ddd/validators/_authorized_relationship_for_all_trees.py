@@ -34,12 +34,12 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
     def __init__(
             self,
             tree: 'ProgramTree',
-            node_to_attach: 'Node',
+            node_to_paste: 'Node',
             path: 'Path'
     ) -> None:
         super().__init__()
         self.tree = tree
-        self.node_to_attach = node_to_attach
+        self.node_to_paste = node_to_paste
         self.path = path
 
     def validate(self, *args, **kwargs):
@@ -47,7 +47,7 @@ class ValidateAuthorizedRelationshipForAllTrees(BusinessValidator):
         trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
         for tree in trees:
             for parent_from_reference_link in tree.get_parents_using_node_as_reference(child_node):
-                validator = PasteAuthorizedRelationshipValidator(tree, self.node_to_attach, parent_from_reference_link)
+                validator = PasteAuthorizedRelationshipValidator(tree, self.node_to_paste, parent_from_reference_link)
                 if not validator.is_valid():
                     for msg in validator.error_messages:
                         self.add_error_message(msg.message)

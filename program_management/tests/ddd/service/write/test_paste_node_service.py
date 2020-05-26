@@ -65,7 +65,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
 
         self._patch_persist_tree()
         self._patch_load_tree()
-        self._patch_load_trees_from_children()
         self._patch_load_child_node_to_attach()
         self.paste_command = program_management.ddd.command.PasteElementCommand(
             root_id=self.tree.root_node.node_id,
@@ -100,11 +99,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_load = patcher_load.start()
         self.mock_load.return_value = self.node_to_paste
 
-    def _patch_load_trees_from_children(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load_tress_from_children = patcher_load.start()
-
     @patch.object(program_tree.ProgramTree, 'paste_node')
     def test_when_attach_node_action_is_valid(self, mock_attach_node):
         validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
@@ -120,40 +114,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         result = program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_used_as_reference_is_not_valid(self, mock_load):
-        link1 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
-        link2 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
-
-        mock_load.return_value = [
-            ProgramTreeFactory(root_node=link1.parent),
-            ProgramTreeFactory(root_node=link2.parent)
-        ]
-        self.mock_validator(PasteNodeValidatorList, [])
-        self.mock_validator(PasteAuthorizedRelationshipValidator, ['error link reference'])
-
-        result = paste_element_service.paste_element_service(self.paste_command)
-        self.assertEqual(len(result), 2)
-        self.assertEqual(result[0].message, 'error link reference')
-        self.assertEqual(result[0].level, MessageLevel.ERROR)
-
-    @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_used_as_reference_is_valid(self, mock_load):
-        link1 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
-        link2 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
-
-        mock_load.return_value = [
-            ProgramTreeFactory(root_node=link1.parent),
-            ProgramTreeFactory(root_node=link2.parent)
-        ]
-        self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        self.mock_validator(PasteAuthorizedRelationshipValidator, [])
-
-        result = paste_element_service.paste_element_service(self.paste_command)
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].message, _('Success message'))
-        self.assertEqual(result[0].level, MessageLevel.SUCCESS)
 
     def test_when_commit_is_true_then_persist_modification(self):
         self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
@@ -173,8 +133,12 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
             path_where_to_detach=None
         )
         paste_element_service.paste_element_service(paste_command_with_commit_set_to_true)
-        self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)
+
+    def test_when_commit_is_false_then_sould_not_persist_modification(self):
+        self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
+        program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
+        self.assertFalse(self.mock_persist.called)
 
     @mock.patch("program_management.ddd.service.detach_node_service.detach_node")
     def test_when_path_to_detach_is_set_then_should_call_detach_service(self, mock_detach):
@@ -197,11 +161,6 @@ class TestPasteNode(SimpleTestCase, ValidatorPatcherMixin):
         )
         paste_element_service.paste_element_service(paste_command_with_path_to_detach_set)
         self.assertTrue(mock_detach.called)
-
-    def test_when_commit_is_false_then_sould_not_persist_modification(self):
-        self.mock_validator(PasteNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
-        program_management.ddd.service.write.paste_element_service.paste_element_service(self.paste_command)
-        self.assertFalse(self.mock_persist.called)
 
 
 class TestCheckAttach(SimpleTestCase, ValidatorPatcherMixin):
