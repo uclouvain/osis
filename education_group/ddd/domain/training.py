@@ -37,6 +37,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization
+from education_group.ddd.domain._diploma import Diploma
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
@@ -100,6 +101,7 @@ class Training(interface.RootEntity):
             co_organizations: List[Coorganization] = None,
             academic_type: AcademicTypes = None,
             duration_unit: DurationUnitsEnum = None,
+            diploma: Diploma = None,
     ):
         super(Training, self).__init__(entity_id=entity_identity)
         self.entity_id = entity_identity
@@ -138,6 +140,7 @@ class Training(interface.RootEntity):
         self.co_graduation = co_graduation
         self.co_organizations = co_organizations
         self.academic_type = academic_type
+        self.diploma = diploma
 
     @property
     def acronym(self) -> str:

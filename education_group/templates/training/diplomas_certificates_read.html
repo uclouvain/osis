@@ -26,8 +26,46 @@
 
 {% block details %}
     <div class="row">
-        <div class="col-md-7">
-            TEST DIPLOMAS CERTIFICATES
+        <div class="col-md-12">
+
+            <div class="row">
+                <div id="leads_to_diploma" class="col-md-12">
+                    {% bootstrap_label _("Leads to diploma/certificate") label_class='d-block'%}
+                    <p>{{ training.diploma.leads_to_diploma|yesno|title }}</p>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="row">
+                <div id="leads_to_diploma" class="col-md-12">
+                    {% bootstrap_label _("Diploma title") label_class='d-block'%}
+                    <p>{{ training.diploma.printing_title }}</p>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="row">
+                <div id="leads_to_diploma" class="col-md-12">
+                    {% bootstrap_label _("Professionnal title") label_class='d-block'%}
+                    <p>{{ training.diploma.professional_title }}</p>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="row">
+                <div id="leads_to_diploma" class="col-md-12">
+                    {% bootstrap_label _("certificate aims") label_class='d-block'%}
+                    <ul>
+                        {% for aim in training.diploma.aims %}
+                            <li>{{ aim.section }} - {{ aim.code }} {{ aim.description }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 {% endblock details %}
