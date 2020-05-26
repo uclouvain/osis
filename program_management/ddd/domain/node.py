@@ -155,6 +155,9 @@ class Node(interface.Entity):
     def is_training(self) -> bool:
         return self.node_type in TrainingType.all()
 
+    def is_mini_training(self) -> bool:
+        return self.node_type in MiniTrainingType.all()
+
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
 

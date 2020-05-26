@@ -65,7 +65,7 @@ urlpatterns = [
         name="education_group_learning_units_is_prerequisite_for"
     ),
     url(
-        r'reporting/(?P<root_id>[0-9]+)/(?P<education_group_year_pk>[0-9]+)/contains/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/contains/$',
         excel.get_learning_units_of_training_for_excel,
         name="education_group_learning_units_contains"
     ),

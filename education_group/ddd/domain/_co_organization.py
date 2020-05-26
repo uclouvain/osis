@@ -28,7 +28,7 @@ from education_group.ddd.domain._academic_partner import AcademicPartner
 from osis_common.ddd import interface
 
 
-class CoOrganization(interface.ValueObject):
+class Coorganization(interface.ValueObject):
     def __init__(
             self,
             partner: AcademicPartner,
