@@ -10,7 +10,7 @@ class TrainingReadDiplomaCertificate(TrainingRead):
     def get_context_data(self, **kwargs):
         return {
             **super().get_context_data(**kwargs),
-            "education_group_year": self.get_training(),
+            "training": self.get_training(),
         }
 
     def get_training(self):
