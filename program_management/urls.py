@@ -81,7 +81,7 @@ urlpatterns = [
     path('<int:root_id>/', include([
         path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
         path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        path('attach/', tree.paste.PasteNodesView.as_view(), name='tree_attach_node'),
+        path('attach/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
         path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
         path('move/', tree.paste.PasteNodesView.as_view(), name='group_element_year_move'),
         path('<int:link_id>/', include([
@@ -89,7 +89,7 @@ urlpatterns = [
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
         ])),
         path('check_attach/', program_management.views.tree.paste.CheckPasteView.as_view(),
-             name="check_education_group_attach"),
+             name="check_education_group_paste"),
         path('<str:node_path>/quick_search/', include([
             path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
             path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),

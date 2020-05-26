@@ -189,7 +189,7 @@ class EducationGroupHierarchy:
                 'element_id': self.education_group_year.pk,
                 'element_type': self.element_type,
                 'title': self.education_group_year.acronym,
-                'attach_url': reverse('tree_attach_node', args=[self.root.pk]),
+                'attach_url': reverse('tree_paste_node', args=[self.root.pk]),
                 'detach_url': reverse('group_element_year_delete', args=[
                     self.root.pk, self.education_group_year.pk, self.group_element_year.pk
                 ]) if self.group_element_year else '#',

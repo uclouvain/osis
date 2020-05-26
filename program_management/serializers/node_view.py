@@ -57,7 +57,7 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None
         'element_id': link.child.pk,
         'element_type': link.child.type.name,
         'title': link.child.code,
-        'attach_url': reverse('tree_attach_node', args=[context['root'].pk]) + "?path=%s" % path,
+        'attach_url': reverse('tree_paste_node', args=[context['root'].pk]) + "?path=%s" % path,
         'detach_url': reverse('tree_detach_node', args=[context['root'].pk]) + "?path=%s" % path,
         'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
         'attach_disabled': False,

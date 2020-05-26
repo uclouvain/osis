@@ -166,7 +166,7 @@ class CheckPasteView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin,
 
         if not error_messages:
             return redirect(
-                reverse("tree_attach_node", args=[self.kwargs["root_id"]]) + "?{}".format(self.request.GET.urlencode())
+                reverse("tree_paste_node", args=[self.kwargs["root_id"]]) + "?{}".format(self.request.GET.urlencode())
             )
 
         display_error_messages(self.request, error_messages)

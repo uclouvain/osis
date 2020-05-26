@@ -67,7 +67,7 @@ class TestAttachNodeView(TestCase):
 
     def setUp(self):
         self.tree = self.setUpTreeData()
-        self.url = reverse("tree_attach_node", kwargs={'root_id': self.tree.root_node.pk})
+        self.url = reverse("tree_paste_node", kwargs={'root_id': self.tree.root_node.pk})
         self.client.force_login(self.person.user)
 
         fetch_tree_patcher = mock.patch('program_management.ddd.repositories.load_tree.load', return_value=self.tree)
@@ -197,7 +197,7 @@ class TestAttachCheckView(TestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
 
-        cls.url = reverse("check_education_group_attach", args=["12"])
+        cls.url = reverse("check_education_group_paste", args=["12"])
         cls.path = "12|25|98"
 
     def setUp(self):
@@ -265,7 +265,7 @@ class TestAttachCheckView(TestCase):
             "path": self.path
         })
         qd.setlist("id", [36, 89])
-        expected_url = reverse("tree_attach_node", args=[12]) + "?{}".format(qd.urlencode())
+        expected_url = reverse("tree_paste_node", args=[12]) + "?{}".format(qd.urlencode())
         self.assertRedirects(
             response,
             expected_url,
