@@ -29,16 +29,17 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet
 
-import program_management.ddd
 from base.ddd.utils import validation_message
 from base.forms.utils import choice_field
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd import command
 from program_management.ddd.repositories import load_node, load_authorized_relationship
+from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators import _block_validator
 from program_management.models.enums.node_type import NodeType
 
 
-class AttachNodeFormSet(BaseFormSet):
+class PasteNodesFormset(BaseFormSet):
 
     def get_form_kwargs(self, index):
         if self.form_kwargs:
@@ -52,13 +53,13 @@ class AttachNodeFormSet(BaseFormSet):
         ))
 
 
-def attach_form_factory(
+def paste_form_factory(
         self,
         path_of_node_to_attach_from: str,
         node_to_attach_id: int,
         node_to_attach_type: NodeType,
         **kwargs
-) -> 'AttachNodeForm':
+) -> 'PasteNodeForm':
     form_class = _get_form_class(path_of_node_to_attach_from, node_to_attach_id, node_to_attach_type)
     return form_class(path_of_node_to_attach_from, node_to_attach_id, node_to_attach_type, **kwargs)
 
@@ -67,24 +68,24 @@ def _get_form_class(
         path_of_node_to_attach_from: str,
         node_to_attach_id: int,
         node_to_attach_type: NodeType
-) -> Type['AttachNodeForm']:
+) -> Type['PasteNodeForm']:
     node_to_attach_from_id = int(path_of_node_to_attach_from.split("|")[-1])
     node_to_attach_from = load_node.load_by_type(NodeType.EDUCATION_GROUP, node_to_attach_from_id)
     node_to_attach = load_node.load_by_type(node_to_attach_type, node_to_attach_id)
     authorized_relationship = load_authorized_relationship.load()
 
     if node_to_attach_from.is_minor_major_list_choice():
-        return AttachToMinorMajorListChoiceForm
+        return PasteToMinorMajorListChoiceForm
     elif node_to_attach.node_type == NodeType.LEARNING_UNIT:
-        return AttachLearningUnitForm
+        return PasteLearningUnitForm
     elif node_to_attach_from.is_training() and node_to_attach.is_minor_major_list_choice():
-        return AttachMinorMajorListChoiceToTrainingForm
+        return PasteMinorMajorListChoiceToTrainingForm
     elif not authorized_relationship.is_authorized(node_to_attach_from.node_type, node_to_attach.node_type):
-        return AttachNotAuthorizedChildren
-    return AttachNodeForm
+        return PasteNotAuthorizedChildren
+    return PasteNodeForm
 
 
-class AttachNodeForm(forms.Form):
+class PasteNodeForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     is_mandatory = forms.BooleanField(required=False)
     block = forms.IntegerField(required=False, widget=forms.widgets.TextInput)
@@ -93,7 +94,14 @@ class AttachNodeForm(forms.Form):
     comment_english = forms.CharField(widget=forms.widgets.Textarea, required=False)
     relative_credits = forms.IntegerField(widget=forms.widgets.TextInput, required=False)
 
-    def __init__(self, to_path: str, node_to_attach_id: int, node_to_attach_type: NodeType, path_to_detach: str = None, **kwargs):
+    def __init__(
+            self,
+            to_path: str,
+            node_to_attach_id: int,
+            node_to_attach_type: NodeType,
+            path_to_detach: str = None,
+            **kwargs
+    ):
         self.to_path = to_path
         self.node_id = node_to_attach_id
         self.node_type = node_to_attach_type
@@ -110,14 +118,14 @@ class AttachNodeForm(forms.Form):
     def save(self) -> List[validation_message.BusinessValidationMessage]:
         result = []
         if self.is_valid():
-            result = program_management.ddd.service.write.paste_element_service.paste_element_service(self._get_attach_request())
+            result = paste_element_service.paste_element_service(self._create_paste_command())
             if result:
                 self.add_error(None, result)
         return result
 
-    def _get_attach_request(self) -> program_management.ddd.command.PasteElementCommand:
+    def _create_paste_command(self) -> command.PasteElementCommand:
         root_id = int(self.to_path.split("|")[0])
-        return program_management.ddd.command.PasteElementCommand(
+        return command.PasteElementCommand(
             root_id=root_id,
             node_id_to_attach=self.node_id,
             type_of_node_to_attach=self.node_type,
@@ -134,12 +142,12 @@ class AttachNodeForm(forms.Form):
         )
 
 
-class AttachLearningUnitForm(AttachNodeForm):
+class PasteLearningUnitForm(PasteNodeForm):
     access_condition = None
     link_type = None
 
 
-class AttachMinorMajorListChoiceToTrainingForm(AttachNodeForm):
+class PasteMinorMajorListChoiceToTrainingForm(PasteNodeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -151,7 +159,7 @@ class AttachMinorMajorListChoiceToTrainingForm(AttachNodeForm):
                 field.disabled = True
 
 
-class AttachToMinorMajorListChoiceForm(AttachNodeForm):
+class PasteToMinorMajorListChoiceForm(PasteNodeForm):
     is_mandatory = None
     block = None
     link_type = None
@@ -159,9 +167,9 @@ class AttachToMinorMajorListChoiceForm(AttachNodeForm):
     comment_english = None
     relative_credits = None
 
-    def _get_attach_request(self) -> program_management.ddd.command.PasteElementCommand:
+    def _create_paste_command(self) -> command.PasteElementCommand:
         root_id = int(self.to_path.split("|")[0])
-        return program_management.ddd.command.PasteElementCommand(
+        return command.PasteElementCommand(
             root_id=root_id,
             node_id_to_attach=self.node_id,
             type_of_node_to_attach=self.node_type,
@@ -178,6 +186,6 @@ class AttachToMinorMajorListChoiceForm(AttachNodeForm):
         )
 
 
-class AttachNotAuthorizedChildren(AttachNodeForm):
+class PasteNotAuthorizedChildren(PasteNodeForm):
     access_condition = None
     relative_credits = None

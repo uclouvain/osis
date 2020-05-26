@@ -47,13 +47,13 @@ from base.utils.cache import ElementCache
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.forms.tree.paste import AttachNodeFormSet, AttachNodeForm
+from program_management.forms.tree.paste import PasteNodesFormset, PasteNodeForm
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
 
 
-def form_valid_effect(formset: AttachNodeFormSet):
+def form_valid_effect(formset: PasteNodesFormset):
     for form in formset:
         form.cleaned_data = {}
     return True
@@ -83,7 +83,7 @@ class TestAttachNodeView(TestCase):
 
         self.get_form_class_patcher = mock.patch(
             'program_management.forms.tree.paste._get_form_class',
-            return_value=AttachNodeForm
+            return_value=PasteNodeForm
         )
         self.get_form_class_patcher.start()
         self.addCleanup(self.get_form_class_patcher.stop)
@@ -132,9 +132,9 @@ class TestAttachNodeView(TestCase):
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
-        self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
+        self.assertIsInstance(response.context['formset'], PasteNodesFormset)
         self.assertEqual(len(response.context['formset'].forms), 1)
-        self.assertIsInstance(response.context['formset'].forms[0], AttachNodeForm)
+        self.assertIsInstance(response.context['formset'].forms[0], PasteNodeForm)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     def test_get_method_when_multiple_education_group_year_element_are_selected(self, mock_cache_elems):
@@ -152,11 +152,11 @@ class TestAttachNodeView(TestCase):
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
-        self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
+        self.assertIsInstance(response.context['formset'], PasteNodesFormset)
         self.assertEqual(len(response.context['formset'].forms), 2)
 
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
-    @mock.patch('program_management.forms.tree.paste.AttachNodeFormSet.is_valid')
+    @mock.patch('program_management.forms.tree.paste.PasteNodesFormset.is_valid')
     def test_post_method_case_formset_invalid(self, mock_formset_is_valid, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
@@ -168,11 +168,11 @@ class TestAttachNodeView(TestCase):
 
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
-        self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
+        self.assertIsInstance(response.context['formset'], PasteNodesFormset)
 
     @mock.patch('program_management.ddd.service.write.paste_element_service.paste_element_service')
-    @mock.patch.object(AttachNodeFormSet, 'is_valid', new=form_valid_effect)
-    @mock.patch.object(AttachNodeForm, 'is_valid')
+    @mock.patch.object(PasteNodesFormset, 'is_valid', new=form_valid_effect)
+    @mock.patch.object(PasteNodeForm, 'is_valid')
     @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
     def test_post_method_case_formset_valid(self, mock_cache_elems, mock_form_valid, mock_service):
         mock_form_valid.return_value = True

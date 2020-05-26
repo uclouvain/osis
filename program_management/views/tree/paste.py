@@ -49,7 +49,7 @@ from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service, detach_node_service
 from program_management.ddd.service.read import element_selected_service
-from program_management.forms.tree.paste import AttachNodeFormSet, attach_form_factory, AttachToMinorMajorListChoiceForm
+from program_management.forms.tree.paste import PasteNodesFormset, paste_form_factory, PasteToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
 
 
@@ -86,7 +86,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         )
 
     def get_form_class(self):
-        return formset_factory(form=attach_form_factory, formset=AttachNodeFormSet, extra=len(self.nodes_to_attach))
+        return formset_factory(form=paste_form_factory, formset=PasteNodesFormset, extra=len(self.nodes_to_attach))
 
     def get_form_kwargs(self) -> List[dict]:
         return [self._get_form_kwargs(node_id, node_type) for node_id, node_type in self.nodes_to_attach]
@@ -127,7 +127,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         if message_list.contains_errors():
             display_error_messages(self.request, message_list)
 
-    def form_valid(self, formset: AttachNodeFormSet):
+    def form_valid(self, formset: PasteNodesFormset):
         messages = formset.save()
         if BusinessValidationMessage.contains_errors(messages):
             return self.form_invalid(formset)
@@ -136,7 +136,7 @@ class PasteNodesView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageM
         return super().form_valid(formset)
 
     def _is_parent_a_minor_major_list_choice(self, formset):
-        return any(isinstance(form, AttachToMinorMajorListChoiceForm) for form in formset)
+        return any(isinstance(form, PasteToMinorMajorListChoiceForm) for form in formset)
 
     def get_success_message(self, cleaned_data):
         return _("The content has been updated.")
