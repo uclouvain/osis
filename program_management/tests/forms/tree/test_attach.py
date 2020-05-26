@@ -29,6 +29,7 @@ import factory.fuzzy
 from django.test import SimpleTestCase, TestCase
 from django.utils.translation import gettext as _
 
+import program_management.forms.tree.paste
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -39,7 +40,8 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree import attach
-from program_management.forms.tree.attach import AttachNodeForm, GroupElementYearForm
+from program_management.forms.tree.attach import GroupElementYearForm
+from program_management.forms.tree.paste import AttachNodeForm
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory, \
     AuthorizedRelationshipObjectFactory
@@ -69,8 +71,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         relationships = AuthorizedRelationshipListFactory()
         self._mock_load_authorized_relationships(relationships)
 
-        form = attach.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
-        self.assertIsInstance(form, attach.AttachLearningUnitForm)
+        form = program_management.forms.tree.paste.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        self.assertIsInstance(form, program_management.forms.tree.paste.AttachLearningUnitForm)
 
     def test_form_returned_when_relationship_is_not_authorized(self):
         path = "9|4|5"
@@ -83,8 +85,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = attach.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
-        self.assertIsInstance(form, attach.AttachNotAuthorizedChildren)
+        form = program_management.forms.tree.paste.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        self.assertIsInstance(form, program_management.forms.tree.paste.AttachNotAuthorizedChildren)
 
     def test_form_returned_when_parent_is_minor_major_list_choice(self):
         path = "6"
@@ -104,8 +106,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = attach.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
-        self.assertIsInstance(form, attach.AttachToMinorMajorListChoiceForm)
+        form = program_management.forms.tree.paste.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        self.assertIsInstance(form, program_management.forms.tree.paste.AttachToMinorMajorListChoiceForm)
 
     def test_form_returned_when_parent_is_training_and_child_is_minor_major_list_choice(self):
         path = "65|589"
@@ -124,8 +126,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = attach.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
-        self.assertIsInstance(form, attach.AttachMinorMajorListChoiceToTrainingForm)
+        form = program_management.forms.tree.paste.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        self.assertIsInstance(form, program_management.forms.tree.paste.AttachMinorMajorListChoiceToTrainingForm)
 
     def test_return_base_form_when_no_special_condition_met(self):
         path = "36"
@@ -142,8 +144,8 @@ class TestAttachNodeFormFactory(SimpleTestCase):
         )
         self._mock_load_authorized_relationships(relationships)
 
-        form = attach.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
-        self.assertEqual(type(form), attach.AttachNodeForm)
+        form = program_management.forms.tree.paste.attach_form_factory(None, path, node_to_attach.node_id, node_to_attach.node_type)
+        self.assertEqual(type(form), program_management.forms.tree.paste.AttachNodeForm)
 
 
 class TestAttachNodeForm(SimpleTestCase):
@@ -188,7 +190,7 @@ class TestAttachNodeForm(SimpleTestCase):
 class TestAttachNodeFormFields(SimpleTestCase):
     def test_attach_node_form_base_fields(self):
         node_to_attach = NodeEducationGroupYearFactory()
-        form = attach.AttachNodeForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.AttachNodeForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
         expected_fields = [
             'relative_credits',
@@ -203,7 +205,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_learning_unit_form_should_remove_access_condition_and_link_type_field(self):
         node_to_attach = NodeLearningUnitYearFactory()
-        form = attach.AttachLearningUnitForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.AttachLearningUnitForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
 
         self.assertNotIn("access_condition", actual_fields)
@@ -211,7 +213,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_to_minor_major_list_choice_should_remove_all_fields_but_access_condition(self):
         node_to_attach = NodeEducationGroupYearFactory()
-        form = attach.AttachToMinorMajorListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.AttachToMinorMajorListChoiceForm("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
         expected_fields = ["access_condition"]
 
@@ -219,7 +221,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_minor_major_list_choice_to_training_form_should_disable_all_fields_but_block(self):
         node_to_attach = NodeEducationGroupYearFactory()
-        form = attach.AttachMinorMajorListChoiceToTrainingForm("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.AttachMinorMajorListChoiceToTrainingForm("", node_to_attach.node_id, node_to_attach.node_type)
 
         expected_fields_disabled = ["block"]
         actual_fields_disabled = [name for name, field in form.fields.items() if not field.disabled]
@@ -227,7 +229,7 @@ class TestAttachNodeFormFields(SimpleTestCase):
 
     def test_attach_not_authorized_children_should_remove_relative_credits_and_access_condition(self):
         node_to_attach = NodeEducationGroupYearFactory()
-        form = attach.AttachNotAuthorizedChildren("", node_to_attach.node_id, node_to_attach.node_type)
+        form = program_management.forms.tree.paste.AttachNotAuthorizedChildren("", node_to_attach.node_id, node_to_attach.node_type)
         actual_fields = form.fields
 
         self.assertNotIn("access_condition", actual_fields)

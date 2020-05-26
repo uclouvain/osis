@@ -47,7 +47,7 @@ from base.utils.cache import ElementCache
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
+from program_management.forms.tree.paste import AttachNodeFormSet, AttachNodeForm
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory, \
     NodeGroupYearFactory
@@ -75,14 +75,14 @@ class TestAttachNodeView(TestCase):
         self.addCleanup(fetch_tree_patcher.stop)
 
         self.fetch_from_cache_patcher = mock.patch(
-            'program_management.business.group_element_years.management.fetch_nodes_selected',
+            'program_management.ddd.service.read.element_selected_service.retrieve_element_selected',
             return_value=[]
         )
         self.fetch_from_cache_patcher.start()
         self.addCleanup(self.fetch_from_cache_patcher.stop)
 
         self.get_form_class_patcher = mock.patch(
-            'program_management.forms.tree.attach._get_form_class',
+            'program_management.forms.tree.paste._get_form_class',
             return_value=AttachNodeForm
         )
         self.get_form_class_patcher.start()
@@ -155,8 +155,8 @@ class TestAttachNodeView(TestCase):
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
         self.assertEqual(len(response.context['formset'].forms), 2)
 
-    @mock.patch('program_management.business.group_element_years.management.fetch_nodes_selected')
-    @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid')
+    @mock.patch('program_management.ddd.service.read.element_selected_service.retrieve_element_selected')
+    @mock.patch('program_management.forms.tree.paste.AttachNodeFormSet.is_valid')
     def test_post_method_case_formset_invalid(self, mock_formset_is_valid, mock_cache_elems):
         subgroup_to_attach = NodeGroupYearFactory(node_type=GroupType.SUB_GROUP)
         mock_cache_elems.return_value = [(subgroup_to_attach.node_id, subgroup_to_attach.node_type)]
@@ -204,7 +204,7 @@ class TestAttachCheckView(TestCase):
         self.client.force_login(self.person.user)
 
         patcher_fetch_nodes_selected = mock.patch(
-            "program_management.business.group_element_years.management.fetch_nodes_selected"
+            "program_management.ddd.service.read.element_selected_service.retrieve_element_selected"
         )
         mock_fetch_nodes_selected = patcher_fetch_nodes_selected.start()
         mock_fetch_nodes_selected.return_value = [(36, NodeType.EDUCATION_GROUP), (89, NodeType.EDUCATION_GROUP)]
@@ -303,6 +303,12 @@ class TestMoveGroupElementYearView(TestCase):
         self.addCleanup(ElementCache(self.person.user).clear)
 
     def test_should_check_attach_and_detach_permission(self):
+        AuthorizedRelationshipFactory(
+            parent_type=self.selected_egy.education_group_type,
+            child_type=self.group_element_year.child_branch.education_group_type,
+            min_count_authorized=0,
+            max_count_authorized=None
+        )
         ElementCache(self.person.user).save_element_selected(
             self.group_element_year.child_branch,
             source_link_id=self.group_element_year.id

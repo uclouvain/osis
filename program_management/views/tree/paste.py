@@ -49,8 +49,7 @@ from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.repositories import load_node
 from program_management.ddd.service import attach_node_service, detach_node_service
 from program_management.ddd.service.read import element_selected_service
-from program_management.forms.tree.attach import AttachNodeFormSet, attach_form_factory, \
-    AttachToMinorMajorListChoiceForm
+from program_management.forms.tree.paste import AttachNodeFormSet, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
 
 
