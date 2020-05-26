@@ -38,6 +38,19 @@
     {% navigation_education_group request.user object request.resolver_match.url_name %}
 {% endblock %}
 
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block bottom_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+
 {% block tabs %}
     <ul class="nav nav-tabs" role="tablist">
         {% for _, tab_url in tab_urls.items %}
@@ -49,3 +62,6 @@
         {% endfor %}
     </ul>
 {% endblock %}
+
+{# No tree on common context #}
+{% block sidebar %}{% endblock %}

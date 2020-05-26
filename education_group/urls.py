@@ -63,17 +63,17 @@ urlpatterns = [
             name="common_bachelor_admission_condition"
         ),
         path(
-            'common-aggregate',
+            'common-aggregate/',
             general_information.CommonAggregateAdmissionCondition.as_view(),
             name="common_aggregate_admission_condition"
         ),
         path(
-            'common-master',
+            'common-master/',
             general_information.CommonMasterAdmissionCondition.as_view(),
             name="common_master_admission_condition"
         ),
         path(
-            'common-master-specialized',
+            'common-master-specialized/',
             general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
             name="common_master_specialized_admission_condition"
         ),

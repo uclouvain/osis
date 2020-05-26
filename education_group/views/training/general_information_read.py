@@ -1,11 +1,10 @@
-from django.conf import settings
-from django.db.models import OuterRef, F, Subquery, fields
+import functools
+
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
-from cms.models.text_label import TextLabel
-from cms.models.translated_text import TranslatedText
-from cms.models.translated_text_label import TranslatedTextLabel
+from base.models.enums.publication_contact_type import PublicationContactType
+from education_group.views import serializers
 from education_group.views.training.common_read import TrainingRead, Tab
 
 
@@ -17,29 +16,51 @@ class TrainingReadGeneralInformation(TrainingRead):
         node = self.get_object()
         return {
             **super().get_context_data(**kwargs),
-            "labels": self.get_translated_labels(),
+            "sections": self.get_sections(),
+            "update_label_url": self.get_update_label_url(),
             "publish_url": reverse('publish_general_information', args=[node.year, node.code]) +
             "?path={}".format(self.get_path()),
             "can_edit_information":
-                self.request.user.has_perm("base.change_pedagogyinformation", self.education_group_version.offer)
+                self.request.user.has_perm("base.change_pedagogyinformation", self.education_group_version.offer),
+            "show_contacts": self.can_have_contacts(),
+            "entity_contact": self.get_entity_contact(),
+            "academic_responsibles": self.get_academic_responsibles(),
+            "other_academic_responsibles": self.get_other_academic_responsibles(),
+            "jury_members": self.get_jury_members(),
+            "other_contacts": self.get_other_contacts()
         }
 
-    def get_translated_labels(self):
-        subqstranslated_fr = TranslatedText.objects.filter(reference=self.get_object().pk, text_label=OuterRef('pk'),
-                                                           language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-        subqstranslated_en = TranslatedText.objects.filter(reference=self.get_object().pk, text_label=OuterRef('pk'),
-                                                           language=settings.LANGUAGE_CODE_EN).values('text')[:1]
-        subqslabel = TranslatedTextLabel.objects.filter(
-            text_label=OuterRef('pk'),
-            language=self.request.LANGUAGE_CODE
-        ).values('label')[:1]
+    def get_update_label_url(self):
+        offer_id = self.education_group_version.offer_id
+        return reverse('education_group_pedagogy_edit', args=[offer_id, offer_id])
 
-        qs = TextLabel.objects.filter(
-            label=general_information_sections.INTRODUCTION,
-        ).annotate(
-            label_id=F('label'),
-            label_translated=Subquery(subqslabel, output_field=fields.CharField()),
-            text_fr=Subquery(subqstranslated_fr, output_field=fields.CharField()),
-            text_en=Subquery(subqstranslated_en, output_field=fields.CharField())
-        ).values('label_id', 'label_translated', 'text_fr', 'text_en')
-        return qs
+    def get_sections(self):
+        return serializers.general_information.get_sections(self.get_object(), self.request.LANGUAGE_CODE)
+
+    def can_have_contacts(self):
+        node = self.get_object()
+        return general_information_sections.CONTACTS in \
+            general_information_sections.SECTIONS_PER_OFFER_TYPE[node.category.name]['specific']
+
+    def get_entity_contact(self):
+        return getattr(
+            self.education_group_version.offer.publication_contact_entity_version,
+            'verbose_title',
+            None
+        )
+
+    def get_academic_responsibles(self):
+        return self._get_contacts().get(PublicationContactType.ACADEMIC_RESPONSIBLE.name) or []
+
+    def get_other_academic_responsibles(self):
+        return self._get_contacts().get(PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name) or []
+
+    def get_jury_members(self):
+        return self._get_contacts().get(PublicationContactType.JURY_MEMBER.name) or []
+
+    def get_other_contacts(self):
+        return self._get_contacts().get(PublicationContactType.OTHER_CONTACT.name) or []
+
+    @functools.lru_cache()
+    def _get_contacts(self):
+        return serializers.general_information.get_contacts(self.get_object())
